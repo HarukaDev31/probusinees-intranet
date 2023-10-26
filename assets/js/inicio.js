@@ -5,7 +5,6 @@ $( function() {
 	$('#form-login')[0].reset();
 	$('#form-login_empresa')[0].reset();
 	$('#form-recuperar_cuenta')[0].reset();
-	$('#form-crear_cuenta')[0].reset();
 
 	// valid email pattern
 	var eregex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -147,77 +146,6 @@ $( function() {
 		submitHandler: form_recuperar_cuenta
 	});
 
-	$("#form-crear_cuenta").validate({
-		rules: {
-			Nu_Tipo_Proveedor_FE: {
-				required: true,
-			},
-			ID_Tipo_Documento_Identidad: {
-				required: true,
-			},
-			Nu_Documento_Identidad: {
-				required: true,
-			},
-			Nu_Celular: {
-				required: true,
-				minlength: 11,
-				maxlength: 11
-			},
-			Txt_Email: {
-				required: true,
-				validemail: true
-			},
-			No_Nombres_Apellidos: {
-				required: true,
-			},
-			ID_Tipo_Rubro_Empresa: {
-				required: true,
-			},
-			Nu_Tipo_Plan_Lae_Gestion: {
-				required: true,
-			},
-		},
-		messages: {
-			Nu_Tipo_Proveedor_FE: {
-				required: "Seleccionar",
-			},
-			ID_Tipo_Documento_Identidad: {
-				required: "Seleccionar",
-			},
-			Nu_Documento_Identidad: {
-				required: "Ingresar RUC / DNI / OTROS",
-			},
-			Nu_Celular: {
-				required: "Ingresar celular",
-				minlength: "Debe ingresar 9 dígitos",
-				maxlength: "Debe ingresar 9 dígitos"
-			},
-			Txt_Email: {
-				required: "Ingresar correo",
-				validemail: "Ingresar un correo válido"
-			},
-			No_Nombres_Apellidos: {
-				required: "Ingresar Nombres y Apellidos",
-			},
-			ID_Tipo_Rubro_Empresa: {
-				required: "Seleccionar",
-			},
-			Nu_Tipo_Plan_Lae_Gestion: {
-				required: "Seleccionar",
-			},
-		},
-		errorPlacement: function (error, element) {
-			$(element).closest('.form-group').find('.help-block').html(error.html());
-		},
-		highlight: function (element) {
-			$(element).closest('.form-group').removeClass('has-success').addClass('has-error');
-		},
-		unhighlight: function (element, errorClass, validClass) {
-			$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
-			$(element).closest('.form-group').find('.help-block').html('');
-		},
-		submitHandler: form_crear_cuenta
-	});
 	
     $("#form-cambiar_clave").validate({
 		rules:{
@@ -358,49 +286,7 @@ $( function() {
 		}
 	})
 
-	$('.panel-heading').removeClass('hidden-xs');
-	$("#btn-crear_cuenta").click(function () {
-		$('.panel-heading').addClass('hidden-xs');
-
-		$('.form-group').removeClass('has-error');
-
-		$('.help-block').empty();
-		$('.form-group').removeClass('has-error');
-		$('#form-crear_cuenta')[0].reset();
-
-		$('#cbo-TiposDocumentoIdentidad').html('');
-
-		url = base_url + 'LoginController/getTiposDocumentoIdentidad';
-		$.post(url, function (response) {
-			$('#cbo-TiposDocumentoIdentidad').html('<option value="">- Seleccionar -</option>');
-			for (var i = 0; i < response.length; i++) {
-				if (response[i]['ID_Tipo_Documento_Identidad'] == 2 || response[i]['ID_Tipo_Documento_Identidad'] == 4 || response[i]['ID_Tipo_Documento_Identidad'] == 1)
-					$('#cbo-TiposDocumentoIdentidad').append('<option value="' + response[i]['ID_Tipo_Documento_Identidad'] + '" data-nu_cantidad_caracteres="' + response[i]['Nu_Cantidad_Caracteres'] + '">' + response[i]['No_Tipo_Documento_Identidad_Breve'] + '</option>');
-			}
-		}, 'JSON');
-
-		$('#cbo-rubro').html('');
-
-		url = base_url + 'LoginController/getValoresTablaDato';
-		$.post(url, { sTipoData: 'Tipo_Rubro_Empresa' }, function (response) {
-			if (response.sStatus == 'success') {
-				var iTotalRegistros = response.arrData.length, response = response.arrData;
-				$('#cbo-rubro').html('<option value="" selected="selected">- Seleccionar -</option>');
-				for (var i = 0; i < iTotalRegistros; i++)
-					$('#cbo-rubro').append('<option value="' + response[i].Nu_Valor + '">' + response[i].No_Descripcion + '</option>');
-			} else {
-				$('#cbo-rubro').html('<option value="0" selected="selected">- Vacío -</option>');
-			}
-		}, 'JSON');
-
-		$('#div-login').addClass('div-ocultar');
-		$('#div-empresa').addClass('div-ocultar');
-		$('#div-recuperar_cuenta').addClass('div-ocultar');
-		$('#div-crear_cuenta').removeClass('div-ocultar');
-
-		$('.div-msg').html('');
-	})
-	
+	$('.panel-heading').removeClass('hidden-xs');	
 	$( '#cbo-Empresas' ).change(function(){
 		$( '#modal-loader' ).modal('show');
 		url = base_url + 'HelperController/getOrganizaciones';
@@ -620,45 +506,5 @@ function form_cambiar_clave() {
     		$( '#btn-cambiar_clave' ).text('Cambiar contraseña');
 		    $( '#btn-cambiar_clave' ).attr('disabled', false);
 		}
-	});
-}
-
-function form_crear_cuenta() {
-	$('#btn-guardar_cuenta').text('');
-	$('#btn-guardar_cuenta').attr('disabled', true);
-	$('#btn-guardar_cuenta').append('Creando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>');
-	var url = base_url + 'LoginController/crear_cuenta';
-	$.ajax({
-		type: 'POST',
-		dataType: 'JSON',
-		url: url,
-		data: $('#form-crear_cuenta').serialize(),
-		success: function (response) {
-			if (response.status == "error") {
-				$('.div-msg').slideDown('fast', function () {
-					$('.div-msg').html('<div class="alert alert-danger">' + response.message + '</div>');
-				});
-
-				$('#div-crear_cuenta').removeClass('div-ocultar');
-				$('#div-crear_cuenta_cuentas_bancarias').addClass('div-ocultar');
-			} else {
-				$('.div-msg').slideDown('fast', function () {
-					$('.div-msg').html('<div class="alert alert-success">' + response.message +'</div>');
-				});
-
-				$('#div-crear_cuenta').addClass('div-ocultar');
-				$('#div-crear_cuenta_cuentas_bancarias').removeClass('div-ocultar');
-			}
-
-			$('#btn-guardar_cuenta').text('Crear cuenta');
-			$('#btn-guardar_cuenta').attr('disabled', false);
-		}
-	})
-	.fail(function (jqXHR, textStatus, errorThrown) {
-		$('#btn-guardar_cuenta').text('Crear cuenta');
-		$('#btn-guardar_cuenta').attr('disabled', false);
-
-		//Message for developer
-		console.log(jqXHR.responseText);
 	});
 }
