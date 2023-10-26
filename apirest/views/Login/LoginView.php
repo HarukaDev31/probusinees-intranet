@@ -169,7 +169,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               </div>
           </div>
         </div><!--FIN row-->
-    </div>
+    </div><!-- container -->
   </div>
   <script type="text/javascript" src="<?php echo base_url("assets/js/jquery-3.2.1.min.js"); ?>"></script>
   <script type="text/javascript" src="<?php echo base_url("plugins_v2/bootstrap/js/bootstrap.bundle.min.js"); ?>"></script>
