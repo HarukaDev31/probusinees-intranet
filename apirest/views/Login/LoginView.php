@@ -371,10 +371,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </div><!--FIN Container-->
   </div>
   <script type="text/javascript" src="<?php echo base_url("assets/js/jquery-3.2.1.min.js"); ?>"></script>
-  <script type="text/javascript" src="<?php echo base_url("bower_components/bootstrap/dist/js/bootstrap.min.js"); ?>"></script>
+  <script type="text/javascript" src="<?php echo base_url("plugins_v2/bootstrap/js/bootstrap.bundle.min.js"); ?>"></script>
   <script type="text/javascript" src="<?php echo base_url("assets/js/jquery.validate.min.js"); ?>"></script>
-  <!--<script type="text/javascript" src="<?php echo base_url("bower_components/select2/dist/js/select2.full.min.js"); ?>"></script>-->
-  <script type="text/javascript" src="<?php echo base_url() . 'plugins/input-mask/jquery.inputmask.js'; ?>"></script>
+  <script type="text/javascript" src="<?php echo base_url("plugins/input-mask/jquery.inputmask.js"); ?>"></script>
   <script type="text/javascript" src="<?php echo base_url("assets/js/inicio.js?ver=2.4.20"); ?>"></script>
   <script> var base_url = '<?php echo base_url(); ?>'; </script>
 </body>
