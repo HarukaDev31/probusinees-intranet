@@ -9,7 +9,7 @@
   <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
-<?php $iControlVersionDashboard = '2.58.0'; ?>
+<?php $iControlVersionDashboard = '2.60.0'; ?>
 <!-- jQuery 3 -->
 <script src="<?php echo base_url() . 'bower_components/jquery/dist/jquery.min.js'; ?>"></script>
 <!-- jQuery UI 1.11.4 -->
@@ -583,6 +583,13 @@ var base_url = '<?php echo base_url(); ?>';
 <script src="<?php echo base_url() . 'assets/js/summernote.min.js';?>"></script>
 
 <script src="<?php echo base_url() . 'dist/js/Proveedores/pedido_proveedor.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<!-- Folder: Logistica -->
+<?php if (isset($js_producto_importacion) && $js_producto_importacion==true) : ?>
+<link rel="stylesheet" href="<?php echo base_url() . 'assets/css/summernote.min.css'; ?>">
+<script src="<?php echo base_url() . 'assets/js/summernote.min.js';?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/Logistica/ReglasLogistica/producto_importacion.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <!-- Ticket Modal -->

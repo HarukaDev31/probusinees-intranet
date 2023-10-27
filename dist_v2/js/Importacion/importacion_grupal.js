@@ -1,6 +1,46 @@
 var url, table_Entidad;
+//AUTOCOMPLETE
+var caractes_no_validos_global_autocomplete = "\"'~!@%^\|";
+// Se puede crear un arreglo a partir de la cadena
+let search_global_autocomplete = caractes_no_validos_global_autocomplete.split('');
+// Solo tomé algunos caracteres, completa el arreglo
+let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
+//28 caracteres
+// FIN AUTOCOMPLETE
 
 $(function () {
+  //Global Autocomplete
+  $( '.autocompletar' ).autoComplete({
+    minChars: 0,
+    source: function (term, response) {
+      term = term.trim();
+      if (term.length > 2) {
+        var term = term.toLowerCase();
+        $.post( base_url + 'AutocompleteImportacionController/globalAutocomplete', { global_search : term }, function( arrData ){
+          response(arrData);
+        }, 'JSON');
+      }
+    },
+    renderItem: function (item, search){
+      search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+      return '<div title="' + caracteresValidosAutocomplete(item.Nombre) + '" class="autocomplete-suggestion" data-id="' + item.ID + '" data-codigo="' + item.Codigo + '" data-nombre="' + caracteresValidosAutocomplete(item.Nombre) + '" data-val="' + search + '">' + caracteresValidosAutocomplete(item.Nombre).replace(re, "<b>$1</b>") + '</div>';
+    },
+    onSelect: function(e, term, item){
+      $( '#txt-AID' ).val(item.data('id'));
+      $( '#txt-ACodigo' ).val(item.data('codigo'));
+      $('#txt-ANombre').val(item.data('nombre'));
+
+			arrItemVentaTemporal={
+				id:item.data('id'),
+				codigo:item.data('codigo'),
+				nombre:item.data('nombre'),
+      }
+      
+			agregarItemVentaTemporal(arrItemVentaTemporal);
+    }
+  });
+
   //Date picker
   $('#fecha_inicio').datetimepicker({
     maxDate: moment(),
@@ -157,6 +197,11 @@ $(function () {
 		submitHandler: form_Entidad
 	});
   
+	$( '#table-Producto_Enlace tbody' ).on('click', '#btn-deleteProductoEnlace', function(){
+    $(this).closest ('tr').remove();
+    if ($( '#table-Producto_Enlace >tbody >tr' ).length == 0)
+	    $( '#table-Producto_Enlace' ).hide();
+	})
 })
 
 function agregarCliente(){
@@ -169,6 +214,9 @@ function agregarCliente(){
   $( '.div-AgregarEditar' ).show();
 		
   $( '[name="EID_Importacion_Grupal"]' ).val('');
+
+	$( '#table-Producto_Enlace tbody' ).empty();
+  $( '#table-Producto_Enlace' ).hide();
 
   url = base_url + 'HelperController/getMonedas';
   $.post( url , function( responseMonedas ){
@@ -190,12 +238,18 @@ function verCliente(ID){
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
 
+	$( '#table-Producto_Enlace tbody' ).empty();
+  $( '#table-Producto_Enlace' ).show();
+
   url = base_url + 'Importacion/ImportacionGrupal/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
     dataType: "JSON",
     success: function(response){
+      var detalle = response;
+      response = response[0];
+
       $( '.div-AgregarEditar' ).show();
             
       $( '[name="EID_Importacion_Grupal"]' ).val(response.ID_Importacion_Grupal);
@@ -227,6 +281,17 @@ function verCliente(ID){
         $( '#cbo-Estado' ).append( '<option value="' + i + '" ' + selected + '>' + (i == 0 ? 'Inactivo' : 'Activo') + '</option>' );
       }
       
+      var table_enlace_producto = "";
+      for (i = 0; i < detalle.length; i++) {
+        table_enlace_producto +=
+        "<tr id='tr_enlace_producto" + detalle[i]['ID_Producto'] + "'>"
+          + "<td style='display:none;' class='text-left td-id_item'>" + detalle[i]['ID_Producto'] + "</td>"
+          + "<td class='text-left td-name'>" + detalle[i]['No_Producto'] + "</td>"
+          + "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
+          table_enlace_producto += '<input type="hidden" name="addProducto[' + detalle[i]['ID_Producto'] + '][id_item]" value="' + detalle[i]['ID_Producto'] + '">';
+        table_enlace_producto += "</tr>";
+      }
+      $( '#table-Producto_Enlace' ).append(table_enlace_producto);
     },
     error: function (jqXHR, textStatus, errorThrown) {
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
@@ -243,55 +308,61 @@ function verCliente(ID){
 }
 
 function form_Entidad(){
-  $( '#btn-save' ).text('');
-  $( '#btn-save' ).attr('disabled', true);
-  $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-  
-  url = base_url + 'Importacion/ImportacionGrupal/crudCliente';
-  $.ajax({
-    type		  : 'POST',
-    dataType	: 'JSON',
-    url		    : url,
-    data		  : $('#form-Cliente').serialize(),
-    success : function( response ){      
-      $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-      $( '#modal-message' ).modal('show');
-      
-      if (response.status == 'success'){
-        $( '#form-Cliente' )[0].reset();
+  if ($( '#table-Producto_Enlace >tbody >tr' ).length == 0) {
+    $( '#txt-ANombre' ).closest('.form-group').find('.help-block').html('Elegir al menos 1 producto');
+    $( '#txt-ANombre' ).closest('.form-group').removeClass('has-success').addClass('has-error');
+    $( '#txt-ANombre' ).focus();
+  } else {
+    $( '#btn-save' ).text('');
+    $( '#btn-save' ).attr('disabled', true);
+    $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+    
+    url = base_url + 'Importacion/ImportacionGrupal/crudCliente';
+    $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : $('#form-Cliente').serialize(),
+      success : function( response ){      
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        $( '#modal-message' ).modal('show');
         
-        $( '.div-AgregarEditar' ).hide();
-        $( '.div-Listar' ).show();
-        $( '.modal-message' ).addClass(response.style_modal);
-        $( '.modal-title-message' ).text(response.message);
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
-        reload_table_Entidad();
-      } else {
-        $( '.modal-message' ).addClass(response.style_modal);
-        $( '.modal-title-message' ).text(response.message);
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+        if (response.status == 'success'){
+          $( '#form-Cliente' )[0].reset();
+          
+          $( '.div-AgregarEditar' ).hide();
+          $( '.div-Listar' ).show();
+          $( '.modal-message' ).addClass(response.style_modal);
+          $( '.modal-title-message' ).text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+          reload_table_Entidad();
+        } else {
+          $( '.modal-message' ).addClass(response.style_modal);
+          $( '.modal-title-message' ).text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+        }
+        
+        $( '#btn-save' ).text('');
+        $( '#btn-save' ).append( 'Guardar' );
+        $( '#btn-save' ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+        console.log(jqXHR.responseText);
+        
+        $( '#btn-save' ).text('');
+        $( '#btn-save' ).append( 'Guardar' );
+        $( '#btn-save' ).attr('disabled', false);
       }
-      
-      $( '#btn-save' ).text('');
-      $( '#btn-save' ).append( 'Guardar' );
-      $( '#btn-save' ).attr('disabled', false);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-      
-      $( '#modal-message' ).modal('show');
-      $( '.modal-message' ).addClass( 'modal-danger' );
-      $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-      setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-      
-      //Message for developer
-      console.log(jqXHR.responseText);
-      
-      $( '#btn-save' ).text('');
-      $( '#btn-save' ).append( 'Guardar' );
-      $( '#btn-save' ).attr('disabled', false);
-    }
-  });
+    });
+  }
 }
 
 function eliminarCliente(ID_Empresa, ID, Nu_Documento_Identidad){
@@ -319,7 +390,7 @@ function _eliminarCliente($modal_delete, ID_Empresa, ID, Nu_Documento_Identidad)
     url       : url,
     type      : "GET",
     dataType  : "JSON",
-    success: function( response ){      
+    success: function( response ){
       $modal_delete.modal('hide');
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
   	  $( '#modal-message' ).modal('show');
@@ -348,4 +419,45 @@ function _eliminarCliente($modal_delete, ID_Empresa, ID, Nu_Documento_Identidad)
       console.log(jqXHR.responseText);
     },
   });
+}
+
+function caracteresValidosAutocomplete(msg) {
+  // Recorrer todos los caracteres
+  search_global_autocomplete.forEach((char, index) => {
+    // Remplazar cada caracter en la cadena
+    msg = msg.replaceAll(char, replace_global_autocomplete[index]);
+  });
+  return msg;
+}
+
+function agregarItemVentaTemporal(arrParams){
+  var table_enlace_producto =
+  "<tr id='tr_enlace_producto" + arrParams.id + "'>"
+    + "<td style='display:none;' class='text-left td-id_item'>" + arrParams.id + "</td>"
+    + "<td class='text-left td-name'>" + arrParams.nombre + "</td>"
+    + "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
+    table_enlace_producto += '<input type="hidden" name="addProducto[' + arrParams.id + '][id_item]" value="' + arrParams.id + '">';
+  table_enlace_producto += "</tr>";
+  
+  if( isExistTableTemporalProducto(arrParams.id) ){
+    $( '#txt-ANombre' ).closest('.form-group').find('.help-block').html('Ya existe <b>' + arrParams.nombre + '</b>');
+    $( '#txt-ANombre' ).closest('.form-group').removeClass('has-success').addClass('has-error');
+    $( '#txt-AID' ).val('');
+    $( '#txt-ACodigo' ).val('');
+    $( '#txt-ANombre' ).val('');
+    
+    $( '#txt-ANombre' ).focus();
+  } else {
+    $( '#table-Producto_Enlace' ).show();
+    $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+    $( '#txt-AID' ).val('');
+    $( '#txt-ACodigo' ).val('');
+    $( '#txt-ANombre' ).val('');
+    
+    $( '#txt-ANombre' ).focus();
+  }
+}
+
+function isExistTableTemporalProducto($id){
+  return Array.from($('tr[id*=tr_enlace_producto]')).some(element => ($('td:nth(0)',$(element)).html()==$id));
 }

@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"); ?>">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=1.0.0'; ?>">
 </head>
 <body class="hold-transition sidebar-mini">
   <input type="hidden" id="hidden-sDirectory" name="sDirectory" class="form-control" value="<?php echo $this->router->directory; ?>">
@@ -72,6 +73,7 @@
         <li class="nav-item">
           <a class="nav-link" href="<?php echo base_url() . 'LoginController/logout'; ?>" role="button">
             <i class="fas fa-power-off"></i>
+            Cerrar
           </a>
         </li>
       </ul>

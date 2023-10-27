@@ -62,9 +62,9 @@ class ImportacionGrupal extends CI_Controller {
 		);
 		echo json_encode(
 		$this->input->post('EID_Importacion_Grupal') != '' ?
-			$this->ImportacionGrupalModel->actualizarCliente(array('ID_Importacion_Grupal' => $this->input->post('EID_Importacion_Grupal')), $data)
+			$this->ImportacionGrupalModel->actualizarCliente(array('ID_Importacion_Grupal' => $this->input->post('EID_Importacion_Grupal')), $data, $this->input->post('addProducto'))
 		:
-			$this->ImportacionGrupalModel->agregarCliente($data)
+			$this->ImportacionGrupalModel->agregarCliente($data, $this->input->post('addProducto'))
 		);
 	}
     

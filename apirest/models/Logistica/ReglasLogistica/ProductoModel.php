@@ -362,9 +362,8 @@ class ProductoModel extends CI_Model{
     }
     
     public function get_by_id($ID){
-    	$this->db->select('PRO.*, ITEMSUNAT.ID_Tabla_Dato AS ID_Producto_Sunat, ITEMSUNAT.No_Descripcion AS No_Producto_Sunat');
+    	$this->db->select('PRO.*');
         $this->db->from($this->table . ' AS PRO');
-        $this->db->join($this->table_tabla_dato . ' AS ITEMSUNAT', 'ITEMSUNAT.ID_Tabla_Dato = PRO.ID_Producto_Sunat AND ITEMSUNAT.No_Relacion="Catalogo_Producto_Sunat"', 'left');
         $this->db->where('PRO.ID_Producto',$ID);
         $query = $this->db->get();
         return $query->row();
@@ -398,9 +397,9 @@ ENLAPRO.ID_Producto_Enlace = " . $ID;
 			$this->db->trans_begin();
 			
 			$Ss_Icbper = 0.00;
-			if ($data['ID_Tabla_Dato_Icbper'] == 2070)
-				$Ss_Icbper = $this->db->query("SELECT Nu_Valor FROM tabla_dato WHERE ID_Tabla_Dato=2070 LIMIT 1")->row()->Nu_Valor;
-			$data = array_merge($data, array("Ss_Icbper" => $Ss_Icbper));
+			//if ($data['ID_Tabla_Dato_Icbper'] == 2070)
+				//$Ss_Icbper = $this->db->query("SELECT Nu_Valor FROM tabla_dato WHERE ID_Tabla_Dato=2070 LIMIT 1")->row()->Nu_Valor;
+			//$data = array_merge($data, array("Ss_Icbper" => $Ss_Icbper));
 
 			$this->db->insert($this->table, $data);
 			$Last_ID_Producto = $this->db->insert_id();
@@ -477,9 +476,9 @@ ENLAPRO.ID_Producto_Enlace = " . $ID;
 			$this->db->trans_begin();
 			
 			$Ss_Icbper = 0.00;
-			if ($data['ID_Tabla_Dato_Icbper'] == 2070)
-				$Ss_Icbper = $this->db->query("SELECT Nu_Valor FROM tabla_dato WHERE ID_Tabla_Dato=2070 LIMIT 1")->row()->Nu_Valor;
-			$data = array_merge($data, array("Ss_Icbper" => $Ss_Icbper));
+			//if ($data['ID_Tabla_Dato_Icbper'] == 2070)
+				//$Ss_Icbper = $this->db->query("SELECT Nu_Valor FROM tabla_dato WHERE ID_Tabla_Dato=2070 LIMIT 1")->row()->Nu_Valor;
+			//$data = array_merge($data, array("Ss_Icbper" => $Ss_Icbper));
 			
 		    $this->db->update($this->table, $data, $where);
 

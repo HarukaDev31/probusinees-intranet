@@ -475,34 +475,29 @@ class ProductoController extends CI_Controller {
 			'ID_Empresa'				=> $this->user->ID_Empresa,
 			'Nu_Tipo_Producto'			=> $this->security->xss_clean($_POST['arrProducto']['Nu_Tipo_Producto']),
 			'ID_Tipo_Producto'			=> (!empty($_POST['arrProducto']['ID_Tipo_Producto']) ? $this->security->xss_clean($_POST['arrProducto']['ID_Tipo_Producto']) : 2),
-			'ID_Ubicacion_Inventario'	=> 1,
+			//'ID_Ubicacion_Inventario'	=> 1,
 			'Nu_Codigo_Barra'			=> $this->security->xss_clean(strtoupper($_POST['arrProducto']['Nu_Codigo_Barra'])),
-			'ID_Producto_Sunat'			=> $this->security->xss_clean($_POST['arrProducto']['ID_Producto_Sunat']),
+			//'ID_Producto_Sunat'			=> $this->security->xss_clean($_POST['arrProducto']['ID_Producto_Sunat']),
 			'No_Producto'				=> $_POST['arrProducto']['No_Producto'],
 			'Ss_Precio'	=> $this->security->xss_clean($_POST['arrProducto']['Ss_Precio']),
 			'Ss_Costo' => $this->security->xss_clean($_POST['arrProducto']['Ss_Costo']),
 			'No_Codigo_Interno'			=> $this->security->xss_clean(strtoupper($_POST['arrProducto']['No_Codigo_Interno'])),
 			'ID_Impuesto'				=> $this->security->xss_clean($_POST['arrProducto']['ID_Impuesto']),
-			'Nu_Lote_Vencimiento'		=> $this->security->xss_clean($_POST['arrProducto']['Nu_Lote_Vencimiento']),
+			//'Nu_Lote_Vencimiento'		=> $this->security->xss_clean($_POST['arrProducto']['Nu_Lote_Vencimiento']),
 			'ID_Unidad_Medida'			=> $this->security->xss_clean($_POST['arrProducto']['ID_Unidad_Medida']),
-			'ID_Impuesto_Icbper'		=> $this->security->xss_clean($_POST['arrProducto']['ID_Impuesto_Icbper']),
+			//'ID_Impuesto_Icbper'		=> $this->security->xss_clean($_POST['arrProducto']['ID_Impuesto_Icbper']),
 			'Nu_Compuesto'				=> $this->security->xss_clean($_POST['arrProducto']['Nu_Compuesto']),
 			'Nu_Estado'					=> $this->security->xss_clean($_POST['arrProducto']['Nu_Estado']),
-			'Txt_Ubicacion_Producto_Tienda'	=> $this->security->xss_clean($_POST['arrProducto']['Txt_Ubicacion_Producto_Tienda']),
+			//'Txt_Ubicacion_Producto_Tienda'	=> $this->security->xss_clean($_POST['arrProducto']['Txt_Ubicacion_Producto_Tienda']),
 			'Txt_Producto' => $_POST['arrProducto']['Txt_Producto'],
 			'Nu_Stock_Minimo' => $this->security->xss_clean($_POST['arrProducto']['Nu_Stock_Minimo']),
 			'Nu_Stock_Maximo' => $this->security->xss_clean($_POST['arrProducto']['Nu_Stock_Maximo']),
 			'Qt_CO2_Producto' => $this->security->xss_clean($_POST['arrProducto']['Qt_CO2_Producto']),
-			'Nu_Receta_Medica' => $this->security->xss_clean($_POST['arrProducto']['Nu_Receta_Medica']),
-			'ID_Laboratorio' => $this->security->xss_clean($_POST['arrProducto']['ID_Laboratorio']),
-			'ID_Tipo_Pedido_Lavado'	=> $this->security->xss_clean($_POST['arrProducto']['ID_Tipo_Pedido_Lavado']),
-			'Txt_Composicion' => $sComposicion,
+			//'Nu_Receta_Medica' => $this->security->xss_clean($_POST['arrProducto']['Nu_Receta_Medica']),
+			//'ID_Laboratorio' => $this->security->xss_clean($_POST['arrProducto']['ID_Laboratorio']),
+			//'ID_Tipo_Pedido_Lavado'	=> $this->security->xss_clean($_POST['arrProducto']['ID_Tipo_Pedido_Lavado']),
+			//'Txt_Composicion' => $sComposicion,
 			'No_Imagen_Item' => $sUrlProductoImagen,
-			'Ss_Precio_Ecommerce_Online_Regular' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Ecommerce_Online_Regular']),
-			'Ss_Precio_Ecommerce_Online' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Ecommerce_Online']),
-			'ID_Familia_Marketplace' => $this->security->xss_clean($_POST['arrProducto']['ID_Familia_Marketplace']),
-			'ID_Sub_Familia_Marketplace' => $this->security->xss_clean($_POST['arrProducto']['ID_Sub_Familia_Marketplace']),
-			'ID_Marca_Marketplace' => $this->security->xss_clean($_POST['arrProducto']['ID_Marca_Marketplace']),
 			'Nu_Activar_Precio_x_Mayor' => $Nu_Activar_Precio_x_Mayor
 		);
 
@@ -515,44 +510,18 @@ class ProductoController extends CI_Controller {
 		if ( !empty($_POST['arrProducto']['ID_Sub_Familia']) ){
 			$data_producto = array_merge($data_producto, array("ID_Sub_Familia" => $_POST['arrProducto']['ID_Sub_Familia']));
 		}
-		if ( $_POST['arrProducto']['Nu_Tipo_Producto'] == 1 && $_POST['arrProducto']['ID_Impuesto_Icbper'] == 1 ){
-			$data_producto = array_merge($data_producto, array("ID_Tabla_Dato_Icbper" => 2070));
-		} else {
-			$data_producto = array_merge($data_producto, array("ID_Tabla_Dato_Icbper" => 0));
-		}
 
-		if ( isset($_POST['arrProducto']['Nu_Favorito']) && $_POST['arrProducto']['Nu_Favorito'] != '' ){
-			$data_producto = array_merge($data_producto, array("Nu_Favorito" => $_POST['arrProducto']['Nu_Favorito']));
-		}
-		
-		if ( isset($_POST['arrProducto']['ID_Variante_Item_1']) ){
-			$data_producto = array_merge($data_producto, array("ID_Variante_Item_1" => $_POST['arrProducto']['ID_Variante_Item_1']));
-		}
-		
-		if ( isset($_POST['arrProducto']['ID_Variante_Item_Detalle_1']) ){
-			$data_producto = array_merge($data_producto, array("ID_Variante_Item_Detalle_1" => $_POST['arrProducto']['ID_Variante_Item_Detalle_1']));
-		}
-		
-		if ( isset($_POST['arrProducto']['ID_Variante_Item_2']) ){
-			$data_producto = array_merge($data_producto, array("ID_Variante_Item_2" => $_POST['arrProducto']['ID_Variante_Item_2']));
-		}
-		
-		if ( isset($_POST['arrProducto']['ID_Variante_Item_Detalle_2']) ){
-			$data_producto = array_merge($data_producto, array("ID_Variante_Item_Detalle_2" => $_POST['arrProducto']['ID_Variante_Item_Detalle_2']));
-		}
-		
-		if ( isset($_POST['arrProducto']['ID_Variante_Item_3']) ){
-			$data_producto = array_merge($data_producto, array("ID_Variante_Item_3" => $_POST['arrProducto']['ID_Variante_Item_3']));
-		}
-		
-		if ( isset($_POST['arrProducto']['ID_Variante_Item_Detalle_3']) ){
-			$data_producto = array_merge($data_producto, array("ID_Variante_Item_Detalle_3" => $_POST['arrProducto']['ID_Variante_Item_Detalle_3']));
-		}
+		//if ( isset($_POST['arrProducto']['Nu_Favorito']) && $_POST['arrProducto']['Nu_Favorito'] != '' ){
+			//$data_producto = array_merge($data_producto, array("Nu_Favorito" => $_POST['arrProducto']['Nu_Favorito']));
+		//}
 
-		$data_imagen = array(
-			'No_Producto_Imagen' => $sUrlProductoImagen,
-			'Imagen_Tamano'	=> $_POST['arrProducto']["Imagen_Tamano"],
-		);
+		$data_imagen = array();
+		if(isset($_POST['arrProducto']["Imagen_Tamano"])){
+			$data_imagen = array(
+				'No_Producto_Imagen' => $sUrlProductoImagen,
+				'Imagen_Tamano'	=> $_POST['arrProducto']["Imagen_Tamano"],
+			);
+		}
 
 		$arrProductoPrecioxMayor = 0;
 		if (isset($_POST['arrProductoPrecioxMayor']))

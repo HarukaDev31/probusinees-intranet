@@ -9,7 +9,7 @@
         
         <div class="col-sm-4 div-Listar">
           <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
-            <button type="button" class="btn btn-primary btn-block" onclick="agregarCliente()"><i class="fa fa-plus-circle"></i> Agregar</button>
+            <button type="button" class="btn btn-primary btn-block" onclick="agregarCliente()"><i class="fa fa-plus-circle"></i> Crear</button>
           <?php endif; ?>
         </div>
       </div>
@@ -110,28 +110,29 @@
                   </div>
                   
                   <div class="row">
-                    <div class="col-xs-12 col-sm-9 col-md-6">
+                    <div class="col-xs-12 col-sm-12 col-md-12">
                       <label>Producto</label>
                       <div class="form-group">
                         <input type="hidden" id="txt-AID" name="AID" class="form-control">
                         <input type="hidden" id="txt-ACodigo" name="ACodigo" class="form-control">
-                        <input type="text" id="txt-ANombre" name="ANombre" class="form-control autocompletar" data-global-class_method="AutocompleteController/globalAutocomplete" data-global-table="producto" placeholder="Buscar por Nombre / Código" value="" autocomplete="off">
-                        <span class="help-block" id="error"></span>
+                        <input type="text" id="txt-ANombre" name="ANombre" class="form-control autocompletar" placeholder="Buscar por Nombre / Código" value="" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
                     
-                    <div class="col-xs-12 col-sm-3 col-md-3">
-                      <label>Cantidad</label>
-                      <div class="form-group">
-                        <input type="tel" id="txt-Qt_Producto_Descargar" inputmode="decimal" name="Qt_Producto_Descargar" class="form-control input-decimal" placeholder="Ingresar cantidad" value="1" autocomplete="off">
-                        <span class="help-block" id="error"></span>
-                      </div>
-                    </div>
-                    
-                    <div class="col-xs-12 col-sm-12 col-md-3">
-                      <label class="hidden-xs">&nbsp;</label>
-                      <div class="form-group">
-                        <button type="button" id="btn-addProductosEnlaces" class="btn btn-success btn-block"> Agregar</button>
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                      <div class="table-responsive div-Compuesto">
+                        <table id="table-Producto_Enlace" class="table table-striped table-bordered">
+                          <thead>
+                            <tr>
+                              <th style='display:none;' class="text-left">ID</th>
+                              <th class="text-left">Nombre</th>
+                              <th class="text-center"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div><!-- ./Compuesto -->

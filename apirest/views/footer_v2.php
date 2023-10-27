@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.6'; ?>
+<?php $iControlVersionDashboard = '1.0.10'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -61,6 +61,8 @@
 <!-- date-range-picker -->
 <script src="<?php echo base_url("plugins_v2/daterangepicker/daterangepicker.js"); ?>"></script>
 <script src="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"); ?>"></script>
+
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/Importacion/importacion_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 

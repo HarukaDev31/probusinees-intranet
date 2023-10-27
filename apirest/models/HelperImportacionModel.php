@@ -10,5 +10,30 @@ class HelperImportacionModel extends CI_Model{
 			return array('No_Estado' => 'Activo','No_Class_Estado' => 'success');
 		return array('No_Estado' => 'Inactivo','No_Class_Estado' => 'danger');
 	}
+
+	public function getCategorias(){
+		$query = "SELECT ID_Familia AS ID, No_Familia AS Nombre FROM familia WHERE ID_Empresa = " . $this->user->ID_Empresa;
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'sStatus' => 'danger',
+				'sMessage' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'sStatus' => 'success',
+				'arrData' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'sStatus' => 'warning',
+			'sMessage' => 'No se encontro registro',
+		);
+	}
 }
 ?>
