@@ -92,7 +92,7 @@
                       </div>
                     </div>
 
-                    <div class="col-xs-6 col-sm-4 col-md-4 div-mas_opciones">
+                    <div class="col-xs-6 col-sm-4 col-md-4">
                       <label>Estado <span class="label-advertencia text-danger"> *</span></label>
                       <div class="form-group estado">
                         <select id="cbo-Estado" name="Nu_Estado" class="form-control required"></select>
@@ -103,7 +103,7 @@
                     <div class="col-xs-12 col-sm-12 col-md-12">
                       <label>Descripción</label></span>
                       <div class="form-group">
-                        <textarea name="Txt_Importacion_Grupal" class="form-control required" rows="1" placeholder="Opcional" maxlength="255"></textarea>
+                        <textarea name="Txt_Importacion_Grupal" class="form-control" rows="1" placeholder="Opcional" maxlength="255"></textarea>
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
