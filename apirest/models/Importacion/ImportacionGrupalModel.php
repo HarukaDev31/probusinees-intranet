@@ -52,7 +52,7 @@ class ImportacionGrupalModel extends CI_Model{
 			return array('status' => 'warning', 'style_modal' => 'modal-warning', 'message' => 'Tiene movimiento(s)');
 		} else {
 		*/
-			$this->db->where('ID_Entidad', $ID);
+			$this->db->where('ID_Importacion_Grupal', $ID);
             $this->db->delete($this->table);
 		    if ( $this->db->affected_rows() > 0 ) {
 		        return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro eliminado');

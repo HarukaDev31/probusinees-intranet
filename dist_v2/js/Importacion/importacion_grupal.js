@@ -3,11 +3,19 @@ var url, table_Entidad;
 $(function () {
   //Date picker
   $('#fecha_inicio').datetimepicker({
-    format: 'L'
+    maxDate: moment(),
+    allowInputToggle: true,
+    enabledHours : false,
+    locale: moment().local('es'),
+    format: 'DD/MM/YYYY'
   });
 
   $('#fecha_fin').datetimepicker({
-    format: 'L'
+    maxDate: moment(),
+    allowInputToggle: true,
+    enabledHours : false,
+    locale: moment().local('es'),
+    format: 'DD/MM/YYYY'
   });
 
   url = base_url + 'Importacion/ImportacionGrupal/ajax_list';
@@ -289,7 +297,9 @@ function form_Entidad(){
 function eliminarCliente(ID_Empresa, ID, Nu_Documento_Identidad){
   var $modal_delete = $( '#modal-message-delete' );
   $modal_delete.modal('show');
-  
+
+  $( '#modal-title' ).html('¿Deseas eliminar?');
+
   $( '#btn-cancel-delete' ).off('click').click(function () {
     $modal_delete.modal('hide');
   });

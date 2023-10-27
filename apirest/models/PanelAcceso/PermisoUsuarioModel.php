@@ -115,7 +115,60 @@ MNU.Nu_Orden;";
 			|| $sNombreGrupo == 'FUNDADOR'
 			|| $sNombreGrupo == 'FUNDADORES'
 		) {
-			$query = "SELECT ID_Menu FROM menu WHERE ID_Menu IN(1,8,58,159,162,163);";
+			$menu_acceso = array(
+				'ID_Empresa'		=> $arrPost['ID_Empresa'],
+				'ID_Menu'			=> 8,//Padre Usuarios
+				'ID_Grupo_Usuario'	=> $arrPost['ID_Grupo_Usuario'],
+				'Nu_Consultar'		=> 1,
+				'Nu_Agregar'		=> 1,
+				'Nu_Editar'			=> 1,
+				'Nu_Eliminar'		=> 1,
+			);
+			$this->db->insert($this->table_menu_acceso, $menu_acceso);
+			$menu_acceso = array(
+				'ID_Empresa'		=> $arrPost['ID_Empresa'],
+				'ID_Menu'			=> 57,//Cargo / Grupo
+				'ID_Grupo_Usuario'	=> $arrPost['ID_Grupo_Usuario'],
+				'Nu_Consultar'		=> 1,
+				'Nu_Agregar'		=> 1,
+				'Nu_Editar'			=> 1,
+				'Nu_Eliminar'		=> 0,
+			);
+			$this->db->insert($this->table_menu_acceso, $menu_acceso);
+			$menu_acceso = array(
+				'ID_Empresa'		=> $arrPost['ID_Empresa'],
+				'ID_Menu'			=> 58,//Usuario
+				'ID_Grupo_Usuario'	=> $arrPost['ID_Grupo_Usuario'],
+				'Nu_Consultar'		=> 1,
+				'Nu_Agregar'		=> 1,
+				'Nu_Editar'			=> 1,
+				'Nu_Eliminar'		=> 0,
+			);
+			$this->db->insert($this->table_menu_acceso, $menu_acceso);
+			$menu_acceso = array(
+				'ID_Empresa'		=> $arrPost['ID_Empresa'],
+				'ID_Menu'			=> 59,//Opciones del menú
+				'ID_Grupo_Usuario'	=> $arrPost['ID_Grupo_Usuario'],
+				'Nu_Consultar'		=> 1,
+				'Nu_Agregar'		=> 1,
+				'Nu_Editar'			=> 1,
+				'Nu_Eliminar'		=> 1,
+			);
+			$this->db->insert($this->table_menu_acceso, $menu_acceso);
+
+			// Crear padre configuración
+			$menu_acceso = array(
+				'ID_Empresa'		=> $arrPost['ID_Empresa'],
+				'ID_Menu'			=> 2,
+				'ID_Grupo_Usuario'	=> $arrPost['ID_Grupo_Usuario'],
+				'Nu_Consultar'		=> 1,
+				'Nu_Agregar'		=> 1,
+				'Nu_Editar'			=> 1,
+				'Nu_Eliminar'		=> 1,
+			);
+			$this->db->insert($this->table_menu_acceso, $menu_acceso);
+
+			$query = "SELECT ID_Menu FROM menu WHERE ID_Menu IN(1,9,10,11,25);";//Escritorio, Empresa, Org, Sistema y formato, Almacén
 			$arrData = $this->db->query($query)->result();
 			foreach ( $arrData as $row ) {
 				$arrMenuSeguridad[] = array(
@@ -129,6 +182,23 @@ MNU.Nu_Orden;";
 				);
 			}
 			$this->db->insert_batch($this->table_menu_acceso, $arrMenuSeguridad);
+			unset($arrMenuSeguridad);
+
+			$query = "SELECT ID_Menu FROM menu WHERE ID_Menu IN(12,13,14,15,16,17,18,85,86,87);";//Moneda, Pais, Departamento, Provincia, Distrito, Grupo Impuesto, Monto Impuesto
+			$arrData = $this->db->query($query)->result();
+			foreach ( $arrData as $row ) {
+				$arrMenuSeguridad[] = array(
+					'ID_Empresa'		=> $arrPost['ID_Empresa'],
+					'ID_Menu'			=> $row->ID_Menu,
+					'ID_Grupo_Usuario'	=> $arrPost['ID_Grupo_Usuario'],
+					'Nu_Consultar'		=> 1,
+					'Nu_Agregar'		=> 0,
+					'Nu_Editar'			=> 0,
+					'Nu_Eliminar'		=> 0,
+				);
+			}
+			$this->db->insert_batch($this->table_menu_acceso, $arrMenuSeguridad);
+			unset($arrMenuSeguridad);
 			unset($arrMenuSeguridad);
 		} else {
 			$query = "SELECT ID_Menu FROM menu WHERE ID_Menu IN(1);";

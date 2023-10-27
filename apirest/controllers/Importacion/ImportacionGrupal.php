@@ -29,8 +29,8 @@ class ImportacionGrupal extends CI_Controller {
 			$rows = array();
             $rows[] = $row->No_Moneda;
             $rows[] = $row->No_Importacion_Grupal;
-            $rows[] = $row->Fe_Inicio;
-            $rows[] = $row->Fe_Fin;
+            $rows[] = ToDateBD($row->Fe_Inicio);
+            $rows[] = ToDateBD($row->Fe_Fin);
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
             $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCliente(\'' . $row->ID_Importacion_Grupal . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
