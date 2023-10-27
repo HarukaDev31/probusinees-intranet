@@ -18,6 +18,9 @@
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/datatables-bs4/css/dataTables.bootstrap4.min.css"); ?>">
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/datatables-responsive/css/responsive.bootstrap4.min.css"); ?>">
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/datatables-buttons/css/buttons.bootstrap4.min.css"); ?>">
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="<?php echo base_url("plugins_v2/daterangepicker/daterangepicker.css"); ?>">
+  <link rel="stylesheet" href="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"); ?>">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
 </head>
@@ -80,7 +83,7 @@
       <!-- Brand Logo -->
       <a href="<?php echo base_url() . 'InicioController'; ?>" class="brand-link">
         <img src="<?php echo base_url() . 'dist_v2/img/logos/isotipo_probusiness.png'; ?>" alt="ProBusiness" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">ProBusiness</span>
+        <span class="brand-text font-weight-light"><strong>ProBusiness</strong></span>
       </a>
 
       <!-- Sidebar -->

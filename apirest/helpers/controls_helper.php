@@ -288,6 +288,8 @@ function dateNow($sTypeDate){
 		$dHoy_Hour = $iYear . '' . $iMonth . '' . $iDay;
 	} else if ($sTypeDate == 'numero_ymdhms'){//
 		$dHoy_Hour = $iYear . '' . $iMonth . '' . $iDay . '' . $iHour . '' . $iMinute . '' . $iSecond;
+	} else if ($sTypeDate == 'fecha_actual_dmy'){//
+		$dHoy_Hour = $iDay . '/' . $iMonth . '/' . $iYear;
 	}
 	return $dHoy_Hour;
 }

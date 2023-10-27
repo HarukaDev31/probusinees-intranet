@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.0'; ?>
+<?php $iControlVersionDashboard = '1.0.4'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -33,15 +33,36 @@
 <script src="<?php echo base_url("plugins_v2/datatables-buttons/js/buttons.html5.min.js"); ?>"></script>
 <script src="<?php echo base_url("plugins_v2/datatables-buttons/js/buttons.print.min.js"); ?>"></script>
 <script src="<?php echo base_url("plugins_v2/datatables-buttons/js/buttons.colVis.min.js"); ?>"></script>
+
 <!-- AdminLTE App -->
 <script src="<?php echo base_url("dist_v2/js/adminlte.min.js"); ?>"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="<?php echo base_url("dist_v2/js/demo.js?ver=1.0.0"); ?>"></script>
+
+<!-- jQuery Validate -->
+<script src="<?php echo base_url() . 'assets/js/jquery.validate.min.js'; ?>"></script>
+
+<script type="text/javascript">var base_url = '<?php echo base_url(); ?>';</script>
+
+<script src="<?php echo base_url() . 'dist_v2/js/init.js?ver=' . $iControlVersionDashboard; ?>"></script>
 
 <!-- JS INTERNO DE EMPRESA -->
 <!-- Inicio -->
 <?php if (isset($js_inicio) && $js_inicio==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/inicio.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
+
+<!-- Folder: Importacion -->
+<?php if (isset($js_importacion_grupal) && $js_importacion_grupal==true) : ?>
+<!-- InputMask -->
+<script src="<?php echo base_url("plugins_v2/moment/moment.min.js"); ?>"></script>
+<script src="<?php echo base_url("plugins_v2/inputmask/jquery.inputmask.min.js"); ?>"></script>
+
+<!-- date-range-picker -->
+<script src="<?php echo base_url("plugins_v2/daterangepicker/daterangepicker.js"); ?>"></script>
+<script src="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"); ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/Importacion/importacion_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 </body>
 </html>
