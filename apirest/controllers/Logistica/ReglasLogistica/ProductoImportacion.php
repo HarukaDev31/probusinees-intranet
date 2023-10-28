@@ -6,8 +6,11 @@ date_default_timezone_set('America/Lima');
 
 class ProductoImportacion extends CI_Controller {
 	
-	private $upload_path = '../assets/images/productos/';
-	private $upload_path_table = '../assets/images/productos';
+	//private $upload_path = '../assets/images/productos/';
+	//private $upload_path_table = '../assets/images/productos';
+	
+	private $upload_path = './assets/images/productos/';
+	private $upload_path_table = './assets/images/productos';
 	
 	function __construct(){
     	parent::__construct();	
@@ -289,6 +292,9 @@ class ProductoImportacion extends CI_Controller {
 			'Nu_Tipo_Productos_Relacionados' => $this->security->xss_clean($_POST['arrProducto']['Nu_Tipo_Productos_Relacionados']),
 			'Nu_Cantidad_Productos_Relacionados' => $this->security->xss_clean($_POST['arrProducto']['Nu_Cantidad_Productos_Relacionados']),
 			'ID_Unidad_Medida_Precio' => $this->security->xss_clean($_POST['arrProducto']['ID_Unidad_Medida_Precio']),
+			'Qt_Unidad_Medida' => $this->security->xss_clean($_POST['arrProducto']['Qt_Unidad_Medida']),
+			'Qt_Unidad_Medida_2' => $this->security->xss_clean($_POST['arrProducto']['Qt_Unidad_Medida_2']),
+			'Qt_Pedido_Minimo_Proveedor' => $this->security->xss_clean($_POST['arrProducto']['Qt_Pedido_Minimo_Proveedor']),
 		);
 
 		if ( !empty($_POST['arrProducto']['No_Imagen_Item']) ){

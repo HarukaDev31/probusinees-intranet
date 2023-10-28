@@ -891,6 +891,10 @@ function verProducto(ID, No_Imagen_Item, Nu_Version_Imagen){
             
       $('[name="No_Codigo_Interno"]').val(response.No_Codigo_Interno);
       $('[name="Nu_Codigo_Barra"]').val(response.Nu_Codigo_Barra);
+
+      $('[name="Qt_Unidad_Medida"]').val(response.Qt_Unidad_Medida);
+      $('[name="Qt_Unidad_Medida_2"]').val(response.Qt_Unidad_Medida_2);
+      $('[name="Qt_Pedido_Minimo_Proveedor"]').val(response.Qt_Pedido_Minimo_Proveedor);
     
       $('[name="No_Producto"]').val( clearHTMLTextArea(response.No_Producto) );
 
@@ -1348,6 +1352,9 @@ function form_Producto(){
         'Nu_Tipo_Productos_Relacionados': $( '[name="Nu_Tipo_Productos_Relacionados"]' ).val(),
         'Nu_Cantidad_Productos_Relacionados': $( '[name="Nu_Cantidad_Productos_Relacionados"]' ).val(),
         'ID_Unidad_Medida_Precio' : $( '#cbo-UnidadesMedida_Precio' ).val(),
+        'Qt_Unidad_Medida': $( '[name="Qt_Unidad_Medida"]' ).val(),
+        'Qt_Pedido_Minimo_Proveedor': $( '[name="Qt_Pedido_Minimo_Proveedor"]' ).val(),
+        'Qt_Unidad_Medida_2': $( '[name="Qt_Unidad_Medida_2"]' ).val(),
       };
       $( '#btn-save' ).text('');
       $( '#btn-save' ).attr('disabled', true);

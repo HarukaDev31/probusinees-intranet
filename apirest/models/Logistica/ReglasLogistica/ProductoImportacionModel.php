@@ -20,7 +20,8 @@ class ProductoImportacionModel extends CI_Model{
     var $column_search = array();
     var $order = array('Fe_Registro' => 'desc', 'Nu_Activar_Item_Lae_Shop' => 'desc');
     
-	private $upload_path = '../assets/images/productos/';
+	//private $upload_path = '../assets/images/productos/';
+	private $upload_path = './assets/images/productos/';
 	private $_batchImport;
 	
 	public function __construct(){

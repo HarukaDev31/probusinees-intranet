@@ -318,7 +318,7 @@
                     </div>
                   </div>
                   
-                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3">
+                  <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
                     <label>Unidad <span class="label-advertencia">*</span></label>
                     <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . 'Logistica/ReglasLogistica/UnidadMedidaController/listarUnidadesMedida'; ?>">[Crear]</a>
                     <div class="form-group">
@@ -327,15 +327,23 @@
                     </div>
                   </div>
 
-                  <div class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
+                  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2">
+                    <div class="form-group">
+                      <label>Cantidad</label>
+                      <input type="text" name="Qt_Unidad_Medida" inputmode="numeric" class="form-control input-number" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
+                      <span class="help-block" id="error"></span>
+                    </div>
+                  </div>
+
+                  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2">
                     <div class="form-group">
                       <label>Precio</label>
-                      <input type="text" name="Ss_Precio_Ecommerce_Online_Regular" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="<?php echo ($this->empresa->Nu_Proveedor_Dropshipping == '1' ? 'Opcional' : 'Obligatorio'); ?>">
+                      <input type="text" name="Ss_Precio_Ecommerce_Online_Regular" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
                       <span class="help-block" id="error"></span>
                     </div>
                   </div>
                   
-                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3">
+                  <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
                     <label>Unidad 2<span class="label-advertencia">*</span></label>
                     <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . 'Logistica/ReglasLogistica/UnidadMedidaController/listarUnidadesMedida'; ?>">[Crear]</a>
                     <div class="form-group">
@@ -343,11 +351,19 @@
                       <span class="help-block" id="error"></span>
                     </div>
                   </div>
+
+                  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2">
+                    <div class="form-group">
+                      <label>Cantidad</label>
+                      <input type="text" name="Qt_Unidad_Medida_2" inputmode="numeric" class="form-control input-number" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
+                      <span class="help-block" id="error"></span>
+                    </div>
+                  </div>
                   
-                  <div class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
+                  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2">
                     <div class="form-group">
                       <label>Precio 2</label>
-                      <input type="text" name="Ss_Precio_Ecommerce_Online" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="Opcional">
+                      <input type="text" name="Ss_Precio_Ecommerce_Online" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
                       <span class="help-block" id="error"></span>
                     </div>
                   </div>
@@ -357,6 +373,14 @@
                     <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . '/TiendaVirtual/CategoriasTiendaVirtualController/listar'; ?>">[Crear]</a>
                     <div class="form-group">
                       <select id="cbo-categoria" name="ID_Familia" class="form-control select2" style="width: 100%;"></select>
+                      <span class="help-block" id="error"></span>
+                    </div>
+                  </div>
+
+                  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-3">
+                    <div class="form-group">
+                      <label>Pedido Mínimo</label>
+                      <input type="text" name="Qt_Pedido_Minimo_Proveedor" inputmode="numeric" class="form-control input-number" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
                       <span class="help-block" id="error"></span>
                     </div>
                   </div>
