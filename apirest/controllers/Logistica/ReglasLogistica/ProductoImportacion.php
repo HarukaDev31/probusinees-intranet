@@ -178,7 +178,10 @@ class ProductoImportacion extends CI_Controller {
     //$arrUrlImagePath  = explode('..', $path);
     //$arrUrlImage    = explode('/principal',base_url());
     //$url_image      = $arrUrlImage[0] . $arrUrlImagePath[1];
-	$url_image = $path;
+	//$url_image = $path;
+	$server_addr = $_SERVER['HTTP_HOST'];
+	$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
+	$url_image = $base_url . $path;
     $rows         = $this->ProductoImportacionModel->getImagenes($this->input->post("iIdProducto"),$url_image);
     echo json_encode($rows);
   }
