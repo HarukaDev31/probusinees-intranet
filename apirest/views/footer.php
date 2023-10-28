@@ -9,7 +9,7 @@
   <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
-<?php $iControlVersionDashboard = '2.60.0'; ?>
+<?php $iControlVersionDashboard = '2.61.0'; ?>
 <!-- jQuery 3 -->
 <script src="<?php echo base_url() . 'bower_components/jquery/dist/jquery.min.js'; ?>"></script>
 <!-- jQuery UI 1.11.4 -->
