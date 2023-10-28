@@ -249,7 +249,6 @@ class ProductoImportacion extends CI_Controller {
 		*/
 		$server_addr = $_SERVER['HTTP_HOST'];
 		$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
-		echo $base_url;
 		$url_image = $base_url . $path;
 		//$_POST["arrProducto"]["No_Imagen_Item"]=$url_image.$_POST["arrProducto"]["No_Imagen_Item"];
 		if (!$this->input->is_ajax_request()) exit('No se puede Agregar/Editar y acceder');

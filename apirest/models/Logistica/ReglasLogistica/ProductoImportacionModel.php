@@ -115,7 +115,10 @@ ENLAPRO.ID_Producto_Enlace = " . $ID;
 			$arrUrlImage = explode('/principal',base_url());
 			$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
 			*/
-			$url_image = $path;
+			$server_addr = $_SERVER['HTTP_HOST'];
+			$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
+			$url_image = $base_url . $path;
+			//$url_image = $path;
 
 			return $url_image."/".$Data[0]["No_Producto_Imagen"];
 		} else {
@@ -130,7 +133,10 @@ ENLAPRO.ID_Producto_Enlace = " . $ID;
 		$arrUrlImage = explode('/principal',base_url());
 		$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
 		*/
-		$url_image = $path;
+		//$url_image = $path;
+		$server_addr = $_SERVER['HTTP_HOST'];
+		$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
+		$url_image = $base_url . $path;
     	$query = $this->db->query('SELECT ID_Producto_Imagen,CONCAT("'.$url_image.'/", No_Producto_Imagen) No_Producto_Imagen_url,No_Producto_Imagen,Imagen_Tamano,ID_Predeterminado,ID_Estatus FROM producto_imagen WHERE ID_Producto ='.$ID_Producto.' ORDER BY ID_Predeterminado DESC limit 1');
 		$row = $query->row();
 
