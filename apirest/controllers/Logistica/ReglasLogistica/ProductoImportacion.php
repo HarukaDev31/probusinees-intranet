@@ -9,8 +9,8 @@ class ProductoImportacion extends CI_Controller {
 	//private $upload_path = '../assets/images/productos/';
 	//private $upload_path_table = '../assets/images/productos';
 	
-	private $upload_path = './assets/images/productos/';
-	private $upload_path_table = './assets/images/productos';
+	private $upload_path = 'assets/images/productos/';
+	private $upload_path_table = 'assets/images/productos';
 	
 	function __construct(){
     	parent::__construct();	
