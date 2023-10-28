@@ -111,7 +111,7 @@ class ProductoImportacion extends CI_Controller {
 
 				$config['upload_path'] = $path;
 				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
-				$config['max_size'] = 400;//400 KB
+				$config['max_size'] = 1024;//400 KB
 				$config['file_name'] = cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen;
 				
 				$imagen = cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen;
