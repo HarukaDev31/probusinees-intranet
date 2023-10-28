@@ -146,7 +146,8 @@ class ProductoImportacion extends CI_Controller {
 
 				$arrUrlImagePath = explode('..', $path);
 				$arrUrlImage = explode('/principal',base_url());
-				$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+				//$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+				$url_image = $path;
 				$arrResponse = array(
 					'sStatus' => 'success',
 					'sMessage' => 'imagén guardada',
@@ -159,7 +160,8 @@ class ProductoImportacion extends CI_Controller {
 			} else {
 				$arrUrlImagePath = explode('..', $path);
 				$arrUrlImage = explode('/principal',base_url());
-				$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];       
+				//$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];       
+				$url_image = $path;
 				$arrResponse = array(
 					'sStatus' => 'success',
 					'sMessage' => 'La imagen ya fue guardada',
@@ -173,9 +175,10 @@ class ProductoImportacion extends CI_Controller {
 
     public function get_image(){
     $path         = $this->upload_path . $this->empresa->Nu_Documento_Identidad;
-    $arrUrlImagePath  = explode('..', $path);
-    $arrUrlImage    = explode('/principal',base_url());
-    $url_image      = $arrUrlImage[0] . $arrUrlImagePath[1];
+    //$arrUrlImagePath  = explode('..', $path);
+    //$arrUrlImage    = explode('/principal',base_url());
+    //$url_image      = $arrUrlImage[0] . $arrUrlImagePath[1];
+	$url_image = $path;
     $rows         = $this->ProductoImportacionModel->getImagenes($this->input->post("iIdProducto"),$url_image);
     echo json_encode($rows);
   }
@@ -193,9 +196,12 @@ class ProductoImportacion extends CI_Controller {
 			$arrIDProductosHijos = [];
 			$arrIDProductosHijosPredeterminados = [];
 			$path = $this->upload_path . $this->empresa->Nu_Documento_Identidad;
+			/*
 			$arrUrlImagePath  = explode('..', $path);
 			$arrUrlImage    = explode('/principal',base_url());
 			$url_image      = $arrUrlImage[0] . $arrUrlImagePath[1];
+			*/
+			$url_image = $path;
 			for ($i=0; $i < count($productosHijos); $i++) { 
 				$arrIDProductosHijos[] = $productosHijos[$i]->ID_Producto;
 				$ID_Predeterminado = 0;
@@ -236,9 +242,12 @@ class ProductoImportacion extends CI_Controller {
     
 	public function crudProducto(){
 		$path = $this->upload_path . $this->empresa->Nu_Documento_Identidad;
+		/*
 		$arrUrlImagePath = explode('..', $path);
 		$arrUrlImage = explode('/principal',base_url());
 		$url_image = $arrUrlImage[0] . $arrUrlImagePath[1]."/";
+		*/
+		$url_image = $path;
 		//$_POST["arrProducto"]["No_Imagen_Item"]=$url_image.$_POST["arrProducto"]["No_Imagen_Item"];
 		if (!$this->input->is_ajax_request()) exit('No se puede Agregar/Editar y acceder');
 		
@@ -257,6 +266,21 @@ class ProductoImportacion extends CI_Controller {
 
 		if($_POST['arrProducto']['Ss_Precio_Ecommerce_Online'] < 0.10) {
 			echo json_encode(array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Debes agregar precio'));
+			exit();
+		}
+
+		if($_POST['arrProducto']['Qt_Unidad_Medida'] < 1) {
+			echo json_encode(array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Debes agregar Unidad'));
+			exit();
+		}
+
+		if($_POST['arrProducto']['Qt_Unidad_Medida_2'] < 1) {
+			echo json_encode(array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Debes agregar Unidad'));
+			exit();
+		}
+
+		if($_POST['arrProducto']['Qt_Pedido_Minimo_Proveedor'] < 1) {
+			echo json_encode(array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Debes agregar Pedido'));
 			exit();
 		}
 
@@ -451,9 +475,12 @@ class ProductoImportacion extends CI_Controller {
 		if(count($data_productos_variante_valores) > 0) {
 			$arrVarianteValores = $this->ProductoImportacionModel->getVarianteValoresByIDProducto($ID_Producto_Padre, 1);
 			$path = $this->upload_path . $this->empresa->Nu_Documento_Identidad;
+			/*
 			$arrUrlImagePath = explode('..', $path);
 			$arrUrlImage = explode('/principal',base_url());
 			$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+			*/
+			$url_image = $path;
 			$arrImagenesProductoPadre = $this->ProductoImportacionModel->getImagenes($ID_Producto_Padre, $url_image);
 			for ($i = 0; $i < count($data_productos_variante_valores); $i++) {				
 				$sUrlProductoImagen = '';

@@ -21,7 +21,7 @@ class ProductoImportacionModel extends CI_Model{
     var $order = array('Fe_Registro' => 'desc', 'Nu_Activar_Item_Lae_Shop' => 'desc');
     
 	//private $upload_path = '../assets/images/productos/';
-	private $upload_path = './assets/images/productos/';
+	private $upload_path = 'assets/images/productos/';
 	private $_batchImport;
 	
 	public function __construct(){
@@ -110,9 +110,12 @@ ENLAPRO.ID_Producto_Enlace = " . $ID;
 			// print_r($Data[0]);
 			// echo "\nactualizar producot con default";
 			$path = $this->upload_path . $this->empresa->Nu_Documento_Identidad;
+			/*
 			$arrUrlImagePath = explode('..', $path);
 			$arrUrlImage = explode('/principal',base_url());
 			$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+			*/
+			$url_image = $path;
 
 			return $url_image."/".$Data[0]["No_Producto_Imagen"];
 		} else {
@@ -122,9 +125,12 @@ ENLAPRO.ID_Producto_Enlace = " . $ID;
 
     public function setPredeterminado_actualizar($ID_Producto){
     	$path = $this->upload_path . $this->empresa->Nu_Documento_Identidad;
+		/*
 		$arrUrlImagePath = explode('..', $path);
 		$arrUrlImage = explode('/principal',base_url());
 		$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+		*/
+		$url_image = $path;
     	$query = $this->db->query('SELECT ID_Producto_Imagen,CONCAT("'.$url_image.'/", No_Producto_Imagen) No_Producto_Imagen_url,No_Producto_Imagen,Imagen_Tamano,ID_Predeterminado,ID_Estatus FROM producto_imagen WHERE ID_Producto ='.$ID_Producto.' ORDER BY ID_Predeterminado DESC limit 1');
 		$row = $query->row();
 
@@ -349,9 +355,12 @@ LIMIT 1")->row()->existe > 0){
       return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error');
 
     $path = $this->upload_path . $this->empresa->Nu_Documento_Identidad;
+	/*
     $arrUrlImagePath = explode('..', $path);
     $arrUrlImage = explode('/principal',base_url());
     $url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+	*/
+	$url_image = $path;
 
     $row = $this->getImagen($data['ID_Producto_Imagen'],$url_image);
     
