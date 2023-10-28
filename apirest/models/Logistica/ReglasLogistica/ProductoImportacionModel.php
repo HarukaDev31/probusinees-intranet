@@ -37,9 +37,8 @@ class ProductoImportacionModel extends CI_Model{
 		if ( $this->input->post('Filtro_Nu_Estado') != '-' )
         	$this->db->where('PRO.Nu_Activar_Item_Lae_Shop', $this->input->post('Filtro_Nu_Estado'));
 
-		$this->db->select('PRO.ID_Empresa, PRO.ID_Producto, Nu_Codigo_Barra, No_Producto, STOCK.Qt_Producto AS Qt_Producto, PRO.No_Imagen_Item, PRO.Nu_Version_Imagen, PRO.Nu_Activar_Item_Lae_Shop AS Nu_Estado, PRO.Ss_Precio_Ecommerce_Online_Regular, PRO.Ss_Precio_Ecommerce_Online, Nu_Destacado_Item_Lae_Shop, PRO.Ss_Precio_Vendedor_Dropshipping, PRO.Ss_Precio_Proveedor_Dropshipping, PRO.ID_Producto_Relacion_Producto_Dropshipping')
+		$this->db->select('PRO.ID_Empresa, PRO.ID_Producto, Nu_Codigo_Barra, No_Producto, PRO.No_Imagen_Item, PRO.Nu_Version_Imagen, PRO.Nu_Activar_Item_Lae_Shop AS Nu_Estado, PRO.Ss_Precio_Ecommerce_Online_Regular, PRO.Ss_Precio_Ecommerce_Online, Nu_Destacado_Item_Lae_Shop, PRO.Ss_Precio_Vendedor_Dropshipping, PRO.Ss_Precio_Proveedor_Dropshipping, PRO.ID_Producto_Relacion_Producto_Dropshipping')
 		->from($this->table . ' AS PRO')
-		->join($this->table_stock_producto . ' AS STOCK', 'STOCK.ID_Organizacion = ' . $this->empresa->ID_Organizacion . ' AND STOCK.ID_Almacen = ' . $this->session->userdata['almacen']->ID_Almacen . ' AND STOCK.ID_Producto = PRO.ID_Producto', 'left')
 		->where('PRO.ID_Empresa', $this->empresa->ID_Empresa)
 		->where('PRO.Nu_Tipo_Producto =', 1);
 		
