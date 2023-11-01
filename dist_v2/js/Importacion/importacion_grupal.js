@@ -43,7 +43,7 @@ $(function () {
 
   //Date picker
   $('#fecha_inicio').datetimepicker({
-    maxDate: moment(),
+    minDate: moment(),
     allowInputToggle: true,
     enabledHours : false,
     locale: moment().local('es'),
@@ -51,7 +51,7 @@ $(function () {
   });
 
   $('#fecha_fin').datetimepicker({
-    maxDate: moment(),
+    minDate: moment(),
     allowInputToggle: true,
     enabledHours : false,
     locale: moment().local('es'),
