@@ -58,7 +58,7 @@ $(function () {
     format: 'DD/MM/YYYY'
   });
 
-  url = base_url + 'Importacion/ImportacionGrupal/ajax_list';
+  url = base_url + 'ImportacionGrupal/CampanaGrupal/ajax_list';
   table_Entidad = $( '#table-Cliente' ).DataTable({
     //'dom'       : 'B<"top">frt<"bottom"lp><"clear">',
     //dom: "<'row'<'col-sm-12 col-md-3'Q><'col-sm-12 col-md-5'l><'col-sm-12 col-md-4'f>>" +
@@ -241,7 +241,7 @@ function verCliente(ID){
 	$( '#table-Producto_Enlace tbody' ).empty();
   $( '#table-Producto_Enlace' ).show();
 
-  url = base_url + 'Importacion/ImportacionGrupal/ajax_edit/' + ID;
+  url = base_url + 'ImportacionGrupal/CampanaGrupal/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -317,7 +317,7 @@ function form_Entidad(){
     $( '#btn-save' ).attr('disabled', true);
     $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
     
-    url = base_url + 'Importacion/ImportacionGrupal/crudCliente';
+    url = base_url + 'ImportacionGrupal/CampanaGrupal/crudCliente';
     $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -385,7 +385,7 @@ function reload_table_Entidad(){
 }
 
 function _eliminarCliente($modal_delete, ID_Empresa, ID, Nu_Documento_Identidad){    
-  url = base_url + 'Importacion/ImportacionGrupal/eliminarCliente/' + ID_Empresa + '/' + ID + '/' + Nu_Documento_Identidad;
+  url = base_url + 'ImportacionGrupal/CampanaGrupal/eliminarCliente/' + ID_Empresa + '/' + ID + '/' + Nu_Documento_Identidad;
   $.ajax({
     url       : url,
     type      : "GET",

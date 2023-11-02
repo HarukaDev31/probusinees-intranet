@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.11'; ?>
+<?php $iControlVersionDashboard = '1.0.12'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -52,8 +52,8 @@
 <script src="<?php echo base_url() . 'dist_v2/js/inicio.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
-<!-- Folder: Importacion -->
-<?php if (isset($js_importacion_grupal) && $js_importacion_grupal==true) : ?>
+<!-- Folder: ImportacionGrupal -->
+<?php if (isset($js_campana_grupal) && $js_campana_grupal==true) : ?>
 <!-- InputMask -->
 <script src="<?php echo base_url("plugins_v2/moment/moment.min.js"); ?>"></script>
 <script src="<?php echo base_url("plugins_v2/inputmask/jquery.inputmask.min.js"); ?>"></script>
@@ -63,8 +63,21 @@
 <script src="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"); ?>"></script>
 
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
-<script src="<?php echo base_url() . 'dist_v2/js/Importacion/importacion_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/campana_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
+
+<?php if (isset($js_campana_grupal) && $js_campana_grupal==true) : ?>
+<!-- InputMask -->
+<script src="<?php echo base_url("plugins_v2/moment/moment.min.js"); ?>"></script>
+<script src="<?php echo base_url("plugins_v2/inputmask/jquery.inputmask.min.js"); ?>"></script>
+
+<!-- date-range-picker -->
+<script src="<?php echo base_url("plugins_v2/daterangepicker/daterangepicker.js"); ?>"></script>
+<script src="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"); ?>"></script>
+
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/pedidos_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 
 <!-- Message Delete Modal -->
 <div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" aria-modal="true" role="dialog">

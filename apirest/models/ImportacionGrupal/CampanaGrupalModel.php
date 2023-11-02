@@ -1,5 +1,5 @@
 <?php
-class ImportacionGrupalModel extends CI_Model{
+class CampanaGrupalModel extends CI_Model{
 	var $table = 'importacion_grupal_cabecera';
 	var $table_moneda = 'moneda';
 	var $table_importacion_grupal_detalle = 'importacion_grupal_detalle';

@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class ImportacionGrupal extends CI_Controller {
+class CampanaGrupal extends CI_Controller {
 	
 	private $upload_path = '../assets/images/clientes/';
 	
@@ -9,7 +9,7 @@ class ImportacionGrupal extends CI_Controller {
     	parent::__construct();	
 		$this->load->library('session');
 		$this->load->database('LAE_SYSTEMS');
-		$this->load->model('Importacion/ImportacionGrupalModel');
+		$this->load->model('ImportacionGrupal/CampanaGrupalModel');
 		$this->load->model('HelperImportacionModel');
 	}
 	
@@ -17,13 +17,13 @@ class ImportacionGrupal extends CI_Controller {
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
 			$this->load->view('header_v2');
-			$this->load->view('Importacion/ImportacionGrupalView');
-			$this->load->view('footer_v2', array("js_importacion_grupal" => true));
+			$this->load->view('ImportacionGrupal/CampanaGrupalView');
+			$this->load->view('footer_v2', array("js_campana_grupal" => true));
 		}
 	}
 
 	public function ajax_list(){
-		$arrData = $this->ImportacionGrupalModel->get_datatables();
+		$arrData = $this->CampanaGrupalModel->get_datatables();
         $data = array();
         foreach ($arrData as $row) {
 			$rows = array();
@@ -44,7 +44,7 @@ class ImportacionGrupal extends CI_Controller {
     }
     	
 	public function ajax_edit($ID){
-        echo json_encode($this->ImportacionGrupalModel->get_by_id($this->security->xss_clean($ID)));
+        echo json_encode($this->CampanaGrupalModel->get_by_id($this->security->xss_clean($ID)));
     }
     
 	public function crudCliente(){
@@ -62,14 +62,14 @@ class ImportacionGrupal extends CI_Controller {
 		);
 		echo json_encode(
 		$this->input->post('EID_Importacion_Grupal') != '' ?
-			$this->ImportacionGrupalModel->actualizarCliente(array('ID_Importacion_Grupal' => $this->input->post('EID_Importacion_Grupal')), $data, $this->input->post('addProducto'))
+			$this->CampanaGrupalModel->actualizarCliente(array('ID_Importacion_Grupal' => $this->input->post('EID_Importacion_Grupal')), $data, $this->input->post('addProducto'))
 		:
-			$this->ImportacionGrupalModel->agregarCliente($data, $this->input->post('addProducto'))
+			$this->CampanaGrupalModel->agregarCliente($data, $this->input->post('addProducto'))
 		);
 	}
     
 	public function eliminarCliente($ID){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-		echo json_encode($this->ImportacionGrupalModel->eliminarCliente($this->security->xss_clean($ID)));
+		echo json_encode($this->CampanaGrupalModel->eliminarCliente($this->security->xss_clean($ID)));
 	}
 }
