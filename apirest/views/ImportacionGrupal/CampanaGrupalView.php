@@ -122,7 +122,7 @@
                     
                     <div class="col-xs-12 col-sm-12 col-md-12">
                       <div class="table-responsive div-Compuesto">
-                        <table id="table-Producto_Enlace" class="table table-striped table-bordered">
+                        <table id="table-Producto_Enlace" class="table table-hover">
                           <thead>
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>

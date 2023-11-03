@@ -18,7 +18,7 @@ class PedidosGrupal extends CI_Controller {
 		if(isset($this->session->userdata['usuario'])) {
 			$this->load->view('header_v2');
 			$this->load->view('ImportacionGrupal/PedidosGrupalView');
-			$this->load->view('footer_v2', array("js_campana_grupal" => true));
+			$this->load->view('footer_v2', array("js_pedidos_grupal" => true));
 		}
 	}
 
@@ -27,14 +27,16 @@ class PedidosGrupal extends CI_Controller {
         $data = array();
         foreach ($arrData as $row) {
 			$rows = array();
+            $rows[] = $row->ID_Pedido_Cabecera;
+            $rows[] = ToDateBD($row->Fe_Emision);
+            $rows[] = $row->No_Entidad;
             $rows[] = $row->No_Moneda;
-            $rows[] = $row->No_Importacion_Grupal;
-            $rows[] = ToDateBD($row->Fe_Inicio);
-            $rows[] = ToDateBD($row->Fe_Fin);
-			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCliente(\'' . $row->ID_Importacion_Grupal . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Importacion_Grupal . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+            $rows[] = round($row->Ss_Total, 2);
+            $rows[] = round($row->Qt_Total, 2);
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoArray($row->Nu_Estado);
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)" onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			//$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(

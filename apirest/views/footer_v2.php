@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.12'; ?>
+<?php $iControlVersionDashboard = '1.0.14'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -66,7 +66,7 @@
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/campana_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
-<?php if (isset($js_campana_grupal) && $js_campana_grupal==true) : ?>
+<?php if (isset($js_pedidos_grupal) && $js_pedidos_grupal==true) : ?>
 <!-- InputMask -->
 <script src="<?php echo base_url("plugins_v2/moment/moment.min.js"); ?>"></script>
 <script src="<?php echo base_url("plugins_v2/inputmask/jquery.inputmask.min.js"); ?>"></script>

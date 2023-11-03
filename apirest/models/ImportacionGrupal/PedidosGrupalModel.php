@@ -3,7 +3,9 @@ class PedidosGrupalModel extends CI_Model{
 	var $table = 'importacion_grupal_pedido_cabecera';
 	var $table_importacion_grupal_pedido_detalle = 'importacion_grupal_pedido_detalle';
 	var $table_moneda = 'moneda';
+	var $table_cliente = 'entidad';
 	var $table_producto = 'producto';
+	var $table_unidad_medida = 'unidad_medida';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -12,9 +14,10 @@ class PedidosGrupalModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, MONE.No_Moneda')
+        $this->db->select($this->table . '.*, MONE.No_Moneda, CLI.No_Entidad')
 		->from($this->table)
     	->join($this->table_moneda . ' AS MONE', 'MONE.ID_Moneda = ' . $this->table . '.ID_Moneda', 'join')
+    	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
         
 		if(isset($this->order)) {
@@ -25,6 +28,19 @@ class PedidosGrupalModel extends CI_Model{
 	
 	function get_datatables(){
         $this->_get_datatables_query();
+        $query = $this->db->get();
+        return $query->result();
+    }
+    
+    public function get_by_id($ID){
+        $this->db->select($this->table . '.*, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, IGPD.ID_Producto, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total');
+        $this->db->from($this->table);
+    	$this->db->join($this->table_importacion_grupal_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
+    	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
+    	$this->db->join($this->table_producto . ' AS ITEM', 'ITEM.ID_Producto = IGPD.ID_Producto', 'join');
+		$this->db->join($this->table_unidad_medida . ' AS UM', 'UM.ID_Unidad_Medida = IGPD.ID_Unidad_Medida', 'left');
+		$this->db->join($this->table_unidad_medida . ' AS UM2', 'UM2.ID_Unidad_Medida = IGPD.ID_Unidad_Medida_Precio', 'left');
+        $this->db->where($this->table . '.ID_Pedido_Cabecera',$ID);
         $query = $this->db->get();
         return $query->result();
     }
