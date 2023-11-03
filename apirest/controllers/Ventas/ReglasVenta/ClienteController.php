@@ -10,7 +10,7 @@ class ClienteController extends CI_Controller {
 		$this->load->library('session');
 		$this->load->database('LAE_SYSTEMS');
 		$this->load->model('Ventas/ReglasVenta/ClienteModel');
-		$this->load->model('HelperModel');
+		$this->load->model('HelperImportacionModel');
 	}
 	
 	public function importarExcelCliente(){
@@ -150,19 +150,22 @@ class ClienteController extends CI_Controller {
 	public function listarClientes($sStatus='', $iCantidadNoProcesados=''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
+			$this->load->view('header_v2');
+			$this->load->view('Ventas/ReglasVenta/ClienteView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados));
+			$this->load->view('footer_v2', array("js_cliente" => true));
+			/*
 			$this->load->view('header');
 			$this->load->view('Ventas/ReglasVenta/ClienteView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados));
 			$this->load->view('footer', array("js_cliente" => true));
+			*/
 		}
 	}
 
 	public function ajax_list(){
 		$arrData = $this->ClienteModel->get_datatables();
         $data = array();
-        $no = $this->input->post('start');
         $action = 'delete';
         foreach ($arrData as $row) {
-            $no++;
 			$rows = array();
             $rows[] = $row->No_Tipo_Documento_Identidad_Breve;
             $rows[] = $row->Nu_Documento_Identidad;
@@ -170,20 +173,14 @@ class ClienteController extends CI_Controller {
 			$rows[] = $row->Nu_Celular_Entidad;
 			$rows[] = $row->Txt_Email_Entidad;
 			$rows[] = $row->Txt_Direccion_Entidad;
-			$rows[] = $row->Nu_Dias_Credito;
-			$rows[] = $row->No_Contacto;
-			$rows[] = $row->Txt_Descripcion;
 			$rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-			$arrEstadoRegistro = $this->HelperModel->obtenerEstadoRegistroArray($row->Nu_Estado);
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
             $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCliente(\'' . $row->ID_Entidad . '\', \'' . $row->Nu_Documento_Identidad . '\')"><i class="fa fa-pencil fa-2x" aria-hidden="true"></i></button>';
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Empresa . '\', \'' . $row->ID_Entidad . '\', \'' . ( $row->Nu_Documento_Identidad != '' ? $row->Nu_Documento_Identidad : '-') . '\', \'' . $action . '\')"><i class="fa fa-trash-o fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCliente(\'' . $row->ID_Entidad . '\', \'' . $row->Nu_Documento_Identidad . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Empresa . '\', \'' . $row->ID_Entidad . '\', \'' . ( $row->Nu_Documento_Identidad != '' ? $row->Nu_Documento_Identidad : '-') . '\', \'' . $action . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(
-	        'draw' => $this->input->post('draw'),
-	        'recordsTotal' => $this->ClienteModel->count_all(),
-	        'recordsFiltered' => $this->ClienteModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);

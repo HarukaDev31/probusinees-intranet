@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.14'; ?>
+<?php $iControlVersionDashboard = '1.0.15'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -76,6 +76,10 @@
 <script src="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"); ?>"></script>
 
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/pedidos_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_cliente) && $js_cliente==true) : ?>
+<script src="<?php echo base_url() . 'dist_v2/js/Ventas/ReglasVentas/cliente.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 
