@@ -156,7 +156,7 @@ function verPedido(ID){
           + "<td style='display:none;' class='text-left td-id_item'>" + detalle[i]['ID_Producto'] + "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['No_Producto'] + "</td>"
           + "<td class='text-left td-name'>" + ((detalle[i]['No_Unidad_Medida'] != '' && detalle[i]['No_Unidad_Medida'] != null) ? detalle[i]['No_Unidad_Medida'] : detalle[i]['No_Unidad_Medida_2']) + "</td>"
-          + "<td class='text-left td-name'>" + detalle[i]['Qt_Producto'] + "</td>"
+          + "<td class='text-left td-name'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['Ss_Precio'] + "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['Ss_Total'] + "</td>"
           //+ "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";

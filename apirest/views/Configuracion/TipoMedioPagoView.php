@@ -50,7 +50,7 @@
               </div>
               
               <div class="col-md-3">
-                <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
+                <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1 || $this->user->ID_Usuario==1) : ?>
                 <button type="button" class="btn btn-success btn-block" onclick="agregarTipoMedioPago()"><i class="fa fa-plus-circle"></i> Agregar</button>
                 <?php endif; ?>
               </div>
@@ -67,10 +67,10 @@
                 <th>Medio Pago</th>
                 <th>Tipo Medio Pago</th>
                 <th class="no-sort">Estado</th>
-                <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
+                <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1 || $this->user->ID_Usuario==1) : ?>
                   <th class="no-sort">Editar</th>
                 <?php endif; ?>
-                <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
+                <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1 || $this->user->ID_Usuario==1) : ?>
                   <th class="no-sort">Eliminar</th>
                 <?php endif; ?>
               </tr>

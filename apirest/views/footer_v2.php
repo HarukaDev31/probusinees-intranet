@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.15'; ?>
+<?php $iControlVersionDashboard = '1.0.17'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -80,6 +80,10 @@
 
 <?php if (isset($js_cliente) && $js_cliente==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/Ventas/ReglasVentas/cliente.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_metodo_pago_grupal) && $js_metodo_pago_grupal==true) : ?>
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/metodo_pago.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 
