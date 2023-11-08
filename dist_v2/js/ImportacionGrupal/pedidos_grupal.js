@@ -142,18 +142,21 @@ function verPedido(ID){
       $( '[name="No_Entidad"]' ).val(response.No_Entidad);
       $( '[name="Fe_Emision"]' ).val(ParseDateString(response.Fe_Emision, 'fecha_bd', '-'));
 
-      var sNombreEstado = 'Pendiente';
+      var sDataEstadoPedido = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
       if(response.Nu_Estado == 2)
-        sNombreEstado = 'Confirmado';
-      if(response.Nu_Estado == 2)
-        sNombreEstado = 'Completado';
-      if(response.Nu_Estado == 2)
-        sNombreEstado = 'Rechazado';
-      $( '[name="No_Estado"]' ).val(sNombreEstado);
+        sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
+      else if(response.Nu_Estado == 3)
+        sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
+      else if(response.Nu_Estado == 4)
+        sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
+      $( '#div-estado' ).html(sNombreEstado);
       
       $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
       $( '[name="Nu_Celular_Entidad"]' ).val(response.Nu_Celular_Entidad);
       $( '[name="Txt_Email_Entidad"]' ).val(response.Txt_Email_Entidad);
+
+      $( '#label-total_cantidad' ).text( Math.round10(response.Qt_Total, -2));
+      $( '#label-total_importe' ).text( Math.round10(response.Ss_Total), -2);
 
       var table_enlace_producto = "";
       for (i = 0; i < detalle.length; i++) {
@@ -162,9 +165,9 @@ function verPedido(ID){
           + "<td style='display:none;' class='text-left td-id_item'>" + detalle[i]['ID_Producto'] + "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['No_Producto'] + "</td>"
           + "<td class='text-left td-name'>" + ((detalle[i]['No_Unidad_Medida'] != '' && detalle[i]['No_Unidad_Medida'] != null) ? detalle[i]['No_Unidad_Medida'] : detalle[i]['No_Unidad_Medida_2']) + "</td>"
-          + "<td class='text-left td-name'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
-          + "<td class='text-left td-name'>" + detalle[i]['Ss_Precio'] + "</td>"
-          + "<td class='text-left td-name'>" + detalle[i]['Ss_Total'] + "</td>"
+          + "<td class='text-right td-name'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
+          + "<td class='text-right td-name'>" + detalle[i]['Ss_Precio'] + "</td>"
+          + "<td class='text-right td-name'>" + detalle[i]['Ss_Total'] + "</td>"
           //+ "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
           table_enlace_producto += '<input type="hidden" name="addProducto[' + detalle[i]['ID_Producto'] + '][id_item]" value="' + detalle[i]['ID_Producto'] + '">';
         table_enlace_producto += "</tr>";

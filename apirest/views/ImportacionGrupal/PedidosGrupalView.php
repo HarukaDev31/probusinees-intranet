@@ -67,7 +67,7 @@
                       </div>
                     </div>
 
-                    <div class="col-xs-4 col-sm-3 col-md-2">
+                    <div class="col-6 col-sm-3 col-md-2">
                       <label>F. Emisión</label><span class="label-advertencia text-danger"> *</span>
                       <div class="form-group">
                         <input type="text" id="fecha_emision" name="Fe_Emision" class="form-control" placeholder="Ingresar" autocomplete="off">
@@ -83,10 +83,10 @@
                       </div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-2">
+                    <div class="col-6 col-sm-12 col-md-2">
                       <label>Estado</label>
                       <div class="form-group">
-                        <span class="badge badge-pill badge-primary">Primary</span>
+                        <div id="div-estado" style="font-size: 1.4rem;"></div>
                         <!--
                         <input type="text" name="No_Estado" class="form-control" placeholder="Ingresar" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
@@ -94,7 +94,7 @@
                       </div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-4 col-md-4">
+                    <div class="col-6 col-sm-4 col-md-4">
                       <label>Nro. Documento</label>
                       <div class="form-group">
                         <input type="text" name="Nu_Documento_Identidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -102,7 +102,7 @@
                       </div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-4 col-md-4">
+                    <div class="col-6 col-sm-4 col-md-4">
                       <label>Celular</label>
                       <div class="form-group">
                         <input type="text" name="Nu_Celular_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -128,6 +128,7 @@
                         <input type="text" id="txt-ANombre" name="ANombre" class="form-control autocompletar" placeholder="Buscar por Nombre / Código" value="" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
+                      <!-- que se pueda modificar detalle de pedido -->
                     </div>
                     
                     <div class="col-xs-12 col-sm-12 col-md-12">
@@ -138,18 +139,29 @@
                               <th style='display:none;' class="text-left">ID</th>
                               <th class="text-left">Nombre</th>
                               <th class="text-left">Unidad</th>
-                              <th class="text-left">Cantidad</th>
-                              <th class="text-left">Precio</th>
-                              <th class="text-left">Total</th>
+                              <th class="text-right">Cantidad</th>
+                              <th class="text-right">Precio</th>
+                              <th class="text-right">Total</th>
                               <!--<th class="text-center"></th>-->
                             </tr>
                           </thead>
                           <tbody>
                           </tbody>
+                          <tfoot>
+                            <tr>
+                              <th class="text-right" colspan="2">Cantidad</th>
+                              <th class="text-right"><label id="label-total_cantidad">2</label></th>
+                              <th class="text-right">Total</th>
+                              <th class="text-right"><label id="label-total_importe">2222</label></th>
+                            </tr>
+                          </thead>
                         </table>
                       </div>
                     </div>
                   </div><!-- ./Compuesto -->
+
+
+                  <!-- totales -->
 
                   <div class="row mt-3">
                     <div class="col-xs-12 col-md-12">
