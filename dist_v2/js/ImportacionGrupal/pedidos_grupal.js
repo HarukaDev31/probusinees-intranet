@@ -150,6 +150,10 @@ function verPedido(ID){
       if(response.Nu_Estado == 2)
         sNombreEstado = 'Rechazado';
       $( '[name="No_Estado"]' ).val(sNombreEstado);
+      
+      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
+      $( '[name="Nu_Celular_Entidad"]' ).val(response.Nu_Celular_Entidad);
+      $( '[name="Txt_Email_Entidad"]' ).val(response.Txt_Email_Entidad);
 
       var table_enlace_producto = "";
       for (i = 0; i < detalle.length; i++) {
@@ -179,4 +183,47 @@ function verPedido(ID){
       console.log(jqXHR.responseText);
     }
   })
+}
+
+function cambiarEstado(ID, Nu_Estado, sNombreEstado) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  $('#modal-title').text('¿Deseas cambiar estado?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    $('#modal-loader').modal('show');
+
+    url = base_url + 'ImportacionGrupal/PedidosGrupal/cambiarEstado/' + ID + '/' + Nu_Estado;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $('#modal-loader').modal('hide');
+
+        $modal_delete.modal('hide');
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
 }

@@ -20,14 +20,15 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover">
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th>Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>M</th>
-                      <th>F. Pago</th>
+                      <th>Pago</th>
+                      <th>Voucher</th>
                       <th>Total 50%</th>
                       <th>Total</th>
-                      <th>Cantidad</th>
+                      <!--<th>Cantidad</th>-->
                       <th class="no-sort">Estado</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Editar</th>
@@ -85,7 +86,34 @@
                     <div class="col-xs-12 col-sm-12 col-md-2">
                       <label>Estado</label>
                       <div class="form-group">
+                        <span class="badge badge-pill badge-primary">Primary</span>
+                        <!--
                         <input type="text" name="No_Estado" class="form-control" placeholder="Ingresar" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                        -->
+                      </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-4 col-md-4">
+                      <label>Nro. Documento</label>
+                      <div class="form-group">
+                        <input type="text" name="Nu_Documento_Identidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-4 col-md-4">
+                      <label>Celular</label>
+                      <div class="form-group">
+                        <input type="text" name="Nu_Celular_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-4 col-md-4">
+                      <label>Email</label>
+                      <div class="form-group">
+                        <input type="text" name="Txt_Email_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>

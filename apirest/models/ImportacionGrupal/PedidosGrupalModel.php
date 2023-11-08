@@ -15,7 +15,7 @@ class PedidosGrupalModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, MONE.No_Moneda, CLI.No_Entidad, MP.No_Medio_Pago_Tienda_Virtual')
+        $this->db->select($this->table . '.*, MONE.No_Moneda, CLI.No_Entidad, CLI.Nu_Celular_Entidad, MP.No_Medio_Pago_Tienda_Virtual')
 		->from($this->table)
     	->join($this->table_moneda . ' AS MONE', 'MONE.ID_Moneda = ' . $this->table . '.ID_Moneda', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
@@ -35,7 +35,7 @@ class PedidosGrupalModel extends CI_Model{
     }
     
     public function get_by_id($ID){
-        $this->db->select($this->table . '.*, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, IGPD.ID_Producto, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total');
+        $this->db->select($this->table . '.*, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, IGPD.ID_Producto, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total');
         $this->db->from($this->table);
     	$this->db->join($this->table_importacion_grupal_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
     	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
@@ -46,4 +46,12 @@ class PedidosGrupalModel extends CI_Model{
         $query = $this->db->get();
         return $query->result();
     }
+
+	public function cambiarEstado($ID, $Nu_Estado){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Estado' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0)
+			return array('status' => 'success', 'message' => 'Actualizado');
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+	}
 }

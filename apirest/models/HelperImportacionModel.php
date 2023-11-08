@@ -17,7 +17,7 @@ class HelperImportacionModel extends CI_Model{
 		else if( $iEstado == 2 )
 			return array('No_Estado' => 'Confirmado','No_Class_Estado' => 'primary');
 		else if( $iEstado == 3 )
-			return array('No_Estado' => 'Completado','No_Class_Estado' => 'success');
+			return array('No_Estado' => 'Entregado','No_Class_Estado' => 'success');
 		else
 			return array('No_Estado' => 'Rechazado','No_Class_Estado' => 'danger');
 	}
