@@ -17,7 +17,7 @@ class MetodoPagoGrupal extends CI_Controller {
 		if(isset($this->session->userdata['usuario'])) {
 			//VERIFICAR SI TIENE ACTIVADO MERCADO PAGO O NO
         	#Nu_Tipo_Forma_Pago_Lae_Shop = 2  => MERCADO PAGO
-			$iEstadoPasarelaPagoMercadoPago = $this->MetodoPagoGrupalModel->buscarPasarelaPagoActivadas(2);			
+			$iEstadoPasarelaPagoMercadoPago = $this->MetodoPagoGrupalModel->buscarPasarelaPagoActivadas(2);
 			$this->load->view('header_v2');
 			$this->load->view('ImportacionGrupal/MetodoPagoGrupalView', array(
 				"iEstadoPasarelaPagoMercadoPago" => $iEstadoPasarelaPagoMercadoPago

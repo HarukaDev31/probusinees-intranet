@@ -78,6 +78,10 @@
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/metodo_pago.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<?php if (isset($js_metodo_entrega_grupal) && $js_metodo_entrega_grupal==true) : ?>
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/metodo_entrega.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 
 <!-- Message Delete Modal -->
 <div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" aria-modal="true" role="dialog">
