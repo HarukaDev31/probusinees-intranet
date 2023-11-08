@@ -8,7 +8,7 @@ class MetodoPagoGrupal extends CI_Controller {
 		$this->load->library('session');
 		$this->load->database('LAE_SYSTEMS');
 		$this->load->model('ImportacionGrupal/MetodoPagoGrupalModel');
-		$this->load->model('HelperModel');
+		$this->load->model('HelperImportacionModel');
 		$this->load->model('ConfiguracionModel');
 	}
 
@@ -59,8 +59,8 @@ class MetodoPagoGrupal extends CI_Controller {
             $rows[] = $sCierreVenta;
 			*/
 
-			$arrEstadoRegistro = $this->HelperModel->obtenerEstadoRegistroArray($row->Nu_Estado);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 		
 			//$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verMedioPago(\'' . $row->ID_Medio_Pago . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verMedioPago(\'' . $row->ID_Medio_Pago . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
@@ -130,8 +130,9 @@ class MetodoPagoGrupal extends CI_Controller {
 			$rows[] = $row->No_Cuenta_Bancaria;
 			$rows[] = $row->No_Cuenta_Interbancario;
 		
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verMedioPago_cuentas_bancarias(\'' . $row->ID_Cuenta_Bancaria . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarMedioPago_cuentas_bancarias(\'' . $row->ID_Cuenta_Bancaria . '\')"><i class="fa fa-2x fa-trash-o" aria-hidden="true"></i></button>';
+			//$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verMedioPago_cuentas_bancarias(\'' . $row->ID_Cuenta_Bancaria . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verMedioPago_cuentas_bancarias(\'' . $row->ID_Cuenta_Bancaria . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarMedioPago_cuentas_bancarias(\'' . $row->ID_Cuenta_Bancaria . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
 
             $data[] = $rows;
         }

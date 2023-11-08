@@ -15,33 +15,9 @@ $(function () {
 
   url = base_url + 'ImportacionGrupal/MetodoPagoGrupal/ajax_list';
   table_medio_pago = $('#table-MedioPago').DataTable({
-    dom: "<'row'<'col-sm-12 col-md-5'B><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
+    dom: "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
     "<'row'<'col-sm-12'tr>>" +
     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-    buttons     : [{
-      extend    : 'excel',
-      text      : '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-      titleAttr : 'Excel',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'pdf',
-      text      : '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-      titleAttr : 'PDF',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'colvis',
-      text      : '<i class="fa fa-ellipsis-v"></i> Columnas',
-      titleAttr : 'Columnas',
-      exportOptions: {
-        columns: ':visible'
-      }
-    }],
     "paging": true,
     "lengthChange": true,
     "searching": true,
@@ -145,33 +121,9 @@ $(function () {
   /* NRO. CUENTAS BANCARIAS */
   url = base_url + 'ImportacionGrupal/MetodoPagoGrupal/ajax_list_cuentas_bancarias';
   table_medio_pago_cuentas_bancarias = $('#table-MedioPago-CuentasBancarias').DataTable({
-    dom: "<'row'<'col-sm-12 col-md-5'B><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
+    dom: "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
     "<'row'<'col-sm-12'tr>>" +
     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-    buttons     : [{
-      extend    : 'excel',
-      text      : '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-      titleAttr : 'Excel',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'pdf',
-      text      : '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-      titleAttr : 'PDF',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'colvis',
-      text      : '<i class="fa fa-ellipsis-v"></i> Columnas',
-      titleAttr : 'Columnas',
-      exportOptions: {
-        columns: ':visible'
-      }
-    }],
     "paging": true,
     "lengthChange": true,
     "searching": true,

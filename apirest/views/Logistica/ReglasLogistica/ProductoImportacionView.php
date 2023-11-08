@@ -206,10 +206,14 @@
                   <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                     <th class="no-sort">Editar</th>
                   <?php endif; ?>
-                  <th class="no-sort_left">Código</th>
+                  <!--<th class="no-sort_left">Código</th>-->
                   <th class="no-sort_left">Nombre</th>
-                  <th class="no-sort_right">Precio Tienda</th>
-                  <th class="no-sort_right">Precio Oferta</th>
+                  <th class="no-sort_left">Unidad</th>
+                  <th class="no-sort_left">Cantidad</th>
+                  <th class="no-sort_right">Precio</th>
+                  <th class="no-sort_left">Unidad</th>
+                  <th class="no-sort_left">Cantidad 2</th>
+                  <th class="no-sort_right">Precio 2</th>
                   <th class="no-sort_left">Tienda</th>
                   <th class="no-sort_left img_sort">Imagen</th>
                   <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
@@ -318,7 +322,7 @@
                     </div>
                   </div>
                   
-                  <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
                     <label>Unidad <span class="label-advertencia">*</span></label>
                     <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . 'Logistica/ReglasLogistica/UnidadMedidaController/listarUnidadesMedida'; ?>">[Crear]</a>
                     <div class="form-group">
@@ -338,12 +342,12 @@
                   <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2">
                     <div class="form-group">
                       <label>Precio</label>
-                      <input type="text" name="Ss_Precio_Ecommerce_Online_Regular" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
+                      <input type="text" name="Ss_Precio_Importacion" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
                       <span class="help-block" id="error"></span>
                     </div>
                   </div>
                   
-                  <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
                     <label>Unidad 2<span class="label-advertencia">*</span></label>
                     <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . 'Logistica/ReglasLogistica/UnidadMedidaController/listarUnidadesMedida'; ?>">[Crear]</a>
                     <div class="form-group">
@@ -363,12 +367,12 @@
                   <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2">
                     <div class="form-group">
                       <label>Precio 2</label>
-                      <input type="text" name="Ss_Precio_Ecommerce_Online" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
+                      <input type="text" name="Ss_Precio_Importacion_2" inputmode="decimal" class="form-control input-decimal" maxlength="13" autocomplete="off" value="" placeholder="Obligatorio">
                       <span class="help-block" id="error"></span>
                     </div>
                   </div>
                 
-                  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                     <label>Categoría <span class="label-advertencia">*</span></label>
                     <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . '/TiendaVirtual/CategoriasTiendaVirtualController/listar'; ?>">[Crear]</a>
                     <div class="form-group">
@@ -385,7 +389,7 @@
                     </div>
                   </div>
 
-                  <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-3">
                     <div class="form-group">
                       <label>Estado de Tienda</label>
                       <select id="cbo-Estado" name="Nu_Estado" class="form-control required"></select>

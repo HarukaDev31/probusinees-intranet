@@ -24,6 +24,8 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>M</th>
+                      <th>F. Pago</th>
+                      <th>Total 50%</th>
                       <th>Total</th>
                       <th>Cantidad</th>
                       <th class="no-sort">Estado</th>
@@ -67,12 +69,15 @@
                     <div class="col-xs-4 col-sm-3 col-md-2">
                       <label>F. Emisión</label><span class="label-advertencia text-danger"> *</span>
                       <div class="form-group">
+                        <input type="text" id="fecha_emision" name="Fe_Emision" class="form-control" placeholder="Ingresar" autocomplete="off">
+                        <!--
                         <div class="input-group date" id="fecha_emision" data-target-input="nearest">
                           <input type="text" name="Fe_Emision" value="" class="form-control datetimepicker-input date-picker-report_crud" data-target="#fecha_emision" data-toggle="datetimepicker" />
                           <div class="input-group-append" data-target="#fecha_emision" data-toggle="datetimepicker">
                               <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                           </div>
                         </div>
+                        -->
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>

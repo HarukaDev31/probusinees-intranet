@@ -60,11 +60,16 @@ class ProductoImportacion extends CI_Controller {
             $rows = array();
 			
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verProducto(\'' . $row->ID_Producto . '\', \'' . $row->No_Imagen_Item . '\', \'' . $row->Nu_Version_Imagen . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
-            $rows[] = $row->Nu_Codigo_Barra;
+            //$rows[] = $row->Nu_Codigo_Barra;
 			$rows[] = $row->No_Producto;
+
+			$rows[] = $row->No_Unidad_Medida;
+			$rows[] = $row->Qt_Unidad_Medida;
+			$rows[] = numberFormat($row->Ss_Precio_Importacion, 2, '.', ',');
 			
-			$rows[] = numberFormat($row->Ss_Precio_Ecommerce_Online_Regular, 2, '.', ',');
-			$rows[] = numberFormat($row->Ss_Precio_Ecommerce_Online, 2, '.', ',');
+			$rows[] = $row->No_Unidad_Medida_2;
+			$rows[] = $row->Qt_Unidad_Medida_2;
+			$rows[] = numberFormat($row->Ss_Precio_Importacion_2, 2, '.', ',');
 			
 			$arrEstadoRegistro = $this->HelperDropshippingModel->obtenerEstadoRegistroArray($row->Nu_Estado);
 			$dropdown_estado_tienda = '<div class="dropdown">
@@ -261,15 +266,15 @@ class ProductoImportacion extends CI_Controller {
 			$sUrlProductoImagen = $url_image.$this->security->xss_clean($_POST['arrProducto']['No_Imagen_Item']);
 		}
 
-        settype($_POST['arrProducto']['Ss_Precio_Ecommerce_Online_Regular'], "double");
-		settype($_POST['arrProducto']['Ss_Precio_Ecommerce_Online'], "double");
+        settype($_POST['arrProducto']['Ss_Precio_Importacion'], "double");
+		settype($_POST['arrProducto']['Ss_Precio_Importacion_2'], "double");
 		
-		if( $_POST['arrProducto']['Ss_Precio_Ecommerce_Online_Regular'] < 0.10) {
+		if( $_POST['arrProducto']['Ss_Precio_Importacion'] < 0.10) {
 			echo json_encode(array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Debes agregar precio'));
 			exit();
 		}
 
-		if($_POST['arrProducto']['Ss_Precio_Ecommerce_Online'] < 0.10) {
+		if($_POST['arrProducto']['Ss_Precio_Importacion_2'] < 0.10) {
 			echo json_encode(array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Debes agregar precio'));
 			exit();
 		}
@@ -304,18 +309,15 @@ class ProductoImportacion extends CI_Controller {
 			'ID_Impuesto' => $this->security->xss_clean($_POST['arrProducto']['ID_Impuesto']),
 
 			'No_Producto' => $_POST['arrProducto']['No_Producto'],
-			'Ss_Precio_Ecommerce_Online_Regular' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Ecommerce_Online_Regular']),
-			'Ss_Precio_Ecommerce_Online' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Ecommerce_Online']),
+			'Ss_Precio_Importacion' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Importacion']),
+			'Ss_Precio_Importacion_2' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Importacion_2']),
 
 			'ID_Familia' => $this->security->xss_clean($_POST['arrProducto']['ID_Familia']),
 			'ID_Unidad_Medida' => $this->security->xss_clean($_POST['arrProducto']['ID_Unidad_Medida']),
 			'Nu_Activar_Item_Lae_Shop' => $this->security->xss_clean($_POST['arrProducto']['Nu_Estado']),
 			'Txt_Producto' => $_POST['arrProducto']['Txt_Producto'],
 			'Txt_Url_Video_Lae_Shop' => $_POST['arrProducto']['Txt_Url_Video_Lae_Shop'],
-
-			'Nu_Activar_Precio_x_Mayor' => $Nu_Activar_Precio_x_Mayor,
 			
-			'Txt_Url_Recurso_Drive' => $this->security->xss_clean($_POST['arrProducto']['Txt_Url_Recurso_Drive']),
 			'Nu_Estado_Variantes' => $this->security->xss_clean($_POST['arrProducto']['Nu_Estado_Variantes']),
 			'Nu_Estado_Productos_Relacionados' => $this->security->xss_clean($_POST['arrProducto']['Nu_Estado_Productos_Relacionados']),
 			'Nu_Tipo_Productos_Relacionados' => $this->security->xss_clean($_POST['arrProducto']['Nu_Tipo_Productos_Relacionados']),
@@ -491,10 +493,10 @@ class ProductoImportacion extends CI_Controller {
 				$sUrlProductoImagen = '';
 				$NoProductoImagen = '';
 
-				settype($data_productos_variante_valores[$i]['Ss_Precio_Ecommerce_Online_Regular_Variante_Valores'], "double");
-				settype($data_productos_variante_valores[$i]['Ss_Precio_Ecommerce_Online_Variante_Valores'], "double");
+				settype($data_productos_variante_valores[$i]['Ss_Precio_Importacion_Variante_Valores'], "double");
+				settype($data_productos_variante_valores[$i]['Ss_Precio_Importacion_2_Variante_Valores'], "double");
 				
-				if( $data_productos_variante_valores[$i]['Ss_Precio_Ecommerce_Online_Regular_Variante_Valores'] < 0.10 && $this->empresa->Nu_Proveedor_Dropshipping == 0 ) {
+				if( $data_productos_variante_valores[$i]['Ss_Precio_Importacion_Variante_Valores'] < 0.10 && $this->empresa->Nu_Proveedor_Dropshipping == 0 ) {
 					echo json_encode(array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Debes agregar precio'));
 					exit();
 				}
@@ -514,21 +516,14 @@ class ProductoImportacion extends CI_Controller {
 					'ID_Impuesto' => $this->security->xss_clean($_POST['arrProducto']['ID_Impuesto']),
 		
 					'No_Producto' => $_POST['arrProducto']['No_Producto'] . ' | ' . $data_productos_variante_valores[$i]['No_Producto_Variante_Valores'],
-					'Ss_Precio_Ecommerce_Online_Regular' => $this->security->xss_clean($data_productos_variante_valores[$i]['Ss_Precio_Ecommerce_Online_Regular_Variante_Valores']),
-					'Ss_Precio_Ecommerce_Online' => 0,
+					'Ss_Precio_Importacion' => $this->security->xss_clean($data_productos_variante_valores[$i]['Ss_Precio_Importacion_Variante_Valores']),
+					'Ss_Precio_Importacion_2' => 0,
 		
 					'ID_Familia' => $this->security->xss_clean($_POST['arrProducto']['ID_Familia']),
 					'ID_Unidad_Medida' => $this->security->xss_clean($_POST['arrProducto']['ID_Unidad_Medida']),
 					'Nu_Activar_Item_Lae_Shop' => $this->security->xss_clean($data_productos_variante_valores[$i]['Nu_Estado_Variante_Valores']),
 					'Txt_Producto' => $_POST['arrProducto']['Txt_Producto'],
 					'Txt_Url_Video_Lae_Shop' => $_POST['arrProducto']['Txt_Url_Video_Lae_Shop'],
-		
-					'Nu_Activar_Precio_x_Mayor' => $Nu_Activar_Precio_x_Mayor,
-					
-					'Ss_Precio_Proveedor_Dropshipping' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Proveedor_Dropshipping']),
-					'Ss_Precio_Vendedor_Dropshipping' => $this->security->xss_clean($_POST['arrProducto']['Ss_Precio_Vendedor_Dropshipping']),
-					'Txt_Url_Recurso_Drive' => $this->security->xss_clean($_POST['arrProducto']['Txt_Url_Recurso_Drive']),
-
 					'ID_Producto_Padre' => $ID_Producto_Padre,
 					'Nu_Estado_Producto_Hijo' => 1
 				);

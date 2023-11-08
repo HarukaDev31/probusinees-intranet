@@ -31,6 +31,8 @@ class PedidosGrupal extends CI_Controller {
             $rows[] = ToDateBD($row->Fe_Emision);
             $rows[] = $row->No_Entidad;
             $rows[] = $row->No_Moneda;
+            $rows[] = $row->No_Medio_Pago_Tienda_Virtual;
+            $rows[] = round($row->Ss_Total / 2, 2);
             $rows[] = round($row->Ss_Total, 2);
             $rows[] = round($row->Qt_Total, 2);
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoArray($row->Nu_Estado);

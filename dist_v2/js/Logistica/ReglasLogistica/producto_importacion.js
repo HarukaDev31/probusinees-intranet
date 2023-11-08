@@ -30,7 +30,7 @@ $(function () {
     renderItem: function (item, search){
       search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
-      return '<div title="' + caracteresValidosAutocomplete(item.Nombre) + '" class="autocomplete-suggestion" data-id="' + item.ID + '" data-codigo="' + item.Codigo + '" data-nombre="' + caracteresValidosAutocomplete(item.Nombre) + '" data-val="' + search + '"><span class="hidden-xs"><strong>Producto: </strong></span> ' + caracteresValidosAutocomplete(item.Nombre).replace(re, "<b>$1</b>") + ' | <span class="hidden-sm hidden-md hidden-lg"><br></span><strong>Precio: </strong>' + item.Ss_Precio_Ecommerce_Online_Regular + '<div style="border-bottom-style: ridge; border-bottom-color: black; border-bottom-width: 1px"></div></div>';
+      return '<div title="' + caracteresValidosAutocomplete(item.Nombre) + '" class="autocomplete-suggestion" data-id="' + item.ID + '" data-codigo="' + item.Codigo + '" data-nombre="' + caracteresValidosAutocomplete(item.Nombre) + '" data-val="' + search + '"><span class="hidden-xs"><strong>Producto: </strong></span> ' + caracteresValidosAutocomplete(item.Nombre).replace(re, "<b>$1</b>") + ' | <span class="hidden-sm hidden-md hidden-lg"><br></span><strong>Precio: </strong>' + item.Ss_Precio_Importacion + '<div style="border-bottom-style: ridge; border-bottom-color: black; border-bottom-width: 1px"></div></div>';
     },
     onSelect: function(e, term, item){
       $( '#txt-AID_Producto_Mis_Productos' ).val(item.data('id'));
@@ -898,8 +898,8 @@ function verProducto(ID, No_Imagen_Item, Nu_Version_Imagen){
     
       $('[name="No_Producto"]').val( clearHTMLTextArea(response.No_Producto) );
 
-      $('[name="Ss_Precio_Ecommerce_Online_Regular"]').val( Math.round10(response.Ss_Precio_Ecommerce_Online_Regular, -2) );
-      $('[name="Ss_Precio_Ecommerce_Online"]').val( Math.round10(response.Ss_Precio_Ecommerce_Online, -2) );
+      $('[name="Ss_Precio_Importacion"]').val( Math.round10(response.Ss_Precio_Importacion, -2) );
+      $('[name="Ss_Precio_Importacion_2"]').val( Math.round10(response.Ss_Precio_Importacion_2, -2) );
       
       //DROPSHIPPING
       $('[name="Ss_Precio_Proveedor_Dropshipping"]').val( Math.round10(response.Ss_Precio_Proveedor_Dropshipping, -2) );
@@ -1332,8 +1332,8 @@ function form_Producto(){
         'ID_Producto_Sunat'         : $( '#hidden-ID_Tabla_Dato' ).val(),
         'ID_Tipo_Pedido_Lavado' : $( '#cbo-tipo_pedido_lavado' ).val(),
         'No_Imagen_Item' : dropZoneGloblal._predeterminado(),
-        'Ss_Precio_Ecommerce_Online' : $( '[name="Ss_Precio_Ecommerce_Online"]' ).val(),
-        'Ss_Precio_Ecommerce_Online_Regular' : $( '[name="Ss_Precio_Ecommerce_Online_Regular"]' ).val(),
+        'Ss_Precio_Importacion_2' : $( '[name="Ss_Precio_Importacion_2"]' ).val(),
+        'Ss_Precio_Importacion' : $( '[name="Ss_Precio_Importacion"]' ).val(),
         'ID_Familia_Marketplace' : $( '#cbo-categoria_marketplace' ).val(),
         'ID_Sub_Familia_Marketplace' : $( '#cbo-sub_categoria_marketplace' ).val(),
         'ID_Marca_Marketplace' : $( '#cbo-marca_marketplace' ).val(),
@@ -1891,7 +1891,7 @@ function llenarProductosVarianteValores(productosVarianteValores) {
       let noProducto = productosVarianteValores[i]['No_Producto'].split('|');
       noProducto.shift();
       let Nu_Imagen_Producto_Variante_Valores = productosVarianteValores[i]['No_Imagen_Item'] !== null ? buscarIndiceImagenProductoVarianteValores(productosVarianteValores[i]['No_Imagen_Item']) : '';
-      plantillaProductoVarianteValores += getPlantillaProductoVarianteValores(noProducto.join('|'), productosVarianteValores[i]['ID_Producto'], productosVarianteValores[i]['Nu_Codigo_Barra'], productosVarianteValores[i]['Ss_Precio_Ecommerce_Online_Regular'], productosVarianteValores[i]['Ss_Precio_Ecommerce_Online'], productosVarianteValores[i]['Nu_Activar_Item_Lae_Shop'], Nu_Imagen_Producto_Variante_Valores);
+      plantillaProductoVarianteValores += getPlantillaProductoVarianteValores(noProducto.join('|'), productosVarianteValores[i]['ID_Producto'], productosVarianteValores[i]['Nu_Codigo_Barra'], productosVarianteValores[i]['Ss_Precio_Importacion'], productosVarianteValores[i]['Ss_Precio_Importacion_2'], productosVarianteValores[i]['Nu_Activar_Item_Lae_Shop'], Nu_Imagen_Producto_Variante_Valores);
     }
     tbody.innerHTML = plantillaProductoVarianteValores;
   }
@@ -1958,8 +1958,8 @@ function getObjetoProductosVarianteValores() {
         'ID_Producto_Variante_Valores': variante.querySelector('[name="ID_Producto_Variante_Valores"]').value,
         'No_Producto_Variante_Valores': variante.querySelector('[name="No_Producto_Variante_Valores"]').value.trim(),
         'Nu_Codigo_Barra_Variante_Valores': variante.querySelector('[name="Nu_Codigo_Barra_Variante_Valores"]').value.trim(),
-        'Ss_Precio_Ecommerce_Online_Regular_Variante_Valores':variante.querySelector('[name="Ss_Precio_Ecommerce_Online_Regular_Variante_Valores"]').value,
-        'Ss_Precio_Ecommerce_Online_Variante_Valores':variante.querySelector('[name="Ss_Precio_Ecommerce_Online_Variante_Valores"]').value,
+        'Ss_Precio_Importacion_Variante_Valores':variante.querySelector('[name="Ss_Precio_Importacion_Variante_Valores"]').value,
+        'Ss_Precio_Importacion_2_Variante_Valores':variante.querySelector('[name="Ss_Precio_Importacion_2_Variante_Valores"]').value,
         'Nu_Estado_Variante_Valores': Nu_Estado_Variante_Valores,
         'Nu_Imagen_Producto_Variante_Valores': variante.querySelector('[name="Nu_Imagen_Producto_Variante_Valores"]').value
       };
@@ -1975,7 +1975,7 @@ function getPlantillaProductosVarianteValores(productosVarianteValores, arrProdu
   for (let i = 0; i < productosVarianteValores.length; i++) {
     indice = arrProductoVarianteValores.findIndex(producto => producto['No_Producto_Variante_Valores'].trim().toLowerCase() == productosVarianteValores[i].trim().toLowerCase());
     if(indice > -1) {
-      plantillaProductoVarianteValores += getPlantillaProductoVarianteValores(arrProductoVarianteValores[indice]['No_Producto_Variante_Valores'], arrProductoVarianteValores[indice]['ID_Producto_Variante_Valores'], arrProductoVarianteValores[indice]['Nu_Codigo_Barra_Variante_Valores'], arrProductoVarianteValores[indice]['Ss_Precio_Ecommerce_Online_Regular_Variante_Valores'], arrProductoVarianteValores[indice]['Ss_Precio_Ecommerce_Online_Variante_Valores'], arrProductoVarianteValores[indice]['Nu_Estado_Variante_Valores'], arrProductoVarianteValores[indice]['Nu_Imagen_Producto_Variante_Valores']);
+      plantillaProductoVarianteValores += getPlantillaProductoVarianteValores(arrProductoVarianteValores[indice]['No_Producto_Variante_Valores'], arrProductoVarianteValores[indice]['ID_Producto_Variante_Valores'], arrProductoVarianteValores[indice]['Nu_Codigo_Barra_Variante_Valores'], arrProductoVarianteValores[indice]['Ss_Precio_Importacion_Variante_Valores'], arrProductoVarianteValores[indice]['Ss_Precio_Importacion_2_Variante_Valores'], arrProductoVarianteValores[indice]['Nu_Estado_Variante_Valores'], arrProductoVarianteValores[indice]['Nu_Imagen_Producto_Variante_Valores']);
     } else {
       plantillaProductoVarianteValores += getPlantillaProductoVarianteValores(productosVarianteValores[i]);
     }    
@@ -1983,16 +1983,16 @@ function getPlantillaProductosVarianteValores(productosVarianteValores, arrProdu
   document.querySelector('.table-productos_variante_valores tbody').innerHTML = plantillaProductoVarianteValores;
 }
 
-function getPlantillaProductoVarianteValores(No_Producto_Variante_Valores, ID_Producto_Variante_Valores = 0, Nu_Codigo_Barra_Variante_Valores = '', Ss_Precio_Ecommerce_Online_Regular_Variante_Valores = '', Ss_Precio_Ecommerce_Online_Variante_Valores = '', Nu_Estado_Variante_Valores = 1, Nu_Imagen_Producto_Variante_Valores = '') {
-  if(Ss_Precio_Ecommerce_Online_Regular_Variante_Valores == 0 && ID_Producto_Variante_Valores == 0) {
-    Ss_Precio_Ecommerce_Online_Regular_Variante_Valores = document.querySelector('[name="Ss_Precio_Ecommerce_Online_Regular"]').value;
+function getPlantillaProductoVarianteValores(No_Producto_Variante_Valores, ID_Producto_Variante_Valores = 0, Nu_Codigo_Barra_Variante_Valores = '', Ss_Precio_Importacion_Variante_Valores = '', Ss_Precio_Importacion_2_Variante_Valores = '', Nu_Estado_Variante_Valores = 1, Nu_Imagen_Producto_Variante_Valores = '') {
+  if(Ss_Precio_Importacion_Variante_Valores == 0 && ID_Producto_Variante_Valores == 0) {
+    Ss_Precio_Importacion_Variante_Valores = document.querySelector('[name="Ss_Precio_Importacion"]').value;
   }
-  Ss_Precio_Ecommerce_Online_Variante_Valores = 0;
+  Ss_Precio_Importacion_2_Variante_Valores = 0;
   return `<tr class="tr-producto_variante_valores">
   <td class="td-imagen_producto_variante_valores">${manejarImagen(Nu_Imagen_Producto_Variante_Valores)}</td>
   <td><span class="No_Producto_Variante_Valores">${No_Producto_Variante_Valores.trim()}</span><input type="hidden" name="ID_Producto_Variante_Valores" value="${ID_Producto_Variante_Valores}" /><input type="hidden" name="No_Producto_Variante_Valores" value="${No_Producto_Variante_Valores.trim()}" /><input type="hidden" name="Nu_Codigo_Barra_Variante_Valores" value="${Nu_Codigo_Barra_Variante_Valores}" /></td>
-  <td><div class="div-precio_oferta_regular_producto_variante_valores"><input type="text" name="Ss_Precio_Ecommerce_Online_Regular_Variante_Valores" onkeypress="return checkNumber(event)" inputmode="decimal" class="form-control input-decimal input-precio_ecommerce_online_regular" maxlength="13" autocomplete="off" value="${Ss_Precio_Ecommerce_Online_Regular_Variante_Valores}" placeholder="Obligatorio"><span class="help-block"></span></div>
-  <input type="hidden" name="Ss_Precio_Ecommerce_Online_Variante_Valores" value="${Ss_Precio_Ecommerce_Online_Variante_Valores}" /></td>
+  <td><div class="div-precio_oferta_regular_producto_variante_valores"><input type="text" name="Ss_Precio_Importacion_Variante_Valores" onkeypress="return checkNumber(event)" inputmode="decimal" class="form-control input-decimal input-precio_ecommerce_online_regular" maxlength="13" autocomplete="off" value="${Ss_Precio_Importacion_Variante_Valores}" placeholder="Obligatorio"><span class="help-block"></span></div>
+  <input type="hidden" name="Ss_Precio_Importacion_2_Variante_Valores" value="${Ss_Precio_Importacion_2_Variante_Valores}" /></td>
   <td><select name="Nu_Estado_Variante_Valores" class="form-control"><option value="1" ${Nu_Estado_Variante_Valores == 1 ? 'selected' : ''}>Visible</option><option value="0" ${Nu_Estado_Variante_Valores == 0 ? 'selected' : ''}>Oculto</option></select></td>
   </tr>`;
 }
@@ -2097,12 +2097,12 @@ function validarPreciosProductosVariantesValores() {
   const productosVarianteValores = getObjetoProductosVarianteValores();
   const filasProductosVarianteValores = getFilasProductosVarianteValores();
   for (let i = 0; i < productosVarianteValores.length; i++) {
-    Ss_Precio_Ecommerce_Online_Regular_Variante_Valores = parseFloat(productosVarianteValores[i]['Ss_Precio_Ecommerce_Online_Regular_Variante_Valores']);
-    if(isNaN(Ss_Precio_Ecommerce_Online_Regular_Variante_Valores)) {    //PRECIO TIENDA NO VACIO
-      mensajeErrorPrecioProductoVarianteValor(filasProductosVarianteValores[i].querySelector('[name="Ss_Precio_Ecommerce_Online_Regular_Variante_Valores"]'), '.div-precio_oferta_regular_producto_variante_valores', 'El Precio Tienda no puede estar vacío');
+    Ss_Precio_Importacion_Variante_Valores = parseFloat(productosVarianteValores[i]['Ss_Precio_Importacion_Variante_Valores']);
+    if(isNaN(Ss_Precio_Importacion_Variante_Valores)) {    //PRECIO TIENDA NO VACIO
+      mensajeErrorPrecioProductoVarianteValor(filasProductosVarianteValores[i].querySelector('[name="Ss_Precio_Importacion_Variante_Valores"]'), '.div-precio_oferta_regular_producto_variante_valores', 'El Precio Tienda no puede estar vacío');
       correcto = false;      
-    } else if(Ss_Precio_Ecommerce_Online_Regular_Variante_Valores == 0) { //PRECIO TIENDA NO CERO
-      mensajeErrorPrecioProductoVarianteValor(filasProductosVarianteValores[i].querySelector('[name="Ss_Precio_Ecommerce_Online_Regular_Variante_Valores"]'), '.div-precio_oferta_regular_producto_variante_valores', 'El Precio Tienda debe ser mayor a cero');
+    } else if(Ss_Precio_Importacion_Variante_Valores == 0) { //PRECIO TIENDA NO CERO
+      mensajeErrorPrecioProductoVarianteValor(filasProductosVarianteValores[i].querySelector('[name="Ss_Precio_Importacion_Variante_Valores"]'), '.div-precio_oferta_regular_producto_variante_valores', 'El Precio Tienda debe ser mayor a cero');
       correcto = false;      
     }
   }

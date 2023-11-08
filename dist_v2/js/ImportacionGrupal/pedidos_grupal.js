@@ -2,6 +2,7 @@ var url, table_Entidad;
 
 $(function () {
   //Date picker
+  /*
   $('#fecha_inicio').datetimepicker({
     minDate: moment(),
     allowInputToggle: true,
@@ -17,6 +18,7 @@ $(function () {
     locale: moment().local('es'),
     format: 'DD/MM/YYYY'
   });
+  */
 
   url = base_url + 'ImportacionGrupal/PedidosGrupal/ajax_list';
   table_Entidad = $( '#table-Pedidos' ).DataTable({

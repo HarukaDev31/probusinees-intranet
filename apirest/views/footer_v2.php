@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.17'; ?>
+<?php $iControlVersionDashboard = '1.0.20'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -67,14 +67,6 @@
 <?php endif; ?>
 
 <?php if (isset($js_pedidos_grupal) && $js_pedidos_grupal==true) : ?>
-<!-- InputMask -->
-<script src="<?php echo base_url("plugins_v2/moment/moment.min.js"); ?>"></script>
-<script src="<?php echo base_url("plugins_v2/inputmask/jquery.inputmask.min.js"); ?>"></script>
-
-<!-- date-range-picker -->
-<script src="<?php echo base_url("plugins_v2/daterangepicker/daterangepicker.js"); ?>"></script>
-<script src="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"); ?>"></script>
-
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/pedidos_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 

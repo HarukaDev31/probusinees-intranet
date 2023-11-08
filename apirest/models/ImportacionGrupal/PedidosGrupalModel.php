@@ -6,6 +6,7 @@ class PedidosGrupalModel extends CI_Model{
 	var $table_cliente = 'entidad';
 	var $table_producto = 'producto';
 	var $table_unidad_medida = 'unidad_medida';
+	var $table_medio_pago = 'medio_pago';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -14,10 +15,11 @@ class PedidosGrupalModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, MONE.No_Moneda, CLI.No_Entidad')
+        $this->db->select($this->table . '.*, MONE.No_Moneda, CLI.No_Entidad, MP.No_Medio_Pago_Tienda_Virtual')
 		->from($this->table)
     	->join($this->table_moneda . ' AS MONE', 'MONE.ID_Moneda = ' . $this->table . '.ID_Moneda', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
+    	->join($this->table_medio_pago . ' AS MP', 'MP.ID_Medio_Pago = ' . $this->table . '.ID_Medio_Pago', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
         
 		if(isset($this->order)) {

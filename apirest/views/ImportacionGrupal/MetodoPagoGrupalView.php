@@ -4,7 +4,7 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-8">
-          <h1><i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></h1>
+          <h1><i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-d-none="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></h1>
         </div>
       </div>
     </div><!-- /.container-fluid -->
@@ -105,8 +105,8 @@ echo form_open('', $attributes);
 <div class="modal-dialog">
   <div class="modal-content">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       <h4 class="modal-title text-center"></h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-d-none="true">&times;</span></button>
     </div>
     
     <div class="modal-body">
@@ -128,7 +128,7 @@ echo form_open('', $attributes);
           <input type="hidden" id="cbo-Empresas" name="ID_Empresa" class="form-control" value="<?php echo $this->user->ID_Empresa; ?>">
         <?php } ?>
         
-        <div class="col-xs-4 col-md-6 hidden">
+        <div class="col-xs-4 col-md-6 d-none">
           <div class="form-group">
             <label>Nombre Interno<span class="label-advertencia">*</span></label>
             <input type="text" id="txt-No_Medio_Pago" name="No_Medio_Pago" placeholder="Ingresar nombre" class="form-control required" autocomplete="off" maxlength="50">
@@ -144,7 +144,7 @@ echo form_open('', $attributes);
           </div>
         </div>
 
-        <div class="col-xs-4 col-md-5 hidden">
+        <div class="col-xs-4 col-md-5 d-none">
           <div class="form-group">
             <label>Descripción <span class="label-advertencia">*</span></label>
             <input type="text" id="txt-Txt_Medio_Pago" name="Txt_Medio_Pago" placeholder="Ingresar nombre" class="form-control required" autocomplete="off" maxlength="250">
@@ -152,7 +152,7 @@ echo form_open('', $attributes);
           </div>
         </div>
         
-        <div class="col-xs-5 col-md-3 hidden">
+        <div class="col-xs-5 col-md-3 d-none">
           <div class="form-group">
             <label>SUNAT Codigo <span class="label-advertencia">*</span></label>
             <input type="text" name="No_Codigo_Sunat_PLE" placeholder="Ingresar codigo" class="form-control required" autocomplete="off" maxlength="3">
@@ -160,7 +160,7 @@ echo form_open('', $attributes);
           </div>
         </div>
 
-        <div class="col-xs-6 col-md-4 hidden">
+        <div class="col-xs-6 col-md-4 d-none">
           <div class="form-group">
             <label>Proveedor FE Codigo <span class="label-advertencia"> *</span></label>
             <input type="text" name="No_Codigo_Sunat_FE" placeholder="Ingresar número" class="form-control required" autocomplete="off" maxlength="3">
@@ -168,7 +168,7 @@ echo form_open('', $attributes);
           </div>
         </div>
         
-        <div class="col-xs-5 col-md-3 hidden">
+        <div class="col-xs-5 col-md-3 d-none">
           <div class="form-group">
             <label>Tipo Vista <span class="label-advertencia">*</span></label>
             <input type="tel" name="Nu_Tipo" placeholder="Ingresar codigo" class="form-control required" autocomplete="off" maxlength="3">
@@ -176,7 +176,7 @@ echo form_open('', $attributes);
           </div>
         </div>
         
-        <div class="col-xs-5 col-md-3 hidden">
+        <div class="col-xs-5 col-md-3 d-none">
           <div class="form-group">
             <label>Dinero Caja PV <span class="label-advertencia">*</span></label>
             <select id="cbo-dinero_caja_pv" name="Nu_Tipo_Caja" class="form-control required" style="width: 100%;"></select>
@@ -184,7 +184,7 @@ echo form_open('', $attributes);
           </div>
         </div>
         
-        <div class="col-xs-5 col-md-2 hidden">
+        <div class="col-xs-5 col-md-2 d-none">
           <div class="form-group">
             <label>Orden</label>
             <input type="tel" name="Nu_Orden" placeholder="Ingresar" class="form-control" autocomplete="off" maxlength="3">
@@ -240,12 +240,12 @@ echo form_open('', $attributes);
       <div class="row">
         <div class="col-xs-6 col-md-6">
           <div class="form-group">
-            <button type="button" class="btn btn-danger btn-md btn-block" data-dismiss="modal"><span class="fa fa-sign-out"></span> Salir</button>
+            <button type="button" class="btn btn-danger btn-md btn-block" data-dismiss="modal">Salir</button>
           </div>
         </div>
         <div class="col-xs-6 col-md-6">
           <div class="form-group">
-            <button type="submit" id="btn-save" class="btn btn-success btn-md btn-block btn-verificar"><i class="fa fa-save"></i> Guardar </button>
+            <button type="submit" id="btn-save" class="btn btn-success btn-md btn-block btn-verificar">Guardar</button>
           </div>
         </div>
       </div>
@@ -266,7 +266,7 @@ echo form_open('', $attributes);
   <div class="modal-content">
     <div class="modal-header">
       <h4 class="modal-title text-center"></h4>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-d-none="true">&times;</span></button>
     </div>
     
     <div class="modal-body">
@@ -298,7 +298,7 @@ echo form_open('', $attributes);
           </div>
         </div>
 
-        <div class="col-xs-4 col-md-5 hidden">
+        <div class="col-xs-4 col-md-5 d-none">
           <div class="form-group">
             <label>Banco BD</label>
             <select id="cbo-banco" name="ID_Banco" class="form-control required" style="width: 100%;"></select>

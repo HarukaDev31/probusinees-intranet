@@ -387,7 +387,7 @@ if ($this->user->ID_Pais == 1 && ($this->empresa->Nu_Vendedor_Dropshipping == 1 
       <!-- Sidebar toggle button a-->
       <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
         <span class="sr-only">Toggle navigation</span>&nbsp;&nbsp;&nbsp;
-        <span class="logo-lg hidden-sm hidden-md hidden-lg" style="font-size: 14px;font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight: 400;line-height: 1.42857143;"><b>EcX</b>lae</span>
+        <span class="logo-lg hidden-sm hidden-md hidden-lg" style="font-size: 14px;font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight: 400;line-height: 1.42857143;"><b>Pro</b></span>
       </a>
       
       <div class="navbar-custom-menu">
