@@ -27,4 +27,13 @@ class AutocompleteImportacionController extends CI_Controller {
 			echo json_encode($this->AutocompleteImportacionModel->getDataAutocompleteProduct($arrPost));
 		}
 	}
+	
+	public function globalAutocompleteItemxUnidad(){
+		if ( $this->input->is_ajax_request() && $this->input->post('global_search') ){
+			$arrPost = array(
+				"global_search" => $this->input->post('global_search')
+			);
+			echo json_encode($this->AutocompleteImportacionModel->getDataAutocompleteItemxUnidad($arrPost));
+		}
+	}
 }

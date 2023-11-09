@@ -52,6 +52,9 @@
                 echo form_open('', $attributes);
                 ?>
                   <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
+                  <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
+                  <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
+                  <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
                   
                   <div class="row">
                     <div class="col-6 col-sm-4 col-md-2">
@@ -123,15 +126,35 @@
                   </div>
                   
                   <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 d-none">
+                    <div class="col-12 col-sm-8 col-md-8">
                       <label>Producto</label>
                       <div class="form-group">
                         <input type="hidden" id="txt-AID" name="AID" class="form-control">
-                        <input type="hidden" id="txt-ACodigo" name="ACodigo" class="form-control">
-                        <input type="text" id="txt-ANombre" name="ANombre" class="form-control autocompletar" placeholder="Buscar por Nombre / Código" value="" autocomplete="off">
+                        <input type="hidden" id="txt-ID_Producto" name="ID_Producto" class="form-control">
+                        <input type="hidden" id="txt-ID_Unidad_Medida" name="ID_Unidad_Medida" class="form-control">
+                        <input type="hidden" id="txt-ID_Unidad_Medida_2" name="ID_Unidad_Medida_2" class="form-control">
+                        <input type="hidden" id="txt-Precio_Producto" name="Precio_Producto" class="form-control">
+                        <input type="hidden" id="txt-Cantidad_Configurada_Producto" name="Cantidad_Configurada_Producto" class="form-control">
+                        <input type="hidden" id="txt-Nombre_Producto" name="Nombre_Producto" class="form-control">
+                        <input type="hidden" id="txt-Nombre_Unidad_Medida" name="Nombre_Unidad_Medida" class="form-control">
+                        <input type="text" id="txt-ANombre" name="ANombre" class="form-control autocompletar" placeholder="Buscar por Nombre" value="" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
-                      <!-- que se pueda modificar detalle de pedido -->
+                    </div>
+                      
+                    <div class="col-12 col-sm-2 col-md-2">
+                      <label>Cantidad</label>
+                      <div class="form-group">
+                        <input type="text" id="txt-Qt_Producto_Descargar" inputmode="decimal" name="Qt_Producto_Descargar" class="form-control input-decimal" placeholder="Ingresar cantidad" value="1" autocomplete="off">
+                        <span class="help-block" id="error"></span>
+                      </div>
+                    </div>
+                    
+                    <div class="col-12 col-sm-2 col-md-2">
+                      <label class="hidden-xs">&nbsp;</label>
+                      <div class="form-group">
+                        <button type="button" id="btn-addProductosEnlaces" class="btn btn-success btn-block"> Agregar</button>
+                      </div>
                     </div>
                     
                     <div class="col-xs-12 col-sm-12 col-md-12">
@@ -140,12 +163,13 @@
                           <thead>
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
+                              <th style='display:none;' class="text-left">ID BD</th>
                               <th class="text-left">Nombre</th>
-                              <th class="text-left">Unidad</th>
-                              <th class="text-right">Cantidad</th>
-                              <th class="text-right">Precio</th>
+                              <th class="text-left">Tipo</th>
+                              <th class="text-right">Unidad</th>
+                              <th class="text-right">C/U</th>
                               <th class="text-right">Total</th>
-                              <!--<th class="text-center"></th>-->
+                              <th class="text-center"></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -167,9 +191,14 @@
                   <!-- totales -->
 
                   <div class="row mt-3">
-                    <div class="col-xs-12 col-md-12">
+                    <div class="col-xs-6 col-md-6">
                       <div class="form-group">
                         <button type="button" id="btn-cancelar" class="btn btn-danger btn-lg btn-block">Salir</button>
+                      </div>
+                    </div>
+                    <div class="col-xs-6 col-md-6">
+                      <div class="form-group">
+                        <button type="submit" id="btn-save" class="btn btn-success btn-lg btn-block btn-verificar">Guardar</button>
                       </div>
                     </div>
                   </div>

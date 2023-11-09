@@ -97,4 +97,27 @@ class PedidosGrupal extends CI_Controller {
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     	echo json_encode($this->PedidosGrupalModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
 	}
+
+	public function crudPedidoGrupal(){
+		//array_debug($this->input->post());
+		
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+		$data = array(
+			'ID_Empresa' => $this->input->post('EID_Empresa'),
+			'ID_Organizacion' => $this->input->post('EID_Organizacion'),
+			'Nu_Documento_Identidad' => $this->input->post('Nu_Documento_Identidad'),
+			'No_Entidad' => $this->input->post('No_Entidad'),
+			'Nu_Celular_Entidad' => $this->input->post('Nu_Celular_Entidad'),
+			'Txt_Email_Entidad' => $this->input->post('Txt_Email_Entidad'),
+		);
+		echo json_encode($this->PedidosGrupalModel->actualizarPedido(
+				array(
+					'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
+					'ID_Entidad' => $this->input->post('EID_Entidad'),
+				),
+				$data,
+				$this->input->post('addProducto')
+			)
+		);
+	}
 }

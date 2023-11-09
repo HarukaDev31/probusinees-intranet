@@ -7,6 +7,20 @@ $(function () {
     $( '.div-AgregarEditar' ).hide();
     $( '.div-Listar' ).show();
   })
+  
+  $( '.input-number' ).on('input', function () {
+    this.value = this.value.replace(/[^0-9]/g,'');
+  });
+  
+  $( '.input-decimal' ).on('input', function () {
+    var numero = parseFloat(this.value);
+    if(!isNaN(numero)){
+      this.value = this.value.replace(/[^0-9\.]/g,'');
+      if (numero < 0)
+        this.value = '';
+    } else
+      this.value = this.value.replace(/[^0-9\.]/g,'');
+  });
 })
 
 function ParseDateString(fecha, tipo_fecha, caracter){

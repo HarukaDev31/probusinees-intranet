@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.23'; ?>
+<?php $iControlVersionDashboard = '1.0.31'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -67,6 +67,7 @@
 <?php endif; ?>
 
 <?php if (isset($js_pedidos_grupal) && $js_pedidos_grupal==true) : ?>
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/pedidos_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
