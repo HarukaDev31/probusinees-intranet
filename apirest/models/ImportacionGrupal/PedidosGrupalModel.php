@@ -7,6 +7,7 @@ class PedidosGrupalModel extends CI_Model{
 	var $table_producto = 'producto';
 	var $table_unidad_medida = 'unidad_medida';
 	var $table_medio_pago = 'medio_pago';
+	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -15,8 +16,9 @@ class PedidosGrupalModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, MONE.No_Moneda, CLI.No_Entidad, CLI.Nu_Celular_Entidad, MP.No_Medio_Pago_Tienda_Virtual')
+        $this->db->select($this->table . '.*, IGC.No_Importacion_Grupal, MONE.No_Moneda, CLI.No_Entidad, CLI.Nu_Celular_Entidad, MP.No_Medio_Pago_Tienda_Virtual')
 		->from($this->table)
+    	->join($this->table_importacion_grupal_cabecera . ' AS IGC', 'IGC.ID_Importacion_Grupal = ' . $this->table . '.ID_Importacion_Grupal', 'join')
     	->join($this->table_moneda . ' AS MONE', 'MONE.ID_Moneda = ' . $this->table . '.ID_Moneda', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_medio_pago . ' AS MP', 'MP.ID_Medio_Pago = ' . $this->table . '.ID_Medio_Pago', 'join')
@@ -35,7 +37,7 @@ class PedidosGrupalModel extends CI_Model{
     }
     
     public function get_by_id($ID){
-        $this->db->select($this->table . '.*, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Direccion_Entidad, CLI.Txt_Email_Entidad, IGPD.ID_Producto, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total');
+        $this->db->select($this->table . '.*, ' . $this->table . '.Ss_Total AS importe_total, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Direccion_Entidad, CLI.Txt_Email_Entidad, IGPD.ID_Producto, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total');
         $this->db->from($this->table);
     	$this->db->join($this->table_importacion_grupal_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
     	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');

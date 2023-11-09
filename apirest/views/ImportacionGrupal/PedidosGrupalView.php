@@ -20,11 +20,14 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover">
                   <thead>
                     <tr>
+                      <th>Campaña</th>
                       <th>Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
+                      <!--
                       <th>M</th>
                       <th>Pago</th>
+                      -->
                       <th>Voucher</th>
                       <th>Total 50%</th>
                       <th>Total</th>
@@ -51,7 +54,7 @@
                   <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
                   
                   <div class="row">
-                    <div class="col-xs-4 col-sm-4 col-md-2">
+                    <div class="col-6 col-sm-4 col-md-2">
                       <div class="form-group">
                         <label>Moneda <span class="label-advertencia text-danger"> *</span></label>
                         <select id="cbo-Monedas" name="ID_Moneda" class="form-control required" style="width: 100%;"></select>
@@ -59,7 +62,18 @@
                       </div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-6">
+                    <div class="col-6 col-sm-4 col-md-2">
+                      <label>Estado</label>
+                      <div class="form-group">
+                        <div id="div-estado" style="font-size: 1.4rem;"></div>
+                        <!--
+                        <input type="text" name="No_Estado" class="form-control" placeholder="Ingresar" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                        -->
+                      </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-8">
                       <label>Nombre</label>
                       <div class="form-group">
                         <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -67,7 +81,7 @@
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-3 col-md-2">
+                    <div class="col-6 col-sm-3 col-md-2 d-none">
                       <label>F. Emisión</label><span class="label-advertencia text-danger"> *</span>
                       <div class="form-group">
                         <input type="text" id="fecha_emision" name="Fe_Emision" class="form-control" placeholder="Ingresar" autocomplete="off">
@@ -80,17 +94,6 @@
                         </div>
                         -->
                         <span class="help-block text-danger" id="error"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-6 col-sm-12 col-md-2">
-                      <label>Estado</label>
-                      <div class="form-group">
-                        <div id="div-estado" style="font-size: 1.4rem;"></div>
-                        <!--
-                        <input type="text" name="No_Estado" class="form-control" placeholder="Ingresar" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                        -->
                       </div>
                     </div>
 

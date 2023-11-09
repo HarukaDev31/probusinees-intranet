@@ -142,7 +142,7 @@ function verPedido(ID){
       $( '[name="No_Entidad"]' ).val(response.No_Entidad);
       $( '[name="Fe_Emision"]' ).val(ParseDateString(response.Fe_Emision, 'fecha_bd', '-'));
 
-      var sDataEstadoPedido = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
+      var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
       if(response.Nu_Estado == 2)
         sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
       else if(response.Nu_Estado == 3)
@@ -156,7 +156,7 @@ function verPedido(ID){
       $( '[name="Txt_Email_Entidad"]' ).val(response.Txt_Email_Entidad);
 
       $( '#label-total_cantidad' ).text( Math.round10(response.Qt_Total, -2));
-      $( '#label-total_importe' ).text( Math.round10(response.Ss_Total), -2);
+      $( '#label-total_importe' ).text( Math.round10(response.importe_total), -2);
 
       var table_enlace_producto = "";
       for (i = 0; i < detalle.length; i++) {
