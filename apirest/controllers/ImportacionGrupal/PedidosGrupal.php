@@ -31,7 +31,7 @@ class PedidosGrupal extends CI_Controller {
             $rows[] = $row->No_Importacion_Grupal;
             $rows[] = $row->ID_Pedido_Cabecera;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Entidad;
+            $rows[] = $row->No_Entidad . "\n" . $row->Nu_Celular_Entidad;
             /*
 			$rows[] = $row->No_Moneda;
             $rows[] = $row->No_Medio_Pago_Tienda_Virtual;
