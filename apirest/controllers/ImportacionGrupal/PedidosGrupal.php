@@ -71,7 +71,7 @@ class PedidosGrupal extends CI_Controller {
 			} else if($row->Nu_Estado==3){
 				$fSaldo = '0.00';
 			}
-            $rows[] = round($row->Ss_Total / 2, 2);
+            $rows[] = $fSaldo;
 
             $rows[] = round($row->Ss_Total, 2);
 			
