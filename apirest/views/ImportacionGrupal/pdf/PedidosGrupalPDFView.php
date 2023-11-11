@@ -230,6 +230,13 @@
             <th class="text-right" style="width: 20%">TOTAL</th>
             <th class="text-right" style="width: 15%"><?php echo $arrData[0]->No_Signo . ' ' . numberFormat($arrData[0]->importe_total, 2, '.', ','); ?></th>
           </tr>
+          <?php if($arrData[0]->Nu_Estado_Pedido==1){//2= ?>
+          <tr class="tr-theadFormat tr-totales">
+            <th class="text-right" style="width: 65%"></th>
+            <th class="text-right" style="width: 20%">TOTAL A PAGAR</th>
+            <th class="text-right" style="width: 15%"><?php echo $arrData[0]->No_Signo . ' ' . numberFormat(($arrData[0]->importe_total/2), 2, '.', ','); ?></th>
+          </tr>
+          <?php } ?>
           <?php if($arrData[0]->Nu_Estado_Pedido==2){//2= ?>
           <tr class="tr-theadFormat tr-totales">
             <th class="text-right" style="width: 65%"></th>
