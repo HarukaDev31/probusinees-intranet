@@ -150,8 +150,8 @@ class PedidosGrupal extends CI_Controller {
 			$html = ob_get_contents();
 			ob_end_clean();
 			
-			$pdf->SetAuthor('probusiness');
-			$pdf->SetTitle('probusiness_Cotizacion_' . $data[0]->Nu_Documento_Identidad . '_' . $data[0]->ID_Pedido_Cabecera);
+			$pdf->SetAuthor('ProBusiness');
+			$pdf->SetTitle('ProBusiness_Cotizacion_' . $data[0]->Nu_Documento_Identidad . '_' . $data[0]->ID_Pedido_Cabecera);
 		
 			$pdf->SetPrintHeader(false);
 			$pdf->SetPrintFooter(false);

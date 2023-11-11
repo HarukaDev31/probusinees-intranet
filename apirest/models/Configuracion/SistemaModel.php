@@ -241,6 +241,7 @@ class SistemaModel extends CI_Model{
             }
             // ./ Formatos de documentos
             
+            /*
             $query = "SELECT ID_Entidad FROM entidad WHERE ID_Empresa = " . $data['ID_Empresa'] . " AND Nu_Tipo_Entidad = 0 AND No_Entidad LIKE '%clientes varios%' LIMIT 1"; //1 = ID_Entidad -> Cliente varios
             if ( !$this->db->simple_query($query) ){
                 $this->db->trans_rollback();
@@ -264,6 +265,7 @@ class SistemaModel extends CI_Model{
                 );
             }
             $data = array_merge($data, array('ID_Entidad_Clientes_Varios_Venta_Predeterminado' => $ID_Entidad));
+            */
 
             if ( $this->db->update($this->table, $data, $where) > 0 ) {
                 /* TOUR GESTION */

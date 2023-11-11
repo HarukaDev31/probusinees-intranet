@@ -251,11 +251,11 @@ function verPedido(ID){
       $( '[name="Fe_Emision"]' ).val(ParseDateString(response.Fe_Emision, 'fecha_bd', '-'));
 
       var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
-      if(response.Nu_Estado == 2)
+      if(response.Nu_Estado_Pedido == 2)
         sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
-      else if(response.Nu_Estado == 3)
+      else if(response.Nu_Estado_Pedido == 3)
         sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
-      else if(response.Nu_Estado == 4)
+      else if(response.Nu_Estado_Pedido == 4)
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
       
