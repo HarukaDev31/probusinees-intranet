@@ -97,7 +97,8 @@ class SistemaController extends CI_Controller {
 
 					$arrUrlImagePath = explode('..', $path);
 					$arrUrlImage = explode('/principal',base_url());
-					$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+					//$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+					$url_image = $path;
 					$arrResponse = array(
 						'sStatus' => 'success',
 						'sMessage' => 'imagén guardada',
@@ -109,7 +110,8 @@ class SistemaController extends CI_Controller {
 			} else {
 				$arrUrlImagePath = explode('..', $path);
 				$arrUrlImage = explode('/principal',base_url());
-				$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+				//$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+				$url_image = $path;
 
 				$arrResponse = array(
 					'sStatus' => 'success',

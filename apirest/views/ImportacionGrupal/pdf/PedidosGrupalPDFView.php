@@ -308,7 +308,7 @@
           </tr>
       </table>
       <?php } ?>
-      <br><br>
+      <br><br><br>
 	  	<table class="table_pdf">
         <thead>
           <tr class="tr-sub_thead">
