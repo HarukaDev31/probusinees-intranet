@@ -64,7 +64,15 @@ class PedidosGrupal extends CI_Controller {
 			}
 			$rows[] = $voucher;
 
+			//saldo de cliente
+			$fSaldo = round($row->Ss_Total, 2);
+			if($row->Nu_Estado==2){
+				$fSaldo = round($row->Ss_Total / 2, 2);
+			} else if($row->Nu_Estado==3){
+				$fSaldo = '0.00';
+			}
             $rows[] = round($row->Ss_Total / 2, 2);
+
             $rows[] = round($row->Ss_Total, 2);
 			
 			//PDF cliente de pedido
