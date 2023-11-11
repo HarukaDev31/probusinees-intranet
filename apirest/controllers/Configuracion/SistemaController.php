@@ -99,7 +99,9 @@ class SistemaController extends CI_Controller {
 					$arrUrlImagePath = explode('..', $path);
 					$arrUrlImage = explode('/principal',base_url());
 					//$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
-					$url_image = $path;
+					$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
+					$url_image = $base_url . $path;
+					//$url_image = $path;
 					$arrResponse = array(
 						'sStatus' => 'success',
 						'sMessage' => 'imagén guardada',
