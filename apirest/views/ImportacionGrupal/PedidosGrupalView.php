@@ -29,8 +29,9 @@
                       <th>Pago</th>
                       -->
                       <th>Voucher</th>
-                      <th>Total 50%</th>
+                      <th>Saldo</th>
                       <th>Total</th>
+                      <th>PDF</th>
                       <!--<th>Cantidad</th>-->
                       <th class="no-sort">Estado</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>

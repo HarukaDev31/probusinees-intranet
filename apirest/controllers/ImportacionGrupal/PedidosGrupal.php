@@ -4,6 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class PedidosGrupal extends CI_Controller {
 	
 	private $upload_path = '../assets/images/clientes/';
+	private $file_path = '../assets/images/logos/';
+	private $logo_cliente_path = '../assets/images/logos/';
+	private $logo_cliente_logos_empresa_almacen_path = '../assets/images/logos_empresa_almacen/';
 	
 	function __construct(){
     	parent::__construct();	
@@ -63,6 +66,10 @@ class PedidosGrupal extends CI_Controller {
 
             $rows[] = round($row->Ss_Total / 2, 2);
             $rows[] = round($row->Ss_Total, 2);
+			
+			//PDF cliente de pedido
+			$rows[] = '<button class="btn btn-xs btn-link" alt="PDF" title="PDF" href="javascript:void(0)" onclick="generarPDFPedidoCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-pdf text-danger fa-2x"></i></button>';
+
             //$rows[] = round($row->Qt_Total, 2);
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoArray($row->Nu_Estado);
             //$rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
@@ -119,5 +126,80 @@ class PedidosGrupal extends CI_Controller {
 				$this->input->post('addProducto')
 			)
 		);
+	}
+
+	//generar cotización PDF para pedido de cliente	
+	public function generarPDFPedidoCliente($ID){
+        $data = $this->PedidosGrupalModel->get_by_id($this->security->xss_clean($ID));
+		//array_debug($data);
+
+		if( !empty($data) ){
+			$this->load->library('Pdf');
+			
+			$this->load->library('EnLetras', 'el');
+			$EnLetras = new EnLetras();
+
+			$pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, 'A4', true, 'UTF-8', false);
+			
+			ob_start();
+			$file = $this->load->view('ImportacionGrupal/pdf/PedidosGrupalPDFView', array(
+				'arrDataEmpresa' => $data,
+				'arrData' => $data,
+				'totalEnLetras'	=> $EnLetras->ValorEnLetras($data[0]->Ss_Total, $data[0]->No_Moneda),
+			));
+			$html = ob_get_contents();
+			ob_end_clean();
+			
+			$pdf->SetAuthor('probusiness');
+			$pdf->SetTitle('probusiness_Cotizacion_' . $data[0]->Nu_Documento_Identidad . '_' . $data[0]->ID_Pedido_Cabecera);
+		
+			$pdf->SetPrintHeader(false);
+			$pdf->SetPrintFooter(false);
+
+			$pdf->SetMargins(PDF_MARGIN_LEFT-5, PDF_MARGIN_TOP-20, PDF_MARGIN_RIGHT-5);
+			$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+			
+			$pdf->AddPage();
+				
+			$sNombreLogo=str_replace(' ', '_', $data[0]->No_Logo_Empresa);
+			$sRutaArchivoLogoCliente = $this->logo_cliente_path . $sNombreLogo;
+			$sUrlImagen = $data[0]->No_Imagen_Logo_Empresa;
+
+			$sCssFontFamily='Arial';
+			$format_header = '<table border="0" cellspacing="1" cellpadding="0">';
+				$format_header .= '<tr>';
+					$format_header .= '<td style="width: 50%; text-align: left;">';
+						$format_header .= '<img style="height: ' . $data[0]->Nu_Height_Logo_Ticket . 'px; width: ' . $data[0]->Nu_Width_Logo_Ticket . 'px;" src="' . $sUrlImagen . '"><br>';
+					$format_header .= '</td>';
+					$format_header .= '<td style="width: 50%; text-align: right;">';
+						if(!empty($data[0]->No_Empresa_Comercial))
+							$format_header .= '<label style="font-size: 11px; font-family: "' . $sCssFontFamily . '", Times, serif;"><b>' . $data[0]->No_Empresa_Comercial . '</b></label><br>';
+						else
+							$format_header .= '<label style="font-size: 10px; font-family: "' . $sCssFontFamily . '", Times, serif;"><b>' . $data[0]->No_Empresa . '</b></label><br>';
+						$format_header .= '<label style="font-size: 10px; font-family: "' . $sCssFontFamily . '", Times, serif;"><b>RUC: ' . $data[0]->Nu_Documento_Identidad_Empresa . '</b></label><br>';
+						if(!empty($data[0]->Txt_Direccion_Empresa))
+							$format_header .= '<label style="font-size: 9px; font-family: "' . $sCssFontFamily . '", Times, serif;">' . $data[0]->Txt_Direccion_Empresa . ' - ' . $data[0]->No_Departamento . ' - ' . $data[0]->No_Provincia . ' - ' . $data[0]->No_Distrito . '</label><br>';
+						if(!empty($data[0]->No_Dominio_Empresa))
+							$format_header .= '<label style="color: #000000; font-size: 10px; font-family: "Times New Roman", Times, serif;">' . $data[0]->No_Dominio_Empresa . '</label><br>';
+						if(!empty($data[0]->Nu_Celular_Empresa))
+							$format_header .= '<label style="color: #868686; font-size: 10px; font-family: "Times New Roman", Times, serif;">Celular: ' . $data[0]->Nu_Celular_Empresa . '</label><br>';
+						if(!empty($data[0]->Txt_Email_Empresa))
+							$format_header .= '<label style="color: #34bdad; font-size: 10px; font-family: "Times New Roman", Times, serif;">Correo: ' . $data[0]->Txt_Email_Empresa . '</label><br>';
+						if(!empty($data[0]->Txt_Slogan_Empresa))
+							$format_header .= '<label style="color: #979797; font-size: 10px; font-family: "Times New Roman", Times, serif;">' . $data[0]->Txt_Slogan_Empresa . '</label>';
+					$format_header .= '</td>';
+				$format_header .= '</tr>';
+			$format_header .= '</table>';
+			$pdf->writeHTML($format_header, true, 0, true, 0);
+
+			$pdf->setFont('helvetica', '', 7);
+			$pdf->writeHTML($html, true, false, true, false, '');
+			
+			$file_name = 'ProBusiness_Cotizacion_' . $data[0]->Nu_Documento_Identidad . '_' . $data[0]->ID_Pedido_Cabecera . ".pdf";
+			$pdf->Output($file_name, 'I');
+		} else {
+			exit();
+			//alert('no existe');
+		}
 	}
 }

@@ -2,11 +2,17 @@
 class PedidosGrupalModel extends CI_Model{
 	var $table = 'importacion_grupal_pedido_cabecera';
 	var $table_importacion_grupal_pedido_detalle = 'importacion_grupal_pedido_detalle';
+	var $table_empresa = 'empresa';
+	var $table_organizacion = 'organizacion';
+	var $table_configuracion = 'configuracion';
 	var $table_moneda = 'moneda';
 	var $table_cliente = 'entidad';
 	var $table_producto = 'producto';
 	var $table_unidad_medida = 'unidad_medida';
 	var $table_medio_pago = 'medio_pago';
+	var $table_departamento = 'departamento';
+	var $table_provincia = 'provincia';
+	var $table_distrito = 'distrito';
 	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	
     var $order = array('Fe_Registro' => 'desc');
@@ -37,8 +43,14 @@ class PedidosGrupalModel extends CI_Model{
     }
     
     public function get_by_id($ID){
-        $this->db->select($this->table . '.*, ' . $this->table . '.Ss_Total AS importe_total, IGPD.ID_Unidad_Medida, IGPD.ID_Unidad_Medida_Precio, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Direccion_Entidad, CLI.Txt_Email_Entidad, IGPD.ID_Producto, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total');
+        $this->db->select('DEP.No_Departamento, PRO.No_Provincia, DIS.No_Distrito, EMP.No_Empresa, EMP.Txt_Direccion_Empresa, EMP.Nu_Documento_Identidad AS Nu_Documento_Identidad_Empresa, CONFI.No_Logo_Empresa, CONFI.No_Imagen_Logo_Empresa, CONFI.Nu_Height_Logo_Ticket, CONFI.Nu_Width_Logo_Ticket, ' . $this->table . '.*, ' . $this->table . '.Ss_Total AS importe_total, IGPD.ID_Unidad_Medida, IGPD.ID_Unidad_Medida_Precio, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Direccion_Entidad, CLI.Txt_Email_Entidad, IGPD.ID_Producto, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total');
         $this->db->from($this->table);
+		$this->db->join($this->table_empresa . ' AS EMP', 'EMP.ID_Empresa = ' . $this->table . '.ID_Empresa', 'join');
+		$this->db->join($this->table_departamento . ' AS DEP', 'DEP.ID_Departamento = EMP.ID_Departamento', 'join');
+		$this->db->join($this->table_provincia . ' AS PRO', 'PRO.ID_Provincia = EMP.ID_Provincia', 'join');
+		$this->db->join($this->table_distrito . ' AS DIS', 'DIS.ID_Distrito = EMP.ID_Distrito', 'join');
+		$this->db->join($this->table_organizacion . ' AS ORG', 'ORG.ID_Organizacion = ' . $this->table . '.ID_Organizacion', 'join');
+		$this->db->join($this->table_configuracion . ' AS CONFI', 'CONFI.ID_Empresa = EMP.ID_Empresa', 'join');
     	$this->db->join($this->table_importacion_grupal_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
     	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
     	$this->db->join($this->table_producto . ' AS ITEM', 'ITEM.ID_Producto = IGPD.ID_Producto', 'join');

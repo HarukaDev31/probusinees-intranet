@@ -488,3 +488,27 @@ function calcularTotales(){
   $( '#label-total_cantidad' ).text( Math.round10(fCantidadTotal, -2));
   $( '#label-total_importe' ).text( Math.round10(fImporteTotal, -2));
 }
+
+function generarPDFPedidoCliente(ID){
+  var $modal_delete = $( '#modal-message-delete' );
+  $modal_delete.modal('show');
+  
+  $( '.modal-message-delete' ).removeClass('modal-danger modal-warning modal-success');
+  $( '.modal-message-delete' ).addClass('modal-success');
+
+  $('#modal-title').text('¿Deseas genera PDF?');
+  
+  $( '#btn-cancel-delete' ).off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+  
+  $( '#btn-save-delete' ).off('click').click(function () {
+    _generarPDFPedidoCliente($modal_delete, ID);
+  });
+}
+
+function _generarPDFPedidoCliente($modal_delete, ID){
+  $modal_delete.modal('hide');
+  url = base_url + 'ImportacionGrupal/PedidosGrupal/generarPDFPedidoCliente/' + ID;
+  window.open(url,'_blank');
+}
