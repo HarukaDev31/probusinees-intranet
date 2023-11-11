@@ -53,7 +53,7 @@ class PedidosGrupal extends CI_Controller {
 				//$image = '<a class="btn btn-link" href="' . $url_voucher . '" target="_blank" rel="noopener noreferrer" role="button"><i class="fas fa-link" aria-hidden="true"></i> link</a>';
 				
 				$sCodigoPaisCelular='51';
-				$sMensajeWhatsAppVoucher = "Hola " . $row->No_Entidad . ", espero se encuentre bien. 👋🏻\n\n";
+				$sMensajeWhatsAppVoucher = "Hola *" . $row->No_Entidad . "*, espero se encuentre bien. 👋🏻\n\n";
 				$sMensajeWhatsAppVoucher .= "Le comento que no hemos recibio su depósito 😢\n\n";
 				$sMensajeWhatsAppVoucher .= "Le envío link donde adjuntará su voucher.\n";
 				$sMensajeWhatsAppVoucher .= $url_voucher;
