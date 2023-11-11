@@ -2,7 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class SistemaController extends CI_Controller {
-	private $upload_path = '../assets/images/logos';
+	//private $upload_path = '../assets/images/logos';
+	private $upload_path = 'assets/images/logos';
 	
 	function __construct(){
     	parent::__construct();
