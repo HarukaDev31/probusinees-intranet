@@ -307,26 +307,16 @@ class PedidosAgente extends CI_Controller {
 				->setCellValue('A' . $fila, $iCounter);
 
 				if( !empty($row->Txt_Url_Imagen_Producto) ){
-					//$objDrawing->setPath('https://intranet.probusiness.pe/assets/images/productos/20603287721/elefantepn.png?ver=1');
-					/*
-					$objDrawing->setPath('assets/img/arturo.jpeg');
-					$objDrawing->setCoordinates('B' . $fila);
-					$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-					$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
-					*/
-					// imagecreatefromXXX  (XXX is jpeg png or gif)
-					//$gdImage = imagecreatefromjpeg('https://intranet.probusiness.pe/assets/images/productos/20603287721/elefantepn.png?ver=1');
-					$gdImage = imagecreatefrompng('https://intranet.probusiness.pe/assets/images/productos/20603287721/elefantepn.png?ver=1');
-					
-
 					$objDrawing = new PHPExcel_Worksheet_Drawing();
 					$objDrawing->setName('Sample image');
 					$objDrawing->setDescription('Sample image');
-					$objDrawing->setImageResource($gdImage);
-					$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
-					$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
-					$objDrawing->setHeight(36);
+					//$objDrawing->setPath('assets/img/arturo.jpeg');
+					$objDrawing->setPath('./assets/images/productos/04be328a212d1b43ab42fa7565abddb5.jpeg');
+					$objDrawing->setHeight(100);
+					$objDrawing->setWidth(100);
+					$objDrawing->setCoordinates('B' . $fila);
 					$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+					$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
 				} else {
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
 					->setCellValue('B' . $fila, '');
