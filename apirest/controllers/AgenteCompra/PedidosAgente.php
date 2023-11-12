@@ -315,7 +315,9 @@ class PedidosAgente extends CI_Controller {
 					$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
 					*/
 					// imagecreatefromXXX  (XXX is jpeg png or gif)
-					$gdImage = imagecreatefromjpeg('https://intranet.probusiness.pe/assets/images/productos/20603287721/elefantepn.png?ver=1');
+					//$gdImage = imagecreatefromjpeg('https://intranet.probusiness.pe/assets/images/productos/20603287721/elefantepn.png?ver=1');
+					$gdImage = imagecreatefrompng('https://intranet.probusiness.pe/assets/images/productos/20603287721/elefantepn.png?ver=1');
+					
 
 					$objDrawing = new PHPExcel_Worksheet_Drawing();
 					$objDrawing->setName('Sample image');
