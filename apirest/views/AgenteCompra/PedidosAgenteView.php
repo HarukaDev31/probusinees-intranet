@@ -138,8 +138,8 @@
                           <thead>
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-left">Imagen</th>
-                              <th class="text-left">Nombre Comercial</th>
+                              <th class="text-left" width="30%">Imagen</th>
+                              <th class="text-left">Nombre</th>
                               <th class="text-left">Características</th>
                               <th class="text-right">Cantidad</th>
                               <th class="text-left">Link</th>
