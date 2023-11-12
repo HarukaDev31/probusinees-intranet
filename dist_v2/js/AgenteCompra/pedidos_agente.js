@@ -258,7 +258,7 @@ function verPedido(ID){
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td class='text-center td-name'><img style='height: 250px;'' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-fluid mb-2'></td>"
+          + "<td class='text-center td-name'><img style='max-height: 350px;width: 350px;' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-fluid mb-2'></td>"
           + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           + "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
