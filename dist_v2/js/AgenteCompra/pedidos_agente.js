@@ -236,19 +236,11 @@ function verPedido(ID){
       $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
       $( '[name="EID_Organizacion"]' ).val(response.ID_Organizacion);
 
-      url = base_url + 'HelperController/getMonedas';
-      $.post( url , function( responseMonedas ){
-        $( '#cbo-Monedas' ).html('');
-        for (var i = 0; i < responseMonedas.length; i++){
-          selected = '';
-          if(response.ID_Moneda == responseMonedas[i]['ID_Moneda']){
-            selected = 'selected="selected"';
-          }
-          $( '#cbo-Monedas' ).append( '<option value="' + responseMonedas[i]['ID_Moneda'] + '" data-no_signo="' + responseMonedas[i]['No_Signo'] + '" ' + selected + '>' + responseMonedas[i]['No_Moneda'] + '</option>' );
-        }
-      }, 'JSON');
+      $( '[name="No_Contacto"]' ).val(response.No_Contacto);
+      $( '[name="Txt_Email_Contacto"]' ).val(response.Txt_Email_Contacto);
+      $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
       $( '[name="No_Entidad"]' ).val(response.No_Entidad);
-      $( '[name="Fe_Emision"]' ).val(ParseDateString(response.Fe_Emision, 'fecha_bd', '-'));
+      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
 
       var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
       if(response.Nu_Estado_Pedido == 2)
@@ -258,35 +250,22 @@ function verPedido(ID){
       else if(response.Nu_Estado_Pedido == 4)
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
-      
-      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
-      $( '[name="Nu_Celular_Entidad"]' ).val(response.Nu_Celular_Entidad);
-      $( '[name="Txt_Email_Entidad"]' ).val(response.Txt_Email_Entidad);
-
-      $( '#label-total_cantidad' ).text( Math.round10(response.Qt_Total, -2));
-      $( '#label-total_importe' ).text( Math.round10(response.importe_total, -2));
 
       var table_enlace_producto = "";
       for (i = 0; i < detalle.length; i++) {
-        var id_item =  detalle[i]['ID_Producto'] + (detalle[i]['ID_Unidad_Medida'] != '0' ? detalle[i]['ID_Unidad_Medida'] : '') + (detalle[i]['ID_Unidad_Medida_Precio'] != '0' ? detalle[i]['ID_Unidad_Medida_Precio'] : '');
+        var id_item = detalle[i]['ID_Pedido_Detalle'];
+        var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "</a>" : "");
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td style='display:none;' class='text-left td-id_item_bd'>" + detalle[i]['ID_Producto'] + "</td>"
-          + "<td style='display:none;' class='text-left td-id_unidad_medida_bd'>" + detalle[i]['ID_Unidad_Medida'] + "</td>"
-          + "<td style='display:none;' class='text-left td-id_unidad_medida_precio_bd'>" + detalle[i]['ID_Unidad_Medida_Precio'] + "</td>"
-          + "<td class='text-left td-name'>" + detalle[i]['No_Producto'] + "</td>"
-          + "<td class='text-left td-unidad_medida'>" + ((detalle[i]['No_Unidad_Medida'] != '' && detalle[i]['No_Unidad_Medida'] != null) ? detalle[i]['No_Unidad_Medida'] : detalle[i]['No_Unidad_Medida_2']) + "</td>"
+          + "<td class='text-left td-name'><img src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-fluid mb-2'></td>"
+          + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
+          + "<td class='text-left td-name'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           + "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
-          + "<td class='text-right td-precio'>" + detalle[i]['Ss_Precio'] + "</td>"
-          + "<td class='text-right td-total'>" + detalle[i]['Ss_Total'] + "</td>"
-          + "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link text-danger' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + detalle[i]['ID_Producto'] + '">';
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_unidad_medida]" value="' + detalle[i]['ID_Unidad_Medida'] + '">';
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_unidad_medida_2]" value="' + detalle[i]['ID_Unidad_Medida_Precio'] + '">';
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][cantidad_item]" value="' + detalle[i]['Qt_Producto'] + '">';
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][precio_item]" value="' + detalle[i]['Ss_Precio'] + '">';
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][total_item]" value="' + detalle[i]['Ss_Total'] + '">';
+          + "<td class='text-left td-name'>" + href_link + "</td>"
+          //+ "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link text-danger' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
+          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
+          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
         table_enlace_producto += "</tr>";
       }
       $( '#table-Producto_Enlace' ).append(table_enlace_producto);

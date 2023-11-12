@@ -24,11 +24,12 @@
                       <th>Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
+                      <th>Empresa</th>
                       <th class="no-sort">Excel</th>
                       <!--<th class="no-sort">PDF</th>-->
                       <th>Estado</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
-                        <th class="no-sort">Editar</th>
+                        <th class="no-sort">Ver</th>
                       <?php endif; ?>
                       <!--
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
@@ -51,76 +52,56 @@
                   <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
                   
                   <div class="row">
-                    <div class="col-6 col-sm-4 col-md-2">
-                      <div class="form-group">
-                        <label>Moneda <span class="label-advertencia text-danger"> *</span></label>
-                        <select id="cbo-Monedas" name="ID_Moneda" class="form-control required" style="width: 100%;"></select>
-                        <span class="help-block" id="error"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-6 col-sm-4 col-md-2">
+                    <div class="col-12 col-sm-12 col-md-12">
                       <label>Estado</label>
                       <div class="form-group">
                         <div id="div-estado" style="font-size: 1.4rem;"></div>
-                        <!--
-                        <input type="text" name="No_Estado" class="form-control" placeholder="Ingresar" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                        -->
                       </div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-8">
-                      <label>Nombre</label>
+                    <div class="col-12 col-sm-12 col-md-6">
+                      <label>Cliente</label>
+                      <div class="form-group">
+                        <input type="text" name="No_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-sm-4 col-md-4">
+                      <label>Email</label>
+                      <div class="form-group">
+                        <input type="text" name="Txt_Email_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-sm-4 col-md-2">
+                      <label>Celular</label>
+                      <div class="form-group">
+                        <input type="text" inputmode="tel" name="Nu_Celular_Contacto" class="form-control required" placeholder="Ingresar" maxlength="11" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    
+                    <div class="col-12 col-sm-12 col-md-6">
+                      <label>Empresa</label>
                       <div class="form-group">
                         <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-3 col-md-2 d-none">
-                      <label>F. Emisión</label><span class="label-advertencia text-danger"> *</span>
-                      <div class="form-group">
-                        <input type="text" id="fecha_emision" name="Fe_Emision" class="form-control" placeholder="Ingresar" autocomplete="off">
-                        <!--
-                        <div class="input-group date" id="fecha_emision" data-target-input="nearest">
-                          <input type="text" name="Fe_Emision" value="" class="form-control datetimepicker-input date-picker-report_crud" data-target="#fecha_emision" data-toggle="datetimepicker" />
-                          <div class="input-group-append" data-target="#fecha_emision" data-toggle="datetimepicker">
-                              <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                          </div>
-                        </div>
-                        -->
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-6 col-sm-4 col-md-4">
-                      <label>Nro. Documento</label>
+                    <div class="col-12 col-sm-4 col-md-4">
+                      <label>RUC</label>
                       <div class="form-group">
                         <input type="text" name="Nu_Documento_Identidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
-
-                    <div class="col-6 col-sm-4 col-md-4">
-                      <label>Celular</label>
-                      <div class="form-group">
-                        <input type="text" name="Nu_Celular_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-xs-12 col-sm-4 col-md-4">
-                      <label>Email</label>
-                      <div class="form-group">
-                        <input type="text" name="Txt_Email_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
-                    </div>
                   </div>
-                  
+                    
                   <div class="row">
-                    <div class="col-12 col-sm-8 col-md-8">
+                    <div class="col-12 col-sm-8 col-md-8 d-none">
                       <label>Producto</label>
                       <div class="form-group">
                         <input type="hidden" id="txt-AID" name="AID" class="form-control">
@@ -136,7 +117,7 @@
                       </div>
                     </div>
                       
-                    <div class="col-12 col-sm-2 col-md-2">
+                    <div class="col-12 col-sm-2 col-md-2 d-none">
                       <label>Cantidad</label>
                       <div class="form-group">
                         <input type="text" id="txt-Qt_Producto_Descargar" inputmode="decimal" name="Qt_Producto_Descargar" class="form-control input-decimal" placeholder="Ingresar cantidad" value="1" autocomplete="off">
@@ -144,7 +125,7 @@
                       </div>
                     </div>
                     
-                    <div class="col-12 col-sm-2 col-md-2">
+                    <div class="col-12 col-sm-2 col-md-2 d-none">
                       <label class="hidden-xs">&nbsp;</label>
                       <div class="form-group">
                         <button type="button" id="btn-addProductosEnlaces" class="btn btn-success btn-block"> Agregar</button>
@@ -157,32 +138,20 @@
                           <thead>
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
-                              <th style='display:none;' class="text-left">ID BD</th>
-                              <th class="text-left">Nombre</th>
-                              <th class="text-left">Tipo</th>
-                              <th class="text-right">Unidad</th>
-                              <th class="text-right">C/U</th>
-                              <th class="text-right">Total</th>
-                              <th class="text-center"></th>
+                              <th class="text-left">Imagen</th>
+                              <th class="text-left">Nombre Comercial</th>
+                              <th class="text-left">Características</th>
+                              <th class="text-right">Cantidad</th>
+                              <th class="text-left">Link</th>
+                              <!--<th class="text-center"></th>-->
                             </tr>
                           </thead>
                           <tbody>
                           </tbody>
-                          <tfoot>
-                            <tr>
-                              <th class="text-right" colspan="2">Cantidad</th>
-                              <th class="text-right"><label id="label-total_cantidad">2</label></th>
-                              <th class="text-right">Total</th>
-                              <th class="text-right"><label id="label-total_importe">2222</label></th>
-                            </tr>
-                          </thead>
                         </table>
                       </div>
                     </div>
-                  </div><!-- ./Compuesto -->
-
-
-                  <!-- totales -->
+                  </div><!-- ./table -->
 
                   <div class="row mt-3">
                     <div class="col-xs-6 col-md-6">

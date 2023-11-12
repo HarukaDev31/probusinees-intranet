@@ -34,7 +34,8 @@ class PedidosAgente extends CI_Controller {
             $rows[] = $row->No_Pais;
             $rows[] = $row->ID_Pedido_Cabecera;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Entidad . "\n" . $row->Nu_Celular_Entidad;
+            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto . "<br>" . $row->Txt_Email_Contacto;
+            $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 			
 			//EXCEL cliente de pedido
 			$rows[] = '<button class="btn btn-xs btn-link" alt="PDF" title="PDF" href="javascript:void(0)" onclick="generarExcelPedidoCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
@@ -261,7 +262,7 @@ class PedidosAgente extends CI_Controller {
 			//assets/img/logos/logo_horizontal_probusiness_claro.png?ver=4.0.0
 			$objDrawing->setPath('assets/img/logos/logo_horizontal_probusiness_claro.png');
 			$objDrawing->setHeight(210);
-			$objDrawing->setWidth(210);
+			$objDrawing->setWidth(200);
 			$objDrawing->setCoordinates('B' . $fila);
 			$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(30);
@@ -311,6 +312,28 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_left);
 			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_right);
 
+			$objPHPExcel->getActiveSheet()
+			->getStyle('B' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'E7E7E7')
+					)
+				)
+			);
+			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('E' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'E7E7E7')
+					)
+				)
+			);
+
 			$fila = 6;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)
 			->setCellValue('B' . $fila, 'CORREO')
@@ -324,6 +347,28 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_left);
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_right);
 			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('B' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'E7E7E7')
+					)
+				)
+			);
+			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('E' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'E7E7E7')
+					)
+				)
+			);
+
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)
 			->setCellValue('E' . $fila, 'RUC')
 			->setCellValue('F' . $fila, $data[0]->Nu_Documento_Identidad);
@@ -349,6 +394,28 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_left);
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_right);
 			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('B' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'E7E7E7')
+					)
+				)
+			);
+			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('E' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'E7E7E7')
+					)
+				)
+			);
+
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)
 			->setCellValue('E' . $fila, 'PAÍS')
 			->setCellValue('F' . $fila, $data[0]->No_Pais_Cliente);
@@ -424,13 +491,15 @@ class PedidosAgente extends CI_Controller {
 					$objDrawing->setDescription($row->Txt_Descripcion);
 					
 					//pruebas localhost
-					//$objDrawing->setPath('assets/img/arturo.jpeg');
+					$objDrawing->setPath('assets/img/arturo.jpeg');
 
 					//cloud
-					//$objDrawing->setPath('../../agentecompra.probusiness.pe/public_html/assets/images/productos/0162663a046cf7cd5b837219170dc11d.png');
+					/*
+					$objDrawing->setPath('../../agentecompra.probusiness.pe/public_html/assets/images/productos/0162663a046cf7cd5b837219170dc11d.png');
 					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
 					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
 					$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
+					*/
 
 					$objDrawing->setHeight(100);
 					$objDrawing->setWidth(100);

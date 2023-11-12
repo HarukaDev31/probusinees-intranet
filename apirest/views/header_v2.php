@@ -71,9 +71,9 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="<?php echo base_url() . 'LoginController/logout'; ?>" role="button">
-            <i class="fas fa-power-off"></i>
-            Cerrar
+          <a class="nav-link text-danger" href="<?php echo base_url() . 'LoginController/logout'; ?>" role="button">
+            <i class="text-danger fas fa-power-off"></i>
+            Salir
           </a>
         </li>
       </ul>
