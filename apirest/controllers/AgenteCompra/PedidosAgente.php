@@ -285,7 +285,6 @@ class PedidosAgente extends CI_Controller {
 			$fila = 6;
 				
 			$iCounter = 1;
-			$objDrawing = new PHPExcel_Worksheet_Drawing();
             foreach($data as $row) {
 				/*
 				$objPHPExcel->getActiveSheet()->getStyle('A' . $fila . ':' . 'C' . $fila)->applyFromArray($style_align_center);
@@ -318,6 +317,7 @@ class PedidosAgente extends CI_Controller {
 					// imagecreatefromXXX  (XXX is jpeg png or gif)
 					$gdImage = imagecreatefromjpeg('https://intranet.probusiness.pe/assets/images/productos/20603287721/elefantepn.png?ver=1');
 
+					$objDrawing = new PHPExcel_Worksheet_Drawing();
 					$objDrawing->setName('Sample image');
 					$objDrawing->setDescription('Sample image');
 					$objDrawing->setImageResource($gdImage);
@@ -325,7 +325,6 @@ class PedidosAgente extends CI_Controller {
 					$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
 					$objDrawing->setHeight(36);
 					$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-					$objDrawing->setCoordinates('B' . $fila);
 				} else {
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
 					->setCellValue('B' . $fila, '');
