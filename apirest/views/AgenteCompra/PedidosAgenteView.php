@@ -25,7 +25,7 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th class="no-sort">Excel</th>
-                      <th class="no-sort">PDF</th>
+                      <!--<th class="no-sort">PDF</th>-->
                       <th>Estado</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Editar</th>
