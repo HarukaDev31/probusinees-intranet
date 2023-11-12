@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.33'; ?>
+<?php $iControlVersionDashboard = '1.0.35'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -83,6 +83,11 @@
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/metodo_entrega.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<?php if (isset($js_pedidos_agente) && $js_pedidos_agente==true) : ?>
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_agente.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 
 <!-- Message Delete Modal -->
 <div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" aria-modal="true" role="dialog">
@@ -95,8 +100,8 @@
         </button>
       </div>
       <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-        <button type="button" id="btn-save-delete" class="btn btn-primary">Aceptar</button>
+        <button type="button" class="btn btn-outline-secondary col" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="btn-save-delete" class="btn btn-primary col">Aceptar</button>
       </div>
     </div>
     <!-- /.modal-content -->
