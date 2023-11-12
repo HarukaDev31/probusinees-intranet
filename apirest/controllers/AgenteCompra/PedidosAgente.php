@@ -315,6 +315,8 @@ class PedidosAgente extends CI_Controller {
 					
 					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
 
+					echo $row->Txt_Url_Imagen_Producto;
+
 					$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 
 					$objDrawing->setHeight(100);
