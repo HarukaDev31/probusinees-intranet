@@ -311,7 +311,7 @@ class PedidosAgente extends CI_Controller {
 					$objDrawing->setName('Sample image');
 					$objDrawing->setDescription('Sample image');
 					//$objDrawing->setPath('assets/img/arturo.jpeg');
-					$objDrawing->setPath('./assets/images/productos/04be328a212d1b43ab42fa7565abddb5.jpeg');
+					$objDrawing->setPath('../../agentecompra.probusiness.pe/public_html/assets/images/productos/0162663a046cf7cd5b837219170dc11d.png');
 					$objDrawing->setHeight(100);
 					$objDrawing->setWidth(100);
 					$objDrawing->setCoordinates('B' . $fila);
