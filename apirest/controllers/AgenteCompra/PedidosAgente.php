@@ -501,8 +501,8 @@ class PedidosAgente extends CI_Controller {
 					$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 					
 
-					$objDrawing->setHeight(100);
-					$objDrawing->setWidth(100);
+					$objDrawing->setHeight(300);
+					$objDrawing->setWidth(300);
 					$objDrawing->setCoordinates('B' . $fila);
 					$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 				} else {
