@@ -278,13 +278,13 @@
           </tr>
           <?php if (!empty($arrData[0]->Txt_Url_Imagen_Deposito) && empty($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago)) { ?>
           <tr class="tr-sub_thead">
-            <th class="text-center content"><img style="height:100px; width:100px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito; ?>"></th>
+            <th class="text-center content"><img style="height:150px; width:150px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito; ?>"></th>
           </tr>
           <?php } ?>
           <?php if (!empty($arrData[0]->Txt_Url_Imagen_Deposito) && !empty($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago)) { ?>
           <tr class="tr-sub_thead">
-            <th class="text-center content"><img style="height:100px; width:100px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
-            <th class="text-center content"><img style="height:100px; width:100px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
+            <th class="text-center content"><img style="height:150px; width:150px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
+            <th class="text-center content"><img style="height:150px; width:150px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
           </tr>
           <?php } ?>
           <tr class="tr-otros_campos_footer">
