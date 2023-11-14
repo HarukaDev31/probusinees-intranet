@@ -233,7 +233,12 @@
           <?php if($arrData[0]->Nu_Estado_Pedido==1){//2= ?>
           <tr class="tr-theadFormat tr-totales">
             <th class="text-right" style="width: 65%"></th>
-            <th class="text-right" style="width: 20%">TOTAL A PAGAR</th>
+            <th class="text-right" style="width: 20%">PAGAR (50%)</th>
+            <th class="text-right" style="width: 15%"><?php echo $arrData[0]->No_Signo . ' ' . numberFormat(($arrData[0]->importe_total/2), 2, '.', ','); ?></th>
+          </tr>
+          <tr class="tr-theadFormat tr-totales">
+            <th class="text-right" style="width: 65%"></th>
+            <th class="text-right" style="width: 20%">SALDO</th>
             <th class="text-right" style="width: 15%"><?php echo $arrData[0]->No_Signo . ' ' . numberFormat(($arrData[0]->importe_total/2), 2, '.', ','); ?></th>
           </tr>
           <?php } ?>
@@ -251,6 +256,8 @@
           <?php } ?>
         </thead>
       </table>
+
+
 	  	<table class="table_pdf" cellpadding="2">
         <tr class="tr-otros_campos_footer">
           <th class="text-center" colspan="3">&nbsp;</th>
@@ -262,6 +269,35 @@
           <th class="text-center" colspan="3">&nbsp;</th>
         </tr>
       </table>
+      
+      <!-- VOUCHER DE PAGOS -->
+      <?php if (!empty($arrData[0]->Txt_Url_Imagen_Deposito) || !empty($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago)) { ?>
+      <table class="table_pdf" cellpadding="2">
+        <thead>
+          <tr class="tr-otros_campos_footer">
+            <th class="text-center">&nbsp;</th>
+          </tr>
+          <tr class="tr-theadFormat tr-header tr-header-detalle">
+            <th class="text-left border-left border-right">Voucher de pagos</th>
+          </tr>
+          <?php if ($arrData[0]->Txt_Url_Imagen_Deposito==1) { ?>
+          <tr class="tr-sub_thead">
+            <th class="text-center content"><img style="height:200px; width:200px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
+          </tr>
+          <?php } ?>
+          <?php if ($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago==1) { ?>
+          <tr class="tr-sub_thead">
+            <th class="text-center content"><img style="height:200px; width:200px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
+          </tr>
+          <?php } ?>
+          <tr class="tr-otros_campos_footer">
+            <th class="text-center">&nbsp;</th>
+          </tr>
+        </thead>
+      </table>
+      <?php } ?>
+      <!-- VOUCHER DE PAGOS -->
+
       <?php if ( !empty($arrData[0]->Txt_Garantia)) { ?>
 	  	<table class="table_pdf" cellpadding="4">
         <thead>

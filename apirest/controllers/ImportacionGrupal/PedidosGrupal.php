@@ -35,22 +35,16 @@ class PedidosGrupal extends CI_Controller {
             $rows[] = $row->ID_Pedido_Cabecera;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
             $rows[] = $row->No_Entidad . "\n" . $row->Nu_Celular_Entidad;
-            /*
-			$rows[] = $row->No_Moneda;
-            $rows[] = $row->No_Medio_Pago_Tienda_Virtual;
-			*/
-            
 			
 			$image='';
 			$voucher='';
 			if(!empty($row->Txt_Url_Imagen_Deposito)){
-				//$image = '<img class="img-fluid" src="' . $row->Txt_Url_Imagen_Deposito . '" style="cursor:pointer; max-height:40px;" />';
-				$voucher = '<a class="btn btn-link" href="' . $row->Txt_Url_Imagen_Deposito . '"  target="_blank" rel="noopener noreferrer"><i class="fas fa-file-alt fa-2x"></i></a>';
+				$voucher = '<a class="btn btn-link position-relative" href="' . $row->Txt_Url_Imagen_Deposito . '"  target="_blank" rel="noopener noreferrer"><i class="fas fa-file-alt fa-2x"></i>';
+				$voucher .= '<span id="span-cart-global_cantidad" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">1</span>';
+				$voucher .= '</a>';
 			} else {
-				//https://impogrupal.probusiness.pe/Payment/thank/8
 				$url_voucher = 'https://impogrupal.probusiness.pe/Payment/thank/';
 				$url_voucher = $url_voucher . $row->ID_Pedido_Cabecera;
-				//$image = '<a class="btn btn-link" href="' . $url_voucher . '" target="_blank" rel="noopener noreferrer" role="button"><i class="fas fa-link" aria-hidden="true"></i> link</a>';
 				
 				$sCodigoPaisCelular='51';
 				$sMensajeWhatsAppVoucher = "Hola *" . $row->No_Entidad . "*, espero se encuentre bien. 👋🏻\n\n";
@@ -58,17 +52,43 @@ class PedidosGrupal extends CI_Controller {
 				$sMensajeWhatsAppVoucher .= "Le envío link donde adjuntará su voucher.\n";
 				$sMensajeWhatsAppVoucher .= $url_voucher;
 				$sMensajeWhatsAppVoucher = urlencode($sMensajeWhatsAppVoucher);
-				$sMensajeWhatsAppVoucher = '<a class="btn btn-link" href="https://api.whatsapp.com/send?phone=' . $sCodigoPaisCelular . $row->Nu_Celular_Entidad . '&text=' . $sMensajeWhatsAppVoucher . '" target="_blank"><i class="fab fa-whatsapp fa-2x" style="color: #25d366;"></i></a>';
+				$sMensajeWhatsAppVoucher = '<a class="btn btn-link position-relative" href="https://api.whatsapp.com/send?phone=' . $sCodigoPaisCelular . $row->Nu_Celular_Entidad . '&text=' . $sMensajeWhatsAppVoucher . '" target="_blank"><i class="fab fa-whatsapp fa-2x" style="color: #25d366;"></i>';
+				$sMensajeWhatsAppVoucher .= '<span id="span-cart-global_cantidad" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">pago 1</span>';
+				$sMensajeWhatsAppVoucher .= '</a>';
 
 				$voucher = $sMensajeWhatsAppVoucher;
 			}
+
+			//pago voucher 2
+			if($row->Nu_Estado==2 || $row->Nu_Estado==3){//confirmado
+				if(!empty($row->Txt_Url_Imagen_Deposito_Segundo_Pago)){
+					$voucher .= ' <a class="btn btn-link position-relative" href="' . $row->Txt_Url_Imagen_Deposito_Segundo_Pago . '"  target="_blank" rel="noopener noreferrer"><i class="fas fa-file-alt fa-2x"></i>';
+					$voucher .= '<span id="span-cart-global_cantidad" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">2</span>';
+					$voucher .= '</a>';
+				} else {
+					$url_voucher = 'https://impogrupal.probusiness.pe/Payment/voucher/';
+					$url_voucher = $url_voucher . $row->ID_Pedido_Cabecera;
+					
+					$sCodigoPaisCelular='51';
+					$sMensajeWhatsAppVoucher = "Hola *" . $row->No_Entidad . "*, espero se encuentre bien. 👋🏻\n\n";
+					$sMensajeWhatsAppVoucher .= "Le envío link donde adjuntará su voucher del segundo pago.\n";
+					$sMensajeWhatsAppVoucher .= $url_voucher;
+					$sMensajeWhatsAppVoucher = urlencode($sMensajeWhatsAppVoucher);
+					$sMensajeWhatsAppVoucher = ' <a class="btn btn-link position-relative" href="https://api.whatsapp.com/send?phone=' . $sCodigoPaisCelular . $row->Nu_Celular_Entidad . '&text=' . $sMensajeWhatsAppVoucher . '" target="_blank"><i class="fab fa-whatsapp fa-2x" style="color: #25d366;"></i>';
+					$sMensajeWhatsAppVoucher .= '<span id="span-cart-global_cantidad" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">pago 2</span>';
+					$sMensajeWhatsAppVoucher .= '</a>';
+	
+					$voucher .= $sMensajeWhatsAppVoucher;
+				}
+			}
+
 			$rows[] = $voucher;
 
 			//saldo de cliente
 			$fSaldo = round($row->Ss_Total, 2);
-			if($row->Nu_Estado==2){
+			if($row->Nu_Estado==2){//confirmado
 				$fSaldo = round($row->Ss_Total / 2, 2);
-			} else if($row->Nu_Estado==3){
+			} else if($row->Nu_Estado==3){//entregado
 				$fSaldo = '0.00';
 			}
             $rows[] = $fSaldo;
