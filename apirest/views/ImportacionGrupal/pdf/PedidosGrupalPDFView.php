@@ -257,7 +257,6 @@
         </thead>
       </table>
 
-
 	  	<table class="table_pdf" cellpadding="2">
         <tr class="tr-otros_campos_footer">
           <th class="text-center" colspan="3">&nbsp;</th>
@@ -274,24 +273,22 @@
       <?php if (!empty($arrData[0]->Txt_Url_Imagen_Deposito) || !empty($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago)) { ?>
       <table class="table_pdf" cellpadding="2">
         <thead>
-          <tr class="tr-otros_campos_footer">
-            <th class="text-center">&nbsp;</th>
-          </tr>
           <tr class="tr-theadFormat tr-header tr-header-detalle">
-            <th class="text-left border-left border-right">Voucher de pagos</th>
+            <th class="text-left border-left border-right"  colspan="2">Voucher de pagos</th>
           </tr>
-          <?php if ($arrData[0]->Txt_Url_Imagen_Deposito==1) { ?>
+          <?php if (!empty($arrData[0]->Txt_Url_Imagen_Deposito) && empty($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago)) { ?>
           <tr class="tr-sub_thead">
-            <th class="text-center content"><img style="height:200px; width:200px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
+            <th class="text-center content"><img style="height:100px; width:100px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
           </tr>
           <?php } ?>
-          <?php if ($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago==1) { ?>
+          <?php if (!empty($arrData[0]->Txt_Url_Imagen_Deposito) && !empty($arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago)) { ?>
           <tr class="tr-sub_thead">
-            <th class="text-center content"><img style="height:200px; width:200px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
+            <th class="text-center content"><img style="height:100px; width:100px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
+            <th class="text-center content"><img style="height:100px; width:100px;" src="<?php echo $arrData[0]->Txt_Url_Imagen_Deposito_Segundo_Pago; ?>"></th>
           </tr>
           <?php } ?>
           <tr class="tr-otros_campos_footer">
-            <th class="text-center">&nbsp;</th>
+            <th class="text-center" colspan="2">&nbsp;</th>
           </tr>
         </thead>
       </table>
