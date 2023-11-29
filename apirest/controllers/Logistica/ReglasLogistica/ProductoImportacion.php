@@ -11,6 +11,7 @@ class ProductoImportacion extends CI_Controller {
 	
 	private $upload_path = 'assets/images/productos/';
 	private $upload_path_table = 'assets/images/productos';
+	private $upload_path_table_v2 = '../../../assets/images/productos';
 	
 	function __construct(){
     	parent::__construct();	
@@ -38,7 +39,7 @@ class ProductoImportacion extends CI_Controller {
 			$arrImgProducto = explode('productos',$row->No_Imagen_Item);
 			$sPathImgProducto='';
 			if(isset($arrImgProducto[1]))
-				$sPathImgProducto = $this->upload_path_table . $arrImgProducto[1];
+				$sPathImgProducto = $this->upload_path_table_v2 . $arrImgProducto[1];
 
 			$image='';
 			if(!empty($sPathImgProducto) && !empty($row->No_Imagen_Item)){
