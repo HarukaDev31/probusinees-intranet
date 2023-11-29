@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.57'; ?>
+<?php $iControlVersionDashboard = '1.0.58'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>

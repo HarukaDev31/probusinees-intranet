@@ -672,7 +672,7 @@ function agregarProducto(){
   $('[name="ENu_Codigo_Barra"]').val('');
   $('[name="ENo_Codigo_Interno"]').val('');
 
-  $('#checkbox-precios_x_mayor').prop('checked', false).iCheck('update');
+  //$('#checkbox-precios_x_mayor').prop('checked', false).iCheck('update');
   $('.div-precios_x_mayor').hide();
   $('#table-precios_x_mayor').hide();
   $( '#table-precios_x_mayor tbody' ).empty();
