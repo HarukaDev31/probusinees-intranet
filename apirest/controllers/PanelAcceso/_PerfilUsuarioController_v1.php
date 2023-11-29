@@ -14,9 +14,9 @@ class PerfilUsuarioController extends CI_Controller {
 	public function listarPerfilUsuarios(){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('inicio');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
+			$this->load->view('header');
 			$this->load->view('PanelAcceso/PerfilUsuarioView');
-			$this->load->view('footer_v2', array("js_perfil_usuario" => true));
+			$this->load->view('footer', array("js_perfil_usuario" => true));
 		}
 	}
 	

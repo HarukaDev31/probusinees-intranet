@@ -24,15 +24,18 @@ class ProductoImportacion extends CI_Controller {
 	public function listar(){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
+			$this->load->view('header');
 			$this->load->view('Logistica/ReglasLogistica/ProductoImportacionView', array('NDI' => $this->empresa->Nu_Documento_Identidad));
-			$this->load->view('footer_v2', array("js_producto_importacion" => true));
+			$this->load->view('footer', array("js_producto_importacion" => true));
 		}
 	}
 	
 	public function ajax_list(){
 		$arrData = $this->ProductoImportacionModel->get_datatables();
         $data = array();
+		$draw = intval($this->input->get("draw"));
+		$no = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
         $action = 'delete';
         foreach ($arrData as $row) {
 			$arrImgProducto = explode('productos',$row->No_Imagen_Item);
@@ -42,13 +45,21 @@ class ProductoImportacion extends CI_Controller {
 
 			$image='';
 			if(!empty($sPathImgProducto) && !empty($row->No_Imagen_Item)){
-				$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Item . '" src="' . $sPathImgProducto . '" title="' . limpiarCaracteresEspeciales($row->No_Producto) . '" alt="' . limpiarCaracteresEspeciales($row->No_Producto) . '" style="cursor:pointer; max-height:100px;" />';
+				if ( file_exists($sPathImgProducto) ) {
+					$bStatusFileImage = fopen($sPathImgProducto, "r");
+					if ($bStatusFileImage) {
+						$img_binary = fread($bStatusFileImage, filesize($sPathImgProducto));
+						$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
+						$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Item . '" src="' . $base64 . '" title="' . limpiarCaracteresEspeciales($row->No_Producto) . '" alt="' . limpiarCaracteresEspeciales($row->No_Producto) . '" style="cursor:pointer; max-height:100px;" />';
+					}
+				}
 			}
 
         	settype($row->Qt_Producto, "double");
+            $no++;
             $rows = array();
 			
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verProducto(\'' . $row->ID_Producto . '\', \'' . $row->No_Imagen_Item . '\', \'' . $row->Nu_Version_Imagen . '\')"><i class="far fa-2x fa-edit" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verProducto(\'' . $row->ID_Producto . '\', \'' . $row->No_Imagen_Item . '\', \'' . $row->Nu_Version_Imagen . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
             //$rows[] = $row->Nu_Codigo_Barra;
 			$rows[] = $row->No_Producto;
 
@@ -64,8 +75,8 @@ class ProductoImportacion extends CI_Controller {
 			$dropdown_estado_tienda = '<div class="dropdown">
 			<button style="width: 100%;" class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">' . ($row->Nu_Estado == 1 ? 'Visible' : 'Oculto') . ' <span class="caret"></span></button>
 			<ul class="dropdown-menu" style="width: 100%; position: sticky;">
-				<li class="dropdown-item p-0 m-0"><a class="btn btn-link btn-block"alt="Mostrar item en tienda" title="Mostrar item en tienda" href="javascript:void(0)" onclick="cambiarEstadoTienda(\'' . $row->ID_Producto . '\',1);">Visible</a></li>
-				<li class="dropdown-item p-0 m-0"><a class="btn btn-link btn-block" alt="Ocultar item en tienda" title="Ocultar item en tienda" href="javascript:void(0)" onclick="cambiarEstadoTienda(\'' . $row->ID_Producto . '\',0);">Oculto</a></li>
+				<li><a alt="Mostrar item en tienda" title="Mostrar item en tienda" href="javascript:void(0)" onclick="cambiarEstadoTienda(\'' . $row->ID_Producto . '\',1);">Visible</a></li>
+				<li><a alt="Ocultar item en tienda" title="Ocultar item en tienda" href="javascript:void(0)" onclick="cambiarEstadoTienda(\'' . $row->ID_Producto . '\',0);">Oculto</a></li>
 			</ul>
 			</div>';
 			$rows[] = $dropdown_estado_tienda;
@@ -73,10 +84,13 @@ class ProductoImportacion extends CI_Controller {
 
 			$rows[] = !empty($image) ? $image : 'Sin imagen';
 			
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarProducto(\'' . $row->ID_Empresa . '\', \'' . $row->ID_Producto . '\', \'' . $row->Nu_Codigo_Barra . '\', \'' . 0 . '\', \'' . $action . '\', \'' . $row->No_Imagen_Item . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarProducto(\'' . $row->ID_Empresa . '\', \'' . $row->ID_Producto . '\', \'' . $row->Nu_Codigo_Barra . '\', \'' . 0 . '\', \'' . $action . '\', \'' . $row->No_Imagen_Item . '\')"><i class="fa fa-2x fa-trash-o" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(
+	        'draw' => $this->input->post('draw'),
+	        'recordsTotal' => $this->ProductoImportacionModel->count_all(),
+	        'recordsFiltered' => $this->ProductoImportacionModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);

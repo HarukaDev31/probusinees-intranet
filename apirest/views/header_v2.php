@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"); ?>">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=1.0.0'; ?>">
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=2.0.0'; ?>">
 </head>
 <body class="hold-transition sidebar-mini">
   <input type="hidden" id="hidden-sDirectory" name="sDirectory" class="form-control" value="<?php echo $this->router->directory; ?>">
@@ -138,9 +138,9 @@
                     if ($this->router->directory != $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
                       $No_Class_Li = "nav-item";
                     else if ($this->router->directory == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
-                      $No_Class_Li = "nav-item active  menu-open";
+                      $No_Class_Li = "nav-item active menu-open";
                     else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0)
-                      $No_Class_Li = "nav-item active  menu-open"; ?>
+                      $No_Class_Li = "nav-item "; ?>
                     <li class="<?php echo $No_Class_Li; ?>">
                       <a class="nav-link <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
                         <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
@@ -153,7 +153,7 @@
                       <ul class="nav nav-treeview">
                         <?php foreach($arrHijos->SubHijos as $arrSubHijos): ?>
                         <li class="<?php echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>">
-                          <a class="nav-link <?php echo $No_Class_Li; ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
+                          <a class="nav-link <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'active' : ''); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
                             <i class="<?php echo $arrSubHijos->Txt_Css_Icons; ?>"></i>
                             <p>&nbsp;<?php echo $arrSubHijos->No_Menu; ?></p>
                           </a>

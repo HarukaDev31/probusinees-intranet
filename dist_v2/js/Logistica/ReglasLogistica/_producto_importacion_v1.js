@@ -143,65 +143,9 @@ $(function () {
   
   $( '.div-AgregarEditar' ).hide();
   
-  //$('.select2').select2();
+  $('.select2').select2();
   
   url = base_url + 'Logistica/ReglasLogistica/ProductoImportacion/ajax_list';
-  table_producto = $('#table-Producto').DataTable({
-    dom: "<'row'<'col-sm-12 col-md-12 d-flex'f>>" +
-    "<'row'<'col-sm-12'tr>>" +
-    "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-    'processing'  : true,
-    "paging": true,
-    "lengthChange": true,
-    "searching": true,
-    "ordering": true,
-    "info": true,
-    "autoWidth": false,
-    "responsive": false,
-    'pagingType'  : 'full_numbers',
-    'oLanguage' : {
-      'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-      'sLengthMenu'        : '_MENU_',
-      'sSearch'            : 'Buscar producto: ',
-      'sSearchPlaceholder' : '',
-      'sZeroRecords'       : 'No se encontraron registros',
-      'sInfoEmpty'         : 'No hay registros',
-      'sLoadingRecords'    : 'Cargando...',
-      'sProcessing'        : 'Procesando...',
-      'oPaginate'          : {
-        'sFirst'    : '<<',
-        'sLast'     : '>>',
-        'sPrevious' : '<',
-        'sNext'     : '>',
-      },
-    },
-    'order': [],
-    'ajax': {
-      'url'       : url,
-      'type'      : 'POST',
-      'dataType'  : 'JSON',
-      'data'      : function ( data ) {
-        data.Filtros_Productos = $( '#cbo-Filtros_Productos' ).val(),
-        data.Global_Filter = $( '#txt-Global_Filter' ).val(),
-        data.Filtro_Nu_Estado = $('#cbo-filtro-estado_producto').val();
-      },
-    },
-    'columnDefs': [
-      {
-        'targets': 'no-hidden',
-        "visible": false, 
-      },{
-      'className' : 'text-center',
-      'targets'   : 'no-sort',
-      'orderable' : false,
-    },],
-    'lengthMenu': [[10, 100, 500, 1000], [10, 100, 500, 1000]],
-  });
-  
-  $('#table-Producto_filter input').removeClass('form-control-sm');
-  $('#table-Producto_filter input').addClass('form-control-md');
-  $('#table-Producto_filter input').addClass("width_full");
-  /*
   table_producto = $('#table-Producto').DataTable({
     'dom': 'B<"top">frt<"bottom"lip><"clear">',
     buttons     : [{
@@ -309,7 +253,6 @@ $(function () {
         $(row).addClass('danger');
     }
   });
-  */
 
   url = base_url + 'HelperController/getEmpresas';
   var selected = '';
@@ -326,17 +269,14 @@ $(function () {
   $("#btn-cancelar").click(function(){
      //table_producto.ajax.reload();
   });
-/*
+
   $('.dataTables_length').addClass('col-xs-4 col-sm-5 col-md-1');
   $('.dataTables_info').addClass('col-xs-8 col-sm-7 col-md-4');
   $('.dataTables_paginate').addClass('col-xs-12 col-sm-12 col-md-7');
-*/
 
-/*
   $( '#txt-Global_Filter' ).keyup(function() {
     table_producto.search($(this).val()).draw();
   });
-  */
 
   $('#cbo-filtro-estado_producto').change(function () {
     table_producto.search($(this).val()).draw();
@@ -484,11 +424,9 @@ $(function () {
         $( '#table-Producto_Enlace' ).hide();
   })
   
-  /*
   $(document).bind('keydown', 'f2', function(){
     agregarProducto();
   });
-  */
   
   /* Categorías */
   $('#cbo-categoria').change(function () {
@@ -2337,13 +2275,4 @@ function getProductosRelacionados() {
       }
     });
   }
-}
-
-function clearHTMLTextArea(str){
-  str=str.replace(/<br>/gi, "");
-  str=str.replace(/<br\s\/>/gi, "");
-  str=str.replace(/<br\/>/gi, "");
-  str=str.replace(/<\/button>/gi, "");
-  str=str.replace(/<br >/gi, "");
-  return str;
 }

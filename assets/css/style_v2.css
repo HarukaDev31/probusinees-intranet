@@ -1,4 +1,20 @@
 
+
+.width_full {
+  width: 100% !important;
+}
+
+
+.dropzone .dz-preview .dz-image {
+  width: 120px;
+  height: 120px;
+}
+
+.dropzone .dz-preview .dz-image img {
+  display: block;
+  height: 120px;
+}
+
 /* Autocomplete */
 .autocomplete-suggestions {
   text-align: left; cursor: default; border: 1px solid #ccc; border-top: 0; background: #fff; box-shadow: -1px 1px 3px rgba(0,0,0,.1);

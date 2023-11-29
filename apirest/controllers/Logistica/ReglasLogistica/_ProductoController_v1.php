@@ -245,10 +245,9 @@ class ProductoController extends CI_Controller {
 	public function listarProductos($sStatus='', $iCantidadNoProcesados='', $sMessageErrorBD=''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			//$this->load->view('header');
-			$this->load->view('header_v2');
+			$this->load->view('header');
 			$this->load->view('Logistica/ReglasLogistica/ProductoView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados, 'sMessageErrorBD' => $sMessageErrorBD));
-			$this->load->view('footer_v2', array("js_producto" => true));
+			$this->load->view('footer', array("js_producto" => true));
 		}
 	}
 	
@@ -267,13 +266,13 @@ class ProductoController extends CI_Controller {
 
 			$image='';
 			if(!empty($sPathImgProducto) && !empty($row->No_Imagen_Item)){
-				//if ( file_exists($sPathImgProducto) ) {
-					//$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
-					//$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
+				if ( file_exists($sPathImgProducto) ) {
+					$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
+					$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
 					//$image = '<div class="thumbnail">';
-					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Item . '" src="' . $sPathImgProducto . '" title="' . limpiarCaracteresEspeciales($row->No_Producto) . '" alt="' . limpiarCaracteresEspeciales($row->No_Producto) . '" style="cursor:pointer; max-height:40px;" />';
+					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Item . '" src="' . $base64 . '" title="' . limpiarCaracteresEspeciales($row->No_Producto) . '" alt="' . limpiarCaracteresEspeciales($row->No_Producto) . '" style="cursor:pointer; max-height:40px;" />';
 					//$image .= '</div>';
-				//}
+				}
 			}
 
         	settype($row->Qt_Producto, "double");

@@ -1,92 +1,96 @@
-<div class="content-wrapper">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-8">
-          <h1><i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></h1>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">  
+  <!-- Main content -->
+  <section class="content">
+    <!-- New box-header -->
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="div-content-header">
+          <h3>
+            <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?>
+          </h3>
         </div>
       </div>
-    </div><!-- /.container-fluid -->
-  </section>
+    </div>
+    <!-- ./New box-header -->
 
-  <section class="content">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <div class="row div-Filtros">
-                <br class="hidden-xs hidden-sm">
-                <?php
-                if ( $this->user->No_Usuario == 'root' ){ ?>
-                <div class="col-md-6">
-                  <label>Empresa</label>
-                  <div class="form-group">
-                    <select id="cbo-filtro_empresa" name="ID_Empresa" class="form-control select2" style="width: 100%;"></select>
-                    <span class="help-block" id="error"></span>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <label>Organización</label>
-                  <div class="form-group">
-                    <select id="cbo-filtro_organizacion" name="ID_Organizacion" class="form-control select2" style="width: 100%;"></select>
-                    <span class="help-block" id="error"></span>
-                  </div>
-                </div>
-                <?php } else { ?>
-                  <input type="hidden" id="cbo-filtro_empresa" name="ID_Empresa" class="form-control" value="<?php echo $this->user->ID_Empresa; ?>">
-                  <input type="hidden" id="cbo-filtro_organizacion" name="ID_Organizacion" class="form-control" value="<?php echo $this->user->ID_Organizacion; ?>">
-                <?php } ?>
-
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label></label>
-                    <select id="cbo-Filtros_Perfil_Usuario" name="Filtros_Perfil_Usuario" class="form-control">
-                      <option value="Perfil_Usuario">Nombre Cargo</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div class="col-md-6">
-                  <label class="hidden-xs hidden-sm">&nbsp;</label>
-                  <div class="form-group">
-                    <input type="text" id="txt-Global_Filter" name="Global_Filter" class="form-control" maxlength="11" placeholder="Buscar" value="">
-                  </div>
-                </div>
-                
-                <div class="col-md-3">
-                  <label class="hidden-xs hidden-sm">&nbsp;</label>
-                  <div class="form-group">
-                    <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
-                      <button type="button" class="btn btn-success btn-block" onclick="agregarPerfilUsuario()"><i class="fa fa-plus-circle"></i> Agregar</button>
-                    <?php endif; ?>
-                    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-content">
+          <!-- box-header -->
+          <div class="box-header box-header-new div-Listar">
+            <div class="row div-Filtros">
+              <br class="hidden-xs hidden-sm">
+              <?php
+              if ( $this->user->No_Usuario == 'root' ){ ?>
+              <div class="col-md-6">
+                <label>Empresa</label>
+                <div class="form-group">
+                  <select id="cbo-filtro_empresa" name="ID_Empresa" class="form-control select2" style="width: 100%;"></select>
+                  <span class="help-block" id="error"></span>
                 </div>
               </div>
-              <div class="table-responsive">
-                <table id="table-Perfil_Usuario" class="table table-striped table-bordered">
-                  <thead>
-                    <tr>
-                      <?php if ( $this->user->No_Usuario == 'root' ){ ?>
-                      <th>Empresa</th>
-                      <th>Organizacion</th>
-                      <?php } ?>
-                      <th>Cargo</th>
-                      <th>Descripción</th>
-                      <th class="no-sort">Estado</th>
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
-                        <th class="no-sort">Editar</th>
-                      <?php endif; ?>
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
-                        <th class="no-sort">Eliminar</th>
-                      <?php endif; ?>
-                    </tr>
-                  </thead>
-                </table>
+              <div class="col-md-6">
+                <label>Organización</label>
+                <div class="form-group">
+                  <select id="cbo-filtro_organizacion" name="ID_Organizacion" class="form-control select2" style="width: 100%;"></select>
+                  <span class="help-block" id="error"></span>
+                </div>
+              </div>
+              <?php } else { ?>
+                <input type="hidden" id="cbo-filtro_empresa" name="ID_Empresa" class="form-control" value="<?php echo $this->user->ID_Empresa; ?>">
+                <input type="hidden" id="cbo-filtro_organizacion" name="ID_Organizacion" class="form-control" value="<?php echo $this->user->ID_Organizacion; ?>">
+              <?php } ?>
+
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label></label>
+                  <select id="cbo-Filtros_Perfil_Usuario" name="Filtros_Perfil_Usuario" class="form-control">
+                    <option value="Perfil_Usuario">Nombre Cargo</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label class="hidden-xs hidden-sm">&nbsp;</label>
+                <div class="form-group">
+                  <input type="text" id="txt-Global_Filter" name="Global_Filter" class="form-control" maxlength="11" placeholder="Buscar" value="">
+                </div>
+              </div>
+              
+              <div class="col-md-3">
+                <label class="hidden-xs hidden-sm">&nbsp;</label>
+                <div class="form-group">
+                  <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
+                    <button type="button" class="btn btn-success btn-block" onclick="agregarPerfilUsuario()"><i class="fa fa-plus-circle"></i> Agregar</button>
+                  <?php endif; ?>
+                  </div>
               </div>
             </div>
           </div>
+          <!-- /.box-header -->
+          <div class="table-responsive">
+            <table id="table-Perfil_Usuario" class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <?php if ( $this->user->No_Usuario == 'root' ){ ?>
+                  <th>Empresa</th>
+                  <th>Organizacion</th>
+                  <?php } ?>
+                  <th>Cargo</th>
+                  <th>Descripción</th>
+                  <th class="no-sort">Estado</th>
+                  <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
+                    <th class="no-sort">Editar</th>
+                  <?php endif; ?>
+                  <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
+                    <th class="no-sort">Eliminar</th>
+                  <?php endif; ?>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <!-- /.box-body -->
         </div>
         <!-- /.box -->
       </div>

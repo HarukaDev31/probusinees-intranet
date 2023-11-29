@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.53'; ?>
+<?php $iControlVersionDashboard = '1.0.57'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -88,6 +88,20 @@
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_agente.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<!-- Usuarios y opciones -->
+<?php if (isset($js_perfil_usuario) && $js_perfil_usuario==true) : ?>
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/perfil_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<!-- Folder: Logistica -->
+<?php if (isset($js_producto_importacion) && $js_producto_importacion==true) : ?>
+<link rel="stylesheet" href="<?php echo base_url() . 'assets/css/summernote.min.css'; ?>">
+<script src="<?php echo base_url() . 'assets/js/summernote.min.js';?>"></script>
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+<link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
+<script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/Logistica/ReglasLogistica/producto_importacion.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
 
 <!-- Message Delete Modal -->
 <div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" aria-modal="true" role="dialog">
