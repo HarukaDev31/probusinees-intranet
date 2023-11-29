@@ -97,11 +97,9 @@ class CampanaGrupalModel extends CI_Model{
     }
     
 	public function eliminarCliente($ID){
-		/*
-		if ($this->db->query("SELECT COUNT(*) AS existe FROM pedido_cabecera WHERE ID_Entidad=" . $ID . " LIMIT 1")->row()->existe > 0) {
+		if ($this->db->query("SELECT COUNT(*) AS existe FROM importacion_grupal_pedido_cabecera WHERE ID_Importacion_Grupal=" . $ID . " LIMIT 1")->row()->existe > 0) {
 			return array('status' => 'warning', 'style_modal' => 'modal-warning', 'message' => 'Tiene movimiento(s)');
 		} else {
-		*/
 			$this->db->where('ID_Importacion_Grupal', $ID);
             $this->db->delete($this->table_importacion_grupal_detalle);
 
@@ -110,7 +108,7 @@ class CampanaGrupalModel extends CI_Model{
 		    if ( $this->db->affected_rows() > 0 ) {
 		        return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro eliminado');
 		    }
-		//}
+		}
         return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al eliminar');
 	}
 }

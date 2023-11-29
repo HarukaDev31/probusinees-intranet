@@ -247,9 +247,9 @@ ENLAPRO.ID_Producto_Enlace = " . $ID;
     }
     
 	public function eliminarProducto($ID_Empresa, $ID, $Nu_Codigo_Barra, $Nu_Compuesto, $sNombreImagenItem){
-		if ($this->db->query("SELECT COUNT(*) AS existe FROM " . $this->table_documento_detalle . " WHERE ID_Producto=" . $ID . " LIMIT 1")->row()->existe > 0){
-			return array('status' => 'warning', 'style_modal' => 'modal-warning', 'message' => 'El producto tiene movimiento(s)');
-		} else if ($this->db->query("SELECT COUNT(*) AS existe FROM pedido_detalle WHERE ID_Producto=" . $ID . " LIMIT 1")->row()->existe > 0){
+		if ($this->db->query("SELECT COUNT(*) AS existe FROM importacion_grupal_detalle WHERE ID_Producto=" . $ID . " LIMIT 1")->row()->existe > 0){
+			return array('status' => 'warning', 'style_modal' => 'modal-warning', 'message' => 'El producto está en una campaña');
+		} else if ($this->db->query("SELECT COUNT(*) AS existe FROM importacion_grupal_pedido_detalle WHERE ID_Producto=" . $ID . " LIMIT 1")->row()->existe > 0){
 			return array('status' => 'warning', 'style_modal' => 'modal-warning', 'message' => 'El producto tiene pedido(s)');
 		} else if ($this->db->query("SELECT COUNT(*) AS existe
 FROM
