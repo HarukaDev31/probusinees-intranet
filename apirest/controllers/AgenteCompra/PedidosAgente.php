@@ -539,7 +539,7 @@ class PedidosAgente extends CI_Controller {
 				$iCounter++;
 				$fila++;
 			} // /. foreach data
-		}
+		
 			foreach($objPHPExcel->getActiveSheet()->getRowDimensions() as $rd) { 
 				$rd->setRowHeight(-1); 
 			}
