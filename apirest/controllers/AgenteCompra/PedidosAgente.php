@@ -499,7 +499,7 @@ class PedidosAgente extends CI_Controller {
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 						$objDrawing->setWidthAndHeight(148,500);
-						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(230);
+						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(250);
 						//$objDrawing->setHeight($objDrawing->getHeight() - ($objDrawing->getHeight() * .25));
 						$objDrawing->setResizeProportional(true);
 
