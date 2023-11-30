@@ -499,8 +499,8 @@ class PedidosAgente extends CI_Controller {
 					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
-						//$objDrawing->setHeight(200);
-						//$objDrawing->setWidth(200);
+						$objDrawing->setHeight(500);
+						$objDrawing->setWidth(500);
 						$objDrawing->setCoordinates('B' . $fila);
 						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 					}
