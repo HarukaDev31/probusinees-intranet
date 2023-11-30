@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.58'; ?>
+<?php $iControlVersionDashboard = '1.0.59'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -104,6 +104,13 @@
 <link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
 <script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/Logistica/ReglasLogistica/producto_importacion.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<!-- Usuarios y opciones -->
+<?php if (isset($js_slider_importacion) && $js_slider_importacion==true) : ?>
+<link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
+<script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/slider.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <!-- Message Delete Modal -->
