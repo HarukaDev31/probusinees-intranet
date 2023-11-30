@@ -469,7 +469,7 @@ class PedidosAgente extends CI_Controller {
 			);
 			
 			$fila = 10;
-			$objPHPExcel->getActiveSheet()->freezePane('A' . $fila);//LINEA HORIZONTAL PARA SEPARAR CABECERA Y DETALLE
+			//$objPHPExcel->getActiveSheet()->freezePane('A' . $fila);//LINEA HORIZONTAL PARA SEPARAR CABECERA Y DETALLE
 				
 			$iCounter = 1;
             foreach($data as $row) {				
