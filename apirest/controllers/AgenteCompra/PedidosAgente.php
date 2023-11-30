@@ -500,9 +500,14 @@ class PedidosAgente extends CI_Controller {
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 						$objDrawing->setHeight(500);
-						$objDrawing->setWidth(500);
+						//$objDrawing->setWidth(500);
 						$objDrawing->setCoordinates('B' . $fila);
 						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+
+						$sheet = $objPHPExcel->getActiveSheet();
+						$sheet->calculateColumnWidths();
+						$columnDimension = $sheet->getColumnDimension('B');
+						$columnDimension->setAutoSize(false)->setWidth($columnDimension->getWidth());
 					}
 				} else {
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
@@ -539,10 +544,6 @@ class PedidosAgente extends CI_Controller {
 				$iCounter++;
 				$fila++;
 			} // /. foreach data
-		
-			foreach($objPHPExcel->getActiveSheet()->getRowDimensions() as $rd) { 
-				$rd->setRowHeight(-1); 
-			}
 
 			header('Content-type: application/vnd.ms-excel');
 			header('Content-Disposition: attachment; filename="' . $fileNameExcel . '"');
