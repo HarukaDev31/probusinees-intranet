@@ -430,7 +430,7 @@ class PedidosAgente extends CI_Controller {
 
 
 			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth("10");//NRO
-			//$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth("30");//NRO
+			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth("40");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth("30");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth("40");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth("15");//NRO
@@ -492,15 +492,17 @@ class PedidosAgente extends CI_Controller {
 					
 					//pruebas localhost
 					//$objDrawing->setPath('assets/img/arturo.jpeg');
-					//$objDrawing->setPath('../../agentecompra.probusiness.pe/public_html/assets/images/productos/0162663a046cf7cd5b837219170dc11d.png');
 
 					//cloud
 					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
 					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
-						$objDrawing->setHeight(500);
-						$objDrawing->setWidth(500);
+						$objDrawing->setWidthAndHeight(148,500);
+						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(200);
+						//$objDrawing->setHeight($objDrawing->getHeight() - ($objDrawing->getHeight() * .25));
+						$objDrawing->setResizeProportional(true);
+
 						$objDrawing->setCoordinates('B' . $fila);
 						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 					}
@@ -516,7 +518,7 @@ class PedidosAgente extends CI_Controller {
 				->setCellValue('F' . $fila, $row->Txt_Url_Link_Pagina_Producto)
 				;
 				
-				$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(160);
+				//$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(160);
 				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getAlignment()->setWrapText(true);
 
 				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->getNumberFormat()->setFormatCode('#,##0.00');
