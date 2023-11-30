@@ -500,13 +500,9 @@ class PedidosAgente extends CI_Controller {
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 						$objDrawing->setHeight(500);
-						//$objDrawing->setWidth(500);
+						$objDrawing->setWidth(500);
 						$objDrawing->setCoordinates('B' . $fila);
 						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-
-						foreach(range('A','B') as $columnID) {
-							$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)->setAutoSize(true);
-						}
 					}
 				} else {
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
