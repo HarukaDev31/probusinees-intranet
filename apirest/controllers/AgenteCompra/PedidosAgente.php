@@ -492,19 +492,18 @@ class PedidosAgente extends CI_Controller {
 					
 					//pruebas localhost
 					//$objDrawing->setPath('assets/img/arturo.jpeg');
+					//$objDrawing->setPath('../../agentecompra.probusiness.pe/public_html/assets/images/productos/0162663a046cf7cd5b837219170dc11d.png');
 
 					//cloud
-					
-					$objDrawing->setPath('../../agentecompra.probusiness.pe/public_html/assets/images/productos/0162663a046cf7cd5b837219170dc11d.png');
 					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
 					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
-					$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
-					
-
-					$objDrawing->setHeight(200);
-					$objDrawing->setWidth(200);
-					$objDrawing->setCoordinates('B' . $fila);
-					$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
+						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
+						//$objDrawing->setHeight(200);
+						//$objDrawing->setWidth(200);
+						$objDrawing->setCoordinates('B' . $fila);
+						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+					}
 				} else {
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
 					->setCellValue('B' . $fila, '');
