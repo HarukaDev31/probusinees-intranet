@@ -25,7 +25,7 @@ class ProductoImportacion extends CI_Controller {
 	public function listar(){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
+			$this->load->view('header_v2', array("js_producto_importacion" => true));
 			$this->load->view('Logistica/ReglasLogistica/ProductoImportacionView', array('NDI' => $this->empresa->Nu_Documento_Identidad));
 			$this->load->view('footer_v2', array("js_producto_importacion" => true));
 		}

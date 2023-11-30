@@ -95,8 +95,11 @@
 
 <!-- Folder: Logistica -->
 <?php if (isset($js_producto_importacion) && $js_producto_importacion==true) : ?>
+<!--
 <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/summernote.min.css'; ?>">
 <script src="<?php echo base_url() . 'assets/js/summernote.min.js';?>"></script>
+-->
+<script src="<?php echo base_url() . 'plugins_v2/summernote/summernote-bs4.min.js';?>"></script>
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
 <script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
