@@ -504,10 +504,9 @@ class PedidosAgente extends CI_Controller {
 						$objDrawing->setCoordinates('B' . $fila);
 						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 
-						$sheet = $objPHPExcel->getActiveSheet();
-						$sheet->calculateColumnWidths();
-						$columnDimension = $sheet->getColumnDimension('B');
-						$columnDimension->setAutoSize(false)->setWidth($columnDimension->getWidth());
+						foreach(range('A','B') as $columnID) {
+							$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)->setAutoSize(true);
+						}
 					}
 				} else {
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
