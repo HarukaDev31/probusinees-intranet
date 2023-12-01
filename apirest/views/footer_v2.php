@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.59'; ?>
+<?php $iControlVersionDashboard = '1.0.61'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -99,7 +99,7 @@
 <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/summernote.min.css'; ?>">
 <script src="<?php echo base_url() . 'assets/js/summernote.min.js';?>"></script>
 -->
-<script src="<?php echo base_url() . 'plugins_v2/summernote/summernote-bs4.min.js';?>"></script>
+<script src="<?php echo base_url() . 'plugins_v2/summernote/summernote-bs4.js?ver=1.0.0';?>"></script>
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
 <script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>

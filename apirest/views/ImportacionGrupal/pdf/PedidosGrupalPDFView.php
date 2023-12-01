@@ -169,7 +169,8 @@
           </tr>
           <tr class="tr-sub_thead">
             <th class="text-left content" style="width: 15%;"><b>DIRECCIÓN</b></th>
-            <th class="text-left content" style="width: 55%;"><?php echo ': ' . $arrData[0]->Txt_Direccion_Entidad . ' - ' . $arrData[0]->No_Distrito_Cliente . ' - ' . $arrData[0]->No_Provincia_Cliente . ' - ' . $arrData[0]->No_Departamento_Cliente; ?></th>
+            <th class="text-left content" style="width: 55%;"><?php echo ': ' . $arrData[0]->No_Distrito_Cliente . ' - ' . $arrData[0]->No_Provincia_Cliente . ' - ' . $arrData[0]->No_Departamento_Cliente; ?></th>
+            <!--<th class="text-left content" style="width: 55%;"><?php echo ': ' . $arrData[0]->Txt_Direccion_Entidad . ' - ' . $arrData[0]->No_Distrito_Cliente . ' - ' . $arrData[0]->No_Provincia_Cliente . ' - ' . $arrData[0]->No_Departamento_Cliente; ?></th>-->
             <th class="text-left content" style="width: 5%;"></th>
             <th class="text-left content" style="width: 25%"><b>MONEDA:</b> <?php echo $arrData[0]->No_Moneda; ?></th>
           </tr>
