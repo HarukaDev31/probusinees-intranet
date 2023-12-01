@@ -184,7 +184,7 @@
             <th class="text-left border-left border-right">Observaciones</th>
           </tr>
           <tr class="tr-sub_thead">
-            <th class="text-left content"><?php echo $arrData[0]->No_Importacion_Grupal; ?></th>
+            <th class="text-left content"><?php echo $arrData[0]->No_Importacion_Grupal . ' - ' . $arrData[0]->No_Estado_Recepcion; ?></th>
           </tr>
           <tr class="tr-sub_thead">
             <th class="text-left content"></th>
