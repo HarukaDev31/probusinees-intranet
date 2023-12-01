@@ -344,12 +344,12 @@ function verMetodoEntrega(ID) {
       $('[name="No_Metodo_Entrega_Tienda_Virtual"]').val(response.No_Metodo_Entrega_Tienda_Virtual);
       var selected;
       $('.div-Estado').show();
-      $('#cbo-Estado').html('');
+      $('#cbo-Estado_2').html('');
       for (var i = 0; i < 2; i++) {
         selected = '';
         if (response.Nu_Estado == i)
           selected = 'selected="selected"';
-        $('#cbo-Estado').append('<option value="' + i + '" ' + selected + '>' + (i == 0 ? 'Inactivo' : 'Activo') + '</option>');
+        $('#cbo-Estado_2').append('<option value="' + i + '" ' + selected + '>' + (i == 0 ? 'Inactivo' : 'Activo') + '</option>');
       }
 
       $('.div-recojo_tienda').hide();

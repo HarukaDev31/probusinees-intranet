@@ -9,6 +9,7 @@ class MetodoEntregaGrupal extends CI_Controller {
 		$this->load->database('LAE_SYSTEMS');
 		$this->load->model('ImportacionGrupal/MetodoEntregaGrupalModel');
 		$this->load->model('HelperDropshippingModel');
+		$this->load->model('HelperImportacionModel');
 		$this->load->model('ConfiguracionModel');
 	}
 
@@ -27,9 +28,9 @@ class MetodoEntregaGrupal extends CI_Controller {
         foreach ($arrData as $row) {
             $rows = array();
             $rows[] = $row->No_Metodo_Entrega_Tienda_Virtual;
-			$arrEstadoRegistro = $this->HelperDropshippingModel->obtenerEstadoRegistroArray($row->Nu_Estado);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';			
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verMetodoEntrega(\'' . $row->ID_Metodo_Entrega_Tienda_Virtual . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';			
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verMetodoEntrega(\'' . $row->ID_Metodo_Entrega_Tienda_Virtual . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(
@@ -46,7 +47,7 @@ class MetodoEntregaGrupal extends CI_Controller {
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		$data = array(
 			'No_Metodo_Entrega_Tienda_Virtual' => $this->input->post('No_Metodo_Entrega_Tienda_Virtual'),
-			'Nu_Estado' => $this->input->post('Nu_Estado'),
+			'Nu_Estado' => $this->input->post('Nu_Estado_2'),
 		);
 
 		$data_recojo_tienda = array(

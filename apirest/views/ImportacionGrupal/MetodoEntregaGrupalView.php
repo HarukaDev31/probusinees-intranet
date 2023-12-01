@@ -17,13 +17,13 @@
         <div class="col-12">
           <div class="card">
             <div class="card-body">
-              <div class="table-responsive div-Listar d-none">
+              <div class="table-responsive div-Listar">
                 <table id="table-MedioPago" class="table table-striped table-bordered">
                   <thead>
                   <tr>
                     <th>Metodo de entrega</th>
                     <th class="no-sort">Estado</th>
-                    <!--<th class="no-sort">Editar</th>-->
+                    <th class="no-sort">Editar</th>
                   </tr>
                   </thead>
                 </table>
@@ -238,7 +238,7 @@ echo form_open('', $attributes);
         <div class="col-xs-12 col-md-12 hidden">
           <label>Nombre <span class="label-advertencia">(Opcional)</span></label>
           <div class="form-group">
-            <input type="text" id="txt-No_Almacen" name="No_Almacen" placeholder="Nombre (opcional)" class="form-control required" autocomplete="off" maxlength="100">
+            <input type="text" id="txt-No_Almacen" name="No_Almacen" placeholder="Nombre (opcional)" class="form-control" autocomplete="off" maxlength="100">
             <span class="help-block" id="error"></span>
           </div>
         </div>
@@ -285,19 +285,9 @@ echo form_open('', $attributes);
       </div>
     </div>
     
-    <div class="modal-footer">
-      <div class="row">
-        <div class="col-xs-6 col-md-6">
-          <div class="form-group">
-            <button type="button" class="btn btn-danger btn-md btn-block" data-dismiss="modal">Salir</button>
-          </div>
-        </div>
-        <div class="col-xs-6 col-md-6">
-          <div class="form-group">
-            <button type="submit" id="btn-save" class="btn btn-success btn-md btn-block btn-verificar">Guardar</button>
-          </div>
-        </div>
-      </div>
+    <div class="modal-footer justify-content-between">
+      <button type="button" class="btn btn-danger btn-md btn-block col" data-dismiss="modal">Salir</button>
+      <button type="submit" id="btn-save" class="btn btn-success btn-md btn-block col btn-verificar">Guardar</button>
     </div>
   </div>
 </div>
