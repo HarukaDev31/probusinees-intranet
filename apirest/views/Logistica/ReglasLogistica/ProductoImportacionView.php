@@ -268,32 +268,33 @@
                         </div>
                       </div>
                                         
-                      <div class="col-xs-6 col-sm-4 col-md-4 col-lg-4  d-none">
+                      <div class="col-12 col-sm-2 col-md-2 col-lg-2">
                         <div class="form-group">
-                          <label>Código<span class="label-advertencia">*</span></label>
-                          <input value="<?php echo rand(12345678910,10987654321); ?>" type="text" id="txt-Nu_Codigo_Barra" name="Nu_Codigo_Barra" class="form-control input-codigo_barra input-Mayuscula" placeholder="Ingresar código" maxlength="20" autocomplete="off">
+                          <label>Código <span class="label-advertencia text-danger">*</span></label>
+                          <input value="" type="text" id="txt-Nu_Codigo_Barra" name="Nu_Codigo_Barra" class="form-control input-codigo_barra input-Mayuscula" placeholder="Ingresar código" maxlength="20" autocomplete="off">
+                          <!--<input value="<?php echo rand(12345678910,10987654321); ?>" type="text" id="txt-Nu_Codigo_Barra" name="Nu_Codigo_Barra" class="form-control input-codigo_barra input-Mayuscula" placeholder="Ingresar código" maxlength="20" autocomplete="off">-->
                           <span class="help-block" id="error"></span>
                         </div>
                       </div>
 
                       <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4  d-none">
                         <div class="form-group">
-                          <label>Impuesto<span class="label-advertencia">*</span></label>
+                          <label>Impuesto<span class="label-advertencia text-danger">*</span></label>
                           <select id="cbo-Impuestos" name="ID_Impuesto" class="form-control required" style="width: 100%;"></select>
                           <span class="help-block" id="error"></span>
                         </div>
                       </div>
                       
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                      <div class="col-12 col-sm-10 col-md-10 col-lg-10">
                         <div class="form-group">
-                          <label>Nombre <span class="label-advertencia">*</span></label>
+                          <label>Nombre <span class="label-advertencia text-danger">*</span></label>
                           <textarea name="No_Producto" class="form-control required" rows="1" placeholder="Ingresar nombre" maxlength="250" style="height: 34px;"></textarea>
                           <span class="help-block" id="error"></span>
                         </div>
                       </div>
                       
                       <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
-                        <label>Unidad <span class="label-advertencia">*</span></label>
+                        <label>Unidad <span class="label-advertencia text-danger">*</span></label>
                         <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . 'Logistica/ReglasLogistica/UnidadMedidaController/listarUnidadesMedida'; ?>">[Crear]</a>
                         <div class="form-group">
                           <select id="cbo-UnidadesMedida" name="ID_Unidad_Medida" class="form-control " style="width: 100%;"></select>
@@ -318,7 +319,7 @@
                       </div>
                       
                       <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
-                        <label>Unidad 2<span class="label-advertencia">*</span></label>
+                        <label>Unidad 2 <span class="label-advertencia  text-danger">*</span></label>
                         <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . 'Logistica/ReglasLogistica/UnidadMedidaController/listarUnidadesMedida'; ?>">[Crear]</a>
                         <div class="form-group">
                           <select id="cbo-UnidadesMedida_Precio" name="ID_Unidad_Medida_Precio" class="form-control " style="width: 100%;"></select>
@@ -343,7 +344,7 @@
                       </div>
                     
                       <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
-                        <label>Categoría <span class="label-advertencia">*</span></label>
+                        <label>Categoría <span class="label-advertencia text-danger">*</span></label>
                         <a class="btn btn-link" target="_blank" style="padding:0px; color: #7b7b7b" href="<?php echo base_url() . '/TiendaVirtual/CategoriasTiendaVirtualController/listar'; ?>">[Crear]</a>
                         <div class="form-group">
                           <select id="cbo-categoria" name="ID_Familia" class="form-control " style="width: 100%;"></select>
@@ -361,7 +362,7 @@
 
                       <div class="col-6 col-sm-4 col-md-4 col-lg-3">
                         <div class="form-group">
-                          <label>Estado de Tienda</label>
+                          <label>Tienda</label>
                           <select id="cbo-Estado" name="Nu_Estado" class="form-control required"></select>
                           <span class="help-block" id="error"></span>
                         </div>
