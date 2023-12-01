@@ -13,6 +13,7 @@ class PedidosGrupalModel extends CI_Model{
 	var $table_departamento = 'departamento';
 	var $table_provincia = 'provincia';
 	var $table_distrito = 'distrito';
+	var $table_distrito_tienda_virtual = 'distrito_tienda_virtual';
 	var $table_tipo_documento_identidad = 'tipo_documento_identidad';
 	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	
@@ -44,7 +45,7 @@ class PedidosGrupalModel extends CI_Model{
     }
     
     public function get_by_id($ID){
-        $this->db->select('DEP.No_Departamento, PRO.No_Provincia, DIS.No_Distrito, EMP.No_Empresa, EMP.Txt_Direccion_Empresa, EMP.Nu_Documento_Identidad AS Nu_Documento_Identidad_Empresa, CONFI.No_Logo_Empresa, CONFI.No_Imagen_Logo_Empresa, CONFI.Nu_Height_Logo_Ticket, CONFI.Nu_Width_Logo_Ticket, ' . $this->table . '.*, ' . $this->table . '.Ss_Total AS importe_total, IGPD.ID_Unidad_Medida, IGPD.ID_Unidad_Medida_Precio, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Direccion_Entidad, CLI.Txt_Email_Entidad, IGPD.ID_Producto, ITEM.Nu_Codigo_Barra, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total, TDI.No_Tipo_Documento_Identidad_Breve, MONE.No_Moneda, MP.No_Medio_Pago_Tienda_Virtual AS No_Medio_Pago, IGC.No_Importacion_Grupal, MONE.No_Signo, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido, CONFI.Txt_Cuentas_Bancarias');
+        $this->db->select('DEPCLI.No_Departamento AS No_Departamento_Cliente, PROCLI.No_Provincia AS No_Provincia_Cliente, DISCLI.No_Distrito AS No_Distrito_Cliente, DEP.No_Departamento, PRO.No_Provincia, DIS.No_Distrito, EMP.No_Empresa, EMP.Txt_Direccion_Empresa, EMP.Nu_Documento_Identidad AS Nu_Documento_Identidad_Empresa, CONFI.No_Logo_Empresa, CONFI.No_Imagen_Logo_Empresa, CONFI.Nu_Height_Logo_Ticket, CONFI.Nu_Width_Logo_Ticket, ' . $this->table . '.*, ' . $this->table . '.Ss_Total AS importe_total, IGPD.ID_Unidad_Medida, IGPD.ID_Unidad_Medida_Precio, UM.No_Unidad_Medida, UM2.No_Unidad_Medida AS No_Unidad_Medida_2, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Direccion_Entidad, CLI.Txt_Email_Entidad, IGPD.ID_Producto, ITEM.Nu_Codigo_Barra, ITEM.No_Producto, IGPD.Qt_Producto, IGPD.Ss_Precio, IGPD.Ss_Total, TDI.No_Tipo_Documento_Identidad_Breve, MONE.No_Moneda, MP.No_Medio_Pago_Tienda_Virtual AS No_Medio_Pago, IGC.No_Importacion_Grupal, MONE.No_Signo, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido, CONFI.Txt_Cuentas_Bancarias');
         $this->db->from($this->table);
 		$this->db->join($this->table_importacion_grupal_cabecera . ' AS IGC', 'IGC.ID_Importacion_Grupal = ' . $this->table . '.ID_Importacion_Grupal', 'join');
 		$this->db->join($this->table_medio_pago . ' AS MP', 'MP.ID_Medio_Pago = ' . $this->table . '.ID_Medio_Pago', 'join');
@@ -53,6 +54,9 @@ class PedidosGrupalModel extends CI_Model{
 		$this->db->join($this->table_departamento . ' AS DEP', 'DEP.ID_Departamento = EMP.ID_Departamento', 'join');
 		$this->db->join($this->table_provincia . ' AS PRO', 'PRO.ID_Provincia = EMP.ID_Provincia', 'join');
 		$this->db->join($this->table_distrito . ' AS DIS', 'DIS.ID_Distrito = EMP.ID_Distrito', 'join');
+		$this->db->join($this->table_departamento . ' AS DEPCLI', 'DEPCLI.ID_Departamento = ' . $this->table . '.ID_Departamento', 'left');
+		$this->db->join($this->table_provincia . ' AS PROCLI', 'PROCLI.ID_Provincia = ' . $this->table . '.ID_Provincia', 'left');
+		$this->db->join($this->table_distrito_tienda_virtual . ' AS DISCLI', 'DISCLI.ID_Distrito = ' . $this->table . '.ID_Distrito', 'left');
 		$this->db->join($this->table_organizacion . ' AS ORG', 'ORG.ID_Organizacion = ' . $this->table . '.ID_Organizacion', 'join');
 		$this->db->join($this->table_configuracion . ' AS CONFI', 'CONFI.ID_Empresa = EMP.ID_Empresa', 'join');
     	$this->db->join($this->table_importacion_grupal_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');

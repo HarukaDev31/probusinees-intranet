@@ -151,26 +151,26 @@
 	  	<table class="table_pdf" border="0">
         <thead>
           <tr class="tr-sub_thead">
-            <th class="text-left title" style="width: 50%">CLIENTE</th>
-            <th class="text-left title" style="width: 25%"><?php echo (!empty($arrData[0]->No_Contacto) ? 'CONTACTO' : ''); ?></th>
-            <th class="text-left content" style="width: 25%"></th>
+            <th class="text-left title" style="width: 15%">CLIENTE</th>
+            <th class="text-left title" style="width: 55%"><?php echo (!empty($arrData[0]->No_Contacto) ? 'CONTACTO' : ''); ?></th>
+            <th class="text-left content" style="width: 5%"></th>
           </tr>
           <tr class="tr-sub_thead">
             <th class="text-left content" style="width: 15%;"><b><?php echo $arrData[0]->No_Tipo_Documento_Identidad_Breve; ?></b></th>
-            <th class="text-left content" style="width: 35%;"><?php echo ': ' . $arrData[0]->Nu_Documento_Identidad; ?></th>
-            <th class="text-left content" style="width: 25%;"></th>
+            <th class="text-left content" style="width: 55%;"><?php echo ': ' . $arrData[0]->Nu_Documento_Identidad; ?></th>
+            <th class="text-left content" style="width: 5%;"></th>
             <th class="text-left content" style="width: 25%;"></th>
           </tr>
           <tr class="tr-sub_thead">
             <th class="text-left content" style="width: 15%;"><b>DENOMINACIÓN</b></th>
-            <th class="text-left content" style="width: 35%;"><?php echo ': ' . $arrData[0]->No_Entidad; ?></th>
-            <th class="text-left content" style="width: 25%;"></th>
+            <th class="text-left content" style="width: 55%;"><?php echo ': ' . $arrData[0]->No_Entidad; ?></th>
+            <th class="text-left content" style="width: 5%;"></th>
             <th class="text-left content" style="width: 25%"><b>FORMA DE PAGO:</b> <?php echo $arrData[0]->No_Medio_Pago; ?></th>
           </tr>
           <tr class="tr-sub_thead">
             <th class="text-left content" style="width: 15%;"><b>DIRECCIÓN</b></th>
-            <th class="text-left content" style="width: 35%;"><?php echo ': ' . $arrData[0]->Txt_Direccion_Entidad; ?></th>
-            <th class="text-left content" style="width: 25%;"></th>
+            <th class="text-left content" style="width: 55%;"><?php echo ': ' . $arrData[0]->Txt_Direccion_Entidad . ' - ' . $arrData[0]->No_Distrito_Cliente . ' - ' . $arrData[0]->No_Provincia_Cliente . ' - ' . $arrData[0]->No_Departamento_Cliente; ?></th>
+            <th class="text-left content" style="width: 5%;"></th>
             <th class="text-left content" style="width: 25%"><b>MONEDA:</b> <?php echo $arrData[0]->No_Moneda; ?></th>
           </tr>
         </thead>
@@ -233,7 +233,7 @@
           <?php if($arrData[0]->Nu_Estado_Pedido==1){//2= ?>
           <tr class="tr-theadFormat tr-totales">
             <th class="text-right" style="width: 65%"></th>
-            <th class="text-right" style="width: 20%">PAGAR (50%)</th>
+            <th class="text-right" style="width: 20%">ADELANTO (50%)</th>
             <th class="text-right" style="width: 15%"><?php echo $arrData[0]->No_Signo . ' ' . numberFormat(($arrData[0]->importe_total/2), 2, '.', ','); ?></th>
           </tr>
           <tr class="tr-theadFormat tr-totales">

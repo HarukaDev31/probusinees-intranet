@@ -77,7 +77,7 @@
                     <div class="col-xs-3 col-sm-2 col-md-1 text-center div-api">
                       <label>Api</label>
                       <div class="form-group">
-                        <button type="button" id="btn-cloud-api" class="btn btn-success btn-block btn-md"><i class="fa fa-cloud-download fa-lg"></i></button>
+                        <button type="button" id="btn-cloud-api" class="btn btn-success btn-block btn-md"><i class="fa fa-cloud fa-lg"></i></button>
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>
