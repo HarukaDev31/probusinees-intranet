@@ -55,7 +55,7 @@ $(function () {
 
   url = base_url + 'AgenteCompra/PedidosAgente/ajax_list';
   table_Entidad = $( '#table-Pedidos' ).DataTable({
-    dom: "<'row'<'col-sm-12 col-md-5'B><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
+    dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
     "<'row'<'col-sm-12'tr>>" +
     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
     buttons     : [{
@@ -128,7 +128,9 @@ $(function () {
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
   
-  $( '.custom-select' ).removeClass('custom-select-sm form-control-sm');
+  $('#table-Pedidos_filter input').removeClass('form-control-sm');
+  $('#table-Pedidos_filter input').addClass('form-control-md');
+  $('#table-Pedidos_filter input').addClass("width_full");
 
   $( '.div-AgregarEditar' ).hide();
 

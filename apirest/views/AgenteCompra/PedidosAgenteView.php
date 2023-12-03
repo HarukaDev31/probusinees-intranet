@@ -17,8 +17,8 @@
           <div class="card">
             <div class="card-body">
               <div class="table-responsive div-Listar">
-                <table id="table-Pedidos" class="table table-bordered table-hover">
-                  <thead>
+                <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
+                  <thead class="thead-light">
                     <tr>
                       <th>País</th>
                       <th>Pedido</th>
