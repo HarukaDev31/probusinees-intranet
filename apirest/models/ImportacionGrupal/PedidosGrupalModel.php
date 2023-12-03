@@ -135,7 +135,19 @@ class PedidosGrupalModel extends CI_Model{
 			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
 		} else {
 			$this->db->trans_commit();
-			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Pedido modificado');
 		}
     }
+    
+	public function eliminarPedido($ID){
+		$this->db->where('ID_Pedido_Cabecera', $ID);
+		$this->db->delete($this->table_importacion_grupal_pedido_detalle);
+
+		$this->db->where('ID_Pedido_Cabecera', $ID);
+		$this->db->delete($this->table);
+		if ( $this->db->affected_rows() > 0 ) {
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Pedido eliminado');
+		}
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al eliminar');
+	}
 }

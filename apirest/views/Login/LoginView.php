@@ -46,13 +46,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   <div class="fondo_pantalla">
     <div class="container-fluid">
         <div class="row">
-        <div class="d-none d-md-flex col-sm-12 col-md-6 col-lg-6 bg-image" alt="ProBusiness" title="ProBusiness"></div>
+        <div class="d-none d-md-flex col-sm-12 col-md-6 col-lg-6 bg-image" alt="Portada ProBusiness" title="Portada ProBusiness"></div>
         <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="panel panel-default">
               <div class="panel-heading">
                 <div class="row row-login-logo">
                   <div class="col-md-12 col-lg-12 text-center">
-                    <img class="img-logo" src="<?php echo base_url("assets/img/logos/logo_horizontal_probusiness_claro.png?ver=4.0.0") ?>" alt="ProBusiness" title="ProBusiness">
+                    <img class="img-logo" src="<?php echo base_url("assets/img/logos/logo_probusiness.png?ver=4.0.0") ?>" alt="Logo ProBusiness" title="Logo ProBusiness">
                   </div>
                 </div>
               </div>

@@ -3,7 +3,7 @@
     <div class="float-right d-none d-sm-block">
       <b>Version</b> 1.0.0
     </div>
-    <strong>&copy; 2023 <a href="#">ProBusiness</a></strong>
+    <strong>&copy; 2023 <a style="color: #FF500B !important" href="https://probusiness.pe" target="_blank" alt="ProBusiness" rel="noopener noreferrer">ProBusiness</a></strong>
   </footer>
 
   <!-- Control Sidebar -->
@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.63'; ?>
+<?php $iControlVersionDashboard = '1.0.64'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>

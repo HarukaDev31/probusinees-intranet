@@ -17,8 +17,8 @@
           <div class="card">
             <div class="card-body">
               <div class="table-responsive div-Listar">
-                <table id="table-Pedidos" class="table table-bordered table-hover">
-                  <thead>
+                <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
+                  <thead class="thead-light">
                     <tr>
                       <th>Campaña</th>
                       <th>Pedido</th>
@@ -37,11 +37,9 @@
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Editar</th>
                       <?php endif; ?>
-                      <!--
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
                         <th class="no-sort">Eliminar</th>
                       <?php endif; ?>
-                      -->
                     </tr>
                   </thead>
                 </table>

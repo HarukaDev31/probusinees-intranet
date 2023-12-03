@@ -107,15 +107,15 @@ class PedidosGrupal extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item"><a alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',1);">Pendiente</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item"><a alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2);">Confirmado</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item"><a alt="Entregado" title="Entregado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Entregado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-2 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',1);">Pendiente</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-2 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2);">Confirmado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-2 py-1 btn-block" alt="Entregado" title="Entregado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Entregado</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
             $rows[] = $dropdown_estado;
 
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-			//$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar pedido" title="Eliminar pedido" href="javascript:void(0)" onclick="eliminarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(
@@ -229,5 +229,10 @@ class PedidosGrupal extends CI_Controller {
 			exit();
 			//alert('no existe');
 		}
+	}
+    
+	public function eliminarPedido($ID){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+		echo json_encode($this->PedidosGrupalModel->eliminarPedido($this->security->xss_clean($ID)));
 	}
 }

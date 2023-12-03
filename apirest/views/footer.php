@@ -2,7 +2,7 @@
     <div class="pull-right hidden-xs">
       <b style="color: white">Version</b> <span style="color: white"><?php echo NUEVA_VERSION_SISTEMA; ?></span>
     </div>
-    <strong><a href="https://www.ecxpresslae.com" target="_blank" alt="ecxpresslae" title="ecxpresslae"><span style="color: #EC4747 !important">ProBusiness</span></a> <span style="color: white">&copy; 2023</strong>
+    <strong><a href="https://probusiness.pe" target="_blank" alt="ProBusiness" title="ProBusiness"><span style="color: #FF500B !important">ProBusiness</span></a> <span style="color: white">&copy; 2023</strong>
   </footer>
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->

@@ -55,7 +55,7 @@ $(function () {
 
   url = base_url + 'ImportacionGrupal/PedidosGrupal/ajax_list';
   table_Entidad = $( '#table-Pedidos' ).DataTable({
-    dom: "<'row'<'col-sm-12 col-md-5'B><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
+    dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
     "<'row'<'col-sm-12'tr>>" +
     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
     buttons     : [{
@@ -128,7 +128,9 @@ $(function () {
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
   
-  $( '.custom-select' ).removeClass('custom-select-sm form-control-sm');
+  $('#table-Pedidos_filter input').removeClass('form-control-sm');
+  $('#table-Pedidos_filter input').addClass('form-control-md');
+  $('#table-Pedidos_filter input').addClass("width_full");
 
   $( '.div-AgregarEditar' ).hide();
 
@@ -511,4 +513,56 @@ function _generarPDFPedidoCliente($modal_delete, ID){
   $modal_delete.modal('hide');
   url = base_url + 'ImportacionGrupal/PedidosGrupal/generarPDFPedidoCliente/' + ID;
   window.open(url,'_blank');
+}
+
+function eliminarPedido(ID){
+  var $modal_delete = $( '#modal-message-delete' );
+  $modal_delete.modal('show');
+
+  $( '#modal-title' ).html('¿Deseas eliminar?');
+
+  $( '#btn-cancel-delete' ).off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $( '#btn-save-delete' ).off('click').click(function () {
+    _eliminarPedido($modal_delete, ID);
+  });
+}
+
+function _eliminarPedido($modal_delete, ID){
+  url = base_url + 'ImportacionGrupal/PedidosGrupal/eliminarPedido/' + ID;
+  $.ajax({
+    url       : url,
+    type      : "GET",
+    dataType  : "JSON",
+    success: function( response ){
+      $modal_delete.modal('hide');
+	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+  	  $( '#modal-message' ).modal('show');
+		  
+		  if (response.status == 'success'){
+  	    $( '.modal-message' ).addClass(response.style_modal);
+  	    $( '.modal-title-message' ).text(response.message);
+  	    setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+  	    reload_table_Entidad();
+		  } else {
+  	    $( '.modal-message' ).addClass(response.style_modal);
+  	    $( '.modal-title-message' ).text(response.message);
+  	    setTimeout(function() {$('#modal-message').modal('hide');}, 1500);
+		  }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $modal_delete.modal('hide');
+      $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+      
+  	  $( '#modal-message' ).modal('show');
+      $( '.modal-message' ).addClass( 'modal-danger' );
+      $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+      setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+      
+      //Message for developer
+      console.log(jqXHR.responseText);
+    },
+  });
 }
