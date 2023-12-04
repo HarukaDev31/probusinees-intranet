@@ -194,14 +194,20 @@ class BannersGrupal extends CI_Controller {
 					);
 				} else {
 					$UploadData = $this->upload->data();
+
 					$data = array('Nu_Version_Imagen' => $this->input->post('iVersionImage'));
 					$where = array('ID_Ecommerce_Inicio' => $this->input->post('iIdEcommerceInicio') );
 					$this->SliderModel->actualizarVersionImagen($where, $data);
 
 					$arrUrlImagePath = explode('..', $path);
 					$arrUrlImage = explode('/principal',base_url());
+								
+					$server_addr = $_SERVER['HTTP_HOST'];
+					$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
+					$url_image = $base_url . $path;
+
 					//$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
-					$url_image = $path;
+					//$url_image = $path;
 					$arrResponse = array(
 						'sStatus' => 'success',
 						'sMessage' => 'imagén guardada',
