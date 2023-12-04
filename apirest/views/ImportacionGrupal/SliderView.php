@@ -39,7 +39,7 @@
                 
                 <div class="col-md-12">
                   <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
-                  <button type="button" class="btn btn-success btn-block" onclick="agregarInicio('1')"><i class="fa fa-plus-circle"></i> Agregar</button>
+                  <button type="button" class="btn btn-success btn-block" onclick="agregarInicio('1')">Agregar</button>
                   <?php endif; ?>
                 </div>
               </div>
@@ -87,7 +87,7 @@
                 
                 <div class="col-md-12">
                   <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
-                  <button type="button" class="btn btn-success btn-block" onclick="agregarInicio('3')"><i class="fa fa-plus-circle"></i> Agregar</button>
+                  <button type="button" class="btn btn-success btn-block" onclick="agregarInicio('3')">Agregar</button>
                   <?php endif; ?>
                 </div>
               </div>
@@ -131,8 +131,8 @@ echo form_open('', $attributes);
   <div class="modal-dialog modal-lg">
   	<div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title text-center"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       
     	<div class="modal-body">

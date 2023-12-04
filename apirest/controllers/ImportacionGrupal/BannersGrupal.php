@@ -4,6 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class BannersGrupal extends CI_Controller {
 	private $upload_path = '../assets/images/sliders/';
 	private $upload_path_table = '../assets/images/sliders';
+	private $upload_path_table_v2 = '../../../assets/images/sliders';
 	
 	function __construct(){
     	parent::__construct();
@@ -35,15 +36,15 @@ class BannersGrupal extends CI_Controller {
 			$arrImgProducto = explode('sliders',$row->No_Imagen_Url_Inicio_Slider);
 			$sPathImgProducto='';
 			if(isset($arrImgProducto[1]))
-				$sPathImgProducto = $this->upload_path_table . $arrImgProducto[1];
+				$sPathImgProducto = $this->upload_path_table_v2 . $arrImgProducto[1];
 
 			$image='';
 			if(!empty($sPathImgProducto) && !empty($row->No_Imagen_Url_Inicio_Slider)){
-				if ( file_exists($sPathImgProducto) ) {
-					$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
-					$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
-					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Inicio_Slider . '" src="' . $base64 . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
-				}
+				//if ( file_exists($sPathImgProducto) ) {
+					//$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
+					//$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
+					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Inicio_Slider . '" src="' . $sPathImgProducto . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
+				//}
 			}
 			
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verInicio(\'' . $row->ID_Ecommerce_Inicio . '\', \'' . $row->No_Imagen_Inicio_Slider . '\', \'' . $row->No_Imagen_Url_Inicio_Slider . '\', \'' . $row->Nu_Version_Imagen . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
@@ -53,7 +54,7 @@ class BannersGrupal extends CI_Controller {
             $rows[] = $row->No_Slider;
 			
 			$arrEstadoRegistro = $this->HelperDropshippingModel->obtenerEstadoRegistroArray($row->Nu_Estado_Slider);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			
 			$rows[] = '<button class="btn btn-xs btn-link delete" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarInicio(\'' . $row->ID_Ecommerce_Inicio . '\', \''.$action.'\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
@@ -79,26 +80,26 @@ class BannersGrupal extends CI_Controller {
 			$arrImgProducto = explode('sliders',$row->No_Imagen_Url_Inicio_Slider);
 			$sPathImgProducto='';
 			if(isset($arrImgProducto[1]))
-				$sPathImgProducto = $this->upload_path_table . $arrImgProducto[1];
+				$sPathImgProducto = $this->upload_path_table_v2 . $arrImgProducto[1];
 
 			$image='';
 			if(!empty($sPathImgProducto) && !empty($row->No_Imagen_Url_Inicio_Slider)){
-				if ( file_exists($sPathImgProducto) ) {
-					$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
-					$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
-					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Inicio_Slider . '" src="' . $base64 . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
-				}
+				//if ( file_exists($sPathImgProducto) ) {
+					//$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
+					//$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
+					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Inicio_Slider . '" src="' . $sPathImgProducto . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
+				//}
 			}
 			
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verInicio(\'' . $row->ID_Ecommerce_Inicio . '\', \'' . $row->No_Imagen_Inicio_Slider . '\', \'' . $row->No_Imagen_Url_Inicio_Slider . '\', \'' . $row->Nu_Version_Imagen . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verInicio(\'' . $row->ID_Ecommerce_Inicio . '\', \'' . $row->No_Imagen_Inicio_Slider . '\', \'' . $row->No_Imagen_Url_Inicio_Slider . '\', \'' . $row->Nu_Version_Imagen . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
             $rows[] = $row->Nu_Orden_Slider;
 			$rows[] = $image;
             $rows[] = $row->No_Slider;
 
 			$arrEstadoRegistro = $this->HelperDropshippingModel->obtenerEstadoRegistroArray($row->Nu_Estado_Slider);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			
-			$rows[] = '<button class="btn btn-xs btn-link delete" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarInicio(\'' . $row->ID_Ecommerce_Inicio . '\', \''.$action.'\')"><i class="fa fa-2x fa-trash-o" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link delete" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarInicio(\'' . $row->ID_Ecommerce_Inicio . '\', \''.$action.'\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(
