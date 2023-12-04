@@ -7,7 +7,8 @@ class SliderModel extends CI_Model{
     var $column_search = array('');
     var $order = array('Nu_Orden_Slider' => 'asc');
 	
-    private $upload_path = '../assets/images/sliders/';
+    //private $upload_path = '../assets/images/sliders/';
+	private $upload_path = 'assets/images/sliders/';
     
 	public function __construct(){
 		parent::__construct();

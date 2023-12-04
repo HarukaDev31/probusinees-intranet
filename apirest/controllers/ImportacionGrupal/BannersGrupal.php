@@ -180,7 +180,8 @@ class BannersGrupal extends CI_Controller {
 				$config['upload_path'] = $path;
 				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
 				$config['max_size'] = 1024;
-				$config['file_name'] = cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen;
+				$config['encrypt_name'] = TRUE;
+				//$config['file_name'] = cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen;
 
 				$this->load->library('upload', $config);
 
@@ -191,19 +192,23 @@ class BannersGrupal extends CI_Controller {
 						'sClassModal' => 'modal-danger',
 					);
 				} else {
+					$UploadData = $this->upload->data();
 					$data = array('Nu_Version_Imagen' => $this->input->post('iVersionImage'));
 					$where = array('ID_Ecommerce_Inicio' => $this->input->post('iIdEcommerceInicio') );
 					$this->SliderModel->actualizarVersionImagen($where, $data);
 
 					$arrUrlImagePath = explode('..', $path);
 					$arrUrlImage = explode('/principal',base_url());
-					$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+					//$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+					$url_image = $path;
 					$arrResponse = array(
 						'sStatus' => 'success',
 						'sMessage' => 'imagén guardada',
 						'sClassModal' => 'modal-success',
-						'sNombreImagenInicio' => cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
-						'sNombreImagenInicioUrl' => $url_image . '/' . cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
+						'sNombreImagenInicio' => $UploadData["file_name"],
+						'sNombreImagenInicioUrl' => $url_image . '/' . $UploadData["file_name"],
+						//'sNombreImagenInicio' => cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
+						//'sNombreImagenInicioUrl' => $url_image . '/' . cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
 					);
 				}
 			} else {
@@ -257,9 +262,15 @@ class BannersGrupal extends CI_Controller {
     }
 
 	public function get_image(){
+		/*
 		$sUrlImage = $this->input->post('sUrlImage');
 		$arrUrlImage = explode($this->empresa->Nu_Documento_Identidad, $sUrlImage);
 		$path = $this->upload_path . $this->empresa->Nu_Documento_Identidad . $arrUrlImage[1];
+		*/
+		$path         = $this->upload_path . $this->empresa->Nu_Documento_Identidad;		
+		$server_addr = $_SERVER['HTTP_HOST'];
+		$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
+		$url_image = $base_url . $path;
     	$arrfilesImages = array();
 		if ( file_exists($path) ){
 			$arrfilesImages[] = array(
