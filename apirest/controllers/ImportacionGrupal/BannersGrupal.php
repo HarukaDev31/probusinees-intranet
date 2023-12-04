@@ -2,7 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class BannersGrupal extends CI_Controller {
-	private $upload_path = '../assets/images/sliders/';
+	//private $upload_path = '../assets/images/sliders/';
+	private $upload_path = 'assets/images/sliders/';
 	private $upload_path_table = '../assets/images/sliders';
 	private $upload_path_table_v2 = '../../../assets/images/sliders';
 	
