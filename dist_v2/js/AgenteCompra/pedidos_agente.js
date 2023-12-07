@@ -211,7 +211,14 @@ $(function () {
 
     $('.modal-ver_item').modal('show');
     $('.img-responsive').attr('src', $(this).data('url_img'));
-    $("#a-download_image").attr("href", $(this).data('url_img'));
+    //$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
+    //$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
+
+    var img_item = $(this).data('url_img');
+    img_item = img_item.replace("https://", "../../");
+    img_item = img_item.replace("assets", "public_html/assets");
+
+    $("#a-download_image").attr("href", img_item);
   })
   
   $('#span-id_pedido').html('');
