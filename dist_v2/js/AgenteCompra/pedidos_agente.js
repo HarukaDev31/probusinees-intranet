@@ -211,7 +211,7 @@ $(function () {
 
     $('.modal-ver_item').modal('show');
     $('.img-responsive').attr('src', $(this).data('url_img'));
-    $("#a-download_image").attr("data-id_item", $(this).data('url_img'));
+    $("#a-download_image").attr("data-id_item", $(this).data('id_item'));
 
     //$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
     //$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
