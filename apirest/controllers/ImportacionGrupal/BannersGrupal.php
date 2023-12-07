@@ -42,7 +42,7 @@ class BannersGrupal extends CI_Controller {
 				//if ( file_exists($sPathImgProducto) ) {
 					//$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
 					//$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
-					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Inicio_Slider . '" src="' . $sPathImgProducto . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
+					$image = '<img class="img-fluid" data-url_img="' . $sPathImgProducto . '" src="' . $sPathImgProducto . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
 				//}
 			}
 			
@@ -81,7 +81,7 @@ class BannersGrupal extends CI_Controller {
 				//if ( file_exists($sPathImgProducto) ) {
 					//$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
 					//$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
-					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Inicio_Slider . '" src="' . $sPathImgProducto . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
+					$image = '<img class="img-fluid" data-url_img="' . $sPathImgProducto . '" src="' . $sPathImgProducto . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
 				//}
 			}
 			
@@ -116,11 +116,11 @@ class BannersGrupal extends CI_Controller {
 
 			$image='';
 			if(!empty($sPathImgProducto) && !empty($row->No_Imagen_Url_Inicio_Slider)){
-				if ( file_exists($sPathImgProducto) ) {
-					$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
-					$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
-					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Inicio_Slider . '" src="' . $base64 . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
-				}
+				//if ( file_exists($sPathImgProducto) ) {
+					//$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
+					//$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
+					$image = '<img class="img-fluid" data-url_img="' . $sPathImgProducto . '" src="' . $sPathImgProducto . '" title="' . $row->No_Imagen_Inicio_Slider . '" alt="' . $row->No_Imagen_Inicio_Slider . '" style="cursor:pointer; max-height:40px;" />';
+				//}
 			}
 			$rows[] = $image;
 
@@ -184,8 +184,8 @@ class BannersGrupal extends CI_Controller {
 					$where = array('ID_Ecommerce_Inicio' => $this->input->post('iIdEcommerceInicio') );
 					$this->SliderModel->actualizarVersionImagen($where, $data);
 
-					$arrUrlImagePath = explode('..', $path);
-					$arrUrlImage = explode('/principal',base_url());
+					//$arrUrlImagePath = explode('..', $path);
+					//$arrUrlImage = explode('/principal',base_url());
 								
 					$server_addr = $_SERVER['HTTP_HOST'];
 					$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';

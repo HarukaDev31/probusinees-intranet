@@ -40,7 +40,7 @@ class CategoriasGrupal extends CI_Controller {
 				//if ( file_exists($sPathImgProducto) ) {
 					//$img_binary = fread(fopen($sPathImgProducto, "r"), filesize($sPathImgProducto));
 					//$base64 = 'data:image/png;base64, ' . base64_encode($img_binary);
-					$image = '<img class="img-fluid" data-url_img="' . $row->No_Imagen_Url_Categoria . '" src="' . $row->No_Imagen_Url_Categoria . '" title="' . $row->No_Familia . '" alt="' . $row->No_Familia . '" style="cursor:pointer; max-height:40px;" />';
+					$image = '<img class="img-fluid" data-url_img="' . $sPathImgProducto . '" src="' . $sPathImgProducto . '" title="' . $row->No_Familia . '" alt="' . $row->No_Familia . '" style="cursor:pointer; max-height:40px;" />';
 				//}
 			}
 
@@ -87,8 +87,9 @@ class CategoriasGrupal extends CI_Controller {
 
 				$config['upload_path'] = $path;
 				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
-				$config['max_size'] = 400;//400 KB
-				$config['file_name'] = cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen;
+				$config['max_size'] = 1024;//400 KB
+				$config['encrypt_name'] = TRUE;
+				//$config['file_name'] = cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen;
 
 				$this->load->library('upload', $config);
 
@@ -99,20 +100,30 @@ class CategoriasGrupal extends CI_Controller {
 						'sClassModal' => 'modal-danger',
 					);
 				} else {
+					$UploadData = $this->upload->data();
+
 					$data = array('Nu_Version_Imagen' => $this->input->post('iVersionImage'));
 					$where = array('ID_Familia' => $this->input->post('iIdFamilia') );
 					$this->CategoriaModel->actualizarVersionImagen($where, $data);
 
+					/*
 					$arrUrlImagePath = explode('..', $path);
 					$arrUrlImage = explode('/principal',base_url());
 					$url_image = $arrUrlImage[0] . $arrUrlImagePath[1];
+					*/
+
+					$server_addr = $_SERVER['HTTP_HOST'];
+					$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr.'/';
+					$url_image = $base_url . $path;
 
 					$arrResponse = array(
 						'sStatus' => 'success',
 						'sMessage' => 'imagén guardada',
 						'sClassModal' => 'modal-success',
-						'sNombreImagenCategoria' => cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
-						'sNombreImagenCategoriaUrl' => $url_image . '/' . cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
+						'sNombreImagenCategoria' => $UploadData["file_name"],
+						'sNombreImagenCategoriaUrl' => $url_image . '/' . $UploadData["file_name"],
+						//'sNombreImagenCategoria' => cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
+						//'sNombreImagenCategoriaUrl' => $url_image . '/' . cambiarCaracteresEspecialesImagen($sNombreImagen) . '.' . $sExtensionNombreImagen,
 					);
 				}
 			} else {
