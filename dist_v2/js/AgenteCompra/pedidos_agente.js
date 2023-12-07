@@ -228,7 +228,9 @@ $(function () {
 	$( '#a-download_image' ).click(function(){
     id = $(this).data('id_item');
     url = base_url + 'AgenteCompra/PedidosAgente/downloadImage/' + id;
-    window.open(url,'_blank');
+    
+    var popupwin = window.open(url);
+    setTimeout(function() { popupwin.close();}, 2000);
   })
 
   $('#span-id_pedido').html('');
