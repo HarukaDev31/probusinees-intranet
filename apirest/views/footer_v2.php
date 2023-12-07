@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.73'; ?>
+<?php $iControlVersionDashboard = '1.0.78'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -88,6 +88,11 @@
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_agente.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<?php if (isset($js_pedidos_garantizados) && $js_pedidos_garantizados==true) : ?>
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_garantizados.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 <!-- Usuarios y opciones -->
 <?php if (isset($js_perfil_usuario) && $js_perfil_usuario==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/perfil_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
@@ -112,8 +117,6 @@
 <script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/slider.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
-
-
 
 <!-- Message Delete Modal -->
 <div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" tabindex="-1">

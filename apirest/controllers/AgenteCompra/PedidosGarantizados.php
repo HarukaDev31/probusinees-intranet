@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class PedidosAgente extends CI_Controller {
+class PedidosGarantizados extends CI_Controller {
 	
 	private $upload_path = '../assets/images/clientes/';
 	private $file_path = '../assets/images/logos/';
@@ -12,7 +12,7 @@ class PedidosAgente extends CI_Controller {
     	parent::__construct();	
 		$this->load->library('session');
 		$this->load->database('LAE_SYSTEMS');
-		$this->load->model('AgenteCompra/PedidosAgenteModel');
+		$this->load->model('AgenteCompra/PedidosGarantizadosModel');
 		$this->load->model('HelperImportacionModel');
 		if(!isset($this->session->userdata['usuario'])) {
 			redirect('');
@@ -23,21 +23,21 @@ class PedidosAgente extends CI_Controller {
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
 			$this->load->view('header_v2');
-			$this->load->view('AgenteCompra/PedidosAgenteView');
-			$this->load->view('footer_v2', array("js_pedidos_agente" => true));
+			$this->load->view('AgenteCompra/PedidosGarantizadosView');
+			$this->load->view('footer_v2', array("js_pedidos_garantizados" => true));
 		}
 	}
 
 	public function ajax_list(){
-		$arrData = $this->PedidosAgenteModel->get_datatables();
+		$arrData = $this->PedidosGarantizadosModel->get_datatables();
         $data = array();
         foreach ($arrData as $row) {
 			$rows = array();
 
             $rows[] = $row->No_Pais;
-            $rows[] = $row->ID_Pedido_Cabecera;
-            $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto . "<br>" . $row->Txt_Email_Contacto;
+            $rows[] = $row->Nu_Correlativo;
+            $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
+            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 			
 			//EXCEL cliente de pedido
@@ -55,11 +55,26 @@ class PedidosAgente extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',1,0);">Pendiente</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Garantizado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2);">Garantizado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Enviado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',4);">Rechazado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',5);">Confirmado</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
             $rows[] = $dropdown_estado;
+
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($row->Nu_Estado_China);
+			$dropdown_estado_china = '<div class="dropdown">';
+				$dropdown_estado_china .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+					$dropdown_estado_china .= $arrEstadoRegistro['No_Estado'];
+				$dropdown_estado_china .= '<span class="caret"></span></button>';
+				$dropdown_estado_china .= '<ul class="dropdown-menu">';
+					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',1);">Pendiente</a></li>';
+					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',2);">En proceso</a></li>';
+					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',3);">Cotizado</a></li>';
+				$dropdown_estado_china .= '</ul>';
+			$dropdown_estado_china .= '</div>';
+            $rows[] = $dropdown_estado_china;
 
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 			//$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
@@ -72,12 +87,17 @@ class PedidosAgente extends CI_Controller {
     }
     	
 	public function ajax_edit($ID){
-        echo json_encode($this->PedidosAgenteModel->get_by_id($this->security->xss_clean($ID)));
+        echo json_encode($this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID)));
     }
 
-	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){
+	public function cambiarEstado($ID, $Nu_Estado){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosAgenteModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($id_correlativo)));
+    	echo json_encode($this->PedidosGarantizadosModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
+	}
+
+	public function cambiarEstadoChina($ID, $Nu_Estado){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosGarantizadosModel->cambiarEstadoChina($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
 	}
 
 	public function crudPedidoGrupal(){
@@ -92,7 +112,7 @@ class PedidosAgente extends CI_Controller {
 			'Nu_Celular_Entidad' => $this->input->post('Nu_Celular_Entidad'),
 			'Txt_Email_Entidad' => $this->input->post('Txt_Email_Entidad'),
 		);
-		echo json_encode($this->PedidosAgenteModel->actualizarPedido(
+		echo json_encode($this->PedidosGarantizadosModel->actualizarPedido(
 				array(
 					'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
 					'ID_Entidad' => $this->input->post('EID_Entidad'),
@@ -105,7 +125,7 @@ class PedidosAgente extends CI_Controller {
 
 	//generar cotización PDF para pedido de cliente	
 	public function generarPDFPedidoCliente($ID){
-        $data = $this->PedidosAgenteModel->get_by_id($this->security->xss_clean($ID));
+        $data = $this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID));
 		//array_debug($data);
 
 		if( !empty($data) ){
@@ -117,7 +137,7 @@ class PedidosAgente extends CI_Controller {
 			$pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, 'A4', true, 'UTF-8', false);
 			
 			ob_start();
-			$file = $this->load->view('AgenteCompra/pdf/PedidosAgentePDFView', array(
+			$file = $this->load->view('AgenteCompra/pdf/PedidosGarantizadosPDFView', array(
 				'arrDataEmpresa' => $data,
 				'arrData' => $data,
 				'totalEnLetras'	=> $EnLetras->ValorEnLetras($data[0]->Ss_Total, $data[0]->No_Moneda),
@@ -180,7 +200,7 @@ class PedidosAgente extends CI_Controller {
 
 	//generar cotización PDF para pedido de cliente	
 	public function generarExcelPedidoCliente($ID){
-        $data = $this->PedidosAgenteModel->get_by_id($this->security->xss_clean($ID));
+        $data = $this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID));
 		//array_debug($data);
 
 		if( !empty($data) ){
@@ -560,7 +580,7 @@ class PedidosAgente extends CI_Controller {
 
 	public function downloadImage($id){
 		//echo "hola";
-		$objPedido = $this->PedidosAgenteModel->getDownloadImage($this->security->xss_clean($id));
+		$objPedido = $this->PedidosGarantizadosModel->getDownloadImage($this->security->xss_clean($id));
 		//array_debug($objPedido);
 		
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);

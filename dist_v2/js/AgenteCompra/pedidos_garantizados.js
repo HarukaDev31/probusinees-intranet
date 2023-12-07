@@ -53,7 +53,7 @@ $(function () {
     }
   });
 
-  url = base_url + 'AgenteCompra/PedidosAgente/ajax_list';
+  url = base_url + 'AgenteCompra/PedidosGarantizados/ajax_list';
   table_Entidad = $( '#table-Pedidos' ).DataTable({
     dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
     "<'row'<'col-sm-12'tr>>" +
@@ -227,7 +227,7 @@ $(function () {
   
 	$( '#a-download_image' ).click(function(){
     id = $(this).data('id_item');
-    url = base_url + 'AgenteCompra/PedidosAgente/downloadImage/' + id;
+    url = base_url + 'AgenteCompra/PedidosGarantizados/downloadImage/' + id;
     
     var popupwin = window.open(url);
     setTimeout(function() { popupwin.close();}, 2000);
@@ -253,7 +253,7 @@ function verPedido(ID){
 
   $('#span-id_pedido').html('Nro. ' + ID);
 
-  url = base_url + 'AgenteCompra/PedidosAgente/ajax_edit/' + ID;
+  url = base_url + 'AgenteCompra/PedidosGarantizados/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -326,16 +326,20 @@ function verPedido(ID){
   })
 }
 
-function cambiarEstado(ID, Nu_Estado, id_correlativo) {
+function cambiarEstado(ID, Nu_Estado) {
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
   $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
   $('.modal-message-delete').addClass('modal-success');
 
-  var sNombreEstado = 'Pendiente';
+  var sNombreEstado = 'Garantizado';
   if(Nu_Estado==2)
-    sNombreEstado = 'Garantizado';
+    sNombreEstado = 'Enviado';
+  else if(Nu_Estado==2)
+    sNombreEstado = 'Rechazado';
+  else if(Nu_Estado==2)
+    sNombreEstado = 'Confirmado';
 
   $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
 
@@ -349,7 +353,62 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosAgente/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + id_correlativo;
+    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstado/' + ID + '/' + Nu_Estado;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
+}
+
+function cambiarEstadoChina(ID, Nu_Estado) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  var sNombreEstado = 'Pendiente';
+  if(Nu_Estado==2)
+    sNombreEstado = 'En proceso';
+  else if(Nu_Estado==2)
+    sNombreEstado = 'Cotizado';
+
+  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstadoChina/' + ID + '/' + Nu_Estado;
     $.ajax({
       url: url,
       type: "GET",
@@ -457,7 +516,7 @@ function form_pedido(){
     $( '#btn-save' ).attr('disabled', true);
     $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
     
-    url = base_url + 'AgenteCompra/PedidosAgente/crudPedidoGrupal';
+    url = base_url + 'AgenteCompra/PedidosGarantizados/crudPedidoGrupal';
     $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -540,7 +599,7 @@ function generarPDFPedidoCliente(ID){
 
 function _generarPDFPedidoCliente($modal_delete, ID){
   $modal_delete.modal('hide');
-  url = base_url + 'AgenteCompra/PedidosAgente/generarPDFPedidoCliente/' + ID;
+  url = base_url + 'AgenteCompra/PedidosGarantizados/generarPDFPedidoCliente/' + ID;
   window.open(url,'_blank');
 }
 
@@ -564,6 +623,6 @@ function generarExcelPedidoCliente(ID){
 
 function _generarExcelPedidoCliente($modal_delete, ID){
   $modal_delete.modal('hide');
-  url = base_url + 'AgenteCompra/PedidosAgente/generarExcelPedidoCliente/' + ID;
+  url = base_url + 'AgenteCompra/PedidosGarantizados/generarExcelPedidoCliente/' + ID;
   window.open(url,'_blank');
 }

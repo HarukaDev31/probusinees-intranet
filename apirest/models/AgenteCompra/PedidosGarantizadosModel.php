@@ -1,5 +1,5 @@
 <?php
-class PedidosAgenteModel extends CI_Model{
+class PedidosGarantizadosModel extends CI_Model{
 	var $table = 'agente_compra_pedido_cabecera';
 	var $table_importacion_grupal_pedido_detalle = 'agente_compra_pedido_detalle';
 	var $table_empresa = 'empresa';
@@ -30,7 +30,8 @@ class PedidosAgenteModel extends CI_Model{
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
-    	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
+    	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
+		->where($this->table . '.Nu_Estado>=', 2);
         
 		if(isset($this->order)) {
 			$order = $this->order;
@@ -69,10 +70,11 @@ class PedidosAgenteModel extends CI_Model{
         return $query->result();
     }
 
-	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){
+	public function cambiarEstado($ID, $Nu_Estado){
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
+			/*
 			if($Nu_Estado==2 && $id_correlativo==0){
 				//si es Nu_Estado=2 Garantizado crear correlativo de mes y año si no existe y asignar al pedido
 				$arrCorrelativo = $this->generarCorrelativo();
@@ -83,9 +85,7 @@ class PedidosAgenteModel extends CI_Model{
 					//actualizar tabla para agregar correlativo
 					$data = array(
 						'ID_Agente_Compra_Correlativo' => $ID_Agente_Compra_Correlativo,
-						'Nu_Correlativo' => $Nu_Correlativo,
-						'Fe_Emision_Cotizacion' => dateNow('fecha'),
-						'Fe_Registro_Hora_Cotizacion' => dateNow('fecha_hora')
+						'Nu_Correlativo' => $Nu_Correlativo
 					);
 					if ($this->db->update($this->table, $data, $where) > 0) {
 						return array('status' => 'success', 'message' => 'Correlativo generado');
@@ -98,6 +98,17 @@ class PedidosAgenteModel extends CI_Model{
 			} else {
 				return array('status' => 'success', 'message' => 'Actualizado');
 			}
+			*/
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+	}
+
+	public function cambiarEstadoChina($ID, $Nu_Estado){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Estado_China' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Actualizado');
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
 	}

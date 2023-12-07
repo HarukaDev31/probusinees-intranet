@@ -25,6 +25,13 @@
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
   <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=4.0.0'; ?>">
   
+  <meta name="theme-color" content="#FF6700">
+  <meta name="msapplication-navbutton-color" content="#FF6700"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="msapplication-navbutton-color" content="#FF6700" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <?php if (isset($js_producto_importacion) && $js_producto_importacion==true) : ?>  
   <link rel="stylesheet" href="<?php echo base_url() . 'plugins_v2/summernote/summernote-bs4.min.css'; ?>">
   <?php endif; ?>

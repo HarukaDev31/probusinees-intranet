@@ -24,13 +24,14 @@
                   <thead class="thead-light">
                     <tr>
                       <th>País</th>
-                      <th>Pedido</th>
+                      <th>Cotización</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
                       <th class="no-sort">Excel</th>
                       <!--<th class="no-sort">PDF</th>-->
                       <th>Estado</th>
+                      <th>Estado China</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>

@@ -28,15 +28,15 @@ class HelperImportacionModel extends CI_Model{
 		else if( $iEstado == 2 )
 			return array('No_Estado' => 'Garantizado','No_Class_Estado' => 'primary');//separa con $50 o más para iniciar proceso de cotizado
 		else if( $iEstado == 3 )
-			return array('No_Estado' => 'Enviado','No_Class_Estado' => 'success');
+			return array('No_Estado' => 'Enviado','No_Class_Estado' => 'warning');
 		else if( $iEstado == 4 )
 			return array('No_Estado' => 'Rechazado','No_Class_Estado' => 'danger');
 		else if( $iEstado == 5 )
-			return array('No_Estado' => 'Confirmado','No_Class_Estado' => 'danger');
+			return array('No_Estado' => 'Confirmado','No_Class_Estado' => 'success');
 		else if( $iEstado == 6 )
-			return array('No_Estado' => 'Pago 30%','No_Class_Estado' => 'danger');
+			return array('No_Estado' => 'Pago 30%','No_Class_Estado' => 'primary');
 		else if( $iEstado == 7 )
-			return array('No_Estado' => 'Pago 100%','No_Class_Estado' => 'danger');
+			return array('No_Estado' => 'Pago 100%','No_Class_Estado' => 'primary');
 	}
 
 	//1=Pendiente, 2=Proceso, 3=Cotizado, 4=Producción, 5=Inspección y 6=Entregado
@@ -48,11 +48,11 @@ class HelperImportacionModel extends CI_Model{
 		else if( $iEstado == 3 )
 			return array('No_Estado' => 'Cotizado','No_Class_Estado' => 'success');
 		else if( $iEstado == 4 )
-			return array('No_Estado' => 'Producción','No_Class_Estado' => 'danger');
+			return array('No_Estado' => 'Producción','No_Class_Estado' => 'warning');
 		else if( $iEstado == 5 )
-			return array('No_Estado' => 'Inspección','No_Class_Estado' => 'danger');
+			return array('No_Estado' => 'Inspección','No_Class_Estado' => 'secondary');
 		else if( $iEstado == 6 )
-			return array('No_Estado' => 'Entregado','No_Class_Estado' => 'danger');
+			return array('No_Estado' => 'Entregado','No_Class_Estado' => 'primary');
 	}
 
 	public function getCategorias(){
