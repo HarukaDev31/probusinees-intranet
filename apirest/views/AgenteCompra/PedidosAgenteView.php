@@ -192,7 +192,7 @@
         <div class="col-xs-12 text-center">
           <img class="img-responsive img-fluid" style=" display: block; margin-left: auto; margin-right: auto;" src="">
         </div>
-        <a id="a-download_image" class="mt-4 btn btn-primary btn-block" href="/images/myw3schoolsimage.jpg" download>Descargar</a>
+        <a id="a-download_image" class="mt-4 btn btn-primary btn-block" href="" target="_blank" rel="noopener noreferrer" download="probusiness">Descargar</a>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
