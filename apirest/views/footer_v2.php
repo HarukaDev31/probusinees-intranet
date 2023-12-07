@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.81'; ?>
+<?php $iControlVersionDashboard = '1.0.83'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -52,6 +52,10 @@
 <script src="<?php echo base_url() . 'dist_v2/js/inicio.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<?php if (isset($js_cliente) && $js_cliente==true) : ?>
+<script src="<?php echo base_url() . 'dist_v2/js/Ventas/ReglasVentas/cliente.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 <!-- Folder: ImportacionGrupal -->
 <?php if (isset($js_campana_grupal) && $js_campana_grupal==true) : ?>
 <!-- InputMask -->
@@ -71,10 +75,6 @@
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/pedidos_grupal.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
-<?php if (isset($js_cliente) && $js_cliente==true) : ?>
-<script src="<?php echo base_url() . 'dist_v2/js/Ventas/ReglasVentas/cliente.js?ver=' . $iControlVersionDashboard; ?>"></script>
-<?php endif; ?>
-
 <?php if (isset($js_metodo_pago_grupal) && $js_metodo_pago_grupal==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/metodo_pago.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
@@ -83,6 +83,19 @@
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/metodo_entrega.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<?php if (isset($js_slider_importacion) && $js_slider_importacion==true) : ?>
+<link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
+<script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/slider.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_categoria_importacion_grupal) && $js_categoria_importacion_grupal==true) : ?>
+<link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
+<script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/categoria.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<!-- agente de compra -->
 <?php if (isset($js_pedidos_agente) && $js_pedidos_agente==true) : ?>
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_agente.js?ver=' . $iControlVersionDashboard; ?>"></script>
@@ -115,12 +128,19 @@
 <script src="<?php echo base_url() . 'dist_v2/js/Logistica/ReglasLogistica/producto_importacion.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
-<!-- Usuarios y opciones -->
-<?php if (isset($js_slider_importacion) && $js_slider_importacion==true) : ?>
-<link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
-<script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
-<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/slider.js?ver=' . $iControlVersionDashboard; ?>"></script>
-<?php endif; ?>
+<div id="modal-loader" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-loader">
+    <div class="modal-content modal-content-loader-change">
+      <div class="modal-body">
+        <div class="text-center">
+          <div class="spinner-border" style="width: 5rem; height: 5rem;" role="status">
+            <span class="sr-only"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Message Delete Modal -->
 <div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" tabindex="-1">
@@ -135,20 +155,6 @@
       <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-outline-secondary col" data-dismiss="modal">Cancelar</button>
         <button type="button" id="btn-save-delete" class="btn btn-primary col">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="modal-loader" class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-dialog-loader">
-    <div class="modal-content modal-content-loader-change">
-      <div class="modal-body">
-        <div class="text-center">
-          <div class="spinner-border" style="width: 5rem; height: 5rem;" role="status">
-            <span class="sr-only"></span>
-          </div>
-        </div>
       </div>
     </div>
   </div>

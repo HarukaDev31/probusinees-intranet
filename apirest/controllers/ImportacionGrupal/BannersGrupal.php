@@ -28,10 +28,8 @@ class BannersGrupal extends CI_Controller {
 	public function ajax_list(){
 		$arrData = $this->SliderModel->get_datatables();
         $data = array();
-        $no = $this->input->post('start');
         $action='delete';
         foreach ($arrData as $row) {
-            $no++;
             $rows = array();
 			
 			$arrImgProducto = explode('sliders',$row->No_Imagen_Url_Inicio_Slider);
@@ -61,9 +59,6 @@ class BannersGrupal extends CI_Controller {
             $data[] = $rows;
         }
         $output = array(
-	        'draw' => $this->input->post('draw'),
-	        'recordsTotal' => $this->SliderModel->count_all(),
-	        'recordsFiltered' => $this->SliderModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);
@@ -72,10 +67,8 @@ class BannersGrupal extends CI_Controller {
 	public function ajax_list_slider_mobile(){
 		$arrData = $this->SliderModel->get_datatables_slider_mobile();
         $data = array();
-        $no = $this->input->post('start');
         $action='delete';
         foreach ($arrData as $row) {
-            $no++;
             $rows = array();
 
 			$arrImgProducto = explode('sliders',$row->No_Imagen_Url_Inicio_Slider);
@@ -104,9 +97,6 @@ class BannersGrupal extends CI_Controller {
             $data[] = $rows;
         }
         $output = array(
-	        'draw' => $this->input->post('draw'),
-	        'recordsTotal' => $this->SliderModel->count_all_slider_mobile(),
-	        'recordsFiltered' => $this->SliderModel->count_filtered_slider_mobile(),
 	        'data' => $data,
         );
         echo json_encode($output);
@@ -115,10 +105,8 @@ class BannersGrupal extends CI_Controller {
 	public function ajax_list_ofertas(){
 		$arrData = $this->SliderModel->get_datatables_ofertas();
         $data = array();
-        $no = $this->input->post('start');
         $action='delete';
         foreach ($arrData as $row) {
-            $no++;
             $rows = array();
             
 			$arrImgProducto = explode('sliders',$row->No_Imagen_Url_Inicio_Slider);
@@ -149,9 +137,6 @@ class BannersGrupal extends CI_Controller {
             $data[] = $rows;
         }
         $output = array(
-	        'draw' => $this->input->post('draw'),
-	        'recordsTotal' => $this->SliderModel->count_all_ofertas(),
-	        'recordsFiltered' => $this->SliderModel->count_filtered_ofertas(),
 	        'data' => $data,
         );
         echo json_encode($output);

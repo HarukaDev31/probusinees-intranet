@@ -35,21 +35,8 @@ class SliderModel extends CI_Model{
 	
 	function get_datatables(){
         $this->_get_datatables_query();
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
-    }
-    
-    function count_filtered(){
-        $this->_get_datatables_query();
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
- 
-    public function count_all(){
-        $this->db->from($this->table);
-        return $this->db->count_all_results();
     }
     
     /* slider mobile */
@@ -73,21 +60,8 @@ class SliderModel extends CI_Model{
 	
 	function get_datatables_slider_mobile(){
         $this->_get_datatables_query_slider_mobile();
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
-    }
-    
-    function count_filtered_slider_mobile(){
-        $this->_get_datatables_query_slider_mobile();
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
- 
-    public function count_all_slider_mobile(){
-        $this->db->from($this->table);
-        return $this->db->count_all_results();
     }
 
     /* ofertas / promociones */
@@ -111,21 +85,8 @@ class SliderModel extends CI_Model{
 	
 	function get_datatables_ofertas(){
         $this->_get_datatables_query_ofertas();
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
-    }
-    
-    function count_filtered_ofertas(){
-        $this->_get_datatables_query_ofertas();
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
- 
-    public function count_all_ofertas(){
-        $this->db->from($this->table);
-        return $this->db->count_all_results();
     }
     
     public function get_by_id($ID){

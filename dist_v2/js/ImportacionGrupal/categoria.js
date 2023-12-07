@@ -1,52 +1,35 @@
 var url;
-var table_familia, table_slider_mobile;
+var table_familia;
 var accion_familia;
 
 $(function () {
   /*
 	$(document).keyup(function(event){
     if(event.which == 27){//ESC
-      $( "#modal-Inicio" ).modal('hide');
+      $( "#modal-Categoria" ).modal('hide');
     }
 	});
   */
 
+  $("#table-Categoria").on('click', '.img-fluid', function () {
+    //$('.img-fluid').data('url_img');
+    $('.img-responsive').attr('src', '');
+    $('.modal-info_item').modal('show');
+    $('.img-responsive').attr('src', $(this).data('url_img'));
+  })
+
   //$('.select2').select2();
-  //$('[data-mask]').inputmask()
+  //$('[data-mask]').inputmask();
   
   /*
-  url = base_url + 'ImportacionGrupal/BannersGrupal/ajax_list';
-  table_familia = $( '#table-Inicio' ).DataTable({
-    'dom'       : '<"top">frt<"bottom"><"clear">',
-    buttons     : [{
-      extend    : 'excel',
-      text      : '<i class="fa fa-file-excel-o color_icon_excel"></i> Excel',
-      titleAttr : 'Excel',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'pdf',
-      text      : '<i class="fa fa-file-pdf-o color_icon_pdf"></i> PDF',
-      titleAttr : 'PDF',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'colvis',
-      text      : '<i class="fa fa-ellipsis-v"></i> Columnas',
-      titleAttr : 'Columnas',
-      exportOptions: {
-        columns: ':visible'
-      }
-    }],
+  url = base_url + 'ImportacionGrupal/CategoriasGrupal/ajax_list';
+  table_familia = $( '#table-Categoria' ).DataTable({
+    'dom': '<"top">frt<"bottom"lip><"clear">',
     'searching'   : false,
     'bStateSave'  : true,
     'processing'  : true,
     'serverSide'  : true,
-    'info'        : false,
+    'info'        : true,
     'autoWidth'   : false,
     'pagingType'  : 'full_numbers',
     'oLanguage' : {
@@ -71,7 +54,7 @@ $(function () {
       'type'      : 'POST',
       'dataType'  : 'json',
       'data'      : function ( data ) {
-        data.Filtros_Inicios = $( '#cbo-Filtros_Inicios' ).val(),
+        data.Filtros_Categorias = $( '#cbo-Filtros_Categorias' ).val(),
         data.Global_Filter = $( '#txt-Global_Filter' ).val();
       },
     },
@@ -81,15 +64,19 @@ $(function () {
       'orderable' : false,
     },],
   });
+  
+  $('.dataTables_length').addClass('col-xs-4 col-sm-5 col-md-1');
+  $('.dataTables_info').addClass('col-xs-8 col-sm-7 col-md-4');
+  $('.dataTables_paginate').addClass('col-xs-12 col-sm-12 col-md-7');
+  
+  $( '#txt-Global_Filter' ).keyup(function() {
+    table_familia.search($(this).val()).draw();
+  });
   */
  
-  url = base_url + 'ImportacionGrupal/BannersGrupal/ajax_list';
-  table_familia = $( '#table-Inicio' ).DataTable({
-    //'dom'       : 'B<"top">frt<"bottom"lp><"clear">',
-    //dom: "<'row'<'col-sm-12 col-md-3'Q><'col-sm-12 col-md-5'l><'col-sm-12 col-md-4'f>>" +
-    //"<'row'<'col-sm-12'tr>>" +
-    //"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-    dom: "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
+  url = base_url + 'ImportacionGrupal/CategoriasGrupal/ajax_list';
+  table_familia = $( '#table-Categoria' ).DataTable({
+    dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
     "<'row'<'col-sm-12'tr>>" +
     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
     buttons     : [{
@@ -118,7 +105,7 @@ $(function () {
     }],
     "paging": true,
     "lengthChange": true,
-    "searching": false,
+    "searching": true,
     "ordering": true,
     "info": true,
     "autoWidth": false,
@@ -159,172 +146,23 @@ $(function () {
       'targets'   : 'no-sort',
       'orderable' : false,
     },],
-    'lengthMenu': [[10, 100, 500, 1000], [10, 100, 500, 1000]],
+    'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
   
-  $('#table-Inicio_filter input').removeClass('form-control-sm');
-  $('#table-Inicio_filter input').addClass('form-control-md');
-  $('#table-Inicio_filter input').addClass("width_full");
-
-  /* slider mobile */
-  url = base_url + 'ImportacionGrupal/BannersGrupal/ajax_list_slider_mobile';
-  table_slider_mobile = $('#table-Inicio-mobile').DataTable({
-    'dom': '<"top">frt<"bottom"><"clear">',
-    buttons: [{
-      extend: 'excel',
-      text: '<i class="fa fa-file-excel-o color_icon_excel"></i> Excel',
-      titleAttr: 'Excel',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend: 'pdf',
-      text: '<i class="fa fa-file-pdf-o color_icon_pdf"></i> PDF',
-      titleAttr: 'PDF',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend: 'colvis',
-      text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-      titleAttr: 'Columnas',
-      exportOptions: {
-        columns: ':visible'
-      }
-    }],
-    'searching': false,
-    'bStateSave': true,
-    'processing': true,
-    'serverSide': true,
-    'info': false,
-    'autoWidth': false,
-    'pagingType': 'full_numbers',
-    'oLanguage': {
-      'sInfo': 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-      'sLengthMenu': '_MENU_',
-      'sSearch': 'Buscar por: ',
-      'sSearchPlaceholder': 'UPC / Nombre',
-      'sZeroRecords': 'No se encontraron registros',
-      'sInfoEmpty': 'No hay registros',
-      'sLoadingRecords': 'Cargando...',
-      'sProcessing': 'Procesando...',
-      'oPaginate': {
-        'sFirst': '<<',
-        'sLast': '>>',
-        'sPrevious': '<',
-        'sNext': '>',
-      },
-    },
-    'order': [],
-    'ajax': {
-      'url': url,
-      'type': 'POST',
-      'dataType': 'json',
-      'data': function (data) {
-        data.Filtros_Inicios = $('#cbo-Filtros_Inicios').val(),
-          data.Global_Filter = $('#txt-Global_Filter').val();
-      },
-    },
-    'columnDefs': [{
-      'className': 'text-center',
-      'targets': 'no-sort',
-      'orderable': false,
-    },],
-  });
-
-  /* ofertas y promociones */
-  url = base_url + 'ImportacionGrupal/BannersGrupal/ajax_list_ofertas';
-  table_oferta = $('#table-oferta').DataTable({
-    'dom': '<"top">frt<"bottom"><"clear">',
-    buttons: [{
-      extend: 'excel',
-      text: '<i class="fa fa-file-excel-o color_icon_excel"></i> Excel',
-      titleAttr: 'Excel',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend: 'pdf',
-      text: '<i class="fa fa-file-pdf-o color_icon_pdf"></i> PDF',
-      titleAttr: 'PDF',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend: 'colvis',
-      text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-      titleAttr: 'Columnas',
-      exportOptions: {
-        columns: ':visible'
-      }
-    }],
-    'searching': false,
-    'bStateSave': true,
-    'processing': true,
-    'serverSide': true,
-    'info': false,
-    'autoWidth': false,
-    'pagingType': 'full_numbers',
-    'oLanguage': {
-      'sInfo': 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-      'sLengthMenu': '_MENU_',
-      'sSearch': 'Buscar por: ',
-      'sSearchPlaceholder': 'UPC / Nombre',
-      'sZeroRecords': 'No se encontraron registros',
-      'sInfoEmpty': 'No hay registros',
-      'sLoadingRecords': 'Cargando...',
-      'sProcessing': 'Procesando...',
-      'oPaginate': {
-        'sFirst': '<<',
-        'sLast': '>>',
-        'sPrevious': '<',
-        'sNext': '>',
-      },
-    },
-    'order': [],
-    'ajax': {
-      'url': url,
-      'type': 'POST',
-      'dataType': 'json',
-      'data': function (data) {
-        data.Filtros_Inicios = $('#cbo-Filtros_Inicios').val(),
-          data.Global_Filter = $('#txt-Global_Filter').val();
-      },
-    },
-    'columnDefs': [{
-      'className': 'text-center',
-      'targets': 'no-sort',
-      'orderable': false,
-    },],
-  });
-
-  $( '.dataTables_length' ).addClass('col-md-3');
-  $( '.dataTables_paginate' ).addClass('col-md-9');
+  $('#table-Categoria_filter input').removeClass('form-control-sm');
+  $('#table-Categoria_filter input').addClass('form-control-md');
+  $('#table-Categoria_filter input').addClass("width_full");
   
-  /*
-  $( '#txt-Global_Filter' ).keyup(function() {
-    table_familia.search($(this).val()).draw();
-  });
-  */
-  
-  $( '#form-Inicio' ).validate({
+  $( '#form-Categoria' ).validate({
 		rules:{
-      /*
-			No_Slider: {
+			No_Familia: {
 				required: true,
 			},
-      */
 		},
 		messages:{
-      /*
-			No_Slider:{
+			No_Familia:{
 				required: "Ingresar nombre"
 			},
-      */
 		},
 		errorPlacement : function(error, element) {
 		  $(element).closest('.form-group').find('.help-block').html(error.html());
@@ -336,37 +174,38 @@ $(function () {
 			$(element).closest('.form-group').removeClass('has-error').addClass('has-success');
 			$(element).closest('.form-group').find('.help-block').html('');
     },
-		submitHandler: form_Inicio
+		submitHandler: form_Categoria
 	});
 	
   /*
   $(document).bind('keydown', 'f2', function(){
-    agregarInicio();
+    agregarCategoria();
   });
   */
 })
 
-function agregarInicio(iTipoInicio){
+function agregarCategoria(){
   accion_familia='add_familia';
   
   //$( '#modal-loader' ).modal('show');
   
-  $( '#form-Inicio' )[0].reset();
+  $( '#form-Categoria' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
   
-  $( '#modal-Inicio' ).modal('show');
-  $( '.modal-title' ).text('Nuevo Slider');
+  $( '#modal-Categoria' ).modal('show');
+  $( '.modal-title' ).text('Nueva Categoría');
   
-  $( '[name="EID_Empresa"]' ).val('');
-  $( '[name="EID_Ecommerce_Inicio"]' ).val('');
-  $( '[name="ENo_Slider"]' ).val('');
-
-  $('[name="Nu_Tipo_Inicio"]').val(iTipoInicio);
+  $('[name="EID_Empresa"]').val('');
+  $('[name="EID_Familia"]').val('');
+  $('[name="ENo_Familia"]').val('');
+  $('[name="ENu_Orden"]').val('');
+  $('[name="No_Imagen_Categoria"]').val('');
+  $('[name="No_Imagen_Url_Categoria"]').val('');
   
-	$( '#modal-Inicio' ).on('shown.bs.modal', function() {
-		$( '#txt-No_Slider' ).focus();
+	$( '#modal-Categoria' ).on('shown.bs.modal', function() {
+		$( '#txt-No_Familia' ).focus();
 	})
   
   //$( '#modal-loader' ).modal('show');
@@ -378,8 +217,19 @@ function agregarInicio(iTipoInicio){
     //$( '#modal-loader' ).modal('hide');
   }, 'JSON');
 
-  $( '.div-Estado' ).hide();
-  $( '#cbo-Estado' ).html( '<option value="1">Activo</option>' );
+  $('.div-Estado').hide();
+  $('#cbo-Estado').html('<option value="1">Activo</option>');
+
+  $('#cbo-color').html('<option value="141619">Negro</option>' );
+  $('#cbo-color').append('<option value="0d6efd">Azul</option>');
+  $('#cbo-color').append('<option value="198754">Verde</option>');
+  $('#cbo-color').append('<option value="dc3545">Rojo</option>');
+  $('#cbo-color').append('<option value="ffff00">Amarillo</option>');
+  $('#cbo-color').append('<option value="0dcaf0">Celeste</option>');
+  $('#cbo-color').append('<option value="ff9100">Naranja</option>');
+  $('#cbo-color').append('<option value="7c4dff">Morado</option>');
+  $('#cbo-color').append('<option value="ff4081">Rosado</option>');
+  $('#cbo-color').append('<option value="4e342e">Marron</option>');
   
   /* obtener imagen guardada(s) */
   $( '.divDropzone' ).html(
@@ -390,22 +240,23 @@ function agregarInicio(iTipoInicio){
     +'</div>'
   );
 
+
   Dropzone.autoDiscover = false;
   Dropzone.prototype.defaultOptions.dictDefaultMessage = "Presionar para subir imágen";
   Dropzone.prototype.defaultOptions.dictFallbackMessage = "Tu navegador no soporta la función arrastrar la imágen";
   Dropzone.prototype.defaultOptions.dictFileTooBig = "La imágen pesa ({{filesize}}MiB). El tamaño máximo es: {{maxFilesize}}MiB.";
-  Dropzone.prototype.defaultOptions.dictInvalidFileType = "Solo se permite imágenes PNG";
+  Dropzone.prototype.defaultOptions.dictInvalidFileType = "Solo se permite imágenes PNG / JPG / JPEG";
   Dropzone.prototype.defaultOptions.dictCancelUpload = "Cancelar";
   Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = "¿Estás seguro de cancelar la subida?";
   Dropzone.prototype.defaultOptions.dictRemoveFile = "Eliminar";
   Dropzone.prototype.defaultOptions.dictMaxFilesExceeded = "Solo se puede subir 1 imágen";
-  
-  url = base_url + 'ImportacionGrupal/BannersGrupal/uploadOnly';
+
+  url = base_url + 'ImportacionGrupal/CategoriasGrupal/uploadOnly';
   var myDropzone = new Dropzone("#id-divDropzone", {
-    url : url,
+    url: url,
     params: {
       iVersionImage: 1,
-      iIdEcommerceInicio: 1,
+      iIdProducto: 1,
     },
     acceptedFiles: ".jpeg,.jpg,.png,.webp",
     addRemoveLinks: true,
@@ -427,9 +278,9 @@ function agregarInicio(iTipoInicio){
         setTimeout(function () { file.previewElement.classList.add("dz-image-preview"); }, 1);
       }
     },
-    removedfile: function(file){
+    removedfile: function (file) {
       var nameFileImage = file.name;
-      url = base_url + 'ImportacionGrupal/BannersGrupal/removeFileImage';
+      url = base_url + 'ImportacionGrupal/CategoriasGrupal/removeFileImage';
       $.ajax({
         url: url,
         type: "POST",
@@ -443,9 +294,8 @@ function agregarInicio(iTipoInicio){
             $('.modal-message').addClass(response.style_modal);
             $('.modal-title-message').text(response.message);
             setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
-
-            $('[name="No_Imagen_Inicio_Slider"]').val('');
-            $('[name="No_Imagen_Url_Inicio_Slider"]').val('');
+            $('#hidden-nombre_imagen_categoria').val('');
+            $('#hidden-nombre_imagen_url_categoria').val('');
             //reload_table_producto();
           } else {
             $('.modal-message').addClass(response.style_modal);
@@ -467,69 +317,70 @@ function agregarInicio(iTipoInicio){
       var previewElement;
       return (previewElement = file.previewElement) != null ? (previewElement.parentNode.removeChild(file.previewElement)) : (void 0);
     },
-    init : function() {
+    init: function () {
       //Verificar respuesta del servidor al subir archivo
-      this.on("success", function(file, response) {
+      this.on("success", function (file, response) {
         var response = jQuery.parseJSON(response);
 
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        $( '#modal-message' ).modal('show');
-        
-        if (response.sStatus != 'error'){
-          $( '.modal-message' ).addClass(response.sClassModal);
-          $( '.modal-title-message' ).text(response.sMessage);
+        console.log('2');
+        console.log(response);
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
 
-          $( '[name="No_Imagen_Inicio_Slider"]' ).val( response.sNombreImagenInicio );
-          $( '[name="No_Imagen_Url_Inicio_Slider"]' ).val( response.sNombreImagenInicioUrl );
+        if (response.sStatus != 'error') {
+          $('.modal-message').addClass(response.sClassModal);
+          $('.modal-title-message').text(response.sMessage);
 
-          setTimeout(function() {$('#modal-message').modal('hide'); }, 1100);
+          $('#hidden-nombre_imagen_categoria').val(response.sNombreImagenCategoria);
+          $('#hidden-nombre_imagen_url_categoria').val(response.sNombreImagenCategoriaUrl);
+
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
         } else {
-          $( '.modal-message' ).addClass(response.sClassModal);
-          $( '.modal-title-message' ).text(response.sMessage);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+          $('.modal-message').addClass(response.sClassModal);
+          $('.modal-title-message').text(response.sMessage);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
         }
       })
     },
-  });
-  
+  })
+  //FIN IMAGEN
+
   //$( '#modal-loader' ).modal('hide');
 }
 
-function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_Version_Imagen){
+function verCategoria(ID, No_Imagen_Categoria, No_Imagen_Url_Categoria, Nu_Version_Imagen){
   accion_familia='upd_familia';
   
-  $( '#form-Inicio' )[0].reset();
+  $( '#form-Categoria' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
   
   //$( '#modal-loader' ).modal('show');
  
-  url = base_url + 'ImportacionGrupal/BannersGrupal/ajax_edit/' + ID;
+  url = base_url + 'ImportacionGrupal/CategoriasGrupal/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
     dataType: "JSON",
     success: function(response){
-      $( '#modal-Inicio' ).modal('show');
-      $( '.modal-title' ).text('Modifcar Slider');
+      $( '#modal-Categoria' ).modal('show');
+      $( '.modal-title' ).text('Modifcar Categoría');
   
-    	$( '#modal-Inicio' ).on('shown.bs.modal', function() {
-    		$( '#txt-No_Slider' ).focus();
+    	$( '#modal-Categoria' ).on('shown.bs.modal', function() {
+    		$( '#txt-No_Familia' ).focus();
     	})
       
       $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
-      $( '[name="EID_Ecommerce_Inicio"]' ).val(response.ID_Ecommerce_Inicio);
-      $( '[name="ENo_Slider"]' ).val(response.No_Slider);
+      $( '[name="EID_Familia"]' ).val(response.ID_Familia);
+      $( '[name="ENo_Familia"]').val(response.No_Familia);
+      $( '[name="ENu_Orden"]' ).val(response.Nu_Orden);
+      $( '[name="No_Imagen_Categoria"]' ).val(response.No_Imagen_Categoria);
+      $( '[name="No_Imagen_Url_Categoria"]' ).val(response.No_Imagen_Url_Categoria);
 
-      $('[name="Nu_Tipo_Inicio"]').val(response.Nu_Tipo_Inicio);
-
-      $( '[name="No_Imagen_Inicio_Slider"]' ).val(response.No_Imagen_Inicio_Slider);
-      $( '[name="No_Imagen_Url_Inicio_Slider"]' ).val(response.No_Imagen_Url_Inicio_Slider);
-      
-      $('[name="No_Slider"]').val(response.No_Slider);
-      $('[name="Nu_Orden_Slider"]').val(response.Nu_Orden_Slider);
-      $('[name="No_Url_Accion"]').val(response.No_Url_Accion);
+      $('[name="Nu_Orden"]').val(response.Nu_Orden);
+      $('[name="No_Familia"]').val(response.No_Familia);
+      $('[name="No_Familia_Breve"]').val(response.No_Familia_Breve);
       
       $( '.div-Estado' ).show();
       $( '#cbo-Estado' ).html( '' );
@@ -545,10 +396,60 @@ function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_
           $( '#cbo-Empresas' ).append( '<option value="' + responseEmpresa[i].ID_Empresa + '" ' + selected + '>' + responseEmpresa[i].No_Empresa + '</option>' );
         }
       }, 'JSON');
+
+      selected = '';
+      if (response.No_Html_Color == '141619')
+        selected = 'selected="selected"';
+      $('#cbo-color').html('<option value="141619" ' + selected + '>Negro</option>');
+
+      selected = '';
+      if (response.No_Html_Color == '0d6efd')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="0d6efd" ' + selected + '>Azul</option>');
+
+      selected = '';
+      if (response.No_Html_Color == '198754')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="198754" ' + selected + '>Verde</option>');
+
+      selected = '';
+      if (response.No_Html_Color == 'dc3545')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="dc3545" ' + selected + '>Rojo</option>');
+
+      selected = '';
+      if (response.No_Html_Color == 'ffff00')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="ffff00" ' + selected + '>Amarillo</option>');
+
+      selected = '';
+      if (response.No_Html_Color == '0dcaf0')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="0dcaf0" ' + selected + '>Celeste</option>');
+
+      selected = '';
+      if (response.No_Html_Color == 'ff9100')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="ff9100" ' + selected + '>Naranja</option>');
       
+      selected = '';
+      if (response.No_Html_Color == '7c4dff')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="7c4dff" ' + selected + '>Morado</option>');
+
+      selected = '';
+      if (response.No_Html_Color == 'ff4081')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="ff4081" ' + selected + '>Rosado</option>');
+
+      selected = '';
+      if (response.No_Html_Color == '4e342e')
+        selected = 'selected="selected"';
+      $('#cbo-color').append('<option value="4e342e" ' + selected + '>Marron</option>');
+
       for (var i = 0; i < 2; i++){
         selected = '';
-        if(response.Nu_Estado_Slider == i)
+        if (response.Nu_Activar_Familia_Lae_Shop == i)
           selected = 'selected="selected"';
         $( '#cbo-Estado' ).append( '<option value="' + i + '" ' + selected + '>' + (i == 0 ? 'Inactivo' : 'Activo') + '</option>' );
       }
@@ -581,26 +482,26 @@ function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_
   Dropzone.prototype.defaultOptions.dictDefaultMessage = "Presionar para subir imágen";
   Dropzone.prototype.defaultOptions.dictFallbackMessage = "Tu navegador no soporta la función arrastrar la imágen";
   Dropzone.prototype.defaultOptions.dictFileTooBig = "La imágen pesa ({{filesize}}MiB). El tamaño máximo es: {{maxFilesize}}MiB.";
-  Dropzone.prototype.defaultOptions.dictInvalidFileType = "Solo se permite imágenes PNG";
+  Dropzone.prototype.defaultOptions.dictInvalidFileType = "Solo se permite imágenes PNG / JPG / JPEG";
   Dropzone.prototype.defaultOptions.dictCancelUpload = "Cancelar";
   Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = "¿Estás seguro de cancelar la subida?";
   Dropzone.prototype.defaultOptions.dictRemoveFile = "Eliminar";
   Dropzone.prototype.defaultOptions.dictMaxFilesExceeded = "Solo se puede subir 1 imágen";
-    
-  url = base_url + 'ImportacionGrupal/BannersGrupal/uploadOnly/' + ID;
+
+  url = base_url + 'ImportacionGrupal/CategoriasGrupal/uploadOnly';
   var myDropzone = new Dropzone("#id-divDropzone", {
     url: url,
     params: {
       iVersionImage: (parseInt(Nu_Version_Imagen) + 1),
-      iIdEcommerceInicio: ID,
+      iIdProducto: ID,
     },
     acceptedFiles: ".jpeg,.jpg,.png,.webp",
     addRemoveLinks: true,
     uploadMultiple: false,
     maxFilesize: 1,//Peso en MB
     maxFiles: 1,
-    thumbnailHeight: 200,
-    thumbnailWidth: 200,
+    thumbnailHeight: 300,
+    thumbnailWidth: 300,
     parallelUploads: 1,
     thumbnail: function (file, dataUrl) {
       if (file.previewElement) {
@@ -615,6 +516,7 @@ function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_
       }
     },
     removedfile: function (file) {
+      url = base_url + 'ImportacionGrupal/CategoriasGrupal/removeFileImage';
       $.ajax({
         url: url,
         type: "POST",
@@ -628,10 +530,8 @@ function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_
             $('.modal-message').addClass(response.style_modal);
             $('.modal-title-message').text(response.message);
             setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
-
-            $('[name="No_Imagen_Inicio_Slider"]').val('');
-            $('[name="No_Imagen_Url_Inicio_Slider"]').val('');
-
+            $('#hidden-nombre_imagen_categoria').val('');
+            $('#hidden-nombre_imagen_url_categoria').val('');
           } else {
             $('.modal-message').addClass(response.style_modal);
             $('.modal-title-message').text(response.message);
@@ -653,6 +553,7 @@ function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_
       return (previewElement = file.previewElement) != null ? (previewElement.parentNode.removeChild(file.previewElement)) : (void 0);
     },
     init: function () {
+      console.log('entro');
       //Verificar respuesta del servidor al subir archivo
       this.on("success", function (file, response) {
         var response = jQuery.parseJSON(response);
@@ -664,8 +565,8 @@ function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_
           $('.modal-message').addClass(response.sClassModal);
           $('.modal-title-message').text(response.sMessage);
 
-          $('[name="No_Imagen_Inicio_Slider"]').val(response.sNombreImagenInicio);
-          $('[name="No_Imagen_Url_Inicio_Slider"]').val(response.sNombreImagenInicioUrl);
+          $('#hidden-nombre_imagen_categoria').val(response.sNombreImagenCategoria);
+          $('#hidden-nombre_imagen_url_categoria').val(response.sNombreImagenCategoriaUrl);
 
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
         } else {
@@ -675,26 +576,27 @@ function verInicio(ID, No_Imagen_Inicio_Slider, No_Imagen_Url_Inicio_Slider, Nu_
         }
       })
 
-      if (No_Imagen_Url_Inicio_Slider.length > 0 && No_Imagen_Url_Inicio_Slider != '' && No_Imagen_Url_Inicio_Slider !== undefined) {
+      if (No_Imagen_Url_Categoria.length > 0 && No_Imagen_Url_Categoria != '' && No_Imagen_Url_Categoria !== undefined) {
         var me = this;
-        url = base_url + 'ImportacionGrupal/BannersGrupal/get_image';
+        url = base_url + 'ImportacionGrupal/CategoriasGrupal/get_image';
         var arrPost = {
-          'sUrlImage': No_Imagen_Url_Inicio_Slider,
+          'sUrlImage': No_Imagen_Url_Categoria,
         }
         $.post(url, arrPost, function (response) {
           $.each(response, function (key, value) {
             var mockfile = value;
             me.emit("addedfile", mockfile);
-            me.emit("thumbnail", mockfile, No_Imagen_Url_Inicio_Slider);
+            me.emit("thumbnail", mockfile, No_Imagen_Url_Categoria);
             me.emit("complete", mockfile);
           })
         }, 'json');
       }
     }
   })
+  //FIN IMAGEN
 }
 
-function form_Inicio(){
+function form_Categoria(){
   if ( accion_familia=='add_familia' || accion_familia=='upd_familia' ) {
     $( '#btn-save' ).text('');
     $( '#btn-save' ).attr('disabled', true);
@@ -702,12 +604,12 @@ function form_Inicio(){
   
     //$( '#modal-loader' ).modal('show');
     
-    url = base_url + 'ImportacionGrupal/BannersGrupal/crudInicio';
+    url = base_url + 'ImportacionGrupal/CategoriasGrupal/crudCategoria';
   	$.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
   		url		    : url,
-  		data		  : $('#form-Inicio').serialize(),
+  		data		  : $('#form-Categoria').serialize(),
   		success : function( response ){
   		  //$( '#modal-loader' ).modal('hide');
   		  
@@ -716,13 +618,11 @@ function form_Inicio(){
   		  
   		  if (response.status == 'success'){
   		    accion_familia='';
-  		    $('#modal-Inicio').modal('hide');
+  		    $('#modal-Categoria').modal('hide');
     	    $( '.modal-message' ).addClass(response.style_modal);
     	    $( '.modal-title-message' ).text(response.message);
     	    setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
-          reload_table_inicio_slider();
-          reload_table_inicio_slider_mobile();
-          reload_table_inicio_ofertas();
+    	    reload_table_familia();
   		  } else {
     	    $( '.modal-message' ).addClass(response.style_modal);
     	    $( '.modal-title-message' ).text(response.message);
@@ -753,7 +653,7 @@ function form_Inicio(){
   }
 }
 
-function eliminarInicio(ID, accion_familia){
+function eliminarCategoria(ID, accion_familia){
   var $modal_delete = $( '#modal-message-delete' );
   $modal_delete.modal('show');
   
@@ -763,20 +663,20 @@ function eliminarInicio(ID, accion_familia){
   
   $(document).bind('keydown', 'esc', function(){
     if ( accion_familia=='delete' ) {
-      _eliminarInicio($modal_delete, ID);
+      _eliminarCategoria($modal_delete, ID);
       accion_familia='';
     }
   });
 
   $( '#btn-save-delete' ).off('click').click(function () {
-    _eliminarInicio($modal_delete, ID);
+    _eliminarCategoria($modal_delete, ID);
   });
 }
 
-function _eliminarInicio($modal_delete, ID){
+function _eliminarCategoria($modal_delete, ID){
   //$( '#modal-loader' ).modal('show');
   
-  url = base_url + 'ImportacionGrupal/BannersGrupal/eliminarInicio/' + ID;
+  url = base_url + 'ImportacionGrupal/CategoriasGrupal/eliminarCategoria/' + ID;
   $.ajax({
     url       : url,
     type      : "GET",
@@ -793,9 +693,7 @@ function _eliminarInicio($modal_delete, ID){
   	    $( '.modal-message' ).addClass(response.style_modal);
   	    $( '.modal-title-message' ).text(response.message);
   	    setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
-        reload_table_inicio_slider();
-        reload_table_inicio_slider_mobile();
-        reload_table_inicio_ofertas();
+  	    reload_table_familia();
 		  } else {
 		    accion_familia='';
   	    $( '.modal-message' ).addClass(response.style_modal);
@@ -821,14 +719,6 @@ function _eliminarInicio($modal_delete, ID){
   });
 }
 
-function reload_table_inicio_slider(){
+function reload_table_familia(){
   table_familia.ajax.reload(null,false);
-}
-
-function reload_table_inicio_slider_mobile() {
-  table_slider_mobile.ajax.reload(null, false);
-}
-
-function reload_table_inicio_ofertas() {
-  table_oferta.ajax.reload(null, false);
 }
