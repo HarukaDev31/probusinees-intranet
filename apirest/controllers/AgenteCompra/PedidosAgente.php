@@ -557,4 +557,29 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('A' . $fila)->applyFromArray($style_align_center);
 		}
 	}
+
+	public function downloadImage($id){
+		//echo "hola";
+		$objPedido = $this->PedidosAgenteModel->get_by_id($this->security->xss_clean($id));
+		
+		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+		$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+		//$file="assets/img/arturo.jpeg";
+		if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+			die('file not found');
+		} else {
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+			header('Content-Transfer-Encoding: binary');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+			ob_clean();
+			flush();
+			readfile($file);
+			exit;
+		}
+	}
 }

@@ -211,16 +211,26 @@ $(function () {
 
     $('.modal-ver_item').modal('show');
     $('.img-responsive').attr('src', $(this).data('url_img'));
+    $("#a-download_image").attr("data-id_item", $(this).data('url_img'));
+
     //$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
     //$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
 
+    /*
     var img_item = $(this).data('url_img');
     img_item = img_item.replace("https://", "../../");
     img_item = img_item.replace("assets", "public_html/assets");
 
     $("#a-download_image").attr("href", img_item);
+    */
   })
   
+	$( '#a-download_image' ).click(function(){
+    id = $(this).data('id_item');
+    url = base_url + 'AgenteCompra/PedidosAgente/downloadImage/' + id;
+    window.open(url,'_blank');
+  })
+
   $('#span-id_pedido').html('');
 })
 
@@ -279,7 +289,7 @@ function verPedido(ID){
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td class='text-center td-name' width='50%'><img style='max-height: 350px;width: 100%; cursor:pointer' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid mb-2'></td>"
+          + "<td class='text-center td-name' width='50%'><img style='max-height: 350px;width: 100%; cursor:pointer' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid mb-2'></td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           //+ "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"

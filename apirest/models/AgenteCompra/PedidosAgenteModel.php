@@ -135,4 +135,9 @@ class PedidosAgenteModel extends CI_Model{
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
 		}
     }
+	
+	public function downloadImage($id){
+		$query = "SELECT Txt_Url_Imagen_Producto FROM agente_compra_pedido_cabecera WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
 }
