@@ -561,14 +561,16 @@ class PedidosAgente extends CI_Controller {
 	public function downloadImage($id){
 		//echo "hola";
 		$objPedido = $this->PedidosAgenteModel->getDownloadImage($this->security->xss_clean($id));
-		array_debug($objPedido);
-		/*
+		//array_debug($objPedido);
+		
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
 		//$file="assets/img/arturo.jpeg";
 		if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
 			die('file not found');
 		} else {
+			
 			header('Content-Description: File Transfer');
 			header('Content-Type: application/octet-stream');
 			header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
@@ -578,7 +580,7 @@ class PedidosAgente extends CI_Controller {
 			header('Pragma: public');
 			ob_clean();
 			flush();
-			readfile($file);
+			readfile($objPedido->Txt_Url_Imagen_Producto);
 			exit;
 		}
 		*/
