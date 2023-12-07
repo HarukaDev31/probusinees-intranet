@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class CategoriasGrupal extends CI_Controller {
-	private $upload_path = '../assets/images/categorias/';
+	private $upload_path = 'assets/images/categorias/';//aqui cambie y agregue carpeta
 	private $upload_path_table = '../assets/images/categorias';
 	private $upload_path_table_v2 = '../../../assets/images/categorias';
 	
