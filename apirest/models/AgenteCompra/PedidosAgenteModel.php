@@ -136,7 +136,7 @@ class PedidosAgenteModel extends CI_Model{
 		}
     }
 	
-	public function downloadImage($id){
+	public function getDownloadImage($id){
 		$query = "SELECT Txt_Url_Imagen_Producto FROM agente_compra_pedido_detalle WHERE ID_Pedido_Detalle = " . $id . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
