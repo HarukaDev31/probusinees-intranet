@@ -560,7 +560,7 @@ class PedidosAgente extends CI_Controller {
 
 	public function downloadImage($id){
 		//echo "hola";
-		$objPedido = $this->PedidosAgenteModel->get_by_id($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAgenteModel->downloadImage($this->security->xss_clean($id));
 		array_debug($objPedido);
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
