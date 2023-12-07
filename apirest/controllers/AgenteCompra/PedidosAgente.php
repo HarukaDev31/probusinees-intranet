@@ -561,10 +561,8 @@ class PedidosAgente extends CI_Controller {
 	public function downloadImage($id){
 		//echo "hola";
 		$objPedido = $this->PedidosAgenteModel->downloadImage($this->security->xss_clean($id));
-		array_debug($objPedido);
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
-		array_debug($objPedido->Txt_Url_Imagen_Producto);
 		//$file="assets/img/arturo.jpeg";
 		if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
 			die('file not found');
