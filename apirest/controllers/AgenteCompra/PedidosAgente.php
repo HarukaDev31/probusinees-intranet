@@ -583,6 +583,5 @@ class PedidosAgente extends CI_Controller {
 			readfile($objPedido->Txt_Url_Imagen_Producto);
 			exit;
 		}
-		*/
 	}
 }
