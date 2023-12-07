@@ -6,8 +6,8 @@ class PerfilUsuarioModel extends CI_Model{
 	var $table_tabla_dato = 'tabla_dato';
 	
     var $column_order = array('No_Empresa', 'No_Organizacion', 'No_Grupo', 'No_Grupo_Descripcion',null);
-    var $column_search = array('No_Empresa', 'No_Organizacion', 'No_Grupo', 'No_Grupo_Descripcion');
-    var $order = array('No_Empresa' => 'desc', 'No_Organizacion' => 'desc', 'No_Grupo' => 'desc');
+    var $column_search = array();
+    var $order = array('Fe_Registro_Hora' => 'desc');
 	
 	public function __construct(){
 		parent::__construct();
@@ -23,11 +23,15 @@ class PerfilUsuarioModel extends CI_Model{
         if( $this->input->post('Perfil_Usuario') == 'Perfil_Usuario' )
             $this->db->like('No_Grupo', $this->input->post('Global_Filter'));
                 
-        $this->db->select('EMP.ID_Empresa, EMP.No_Empresa, ORG.ID_Organizacion, ORG.No_Organizacion, ID_Grupo, No_Grupo, No_Grupo_Descripcion, ' . $this->table . '.Nu_Estado')
+        $this->db->select('EMP.ID_Empresa, EMP.No_Empresa, ORG.ID_Organizacion, ORG.No_Organizacion, ID_Grupo, Nu_Tipo_Privilegio_Acceso, No_Grupo, No_Grupo_Descripcion, ' . $this->table . '.Nu_Estado')
         ->from($this->table)
         ->join($this->table_empresa . ' AS EMP', 'EMP.ID_Empresa = ' . $this->table . '.ID_Empresa', 'join')
         ->join($this->table_organizacion . ' AS ORG', 'ORG.ID_Organizacion = ' . $this->table . '.ID_Organizacion', 'join');
          
+		if ($this->user->ID_Grupo != 1){
+        	$this->db->where('ID_Grupo != ', 1);
+		}
+
         if(isset($_POST['order'])){
             $this->db->order_by($this->column_order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
         } else if(isset($this->order)) {
@@ -38,21 +42,8 @@ class PerfilUsuarioModel extends CI_Model{
 	
 	function get_datatables(){
         $this->_get_datatables_query();
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
-    }
-    
-    function count_filtered(){
-        $this->_get_datatables_query();
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
- 
-    public function count_all(){
-        $this->db->from($this->table);
-        return $this->db->count_all_results();
     }
     
     public function get_by_id($ID_Grupo){

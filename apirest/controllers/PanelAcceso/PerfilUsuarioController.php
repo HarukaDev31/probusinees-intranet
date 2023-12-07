@@ -22,30 +22,33 @@ class PerfilUsuarioController extends CI_Controller {
 	
 	public function ajax_list(){
 		$arrData = $this->PerfilUsuarioModel->get_datatables();
-        $data = array();
-        $no = $this->input->post('start');
         $action = 'delete';
         foreach ($arrData as $row) {
-            $no++;
             $rows = array();
 			if ( $this->user->No_Usuario == 'root' ){
 				$rows[] = $row->No_Empresa;
 				$rows[] = $row->No_Organizacion;
 			}
+
+			$sNombrePrivilegioAcceso = 'Personal Probusiness';
+			if($row->Nu_Tipo_Privilegio_Acceso==2){
+				$sNombrePrivilegioAcceso = 'Personal China';
+			} else if($row->Nu_Tipo_Privilegio_Acceso==3){
+				$sNombrePrivilegioAcceso = 'Proveedor externo';
+			}
+
+            $rows[] = '<span class="badge bg-secondary">' . $sNombrePrivilegioAcceso . '</span>';
             $rows[] = $row->No_Grupo;
             $rows[] = $row->No_Grupo_Descripcion;
 			
 			$arrEstadoRegistro = $this->HelperModel->obtenerEstadoRegistroArray($row->Nu_Estado);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-
-            $rows[] = '<button class="btn btn-xs btn-link btn-upd" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verPerfilUsuario(\'' . $row->ID_Grupo . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
-            $rows[] = '<button class="btn btn-xs btn-link btn-upd" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarPerfilUsuario(\'' . $row->ID_Grupo . '\', \'' . $action . '\')"><i class="fa fa-2x fa-trash-o" aria-hidden="true"></i></button>';
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			
+            $rows[] = '<button class="btn btn-xs btn-link btn-upd" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verPerfilUsuario(\'' . $row->ID_Grupo . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+            $rows[] = '<button class="btn btn-xs btn-link btn-upd" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarPerfilUsuario(\'' . $row->ID_Grupo . '\', \'' . $action . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(
-	        "draw" => $this->input->post('draw'),
-	        "recordsTotal" => $this->PerfilUsuarioModel->count_all(),
-	        "recordsFiltered" => $this->PerfilUsuarioModel->count_filtered(),
 	        "data" => $data,
         );
         echo json_encode($output);
@@ -63,6 +66,7 @@ class PerfilUsuarioController extends CI_Controller {
 			'No_Grupo' => $this->input->post('No_Grupo'),
 			'No_Grupo_Descripcion' => $this->input->post('No_Grupo_Descripcion'),
 			'Nu_Estado' => $this->input->post('Nu_Estado'),
+			'Nu_Tipo_Privilegio_Acceso' => $this->input->post('Nu_Tipo_Privilegio_Acceso'),
 		);
 		echo json_encode(
 		($_POST['EID_Organizacion'] != '' || $_POST['EID_Grupo'] != '') ?

@@ -61,3 +61,6 @@
   width: 100%;
   height: 150px;
 }
+
+.tableFixHead          { overflow: auto; height: 700px; }
+.tableFixHead thead th { position: sticky; top: 0; z-index: 1; }

@@ -3,14 +3,14 @@ var url, sMenuPadre = '';
 $(function () {
 	$('.select2').select2();
 	
-	$( '#modal-loader' ).modal('show');
+	//$( '#modal-loader' ).modal('show');
     
 	url = base_url + 'HelperController/getEmpresasOpcionesMenu';
 	$.post( url , function( response ){
 		$( '#cbo-Empresas' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
 		for (var i = 0; i < response.length; i++)
 			$( '#cbo-Empresas' ).append( '<option value="' + response[i].ID_Empresa + '" data-nu_tipo_rubro_empresa="' + response[i].Nu_Tipo_Rubro_Empresa + '" data-proveedor_dropshipping="' + response[i].Nu_Proveedor_Dropshipping + '">' + response[i].No_Empresa + '</option>' );
-		$( '#modal-loader' ).modal('hide');
+		//$( '#modal-loader' ).modal('hide');
 	}, 'JSON');
 
 	$( '#cbo-Empresas' ).change(function(){
@@ -18,7 +18,7 @@ $(function () {
 
 		$('#cbo-Grupos').html('<option value="0" selected="selected">- vacío -</option>');
 
-		$( '#modal-loader' ).modal('show');
+		//$( '#modal-loader' ).modal('show');
 		url = base_url + 'HelperController/getOrganizaciones';
 		var arrParams = {
 		  iIdEmpresa : $( this ).val(),
@@ -27,7 +27,7 @@ $(function () {
 			$( '#cbo-organizacion' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
 			for (var i = 0; i < response.length; i++)
 				$( '#cbo-organizacion' ).append( '<option value="' + response[i].ID_Organizacion + '">' + response[i].No_Organizacion + '</option>' );    
-			$( '#modal-loader' ).modal('hide');
+			//$( '#modal-loader' ).modal('hide');
 		}, 'JSON');
 	});
 
@@ -39,13 +39,13 @@ $(function () {
 		$( '#cbo-organizacion' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
 		for (var i = 0; i < response.length; i++)
 		$( '#cbo-organizacion' ).append( '<option value="' + response[i].ID_Organizacion + '">' + response[i].No_Organizacion + '</option>' );    
-		$( '#modal-loader' ).modal('hide');  
+		//$( '#modal-loader' ).modal('hide');  
 	}, 'JSON');
 
 	$( '#cbo-organizacion' ).change(function(){
 		$( '#form-Permiso_Usuario' ).hide();
 
-		$( '#modal-loader' ).modal('show');
+		//$( '#modal-loader' ).modal('show');
 		url = base_url + 'HelperController/getGrupos';
 		var arrParams = {
 			iIdEmpresa : $( '#cbo-Empresas' ).val(),
@@ -55,12 +55,12 @@ $(function () {
 		  $( '#cbo-Grupos' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
 		  for (var i = 0; i < response.length; i++)
 			$( '#cbo-Grupos' ).append( '<option value="' + response[i].ID_Grupo + '">' + response[i].No_Grupo + '</option>' );    
-		  $( '#modal-loader' ).modal('hide');
+		  //$( '#modal-loader' ).modal('hide');
 		}, 'JSON');
 	});
 	
 	if ( $( '#cbo-Empresas' ).val() > 0 || $( '#cbo-organizacion' ).val() > 0 ) {
-		$( '#modal-loader' ).modal('show');
+		//$( '#modal-loader' ).modal('show');
 		url = base_url + 'HelperController/getGrupos';
 		var arrParams = {
 			iIdEmpresa : $( '#cbo-Empresas' ).val(),
@@ -70,7 +70,7 @@ $(function () {
 		  $( '#cbo-Grupos' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
 		  for (var i = 0; i < response.length; i++)
 			$( '#cbo-Grupos' ).append( '<option value="' + response[i].ID_Grupo + '">' + response[i].No_Grupo + '</option>' );    
-		  $( '#modal-loader' ).modal('hide');
+		  //$( '#modal-loader' ).modal('hide');
 		}, 'JSON');
 	}
 
@@ -82,7 +82,7 @@ $(function () {
 
     	if ( ID_Grupo > 0 ) {
 			$( '#form-Permiso_Usuario' ).show();
-			$( '#modal-loader' ).modal('show');
+			//$( '#modal-loader' ).modal('show');
 			url = base_url + 'PanelAcceso/PermisoUsuarioController/getMenuAccesoxGrupo/' + $( '#cbo-Empresas' ).val() + '/' + $( '#cbo-organizacion' ).val() + '/' + ID_Grupo + '/' + $( '#cbo-Empresas' ).find(':selected').data('nu_tipo_rubro_empresa') + '/' + $( '#cbo-Empresas' ).find(':selected').data('proveedor_dropshipping');
 			$.getJSON( url, function( response ) {
 				if (response.status == 'success') {
@@ -92,8 +92,8 @@ $(function () {
 					+ '<form id="form-Permiso_Usuario" enctype="multipart/form-data" method="post" role="form" autocomplete="off">'
 						+ '<input type="hidden" name="ID_Grupo_" value="' + ID_Grupo + '" >'
 						+ '<input type="hidden" name="iProveedorDropshipping" value="' + $( '#cbo-Empresas' ).find(':selected').data('proveedor_dropshipping') + '" >'
-						+ '<table id="table-Permiso_Usuario" class="table table-striped table-bordered">'
-							+ '<thead>'
+						+ '<table id="table-Permiso_Usuario" class="table table-bordered table-hover table-striped">'
+							+ '<thead class="thead-light">'
 								+ '<tr>'
 								+ '<th class="text-center"><input type="checkbox" class="flat-red" onclick="checkAllMenuHeader();" id="check-AllMenuHeader"></th>'
 									+ '<th class="text-center">Menu</th>'
@@ -160,7 +160,7 @@ $(function () {
         					}// /. for 
 							content += ''
 							+'</tbody>'
-							+ '<tfoot>'
+							+ '<tfoot class="thead-light">'
 								+ '<tr>'
 									+ '<th class="text-center"><input type="checkbox" class="flat-red" onclick="checkAllMenuFooter();" id="check-AllMenuFooter"></th>'
 									+ '<th class="text-center">Menu</th>'
@@ -188,7 +188,7 @@ $(function () {
 					$( '.modal-title-message' ).text(response.message);
 					setTimeout(function() {$('#modal-message').modal('hide');}, 3000);
 				}
-				$( '#modal-loader' ).modal('hide');
+				//$( '#modal-loader' ).modal('hide');
 			}, 'JSON')
 			.fail(function(jqXHR, textStatus, errorThrown) {
 				$( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
@@ -198,7 +198,7 @@ $(function () {
 				$( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
 				setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
 				
-				$( '#modal-loader' ).modal('hide');
+				//$( '#modal-loader' ).modal('hide');
 			
 				//Message for developer
 				console.log(jqXHR.responseText);
@@ -246,7 +246,7 @@ function guardarMenuAcceso(){
 	$( '.btn-save' ).attr('disabled', true);
 	$( '.btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-	$( '#modal-loader' ).modal('show');
+	//$( '#modal-loader' ).modal('show');
 	url = base_url + 'PanelAcceso/PermisoUsuarioController/crudPermisoUsuario';
 	$.ajax({
 		type : 'POST',
@@ -254,7 +254,7 @@ function guardarMenuAcceso(){
 		url : url,
 		data : $('#form-Permiso_Usuario').serialize(),
 		success : function( response ){
-			$( '#modal-loader' ).modal('hide');
+			//$( '#modal-loader' ).modal('hide');
 			$( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
 			$( '#modal-message' ).modal('show');
 			
@@ -283,7 +283,7 @@ function guardarMenuAcceso(){
         $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
 		setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
 		
-		$( '#modal-loader' ).modal('hide');
+		//$( '#modal-loader' ).modal('hide');
 	
 		//Message for developer
 		console.log(jqXHR.responseText);

@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.78'; ?>
+<?php $iControlVersionDashboard = '1.0.81'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -95,7 +95,11 @@
 
 <!-- Usuarios y opciones -->
 <?php if (isset($js_perfil_usuario) && $js_perfil_usuario==true) : ?>
-<script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/perfil_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/PanelAcceso/perfil_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+<?php if (isset($js_permiso_usuario) && $js_permiso_usuario==true) : ?>
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/PanelAcceso/permiso_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <!-- Folder: Logistica -->

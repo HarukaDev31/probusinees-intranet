@@ -14,9 +14,9 @@ class PermisoUsuarioController extends CI_Controller {
 	public function listarPermisosUsuarios(){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('inicio');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header');
+			$this->load->view('header_v2', array("js_permiso_usuario" => true));
 			$this->load->view('PanelAcceso/PermisoUsuarioView');
-			$this->load->view('footer', array("js_permiso_usuario" => true));
+			$this->load->view('footer_v2', array("js_permiso_usuario" => true));
 		}
 	}
 	

@@ -35,8 +35,8 @@ class UsuarioModel extends CI_Model{
         ->join($this->table_organizacion . ' AS ORG', 'ORG.ID_Organizacion = ' . $this->table . '.ID_Organizacion', 'join')
 		->join($this->table_grupo . ' AS GRPUSR', 'GRPUSR.ID_Grupo = ' . $this->table . '.ID_Grupo', 'left');
          
-		if ($this->user->No_Usuario != 'root'){
-        	$this->db->where('No_Usuario != ', '"root"');			
+		if ($this->user->ID_Usuario != 1){
+        	$this->db->where('No_Usuario != ', '"root"');
 		}
 
         if(isset($_POST['order'])){

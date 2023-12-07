@@ -21,10 +21,15 @@
   <!-- daterange picker -->
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/daterangepicker/daterangepicker.css"); ?>">
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"); ?>">
+  
+  <?php if (isset($js_permiso_usuario) && $js_permiso_usuario==true) : ?>
+  <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
+  <?php endif; ?>
+
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=4.0.0'; ?>">
-  
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=5.0.0'; ?>">
+
   <meta name="theme-color" content="#FF6700">
   <meta name="msapplication-navbutton-color" content="#FF6700"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>

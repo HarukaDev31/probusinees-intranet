@@ -28,7 +28,7 @@ MNU.ID_Padre=0
 AND MNU.Nu_Activo=0
 " . $this->where_id_grupo . "
 ORDER BY
-MNU.ID_Padre,
+MNU.ID_Padre ASC,
 MNU.Nu_Orden;";
 		$arrMenuPadre = $this->db->query($sql)->result();
 		

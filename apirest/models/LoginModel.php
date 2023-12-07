@@ -46,6 +46,7 @@ USR.*,
 GRP.ID_Organizacion,
 GRP.No_Grupo,
 GRP.No_Grupo_Descripcion,
+GRP.Nu_Tipo_Privilegio_Acceso,
 GRPUSR.ID_Grupo_Usuario,
 T.No_Dominio_Tienda_Virtual,
 T.No_Subdominio_Tienda_Virtual,
@@ -92,6 +93,7 @@ USR.*,
 GRP.ID_Organizacion,
 GRP.No_Grupo,
 GRP.No_Grupo_Descripcion,
+GRP.Nu_Tipo_Privilegio_Acceso,
 GRPUSR.ID_Grupo_Usuario,
 T.No_Dominio_Tienda_Virtual,
 T.No_Subdominio_Tienda_Virtual,
@@ -136,14 +138,14 @@ LIMIT 1;";
 								} else {
 									return array(
 										'sStatus' => 'warning',
-										'sMessage' => 'Comunicarse con soporte para activación de cuenta. <a href="https://api.whatsapp.com/send?phone=51904179541&text=Hola%20Ecxlae" alt="EcxpressLae" title="EcxpressLae" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-whatsapp fa-2x" style="color: #25d366;"></i>&nbsp;<span>(+51) 904 179 541</span></a>',
+										'sMessage' => 'Comunicarse con soporte para activación de cuenta',
 									);
 								}
 							}// /. if - else verificar empresa y organizacion
 						} else {
 							return array(
 								'sStatus' => 'warning',
-								'sMessage' => 'Comunicarse con soporte para activación de cuenta. <a href="https://api.whatsapp.com/send?phone=51904179541&text=Hola%20Ecxlae" alt="EcxpressLae" title="EcxpressLae" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-whatsapp fa-2x" style="color: #25d366;"></i>&nbsp;<span>(+51) 904 179 541</span></a>',
+								'sMessage' => 'comunicarse con soporte.',
 							);//Usuario Suspendido
 						}// /. if - else usuario suspendido
 					} else {
@@ -155,13 +157,13 @@ LIMIT 1;";
 				} else {
 					return array(
 						'sStatus' => 'danger',
-						'sMessage' => 'comunicarse con soporte para activación de cuenta. <a href="https://api.whatsapp.com/send?phone=51904179541&text=Hola%20Ecxlae" alt="EcxpressLae" title="EcxpressLae" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-whatsapp fa-2x" style="color: #25d366;"></i>&nbsp;<span>(+51) 904 179 541</span></a>',
+						'sMessage' => 'Comunicarse con soporte.',
 					);//Usuario no existe
 				} // /. if - else usuario no existe
 			} else {
 				return array(
 					'sStatus' => 'danger',
-					'sMessage' => 'comunicarse con soporte para activación de cuenta. <a href="https://api.whatsapp.com/send?phone=51904179541&text=Hola%20Ecxlae" alt="EcxpressLae" title="EcxpressLae" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-whatsapp fa-2x" style="color: #25d366;"></i>&nbsp;<span>(+51) 904 179 541</span></a>',
+					'sMessage' => 'comunicarse con soporte',
 				);//Usuario no existe
 			} // /. if - else usuario no existe
 		} else {
