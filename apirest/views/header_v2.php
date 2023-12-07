@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"); ?>">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=2.0.0'; ?>">
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=4.0.0'; ?>">
   
   <?php if (isset($js_producto_importacion) && $js_producto_importacion==true) : ?>  
   <link rel="stylesheet" href="<?php echo base_url() . 'plugins_v2/summernote/summernote-bs4.min.css'; ?>">

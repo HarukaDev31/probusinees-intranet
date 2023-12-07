@@ -2,7 +2,6 @@
   width: 100% !important;
 }
 
-
 .dropzone .dz-preview .dz-image {
   width: 120px;
   height: 120px;
@@ -24,4 +23,41 @@
 .autocomplete-suggestion b { font-weight: normal; color: #1f8dd6; }
 .autocomplete-suggestion.selected { background: #f0f0f0; }
 
+/* CARGANDO PAGINA */
+.modal-dialog-loader {
+  max-width: 500px !important;
+  margin: 14rem auto !important;
+  background-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 9px transparent;
+}
 
+.modal-header-change {
+  border-bottom: 1px solid transparent;
+}
+
+.modal-content-loader-change {
+  background-color: transparent;
+  box-shadow: 0 3px 9px transparent;
+}
+/* FIN CARGANDO PAGINA */
+
+.conte_img {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+  position: relative;
+  z-index: 0;
+}
+
+.conte_img img {
+  max-width: 100%;
+  width: auto !important;
+  margin: auto;
+  cursor: pointer;
+  /*border-radius: 12px;*/
+}
+
+.img-card-interno {
+  width: 100%;
+  height: 150px;
+}

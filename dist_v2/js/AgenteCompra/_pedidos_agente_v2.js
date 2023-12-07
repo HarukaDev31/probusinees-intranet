@@ -82,6 +82,7 @@ $(function () {
         columns: ':visible'
       }
     }],
+    "processing": true,
     "paging": true,
     "lengthChange": true,
     "searching": true,
@@ -114,6 +115,15 @@ $(function () {
       'data'      : function ( data ) {
         data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
         data.Global_Filter = $( '#txt-Global_Filter' ).val();
+      },
+      beforeSend: function () {
+        $('#modal-loader').modal('show');
+      },
+      complete: function () {
+        $( '#modal-loader' ).on('shown.bs.modal', function() {
+          $('#modal-loader').modal('hide');
+        })
+        $('#modal-loader').modal('hide');
       },
     },
     'columnDefs': [
@@ -205,16 +215,6 @@ $(function () {
 	  },
 		submitHandler: form_pedido
 	});
-  
-  $("#table-Producto_Enlace").on('click', '.img-table_item', function () {
-    $('.img-responsive').attr('src', '');
-
-    $('.modal-ver_item').modal('show');
-    $('.img-responsive').attr('src', $(this).data('url_img'));
-    $("#a-download_image").attr("href", $(this).data('url_img'));
-  })
-  
-  $('#span-id_pedido').html('');
 })
 
 function reload_table_Entidad(){
@@ -231,8 +231,6 @@ function verPedido(ID){
 
 	$( '#table-Producto_Enlace tbody' ).empty();
   $( '#table-Producto_Enlace' ).show();
-
-  $('#span-id_pedido').html('Nro. ' + ID);
 
   url = base_url + 'AgenteCompra/PedidosAgente/ajax_edit/' + ID;
   $.ajax({
@@ -272,19 +270,39 @@ function verPedido(ID){
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td class='text-center td-name' width='50%'><img style='max-height: 350px;width: 100%; cursor:pointer' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid mb-2'></td>"
-          + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
-          + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
-          //+ "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
-          + "<td class='text-left td-name' width='10%'>" + href_link + "</td>"
+          + "<td class='text-center td-name'><img style='max-height: 350px;width: 100%;' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-fluid mb-2'></td>"
+          + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
+          + "<td class='text-left td-name'>" + detalle[i]['Txt_Descripcion'] + "</td>"
+          + "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
+          + "<td class='text-left td-name'>" + href_link + "</td>"
           //+ "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link text-danger' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
         table_enlace_producto += "</tr>";
       }
-      
-      $('#span-total_cantidad_items').html(i);
       $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+
+      //visible para mostrar a publico
+      $( '#div-arrItems' ).html('');
+      var div_items='';
+      div_items += '<div class="row">';
+      for (i = 0; i < detalle.length; i++) {
+        div_items += '<div class="col-6 col-sm-4 col-md-3">';
+          div_items += '<div class="card">';
+            div_items += '<div class="conte_img">';
+              div_items += '<img style="" class="img-card-interno" src="' + detalle[i]['Txt_Url_Imagen_Producto'] + '" alt="Card image cap">';
+            div_items += '</div>';
+            div_items += '<div class="card-body">';
+              div_items += '<h5 class="card-title font-weight-bold">' + detalle[i]['Txt_Producto'] + '</h5>';
+              div_items += '<p class="card-text">' + detalle[i]['Txt_Descripcion'] + '</p>';
+              div_items += '<a href="#" class="btn btn-primary">Agregar proveedor</a>';
+            div_items += '</div>';
+          div_items += '</div>';
+        div_items += '</div>';
+      }
+      div_items += '</div>';
+      
+      $( '#div-arrItems' ).append(div_items);
     },
     error: function (jqXHR, textStatus, errorThrown) {
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');

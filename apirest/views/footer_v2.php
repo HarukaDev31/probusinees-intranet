@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.65'; ?>
+<?php $iControlVersionDashboard = '1.0.69'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -113,8 +113,10 @@
 <script src="<?php echo base_url() . 'dist_v2/js/ImportacionGrupal/slider.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+
+
 <!-- Message Delete Modal -->
-<div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" aria-modal="true" role="dialog">
+<div class="modal fade modal-danger modal-message-delete" id="modal-message-delete" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -128,10 +130,22 @@
         <button type="button" id="btn-save-delete" class="btn btn-primary col">Aceptar</button>
       </div>
     </div>
-    <!-- /.modal-content -->
   </div>
-  <!-- /.modal-dialog -->
-<div></div></div>
+</div>
+
+<div id="modal-loader" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-loader">
+    <div class="modal-content modal-content-loader-change">
+      <div class="modal-body">
+        <div class="text-center">
+          <div class="spinner-border" style="width: 5rem; height: 5rem;" role="status">
+            <span class="sr-only"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 </body>

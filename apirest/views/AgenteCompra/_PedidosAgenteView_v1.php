@@ -4,10 +4,7 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-8">
-          <h1>
-            <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?>
-            &nbsp;<span id="span-id_pedido" class="badge badge-primary"></span>
-          </h1>
+          <h1><i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></h1>
         </div>
       </div>
     </div><!-- /.container-fluid -->
@@ -55,14 +52,14 @@
                   <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
                   
                   <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 d-none">
+                    <div class="col-12 col-sm-12 col-md-12">
                       <label>Estado</label>
                       <div class="form-group">
                         <div id="div-estado" style="font-size: 1.4rem;"></div>
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-6 col-md-6">
+                    <div class="col-12 col-sm-12 col-md-6">
                       <label>Cliente</label>
                       <div class="form-group">
                         <input type="text" name="No_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -70,7 +67,7 @@
                       </div>
                     </div>
 
-                    <div class="col-12 col-sm-4 col-md-4 d-none">
+                    <div class="col-12 col-sm-4 col-md-4">
                       <label>Email</label>
                       <div class="form-group">
                         <input type="text" name="Txt_Email_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -78,7 +75,7 @@
                       </div>
                     </div>
 
-                    <div class="col-12 col-sm-4 col-md-2 d-none">
+                    <div class="col-12 col-sm-4 col-md-2">
                       <label>Celular</label>
                       <div class="form-group">
                         <input type="text" inputmode="tel" name="Nu_Celular_Contacto" class="form-control required" placeholder="Ingresar" maxlength="11" autocomplete="off">
@@ -86,7 +83,7 @@
                       </div>
                     </div>
                     
-                    <div class="col-6 col-sm-6 col-md-6">
+                    <div class="col-12 col-sm-12 col-md-6">
                       <label>Empresa</label>
                       <div class="form-group">
                         <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -94,10 +91,10 @@
                       </div>
                     </div>
 
-                    <div class="col-12 col-sm-4 col-md-4 d-none">
+                    <div class="col-12 col-sm-4 col-md-4">
                       <label>RUC</label>
                       <div class="form-group">
-                        <input type="text" name="Nu_Documento_Identidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <input type="text" name="Nu_Documento_Identidad" class="form-control" placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
@@ -136,18 +133,16 @@
                     </div>
                     
                     <div class="col-xs-12 col-sm-12 col-md-12">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-secondary"></span> Productos</h3>
-
                       <div class="table-responsive div-Compuesto">
                         <table id="table-Producto_Enlace" class="table table-hover">
                           <thead>
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-left" width="50%">producto_imagen</th>
-                              <th class="text-left" width="20%">Nombre</th>
-                              <th class="text-left" width="20%">Características</th>
-                              <!--<th class="text-right">Qty</th>-->
-                              <th class="text-left" width="10%">Link</th>
+                              <th class="text-left" width="30%">Imagen</th>
+                              <th class="text-left">Nombre</th>
+                              <th class="text-left">Características</th>
+                              <th class="text-right">Cantidad</th>
+                              <th class="text-left">Link</th>
                               <!--<th class="text-center"></th>-->
                             </tr>
                           </thead>
@@ -159,12 +154,12 @@
                   </div><!-- ./table -->
 
                   <div class="row mt-3">
-                    <div class="col-6 col-md-6">
+                    <div class="col-xs-6 col-md-6">
                       <div class="form-group">
                         <button type="button" id="btn-cancelar" class="btn btn-danger btn-lg btn-block">Salir</button>
                       </div>
                     </div>
-                    <div class="col-6 col-md-6">
+                    <div class="col-xs-6 col-md-6">
                       <div class="form-group">
                         <button type="submit" id="btn-save" class="btn btn-success btn-lg btn-block btn-verificar">Guardar</button>
                       </div>
@@ -183,23 +178,3 @@
   <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-
-<!-- modal ver imagen del item -->
-<div class="modal fade modal-ver_item" id="modal-default">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-body" id="modal-body-ver_item">
-        <div class="col-xs-12 text-center">
-          <img class="img-responsive img-fluid" style=" display: block; margin-left: auto; margin-right: auto;" src="">
-        </div>
-        <a id="a-download_image" class="mt-4 btn btn-primary btn-block" href="/images/myw3schoolsimage.jpg" download>Descargar</a>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
-      </div>
-    </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
-</div>
-<!-- /.modal imagen del item -->
