@@ -191,7 +191,14 @@
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Detalle_item" name="EID_Pedido_Detalle_item" class="form-control">
-                  
+                  <!--
+Precio Ss_Precio
+moq Qt_Producto_Moq
+qty_caja Qt_Producto_Caja
+cbm Qt_Cbm
+delivery (es un campo texto?) Nu_Dias_Delivery
+observaciones (opcional)	Txt_Nota
+                  -->
                   <div class="row">
                     <div class="col-12 col-sm-12 col-md-12 shadow p-0" id="div-button-add_item">
                       <div class="d-grid gap">
@@ -200,9 +207,83 @@
                     </div>
                   </div>
                   
-                  <div id="div-arrItems"></div>
+                  <div id="div-arrItems">
 
-                  <div class="row mt-4">
+                    <!--
+                    <div id="card1" class="card border-0 rounded shadow mt-3">
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">
+                                <h6 class="card-title mb-2" style="font-weight:bold">
+                                  <span class="fw-bold">Precio<span class="label-advertencia text-danger"> *</span></span>
+                                </h6>
+                                <div class="form-group">
+                                  <input type="text" id="modal-precio1" inputmode="decimal" data-correlativo="1" name="addProducto[1][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+                                  <span class="help-block text-danger" id="error"></span>
+                                </div>
+                              </div>
+                              
+                              <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">
+                                <h6 class="card-title mb-2" style="font-weight:bold">
+                                  <span class="fw-bold">moq<span class="label-advertencia text-danger"> *</span></span>
+                                </h6>
+                                <div class="form-group">
+                                  <input type="text" id="modal-moq1" inputmode="decimal" data-correlativo="1" name="addProducto[1][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+                                  <span class="help-block text-danger" id="error"></span>
+                                </div>
+                              </div>
+                              
+                              <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">
+                                <h6 class="card-title mb-2" style="font-weight:bold">
+                                  <span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>
+                                </h6>
+                                <div class="form-group">
+                                  <input type="text" id="modal-qty_caja1" inputmode="decimal" data-correlativo="1" name="addProducto[1][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
+                                  <span class="help-block text-danger" id="error"></span>
+                                </div>
+                              </div>
+                              
+                              <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">
+                                <h6 class="card-title mb-2" style="font-weight:bold">
+                                  <span class="fw-bold">cbm<span class="label-advertencia text-danger"> *</span></span>
+                                </h6>
+                                <div class="form-group">
+                                  <input type="text" id="modal-cbm1" inputmode="decimal" data-correlativo="1" name="addProducto[1][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
+                                  <span class="help-block text-danger" id="error"></span>
+                                </div>
+                              </div>
+
+                              <div class="col-12 col-sm-3 col-md-3 col-lg-4 mb-3">
+                                <h6 class="card-title mb-2" style="font-weight:bold">
+                                  <span class="fw-bold">Días Delivery</span>
+                                </h6>
+                                <input type="text" inputmode="text" id="modal-delivery1" name="addProducto[1][delivery]" class="arrProducto form-control input-number" value="7" placeholder="" maxlength="255" autocomplete="off" />
+                              </div>
+
+                              <div class="col-sm-12 mb-3">
+                                <h6 class="card-title mb-2" style="font-weight:bold">
+                                  <span class="fw-bold">Observaciones</span>
+                                </h6>
+                                <div class="form-group">
+                                  <textarea class="arrProducto form-control required nota" placeholder="Opcional" id="modal-nota1" name="addProducto[1][nota]" style="height: 100px;"></textarea>
+                                  <span class="help-block text-danger" id="error"></span>
+                                </div>
+                              </div>
+
+                              <div class="col-sm-12 ps-4 mb-3 pe-4">
+                                <div class="d-grid gap"><button type="button" id="btn-quitar_item_1" class="btn btn-outline-danger btn-quitar_item col" data-id="1">Quitar</button></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    -->
+                  </div>
+
+                  <div class="row mt-3">
                     <div class="col-6 col-md-6">
                       <div class="form-group">
                         <button type="button" id="btn-cancel_detalle_item_proveedor" class="btn btn-outline-secondary btn-lg btn-block">Regresar</button>
@@ -210,7 +291,7 @@
                     </div>
                     <div class="col-6 col-md-6">
                       <div class="form-group">
-                        <button type="submit" id="btn-save_detalle_item_proveedor" class="btn btn-success btn-lg btn-block shadow">Guardar</button>
+                        <button type="submit" id="btn-save_detalle_item_proveedor" class="btn btn-success btn-lg btn-block">Guardar</button>
                       </div>
                     </div>
                   </div>

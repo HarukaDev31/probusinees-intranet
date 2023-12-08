@@ -751,12 +751,12 @@ function _generarExcelPedidoCliente($modal_delete, ID){
 function addItems(){
   div_items = '';
 
-  div_items += '<div id="card' + iCounterItems + '" class="card border-0 rounded shadow mt-3">';
+  div_items += '<div id="card' + iCounterItems + '" class="card border-0 rounded shadow-sm mt-3">';
     div_items += '<div class="row">';
       div_items += '<div class="col-sm-12">';
       div_items += '<div class="card-body">';
       div_items += '<div class="row">';
-      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
       div_items += '<span class="fw-bold">Precio<span class="label-advertencia text-danger"> *</span></span>';
       div_items += '</h6>';
@@ -766,7 +766,7 @@ function addItems(){
       div_items += '</div>';
       div_items += '</div>';
                 
-      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
       div_items += '<span class="fw-bold">moq<span class="label-advertencia text-danger"> *</span></span>';
       div_items += '</h6>';
@@ -776,7 +776,7 @@ function addItems(){
       div_items += '</div>';
       div_items += '</div>';
                 
-      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
       div_items += '<span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>';
       div_items += '</h6>';
@@ -786,7 +786,7 @@ function addItems(){
       div_items += '</div>';
       div_items += '</div>';
                 
-      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
       div_items += '<span class="fw-bold">cbm<span class="label-advertencia text-danger"> *</span></span>';
       div_items += '</h6>';
@@ -796,7 +796,7 @@ function addItems(){
       div_items += '</div>';
       div_items += '</div>';
 
-      div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-4 mb-3">';
+      div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-4 mb-3 mb-sm-0">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
       div_items += '<span class="fw-bold">Delivery</span>';
       div_items += '</h6>';
