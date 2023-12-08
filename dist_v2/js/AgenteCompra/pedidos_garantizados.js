@@ -234,6 +234,23 @@ $(function () {
   })
 
   $('#span-id_pedido').html('');
+  
+  $('#div-add_item_proveedor').hide();
+	$(document).on('click', '.btn-add_proveedor', function () {
+    console.log( 'id_empresa > ' + $(this).data('id_empresa'));
+    console.log( 'id_organizacion > ' + $(this).data('id_organizacion'));
+    console.log( 'id_pedido_cabecera > ' + $(this).data('id_pedido_cabecera'));
+    console.log( 'id_pedido_detalle > ' + $(this).data('id_pedido_detalle'));
+    
+    $('.div-Listar').hide();
+    $('.div-AgregarEditar').hide();
+
+    $('#div-add_item_proveedor').show();
+    $( '#txt-EID_Empresa_item' ).val($(this).data('id_empresa'));
+    $( '#txt-EID_Organizacion_item' ).val($(this).data('id_organizacion'));
+    $( '#txt-EID_Pedido_Cabecera_item' ).val($(this).data('id_pedido_cabecera'));
+    $( '#txt-EID_Pedido_Detalle_item' ).val($(this).data('id_pedido_detalle'));
+  })
 })
 
 function reload_table_Entidad(){
@@ -274,6 +291,7 @@ function verPedido(ID){
       $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
       $( '[name="No_Entidad"]' ).val(response.No_Entidad);
       $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
+      $( '[name="Ss_Tipo_Cambio"]' ).val(response.Ss_Tipo_Cambio);
 
       var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
       if(response.Nu_Estado_Pedido == 2)
@@ -297,8 +315,8 @@ function verPedido(ID){
             if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
               table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span>"
             }
-          table_enlace_producto +=
-          "</td>"
+            table_enlace_producto += '<button type="button" id="btn-add_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Proveedor</button>';
+          table_enlace_producto += "</td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           //+ "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"

@@ -16,6 +16,7 @@ class PedidosGarantizadosModel extends CI_Model{
 	var $table_tipo_documento_identidad = 'tipo_documento_identidad';
 	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	var $table_pais = 'pais';
+	var $table_agente_compra_correlativo = 'agente_compra_correlativo';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -26,10 +27,12 @@ class PedidosGarantizadosModel extends CI_Model{
 	public function _get_datatables_query(){
         $this->db->select($this->table . '.*, P.No_Pais, 
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto')
+		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
+		CORRE.Fe_Month')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
+    	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where($this->table . '.Nu_Estado>=', 2);
         
@@ -115,48 +118,10 @@ class PedidosGarantizadosModel extends CI_Model{
     
     public function actualizarPedido($where, $data, $arrProducto){
 		$this->db->trans_begin();
-		
-		//actualizar cliente
-		$data_cliente = array(
-			'Nu_Documento_Identidad' => $data['Nu_Documento_Identidad'],
-			'No_Entidad' => $data['No_Entidad'],
-			'Nu_Celular_Entidad' => $data['Nu_Celular_Entidad'],
-			'Txt_Email_Entidad' => $data['Txt_Email_Entidad'],
-		);
-		$where_cliente = array(
-			'ID_Entidad' => $where['ID_Entidad'],
-		);
-		$this->db->update($this->table_cliente, $data_cliente, $where_cliente);
-
-		$this->db->where('ID_Pedido_Cabecera', $where['ID_Pedido_Cabecera']);
-		$this->db->delete($this->table_importacion_grupal_pedido_detalle);
-		
-		$fImporteTotal = 0;
-		$fCantidadTotal = 0;
-		foreach($arrProducto as $row) {
-			$fImporteTotal += $row['total_item'];
-			$fCantidadTotal += $row['cantidad_item'];
-
-			$arrSaleOrderDetail[] = array(
-                'ID_Empresa' => $data['ID_Empresa'],
-                'ID_Organizacion' => $data['ID_Organizacion'],
-				'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-				'ID_Producto' => $row['id_item'],
-				'ID_Unidad_Medida' => $row['id_unidad_medida'],
-				'ID_Unidad_Medida_Precio' => $row['id_unidad_medida_2'],
-				'Qt_Producto' => $row['cantidad_item'],
-				'Ss_Precio' => $row['precio_item'],
-				'Ss_SubTotal' => $row['total_item'],
-				'Ss_Impuesto' => 0,
-				'Ss_Total' => $row['total_item'],
-			);
-		}
-		$this->db->insert_batch($this->table_importacion_grupal_pedido_detalle, $arrSaleOrderDetail);
 
 		//actualizar cabecera
 		$data_cabecera = array(
-			'Ss_Total' => $fImporteTotal,
-			'Qt_Total' => $fCantidadTotal,
+			'Ss_Tipo_Cambio' => $data['Ss_Tipo_Cambio'],
 		);
 		$where_cabecera = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],

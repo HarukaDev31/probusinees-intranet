@@ -35,7 +35,7 @@ class PedidosGarantizados extends CI_Controller {
 			$rows = array();
 
             $rows[] = $row->No_Pais;
-            $rows[] = $row->Nu_Correlativo;
+            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . $row->Nu_Correlativo;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
@@ -114,17 +114,11 @@ class PedidosGarantizados extends CI_Controller {
 		
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		$data = array(
-			'ID_Empresa' => $this->input->post('EID_Empresa'),
-			'ID_Organizacion' => $this->input->post('EID_Organizacion'),
-			'Nu_Documento_Identidad' => $this->input->post('Nu_Documento_Identidad'),
-			'No_Entidad' => $this->input->post('No_Entidad'),
-			'Nu_Celular_Entidad' => $this->input->post('Nu_Celular_Entidad'),
-			'Txt_Email_Entidad' => $this->input->post('Txt_Email_Entidad'),
+			'Ss_Tipo_Cambio' => $this->input->post('Ss_Tipo_Cambio'),
 		);
 		echo json_encode($this->PedidosGarantizadosModel->actualizarPedido(
 				array(
 					'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
-					'ID_Entidad' => $this->input->post('EID_Entidad'),
 				),
 				$data,
 				$this->input->post('addProducto')
