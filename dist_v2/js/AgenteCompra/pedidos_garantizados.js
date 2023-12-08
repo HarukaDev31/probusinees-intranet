@@ -1,4 +1,4 @@
-var url, table_Entidad;
+var url, table_Entidad, div_items = '', iCounterItems = 1;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^\|";
 // Se puede crear un arreglo a partir de la cadena
@@ -236,21 +236,124 @@ $(function () {
   $('#span-id_pedido').html('');
   
   $('#div-add_item_proveedor').hide();
-	$(document).on('click', '.btn-add_proveedor', function () {
-    console.log( 'id_empresa > ' + $(this).data('id_empresa'));
-    console.log( 'id_organizacion > ' + $(this).data('id_organizacion'));
-    console.log( 'id_pedido_cabecera > ' + $(this).data('id_pedido_cabecera'));
-    console.log( 'id_pedido_detalle > ' + $(this).data('id_pedido_detalle'));
+	$(document).on('click', '.btn-add_proveedor', function (e) {
+    e.preventDefault();
     
+    //console.log( 'id_empresa > ' + $(this).data('id_empresa'));
+    //console.log( 'id_organizacion > ' + $(this).data('id_organizacion'));
+    //console.log( 'id_pedido_cabecera > ' + $(this).data('id_pedido_cabecera'));
+    //console.log( 'id_pedido_detalle > ' + $(this).data('id_pedido_detalle'));
+    
+    $('#div-arrItems').html('');
+
     $('.div-Listar').hide();
     $('.div-AgregarEditar').hide();
-
     $('#div-add_item_proveedor').show();
+
+    $('#modal-precio1').focus();
+
+    iCounterItems=1;
+    addItems();
+
     $( '#txt-EID_Empresa_item' ).val($(this).data('id_empresa'));
     $( '#txt-EID_Organizacion_item' ).val($(this).data('id_organizacion'));
     $( '#txt-EID_Pedido_Cabecera_item' ).val($(this).data('id_pedido_cabecera'));
     $( '#txt-EID_Pedido_Detalle_item' ).val($(this).data('id_pedido_detalle'));
   })
+  
+  $(document).on('click', '.btn-quitar_item', function (e) {
+    e.preventDefault();
+    //alert($(this).data('id'));
+    $('#card' + $(this).data('id')).remove();
+	})
+  
+  $(document).on('click', '#btn-add_item', function (e) {
+    e.preventDefault();
+    addItems();
+
+    $('#div-button-add_item').removeClass('mt-2');
+    $('#div-button-add_item').addClass('mt-0');
+  })
+  
+  $(document).on('click', '#btn-cancel_detalle_item_proveedor', function (e) {
+    e.preventDefault();
+    
+    $('.div-Listar').hide();
+    $('.div-AgregarEditar').show();
+    $('#div-add_item_proveedor').hide();
+  })
+
+  $("#form-arrItems").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    //validacion de articulos
+    var sEstadoArticulos = true;
+    $("#form-arrItems").find(':input').each(function () {
+      var elemento = this;
+
+      if(elemento.dataset.correlativo!==undefined){
+        if (elemento.classList[0]=='arrProducto'){
+          if(elemento.type=='text'){
+            if (elemento.classList[2]=='required'){
+              if(
+                (elemento.classList[3]=='precio' || elemento.classList[3]=='moq' || elemento.classList[3]=='qty_caja' || elemento.classList[3]=='cbm')
+                && (isNaN(parseFloat($('#' + elemento.id).val())) || parseFloat($('#' + elemento.id).val()) < 0.00)
+              ){
+                $('#' + elemento.id).closest('.form-group').find('.help-block').html('Ingresar ' + elemento.classList[3]);
+                $('#' + elemento.id).closest('.form-group').removeClass('has-success').addClass('has-error');
+
+                scrollToError($("html, body"), $('#' + elemento.id));
+
+								$('#' + elemento.id).focus();
+								$('#' + elemento.id).select();
+								setTimeout(function () {
+									$('#' + elemento.id).focus(); $('#' + elemento.id).select();
+								}, 30);
+
+                sEstadoArticulos = false;
+                return false;
+              }
+            }
+          }
+        }
+      }
+    });
+    //validacion de articulos
+    
+    if(sEstadoArticulos==true) {
+      $('#btn-save_detalle_item_proveedor').prop('disabled', true);
+      $('#btn-save_detalle_item_proveedor').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando');
+
+      var postData = new FormData($("#form-arrItems")[0]);
+      console.log(postData);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosGarantizados/addPedidoItemProveedor',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#btn-save_detalle_item_proveedor').prop('disabled', false);
+        $('#btn-save_detalle_item_proveedor').html('Guardar');
+
+        console.log(response);
+        if(response.status=='success'){
+          alert(response.message);
+
+          $('.div-Listar').hide();
+          $('.div-AgregarEditar').show();
+          $('#div-add_item_proveedor').hide();
+        } else {
+          alert(response.message);
+        }
+      });
+    }
+  });
 })
 
 function reload_table_Entidad(){
@@ -643,4 +746,122 @@ function _generarExcelPedidoCliente($modal_delete, ID){
   $modal_delete.modal('hide');
   url = base_url + 'AgenteCompra/PedidosGarantizados/generarExcelPedidoCliente/' + ID;
   window.open(url,'_blank');
+}
+
+function addItems(){
+  div_items = '';
+
+  div_items += '<div id="card' + iCounterItems + '" class="card border-0 rounded shadow mt-3">';
+    div_items += '<div class="row">';
+      div_items += '<div class="col-sm-12">';
+      div_items += '<div class="card-body">';
+      div_items += '<div class="row">';
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+      div_items += '<span class="fw-bold">Precio<span class="label-advertencia text-danger"> *</span></span>';
+      div_items += '</h6>';
+      div_items += '<div class="form-group">';
+      div_items += '<input type="text" id="modal-precio' + iCounterItems + '" data-correlativo="' + iCounterItems + '" inputmode="decimal" name="addProducto[' + iCounterItems + '][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />';
+      div_items += '<span class="help-block text-danger" id="error"></span>';
+      div_items += '</div>';
+      div_items += '</div>';
+                
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+      div_items += '<span class="fw-bold">moq<span class="label-advertencia text-danger"> *</span></span>';
+      div_items += '</h6>';
+      div_items += '<div class="form-group">';
+      div_items += '<input type="text" id="modal-moq' + iCounterItems + '" data-correlativo="' + iCounterItems + '" inputmode="decimal" name="addProducto[' + iCounterItems + '][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />';
+      div_items += '<span class="help-block text-danger" id="error"></span>';
+      div_items += '</div>';
+      div_items += '</div>';
+                
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+      div_items += '<span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>';
+      div_items += '</h6>';
+      div_items += '<div class="form-group">';
+      div_items += '<input type="text" id="modal-qty_caja' + iCounterItems + '" data-correlativo="' + iCounterItems + '" inputmode="decimal" name="addProducto[' + iCounterItems + '][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />';
+      div_items += '<span class="help-block text-danger" id="error"></span>';
+      div_items += '</div>';
+      div_items += '</div>';
+                
+      div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">';
+      div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+      div_items += '<span class="fw-bold">cbm<span class="label-advertencia text-danger"> *</span></span>';
+      div_items += '</h6>';
+      div_items += '<div class="form-group">';
+      div_items += '<input type="text" id="modal-cbm' + iCounterItems + '" data-correlativo="' + iCounterItems + '" inputmode="decimal" name="addProducto[' + iCounterItems + '][cbm]" class="arrProducto form-control required input-decimal" cbm placeholder="" value="" autocomplete="off" />';
+      div_items += '<span class="help-block text-danger" id="error"></span>';
+      div_items += '</div>';
+      div_items += '</div>';
+
+      div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-4 mb-3">';
+      div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+      div_items += '<span class="fw-bold">Delivery</span>';
+      div_items += '</h6>';
+      div_items += '<input type="text" inputmode="text" id="modal-delivery' + iCounterItems + '" name="addProducto[' + iCounterItems + '][delivery]" class="arrProducto form-control input-number" placeholder="" maxlength="255" autocomplete="off" />';
+      div_items += '</div>';
+
+      div_items += '<div class="col-sm-12 mb-3">';
+      div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+      div_items += '<span class="fw-bold">Observaciones</span>';
+      div_items += '</h6>';
+      div_items += '<div class="form-group">';
+      div_items += '<textarea class="arrProducto form-control required nota" placeholder="Opcional" id="modal-nota' + iCounterItems + '" name="addProducto[' + iCounterItems + '][nota]" style="height: 100px;"></textarea>';
+      div_items += '<span class="help-block text-danger" id="error"></span>';
+      div_items += '</div>';
+      div_items += '</div>';
+
+      div_items += '<div class="col-sm-12 ps-4 mb-3 pe-4">';
+      div_items += '<div class="d-grid gap"><button type="button" id="btn-quitar_item_' + iCounterItems + '" class="btn btn-outline-danger btn-quitar_item col" data-id="' + iCounterItems + '">Quitar</button></div>';
+      div_items += '</div>';
+      div_items += '</div>';
+      div_items += '</div>';
+      div_items += '</div>';
+    div_items += '</div>';
+  div_items += '</div>';
+
+  $( '#div-arrItems' ).append(div_items);
+  
+  $('#modal-precio' + iCounterItems).focus();
+
+  validateNumberLetter();
+  validateDecimal();
+  validateNumber();
+
+  ++iCounterItems;
+}
+
+function validateNumberLetter(){
+  $( '.input-number_letter' ).unbind();
+  $( '.input-number_letter' ).on('input', function () {
+    this.value = this.value.replace(/[^a-zA-Z0-9]/g,'');
+  });
+}
+
+function validateDecimal(){
+  $( '.input-decimal' ).unbind();
+  $( '.input-decimal' ).on('input', function () {
+    numero = parseFloat(this.value);
+    if(!isNaN(numero)){
+      this.value = this.value.replace(/[^0-9\.]/g,'');
+      if (numero < 0)
+        this.value = '';
+    } else
+      this.value = this.value.replace(/[^0-9\.]/g,'');
+  });
+}
+
+function validateNumber(){
+  $( '.input-number' ).unbind();
+  $( '.input-number' ).on('input', function () {
+    this.value = this.value.replace(/[^0-9]/g,'');
+  });
+}
+
+function scrollToError( $sMetodo, $IdElemento ){
+  $sMetodo.animate({
+    scrollTop: $IdElemento.offset().top - 100
+  }, 'slow');
 }

@@ -136,6 +136,35 @@ class PedidosGarantizadosModel extends CI_Model{
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
 		}
     }
+    
+    public function addPedidoItemProveedor($data){
+		$this->db->trans_begin();
+
+		//actualizar cabecera
+		foreach($data['addProducto'] as $row) {
+			$arrSaleOrderDetail[] = array(
+                'ID_Empresa' => $data['EID_Empresa_item'],
+                'ID_Organizacion' => $data['EID_Organizacion_item'],
+				'ID_Pedido_Cabecera' => $data['EID_Pedido_Cabecera_item'],
+				'ID_Pedido_Detalle' => $data['EID_Pedido_Detalle_item'],
+				'Ss_Precio' => $row['precio'],
+				'Qt_Producto_Moq' => $row['moq'],
+				'Qt_Producto_Caja' => $row['qty_caja'],
+				'Qt_Cbm' => $row['cbm'],
+				'Nu_Dias_Delivery' => $row['delivery'],
+				'Txt_Nota' => $row['nota'],
+			);
+		}
+		$this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor', $arrSaleOrderDetail);
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
+		} else {
+			$this->db->trans_commit();
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
+		}
+    }
 	
 	public function getDownloadImage($id){
 		$query = "SELECT Txt_Url_Imagen_Producto FROM agente_compra_pedido_detalle WHERE ID_Pedido_Detalle = " . $id . " LIMIT 1";

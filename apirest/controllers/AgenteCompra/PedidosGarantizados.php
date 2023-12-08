@@ -35,7 +35,7 @@ class PedidosGarantizados extends CI_Controller {
 			$rows = array();
 
             $rows[] = $row->No_Pais;
-            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . $row->Nu_Correlativo;
+            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . '-' . $row->Nu_Correlativo;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
@@ -124,6 +124,12 @@ class PedidosGarantizados extends CI_Controller {
 				$this->input->post('addProducto')
 			)
 		);
+	}
+
+	public function addPedidoItemProveedor(){
+		//array_debug($this->input->post());
+		echo json_encode($this->PedidosGarantizadosModel->addPedidoItemProveedor($this->input->post()));
+		exit();
 	}
 
 	//generar cotización PDF para pedido de cliente	
