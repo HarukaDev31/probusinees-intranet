@@ -192,7 +192,7 @@
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Detalle_item" name="EID_Pedido_Detalle_item" class="form-control">
                   
-                  <div class="row">
+                  <div class="row div-agregar_proveedor">
                     <div class="col-12 col-sm-12 col-md-12 shadow p-0" id="div-button-add_item">
                       <div class="d-grid gap">
                         <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col">Agregar proveedor</button>
@@ -200,9 +200,9 @@
                     </div>
                   </div>
                   
-                  <div id="div-arrItems"></div>
+                  <div id="div-arrItems" class="div-agregar_proveedor"></div>
 
-                  <div class="row mt-4">
+                  <div class="row mt-4 div-agregar_proveedor">
                     <div class="col-6 col-md-6">
                       <div class="form-group">
                         <button type="button" id="btn-cancel_detalle_item_proveedor" class="btn btn-outline-secondary btn-lg btn-block">Regresar</button>
@@ -216,6 +216,54 @@
                   </div>
                 <?php echo form_close(); ?>
               </div><!--div agregar productos de proveedor -->
+              <div class="box-body" id="div-elegir_item_proveedor">
+                <?php
+                $attributes = array('id' => 'form-arrItemsProveedor');
+                echo form_open('', $attributes);
+                ?>
+                  <input type="hidden" id="txt-EID_Empresa_item" name="EID_Empresa_item" class="form-control">
+                  <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
+                  <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
+                  <input type="hidden" id="txt-EID_Pedido_Detalle_item" name="EID_Pedido_Detalle_item" class="form-control">
+                  
+                  <div id="div-arrItemsProveedor" class="col-xs-12 col-sm-12 col-md-12">
+                    <h3>Productos</h3>
+
+                    <div class="table-responsive">
+                      <table id="table-elegir_productos_proveedor" class="table table-hover">
+                        <thead>
+                          <tr>
+                            <th style='display:none;' class="text-left">ID</th>
+                            <th class="text-left" width="">imagen</th>
+                            <th class="text-left" width="">Precio Dólares</th>
+                            <th class="text-left" width="">Precio Yuanes</th>
+                            <th class="text-left" width="">moq</th>
+                            <th class="text-left" width="">qty_caja</th>
+                            <th class="text-left" width="">cbm</th>
+                            <th class="text-left" width="">delivery</th>
+                            <th class="text-left" width="">Observaciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="row mt-4">
+                    <div class="col-6 col-md-6">
+                      <div class="form-group">
+                        <button type="button" id="btn-cancel_detalle_elegir_proveedor" class="btn btn-outline-secondary btn-lg btn-block">Regresar</button>
+                      </div>
+                    </div>
+                    <div class="col-6 col-md-6">
+                      <div class="form-group">
+                        <button type="submit" id="btn-save_detalle_elegir_proveedor" class="btn btn-success btn-lg btn-block shadow">Guardar</button>
+                      </div>
+                    </div>
+                  </div>
+                <?php echo form_close(); ?>
+              </div><!--div elegir productos de proveedor -->
             </div>
           </div>
         </div>

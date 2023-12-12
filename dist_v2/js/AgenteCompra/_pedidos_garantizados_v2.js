@@ -212,14 +212,17 @@ $(function () {
     $('.modal-ver_item').modal('show');
     $('.img-responsive').attr('src', $(this).data('url_img'));
     $("#a-download_image").attr("data-id_item", $(this).data('id_item'));
-  })
-  
-  $("#table-elegir_productos_proveedor").on('click', '.img-table_item', function () {
-    $('.img-responsive').attr('src', '');
 
-    $('.modal-ver_item').modal('show');
-    $('.img-responsive').attr('src', $(this).data('url_img'));
-    $("#a-download_image").attr("data-id_item", $(this).data('id_item'));
+    //$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
+    //$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
+
+    /*
+    var img_item = $(this).data('url_img');
+    img_item = img_item.replace("https://", "../../");
+    img_item = img_item.replace("assets", "public_html/assets");
+
+    $("#a-download_image").attr("href", img_item);
+    */
   })
   
 	$( '#a-download_image' ).click(function(){
@@ -236,6 +239,11 @@ $(function () {
 	$(document).on('click', '.btn-add_proveedor', function (e) {
     e.preventDefault();
     
+    //console.log( 'id_empresa > ' + $(this).data('id_empresa'));
+    //console.log( 'id_organizacion > ' + $(this).data('id_organizacion'));
+    //console.log( 'id_pedido_cabecera > ' + $(this).data('id_pedido_cabecera'));
+    //console.log( 'id_pedido_detalle > ' + $(this).data('id_pedido_detalle'));
+    
     $('#div-arrItems').html('');
 
     $('.div-Listar').hide();
@@ -251,76 +259,6 @@ $(function () {
     $( '#txt-EID_Organizacion_item' ).val($(this).data('id_organizacion'));
     $( '#txt-EID_Pedido_Cabecera_item' ).val($(this).data('id_pedido_cabecera'));
     $( '#txt-EID_Pedido_Detalle_item' ).val($(this).data('id_pedido_detalle'));
-  })
-  
-	$(document).on('click', '.btn-seleccionar_proveedor', function (e) {
-    e.preventDefault();
-
-    var id_detalle = $(this).data('id_detalle');
-    var id = $(this).data('id');
-    
-    url = base_url + 'AgenteCompra/PedidosGarantizados/elegirItemProveedor/' + id_detalle + '/' + id + '/' + 1;
-    $.ajax({
-      url : url,
-      type: "GET",
-      dataType: "JSON",
-      success: function(response){
-        console.log(response);
-        if(response.status=='success'){
-          alert(response.message);
-          $( '#table-elegir_productos_proveedor tbody' ).empty();
-          getItemProveedor(id_detalle);
-        } else {
-          alert(response.message);
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        
-        $( '#modal-message' ).modal('show');
-        $( '.modal-message' ).addClass( 'modal-danger' );
-        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-        
-        //Message for developer
-        console.log(jqXHR.responseText);
-      }
-    })
-  })
-  
-	$(document).on('click', '.btn-desmarcar_proveedor', function (e) {
-    e.preventDefault();
-
-    var id_detalle = $(this).data('id_detalle');
-    var id = $(this).data('id');
-    
-    url = base_url + 'AgenteCompra/PedidosGarantizados/elegirItemProveedor/' + id_detalle + '/' + id + '/' + 0;
-    $.ajax({
-      url : url,
-      type: "GET",
-      dataType: "JSON",
-      success: function(response){
-        console.log(response);
-        if(response.status=='success'){
-          alert(response.message);
-          $( '#table-elegir_productos_proveedor tbody' ).empty();
-          getItemProveedor(id_detalle);
-        } else {
-          alert(response.message);
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        
-        $( '#modal-message' ).modal('show');
-        $( '.modal-message' ).addClass( 'modal-danger' );
-        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-        
-        //Message for developer
-        console.log(jqXHR.responseText);
-      }
-    })
   })
   
   $('#div-elegir_item_proveedor').hide();
@@ -341,11 +279,77 @@ $(function () {
     $( '#txt-EID_Pedido_Cabecera_item' ).val(id);
     $( '#txt-EID_Pedido_Detalle_item' ).val(id_detalle);
 
-    getItemProveedor(id_detalle);
+    url = base_url + 'AgenteCompra/PedidosGarantizados/getItemProveedor/' + id_detalle;
+    $.ajax({
+      url : url,
+      type: "GET",
+      dataType: "JSON",
+      success: function(response){
+        var detalle = response;
+
+        console.log(detalle);
+        var table_enlace_producto = "", id_item_tmp = 0;
+        for (i = 0; i < detalle.length; i++) {
+          var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
+
+          if(id_item_tmp != id_item){
+            table_enlace_producto +=
+            "<tr id='tr_enlace_producto" + id_item + "'>"
+              + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
+              + "<td class='text-left td-imagen'>";
+
+              /*
+              console.log('entrando > ');
+              url = base_url + 'AgenteCompra/PedidosGarantizados/getItemImagenProveedor/' + id_item;
+              $.ajax({
+                url : url,
+                type: "GET",
+                dataType: "JSON",
+                success: function(response_image){
+                  for (x = 0; x < response_image.length; x++) {
+                    console.log('pinto');
+                    console.log(response_image[x]);
+                    table_enlace_producto += "hola";
+                    table_enlace_producto += "<img style='max-height: 350px;width: 100%; cursor:pointer' data-id_item='" + id_item + "' data-url_img='" + response_image[x]['Txt_Url_Imagen_Producto'] + "' src='" + response_image[x]['Txt_Url_Imagen_Producto'] + "' class='img-thumbnail img-table_item img-fluid mb-2'>";
+                    table_enlace_producto += "<br>";
+                  }
+                  console.log('pinto si');
+                }
+              })
+              */
+              table_enlace_producto += "</td>";
+
+              table_enlace_producto +=
+              "<td class='text-left td-precio'>" + detalle[i]['Ss_Precio'] + "</td>"
+              + "<td class='text-left td-moq'>" + detalle[i]['Qt_Producto_Moq'] + "</td>"
+              + "<td class='text-left td-caja'>" + detalle[i]['Qt_Producto_Caja'] + "</td>"
+              + "<td class='text-left td-cbm'>" + detalle[i]['Qt_Cbm'] + "</td>"
+              + "<td class='text-left td-delivery'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
+              + "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
+            table_enlace_producto += "</tr>";
+            id_item_tmp = id_item;
+          }
+        }
+        
+        $( '#table-elegir_productos_proveedor' ).append(table_enlace_producto);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+        console.log(jqXHR.responseText);
+      }
+    })
   })
   
   $(document).on('click', '.btn-quitar_item', function (e) {
     e.preventDefault();
+    //alert($(this).data('id'));
     $('#card' + $(this).data('id')).remove();
 	})
   
@@ -372,55 +376,6 @@ $(function () {
     $('.div-AgregarEditar').show();
     $('#div-elegir_item_proveedor').hide();
   })
-
-  $(document).on('click', '#btn-save_detalle_elegir_proveedor', function (e) {
-    e.preventDefault();
-
-    url = base_url + 'AgenteCompra/PedidosGarantizados/actualizarElegirItemProductos';
-    $.ajax({
-      type		  : 'POST',
-      dataType	: 'JSON',
-      url		    : url,
-      data		  : $('#form-arrItemsProveedor').serialize(),
-      success : function( response ){
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        $( '#modal-message' ).modal('show');
-        
-        if (response.status == 'success'){
-          $('.div-Listar').hide();
-          $('.div-AgregarEditar').show();
-          $('#div-elegir_item_proveedor').hide();
-
-          $( '.modal-message' ).addClass(response.style_modal);
-          $( '.modal-title-message' ).text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
-        } else {
-          $( '.modal-message' ).addClass(response.style_modal);
-          $( '.modal-title-message' ).text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
-        }
-        
-        $( '#btn-save' ).text('');
-        $( '#btn-save' ).append( 'Guardar' );
-        $( '#btn-save' ).attr('disabled', false);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        
-        $( '#modal-message' ).modal('show');
-        $( '.modal-message' ).addClass( 'modal-danger' );
-        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-        
-        //Message for developer
-        console.log(jqXHR.responseText);
-        
-        $( '#btn-save' ).text('');
-        $( '#btn-save' ).append( 'Guardar' );
-        $( '#btn-save' ).attr('disabled', false);
-      }
-    });
-  });
 
   $("#form-arrItems").on('submit',function(e){
     e.preventDefault();
@@ -565,7 +520,9 @@ function verPedido(ID){
           table_enlace_producto += "</td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
+          //+ "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
           + "<td class='text-left td-name' width='10%'>" + href_link + "</td>"
+          //+ "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link text-danger' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
         table_enlace_producto += "</tr>";
@@ -841,7 +798,31 @@ function calcularTotales(){
   $( '#label-total_importe' ).text( Math.round10(fImporteTotal, -2));
 }
 
-function generarConsolidaTrading(ID){
+function generarPDFPedidoCliente(ID){
+  var $modal_delete = $( '#modal-message-delete' );
+  $modal_delete.modal('show');
+  
+  $( '.modal-message-delete' ).removeClass('modal-danger modal-warning modal-success');
+  $( '.modal-message-delete' ).addClass('modal-success');
+
+  $('#modal-title').text('¿Deseas genera PDF?');
+  
+  $( '#btn-cancel-delete' ).off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+  
+  $( '#btn-save-delete' ).off('click').click(function () {
+    _generarPDFPedidoCliente($modal_delete, ID);
+  });
+}
+
+function _generarPDFPedidoCliente($modal_delete, ID){
+  $modal_delete.modal('hide');
+  url = base_url + 'AgenteCompra/PedidosGarantizados/generarPDFPedidoCliente/' + ID;
+  window.open(url,'_blank');
+}
+
+function generarExcelPedidoCliente(ID){
   var $modal_delete = $( '#modal-message-delete' );
   $modal_delete.modal('show');
   
@@ -853,16 +834,33 @@ function generarConsolidaTrading(ID){
   $( '#btn-cancel-delete' ).off('click').click(function () {
     $modal_delete.modal('hide');
   });
-    
+  
+  /*
+  $('.div-agregar_proveedor').show();
+  $( '.btn-subir_archivos' ).off('click').click(function () {
+    $('.div-agregar_proveedor').hide();
+  });
+  */
+  
   $( '#btn-save-delete' ).off('click').click(function () {
-    _generarConsolidaTrading($modal_delete, ID);
+    _generarExcelPedidoCliente($modal_delete, ID);
   });
 }
 
-function _generarConsolidaTrading($modal_delete, ID){
+function _generarExcelPedidoCliente($modal_delete, ID){
   $modal_delete.modal('hide');
-  url = base_url + 'AgenteCompra/PedidosGarantizados/generarConsolidaTrading/' + ID;
+  url = base_url + 'AgenteCompra/PedidosGarantizados/generarExcelPedidoCliente/' + ID;
   window.open(url,'_blank');
+}
+
+function loadFile(event, id){
+  /*
+  var output = document.getElementById('img_producto-preview' + id);
+  output.src = URL.createObjectURL(event.target.files[0]);
+  output.onload = function() {
+    URL.revokeObjectURL(output.src) // free memory
+  }
+  */
 }
 
 function addItems(){
@@ -1014,77 +1012,4 @@ function scrollToError( $sMetodo, $IdElemento ){
   $sMetodo.animate({
     scrollTop: $IdElemento.offset().top - 100
   }, 'slow');
-}
-
-function getItemProveedor(id_detalle){
-  url = base_url + 'AgenteCompra/PedidosGarantizados/getItemProveedor/' + id_detalle;
-  $.ajax({
-    url : url,
-    type: "GET",
-    dataType: "JSON",
-    success: function(response){
-      var detalle = response;
-
-      console.log(detalle);
-      var table_enlace_producto = "", id_item_tmp = 0;
-      for (i = 0; i < detalle.length; i++) {
-        var id_detalle = detalle[i]['ID_Pedido_Detalle'];
-        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
-        var cantidad = detalle[i]['Qt_Producto_Caja'];
-        var nota = detalle[i]['Txt_Nota'];
-        var cantidad_final = detalle[i]['Qt_Producto_Caja_Final'];
-        var nota_final = detalle[i]['Txt_Nota_Final'];
-        var cantidad_html = (parseFloat(cantidad_final) > parseFloat(cantidad) ? cantidad_final : cantidad);
-
-        if(id_item_tmp != id_item){
-          table_enlace_producto +=
-          "<tr id='tr_enlace_producto" + id_item + "'>"
-            + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-            + "<td class='text-left td-imagen'>";
-
-            for (x = 0; x < detalle.length; x++) {
-              if(id_item == detalle[x]['ID_Pedido_Detalle_Producto_Proveedor']) {
-                table_enlace_producto += "<img style='max-height: 100px;width: 100%; cursor:pointer' data-id_item='" + id_item + "' data-url_img='" + detalle[x]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[x]['Txt_Url_Imagen_Producto'] + "' class='img-thumbnail img-table_item img-fluid mb-2'>";
-                table_enlace_producto += "<br>";
-              }
-            }
-
-            if(detalle[i]['Nu_Selecciono_Proveedor']==0){
-              table_enlace_producto += '<button type="button" id="btn-seleccionar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-plus-square"></i>&nbsp; marcar proveedor</button>';
-            } else {
-              table_enlace_producto += '<button type="button" id="btn-desmarcar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-plus-square"></i>&nbsp; desmarcar proveedor</button>';
-              table_enlace_producto += '<input type="hidden" id="modal-id_detalle' + i + '" name="addProducto[' + i + '][id_detalle]" class="form-control" value="' + id_item + '">';
-              table_enlace_producto += '<input type="hidden" id="modal-cantidad_oculta' + i + '" name="addProducto[' + i + '][cantidad_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Caja'] + '">';
-              table_enlace_producto += '<input type="text" id="modal-cantidad' + i + '" data-correlativo="' + i + '" inputmode="numeric" name="addProducto[' + i + '][cantidad]" class="arrProducto form-control required cantidad input-numeric mt-3" placeholder="Cantidad" value="' + cantidad_html + '" autocomplete="off" />';
-              table_enlace_producto += '<textarea id="modal-nota' + i + '" name="addProducto[' + i + '][nota]" class="mt-3 form-control required nota" placeholder="Observaciones" style="height: 100px;">' + nota_final + '</textarea>';
-            }
-            table_enlace_producto += "</td>";
-
-            table_enlace_producto +=
-            "<td class='text-left td-precio'>" + (parseFloat(detalle[i]['Ss_Precio']) * parseFloat(detalle[i]['Ss_Tipo_Cambio'])).toPrecision(6) + "</td>"
-            + "<td class='text-left td-precio'>" + detalle[i]['Ss_Precio'] + "</td>"
-            + "<td class='text-left td-moq'>" + detalle[i]['Qt_Producto_Moq'] + "</td>"
-            + "<td class='text-left td-caja'>" + detalle[i]['Qt_Producto_Caja'] + "</td>"
-            + "<td class='text-left td-cbm'>" + detalle[i]['Qt_Cbm'] + "</td>"
-            + "<td class='text-left td-delivery'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-            + "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
-          table_enlace_producto += "</tr>";
-          id_item_tmp = id_item;
-        }
-      }
-      
-      $( '#table-elegir_productos_proveedor' ).append(table_enlace_producto);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-      
-      $( '#modal-message' ).modal('show');
-      $( '.modal-message' ).addClass( 'modal-danger' );
-      $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-      setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-      
-      //Message for developer
-      console.log(jqXHR.responseText);
-    }
-  })
 }
