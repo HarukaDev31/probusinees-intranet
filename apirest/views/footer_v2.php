@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.93'; ?>
+<?php $iControlVersionDashboard = '1.0.94'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -104,6 +104,11 @@
 <?php if (isset($js_pedidos_garantizados) && $js_pedidos_garantizados==true) : ?>
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_garantizados.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_pedidos_pagados) && $js_pedidos_pagados==true) : ?>
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_pagados.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <!-- Usuarios y opciones -->

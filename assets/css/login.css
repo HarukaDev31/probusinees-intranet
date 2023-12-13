@@ -274,12 +274,12 @@ div.footerNode a, div.footerNode span {
 }
 
 .bg-image {
-  background-image: url(../img/backgrounds/portada_login.jpg?ver=1.5.0);
+  background-image: url(../img/backgrounds/portada_probusiness.png?ver=1.5.0);
   background-size: cover;
   background-position: left;
   background-repeat: no-repeat;
   height: 100vh;
-  box-shadow: 14px 0 20px 5px rgb(145, 143, 143);
+  box-shadow: 14px 0 20px 5px rgb(210, 210, 210);
   border-color: transparent;
 }
 

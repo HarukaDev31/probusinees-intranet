@@ -841,6 +841,30 @@ function calcularTotales(){
   $( '#label-total_importe' ).text( Math.round10(fImporteTotal, -2));
 }
 
+function generarAgenteCompra(ID){
+  var $modal_delete = $( '#modal-message-delete' );
+  $modal_delete.modal('show');
+  
+  $( '.modal-message-delete' ).removeClass('modal-danger modal-warning modal-success');
+  $( '.modal-message-delete' ).addClass('modal-success');
+
+  $('#modal-title').text('¿Deseas genera EXCEL?');
+  
+  $( '#btn-cancel-delete' ).off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+    
+  $( '#btn-save-delete' ).off('click').click(function () {
+    _generarAgenteCompra($modal_delete, ID);
+  });
+}
+
+function _generarAgenteCompra($modal_delete, ID){
+  $modal_delete.modal('hide');
+  url = base_url + 'AgenteCompra/PedidosGarantizados/generarAgenteCompra/' + ID;
+  window.open(url,'_blank');
+}
+
 function generarConsolidaTrading(ID){
   var $modal_delete = $( '#modal-message-delete' );
   $modal_delete.modal('show');

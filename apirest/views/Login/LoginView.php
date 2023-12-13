@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <!-- Selected -->
     <!-- <link rel="stylesheet" href="<?php echo base_url("bower_components/select2/dist/css/select2.min.css"); ?>"> -->
     <!-- Ecxlae -->
-    <link rel="stylesheet" href="<?php echo base_url("assets/css/login.css?ver=3.30.0"); ?>">
+    <link rel="stylesheet" href="<?php echo base_url("assets/css/login.css?ver=3.32.0"); ?>">
     
     <meta name="theme-color" content="#FF6700">
 		<meta name="msapplication-navbutton-color" content="#FF6700"/>
@@ -47,7 +47,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="container-fluid">
         <div class="row">
         <div class="d-none d-md-flex col-sm-12 col-md-6 col-lg-6 bg-image" alt="Portada ProBusiness" title="Portada ProBusiness"></div>
-        <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="col-sm-12 col-md-6 col-lg-6" style="margin-top: 9%;">
             <div class="panel panel-default">
               <div class="panel-heading">
                 <div class="row row-login-logo">
