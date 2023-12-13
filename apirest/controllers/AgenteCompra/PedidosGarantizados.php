@@ -305,7 +305,7 @@ class PedidosGarantizados extends CI_Controller {
 			->setCellValue('D' . $fila, 'NOMBRE COMERCIAL')
 			->setCellValue('E' . $fila, 'CARACTERÍSTICAS')
 			->setCellValue('F' . $fila, 'CANTIDAD TOTAL')
-			->setCellValue('G' . $fila, 'PRECIO UNITARIO EXW (RMB)')
+			->setCellValue('G' . $fila, 'PRECIO UNITARIO EXW (RMB)')//PRECIO EN YUANES
 			->setCellValue('H' . $fila, 'PRECIO UNITARIO EXW (USD)')
 			->setCellValue('I' . $fila, 'COSTO TOTAL')
 			->setCellValue('J' . $fila, 'PCS / CAJA')
@@ -330,6 +330,9 @@ class PedidosGarantizados extends CI_Controller {
 
 			$fila = 7;
 			$iCounter=1;
+			$fCostoTotalYuanesGeneral = 0;
+			$fCostoTotalGeneral = 0;
+			$fCbmTotal = 0;
             foreach($data as $row) {
 
 				$objPHPExcel->setActiveSheetIndex($hoja_activa)
@@ -364,27 +367,40 @@ class PedidosGarantizados extends CI_Controller {
 					->setCellValue('C' . $fila, '');
 				}
 
+				$fPrecioYuanes = $row->Ss_Precio;
 				$fPrecioDolares = ($row->Ss_Precio * $row->Ss_Tipo_Cambio);
 				$fTotalCajas = ($row->Qt_Producto_Caja_Final / $row->Qt_Producto_Caja);//TOTAL CAJAS
+				$fCostoTotal = ($fPrecioDolares * $row->Qt_Producto_Caja_Final);
+				$fCostoTotalYuanes = ($fPrecioYuanes * $row->Qt_Producto_Caja_Final);
+				$fCbmTotal = ($fTotalCajas * $row->Qt_Cbm);
 				$objPHPExcel->setActiveSheetIndex($hoja_activa)
 				->setCellValue('D' . $fila, $row->Txt_Producto)
 				->setCellValue('E' . $fila, $row->Txt_Descripcion)
 				->setCellValue('F' . $fila, $row->Qt_Producto_Caja_Final)
-				->setCellValue('G' . $fila, $row->Ss_Precio)
+				->setCellValue('G' . $fila, $row->Ss_Precio)//precio yuanes
 				->setCellValue('H' . $fila, $fPrecioDolares)
-				->setCellValue('I' . $fila, $fPrecioDolares * $row->Qt_Producto_Caja_Final)
+				->setCellValue('I' . $fila, $fCostoTotal)
 				->setCellValue('J' . $fila, $row->Qt_Producto_Caja)
 				->setCellValue('K' . $fila, $fTotalCajas)
 				->setCellValue('L' . $fila, $row->Qt_Cbm)
-				->setCellValue('M' . $fila, $fTotalCajas * $row->Qt_Cbm)
+				->setCellValue('M' . $fila, $fCbmTotal)
 				->setCellValue('N' . $fila, $row->Nu_Dias_Delivery)
 				;
+
+				$fCostoTotalGeneral += $fCostoTotal;//precio en dolares
+				$fCostoTotalYuanesGeneral += $fCostoTotalYuanes;//precio en dolares
+				$fCbmTotalGeneral += $fCbmTotal;
 
 				$iCounter++;
 				$fila++;
 			}
 
 			$fila++;
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('H' . $fila, 'TOTAL')
+            ->setCellValue('I' . $fila, numberFormat($fCostoTotalGeneral, 2, '.', ','))
+            ->setCellValue('M' . $fila, numberFormat($fCbmTotalGeneral, 2, '.', ','));
+
 			//SUMAR I y M
 			$objPHPExcel->getActiveSheet()
 			->getStyle('B' . $fila . ':' . 'N' . $fila)
@@ -398,6 +414,179 @@ class PedidosGarantizados extends CI_Controller {
 			);
 		
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->getFont()->setBold(true);
+
+			$fila++;
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)
+			->setCellValue('D' . $fila, 'USD')
+			->setCellValue('E' . $fila, 'RMB')
+			;
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'TOTAL DE LA COMPRA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':C'.$fila);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, numberFormat($fCostoTotalGeneral, 2, '.', ','))
+            ->setCellValue('E' . $fila, numberFormat($fCostoTotalYuanesGeneral, 2, '.', ','));
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)
+			->setCellValue('H' . $fila, 'PAGOS');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('H'.$fila.':K'.$fila);
+			$objPHPExcel->getActiveSheet()
+			->getStyle('H' . $fila . ':' . 'K' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => '009999')
+					)
+				)
+			);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'COMISION');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':C'.$fila);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)
+			->setCellValue('H' . $fila, '1er PAGO');
+			$objPHPExcel->getActiveSheet()
+			->getStyle('H' . $fila . ':' . 'K' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FCE4D6')
+					)
+				)
+			);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('I' . $fila, '0.00');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('I'.$fila.':K'.$fila);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'GASTOS ORIGEN');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':C'.$fila);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)
+			->setCellValue('H' . $fila, '2do PAGO');
+			$objPHPExcel->getActiveSheet()
+			->getStyle('H' . $fila . ':' . 'K' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FCE4D6')
+					)
+				)
+			);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('I' . $fila, '0.00');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('I'.$fila.':K'.$fila);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'FTA X1');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':C'.$fila);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)
+			->setCellValue('H' . $fila, '3er PAGO');
+			$objPHPExcel->getActiveSheet()
+			->getStyle('H' . $fila . ':' . 'K' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FCE4D6')
+					)
+				)
+			);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('I' . $fila, '0.00');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('I'.$fila.':K'.$fila);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'FLETE');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':C'.$fila);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'TOTAL A PAGAR CHINA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':C'.$fila);
+			$objPHPExcel->getActiveSheet()
+			->getStyle('B' . $fila . ':' . 'E' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'F2F2F2')
+					)
+				)
+			);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D' . $fila, $fCostoTotalGeneral);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('E' . $fila, $fCostoTotalYuanesGeneral);
+
+			$fila++;
+			$fila++;
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'PAIS DE ORIGEN: NINGBO, CHINA');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'IMPORTANTE');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, ' - La comision por el servicio de compra es del 5%, pago minimo $500.');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- A la hora de hacer el pago indicar al banco pago OUR.');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- Este servicio incluye compra la carga, revisar y realizar la documentacion de exportacion.');
+
+			//DIBUJAR SELLO
+			$objDrawing = new PHPExcel_Worksheet_Drawing();
+					
+			$objDrawing->setName($row->Txt_Producto);
+			$objDrawing->setDescription($row->Txt_Descripcion);
+			
+			$sSelloEmpresa = 'assets/img/sello_probusiness_china.png';
+			if ( file_exists($sSelloEmpresa) ) {
+				$objDrawing->setPath($sSelloEmpresa);
+				$objDrawing->setWidthAndHeight(150,600);
+				$objDrawing->setResizeProportional(true);
+
+				$sello_fila = $fila;
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('I'.($sello_fila+1).':I'.($sello_fila+8));
+				$objDrawing->setCoordinates('I' . ($sello_fila+1));
+				$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+			}
+
+			$fila++;
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, 'CUENTA BANCARIA CHINA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':E'.$fila);
+			$objPHPExcel->getActiveSheet()
+			->getStyle('B' . $fila . ':' . 'E' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => '009999')
+					)
+				)
+			);
+		   
+			$fila++;
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '** Beneficiary Bank: ZHEJIANG CHOUZHOU COMMERCIAL BANK');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- SWIFT BIC: CZCBCN2X');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- City: YIWU');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- Province: ZHEJIANG');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- Country: CHINA');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- Bank Address: No. 1401 North Chouzhou Road Yiwu Zhejiang China');
+
+			$fila++;
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '** Beneficiary Name:   CHRIS FACTORY LIMITED');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- Beneficiary Account:   NRA15602002010590009448');
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B' . $fila, '- Company Address: Room 2107 21/F CC Wu Building  302-308 Henessy Road, Wanchai, Hong Kong');
 
 			header('Content-type: application/vnd.ms-excel');
 			header('Content-Disposition: attachment; filename="' . $fileNameExcel . '"');
