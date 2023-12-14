@@ -64,3 +64,10 @@
 
 .tableFixHead          { overflow: auto; height: 700px; }
 .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
+
+.img-resize {
+  height: 210px;
+  object-fit: cover;
+  object-position: bottom;
+  cursor: pointer;
+}

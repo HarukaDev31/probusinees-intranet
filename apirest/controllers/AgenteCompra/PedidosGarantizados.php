@@ -43,7 +43,7 @@ class PedidosGarantizados extends CI_Controller {
 			//EXCEL cliente de pedido
 			$excel_consolida_trading = 'P.C.T. <button class="btn btn-xs btn-link" alt="Proforma C. Trading" title="Proforma C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
 			$excel_agente_compra = 'P.T. <button class="btn btn-xs btn-link" alt="Proforma Trading" title="Proforma Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
-			$rows[] = $excel_consolida_trading . ' ' . $excel_agente_compra;
+			$rows[] = $excel_consolida_trading . '<br>' . $excel_agente_compra;
 
             //$rows[] = round($row->Qt_Total, 2);
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($row->Nu_Estado);
@@ -78,9 +78,9 @@ class PedidosGarantizados extends CI_Controller {
 				$dropdown_estado_china .= '</ul>';
 			$dropdown_estado_china .= '</div>';
 
-			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
-				$dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-			}
+			//if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
+				//$dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			//}
 
             $rows[] = $dropdown_estado_china;
 

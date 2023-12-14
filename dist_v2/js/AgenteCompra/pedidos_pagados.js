@@ -212,17 +212,14 @@ $(function () {
     $('.modal-ver_item').modal('show');
     $('.img-responsive').attr('src', $(this).data('url_img'));
     $("#a-download_image").attr("data-id_item", $(this).data('id_item'));
+  })
 
-    //$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
-    //$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
+	$(document).on('click', '.btn-ver_pago_proveedor', function (e) {
+    $('.img-responsive').attr('src', '');
 
-    /*
-    var img_item = $(this).data('url_img');
-    img_item = img_item.replace("https://", "../../");
-    img_item = img_item.replace("assets", "public_html/assets");
-
-    $("#a-download_image").attr("href", img_item);
-    */
+    $('.modal-ver_item').modal('show');
+    $('.img-responsive').attr('src', $(this).data('url_img'));
+    $("#a-download_image").attr("data-id_item", $(this).data('id'));
   })
   
 	$( '#a-download_image' ).click(function(){
@@ -233,6 +230,115 @@ $(function () {
     setTimeout(function() { popupwin.close();}, 2000);
   })
 
+	$(document).on('click', '.btn-agregar_pago_proveedor', function (e) {
+    e.preventDefault();
+
+    var id_empresa = $(this).data('id_empresa');
+    var id_organizacion = $(this).data('id_organizacion');
+    var id_cabecera = $(this).data('id_pedido_cabecera');
+    var id_detalle = $(this).data('id_pedido_detalle');
+    var id = $(this).data('id');
+    var tipo_pago = $(this).data('tipo_pago');
+
+    $( '[name="proveedor-id_empresa"]' ).val(id_empresa);
+    $( '[name="proveedor-id_organizacion"]' ).val(id_organizacion);
+    $( '[name="proveedor-id_cabecera"]' ).val(id_cabecera);
+    $( '[name="proveedor-id_detalle"]' ).val(id_detalle);
+    $( '[name="proveedor-id"]' ).val(id);
+    $( '[name="proveedor-tipo_pago"]' ).val(tipo_pago);
+
+    $('#modal-agregar_pago').modal('show');
+
+    $( '#modal-agregar_pago' ).on('shown.bs.modal', function() {
+      $( '#amount_proveedor' ).focus();
+    })
+  })
+
+	$(document).on('click', '.btn-agregar_inspeccion', function (e) {
+    e.preventDefault();
+
+    var id_empresa = $(this).data('id_empresa');
+    var id_organizacion = $(this).data('id_organizacion');
+    var id_cabecera = $(this).data('id_pedido_cabecera');
+    var id_detalle = $(this).data('id_pedido_detalle');
+    var id = $(this).data('id');
+    var tipo_pago = $(this).data('tipo_pago');
+
+    $( '[name="proveedor-id_empresa"]' ).val(id_empresa);
+    $( '[name="proveedor-id_organizacion"]' ).val(id_organizacion);
+    $( '[name="proveedor-id_cabecera"]' ).val(id_cabecera);
+    $( '[name="proveedor-id_detalle"]' ).val(id_detalle);
+    $( '[name="proveedor-id"]' ).val(id);
+    $( '[name="proveedor-tipo_pago"]' ).val(tipo_pago);
+
+    $('#modal-agregar_inspeccion').modal('show');
+  })
+
+  $("#form-agregar_inspeccion").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('image_inspeccion').files.length == 0) {
+      $('#image_inspeccion').closest('.form-group').find('.help-block').html('Empty image');
+      $('#image_inspeccion').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-agregar_inspeccion")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addInspeccionProveedor',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        if(response.status == 'success') {
+          $('#modal-agregar_inspeccion').modal('hide');
+          subirInspeccion($('#proveedor-id_cabecera').val());
+        } else {
+          alert(response.message);
+        }
+      });
+    }
+  });
+
+  $("#form-agregar_pago_proveedor").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    const amount_proveedor = parseFloat($('#amount_proveedor').val())
+
+    if( isNaN(amount_proveedor) || amount_proveedor<=0.00 || amount_proveedor<=0) {
+      $('#amount_proveedor').closest('.form-group').find('.help-block').html('Empty Amount');
+      $('#amount_proveedor').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else if(document.getElementById('voucher_proveedor').files.length == 0) {
+      $('#voucher_proveedor').closest('.form-group').find('.help-block').html('Empty image');
+      $('#voucher_proveedor').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-agregar_pago_proveedor")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addPagoProveedor',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        if(response.status == 'success') {
+          $('#modal-agregar_pago').modal('hide');
+          verPedido($('#proveedor-id_cabecera').val());
+        } else {
+          alert(response.message);
+        }
+      });
+    }
+  });
+
   $('#span-id_pedido').html('');
 })
 
@@ -240,7 +346,7 @@ function reload_table_Entidad(){
   table_Entidad.ajax.reload(null,false);
 }
 
-function verPedido(ID){  
+function verPedido(ID){
   $( '.div-Listar' ).hide();
   
   $( '#form-pedido' )[0].reset();
@@ -259,6 +365,7 @@ function verPedido(ID){
     type: "GET",
     dataType: "JSON",
     success: function(response){
+      console.log(response);
       var detalle = response;
       response = response[0];
 
@@ -286,26 +393,46 @@ function verPedido(ID){
 
       var table_enlace_producto = "";
       for (i = 0; i < detalle.length; i++) {
-        var cantidad_item = detalle[i]['Qt_Producto'];
-        var id_item = detalle[i]['ID_Pedido_Detalle'];
-        var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "</a>" : "");
+        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
+        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
+
+        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
+        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
+        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
+        //max-height: 350px;width: 100%; cursor:pointer
+
+        var fTotal = (cantidad_item * precio_china);
+        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
+        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
           + "<td class='text-center td-name' width='50%'>"
-            + "<img style='max-height: 350px;width: 100%; cursor:pointer' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid mb-2'>";
-            if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-              table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span>"
+            + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+            
+            if( voucher_1 == '' || voucher_1 == null ){
+              table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; Pagar Proveedor</button>';
+            } else {
+              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; (1) Pago ¥ ' + Ss_Pago_1_Proveedor +  '</button>';
+              if( voucher_2 == '' || voucher_2 == null ){
+                table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; Pagar Proveedor</button>';
+              } else {
+                table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; (2) Pago ¥ ' + Ss_Pago_2_Proveedor + '</button>';
+              }
             }
-          table_enlace_producto +=
-          "</td>"
-          + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
-          + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
-          //+ "<td class='text-right td-cantidad'>" + Math.round10(detalle[i]['Qt_Producto'], -2) + "</td>"
-          + "<td class='text-left td-name' width='10%'>" + href_link + "</td>"
-          //+ "<td class='text-center'><button type='button' id='btn-deleteProductoEnlace' class='btn btn-xs btn-link text-danger' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>";
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
+
+          table_enlace_producto += "</td>"
+          + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
+          + "<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
+          + "<td class='text-right td-price'>" + Math.round10(precio_china, -2) + "</td>"
+          +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
+          +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
+          +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
+          +"<td class='text-left td-supplier'></td>"
+          +"<td class='text-left td-phone'></td>"
+          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
         table_enlace_producto += "</tr>";
       }
       
@@ -520,31 +647,7 @@ function calcularTotales(){
   $( '#label-total_importe' ).text( Math.round10(fImporteTotal, -2));
 }
 
-function generarPDFPedidoCliente(ID){
-  var $modal_delete = $( '#modal-message-delete' );
-  $modal_delete.modal('show');
-  
-  $( '.modal-message-delete' ).removeClass('modal-danger modal-warning modal-success');
-  $( '.modal-message-delete' ).addClass('modal-success');
-
-  $('#modal-title').text('¿Deseas genera PDF?');
-  
-  $( '#btn-cancel-delete' ).off('click').click(function () {
-    $modal_delete.modal('hide');
-  });
-  
-  $( '#btn-save-delete' ).off('click').click(function () {
-    _generarPDFPedidoCliente($modal_delete, ID);
-  });
-}
-
-function _generarPDFPedidoCliente($modal_delete, ID){
-  $modal_delete.modal('hide');
-  url = base_url + 'AgenteCompra/PedidosPagados/generarPDFPedidoCliente/' + ID;
-  window.open(url,'_blank');
-}
-
-function generarExcelPedidoCliente(ID){
+function generarExcelOrderTracking(ID){
   var $modal_delete = $( '#modal-message-delete' );
   $modal_delete.modal('show');
   
@@ -558,12 +661,213 @@ function generarExcelPedidoCliente(ID){
   });
   
   $( '#btn-save-delete' ).off('click').click(function () {
-    _generarExcelPedidoCliente($modal_delete, ID);
+    _generarExcelOrderTracking($modal_delete, ID);
   });
 }
 
-function _generarExcelPedidoCliente($modal_delete, ID){
+function _generarExcelOrderTracking($modal_delete, ID){
   $modal_delete.modal('hide');
-  url = base_url + 'AgenteCompra/PedidosPagados/generarExcelPedidoCliente/' + ID;
+  url = base_url + 'AgenteCompra/PedidosPagados/generarExcelOrderTracking/' + ID;
   window.open(url,'_blank');
+}
+
+function loadFile(event, id){
+  var output = document.getElementById('img_producto-preview' + id);
+  output.src = URL.createObjectURL(event.target.files[0]);
+  output.onload = function() {
+    URL.revokeObjectURL(output.src) // free memory
+  }
+}
+
+function cambiarEstadoChina(ID, Nu_Estado) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  var sNombreEstado = 'Pendiente';
+  if(Nu_Estado==2)
+    sNombreEstado = 'En proceso';
+  else if(Nu_Estado==2)
+    sNombreEstado = 'Cotizado';
+
+  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstadoChina/' + ID + '/' + Nu_Estado;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
+}
+
+function subirInspeccion(ID){
+  $( '.div-Listar' ).hide();
+  
+  $( '#form-pedido' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+	$( '#table-Producto_Enlace tbody' ).empty();
+  $( '#table-Producto_Enlace' ).show();
+
+  $('#span-id_pedido').html('Nro. ' + ID);
+
+  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+      var detalle = response;
+      response = response[0];
+
+      $( '.div-AgregarEditar' ).show();
+            
+      $( '[name="EID_Pedido_Cabecera"]' ).val(response.ID_Pedido_Cabecera);
+      $( '[name="EID_Entidad"]' ).val(response.ID_Entidad);
+      $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
+      $( '[name="EID_Organizacion"]' ).val(response.ID_Organizacion);
+
+      $( '[name="No_Contacto"]' ).val(response.No_Contacto);
+      $( '[name="Txt_Email_Contacto"]' ).val(response.Txt_Email_Contacto);
+      $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
+      $( '[name="No_Entidad"]' ).val(response.No_Entidad);
+      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
+
+      var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
+      if(response.Nu_Estado_Pedido == 2)
+        sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
+      else if(response.Nu_Estado_Pedido == 3)
+        sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
+      else if(response.Nu_Estado_Pedido == 4)
+        sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
+      $( '#div-estado' ).html(sNombreEstado);
+
+      var table_enlace_producto = "";
+      for (i = 0; i < detalle.length; i++) {
+        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
+        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
+
+        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
+        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
+        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
+        var fTotal = (precio_china * cantidad_item);
+
+        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
+        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
+        table_enlace_producto +=
+        "<tr id='tr_enlace_producto" + id_item + "'>"
+          + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
+          + "<td class='text-center td-name' width='30%'>"
+            + "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+            
+            if(detalle[i]['Nu_Agrego_Inspeccion']==0) {//0=No
+              table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-search"></i>&nbsp; Subir fotos / videos</button>';
+            } else {
+              table_enlace_producto += '<button type="button" id="btn-ver_inspeccion' + id_item + '" onclick=verInspeccion(' + id_item + ') class="btn btn-secondary btn-block btn-ver_inspeccion"><i class="fas fa-search"></i>&nbsp; ver fotos / videos</button>';
+            }
+
+          table_enlace_producto += "</td>"
+          +"<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
+          +"<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
+          +"<td class='text-right td-price'>" + Math.round10(precio_china, -2) + "</td>"
+          +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
+          +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
+          +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
+          +"<td class='text-left td-supplier'></td>"
+          +"<td class='text-left td-phone'></td>"
+          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
+        table_enlace_producto += "</tr>";
+      }
+      
+      $('#span-total_cantidad_items').html(i);
+      $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+	    
+  	  $( '#modal-message' ).modal('show');
+	    $( '.modal-message' ).addClass( 'modal-danger' );
+	    $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+	    setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+	    
+	    //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function verInspeccion(ID){
+	$( '#div-img_inspeccion_item' ).html('');
+
+  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit_inspeccion/' + ID;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+
+      $( '#modal-ver_inspeccion_item' ).modal('show');
+
+      var detalle = response;
+      response = response[0];
+      
+      var table_enlace_producto = "";
+      for (i = 0; i < detalle.length; i++) {
+        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Inspeccion'];//max-height: 350px;width: 100%; cursor:pointer
+        table_enlace_producto += "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+      }
+      $( '#div-img_inspeccion_item' ).html(table_enlace_producto);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+	    
+  	  $( '#modal-message' ).modal('show');
+	    $( '.modal-message' ).addClass( 'modal-danger' );
+	    $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+	    setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+	    
+	    //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
 }

@@ -27,18 +27,13 @@
                       <th>Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
-                      <th>Empresa</th>
-                      <!--<th class="no-sort">Excel</th>-->
-                      <!--<th class="no-sort">PDF</th>-->
-                      <th>Estado</th>
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
-                        <th class="no-sort">Ver</th>
-                      <?php endif; ?>
-                      <!--
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
-                        <th class="no-sort">Eliminar</th>
-                      <?php endif; ?>
-                      -->
+                      <!--<th>Empresa</th>-->
+                      <th class="no-sort">Excel</th>
+                      <th>Perú</th>
+                      <th>China</th>
+                      <th class="no-sort">Pay</th>
+                      <th class="no-sort">Insp</th>
+                      <th class="no-sort">Ok</th>
                     </tr>
                   </thead>
                 </table>
@@ -136,19 +131,24 @@
                     </div>
                     
                     <div class="col-xs-12 col-sm-12 col-md-12">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-secondary"></span> Productos</h3>
+                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
 
                       <div class="table-responsive div-Compuesto">
                         <table id="table-Producto_Enlace" class="table table-hover">
                           <thead>
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-left" width="50%">producto_imagen</th>
-                              <th class="text-left" width="20%">Nombre</th>
-                              <th class="text-left" width="20%">Características</th>
-                              <!--<th class="text-right">Qty</th>-->
-                              <th class="text-left" width="10%">Link</th>
-                              <!--<th class="text-center"></th>-->
+                              <th class="text-left" width="50%">Product_Photo</th>
+                              <th class="text-left">Product_Name</th>
+                              <th class="text-right">Qty</th>
+                              <th class="text-right">Price</th>
+                              <th class="text-right">Amount</th>
+                              <th class="text-right">Deposit_#1</th>
+                              <th class="text-right">Balance</th>
+                              <th class="text-right">Deposit_#2</th>
+                              <th class="text-right">Delivery</th>
+                              <th class="text-right">Supplier</th><!--proveedor-->
+                              <th class="text-right">Phone</th><!--celular-->
                             </tr>
                           </thead>
                           <tbody>
@@ -192,10 +192,112 @@
         <div class="col-xs-12 text-center">
           <img class="img-responsive img-fluid" style=" display: block; margin-left: auto; margin-right: auto;" src="">
         </div>
-        <a id="a-download_image" class="mt-4 btn btn-primary btn-lg btn-block" data-id_item="">Descargar</a>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="col btn btn-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
+        <a id="a-download_image" class="col btn btn-primary btn-lg btn-block" data-id_item="">Descargar</a>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal imagen del item -->
+
+<!-- modal agregar pagos -->
+<div class="modal fade modal-agregar_pago" id="modal-agregar_pago">
+  <?php $attributes = array('id' => 'form-agregar_pago_proveedor'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-agregar_pago">
+        <div class="row">
+          <input type="hidden" id="proveedor-id_empresa" name="proveedor-id_empresa" class="form-control">
+          <input type="hidden" id="proveedor-id_organizacion" name="proveedor-id_organizacion" class="form-control">
+          <input type="hidden" id="proveedor-id_cabecera" name="proveedor-id_cabecera" class="form-control">
+          <input type="hidden" id="proveedor-id_detalle" name="proveedor-id_detalle" class="form-control">
+          <input type="hidden" id="proveedor-id" name="proveedor-id" class="form-control">
+          <input type="hidden" id="proveedor-tipo_pago" name="proveedor-tipo_pago" class="form-control">
+
+          <div class="col-12 col-sm-6 text-center">
+            <label>Amount</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" id="amount_proveedor" name="amount_proveedor" class="form-control input-decimal required" placeholder="" maxlength="16" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-6 position-relative text-center ps-4 pe-3 pe-sm-0">
+            <div class="col-sm-12">
+              <label>Voucher</label>
+              <div class="form-group">
+                <label class="btn btn btn-outline-secondary" for="voucher_proveedor" style="width: 100%;">
+                  <input class="arrProducto form-control voucher_proveedor" id="voucher_proveedor" type="file" style="display:none" name="voucher_proveedor" data-id="1" onchange="loadFile(event, 1)" placeholder="sin archivo" accept="image/*">Subir archivo
+                </label>
+                <span class="help-block text-danger" id="error"></span>
+              </div>
+            </div>
+            <img id="img_producto-preview1" src="" class="arrProducto img-thumbnail border-0 rounded" alt="">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_pago_proveedor" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar pagos -->
+
+<!-- modal agregar pagos -->
+<div class="modal fade modal-agregar_inspeccion" id="modal-agregar_inspeccion">
+  <?php $attributes = array('id' => 'form-agregar_inspeccion'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-agregar_inspeccion">
+        <div class="row">
+          <input type="hidden" id="proveedor-id_empresa" name="proveedor-id_empresa" class="form-control">
+          <input type="hidden" id="proveedor-id_organizacion" name="proveedor-id_organizacion" class="form-control">
+          <input type="hidden" id="proveedor-id_cabecera" name="proveedor-id_cabecera" class="form-control">
+          <input type="hidden" id="proveedor-id_detalle" name="proveedor-id_detalle" class="form-control">
+          <input type="hidden" id="proveedor-id" name="proveedor-id" class="form-control">
+          <input type="hidden" id="proveedor-tipo_pago" name="proveedor-tipo_pago" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Inspección</label>
+            <div class="form-group">
+              <input class="form-control" id="image_inspeccion" name="image_inspeccion[]" type="file" accept="image/*" multiple></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_agregar_inspeccion" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar pagos -->
+
+<!-- modal ver imagen del item -->
+<div class="modal fade modal-ver_inspeccion_item" id="modal-ver_inspeccion_item">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-ver_inspeccion_item">
+        <div class="col-xs-12 text-center">
+          <div id="div-img_inspeccion_item"></div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="col btn btn-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
       </div>
     </div>
     <!-- /.modal-content -->

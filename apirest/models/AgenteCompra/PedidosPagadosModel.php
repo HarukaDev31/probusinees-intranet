@@ -1,7 +1,9 @@
 <?php
 class PedidosPagadosModel extends CI_Model{
 	var $table = 'agente_compra_pedido_cabecera';
-	var $table_importacion_grupal_pedido_detalle = 'agente_compra_pedido_detalle';
+	var $table_agente_compra_pedido_detalle = 'agente_compra_pedido_detalle';
+	var $table_agente_compra_pedido_detalle_producto_proveedor = 'agente_compra_pedido_detalle_producto_proveedor';
+	var $table_agente_compra_pedido_detalle_producto_proveedor_imagen = 'agente_compra_pedido_detalle_producto_proveedor_imagen';
 	var $table_empresa = 'empresa';
 	var $table_organizacion = 'organizacion';
 	var $table_configuracion = 'configuracion';
@@ -17,6 +19,7 @@ class PedidosPagadosModel extends CI_Model{
 	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	var $table_pais = 'pais';
 	var $table_agente_compra_correlativo = 'agente_compra_correlativo';
+	var $table_agente_compra_pedido_detalle_producto_proveedor_inspeccion = 'agente_compra_pedido_detalle_producto_proveedor_inspeccion';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -32,7 +35,8 @@ class PedidosPagadosModel extends CI_Model{
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
-    	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
+    	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
+		->where($this->table . '.Nu_Estado>=', 5);
         
 		if(isset($this->order)) {
 			$order = $this->order;
@@ -45,28 +49,49 @@ class PedidosPagadosModel extends CI_Model{
         $query = $this->db->get();
         return $query->result();
     }
-    
+
     public function get_by_id($ID){
-        $this->db->select('P.No_Pais AS No_Pais_Cliente, DEP.No_Departamento, PRO.No_Provincia, DIS.No_Distrito,
-		EMP.No_Empresa, EMP.Txt_Direccion_Empresa, EMP.Nu_Documento_Identidad AS Nu_Documento_Identidad_Empresa,
-		CONFI.No_Logo_Empresa, CONFI.No_Imagen_Logo_Empresa, CONFI.Nu_Height_Logo_Ticket,
-		CONFI.Nu_Width_Logo_Ticket, ' . $this->table . '.*,
-		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
-		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
-		TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido, CONFI.Txt_Cuentas_Bancarias');
+        $this->db->select($this->table . '.ID_Pedido_Cabecera,
+		' . $this->table . '.ID_Entidad,
+		' . $this->table . '.ID_Empresa,
+		' . $this->table . '.ID_Organizacion,
+		' . $this->table . '.Nu_Correlativo,
+		' . $this->table . '.Fe_Emision_Cotizacion,
+		' . $this->table . '.Ss_Tipo_Cambio,
+		' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido,
+		CORRE.Fe_Month,
+		CLI.No_Contacto,
+		CLI.Txt_Email_Contacto,
+		CLI.Nu_Celular_Contacto,
+		CLI.No_Entidad,
+		CLI.Nu_Documento_Identidad,
+		ACPDPP.ID_Pedido_Detalle_Producto_Proveedor,
+		IGPD.ID_Pedido_Detalle,
+		IGPD.Txt_Url_Imagen_Producto,
+		IGPD.Txt_Producto,
+		ACPDPP.Qt_Producto_Caja_Final AS Qt_Producto,
+		ACPDPP.Ss_Precio,
+		ACPDPP.Nu_Dias_Delivery,
+		ACPDPP.Txt_Url_Archivo_Pago_1_Proveedor,
+		ACPDPP.Ss_Pago_1_Proveedor,
+		ACPDPP.Txt_Url_Archivo_Pago_2_Proveedor,
+		ACPDPP.Ss_Pago_2_Proveedor,
+		ACPDPP.Nu_Agrego_Inspeccion');
         $this->db->from($this->table);
-		$this->db->join($this->table_empresa . ' AS EMP', 'EMP.ID_Empresa = ' . $this->table . '.ID_Empresa', 'join');
-		$this->db->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join');
-		$this->db->join($this->table_departamento . ' AS DEP', 'DEP.ID_Departamento = EMP.ID_Departamento', 'join');
-		$this->db->join($this->table_provincia . ' AS PRO', 'PRO.ID_Provincia = EMP.ID_Provincia', 'join');
-		$this->db->join($this->table_distrito . ' AS DIS', 'DIS.ID_Distrito = EMP.ID_Distrito', 'join');
-		$this->db->join($this->table_organizacion . ' AS ORG', 'ORG.ID_Organizacion = ' . $this->table . '.ID_Organizacion', 'join');
-		$this->db->join($this->table_configuracion . ' AS CONFI', 'CONFI.ID_Empresa = EMP.ID_Empresa', 'join');
-    	$this->db->join($this->table_importacion_grupal_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
+    	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
+    	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');		
+    	$this->db->join($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP', 'ACPDPP.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera AND IGPD.ID_Pedido_Detalle=ACPDPP.ID_Pedido_Detalle', 'join');
     	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
-		$this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join');
         $this->db->where($this->table . '.ID_Pedido_Cabecera',$ID);
+		$this->db->where('ACPDPP.Nu_Selecciono_Proveedor',1);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function get_by_id_inspeccion($ID){
+        $this->db->select('ID_Pedido_Detalle_Producto_Inspeccion, Txt_Url_Imagen_Producto');
+        $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor_inspeccion);
+        $this->db->where($this->table_agente_compra_pedido_detalle_producto_proveedor_inspeccion . '.ID_Pedido_Detalle_Producto_Proveedor',$ID);
         $query = $this->db->get();
         return $query->result();
     }
@@ -75,32 +100,142 @@ class PedidosPagadosModel extends CI_Model{
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
-			if($Nu_Estado==2 && $id_correlativo==0){
-				//si es Nu_Estado=2 Garantizado crear correlativo de mes y año si no existe y asignar al pedido
-				$arrCorrelativo = $this->generarCorrelativo();
-				if($arrCorrelativo['status']=='success'){
-					$ID_Agente_Compra_Correlativo = $arrCorrelativo['result']['id_correlativo'];
-					$Nu_Correlativo = $arrCorrelativo['result']['numero_correlativo'];
-
-					//actualizar tabla para agregar correlativo
-					$data = array(
-						'ID_Agente_Compra_Correlativo' => $ID_Agente_Compra_Correlativo,
-						'Nu_Correlativo' => $Nu_Correlativo,
-						'Fe_Emision_Cotizacion' => dateNow('fecha'),
-						'Fe_Registro_Hora_Cotizacion' => dateNow('fecha_hora')
-					);
-					if ($this->db->update($this->table, $data, $where) > 0) {
-						return array('status' => 'success', 'message' => 'Correlativo generado');
-					} else {
-						return array('status' => 'error', 'message' => 'Error al asignar correlativo');
-					}
-				} else {
-					return $arrCorrelativo;
-				}
-			} else {
-				return array('status' => 'success', 'message' => 'Actualizado');
-			}
+			return array('status' => 'success', 'message' => 'Actualizado');
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }
+
+	public function cambiarEstadoChina($ID, $Nu_Estado){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Estado_China' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+	}
+    
+    public function addPagoProveedor($arrPost, $data_files){
+		if(!empty($arrPost)) {
+			if(isset($data_files['voucher_proveedor']) && !empty($data_files['voucher_proveedor']) && !empty($data_files['voucher_proveedor']['name'])) {
+				$this->db->trans_begin();
+
+				$path = "assets/images/pagos_proveedores/";
+				$config['upload_path'] = $path;
+				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+				$config['max_size'] = 3072;//1024 KB = 3 MB
+				$config['encrypt_name'] = TRUE;
+				$config['max_filename'] = '255';
+		
+				$this->load->library('upload', $config);
+
+				if (!$this->upload->do_upload('voucher_proveedor')){
+					$this->db->trans_rollback();
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo archivo proveedor ' . strip_tags($this->upload->display_errors()),
+					);
+				} else {
+					$arrUploadFile = $this->upload->data();
+					$Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
+
+					if($arrPost['proveedor-tipo_pago']==1) {
+						//actualizar tabla
+						$data = array(
+							'Txt_Url_Archivo_Pago_1_Proveedor' => $Txt_Url_Imagen_Proveedor,
+							'Ss_Pago_1_Proveedor' => $arrPost['amount_proveedor'],
+						);
+					} else if($arrPost['proveedor-tipo_pago']==2) {
+						//actualizar tabla
+						$data = array(
+							'Txt_Url_Archivo_Pago_2_Proveedor' => $Txt_Url_Imagen_Proveedor,
+							'Ss_Pago_2_Proveedor' => $arrPost['amount_proveedor'],
+						);
+					} else {
+						return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'No existe tipo de pago');
+					}
+
+					$where = array('ID_Pedido_Detalle_Producto_Proveedor' => $arrPost['proveedor-id']);
+					$this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where);
+				}
+			} else {
+				return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'No hay archivo');
+			}
+		} else {
+			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'No hay datos');
+		}
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
+		} else {
+			//$this->db->trans_rollback();
+			$this->db->trans_commit();
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
+		}
+	}
+	
+	public function getDownloadImage($id){
+		$query = "SELECT Txt_Url_Archivo_Pago_1_Proveedor AS Txt_Url_Imagen_Producto FROM " . $this->table_agente_compra_pedido_detalle_producto_proveedor . " WHERE ID_Pedido_Detalle_Producto_Proveedor = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+	public function addInspeccionProveedor($arrPost, $data_files){
+		if (isset($data_files['image_inspeccion']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/productos_proveedores_inspeccion/";
+			//capturando multiples imagenes por producto de proveedor
+			for ($i=0; $i < count($data_files['image_inspeccion']['name']); $i++) {
+				$_FILES['img_proveedor']['name'] = $data_files['image_inspeccion']['name'][$i];
+				$_FILES['img_proveedor']['type'] = $data_files['image_inspeccion']['type'][$i];
+				$_FILES['img_proveedor']['tmp_name'] = $data_files['image_inspeccion']['tmp_name'][$i];
+				$_FILES['img_proveedor']['error'] = $data_files['image_inspeccion']['error'][$i];
+				$_FILES['img_proveedor']['size'] = $data_files['image_inspeccion']['size'][$i];
+
+				$config['upload_path'] = $path;
+				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+				$config['max_size'] = 10240;//1024 KB = 10 MB
+				$config['encrypt_name'] = TRUE;
+				$config['max_filename'] = '255';
+
+				$this->load->library('upload', $config);
+
+				if (!$this->upload->do_upload('img_proveedor')){
+					$this->db->trans_rollback();
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+					);
+				} else {
+					$arrUploadFile = $this->upload->data();
+					$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+					$arrDetalleImagen[] = array(
+						'ID_Empresa' => $arrPost['proveedor-id_empresa'],
+						'ID_Organizacion' => $arrPost['proveedor-id_organizacion'],
+						'ID_Pedido_Cabecera' => $arrPost['proveedor-id_cabecera'],
+						'ID_Pedido_Detalle' => $arrPost['proveedor-id_detalle'],
+						'ID_Pedido_Detalle_Producto_Proveedor' => $arrPost['proveedor-id'],
+						'Txt_Url_Imagen_Producto' => $Txt_Url_Imagen_Producto,
+					);
+				}
+			}
+
+			$where = array('ID_Pedido_Detalle_Producto_Proveedor' => $arrPost['proveedor-id']);
+			$data = array( 'Nu_Agrego_Inspeccion' => 1 );//1=SI
+			$this->db->update('agente_compra_pedido_detalle_producto_proveedor', $data, $where);
+
+			$this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor_inspeccion', $arrDetalleImagen);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
+			}
+		} else {
+			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'No existe archivo(s)');
+		}
+	}
 }

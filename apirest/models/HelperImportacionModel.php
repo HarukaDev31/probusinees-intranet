@@ -52,7 +52,7 @@ class HelperImportacionModel extends CI_Model{
 		else if( $iEstado == 5 )
 			return array('No_Estado' => 'Inspección','No_Class_Estado' => 'secondary');
 		else if( $iEstado == 6 )
-			return array('No_Estado' => 'Entregado','No_Class_Estado' => 'primary');
+			return array('No_Estado' => 'Entregado','No_Class_Estado' => 'success');
 	}
 
 	public function getCategorias(){

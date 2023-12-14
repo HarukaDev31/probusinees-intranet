@@ -36,7 +36,8 @@ class PedidosGarantizadosModel extends CI_Model{
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
-		->where($this->table . '.Nu_Estado>=', 2);
+		->where($this->table . '.Nu_Estado>=', 2)
+		->where($this->table . '.Nu_Estado<', 5);
         
 		if(isset($this->order)) {
 			$order = $this->order;
