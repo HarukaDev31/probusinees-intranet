@@ -2,96 +2,7 @@ var url;
 var table_perfil_usuario;
 var accion_perfil_usuario;
 
-$(function () {
-  //$('.select2').select2();
-
-  /*
-	$(document).keyup(function(event){
-    if(event.which == 27){//ESC
-      $( "#modal-Perfil_Usuario" ).modal('hide');
-    }
-	});
-  */
-  
-  /*
-  url = base_url + 'PanelAcceso/PerfilUsuarioController/ajax_list';
-  table_perfil_usuario = $( '#table-Perfil_Usuario' ).DataTable({
-    'dom'       : 'B<"top">frt<"bottom"lp><"clear">',
-    buttons     : [{
-      extend    : 'excel',
-      text      : '<i class="fa fa-file-excel-o color_icon_excel"></i> Excel',
-      titleAttr : 'Excel',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'pdf',
-      text      : '<i class="fa fa-file-pdf-o color_icon_pdf"></i> PDF',
-      titleAttr : 'PDF',
-      exportOptions: {
-        columns: ':visible'
-      }
-    },
-    {
-      extend    : 'colvis',
-      text      : '<i class="fa fa-ellipsis-v"></i> Columnas',
-      titleAttr : 'Columnas',
-      exportOptions: {
-        columns: ':visible'
-      }
-    }],
-    'searching'   : false,
-    'bStateSave'  : true,
-    'processing'  : true,
-    'serverSide'  : true,
-    'info'        : true,
-    'autoWidth'   : false,
-    'pagingType'  : 'full_numbers',
-    'oLanguage' : {
-      'sInfo'               : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-      'sLengthMenu'         : '_MENU_',
-      'sSearch'             : 'Buscar por: ',
-      'sSearchPlaceholder'  : 'UPC / Nombre',
-      'sZeroRecords'        : 'No se encontraron registros',
-      'sInfoEmpty'          : 'No hay registros',
-      'sLoadingRecords'     : 'Cargando...',
-      'sProcessing'         : 'Procesando...',
-      'oPaginate'           : {
-        'sFirst'    : '<<',
-        'sLast'     : '>>',
-        'sPrevious' : '<',
-        'sNext'     : '>',
-      },
-    },
-    'order': [],
-    'ajax': {
-      'url'       : url,
-      'type'      : 'POST',
-      'dataType'  : 'json',
-      'data'      : function ( data ) {
-        data.filtro_empresa = $( '#cbo-filtro_empresa' ).val(),
-        data.filtro_organizacion = $( '#cbo-filtro_organizacion' ).val(),
-        data.Perfil_Usuario = $( '#cbo-Filtros_Perfil_Usuario' ).val(),
-        data.Global_Filter  = $( '#txt-Global_Filter' ).val();
-      },
-    },
-    'columnDefs': [{
-      'className' : 'text-center',
-      'targets'   : 'no-sort',
-      'orderable' : false,
-    },],
-    'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
-  });
-  
-  $( '.dataTables_length' ).addClass('col-md-3');
-  $( '.dataTables_paginate' ).addClass('col-md-9');
-
-  $( '#txt-Global_Filter' ).keyup(function() {
-    table_perfil_usuario.search($(this).val()).draw();
-  });
-  */
- 
+$(function () { 
   url = base_url + 'PanelAcceso/PerfilUsuarioController/ajax_list';
   table_perfil_usuario = $( '#table-Perfil_Usuario' ).DataTable({
     dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -151,8 +62,10 @@ $(function () {
       'type'      : 'POST',
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
-        data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
-        data.Global_Filter = $( '#txt-Global_Filter' ).val();
+        data.filtro_empresa = $( '#cbo-filtro_empresa' ).val(),
+        data.filtro_organizacion = $( '#cbo-filtro_organizacion' ).val(),
+        data.Perfil_Usuario = $( '#cbo-Filtros_Perfil_Usuario' ).val(),
+        data.Global_Filter  = $( '#txt-Global_Filter' ).val();
       },
     },
     'columnDefs': [
@@ -289,6 +202,7 @@ function agregarPerfilUsuario(){
   $( '#cbo-privilegio' ).html( '<option value="1">Personal Probusiness</option>' );
   $( '#cbo-privilegio' ).append( '<option value="2">Personal China</option>' );
   $( '#cbo-privilegio' ).append( '<option value="3">Proveedor Externo</option>' );
+  $( '#cbo-privilegio' ).append( '<option value="4">Cliente</option>' );
 }
 
 function verPerfilUsuario(ID_Grupo){
@@ -371,6 +285,11 @@ function verPerfilUsuario(ID_Grupo){
       if (response.Nu_Tipo_Privilegio_Acceso == '3')
         selected = 'selected="selected"';
       $('#cbo-privilegio').append('<option value="3" ' + selected + '>Proveedor Externo</option>');
+
+      selected = '';
+      if (response.Nu_Tipo_Privilegio_Acceso == '4')
+        selected = 'selected="selected"';
+      $('#cbo-privilegio').append('<option value="4" ' + selected + '>Cliente</option>');
       
       $( '#modal-Perfil_Usuario' ).modal('show');
       $( '.modal-title' ).text('Modifcar Perfil Usuario');

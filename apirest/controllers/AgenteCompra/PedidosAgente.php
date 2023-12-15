@@ -29,6 +29,7 @@ class PedidosAgente extends CI_Controller {
 	}
 
 	public function ajax_list(){
+		$sMethod = $this->input->post('sMethod');
 		$arrData = $this->PedidosAgenteModel->get_datatables();
         $data = array();
         foreach ($arrData as $row) {
@@ -61,7 +62,20 @@ class PedidosAgente extends CI_Controller {
 			$dropdown_estado .= '</div>';
             $rows[] = $dropdown_estado;
 
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			$btn_ver = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			if ( $this->MenuModel->verificarAccesoMenuInterno($sMethod)->Nu_Eliminar == 0)
+				$btn_ver = '';
+			$rows[] = $btn_ver;
+
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
+				$btn_asignar_usuario = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
+				if($row->ID_Usuario_Pedido){
+					$btn_asignar_usuario = '<span class="badge bg-secondary">Asignado</span>';
+					$btn_asignar_usuario .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Pedido . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+				}
+			}
+
+			$rows[] = $btn_asignar_usuario;
 			//$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
@@ -583,5 +597,15 @@ class PedidosAgente extends CI_Controller {
 			readfile($objPedido->Txt_Url_Imagen_Producto);
 			exit;
 		}
+	}
+
+	public function asignarPedido($ID){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosAgenteModel->asignarPedido($this->security->xss_clean($ID)));
+	}
+
+	public function removerAsignarPedido($ID, $id_usuario){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosAgenteModel->removerAsignarPedido($this->security->xss_clean($ID), $this->security->xss_clean($id_usuario)));
 	}
 }

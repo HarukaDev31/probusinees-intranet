@@ -32,6 +32,10 @@ class PedidosAgenteModel extends CI_Model{
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
         
+		if($this->user->Nu_Tipo_Privilegio_Acceso==4){//4=cliente
+			$this->db->where($this->table . '.ID_Usuario_Pedido',$this->user->ID_Usuario);
+		}
+
 		if(isset($this->order)) {
 			$order = $this->order;
 			$this->db->order_by(key($order), $order[key($order)]);
@@ -207,5 +211,47 @@ Nu_Correlativo
 			'status' => 'error',
 			'message' => 'Correlativo es: ' . $Nu_Correlativo
 		);
+	}
+
+	public function asignarPedido($ID){
+		$objPedido = $this->db->query("SELECT CLI.ID_Entidad, CLI.Txt_Email_Contacto FROM " . $this->table . " AS PC JOIN entidad AS CLI ON(PC.ID_Entidad=CLI.ID_Entidad) WHERE PC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1")->row();
+		$sCorreo = $objPedido->Txt_Email_Contacto;
+		
+		$objUser = $this->db->query("SELECT ID_Usuario FROM usuario WHERE No_Usuario = '" . $sCorreo . "' LIMIT 1")->row();
+
+		if(!is_object($objUser)){
+			return array(
+				'status' => 'error',
+				'message' => 'Usuario no existe. ' . $sCorreo
+			);
+		} else {
+			$where = array('ID_Pedido_Cabecera' => $ID);
+			$data = array( 'ID_Usuario_Pedido' => $objUser->ID_Usuario );
+			if ($this->db->update($this->table, $data, $where) > 0) {
+				$where = array('ID_Usuario' => $objUser->ID_Usuario);
+				$data = array( 'ID_Entidad' => $objPedido->ID_Entidad );
+				if ($this->db->update('usuario', $data, $where) > 0) {
+					return array('status' => 'success', 'message' => 'Pedido asignado');
+				} else {
+					return array('status' => 'error', 'message' => 'Error al enlazar usuario');
+				}
+			}
+			return array('status' => 'error', 'message' => 'Error al asignar pedido');
+		}
+	}
+
+	public function removerAsignarPedido($ID, $id_usuario){
+		$where = array('ID_Pedido_Cabecera' => $ID);
+		$data = array( 'ID_Usuario_Pedido' => 0 );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			$where = array('ID_Usuario' => $id_usuario);
+			$data = array( 'ID_Entidad' => 0 );
+			if ($this->db->update('usuario', $data, $where) > 0) {
+				return array('status' => 'success', 'message' => 'Elimino asignación');
+			} else {
+				return array('status' => 'error', 'message' => 'Error al eliminar asignación usuario');
+			}
+		}
+		return array('status' => 'error', 'message' => 'Error al eliminar asignación pedido');
 	}
 }

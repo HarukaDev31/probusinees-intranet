@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.105'; ?>
+<?php $iControlVersionDashboard = '1.0.110'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -115,6 +115,10 @@
 <?php if (isset($js_perfil_usuario) && $js_perfil_usuario==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/PanelAcceso/perfil_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
+<?php if (isset($js_usuario) && $js_usuario==true) : ?>
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/PanelAcceso/usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
 <?php if (isset($js_permiso_usuario) && $js_permiso_usuario==true) : ?>
 <script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/PanelAcceso/permiso_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
@@ -165,6 +169,17 @@
   </div>
 </div>
 
+<!-- Message Modal -->
+<div class="modal modal-message fade" id="modal-message">
+  <div class="modal-dialog">
+    <div class="modal-content" id="moda-message-content">
+      <div class="modal-header">
+        <h4 class="modal-title-message text-center"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

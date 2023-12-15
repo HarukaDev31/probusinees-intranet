@@ -4,14 +4,8 @@ var method;
 var accion_usuario;
 
 $(function () {
-  $('[data-mask]').inputmask();
-  
-	$(document).keyup(function(event){
-    if(event.which == 27){//ESC
-      $( "#modal-Usuario" ).modal('hide');
-    }
-	});
-  
+  //$('[data-mask]').inputmask();
+    
 	$(".toggle-password").click(function() {
 		$(this).toggleClass("fa-eye fa-eye-slash");
     var $pwd = $(".pwd");
@@ -23,12 +17,15 @@ $(function () {
   });
   
   $('.select2').select2();
+  
   url = base_url + 'PanelAcceso/UsuarioController/ajax_list';
   table = $( '#table-Usuario' ).DataTable({
-    'dom': 'B<"top">frt<"bottom"lip><"clear">',
+    dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+    "<'row'<'col-sm-12'tr>>" +
+    "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
     buttons     : [{
       extend    : 'excel',
-      text      : '<i class="fa fa-file-excel-o color_icon_excel"></i> Excel',
+      text      : '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
       titleAttr : 'Excel',
       exportOptions: {
         columns: ':visible'
@@ -36,7 +33,7 @@ $(function () {
     },
     {
       extend    : 'pdf',
-      text      : '<i class="fa fa-file-pdf-o color_icon_pdf"></i> PDF',
+      text      : '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
       titleAttr : 'PDF',
       exportOptions: {
         columns: ':visible'
@@ -50,23 +47,24 @@ $(function () {
         columns: ':visible'
       }
     }],
-    'searching'   : false,
-    'bStateSave'  : true,
-    'processing'  : true,
-    'serverSide'  : true,
-    'info'        : true,
-    'autoWidth'   : false,
+    "paging": true,
+    "lengthChange": true,
+    "searching": true,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": false,
     'pagingType'  : 'full_numbers',
     'oLanguage' : {
-      'sInfo'               : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-      'sLengthMenu'         : '_MENU_',
-      'sSearch'             : 'Buscar por: ',
-      'sSearchPlaceholder'  : 'UPC / Nombre',
-      'sZeroRecords'        : 'No se encontraron registros',
-      'sInfoEmpty'          : 'No hay registros',
-      'sLoadingRecords'     : 'Cargando...',
-      'sProcessing'         : 'Procesando...',
-      'oPaginate'           : {
+      'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
+      'sLengthMenu'        : '_MENU_',
+      'sSearch'            : 'Buscar por: ',
+      'sSearchPlaceholder' : '',
+      'sZeroRecords'       : 'No se encontraron registros',
+      'sInfoEmpty'         : 'No hay registros',
+      'sLoadingRecords'    : 'Cargando...',
+      'sProcessing'        : 'Procesando...',
+      'oPaginate'          : {
         'sFirst'    : '<<',
         'sLast'     : '>>',
         'sPrevious' : '<',
@@ -77,7 +75,7 @@ $(function () {
     'ajax': {
       'url'       : url,
       'type'      : 'POST',
-      'dataType'  : 'json',
+      'dataType'  : 'JSON',
       'data'      : function ( data ) {
         data.filtro_empresa = $( '#cbo-filtro_empresa' ).val(),
         data.filtro_organizacion = $( '#cbo-filtro_organizacion' ).val(),
@@ -85,7 +83,11 @@ $(function () {
         data.Global_Filter = $( '#txt-Global_Filter' ).val();
       },
     },
-    'columnDefs': [{
+    'columnDefs': [
+      {
+        'targets': 'no-hidden',
+        "visible": false, 
+      },{
       'className' : 'text-center',
       'targets'   : 'no-sort',
       'orderable' : false,
@@ -93,13 +95,9 @@ $(function () {
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
   
-  $('.dataTables_length').addClass('col-xs-4 col-sm-5 col-md-1');
-  $('.dataTables_info').addClass('col-xs-8 col-sm-7 col-md-4');
-  $('.dataTables_paginate').addClass('col-xs-12 col-sm-12 col-md-7');
-
-  $( '#txt-Global_Filter' ).keyup(function() {
-    table.search($(this).val()).draw();
-  });
+  $('#table-Usuario_filter input').removeClass('form-control-sm');
+  $('#table-Usuario_filter input').addClass('form-control-md');
+  $('#table-Usuario_filter input').addClass("width_full");
   
   $("#form-Usuario").validate({
 		rules:{
@@ -118,8 +116,8 @@ $(function () {
 				equalTo: '#No_Password'
 			},
 			Nu_Celular: {
-				minlength: 11,
-				maxlength: 11
+				minlength: 9,
+				maxlength: 9
 			},
 			Txt_Email: {
 				required: true,
@@ -220,10 +218,6 @@ $(function () {
       $( '#modal-loader' ).modal('hide');
     }, 'JSON');
   });
-
-  $(document).bind('keydown', 'f2', function(){
-    agregarUsuario();
-  });
 })
 
 function reload_table(){
@@ -249,14 +243,14 @@ function agregarUsuario(){
   $( '[name="ENu_Celular"]' ).val( '' );
   $( '[name="ETxt_Email"]' ).val( '' );
   
-  $( '#modal-loader' ).modal('show');
+  //$( '#modal-loader' ).modal('show');
   
   url = base_url + 'HelperController/getEmpresasTodo';
   $.post( url , function( response ){
     $( '#cbo-Empresas' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
     for (var i = 0; i < response.length; i++)
       $( '#cbo-Empresas' ).append( '<option value="' + response[i].ID_Empresa + '">' + response[i].No_Empresa + '</option>' );
-    $( '#modal-loader' ).modal('hide');
+    //$( '#modal-loader' ).modal('hide');
   }, 'JSON');
 
   url = base_url + 'HelperController/getOrganizaciones';
@@ -267,7 +261,7 @@ function agregarUsuario(){
     $( '#cbo-organizacion' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
     for (var i = 0; i < response.length; i++)
       $( '#cbo-organizacion' ).append( '<option value="' + response[i].ID_Organizacion + '">' + response[i].No_Organizacion + '</option>' );    
-    $( '#modal-loader' ).modal('hide');  
+    //$( '#modal-loader' ).modal('hide');  
   }, 'JSON');
 
   url = base_url + 'HelperController/getGrupos';
@@ -295,7 +289,7 @@ function verUsuario(ID_Usuario){
   
   $( '.help-block' ).empty();
  
-  $( '#modal-loader' ).modal('show');
+  //$( '#modal-loader' ).modal('show');
   
   url = base_url + 'PanelAcceso/UsuarioController/ajax_edit/' + ID_Usuario;
   $.ajax({
@@ -339,7 +333,7 @@ function verUsuario(ID_Usuario){
             selected = 'selected="selected"';
           $( '#cbo-organizacion' ).append( '<option value="' + responseGrupo[i].ID_Organizacion + '" ' + selected + '>' + responseGrupo[i].No_Organizacion + '</option>' );
         }
-        $( '#modal-loader' ).modal('hide');
+        //$( '#modal-loader' ).modal('hide');
       }, 'JSON');
 
       url = base_url + 'HelperController/getGrupos';
@@ -355,7 +349,7 @@ function verUsuario(ID_Usuario){
             selected = 'selected="selected"';
           $( '#cbo-Grupos' ).append( '<option value="' + responseGrupo[i].ID_Grupo + '" ' + selected + '>' + responseGrupo[i].No_Grupo + '</option>' );
         }
-        $( '#modal-loader' ).modal('hide');
+        //$( '#modal-loader' ).modal('hide');
       }, 'JSON');
       
       $( '[name="No_Usuario"]' ).val( response.No_Usuario );
@@ -374,7 +368,7 @@ function verUsuario(ID_Usuario){
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      $( '#modal-loader' ).modal('hide');
+      //$( '#modal-loader' ).modal('hide');
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
 	    
   	  $( '#modal-message' ).modal('show');
@@ -410,7 +404,7 @@ function form_Usuario(){
       $( '#btn-save' ).attr('disabled', true);
       $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
       
-      $( '#modal-loader' ).modal('show');
+      //$( '#modal-loader' ).modal('show');
       
       url = base_url + 'PanelAcceso/UsuarioController/crudUsuario';
     	$.ajax({
@@ -419,7 +413,7 @@ function form_Usuario(){
     		url		    : url,
     		data		  : $('#form-Usuario').serialize(),
     		success : function( response ){
-          $( '#modal-loader' ).modal('hide');
+          //$( '#modal-loader' ).modal('hide');
       
     	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
       	  $( '#modal-message' ).modal('show');
@@ -428,19 +422,14 @@ function form_Usuario(){
     		    accion_usuario='';
     		    
     		    $('#modal-Usuario').modal('hide');
-      	    $( '.modal-message' ).addClass(response.style_modal);
+      	    $('#moda-message-content').addClass('bg-' + response.status);
       	    $( '.modal-title-message' ).text(response.message);
       	    setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
-
-            if( $( '[name="hidden-sCorreUsuarioLink"]' ).val() != '' && $( '[name="hidden-sCorreUsuarioLink"]' ).val().length > 4 ){
-              window.location = base_url + 'PanelAcceso/UsuarioController/listarUsuarios';
-            } else {
-      	      reload_table();
-            }
+      	    reload_table();
     		  } else {
-      	    $( '.modal-message' ).addClass(response.style_modal);
+      	    $( '#moda-message-content' ).addClass('bg-danger');
       	    $( '.modal-title-message' ).text(response.message);
-      	    setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+      	    setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
     		  }
     	  
           $( '#btn-save' ).text('');
@@ -448,7 +437,7 @@ function form_Usuario(){
           $( '#btn-save' ).attr('disabled', false);
     		},
         error: function (jqXHR, textStatus, errorThrown) {
-          $( '#modal-loader' ).modal('hide');
+          //$( '#modal-loader' ).modal('hide');
     	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
     	    
       	  $( '#modal-message' ).modal('show');
@@ -489,7 +478,7 @@ function eliminarUsuario(ID, accion_usuario){
 }
 
 function _eliminarUsuario($modal_delete, ID){
-  $( '#modal-loader' ).modal('show');
+  //$( '#modal-loader' ).modal('show');
   
   url = base_url + 'PanelAcceso/UsuarioController/eliminarUsuario/' + ID;
   $.ajax({
@@ -497,7 +486,7 @@ function _eliminarUsuario($modal_delete, ID){
     type      : "GET",
     dataType  : "JSON",
     success: function(response){
-      $( '#modal-loader' ).modal('hide');
+      //$( '#modal-loader' ).modal('hide');
       
       $modal_delete.modal('hide');
       
@@ -518,7 +507,7 @@ function _eliminarUsuario($modal_delete, ID){
 		  }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      $( '#modal-loader' ).modal('hide');
+      //$( '#modal-loader' ).modal('hide');
       $modal_delete.modal('hide');
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
 	    

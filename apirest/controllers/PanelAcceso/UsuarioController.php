@@ -15,26 +15,17 @@ class UsuarioController extends CI_Controller {
 	public function listarUsuarios($sUsuario=''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('inicio');
 		if(isset($this->session->userdata['usuario'])) {
-			//$this->load->view('header');
-			$arrUrlTiendaVirtual = $this->ConfiguracionModel->obtenerUrlTiendaVirtual();
-			$arrPaisesUsuario = $this->ConfiguracionModel->obtenerPaisesUsuario();
-			$this->load->view('header', array(
-					"arrUrlTiendaVirtual" => $arrUrlTiendaVirtual,
-					"arrPaisesUsuario" => $arrPaisesUsuario
-				)
-			);
+			$this->load->view('header_v2');
 			$this->load->view('PanelAcceso/UsuarioView', array('sUsuario' => $sUsuario));
-			$this->load->view('footer', array("js_usuario" => true));
+			$this->load->view('footer_v2', array("js_usuario" => true));
 		}
 	}
 	
 	public function ajax_list(){
 		$arrData = $this->UsuarioModel->get_datatables();
         $data = array();
-        $no = $this->input->post('start');
         $action = 'delete';
         foreach ($arrData as $row) {
-            $no++;
             $rows = array();
 			if ( $this->user->ID_Usuario == 1 ){
 				$rows[] = $row->No_Empresa;
@@ -45,18 +36,15 @@ class UsuarioController extends CI_Controller {
             $rows[] = $row->No_Nombres_Apellidos;
 			
 			$arrEstadoRegistro = $this->HelperModel->obtenerEstadoRegistroArray($row->Nu_Estado);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 
-            $rows[] = (!empty($row->No_Grupo) ? '<button class="btn btn-xs btn-link btn-upd" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verUsuario(\'' . $row->ID_Usuario . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>' : '');
+            $rows[] = (!empty($row->No_Grupo) ? '<button class="btn btn-xs btn-link btn-upd" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verUsuario(\'' . $row->ID_Usuario . '\')"><i class="far fa-2x fa-edit" aria-hidden="true"></i></button>' : '');
 
 			$btn_elminar = '<button class="btn btn-xs btn-link btn-upd" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarUsuario(\'' . $row->ID_Usuario . '\', \'' . $action . '\')"><i class="fa fa-2x fa-trash-o" aria-hidden="true"></i></button>';
             $rows[] = ($row->ID_Usuario != 1 ? $btn_elminar : '');
             $data[] = $rows;
         }
         $output = array(
-	        "draw" => $this->input->post('draw'),
-	        "recordsTotal" => $this->UsuarioModel->count_all(),
-	        "recordsFiltered" => $this->UsuarioModel->count_filtered(),
 	        "data" => $data,
         );
         echo json_encode($output);
@@ -81,7 +69,7 @@ class UsuarioController extends CI_Controller {
     
 	public function crudUsuario(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-		$Nu_Celular = '';
+		$Nu_Celular = $this->input->post('Nu_Celular');
 		if ( $this->input->post('Nu_Celular') && strlen($this->input->post('Nu_Celular')) == 11){
 	        $Nu_Celular = explode(' ', $this->input->post('Nu_Celular'));
 	        $Nu_Celular = $Nu_Celular[0].$Nu_Celular[1].$Nu_Celular[2];

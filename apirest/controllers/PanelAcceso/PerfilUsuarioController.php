@@ -35,6 +35,8 @@ class PerfilUsuarioController extends CI_Controller {
 				$sNombrePrivilegioAcceso = 'Personal China';
 			} else if($row->Nu_Tipo_Privilegio_Acceso==3){
 				$sNombrePrivilegioAcceso = 'Proveedor externo';
+			} else if($row->Nu_Tipo_Privilegio_Acceso==4){
+				$sNombrePrivilegioAcceso = 'Cliente';
 			}
 
             $rows[] = '<span class="badge bg-secondary">' . $sNombrePrivilegioAcceso . '</span>';

@@ -19,6 +19,7 @@
         <div class="col-12">
           <div class="card">
             <div class="card-body">
+          	  <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control" value="<?php echo $this->router->method; ?>">
               <div class="table-responsive div-Listar">
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
@@ -29,16 +30,13 @@
                       <th>Cliente</th>
                       <th>Empresa</th>
                       <th class="no-sort">Excel</th>
-                      <!--<th class="no-sort">PDF</th>-->
                       <th>Estado</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
-                        <th class="no-sort">Ver</th>
+                      <th class="no-sort">Ver</th>
                       <?php endif; ?>
-                      <!--
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
-                        <th class="no-sort">Eliminar</th>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso==1) : ?>
+                      <th class="no-sort">User</th>
                       <?php endif; ?>
-                      -->
                     </tr>
                   </thead>
                 </table>
