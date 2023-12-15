@@ -134,7 +134,7 @@
                     </div>
                     
                     <div class="col-xs-12 col-sm-12 col-md-12">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-secondary"></span> Productos</h3>
+                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
 
                       <div class="table-responsive div-Compuesto">
                         <table id="table-Producto_Enlace" class="table table-hover">

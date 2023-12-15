@@ -145,7 +145,7 @@
                     </div>
                     
                     <div class="col-xs-12 col-sm-12 col-md-12">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-secondary"></span> Productos</h3>
+                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
 
                       <div class="table-responsive div-Compuesto">
                         <table id="table-Producto_Enlace" class="table table-hover">
@@ -191,16 +191,16 @@
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Detalle_item" name="EID_Pedido_Detalle_item" class="form-control">
-                  
+                                    
+                  <div id="div-arrItems" class="div-agregar_proveedor"></div>
+
                   <div class="row div-agregar_proveedor">
                     <div class="col-12 col-sm-12 col-md-12 shadow p-0" id="div-button-add_item">
                       <div class="d-grid gap">
-                        <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col">Agregar proveedor</button>
+                        <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col">Nuevo proveedor</button>
                       </div>
                     </div>
                   </div>
-                  
-                  <div id="div-arrItems" class="div-agregar_proveedor"></div>
 
                   <div class="row mt-4 div-agregar_proveedor">
                     <div class="col-6 col-md-6">

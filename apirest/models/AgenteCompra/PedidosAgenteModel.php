@@ -30,7 +30,8 @@ class PedidosAgenteModel extends CI_Model{
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
-    	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
+    	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
+		->where($this->table . '.Nu_Estado=', 1);
         
 		if($this->user->Nu_Tipo_Privilegio_Acceso==4){//4=cliente
 			$this->db->where($this->table . '.ID_Usuario_Pedido',$this->user->ID_Usuario);

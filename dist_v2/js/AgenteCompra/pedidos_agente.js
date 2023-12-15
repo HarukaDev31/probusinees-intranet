@@ -289,14 +289,14 @@ function verPedido(ID){
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = detalle[i]['Qt_Producto'];
         var id_item = detalle[i]['ID_Pedido_Detalle'];
-        var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "</a>" : "");
+        var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>Link</a>" : "");
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
           + "<td class='text-center td-name' width='50%'>"
             + "<img style='max-height: 350px;width: 100%; cursor:pointer' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid mb-2'>";
             if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-              table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span>"
+              table_enlace_producto += "<br><span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span>"
             }
           table_enlace_producto +=
           "</td>"

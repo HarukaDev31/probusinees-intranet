@@ -489,7 +489,7 @@ class PedidosAgente extends CI_Controller {
 			//$objPHPExcel->getActiveSheet()->freezePane('A' . $fila);//LINEA HORIZONTAL PARA SEPARAR CABECERA Y DETALLE
 				
 			$iCounter = 1;
-            foreach($data as $row) {				
+            foreach($data as $row) {
 				$html_data = array("&nbsp;");
 				$row->Txt_Descripcion =str_replace($html_data," ",$row->Txt_Descripcion);
 		
@@ -532,7 +532,8 @@ class PedidosAgente extends CI_Controller {
 				->setCellValue('C' . $fila, $row->Txt_Producto)
 				->setCellValue('D' . $fila, $row->Txt_Descripcion)
 				->setCellValue('E' . $fila, $row->Qt_Producto)
-				->setCellValue('F' . $fila, $row->Txt_Url_Link_Pagina_Producto)
+				->setCellValue('F' . $fila, 'Link')
+				//->setCellValue('F' . $fila, $row->Txt_Url_Link_Pagina_Producto)
 				;
 				
 				//$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(160);

@@ -548,14 +548,14 @@ function verPedido(ID){
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = detalle[i]['Qt_Producto'];
         var id_item = detalle[i]['ID_Pedido_Detalle'];
-        var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "</a>" : "");
+        var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>Link</a>" : "");
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
           + "<td class='text-center td-name' width='30%'>"
             + "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
             if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-              table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span>"
+              table_enlace_producto += "<br><span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span>"
             }
             if(response.Nu_Estado_China!=3) {//cotizacio china
               table_enlace_producto += '<button type="button" id="btn-add_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Proveedor</button>';
@@ -895,10 +895,10 @@ function addItems(){
   div_items += '<div id="card' + iCounterItems + '" class="card border-0 rounded shadow-sm mt-3">';
     div_items += '<div class="row">';
       div_items += '<div class="col-sm-12">';
-      div_items += '<div class="card-body">';
+      div_items += '<div class="card-body pt-3">';
       div_items += '<div class="row">';
         div_items += '<div class="col-11 col-sm-11 col-md-11 col-lg-11 mb-0 mb-sm-0">';
-          div_items += '<h6 class="text-left card-title mb-2 pt-3" style="text-align: left;">';
+          div_items += '<h6 class="text-left card-title mb-2 pt-0" style="text-align: left;">';
             div_items += '<span class="fw-bold" style="font-weight: bold;">Imagen<span class="label-advertencia text-danger"> *</span></span>';
           div_items += '</h6>';
           div_items += '<div class="form-group">';
@@ -909,6 +909,7 @@ function addItems(){
         div_items += '</div>';
         
         div_items += '<div class="col-1 col-sm-1 col-md-1 col-lg-1">';
+          div_items += '<span class="fw-bold" style="font-weight: bold;">&nbsp;</span>';
           div_items += '<div class="d-grid gap"><button type="button" id="btn-quitar_item_' + iCounterItems + '" class="btn btn-outline-danger btn-quitar_item col" data-id="' + iCounterItems + '">X</div>';
         div_items += '</div>';
 
@@ -971,7 +972,7 @@ function addItems(){
 
       div_items += '<div class="col-12 col-sm-6 mb-3">';
         div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-        div_items += '<span class="fw-bold">Nombre Provedor</span>';
+        div_items += '<span class="fw-bold">Nombre Proveedor</span>';
         div_items += '</h6>';
         div_items += '<div class="form-group">';
         div_items += '<input type="text" inputmode="text" id="modal-contacto_proveedor' + iCounterItems + '" name="addProducto[' + iCounterItems + '][contacto_proveedor]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off" />';
@@ -981,7 +982,7 @@ function addItems(){
 
       div_items += '<div class="col-12 col-sm-6 mb-3">';
         div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-        div_items += '<span class="fw-bold">Foto Provedor</span>';
+        div_items += '<span class="fw-bold">Foto Proveedor</span>';
         div_items += '</h6>';
         div_items += '<div class="form-group">';
         div_items += '<input class="form-control" id="modal-foto_proveedor' + iCounterItems + '" name="proveedor['+iCounterItems+']" type="file" accept="image/*"></input>';
