@@ -67,6 +67,7 @@ class PedidosAgente extends CI_Controller {
 				$btn_ver = '';
 			$rows[] = $btn_ver;
 
+			$btn_asignar_usuario = '';
 			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
 				$btn_asignar_usuario = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
 				if($row->ID_Usuario_Pedido){
