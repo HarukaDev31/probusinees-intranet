@@ -233,6 +233,11 @@ $(function () {
 	$(document).on('click', '.btn-agregar_pago_proveedor', function (e) {
     e.preventDefault();
 
+    $( '#form-agregar_pago_proveedor' )[0].reset();
+
+    $('#img_producto-preview1').html('');
+    $('#img_producto-preview1').attr('src', '');
+
     var id_empresa = $(this).data('id_empresa');
     var id_organizacion = $(this).data('id_organizacion');
     var id_cabecera = $(this).data('id_pedido_cabecera');
@@ -256,6 +261,8 @@ $(function () {
 
 	$(document).on('click', '.btn-agregar_inspeccion', function (e) {
     e.preventDefault();
+
+    $( '#form-agregar_inspeccion' )[0].reset();
 
     var id_empresa = $(this).data('id_empresa');
     var id_organizacion = $(this).data('id_organizacion');
@@ -469,11 +476,11 @@ function verPedido(ID){
           if( voucher_1 == '' || voucher_1 == null ){
             table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
           } else {
-            table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; (1) Pago ¥ ' + Ss_Pago_1_Proveedor +  '</button>';
+            table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_1_Proveedor +  ' (Deposit_#1)</button>';
             if( voucher_2 == '' || voucher_2 == null ){
               table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
             } else {
-              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; (2) Pago ¥ ' + Ss_Pago_2_Proveedor + '</button>';
+              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_2_Proveedor + ' (Deposit_#2)</button>';
             }
           }
         table_enlace_producto +=
@@ -860,6 +867,7 @@ function subirInspeccion(ID){
           if(detalle[i]['Nu_Agrego_Inspeccion']==0) {//0=No
             table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
           } else {
+            table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
             table_enlace_producto += '<button type="button" id="btn-ver_inspeccion' + id_item + '" onclick=verInspeccion(' + id_item + ') class="text-left btn btn-secondary btn-block btn-ver_inspeccion"><i class="fas fa-search"></i>&nbsp; Ver fotos</button>';
           }
         table_enlace_producto += "</td></tr>";
