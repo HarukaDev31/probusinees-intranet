@@ -71,3 +71,7 @@
   object-position: bottom;
   cursor: pointer;
 }
+
+.font-medium {
+  font-size: 1.3rem;
+}

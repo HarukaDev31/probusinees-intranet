@@ -552,22 +552,31 @@ function verPedido(ID){
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td class='text-center td-name' width='30%'>"
-            + "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+          + "<td class='text-center td-name' width='30%'>";
+            
+            table_enlace_producto += "<h6 class='font-weight-bold font-medium'>" + detalle[i]['Txt_Producto'] + "</h6>";
+
             if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-              table_enlace_producto += "<br><span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span>"
+              table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span><br>";
             }
-            if(response.Nu_Estado_China!=3) {//cotizacio china
-              table_enlace_producto += '<button type="button" id="btn-add_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Proveedor</button>';
-            } else {
-              table_enlace_producto += '<button type="button" id="btn-elegir_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-success btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
-            }
+
+            table_enlace_producto += "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+
           table_enlace_producto += "</td>"
-          + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
+          //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           + "<td class='text-left td-name' width='10%'>" + href_link + "</td>"
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
+        table_enlace_producto += "</tr>";
+
+        table_enlace_producto +=
+        "<tr><td class='text-center' colspan='4'>"
+          if(response.Nu_Estado_China!=3) {//cotizacio china
+            table_enlace_producto += '<button type="button" id="btn-add_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Proveedor</button>';
+          } else {
+            table_enlace_producto += '<button type="button" id="btn-elegir_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
+          }
         table_enlace_producto += "</tr>";
       }
       
@@ -1058,7 +1067,7 @@ function getItemProveedor(id_detalle){
         var cantidad = detalle[i]['Qt_Producto_Caja'];
         var nota = detalle[i]['Txt_Nota'];
         var cantidad_final = detalle[i]['Qt_Producto_Caja_Final'];
-        var nota_final = detalle[i]['Txt_Nota_Final'];
+        var nota_final = (detalle[i]['Txt_Nota_Final'] != '' && detalle[i]['Txt_Nota_Final'] != null ? detalle[i]['Txt_Nota_Final'] : '');
         var cantidad_html = (parseFloat(cantidad_final) > parseFloat(cantidad) ? cantidad_final : cantidad);
 
         if(id_item_tmp != id_item){

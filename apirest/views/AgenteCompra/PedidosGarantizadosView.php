@@ -148,12 +148,12 @@
                       <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
 
                       <div class="table-responsive div-Compuesto">
-                        <table id="table-Producto_Enlace" class="table table-hover">
-                          <thead>
+                        <table id="table-Producto_Enlace" class="table table-bordered table-hover table-striped">
+                          <thead class="thead-light">
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
                               <th class="text-left" width="50%">producto_imagen</th>
-                              <th class="text-left" width="20%">Nombre</th>
+                              <!--<th class="text-left" width="20%">Nombre</th>-->
                               <th class="text-left" width="20%">Características</th>
                               <!--<th class="text-right">Qty</th>-->
                               <th class="text-left" width="10%">Link</th>
@@ -230,8 +230,8 @@
                     <h3>Productos</h3>
 
                     <div class="table-responsive">
-                      <table id="table-elegir_productos_proveedor" class="table table-hover">
-                        <thead>
+                      <table id="table-elegir_productos_proveedor" class="table table-bordered table-hover table-striped">
+                        <thead class="thead-light">
                           <tr>
                             <th style='display:none;' class="text-left">ID</th>
                             <th class="text-left" width="">imagen</th>

@@ -4,6 +4,7 @@ $(function () {
 
   //Div ocultar / mostrar
   $( '#btn-cancelar' ).click(function() {
+    $('#span-id_pedido').html('');
     $( '.div-AgregarEditar' ).hide();
     $( '.div-Listar' ).show();
   })
