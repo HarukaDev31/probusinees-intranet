@@ -238,4 +238,50 @@ class PedidosPagadosModel extends CI_Model{
 			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'No existe archivo(s)');
 		}
 	}
+
+	public function addFileProveedor($arrPost, $data_files){
+		if (isset($data_files['image_documento']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/documento_entrega_cotizacion/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'xlsx|csv|xls|pdf|doc|docx';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('image_documento')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['documento-id_cabecera']);
+				$data = array( 'Txt_Url_Archivo_Documento_Entrega' => $Txt_Url_Imagen_Producto );//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarDocumentoEntregado($id){
+		$query = "SELECT Txt_Url_Archivo_Documento_Entrega AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
 }

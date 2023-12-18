@@ -595,7 +595,7 @@ function asignarPedido(ID) {
         $( '#btn-save-delete' ).append( 'Aceptar' );
         $( '#btn-save-delete' ).attr('disabled', false);
 
-        $('#moda-message-content').removeClass('modal-danger modal-warning modal-success');
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
         $('#modal-message').modal('show');
 
         if (response.status == 'success') {
@@ -639,7 +639,7 @@ function removerAsignarPedido(ID, id_usuario) {
         $( '#btn-save-delete' ).append( 'Aceptar' );
         $( '#btn-save-delete' ).attr('disabled', false);
 
-        $('#moda-message-content').removeClass('modal-danger modal-warning modal-success');
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
         $('#modal-message').modal('show');
 
         if (response.status == 'success') {

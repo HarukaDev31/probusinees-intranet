@@ -35,7 +35,7 @@ class PedidosPagados extends CI_Controller {
 			$rows = array();
 
             $rows[] = $row->No_Pais;
-            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . '-' . $row->Nu_Correlativo;
+            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             //$rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
@@ -81,6 +81,11 @@ class PedidosPagados extends CI_Controller {
 			$btn_entregado = '';
 			if($row->Nu_Estado_China==6)
 				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Documento entregado" title="Documento entregado" href="javascript:void(0)"  onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
+
+			if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
+				$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Documento entregado" title="Documento entregado" href="javascript:void(0)"  onclick="descargarDocumentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
+			}
+
 			$rows[] = $btn_entregado;
 
             $data[] = $rows;
@@ -161,7 +166,7 @@ class PedidosPagados extends CI_Controller {
 		//array_debug($data);
 
 		if( !empty($data) ){
-			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3)) . '-' . $data[0]->Nu_Correlativo;
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3)) . str_pad($data[0]->Nu_Correlativo,3,"0",STR_PAD_LEFT);
 			//GENERAR EXCEL
 			$this->load->library('Excel');
 	  			
@@ -172,6 +177,42 @@ class PedidosPagados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->setTitle('Orden Tracking Cot. ' . $sCorrelativoCotizacion);
 			
 			$hoja_activa = 0;
+	
+			$BStyle_top_general = array(
+				'borders' => array(
+					'top' => array(
+						'style' => PHPExcel_Style_Border::BORDER_THIN,
+						'color' => array('rgb' => '000000')
+					)
+				)
+			);
+		
+			$BStyle_left_general = array(
+				'borders' => array(
+					'left' => array(
+						'style' => PHPExcel_Style_Border::BORDER_THIN,
+						'color' => array('rgb' => '000000')
+					)
+				)
+			);
+		
+			$BStyle_right_general = array(
+				'borders' => array(
+					'right' => array(
+						'style' => PHPExcel_Style_Border::BORDER_THIN,
+						'color' => array('rgb' => '000000')
+					)
+				)
+			);
+		
+			$BStyle_bottom_general = array(
+				'borders' => array(
+					'bottom' => array(
+						'style' => PHPExcel_Style_Border::BORDER_THIN,
+						'color' => array('rgb' => '000000')
+					)
+				)
+			);
 		
 			$BStyle_top = array(
 			'borders' => array(
@@ -223,6 +264,16 @@ class PedidosPagados extends CI_Controller {
 			)
 			);
 			
+			$styleArray = array(
+				'borders' => array(
+					'allborders' => array(
+						'style' => PHPExcel_Style_Border::BORDER_THIN,
+						'color' => array('rgb' => 'FFFFFF')
+					)
+				)
+			);
+			$objPHPExcel->getDefaultStyle()->applyFromArray($styleArray);
+
 			//Title
 			$fila=3;
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':M' . $fila)->applyFromArray($BStyle_top);
@@ -250,6 +301,13 @@ class PedidosPagados extends CI_Controller {
 					)
 				)
 			);
+
+			$objPHPExcel->getActiveSheet()->getStyle('B3:M3')->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('B3')->applyFromArray($BStyle_left_general);
+			$objPHPExcel->getActiveSheet()->getStyle('M3')->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('B4')->applyFromArray($BStyle_left_general);
+			$objPHPExcel->getActiveSheet()->getStyle('M4')->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('B4:M4')->applyFromArray($BStyle_bottom_general);
 
 			$fila = 6;
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':M' . $fila)->applyFromArray($BStyle_top);
@@ -297,6 +355,55 @@ class PedidosPagados extends CI_Controller {
 			->setCellValue('L' . $fila, 'SUPPLIER')
 			->setCellValue('M' . $fila, 'PHONE NUMBER')
 			;
+
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_left_general);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_bottom_general);
+
+			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_bottom_general);
 
 			$objPHPExcel->getActiveSheet()
 			->getStyle('B' . $fila . ':' . 'M' . $fila)
@@ -358,6 +465,66 @@ class PedidosPagados extends CI_Controller {
 				->setCellValue('K' . $fila, $row->Nu_Dias_Delivery)
 				;
 				
+				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('L' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('L' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('L' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('L' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_bottom_general);
+
 				$objPHPExcel->getActiveSheet()
 				->getStyle('H' . $fila)
 				->applyFromArray(
@@ -409,6 +576,14 @@ class PedidosPagados extends CI_Controller {
 			
 			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila . ':J' . $fila)->applyFromArray($style_align_right);
 
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_left_general);
+			$objPHPExcel->getActiveSheet()->getStyle('J' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('H' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':J' . $fila)->applyFromArray($BStyle_bottom_general);
+
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
             ->setCellValue('F' . $fila, 'TOTAL')
             ->setCellValue('G' . $fila, numberFormat($fSumGeneralAmount, 2, '.', ','))
@@ -458,5 +633,38 @@ class PedidosPagados extends CI_Controller {
     	
 	public function ajax_edit_inspeccion($ID){
         echo json_encode($this->PedidosPagadosModel->get_by_id_inspeccion($this->security->xss_clean($ID)));
+    }
+
+	public function addFileProveedor(){
+		//array_debug($this->input->post());
+		//array_debug($_FILES);
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->addFileProveedor($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarDocumentoEntregado($id){
+		//echo "hola";
+		$objPedido = $this->PedidosPagadosModel->descargarDocumentoEntregado($this->security->xss_clean($id));
+		//array_debug($objPedido);
+		
+		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+		$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+		//$file="assets/img/arturo.jpeg";
+		if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+			die('file not found');
+		} else {
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+			header('Content-Transfer-Encoding: binary');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+			ob_clean();
+			flush();
+			readfile($objPedido->Txt_Url_Imagen_Producto);
+			exit;
+		}
     }
 }

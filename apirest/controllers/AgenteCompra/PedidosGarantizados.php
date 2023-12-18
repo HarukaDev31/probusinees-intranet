@@ -35,7 +35,7 @@ class PedidosGarantizados extends CI_Controller {
 			$rows = array();
 
             $rows[] = $row->No_Pais;
-            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . '-' . $row->Nu_Correlativo;
+            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
@@ -296,7 +296,7 @@ class PedidosGarantizados extends CI_Controller {
 			);
 			$objPHPExcel->getDefaultStyle()->applyFromArray($styleArray);
 
-			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3)) . '-' . $data[0]->Nu_Correlativo;
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3))  . str_pad($data[0]->Nu_Correlativo,3,"0",STR_PAD_LEFT);
 	  			
 			$objPHPExcel->getActiveSheet()->setTitle('Cot. ' . $sCorrelativoCotizacion);
 			$fileNameExcel = "Proforma_Trading_" . $sCorrelativoCotizacion . ".xls";
@@ -429,6 +429,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_right_general);
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_bottom_general);
+			
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_top_general);
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_right_general);
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_bottom_general);
@@ -1064,7 +1065,7 @@ class PedidosGarantizados extends CI_Controller {
 			);
 			$objPHPExcel->getDefaultStyle()->applyFromArray($styleArray);
 
-			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3)) . '-' . $data[0]->Nu_Correlativo;
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3))  . str_pad($data[0]->Nu_Correlativo,3,"0",STR_PAD_LEFT);
 
 			$fileNameExcel = "Proforma_C_Trading_" . $sCorrelativoCotizacion . ".xls";
 			
@@ -1198,6 +1199,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_right_general);
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_bottom_general);
+
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_top_general);
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_right_general);
 			$objPHPExcel->getActiveSheet()->getStyle('C' . $fila)->applyFromArray($BStyle_bottom_general);

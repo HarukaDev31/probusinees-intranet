@@ -338,6 +338,46 @@ $(function () {
       });
     }
   });
+  
+
+  $("#form-documento_entrega").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('image_documento').files.length == 0) {
+      $('#image_documento').closest('.form-group').find('.help-block').html('Empty file');
+      $('#image_documento').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-documento_entrega")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addFileProveedor',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-documento_entrega').modal('hide');
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          //setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          //reload_table_Entidad();
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
 
   $('#span-id_pedido').html('');
 })
@@ -870,4 +910,18 @@ function verInspeccion(ID){
       console.log(jqXHR.responseText);
     }
   })
+}
+
+function documentoEntregado(id){
+  $( '[name="documento-id_cabecera"]' ).val(id);
+
+  $('#modal-documento_entrega').modal('show');
+  $( '#form-documento_entrega' )[0].reset();
+}
+
+function descargarDocumentoEntregado(id){
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarDocumentoEntregado/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
 }

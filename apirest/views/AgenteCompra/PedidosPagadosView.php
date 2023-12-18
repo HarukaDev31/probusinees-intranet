@@ -134,8 +134,8 @@
                       <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
 
                       <div class="table-responsive div-Compuesto">
-                        <table id="table-Producto_Enlace" class="table table-hover">
-                          <thead>
+                        <table id="table-Producto_Enlace" class="table table-bordered table-hover table-striped">
+                          <thead class="thead-light">
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
                               <th class="text-left" width="50%">Product_Photo</th>
@@ -305,3 +305,33 @@
   <!-- /.modal-dialog -->
 </div>
 <!-- /.modal imagen del item -->
+
+<!-- modal documento -->
+<div class="modal fade modal-documento_entrega" id="modal-documento_entrega">
+  <?php $attributes = array('id' => 'form-documento_entrega'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-documento_entrega">
+        <div class="row">
+          <input type="hidden" id="documento-id_cabecera" name="documento-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Documento</label>
+            <div class="form-group">
+              <input class="form-control" id="image_documento" name="image_documento" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_documento_entrega" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar pagos -->
