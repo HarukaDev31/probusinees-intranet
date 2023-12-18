@@ -136,11 +136,10 @@
                     </div>
                     
                     <div class="col-12 col-sm-12 col-md-12 mb-3" id="div-button-add_item">
-                      <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col shadow">Agregar artículo</button>
+                      <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col shadow">Agregar producto</button>
                     </div>
 
                     <div class="col-12 col-sm-12 col-md-12 mb-3 div-articulos">
-                      <h2 class="text-center mt-3 fw-bold">Artículos</h2>
                       <div id="div-arrItems"></div>
                     </div>
 

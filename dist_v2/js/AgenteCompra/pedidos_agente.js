@@ -693,8 +693,8 @@ function addItems(){
     div_items += '<div class="row">';
       div_items += '<div class="col-sm-4 position-relative text-center ps-4 pe-3 pe-sm-0">';
         div_items += '<div class="col-sm-12">';
-          div_items += '<h6 class="text-left card-title mb-2 pt-3" style="text-align: left;">';
-            div_items += '<span class="fw-bold">Imagen</span>';
+          div_items += '<h6 class="text-left card-title pt-3" style="text-align: left;">';
+            div_items += '<label class="fw-bold">Imagen</label>';
           div_items += '</h6>';
           div_items += '<div class="form-group">';
             div_items += '<label class="btn btn btn-outline-secondary" for="voucher' + iCounter + '" style="width: 100%;">';
@@ -707,18 +707,18 @@ function addItems(){
       div_items += '</div>';
     
       div_items += '<div class="col-sm-8">';
-        div_items += '<div class="card-body">';
+        div_items += '<div class="card-body pb-0">';
           div_items += '<div class="row">';
             div_items += '<div class="col-sm-12 mb-3">';
               div_items += '<h6 class="card-title">';
-                div_items += '<span class="fw-bold">Nombre Comercial</span>';
+                div_items += '<label class="fw-bold">Nombre Comercial</label>';
               div_items += '</h6>';
               div_items += '<input type="text" inputmode="text" id="modal-nombre_comercial' + iCounter + '" name="addProducto[' + iCounter + '][nombre_comercial]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off">';
             div_items += '</div>';
             
-            div_items += '<div class="col-sm-12 mb-3">';
+            div_items += '<div class="col-sm-12 mb-0">';
               div_items += '<h6 class="card-title">';
-                div_items += '<span class="fw-bold">Características</span>';
+                div_items += '<label class="fw-bold">Características</label>';
               div_items += '</h6>';
               div_items += '<div class="form-group">';
                 div_items += '<textarea class="arrProducto form-control required caracteristicas" placeholder="" id="modal-caracteristicas' + iCounter + '" name="addProducto[' + iCounter + '][caracteristicas]" style="height: 100px"></textarea>';
@@ -726,9 +726,9 @@ function addItems(){
               div_items += '</div>';
             div_items += '</div>';
             
-            div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3">';
+            div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-0">';
               div_items += '<h6 class="card-title">';
-                div_items += '<span class="fw-bold">Cantidad</span>';
+                div_items += '<label class="fw-bold">Cantidad</label>';
               div_items += '</h6>';
               div_items += '<div class="form-group">';
                 div_items += '<input type="text" id="modal-cantidad' + iCounter + '" inputmode="decimal" name="addProducto[' + iCounter + '][cantidad]" class="arrProducto form-control cantidad input-decimal" placeholder="" value="" autocomplete="off">';
@@ -736,9 +736,9 @@ function addItems(){
               div_items += '</div>';
             div_items += '</div>';
             
-            div_items += '<div class="col-12 col-sm-9 col-md-9 col-lg-10 mb-1">';
+            div_items += '<div class="col-12 col-sm-9 col-md-9 col-lg-10 mb-0">';
               div_items += '<h6 class="card-title">';
-                div_items += '<span class="fw-bold">Link</span>';
+                div_items += '<label class="fw-bold">Link</label>';
               div_items += '</h6>';
               div_items += '<div class="form-group">';
                 div_items += '<input type="text" inputmode="url" id="modal-link' + iCounter + '" name="addProducto[' + iCounter + '][link]" class="arrProducto form-control link" placeholder="" autocomplete="off" autocapitalize="none">';
