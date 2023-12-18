@@ -1,4 +1,4 @@
-var url, table_Entidad;
+var url, table_Entidad, div_items = '', iCounter = 1;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^\|";
 // Se puede crear un arreglo a partir de la cadena
@@ -9,6 +9,15 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 // FIN AUTOCOMPLETE
 
 $(function () {
+  $(document).on('click', '#btn-add_item', function (e) {
+    e.preventDefault();
+    addItems();
+
+    $( '.div-articulos' ).show();
+    //$('#div-button-add_item').removeClass('mt-2');
+    //$('#div-button-add_item').addClass('mt-4');
+  })
+
   //Global Autocomplete
   $( '.autocompletar' ).autoComplete({
     minChars: 0,
@@ -241,7 +250,8 @@ function reload_table_Entidad(){
   table_Entidad.ajax.reload(null,false);
 }
 
-function verPedido(ID){  
+function verPedido(ID){
+  $( '.div-articulos' ).hide();
   $( '.div-Listar' ).hide();
   
   $( '#form-pedido' )[0].reset();
@@ -308,8 +318,8 @@ function verPedido(ID){
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           + "<td class='text-left td-name' width='10%'>" + href_link + "</td>"
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
+          //table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
+          //table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
         table_enlace_producto += "</tr>";
       }
       
@@ -461,29 +471,36 @@ function form_pedido(){
     $( '#btn-save' ).attr('disabled', true);
     $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
     
+    var postData = new FormData($("#form-pedido")[0]);
+    //$('#form-pedido').serialize(),
+
     url = base_url + 'AgenteCompra/PedidosAgente/crudPedidoGrupal';
     $.ajax({
-      type		  : 'POST',
-      dataType	: 'JSON',
-      url		    : url,
-      data		  : $('#form-pedido').serialize(),
-      success : function( response ){      
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        $( '#modal-message' ).modal('show');
+      type		    : 'POST',
+      dataType	  : 'JSON',
+  		url		      : url,
+  		data		    : postData,
+      mimeType    : "multipart/form-data",
+      contentType : false,
+      cache       : false,
+      processData : false,
+      success : function( response ){
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
         
         if (response.status == 'success'){
           $( '#form-pedido' )[0].reset();
           
           $( '.div-AgregarEditar' ).hide();
           $( '.div-Listar' ).show();
-          $( '.modal-message' ).addClass(response.style_modal);
-          $( '.modal-title-message' ).text(response.message);
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
           setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
           reload_table_Entidad();
         } else {
-          $( '.modal-message' ).addClass(response.style_modal);
-          $( '.modal-title-message' ).text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
         }
         
         $( '#btn-save' ).text('');
@@ -658,4 +675,137 @@ function removerAsignarPedido(ID, id_usuario) {
       }
     });
   });
+}
+
+function addItems(){
+  div_items = '';
+
+  //visible para mostrar a publico
+  div_items += '<div id="card' + iCounter + '" class="card border-0 rounded shadow mt-3">';
+    div_items += '<div class="row">';
+      div_items += '<div class="col-sm-4 position-relative text-center ps-4 pe-3 pe-sm-0">';
+        div_items += '<div class="col-sm-12">';
+          div_items += '<h6 class="text-left card-title mb-2 pt-3" style="text-align: left;">';
+            div_items += '<span class="fw-bold">Imagen</span>';
+          div_items += '</h6>';
+          div_items += '<div class="form-group">';
+            div_items += '<label class="btn btn btn-outline-secondary" for="voucher' + iCounter + '" style="width: 100%;">';
+              div_items += '<input class="arrProducto form-control voucher" id="voucher' + iCounter + '" type="file" style="display:none" name="voucher[]" data-id="' + iCounter + '" onchange="loadFile(event, ' + iCounter + ')" placeholder="sin archivo" accept="image/*">Agregar foto';
+            div_items += '</label>';
+            div_items += '<span class="help-block text-danger" id="error"></span>';
+          div_items += '</div>';
+        div_items += '</div>';
+        div_items += '<img id="img_producto-preview' + iCounter + '" src="" class="arrProducto img-thumbnail border-0 rounded" alt="">'; //cart-size-img
+      div_items += '</div>';
+    
+      div_items += '<div class="col-sm-8">';
+        div_items += '<div class="card-body">';
+          div_items += '<div class="row">';
+            div_items += '<div class="col-sm-12 mb-3">';
+              div_items += '<h6 class="card-title">';
+                div_items += '<span class="fw-bold">Nombre Comercial</span>';
+              div_items += '</h6>';
+              div_items += '<input type="text" inputmode="text" id="modal-nombre_comercial' + iCounter + '" name="addProducto[' + iCounter + '][nombre_comercial]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off">';
+            div_items += '</div>';
+            
+            div_items += '<div class="col-sm-12 mb-3">';
+              div_items += '<h6 class="card-title">';
+                div_items += '<span class="fw-bold">Características</span>';
+              div_items += '</h6>';
+              div_items += '<div class="form-group">';
+                div_items += '<textarea class="arrProducto form-control required caracteristicas" placeholder="" id="modal-caracteristicas' + iCounter + '" name="addProducto[' + iCounter + '][caracteristicas]" style="height: 100px"></textarea>';
+                div_items += '<span class="help-block text-danger" id="error"></span>';
+              div_items += '</div>';
+            div_items += '</div>';
+            
+            div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3">';
+              div_items += '<h6 class="card-title">';
+                div_items += '<span class="fw-bold">Cantidad</span>';
+              div_items += '</h6>';
+              div_items += '<div class="form-group">';
+                div_items += '<input type="text" id="modal-cantidad' + iCounter + '" inputmode="decimal" name="addProducto[' + iCounter + '][cantidad]" class="arrProducto form-control cantidad input-decimal" placeholder="" value="" autocomplete="off">';
+                div_items += '<span class="help-block text-danger" id="error"></span>';
+              div_items += '</div>';
+            div_items += '</div>';
+            
+            div_items += '<div class="col-12 col-sm-9 col-md-9 col-lg-10 mb-1">';
+              div_items += '<h6 class="card-title">';
+                div_items += '<span class="fw-bold">Link</span>';
+              div_items += '</h6>';
+              div_items += '<div class="form-group">';
+                div_items += '<input type="text" inputmode="url" id="modal-link' + iCounter + '" name="addProducto[' + iCounter + '][link]" class="arrProducto form-control link" placeholder="" autocomplete="off" autocapitalize="none">';
+                div_items += '<span class="help-block text-danger" id="error"></span>';
+              div_items += '</div>';
+            div_items += '</div>';
+          div_items += '</div>';
+        div_items += '</div>';
+      div_items += '</div>';
+
+      div_items += '<div class="col-sm-12 ps-4 mb-3 pe-4">';
+        div_items += '<div class="d-grid gap">';
+          div_items += '<button type="button" id="btn-quitar_item_'+iCounter+'" class="btn btn-outline-danger btn-quitar_item col" data-id="'+iCounter+'">Quitar</button>';
+        div_items += '</div>';
+      div_items += '</div>';
+    div_items += '</div>';
+  div_items += '</div>';
+
+  $( '#div-arrItems' ).append(div_items);
+  
+  validateNumberLetter();
+  validateDecimal();
+
+  ++iCounter;
+}
+
+function loadFile(event, id){
+  var output = document.getElementById('img_producto-preview' + id);
+  output.src = URL.createObjectURL(event.target.files[0]);
+  output.onload = function() {
+    URL.revokeObjectURL(output.src) // free memory
+  }
+
+  window.mobileCheck = function() {
+    let check = false;
+    (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+    return check;
+  };
+
+  //if(iOS==true && window.mobileCheck()==true){
+  if(window.mobileCheck()==true){
+    scrollToIOS($("html, body"), $('#modal-nombre_comercial' + id));
+  }
+
+  $('#modal-nombre_comercial' + id).focus();
+  $('#modal-nombre_comercial' + id).select();
+}
+
+function iOS() {
+  return [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ].includes(navigator.platform)
+  // iPad on iOS 13 detection
+  || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+}
+
+function scrollToError( $sMetodo, $IdElemento ){
+  $sMetodo.animate({
+    scrollTop: $IdElemento.offset().top - 100
+  }, 'slow');
+}
+
+function scrollToErrorHTML( $sMetodo, $IdElemento ){
+  $sMetodo.animate({
+    scrollTop: $IdElemento.offset().top + 450
+  }, 'slow');
+}
+
+function scrollToIOS( $sMetodo, $IdElemento ){
+  $sMetodo.animate({
+    scrollTop: $IdElemento.offset().top
+  }, 'slow');
 }

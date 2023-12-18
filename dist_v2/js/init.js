@@ -79,3 +79,22 @@ function ParseDateString(fecha, tipo_fecha, caracter){
   }
 })();
 
+function validateNumberLetter(){
+  $( '.input-number_letter' ).unbind();
+  $( '.input-number_letter' ).on('input', function () {
+    this.value = this.value.replace(/[^a-zA-Z0-9]/g,'');
+  });
+}
+
+function validateDecimal(){
+  $( '.input-decimal' ).unbind();
+  $( '.input-decimal' ).on('input', function () {
+    numero = parseFloat(this.value);
+    if(!isNaN(numero)){
+      this.value = this.value.replace(/[^0-9\.]/g,'');
+      if (numero < 0)
+        this.value = '';
+    } else
+      this.value = this.value.replace(/[^0-9\.]/g,'');
+  });
+}

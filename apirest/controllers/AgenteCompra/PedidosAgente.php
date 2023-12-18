@@ -97,6 +97,7 @@ class PedidosAgente extends CI_Controller {
 
 	public function crudPedidoGrupal(){
 		//array_debug($this->input->post());
+		//array_debug($_FILES);
 		
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		$data = array(

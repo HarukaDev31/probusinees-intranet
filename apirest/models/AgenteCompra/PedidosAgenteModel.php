@@ -108,61 +108,70 @@ class PedidosAgenteModel extends CI_Model{
 	}
     
     public function actualizarPedido($where, $data, $arrProducto){
+		//array_debug($where);
+		//array_debug($data);
+		//array_debug($arrProducto);
+		//array_debug($_FILES);
+
 		$this->db->trans_begin();
 		
-		//actualizar cliente
-		$data_cliente = array(
-			'Nu_Documento_Identidad' => $data['Nu_Documento_Identidad'],
-			'No_Entidad' => $data['No_Entidad'],
-			'Nu_Celular_Entidad' => $data['Nu_Celular_Entidad'],
-			'Txt_Email_Entidad' => $data['Txt_Email_Entidad'],
-		);
-		$where_cliente = array(
-			'ID_Entidad' => $where['ID_Entidad'],
-		);
-		$this->db->update($this->table_cliente, $data_cliente, $where_cliente);
-
-		$this->db->where('ID_Pedido_Cabecera', $where['ID_Pedido_Cabecera']);
-		$this->db->delete($this->table_importacion_grupal_pedido_detalle);
+		//$this->db->where('ID_Pedido_Cabecera', $where['ID_Pedido_Cabecera']);
+		//$this->db->delete('agente_compra_pedido_detalle');
 		
-		$fImporteTotal = 0;
-		$fCantidadTotal = 0;
+		//localhost
+		$path = "assets/images/productos/";
+		//$path = "../../agentecompra.probusiness.pe/public_html/assets/images/productos/";
+        $iCounter=0;
+        $_FILES['tmp_voucher'] = $_FILES['voucher'];
+		
 		foreach($arrProducto as $row) {
-			$fImporteTotal += $row['total_item'];
-			$fCantidadTotal += $row['cantidad_item'];
+            //SET IMAGEN
+            $_FILES['voucher']['name'] = $_FILES['tmp_voucher']['name'][$iCounter];
+            $_FILES['voucher']['type'] = $_FILES['tmp_voucher']['type'][$iCounter];
+            $_FILES['voucher']['tmp_name'] = $_FILES['tmp_voucher']['tmp_name'][$iCounter];
+            $_FILES['voucher']['error'] = $_FILES['tmp_voucher']['error'][$iCounter];
+            $_FILES['voucher']['size'] = $_FILES['tmp_voucher']['size'][$iCounter];
+
+            $config['upload_path'] = $path;
+            $config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+            $config['max_size'] = 3096;//1024 KB = 1 MB
+            $config['encrypt_name'] = TRUE;
+            $config['max_filename'] = '255';
+    
+            $this->load->library('upload', $config);
+
+            if (!$this->upload->do_upload('voucher')){
+                $this->db->trans_rollback();
+                return array(
+                    'status' => 'error',
+                    'message' => 'No se cargo imagen ' . $row['nombre_comercial'] . ' ' . strip_tags($this->upload->display_errors()),
+                );
+            } else {
+                $arrUploadFile = $this->upload->data();
+                $Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+            }
 
 			$arrSaleOrderDetail[] = array(
                 'ID_Empresa' => $data['ID_Empresa'],
                 'ID_Organizacion' => $data['ID_Organizacion'],
 				'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-				'ID_Producto' => $row['id_item'],
-				'ID_Unidad_Medida' => $row['id_unidad_medida'],
-				'ID_Unidad_Medida_Precio' => $row['id_unidad_medida_2'],
-				'Qt_Producto' => $row['cantidad_item'],
-				'Ss_Precio' => $row['precio_item'],
-				'Ss_SubTotal' => $row['total_item'],
-				'Ss_Impuesto' => 0,
-				'Ss_Total' => $row['total_item'],
+                'Txt_Producto' => $row['nombre_comercial'],
+                'Txt_Descripcion' => nl2br($row['caracteristicas']),
+				'Qt_Producto' => $row['cantidad'],
+                'Txt_Url_Imagen_Producto' => $Txt_Url_Imagen_Producto,
+                'Txt_Url_Link_Pagina_Producto' => $row['link'],
 			);
+            ++$iCounter;
 		}
-		$this->db->insert_batch($this->table_importacion_grupal_pedido_detalle, $arrSaleOrderDetail);
-
-		//actualizar cabecera
-		$data_cabecera = array(
-			'Ss_Total' => $fImporteTotal,
-			'Qt_Total' => $fCantidadTotal,
-		);
-		$where_cabecera = array(
-			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-		);
-		$this->db->update($this->table, $data_cabecera, $where_cabecera);
+		$this->db->insert_batch('agente_compra_pedido_detalle', $arrSaleOrderDetail);
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
-			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+			return array('status' => 'error', 'message' => 'Error al modificar');
 		} else {
+			//$this->db->trans_rollback();
 			$this->db->trans_commit();
-			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+			return array('status' => 'success', 'message' => 'Registro modificado');
 		}
     }
 	

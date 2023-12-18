@@ -44,7 +44,9 @@
               
               <div class="box-body div-AgregarEditar">
                 <?php
-                $attributes = array('id' => 'form-pedido');
+                //$attributes = array('id' => 'form-pedido');
+                //echo form_open('', $attributes);
+                $attributes = array('id' => 'form-pedido', 'enctype' => 'multipart/form-data');
                 echo form_open('', $attributes);
                 ?>
                   <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
@@ -133,6 +135,15 @@
                       </div>
                     </div>
                     
+                    <div class="col-12 col-sm-12 col-md-12 mb-3" id="div-button-add_item">
+                      <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col shadow">Agregar artículo</button>
+                    </div>
+
+                    <div class="col-12 col-sm-12 col-md-12 mb-3 div-articulos">
+                      <h2 class="text-center mt-3 fw-bold">Artículos</h2>
+                      <div id="div-arrItems"></div>
+                    </div>
+
                     <div class="col-xs-12 col-sm-12 col-md-12">
                       <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
 
