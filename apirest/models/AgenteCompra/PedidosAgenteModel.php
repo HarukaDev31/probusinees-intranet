@@ -150,6 +150,9 @@ class PedidosAgenteModel extends CI_Model{
             } else {
                 $arrUploadFile = $this->upload->data();
                 $Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$Txt_Url_Imagen_Producto = str_replace("https://intranet.probusiness.pe/../../", "https://", $Txt_Url_Imagen_Producto);
+				$Txt_Url_Imagen_Producto = str_replace("public_html/", "", $Txt_Url_Imagen_Producto);
             }
 
 			$arrSaleOrderDetail[] = array(
