@@ -497,15 +497,21 @@ $(function () {
         //$('#btn-save_detalle_item_proveedor').prop('disabled', false);
         //$('#btn-save_detalle_item_proveedor').html('Guardar');
 
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
         console.log(response);
         if(response.status=='success'){
-          alert(response.message);
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
 
           $('.div-Listar').hide();
           $('.div-AgregarEditar').show();
           $('#div-add_item_proveedor').hide();
         } else {
-          alert(response.message);
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          //alert(response.message);
         }
       });
     }
