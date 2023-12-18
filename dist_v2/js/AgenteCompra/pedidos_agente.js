@@ -260,7 +260,7 @@ function verPedido(ID){
   $( '.div-articulos' ).hide();
   $( '.div-Listar' ).hide();
   
-  $('#div-arrItems').html();
+  $('#div-arrItems').html('');
 
   $( '#form-pedido' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
