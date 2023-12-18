@@ -154,7 +154,7 @@
                               <th style='display:none;' class="text-left">ID</th>
                               <th class="text-left" width="50%">producto_imagen</th>
                               <!--<th class="text-left" width="20%">Nombre</th>-->
-                              <th class="text-left" width="20%">Características</th>
+                              <th class="text-left" width="20%">Características_producto</th>
                               <!--<th class="text-right">Qty</th>-->
                               <th class="text-left" width="10%">Link</th>
                               <!--<th class="text-center"></th>-->

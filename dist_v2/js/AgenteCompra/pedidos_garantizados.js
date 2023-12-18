@@ -265,13 +265,21 @@ $(function () {
       type: "GET",
       dataType: "JSON",
       success: function(response){
-        console.log(response);
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
         if(response.status=='success'){
-          alert(response.message);
+          //alert(response.message);
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+
           $( '#table-elegir_productos_proveedor tbody' ).empty();
           getItemProveedor(id_detalle);
         } else {
-          alert(response.message);
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -300,13 +308,22 @@ $(function () {
       type: "GET",
       dataType: "JSON",
       success: function(response){
-        console.log(response);
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+        
         if(response.status=='success'){
-          alert(response.message);
+          //alert(response.message);
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+
           $( '#table-elegir_productos_proveedor tbody' ).empty();
           getItemProveedor(id_detalle);
         } else {
-          alert(response.message);
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+          //alert(response.message);
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -577,7 +594,7 @@ function verPedido(ID){
           } else {
             table_enlace_producto += '<button type="button" id="btn-elegir_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
           }
-        table_enlace_producto += "</tr>";
+        table_enlace_producto += "</td></tr>";
       }
       
       $('#span-total_cantidad_items').html(i);
@@ -969,17 +986,17 @@ function addItems(){
       div_items += '<input type="text" inputmode="numeric" id="modal-delivery' + iCounterItems + '" name="addProducto[' + iCounterItems + '][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
       div_items += '</div>';
 
-      div_items += '<div class="col-sm-12 mb-3">';
+      div_items += '<div class="col-sm-12 mb-1">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
       div_items += '<span class="fw-bold">Observaciones</span>';
       div_items += '</h6>';
       div_items += '<div class="form-group">';
-      div_items += '<textarea class="arrProducto form-control required nota" placeholder="Opcional" id="modal-nota' + iCounterItems + '" name="addProducto[' + iCounterItems + '][nota]" style="height: 100px;"></textarea>';
+      div_items += '<textarea class="arrProducto form-control required nota" rows="1" placeholder="Opcional" id="modal-nota' + iCounterItems + '" name="addProducto[' + iCounterItems + '][nota]" style="height: 50px;"></textarea>';
       div_items += '<span class="help-block text-danger" id="error"></span>';
       div_items += '</div>';
       div_items += '</div>';
 
-      div_items += '<div class="col-12 col-sm-6 mb-3">';
+      div_items += '<div class="col-12 col-sm-6 mb-1">';
         div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
         div_items += '<span class="fw-bold">Nombre Proveedor</span>';
         div_items += '</h6>';
@@ -989,7 +1006,7 @@ function addItems(){
         div_items += '</div>';
       div_items += '</div>';
 
-      div_items += '<div class="col-12 col-sm-6 mb-3">';
+      div_items += '<div class="col-12 col-sm-6 mb-0">';
         div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
         div_items += '<span class="fw-bold">Foto Proveedor</span>';
         div_items += '</h6>';
@@ -1083,15 +1100,6 @@ function getItemProveedor(id_detalle){
               }
             }
 
-            if(detalle[i]['Nu_Selecciono_Proveedor']==0){
-              table_enlace_producto += '<button type="button" id="btn-seleccionar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-plus-square"></i>&nbsp; marcar proveedor</button>';
-            } else {
-              table_enlace_producto += '<button type="button" id="btn-desmarcar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-plus-square"></i>&nbsp; desmarcar proveedor</button>';
-              table_enlace_producto += '<input type="hidden" id="modal-id_detalle' + i + '" name="addProducto[' + i + '][id_detalle]" class="form-control" value="' + id_item + '">';
-              table_enlace_producto += '<input type="hidden" id="modal-cantidad_oculta' + i + '" name="addProducto[' + i + '][cantidad_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Caja'] + '">';
-              table_enlace_producto += '<input type="text" id="modal-cantidad' + i + '" data-correlativo="' + i + '" inputmode="numeric" name="addProducto[' + i + '][cantidad]" class="arrProducto form-control required cantidad input-numeric mt-3" placeholder="Cantidad" value="' + cantidad_html + '" autocomplete="off" />';
-              table_enlace_producto += '<textarea id="modal-nota' + i + '" name="addProducto[' + i + '][nota]" class="mt-3 form-control required nota" placeholder="Observaciones" style="height: 100px;">' + nota_final + '</textarea>';
-            }
             table_enlace_producto += "</td>";
 
             table_enlace_producto +=
@@ -1103,6 +1111,20 @@ function getItemProveedor(id_detalle){
             + "<td class='text-left td-delivery'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
             + "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
           table_enlace_producto += "</tr>";
+          
+          table_enlace_producto +=
+          "<tr><td class='text-center' colspan='9'>"
+            if(detalle[i]['Nu_Selecciono_Proveedor']==0){
+              table_enlace_producto += '<button type="button" id="btn-seleccionar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-check"></i>&nbsp; marcar proveedor</button>';
+            } else {
+              table_enlace_producto += '<button type="button" id="btn-desmarcar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-times"></i>&nbsp; desmarcar proveedor</button>';
+              table_enlace_producto += '<input type="hidden" id="modal-id_detalle' + i + '" name="addProducto[' + i + '][id_detalle]" class="form-control" value="' + id_item + '">';
+              table_enlace_producto += '<input type="hidden" id="modal-cantidad_oculta' + i + '" name="addProducto[' + i + '][cantidad_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Caja'] + '">';
+              table_enlace_producto += '<input type="text" id="modal-cantidad' + i + '" data-correlativo="' + i + '" inputmode="numeric" name="addProducto[' + i + '][cantidad]" class="arrProducto form-control required cantidad input-numeric mt-3" placeholder="Cantidad" value="' + cantidad_html + '" autocomplete="off" />';
+              table_enlace_producto += '<textarea id="modal-nota' + i + '" name="addProducto[' + i + '][nota]" class="mt-3 form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + nota_final + '</textarea>';
+            }
+          table_enlace_producto += "</td></tr>";
+
           id_item_tmp = id_item;
         }
       }

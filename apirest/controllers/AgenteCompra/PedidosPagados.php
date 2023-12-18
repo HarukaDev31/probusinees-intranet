@@ -69,7 +69,7 @@ class PedidosPagados extends CI_Controller {
             $rows[] = $dropdown_estado;//china
 			
 			//Pagos
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-money-bill fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
 
 			//inspeccion
 			$btn_inspeccion = '';
@@ -80,10 +80,10 @@ class PedidosPagados extends CI_Controller {
 			//entregado
 			$btn_entregado = '';
 			if($row->Nu_Estado_China==6)
-				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Documento entregado" title="Documento entregado" href="javascript:void(0)"  onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
+				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
 
 			if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
-				$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Documento entregado" title="Documento entregado" href="javascript:void(0)"  onclick="descargarDocumentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
+				$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="descargarDocumentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
 			}
 
 			$rows[] = $btn_entregado;

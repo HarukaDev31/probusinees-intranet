@@ -368,8 +368,8 @@ $(function () {
 
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
-          //setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
-          //reload_table_Entidad();
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -450,17 +450,6 @@ function verPedido(ID){
           + "<td class='text-center td-name' width='50%'>"
             + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
             
-            if( voucher_1 == '' || voucher_1 == null ){
-              table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; Pagar Proveedor</button>';
-            } else {
-              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; (1) Pago ¥ ' + Ss_Pago_1_Proveedor +  '</button>';
-              if( voucher_2 == '' || voucher_2 == null ){
-                table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; Pagar Proveedor</button>';
-              } else {
-                table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fa fa-money-bill"></i>&nbsp; (2) Pago ¥ ' + Ss_Pago_2_Proveedor + '</button>';
-              }
-            }
-
           table_enlace_producto += "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
@@ -474,6 +463,21 @@ function verPedido(ID){
           +"<td class='text-left td-phone'></td>"
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
         table_enlace_producto += "</tr>";
+        
+        table_enlace_producto +=
+        "<tr><td class='text-left' colspan='12'>"
+          if( voucher_1 == '' || voucher_1 == null ){
+            table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
+          } else {
+            table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; (1) Pago ¥ ' + Ss_Pago_1_Proveedor +  '</button>';
+            if( voucher_2 == '' || voucher_2 == null ){
+              table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
+            } else {
+              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; (2) Pago ¥ ' + Ss_Pago_2_Proveedor + '</button>';
+            }
+          }
+        table_enlace_producto +=
+        "</td></tr>";
       }
       
       $('#span-total_cantidad_items').html(i);
@@ -837,12 +841,6 @@ function subirInspeccion(ID){
           + "<td class='text-center td-name' width='30%'>"
             + "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
             
-            if(detalle[i]['Nu_Agrego_Inspeccion']==0) {//0=No
-              table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-search"></i>&nbsp; Subir fotos / videos</button>';
-            } else {
-              table_enlace_producto += '<button type="button" id="btn-ver_inspeccion' + id_item + '" onclick=verInspeccion(' + id_item + ') class="btn btn-secondary btn-block btn-ver_inspeccion"><i class="fas fa-search"></i>&nbsp; ver fotos / videos</button>';
-            }
-
           table_enlace_producto += "</td>"
           +"<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
           +"<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
@@ -856,6 +854,15 @@ function subirInspeccion(ID){
           +"<td class='text-left td-phone'></td>"
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
         table_enlace_producto += "</tr>";
+
+        table_enlace_producto +=
+        "<tr><td class='text-left' colspan='12'>"
+          if(detalle[i]['Nu_Agrego_Inspeccion']==0) {//0=No
+            table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
+          } else {
+            table_enlace_producto += '<button type="button" id="btn-ver_inspeccion' + id_item + '" onclick=verInspeccion(' + id_item + ') class="text-left btn btn-secondary btn-block btn-ver_inspeccion"><i class="fas fa-search"></i>&nbsp; Ver fotos</button>';
+          }
+        table_enlace_producto += "</td></tr>";
       }
       
       $('#span-total_cantidad_items').html(i);

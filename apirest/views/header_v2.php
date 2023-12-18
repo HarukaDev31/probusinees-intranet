@@ -28,7 +28,7 @@
 
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=6.1.0'; ?>">
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=6.2.0'; ?>">
 
   <meta name="theme-color" content="#FF6700">
   <meta name="msapplication-navbutton-color" content="#FF6700"/>
@@ -77,11 +77,6 @@
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         <!-- Messages Dropdown Menu -->
-        <li class="nav-item">
-          <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-            <i class="fas fa-expand-arrows-alt"></i>
-          </a>
-        </li>
         <li class="nav-item">
           <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
             <i class="fas fa-th-large"></i>

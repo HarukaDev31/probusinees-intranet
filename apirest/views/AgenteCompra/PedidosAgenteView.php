@@ -137,13 +137,13 @@
                       <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
 
                       <div class="table-responsive div-Compuesto">
-                        <table id="table-Producto_Enlace" class="table table-hover">
-                          <thead>
+                        <table id="table-Producto_Enlace" class="table table-bordered table-hover table-striped">
+                          <thead class="thead-light">
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
                               <th class="text-left" width="50%">producto_imagen</th>
-                              <th class="text-left" width="20%">Nombre</th>
-                              <th class="text-left" width="20%">Características</th>
+                              <!--<th class="text-left" width="20%">Nombre</th>-->
+                              <th class="text-left" width="20%">Características_producto</th>
                               <!--<th class="text-right">Qty</th>-->
                               <th class="text-left" width="10%">Link</th>
                               <!--<th class="text-center"></th>-->
@@ -190,10 +190,10 @@
         <div class="col-xs-12 text-center">
           <img class="img-responsive img-fluid" style=" display: block; margin-left: auto; margin-right: auto;" src="">
         </div>
-        <a id="a-download_image" class="mt-4 btn btn-primary btn-lg btn-block" data-id_item="">Descargar</a>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="col btn btn-danger btn-lg btn-block" data-dismiss="modal">Salir</button>
+        <a id="a-download_image" class="col btn btn-primary btn-lg btn-block" data-id_item="">Descargar</a>
       </div>
     </div>
     <!-- /.modal-content -->

@@ -73,5 +73,32 @@
 }
 
 .font-medium {
-  font-size: 1.3rem;
+  font-size: 1rem;
+}
+
+@media (min-width: 576px) {
+  .font-medium {
+    font-size: 1rem;
+  }
+}
+
+/* md */
+@media (min-width: 768px) {
+  .font-medium {
+    font-size: 1.3rem;
+  }
+}
+
+/* lg */
+@media (min-width: 992px) {
+  .font-medium {
+    font-size: 1.3rem;
+  }
+}
+
+/* xl */
+@media (min-width: 1200px) {
+  .font-medium {
+    font-size: 1.3rem;
+  }
 }
