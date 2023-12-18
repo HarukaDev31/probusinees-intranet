@@ -63,7 +63,7 @@ class PedidosAgente extends CI_Controller {
             $rows[] = $dropdown_estado;
 
 			$btn_ver = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-			if ( $this->MenuModel->verificarAccesoMenuInterno($sMethod)->Nu_Eliminar == 0)
+			if ( $this->MenuModel->verificarAccesoMenuInterno($sMethod)->Nu_Editar == 0)
 				$btn_ver = '';
 			$rows[] = $btn_ver;
 
