@@ -119,8 +119,9 @@ class PedidosAgenteModel extends CI_Model{
 		//$this->db->delete('agente_compra_pedido_detalle');
 		
 		//localhost
-		$path = "assets/images/productos/";
-		//$path = "../../agentecompra.probusiness.pe/public_html/assets/images/productos/";
+		//$path = "assets/images/productos/";
+		//cloud
+		$path = "../../agentecompra.probusiness.pe/public_html/assets/images/productos/";
         $iCounter=0;
         $_FILES['tmp_voucher'] = $_FILES['voucher'];
 		
