@@ -9,6 +9,12 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 // FIN AUTOCOMPLETE
 
 $(function () {
+  $(document).on('click', '.btn-quitar_item', function (e) {
+    e.preventDefault();
+    //alert($(this).data('id'));
+    $('#card' + $(this).data('id')).remove();
+	})
+
   $(document).on('click', '#btn-add_item', function (e) {
     e.preventDefault();
     addItems();
@@ -254,6 +260,8 @@ function verPedido(ID){
   $( '.div-articulos' ).hide();
   $( '.div-Listar' ).hide();
   
+  $('#div-arrItems').html();
+
   $( '#form-pedido' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
   $( '.form-group' ).removeClass('has-success');
