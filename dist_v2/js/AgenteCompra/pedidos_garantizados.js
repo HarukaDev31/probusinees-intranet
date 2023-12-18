@@ -400,20 +400,20 @@ $(function () {
       url		    : url,
       data		  : $('#form-arrItemsProveedor').serialize(),
       success : function( response ){
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        $( '#modal-message' ).modal('show');
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
         
         if (response.status == 'success'){
           $('.div-Listar').hide();
           $('.div-AgregarEditar').show();
           $('#div-elegir_item_proveedor').hide();
 
-          $( '.modal-message' ).addClass(response.style_modal);
-          $( '.modal-title-message' ).text(response.message);
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
           setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
         } else {
-          $( '.modal-message' ).addClass(response.style_modal);
-          $( '.modal-title-message' ).text(response.message);
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
           setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
         }
         
@@ -480,8 +480,8 @@ $(function () {
     //validacion de articulos
     
     if(sEstadoArticulos==true) {
-      //$('#btn-save_detalle_item_proveedor').prop('disabled', true);
-      //$('#btn-save_detalle_item_proveedor').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando');
+      $('#btn-save_detalle_item_proveedor').prop('disabled', true);
+      $('#btn-save_detalle_item_proveedor').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando');
 
       var postData = new FormData($("#form-arrItems")[0]);
       console.log(postData);
@@ -494,8 +494,8 @@ $(function () {
         contentType: false
       })
       .done(function(response) {
-        //$('#btn-save_detalle_item_proveedor').prop('disabled', false);
-        //$('#btn-save_detalle_item_proveedor').html('Guardar');
+        $('#btn-save_detalle_item_proveedor').prop('disabled', false);
+        $('#btn-save_detalle_item_proveedor').html('Guardar');
 
         $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
         $('#modal-message').modal('show');
