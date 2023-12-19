@@ -175,7 +175,7 @@ class ClienteController extends CI_Controller {
 			$rows[] = $row->Txt_Direccion_Entidad;
 			$rows[] = allTypeDate($row->Fe_Registro, '-', 0);
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
-            $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCliente(\'' . $row->ID_Entidad . '\', \'' . $row->Nu_Documento_Identidad . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Empresa . '\', \'' . $row->ID_Entidad . '\', \'' . ( $row->Nu_Documento_Identidad != '' ? $row->Nu_Documento_Identidad : '-') . '\', \'' . $action . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
