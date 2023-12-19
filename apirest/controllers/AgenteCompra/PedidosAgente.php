@@ -114,7 +114,8 @@ class PedidosAgente extends CI_Controller {
 					'ID_Entidad' => $this->input->post('EID_Entidad'),
 				),
 				$data,
-				$this->input->post('addProducto')
+				$this->input->post('addProducto'),
+				$this->input->post('addProductoTable')
 			)
 		);
 	}

@@ -107,7 +107,7 @@ class PedidosAgenteModel extends CI_Model{
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
 	}
     
-    public function actualizarPedido($where, $data, $arrProducto){
+    public function actualizarPedido($where, $data, $arrProducto, $arrProductoTable){
 		//array_debug($where);
 		//array_debug($data);
 		//array_debug($arrProducto);
@@ -121,53 +121,71 @@ class PedidosAgenteModel extends CI_Model{
 		//localhost
 		//$path = "assets/images/productos/";
 		//cloud
-		$path = "../../agentecompra.probusiness.pe/public_html/assets/images/productos/";
-        $iCounter=0;
-        $_FILES['tmp_voucher'] = $_FILES['voucher'];
 		
-		foreach($arrProducto as $row) {
-            //SET IMAGEN
-            $_FILES['voucher']['name'] = $_FILES['tmp_voucher']['name'][$iCounter];
-            $_FILES['voucher']['type'] = $_FILES['tmp_voucher']['type'][$iCounter];
-            $_FILES['voucher']['tmp_name'] = $_FILES['tmp_voucher']['tmp_name'][$iCounter];
-            $_FILES['voucher']['error'] = $_FILES['tmp_voucher']['error'][$iCounter];
-            $_FILES['voucher']['size'] = $_FILES['tmp_voucher']['size'][$iCounter];
+		//agregar productos de tabla de cliente
+		if (!empty($arrProducto)) {
+			$path = "../../agentecompra.probusiness.pe/public_html/assets/images/productos/";
+			$iCounter=0;
+			$_FILES['tmp_voucher'] = $_FILES['voucher'];
+			
+			foreach($arrProducto as $row) {
+				//SET IMAGEN
+				$_FILES['voucher']['name'] = $_FILES['tmp_voucher']['name'][$iCounter];
+				$_FILES['voucher']['type'] = $_FILES['tmp_voucher']['type'][$iCounter];
+				$_FILES['voucher']['tmp_name'] = $_FILES['tmp_voucher']['tmp_name'][$iCounter];
+				$_FILES['voucher']['error'] = $_FILES['tmp_voucher']['error'][$iCounter];
+				$_FILES['voucher']['size'] = $_FILES['tmp_voucher']['size'][$iCounter];
 
-            $config['upload_path'] = $path;
-            $config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
-            $config['max_size'] = 3096;//1024 KB = 1 MB
-            $config['encrypt_name'] = TRUE;
-            $config['max_filename'] = '255';
-    
-            $this->load->library('upload', $config);
+				$config['upload_path'] = $path;
+				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+				$config['max_size'] = 3096;//1024 KB = 1 MB
+				$config['encrypt_name'] = TRUE;
+				$config['max_filename'] = '255';
+		
+				$this->load->library('upload', $config);
 
-            if (!$this->upload->do_upload('voucher')){
-                $this->db->trans_rollback();
-                return array(
-                    'status' => 'error',
-                    'message' => 'No se cargo imagen ' . $row['nombre_comercial'] . ' ' . strip_tags($this->upload->display_errors()),
-                );
-            } else {
-                $arrUploadFile = $this->upload->data();
-                $Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+				if (!$this->upload->do_upload('voucher')){
+					$this->db->trans_rollback();
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen ' . $row['nombre_comercial'] . ' ' . strip_tags($this->upload->display_errors()),
+					);
+				} else {
+					$arrUploadFile = $this->upload->data();
+					$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
 
-				$Txt_Url_Imagen_Producto = str_replace("https://intranet.probusiness.pe/../../", "https://", $Txt_Url_Imagen_Producto);
-				$Txt_Url_Imagen_Producto = str_replace("public_html/", "", $Txt_Url_Imagen_Producto);
-            }
+					$Txt_Url_Imagen_Producto = str_replace("https://intranet.probusiness.pe/../../", "https://", $Txt_Url_Imagen_Producto);
+					$Txt_Url_Imagen_Producto = str_replace("public_html/", "", $Txt_Url_Imagen_Producto);
+				}
 
-			$arrSaleOrderDetail[] = array(
-                'ID_Empresa' => $data['ID_Empresa'],
-                'ID_Organizacion' => $data['ID_Organizacion'],
-				'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-                'Txt_Producto' => $row['nombre_comercial'],
-                'Txt_Descripcion' => nl2br($row['caracteristicas']),
-				'Qt_Producto' => $row['cantidad'],
-                'Txt_Url_Imagen_Producto' => $Txt_Url_Imagen_Producto,
-                'Txt_Url_Link_Pagina_Producto' => $row['link'],
-			);
-            ++$iCounter;
+				$arrSaleOrderDetail[] = array(
+					'ID_Empresa' => $data['ID_Empresa'],
+					'ID_Organizacion' => $data['ID_Organizacion'],
+					'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+					'Txt_Producto' => $row['nombre_comercial'],
+					'Txt_Descripcion' => nl2br($row['caracteristicas']),
+					'Qt_Producto' => $row['cantidad'],
+					'Txt_Url_Imagen_Producto' => $Txt_Url_Imagen_Producto,
+					'Txt_Url_Link_Pagina_Producto' => $row['link'],
+				);
+				++$iCounter;
+			}
+			$this->db->insert_batch('agente_compra_pedido_detalle', $arrSaleOrderDetail);
 		}
-		$this->db->insert_batch('agente_compra_pedido_detalle', $arrSaleOrderDetail);
+
+		//actualizar productos de tabla de cliente
+		if (!empty($arrProductoTable)) {
+			foreach($arrProductoTable as $row) {
+				//array_debug($row);
+				$arrSaleOrderDetailUPD[] = array(
+					'ID_Pedido_Detalle' => $row['id_item'],
+					'Qt_Producto' => $row['cantidad'],
+					'Txt_Descripcion' => nl2br($row['caracteristicas']),
+				);
+			}
+
+    		$this->db->update_batch('agente_compra_pedido_detalle', $arrSaleOrderDetailUPD, 'ID_Pedido_Detalle');
+		}
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();

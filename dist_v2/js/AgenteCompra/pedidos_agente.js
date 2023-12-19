@@ -316,16 +316,27 @@ function verPedido(ID){
             table_enlace_producto += "<h6 class='font-weight-bold font-medium'>" + detalle[i]['Txt_Producto'] + "</h6>";
             
             if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-              table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span><br>";
+              //table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span><br>";
+              table_enlace_producto += '<div class="row">';
+                table_enlace_producto += '<div class="col text-right">';
+                  table_enlace_producto += "<span class='mt-3'>Cantidad</span>";
+                table_enlace_producto += '</div>';
+                table_enlace_producto += '<div class="col">';
+                  table_enlace_producto += '<input type="hidden" name="addProductoTable[' + id_item + '][id_item]" value="' + id_item + '">';
+                  table_enlace_producto += '<input type="text" inputmode="decimal" class="form-control input-decimal" name="addProductoTable[' + id_item + '][cantidad]" value="' + Math.round10(cantidad_item, -2) + '"><br>';
+                table_enlace_producto += '</div>';
+              table_enlace_producto += '</div>';
             }
 
             table_enlace_producto += "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
             
-          table_enlace_producto +=
-          "</td>"
+          table_enlace_producto += "</td>";
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
-          + "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
-          + "<td class='text-left td-name' width='10%'>" + href_link + "</td>"
+          table_enlace_producto += "<td class='text-left td-name' width='20%'>";
+          table_enlace_producto += '<textarea class="form-control" placeholder="" name="addProductoTable[' + id_item + '][caracteristicas]" style="height: 100px">' + clearHTMLTextArea(detalle[i]['Txt_Descripcion']) + '</textarea>';
+          table_enlace_producto += "</td>";
+          //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
+          table_enlace_producto += "<td class='text-left td-name' width='10%'>" + href_link + "</td>";
           //table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][nombre_comercial]" value="' + detalle[i]['Txt_Producto'] + '">';
           //table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][caracteristicas]" value="' + detalle[i]['Txt_Descripcion'] + '">';
         table_enlace_producto += "</tr>";
@@ -333,6 +344,8 @@ function verPedido(ID){
       
       $('#span-total_cantidad_items').html(i);
       $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+      
+      validateDecimal();
     },
     error: function (jqXHR, textStatus, errorThrown) {
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
@@ -827,4 +840,13 @@ function scrollToIOS( $sMetodo, $IdElemento ){
   $sMetodo.animate({
     scrollTop: $IdElemento.offset().top
   }, 'slow');
+}
+
+function clearHTMLTextArea(str){
+  str=str.replace(/<br>/gi, "");
+  str=str.replace(/<br\s\/>/gi, "");
+  str=str.replace(/<br\/>/gi, "");
+  str=str.replace(/<\/button>/gi, "");
+  str=str.replace(/<br >/gi, "");
+  return str;
 }
