@@ -246,8 +246,8 @@ Nu_Correlativo
 	}
 
 	public function asignarPedido($ID){
-		$objPedido = $this->db->query("SELECT CLI.ID_Entidad, CLI.Txt_Email_Contacto FROM " . $this->table . " AS PC JOIN entidad AS CLI ON(PC.ID_Entidad=CLI.ID_Entidad) WHERE PC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1")->row();
-		$sCorreo = $objPedido->Txt_Email_Contacto;
+		$objPedido = $this->db->query("SELECT CLI.ID_Entidad, CLI.Txt_Email_Entidad FROM " . $this->table . " AS PC JOIN entidad AS CLI ON(PC.ID_Entidad=CLI.ID_Entidad) WHERE PC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1")->row();
+		$sCorreo = $objPedido->Txt_Email_Entidad;
 		
 		$objUser = $this->db->query("SELECT ID_Usuario FROM usuario WHERE No_Usuario = '" . $sCorreo . "' LIMIT 1")->row();
 
