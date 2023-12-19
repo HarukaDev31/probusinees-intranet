@@ -117,7 +117,7 @@
                     <div class="col-xs-6 col-sm-4 col-md-2 div-mas_opciones">
                       <div class="form-group">
                         <label>Telefono</label>
-                        <input type="text" inputmode="tel" name="Nu_Telefono_Entidad" placeholder="Opcional" class="form-control" data-inputmask="'mask': ['999 9999']" data-mask autocomplete="off">
+                        <input type="text" inputmode="tel" name="Nu_Telefono_Entidad" placeholder="Opcional" class="form-control" autocomplete="off">
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>
@@ -125,7 +125,7 @@
                     <div class="col-xs-6 col-sm-4 col-md-2 div-mas_opciones">
                       <div class="form-group">
                         <label>Celular</label>
-                        <input type="text" inputmode="tel" name="Nu_Celular_Entidad" placeholder="Opcional" class="form-control" data-inputmask="'mask': ['999 999 999']" data-mask autocomplete="off">
+                        <input type="text" inputmode="tel" name="Nu_Celular_Entidad" placeholder="Opcional" class="form-control" autocomplete="off">
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>

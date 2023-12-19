@@ -78,8 +78,9 @@ $(function () {
         'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
     });
     
-    $( '.custom-select' ).removeClass('custom-select-sm form-control-sm');
-  
+    $('#table-Cliente_filter input').removeClass('form-control-sm');
+    $('#table-Cliente_filter input').addClass('form-control-md');
+    $('#table-Cliente_filter input').addClass("width_full");
   
     $( "#form-Cliente" ).validate({
         rules:{
@@ -95,19 +96,23 @@ $(function () {
                 maxlength: 8
             },
             Nu_Celular_Entidad: {
-                minlength: 11,
-                maxlength: 11
+                minlength: 9,
+                maxlength: 9
             },
+            /*
             Txt_Email_Entidad:{
                 validemail: true,
             },
+            */
             Nu_Celular_Contacto: {
-                minlength: 11,
-                maxlength: 11
+                minlength: 9,
+                maxlength: 9
             },
+            /*
             Txt_Email_Contacto:{
                 validemail: true,
             },
+            */
         },
         messages:{
             ID_Tipo_Documento_Identidad:{
@@ -125,16 +130,20 @@ $(function () {
                 minlength: "Debe ingresar 9 dígitos",
                 maxlength: "Debe ingresar 9 dígitos"
             },
+            /*
             Txt_Email_Entidad:{
                 validemail: "Ingresar correo válido",
             },
+            */
             Nu_Celular_Contacto:{
                 minlength: "Debe ingresar 9 dígitos",
                 maxlength: "Debe ingresar 9 dígitos"
             },
+            /*
             Txt_Email_Contacto:{
                 validemail: "Ingresar correo válido",
             },
+            */
         },
         errorPlacement : function(error, element) {
             $(element).closest('.form-group').find('.help-block').html(error.html());
@@ -261,7 +270,7 @@ function agregarCliente(){
   
   function verCliente(ID, Nu_Documento_Identidad){
     accion_cliente = 'upd_cliente';
-    $( '#modal-loader' ).modal('show');
+    //$( '#modal-loader' ).modal('show');
     
     $( '.div-Listar' ).hide();
     
@@ -350,7 +359,7 @@ function agregarCliente(){
         
         url = base_url + 'HelperController/getDistritos';
         $.post( url, {ID_Provincia : response.ID_Provincia}, function( responseDistrito ){
-          $( '#modal-loader' ).modal('hide');
+          //$( '#modal-loader' ).modal('hide');
           $( '#cbo-Distritos' ).html('');
           for (var i = 0; i < responseDistrito.length; i++){
             selected = '';
@@ -400,10 +409,10 @@ function agregarCliente(){
         
         $( '[name="Txt_Descripcion"]' ).val(response.Txt_Descripcion);
         
-        $( '#modal-loader' ).modal('hide');
+        //$( '#modal-loader' ).modal('hide');
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        $( '#modal-loader' ).modal('hide');
+        //$( '#modal-loader' ).modal('hide');
           $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
           
           $( '#modal-message' ).modal('show');
@@ -433,7 +442,7 @@ function form_Entidad(){
             $( '#btn-save' ).attr('disabled', true);
             $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
             
-            $( '#modal-loader' ).modal('show');
+            //$( '#modal-loader' ).modal('show');
             
             url = base_url + 'Ventas/ReglasVenta/ClienteController/crudCliente';
                 $.ajax({
@@ -442,7 +451,7 @@ function form_Entidad(){
                 url		    : url,
                 data		  : $('#form-Cliente').serialize(),
                 success : function( response ){
-                    $( '#modal-loader' ).modal('hide');
+                    //$( '#modal-loader' ).modal('hide');
                     
                     $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
                     $( '#modal-message' ).modal('show');
@@ -469,7 +478,7 @@ function form_Entidad(){
                     $( '#btn-save' ).attr('disabled', false);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    $( '#modal-loader' ).modal('hide');
+                    //$( '#modal-loader' ).modal('hide');
                     $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
                     
                     $( '#modal-message' ).modal('show');
@@ -510,7 +519,7 @@ function eliminarCliente(ID_Empresa, ID, Nu_Documento_Identidad, accion_cliente)
 }
 
 function _eliminarCliente($modal_delete, ID_Empresa, ID, Nu_Documento_Identidad){
-  $( '#modal-loader' ).modal('show');
+  //$( '#modal-loader' ).modal('show');
     
   url = base_url + 'Ventas/ReglasVenta/ClienteController/eliminarCliente/' + ID_Empresa + '/' + ID + '/' + Nu_Documento_Identidad;
   $.ajax({
@@ -518,7 +527,7 @@ function _eliminarCliente($modal_delete, ID_Empresa, ID, Nu_Documento_Identidad)
     type      : "GET",
     dataType  : "JSON",
     success: function( response ){
-      $( '#modal-loader' ).modal('hide');
+      //$( '#modal-loader' ).modal('hide');
       
       $modal_delete.modal('hide');
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
@@ -538,7 +547,7 @@ function _eliminarCliente($modal_delete, ID_Empresa, ID, Nu_Documento_Identidad)
     },
     error: function (jqXHR, textStatus, errorThrown) {
 		  accion_cliente = '';
-      $( '#modal-loader' ).modal('hide');
+      //$( '#modal-loader' ).modal('hide');
       $modal_delete.modal('hide');
       $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
       

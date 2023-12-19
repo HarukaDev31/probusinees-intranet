@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.138'; ?>
+<?php $iControlVersionDashboard = '1.0.140'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -41,6 +41,8 @@
 
 <!-- jQuery Validate -->
 <script src="<?php echo base_url() . 'assets/js/jquery.validate.min.js'; ?>"></script>
+<script src="<?php echo base_url("plugins_v2/jquery-validation/jquery.validate.min.js"); ?>"></script>
+<script src="<?php echo base_url("plugins_v2/jquery-validation/additional-methods.min.js"); ?>"></script>
 
 <script type="text/javascript">var base_url = '<?php echo base_url(); ?>';</script>
 

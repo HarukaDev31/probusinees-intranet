@@ -222,17 +222,17 @@ class ClienteController extends CI_Controller {
     
 	public function crudCliente(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-		$Nu_Telefono_Entidad = '';
+		$Nu_Telefono_Entidad = $this->input->post('Nu_Telefono_Entidad');
 		if ( $this->input->post('Nu_Telefono_Entidad') && strlen($this->input->post('Nu_Telefono_Entidad')) == 8){
 	        $Nu_Telefono_Entidad = explode(' ', $this->input->post('Nu_Telefono_Entidad'));
 	        $Nu_Telefono_Entidad = $Nu_Telefono_Entidad[0].$Nu_Telefono_Entidad[1];
 		}
-		$Nu_Celular_Entidad = '';
+		$Nu_Celular_Entidad = $this->input->post('Nu_Celular_Entidad');
 		if ( $this->input->post('Nu_Celular_Entidad') && strlen($this->input->post('Nu_Celular_Entidad')) == 11){
 	        $Nu_Celular_Entidad = explode(' ', $this->input->post('Nu_Celular_Entidad'));
 	        $Nu_Celular_Entidad = $Nu_Celular_Entidad[0].$Nu_Celular_Entidad[1].$Nu_Celular_Entidad[2];
 		}
-		$Nu_Celular_Contacto = '';
+		$Nu_Celular_Contacto = $this->input->post('Nu_Celular_Contacto');
 		if ( $this->input->post('Nu_Celular_Contacto') && strlen($this->input->post('Nu_Celular_Contacto')) == 11){
 	        $Nu_Celular_Contacto = explode(' ', $this->input->post('Nu_Celular_Contacto'));
 	        $Nu_Celular_Contacto = $Nu_Celular_Contacto[0].$Nu_Celular_Contacto[1].$Nu_Celular_Contacto[2];
