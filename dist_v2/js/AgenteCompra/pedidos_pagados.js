@@ -346,7 +346,6 @@ $(function () {
     }
   });
   
-
   $("#form-documento_entrega").on('submit',function(e){
     e.preventDefault();
 
@@ -377,6 +376,84 @@ $(function () {
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           reload_table_Entidad();
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+  
+  $("#form-pago_cliente_30").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('pago_cliente_30').files.length == 0) {
+      $('#pago_cliente_30').closest('.form-group').find('.help-block').html('Empty file');
+      $('#pago_cliente_30').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-pago_cliente_30")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addPagoCliente30',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-pago_cliente_30').modal('hide');
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+
+  $("#form-pago_cliente_100").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('pago_cliente_100').files.length == 0) {
+      $('#pago_cliente_100').closest('.form-group').find('.help-block').html('Empty file');
+      $('#pago_cliente_100').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-pago_cliente_100")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addPagoCliente100',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-pago_cliente_100').modal('hide');
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -936,6 +1013,36 @@ function documentoEntregado(id){
 
 function descargarDocumentoEntregado(id){
   url = base_url + 'AgenteCompra/PedidosPagados/descargarDocumentoEntregado/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function subirPago30(){
+  $( '[name="pago_cliente_30-id_cabecera"]' ).val($('#txt-EID_Pedido_Cabecera').val());
+
+  $('#modal-pago_cliente_30').modal('show');
+  $( '#form-pago_cliente_30' )[0].reset();
+}
+
+function descargarPago30(){
+  var id = $('#txt-EID_Pedido_Cabecera').val();
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarPago30/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function subirPago100(){
+  $( '[name="pago_cliente_100-id_cabecera"]' ).val($('#txt-EID_Pedido_Cabecera').val());
+
+  $('#modal-pago_cliente_100').modal('show');
+  $( '#form-pago_cliente_100' )[0].reset();
+}
+
+function descargarPago100(){
+  var id = $('#txt-EID_Pedido_Cabecera').val();
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarPago100/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);

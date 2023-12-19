@@ -96,6 +96,20 @@
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
+
+                    <div class="col-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-primary btn-block" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">subir pago 30%</button>
+                        <button type="button" class="btn btn-link btn-block" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()">Descargar pago 30%</button>
+                      </div>
+                    </div>
+
+                    <div class="col-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-primary btn-block" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">subir pago 100%</button>
+                        <button type="button" class="btn btn-link btn-block" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()">Descargar pago 100%</button>
+                      </div>
+                    </div>
                   </div>
                     
                   <div class="row">
@@ -335,3 +349,63 @@
   <?php echo form_close(); ?>
 </div>
 <!-- /.modal agregar pagos -->
+
+<!-- modal pago 30% cliente -->
+<div class="modal fade modal-pago_cliente_30" id="modal-pago_cliente_30">
+  <?php $attributes = array('id' => 'form-pago_cliente_30'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_cliente_30">
+        <div class="row">
+          <input type="hidden" id="pago_cliente_30-id_cabecera" name="pago_cliente_30-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher pago 30%</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_cliente_30" name="pago_cliente_30" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_pago_cliente_30" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago 30% cliente -->
+
+<!-- modal pago 100% cliente -->
+<div class="modal fade modal-pago_cliente_100" id="modal-pago_cliente_100">
+  <?php $attributes = array('id' => 'form-pago_cliente_100'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_cliente_100">
+        <div class="row">
+          <input type="hidden" id="pago_cliente_100-id_cabecera" name="pago_cliente_100-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher pago 100%</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_cliente_100" name="pago_cliente_100" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-pago_cliente_100" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago 100% cliente -->
