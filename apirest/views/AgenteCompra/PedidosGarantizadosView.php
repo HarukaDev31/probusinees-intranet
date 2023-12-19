@@ -168,12 +168,12 @@
                   </div><!-- ./table -->
 
                   <div class="row mt-3">
-                    <div class="col-6 col-md-6">
+                    <div class="col-12 col-md-12">
                       <div class="form-group">
-                        <button type="button" id="btn-cancelar" class="btn btn-outline-danger btn-lg btn-block">Salir</button>
+                        <button type="button" id="btn-cancelar" class="btn btn-danger btn-lg btn-block">Salir</button>
                       </div>
                     </div>
-                    <div class="col-6 col-md-6">
+                    <div class="col-6 col-md-6 d-none">
                       <div class="form-group">
                         <button type="submit" id="btn-save" class="btn btn-success btn-lg btn-block btn-verificar">Guardar</button>
                       </div>
