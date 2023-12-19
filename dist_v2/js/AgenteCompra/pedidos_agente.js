@@ -348,7 +348,18 @@ function verPedido(ID){
   })
 }
 
-function cambiarEstado(ID, Nu_Estado, id_correlativo) {
+function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido) {
+  if(Nu_Estado==2 && id_usuario_pedido==0){
+    $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+    $('#modal-message').modal('show');
+
+    $('#moda-message-content').addClass( 'bg-danger' );
+    $('.modal-title-message').text('Primero asignar pedido a cliente');
+
+    setTimeout(function () { $('#modal-message').modal('hide'); }, 3100);
+    return 0;
+  }
+
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
@@ -383,16 +394,16 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo) {
         $( '#btn-save-delete' ).append( 'Aceptar' );
         $( '#btn-save-delete' ).attr('disabled', false);
 
-        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
         $('#modal-message').modal('show');
 
         if (response.status == 'success') {
-          $('.modal-message').addClass(response.style_modal);
+          $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           reload_table_Entidad();
         } else {
-          $('.modal-message').addClass(response.style_modal);
+          $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
         }

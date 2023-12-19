@@ -57,7 +57,7 @@ class PedidosAgente extends CI_Controller {
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',1,0);">Pendiente</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Garantizado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $row->ID_Usuario_Pedido . '\');">Garantizado</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
             $rows[] = $dropdown_estado;
@@ -70,7 +70,7 @@ class PedidosAgente extends CI_Controller {
 			$btn_asignar_usuario = '';
 			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
 				$btn_asignar_usuario = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
-				if($row->ID_Usuario_Pedido){
+				if(!empty($row->ID_Usuario_Pedido)){
 					$btn_asignar_usuario = '<span class="badge bg-secondary">Asignado</span>';
 					$btn_asignar_usuario .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Pedido . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
 				}
