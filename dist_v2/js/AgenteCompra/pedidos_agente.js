@@ -333,7 +333,7 @@ function verPedido(ID){
           table_enlace_producto += "</td>";
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           table_enlace_producto += "<td class='text-left td-name' width='20%'>";
-          table_enlace_producto += '<textarea class="form-control" placeholder="" name="addProductoTable[' + id_item + '][caracteristicas]" style="height: 100px">' + clearHTMLTextArea(detalle[i]['Txt_Descripcion']) + '</textarea>';
+          table_enlace_producto += '<textarea class="form-control" placeholder="" name="addProductoTable[' + id_item + '][caracteristicas]" style="height: 200px;">' + clearHTMLTextArea(detalle[i]['Txt_Descripcion']) + '</textarea>';
           table_enlace_producto += "</td>";
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           table_enlace_producto += "<td class='text-left td-name' width='10%'>" + href_link + "</td>";
