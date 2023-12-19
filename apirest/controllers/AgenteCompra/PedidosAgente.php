@@ -38,7 +38,7 @@ class PedidosAgente extends CI_Controller {
             $rows[] = $row->No_Pais;
             $rows[] = $row->ID_Pedido_Cabecera;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto . "<br>" . $row->Txt_Email_Contacto;
+            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto . "<br>" . $row->Txt_Email_Entidad;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 			
 			//EXCEL cliente de pedido
