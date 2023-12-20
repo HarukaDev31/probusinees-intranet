@@ -100,14 +100,14 @@
                     <div class="col-6 col-sm-6 col-md-6">
                       <div class="form-group">
                         <button type="button" class="btn btn-primary btn-block" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">subir pago 30%</button>
-                        <button type="button" class="btn btn-link btn-block" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()">Descargar pago 30%</button>
+                        <button type="button" id="btn-descargar_pago_30" class="btn btn-link btn-block" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()">Descargar</button>
                       </div>
                     </div>
 
                     <div class="col-6 col-sm-6 col-md-6">
                       <div class="form-group">
                         <button type="button" class="btn btn-primary btn-block" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">subir pago 100%</button>
-                        <button type="button" class="btn btn-link btn-block" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()">Descargar pago 100%</button>
+                        <button type="button" id="btn-descargar_pago_100" class="btn btn-link btn-block" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()">Descargar</button>
                       </div>
                     </div>
                   </div>

@@ -506,6 +506,16 @@ function verPedido(ID){
       $( '[name="No_Entidad"]' ).val(response.No_Entidad);
       $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
 
+      $('#btn-descargar_pago_30').hide();
+      if( response.Txt_Url_Pago_30_Cliente != '' && response.Txt_Url_Pago_30_Cliente != null ){
+        $('#btn-descargar_pago_30').show();
+      }
+
+      $('#btn-descargar_pago_100').hide();
+      if( response.Txt_Url_Pago_100_Cliente != '' && response.Txt_Url_Pago_100_Cliente != null ){
+        $('#btn-descargar_pago_100').show();
+      }
+
       var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
       if(response.Nu_Estado_Pedido == 2)
         sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';

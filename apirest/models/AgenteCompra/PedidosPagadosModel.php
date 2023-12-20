@@ -59,6 +59,8 @@ class PedidosPagadosModel extends CI_Model{
 		' . $this->table . '.Fe_Emision_Cotizacion,
 		' . $this->table . '.Ss_Tipo_Cambio,
 		' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido,
+		' . $this->table . '.Txt_Url_Pago_30_Cliente,
+		' . $this->table . '.Txt_Url_Pago_100_Cliente,
 		CORRE.Fe_Month,
 		CLI.No_Contacto,
 		CLI.Txt_Email_Contacto,
