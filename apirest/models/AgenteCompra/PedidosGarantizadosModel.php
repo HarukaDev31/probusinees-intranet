@@ -408,4 +408,50 @@ Nu_Correlativo
 			'message' => 'Correlativo es: ' . $Nu_Correlativo
 		);
 	}
+
+	public function addFileProveedor($arrPost, $data_files){
+		if (isset($data_files['image_documento']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/voucher_pagos_garantizado/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('image_documento')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['documento_pago_garantizado-id_cabecera']);
+				$data = array( 'Txt_Url_Pago_Garantizado' => $Txt_Url_Imagen_Producto );//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Voucher guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarDocumentoPagoGarantizado($id){
+		$query = "SELECT Txt_Url_Pago_Garantizado AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
 }

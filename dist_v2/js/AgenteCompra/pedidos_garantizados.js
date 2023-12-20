@@ -9,6 +9,45 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 // FIN AUTOCOMPLETE
 
 $(function () {
+  $("#form-documento_pago_garantizado").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('image_documento').files.length == 0) {
+      $('#image_documento').closest('.form-group').find('.help-block').html('Empty file');
+      $('#image_documento').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-documento_pago_garantizado")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosGarantizados/addFileProveedor',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-documento_pago_garantizado').modal('hide');
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+
   //Global Autocomplete
   $( '.autocompletar' ).autoComplete({
     minChars: 0,
@@ -1149,4 +1188,18 @@ function getItemProveedor(id_detalle){
       console.log(jqXHR.responseText);
     }
   })
+}
+
+function documentoPagoGarantizado(id){
+  $( '[name="documento_pago_garantizado-id_cabecera"]' ).val(id);
+
+  $('#modal-documento_pago_garantizado').modal('show');
+  $( '#form-documento_pago_garantizado' )[0].reset();
+}
+
+function descargarDocumentoPagoGarantizado(id){
+  url = base_url + 'AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
 }

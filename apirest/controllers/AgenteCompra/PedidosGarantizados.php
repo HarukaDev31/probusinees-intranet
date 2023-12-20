@@ -54,7 +54,7 @@ class PedidosGarantizados extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2);">Garantizado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Garantizado" title="Garantizado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2);">Garantizado</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Enviado</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',4);">Rechazado</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',5);">Confirmado</a></li>';
@@ -86,6 +86,18 @@ class PedidosGarantizados extends CI_Controller {
 
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 			//$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+			
+			//entregado
+			$btn_entregado = '';
+			if($row->Nu_Estado==2)
+				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir pago" title="Subir pago" href="javascript:void(0)" onclick="documentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
+
+			if(!empty($row->Txt_Url_Pago_Garantizado)) {
+				$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Subir pago" title="Subir pago" href="javascript:void(0)" onclick="descargarDocumentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
+			}
+			
+			$rows[] = $btn_entregado;
+
             $data[] = $rows;
         }
         $output = array(
@@ -1680,4 +1692,35 @@ class PedidosGarantizados extends CI_Controller {
 			exit;
 		}
 	}
+
+	public function addFileProveedor(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosGarantizadosModel->addFileProveedor($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarDocumentoPagoGarantizado($id){
+		//echo "hola";
+		$objPedido = $this->PedidosGarantizadosModel->descargarDocumentoPagoGarantizado($this->security->xss_clean($id));
+		//array_debug($objPedido);
+		
+		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+		$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+		//$file="assets/img/arturo.jpeg";
+		if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+			die('file not found');
+		} else {
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+			header('Content-Transfer-Encoding: binary');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+			ob_clean();
+			flush();
+			readfile($objPedido->Txt_Url_Imagen_Producto);
+			exit;
+		}
+    }
 }

@@ -35,6 +35,7 @@
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>
+                      <th class="no-sort">Pay</th>
                       <!--
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
                         <th class="no-sort">Eliminar</th>
@@ -295,3 +296,33 @@
   <!-- /.modal-dialog -->
 </div>
 <!-- /.modal imagen del item -->
+
+<!-- modal documento -->
+<div class="modal fade modal-documento_pago_garantizado" id="modal-documento_pago_garantizado">
+  <?php $attributes = array('id' => 'form-documento_pago_garantizado'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-documento_pago_garantizado">
+        <div class="row">
+          <input type="hidden" id="documento_pago_garantizado-id_cabecera" name="documento_pago_garantizado-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher</label>
+            <div class="form-group">
+              <input class="form-control" id="image_documento" name="image_documento" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_documento_pago_garantizado" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar pagos -->
