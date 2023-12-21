@@ -597,6 +597,8 @@ function verPedido(ID){
       $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
       $( '[name="Ss_Tipo_Cambio"]' ).val(response.Ss_Tipo_Cambio);
 
+      $( '[name="Txt_Observaciones_Garantizado"]' ).val(response.Txt_Observaciones_Garantizado);
+
       var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
       if(response.Nu_Estado_Pedido == 2)
         sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
@@ -1024,11 +1026,18 @@ function addItems(){
       div_items += '</div>';
       div_items += '</div>';
 
-      div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-4 mb-3 mb-sm-0">';
+      div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-      div_items += '<span class="fw-bold">Delivery</span>';
+      div_items += '<span class="fw-bold">T. Producción</span>';
       div_items += '</h6>';
       div_items += '<input type="text" inputmode="numeric" id="modal-delivery' + iCounterItems + '" name="addProducto[' + iCounterItems + '][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
+      div_items += '</div>';
+
+      div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
+      div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+      div_items += '<span class="fw-bold">C. Delivery</span>';
+      div_items += '</h6>';
+      div_items += '<input type="text" inputmode="decimal" id="modal-costo_delivery' + iCounterItems + '" name="addProducto[' + iCounterItems + '][costo_delivery]" class="arrProducto form-control input-decimal" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
       div_items += '</div>';
 
       div_items += '<div class="col-sm-12 mb-1">';
@@ -1147,14 +1156,42 @@ function getItemProveedor(id_detalle){
 
             table_enlace_producto += "</td>";
 
-            table_enlace_producto +=
-            "<td class='text-left td-precio'>" + (parseFloat(detalle[i]['Ss_Precio']) * parseFloat(detalle[i]['Ss_Tipo_Cambio'])).toPrecision(6) + "</td>"
-            + "<td class='text-left td-precio'>" + detalle[i]['Ss_Precio'] + "</td>"
-            + "<td class='text-left td-moq'>" + detalle[i]['Qt_Producto_Moq'] + "</td>"
-            + "<td class='text-left td-caja'>" + detalle[i]['Qt_Producto_Caja'] + "</td>"
-            + "<td class='text-left td-cbm'>" + detalle[i]['Qt_Cbm'] + "</td>"
-            + "<td class='text-left td-delivery'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-            + "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-precio'>" + (parseFloat(detalle[i]['Ss_Precio']) * parseFloat(detalle[i]['Ss_Tipo_Cambio'])).toPrecision(6) + "</td>";
+            
+            //+ "<td class='text-left td-precio'>" + detalle[i]['Ss_Precio'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-precio'>";
+              table_enlace_producto += '<input type="text" id="modal-precio' + i + '" data-correlativo="' + i + '" inputmode="decimal" name="addProducto[' + i + '][precio]" class="arrProducto form-control required precio input-decimal mt-0" placeholder="precio" value="' + detalle[i]['Ss_Precio'] + '" autocomplete="off" />';
+            table_enlace_producto += '</td>';
+            
+            //table_enlace_producto += "<td class='text-left td-moq'>" + detalle[i]['Qt_Producto_Moq'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-moq'>";
+              table_enlace_producto += '<input type="text" id="modal-moq' + i + '" data-correlativo="' + i + '" inputmode="decimal" name="addProducto[' + i + '][moq]" class="arrProducto form-control required moq input-decimal mt-0" placeholder="moq" value="' + detalle[i]['Qt_Producto_Moq'] + '" autocomplete="off" />';
+            table_enlace_producto += '</td>';
+
+            //+ "<td class='text-left td-caja'>" + detalle[i]['Qt_Producto_Caja'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-caja'>";
+              table_enlace_producto += '<input type="text" id="modal-caja' + i + '" data-correlativo="' + i + '" inputmode="decimal" name="addProducto[' + i + '][caja]" class="arrProducto form-control required caja input-decimal mt-0" placeholder="caja" value="' + detalle[i]['Qt_Producto_Caja'] + '" autocomplete="off" />';
+            table_enlace_producto += '</td>';
+
+            //+ "<td class='text-left td-cbm'>" + detalle[i]['Qt_Cbm'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-cbm'>";
+              table_enlace_producto += '<input type="text" id="modal-cbm' + i + '" data-correlativo="' + i + '" inputmode="decimal" name="addProducto[' + i + '][cbm]" class="arrProducto form-control required cbm input-decimal mt-0" placeholder="cbm" value="' + detalle[i]['Qt_Cbm'] + '" autocomplete="off" />';
+            table_enlace_producto += '</td>';
+
+            //+ "<td class='text-left td-delivery'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-delivery'>";
+              table_enlace_producto += '<input type="text" id="modal-delivery' + i + '" data-correlativo="' + i + '" inputmode="decimal" name="addProducto[' + i + '][delivery]" class="arrProducto form-control required delivery input-decimal mt-0" placeholder="delivery" value="' + detalle[i]['Nu_Dias_Delivery'] + '" autocomplete="off" />';
+            table_enlace_producto += '</td>';
+
+            //+ "<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-costo_delivery'>";
+              table_enlace_producto += '<input type="text" id="modal-costo_delivery' + i + '" data-correlativo="' + i + '" inputmode="decimal" name="addProducto[' + i + '][costo_delivery]" class="arrProducto form-control required costo_delivery input-decimal mt-0" placeholder="costo_delivery" value="' + detalle[i]['Ss_Costo_Delivery'] + '" autocomplete="off" />';
+            table_enlace_producto += '</td>';
+
+            //+ "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
+            table_enlace_producto += "<td class='text-left td-nota_historica'>";
+              table_enlace_producto += '<textarea id="modal-nota_historica' + i + '" name="addProducto[' + i + '][nota_historica]" class="mt-0 form-control required nota_historica" placeholder="Observaciones" rows="1" style="height: 60px;">' + clearHTMLTextArea(detalle[i]['Txt_Nota']) + '</textarea>';
+            table_enlace_producto += '</td>';
           table_enlace_producto += "</tr>";
           
           table_enlace_producto +=
@@ -1163,11 +1200,18 @@ function getItemProveedor(id_detalle){
               table_enlace_producto += '<button type="button" id="btn-seleccionar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-check"></i>&nbsp; marcar proveedor</button>';
             } else {
               table_enlace_producto += '<button type="button" id="btn-desmarcar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-times"></i>&nbsp; desmarcar proveedor</button>';
-              table_enlace_producto += '<input type="hidden" id="modal-id_detalle' + i + '" name="addProducto[' + i + '][id_detalle]" class="form-control" value="' + id_item + '">';
-              table_enlace_producto += '<input type="hidden" id="modal-cantidad_oculta' + i + '" name="addProducto[' + i + '][cantidad_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Caja'] + '">';
               table_enlace_producto += '<input type="text" id="modal-cantidad' + i + '" data-correlativo="' + i + '" inputmode="numeric" name="addProducto[' + i + '][cantidad]" class="arrProducto form-control required cantidad input-numeric mt-3" placeholder="Cantidad" value="' + cantidad_html + '" autocomplete="off" />';
-              table_enlace_producto += '<textarea id="modal-nota' + i + '" name="addProducto[' + i + '][nota]" class="mt-3 form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + nota_final + '</textarea>';
-            }
+              table_enlace_producto += '<textarea id="modal-nota' + i + '" name="addProducto[' + i + '][nota]" class="mt-3 form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + clearHTMLTextArea(nota_final) + '</textarea>';
+            }  
+            table_enlace_producto += '<input type="hidden" id="modal-id_detalle' + i + '" name="addProducto[' + i + '][id_detalle]" class="form-control" value="' + id_item + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-cantidad_oculta' + i + '" name="addProducto[' + i + '][cantidad_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Caja'] + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-precio_oculta' + i + '" name="addProducto[' + i + '][precio_oculta]" class="form-control" value="' + detalle[i]['Ss_Precio'] + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-moq_oculta' + i + '" name="addProducto[' + i + '][moq_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Moq'] + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-caja_oculta' + i + '" name="addProducto[' + i + '][caja_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Caja'] + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-cbm_oculta' + i + '" name="addProducto[' + i + '][cbm_oculta]" class="form-control" value="' + detalle[i]['Qt_Cbm'] + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-delivery_oculta' + i + '" name="addProducto[' + i + '][delivery_oculta]" class="form-control" value="' + detalle[i]['Nu_Dias_Delivery'] + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-costo_delivery_oculta' + i + '" name="addProducto[' + i + '][costo_delivery_oculta]" class="form-control" value="' + detalle[i]['Ss_Costo_Delivery'] + '">';
+            table_enlace_producto += '<input type="hidden" id="modal-nota_historica_oculta' + i + '" name="addProducto[' + i + '][nota_historica_oculta]" class="form-control" value="' + detalle[i]['Txt_Nota'] + '">';
           table_enlace_producto += "</td></tr>";
 
           id_item_tmp = id_item;
@@ -1175,6 +1219,9 @@ function getItemProveedor(id_detalle){
       }
       
       $( '#table-elegir_productos_proveedor' ).append(table_enlace_producto);
+      
+      validateDecimal();
+      validateNumber();
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
@@ -1198,8 +1245,43 @@ function documentoPagoGarantizado(id){
 }
 
 function descargarDocumentoPagoGarantizado(id){
+  
+  url = base_url + 'AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizadov2/' + id;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+      
+      if(response.status=='success'){
+        $('.modal-ver_pago_garantizado').modal('show');
+
+        $('.img-pago_garantizado').attr('src', '');
+        $('.img-pago_garantizado').attr('src', response.url_image);
+        
+        url = base_url + 'AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/' + id;
+        $("#a-download_image_pago_garantizado").attr("href", url)
+        //$("#a-download_image_pago_garantizado").attr("data-id_pago", id);
+      } else {
+        alert(response.message);
+      }
+    } 
+  })
+
+  /*
   url = base_url + 'AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
+  */
+}
+
+function clearHTMLTextArea(str){
+  str=str.replace(/<br>/gi, "");
+  str=str.replace(/<br\s\/>/gi, "");
+  str=str.replace(/<br\/>/gi, "");
+  str=str.replace(/<\/button>/gi, "");
+  str=str.replace(/<br >/gi, "");
+  return str;
 }

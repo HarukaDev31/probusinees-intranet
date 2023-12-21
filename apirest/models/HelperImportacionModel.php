@@ -11,6 +11,15 @@ class HelperImportacionModel extends CI_Model{
 		return array('No_Estado' => 'Inactivo','No_Class_Estado' => 'danger');
 	}
 
+	function obtenerTipoServicioArray($iEstado){
+		if( $iEstado == 1 )
+			return array('No_Estado' => 'Trading','No_Class_Estado' => 'success');
+		else if( $iEstado == 2 )
+			return array('No_Estado' => 'C. Trading','No_Class_Estado' => 'primary');
+		else
+			return array('No_Estado' => 'Seleccionar','No_Class_Estado' => 'secondary');
+	}
+
 	function obtenerEstadoPedidoArray($iEstado){
 		if( $iEstado == 1 )
 			return array('No_Estado' => 'Pendiente','No_Class_Estado' => 'secondary');
@@ -36,7 +45,11 @@ class HelperImportacionModel extends CI_Model{
 		else if( $iEstado == 6 )
 			return array('No_Estado' => 'Pago 30%','No_Class_Estado' => 'primary');
 		else if( $iEstado == 7 )
-			return array('No_Estado' => 'Pago 100%','No_Class_Estado' => 'primary');
+			return array('No_Estado' => 'Pago 70%','No_Class_Estado' => 'primary');
+		else if( $iEstado == 8 )
+			return array('No_Estado' => 'Observado','No_Class_Estado' => 'warning');
+		else if( $iEstado == 9 )
+			return array('No_Estado' => 'Pago servicio','No_Class_Estado' => 'primary');
 	}
 
 	//1=Pendiente, 2=Proceso, 3=Cotizado, 4=Producción, 5=Inspección y 6=Entregado

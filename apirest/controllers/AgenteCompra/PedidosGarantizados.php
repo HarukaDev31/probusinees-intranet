@@ -55,9 +55,10 @@ class PedidosGarantizados extends CI_Controller {
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Garantizado" title="Garantizado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2);">Garantizado</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Enviado</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',4);">Rechazado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Enviado" title="Enviado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Enviado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Rechazado" title="Rechazado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',4);">Rechazado</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Confirmado" title="Confirmado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',5);">Confirmado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Observado" title="Observado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',8);">Observado</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
@@ -78,10 +79,9 @@ class PedidosGarantizados extends CI_Controller {
 				$dropdown_estado_china .= '</ul>';
 			$dropdown_estado_china .= '</div>';
 
-			//if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
-				//$dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-			//}
-
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
+				$dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			}
             $rows[] = $dropdown_estado_china;
 
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
@@ -143,6 +143,7 @@ class PedidosGarantizados extends CI_Controller {
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		$data = array(
 			'Ss_Tipo_Cambio' => $this->input->post('Ss_Tipo_Cambio'),
+			'Txt_Observaciones_Garantizado' => $this->input->post('Txt_Observaciones_Garantizado'),
 		);
 		echo json_encode($this->PedidosGarantizadosModel->actualizarPedido(
 				array(
@@ -1721,6 +1722,26 @@ class PedidosGarantizados extends CI_Controller {
 			flush();
 			readfile($objPedido->Txt_Url_Imagen_Producto);
 			exit;
+		}
+    }
+    	
+	public function descargarDocumentoPagoGarantizadov2($id){
+		//echo "hola";
+		$objPedido = $this->PedidosGarantizadosModel->descargarDocumentoPagoGarantizado($this->security->xss_clean($id));
+		//array_debug($objPedido);
+		
+		if(is_object($objPedido)){
+			$response = array(
+				'status' => 'success',
+				'url_image' => $objPedido->Txt_Url_Imagen_Producto
+			);
+			echo json_encode($response);
+		} else {
+			$response = array(
+				'status' => 'error',
+				'message' => 'sin registro'
+			);
+			echo json_encode($response);
 		}
     }
 }

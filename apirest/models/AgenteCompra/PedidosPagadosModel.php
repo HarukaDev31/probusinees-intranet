@@ -36,7 +36,7 @@ class PedidosPagadosModel extends CI_Model{
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
-		->where($this->table . '.Nu_Estado>=', 5);
+		->where_in($this->table . '.Nu_Estado', array(5,6,7,9));
         
 		if(isset($this->order)) {
 			$order = $this->order;
@@ -61,6 +61,7 @@ class PedidosPagadosModel extends CI_Model{
 		' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido,
 		' . $this->table . '.Txt_Url_Pago_30_Cliente,
 		' . $this->table . '.Txt_Url_Pago_100_Cliente,
+		' . $this->table . '.Txt_Url_Pago_Servicio_Cliente,
 		CORRE.Fe_Month,
 		CLI.No_Contacto,
 		CLI.Txt_Email_Contacto,
@@ -78,7 +79,11 @@ class PedidosPagadosModel extends CI_Model{
 		ACPDPP.Ss_Pago_1_Proveedor,
 		ACPDPP.Txt_Url_Archivo_Pago_2_Proveedor,
 		ACPDPP.Ss_Pago_2_Proveedor,
-		ACPDPP.Nu_Agrego_Inspeccion');
+		ACPDPP.Nu_Agrego_Inspeccion,
+		ACPDPP.Ss_Costo_Delivery,
+		ACPDPP.No_Contacto_Proveedor,
+		ACPDPP.Txt_Url_Imagen_Proveedor,
+		ACPDPP.Fe_Entrega_Proveedor');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
     	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');		
@@ -110,6 +115,15 @@ class PedidosPagadosModel extends CI_Model{
 	public function cambiarEstadoChina($ID, $Nu_Estado){
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado_China' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+	}
+
+	public function cambiarTipoServicio($ID, $Nu_Estado){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Tipo_Servicio' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			return array('status' => 'success', 'message' => 'Actualizado');
 		}
@@ -378,4 +392,74 @@ class PedidosPagadosModel extends CI_Model{
 		$query = "SELECT Txt_Url_Pago_100_Cliente AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
+
+	public function addPagoClienteServicio($arrPost, $data_files){
+		if (isset($data_files['pago_cliente_servicio']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/pagos_clientes/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('pago_cliente_servicio')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['pago_cliente_servicio-id_cabecera']);
+				$data = array( 'Txt_Url_Pago_Servicio_Cliente' => $Txt_Url_Imagen_Producto );//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarPagoServicio($id){
+		$query = "SELECT Txt_Url_Pago_Servicio_Cliente AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+    
+    public function actualizarPedido($where, $data, $arrProducto){
+		//actualizar productos de tabla de cliente
+		if (!empty($arrProducto)) {
+			foreach($arrProducto as $row) {
+				//array_debug($row);
+				$arrSaleOrderDetailUPD[] = array(
+					'ID_Pedido_Detalle_Producto_Proveedor' => $row['id_item'],
+					'Fe_Entrega_Proveedor' => ToDate($row['fecha_entrega_proveedor']),
+				);
+			}
+
+    		$this->db->update_batch($this->table_agente_compra_pedido_detalle_producto_proveedor, $arrSaleOrderDetailUPD, 'ID_Pedido_Detalle_Producto_Proveedor');
+		}
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return array('status' => 'error', 'message' => 'Error al modificar');
+		} else {
+			//$this->db->trans_rollback();
+			$this->db->trans_commit();
+			return array('status' => 'success', 'message' => 'Registro modificado');
+		}
+    }
 }

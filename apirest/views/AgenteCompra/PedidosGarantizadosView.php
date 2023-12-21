@@ -30,8 +30,8 @@
                       <th>Empresa</th>
                       <th class="no-sort">Excel</th>
                       <!--<th class="no-sort">PDF</th>-->
-                      <th>Estado</th>
-                      <th>Estado China</th>
+                      <th>Perú</th>
+                      <th>China</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>
@@ -64,7 +64,7 @@
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-4 col-md-4">
+                    <div class="col-6 col-sm-3 col-md-3">
                       <label>Cliente</label>
                       <div class="form-group">
                         <input type="text" name="No_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -88,7 +88,7 @@
                       </div>
                     </div>
                     
-                    <div class="col-6 col-sm-4 col-md-4">
+                    <div class="col-6 col-sm-3 col-md-3">
                       <label>Empresa</label>
                       <div class="form-group">
                         <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -104,11 +104,18 @@
                       </div>
                     </div>
                     
-                    <div class="col-12 col-sm-4 col-md-4">
+                    <div class="col-12 col-sm-4 col-md-2">
                       <label>T.C.</label>
                       <div class="form-group">
                         <input type="text" name="Ss_Tipo_Cambio" class="form-control required" placeholder="Ingresar" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    
+                    <div class="col-12 col-sm-4 col-md-4">
+                      <label>Observaciones</label>
+                      <div class="form-group">
+                        <textarea name="Txt_Observaciones_Garantizado" class="form-control" rows="1" placeholder="Opcional" style="height: 38px !important;"></textarea>
                       </div>
                     </div>
                   </div>
@@ -169,12 +176,12 @@
                   </div><!-- ./table -->
 
                   <div class="row mt-3">
-                    <div class="col-12 col-md-12">
+                    <div class="col-6 col-md-6">
                       <div class="form-group">
                         <button type="button" id="btn-cancelar" class="btn btn-danger btn-lg btn-block">Salir</button>
                       </div>
                     </div>
-                    <div class="col-6 col-md-6 d-none">
+                    <div class="col-6 col-md-6">
                       <div class="form-group">
                         <button type="submit" id="btn-save" class="btn btn-success btn-lg btn-block btn-verificar">Guardar</button>
                       </div>
@@ -235,13 +242,14 @@
                         <thead class="thead-light">
                           <tr>
                             <th style='display:none;' class="text-left">ID</th>
-                            <th class="text-left" width="">imagen</th>
+                            <th class="text-left" width="">imagen_producto</th>
                             <th class="text-left" width="">Precio Dólares</th>
                             <th class="text-left" width="">Precio Yuanes</th>
                             <th class="text-left" width="">moq</th>
                             <th class="text-left" width="">qty_caja</th>
                             <th class="text-left" width="">cbm</th>
-                            <th class="text-left" width="">delivery</th>
+                            <th class="text-left" width="">T. Producción</th>
+                            <th class="text-left" width="">C. Delivery</th>
                             <th class="text-left" width="">Observaciones</th>
                           </tr>
                         </thead>
@@ -326,3 +334,23 @@
   <?php echo form_close(); ?>
 </div>
 <!-- /.modal agregar pagos -->
+
+<!-- modal ver pago garantizado -->
+<div class="modal fade modal-ver_pago_garantizado" id="modal-default">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-ver_pago_garantizado">
+        <div class="col-xs-12 text-center">
+          <img class="img-responsive img-pago_garantizado img-fluid" style=" display: block; margin-left: auto; margin-right: auto;" src="">
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="col btn btn-outline-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
+        <a id="a-download_image_pago_garantizado" target="_blank" rel="noopener noreferrer" class="col btn btn-primary btn-lg btn-block" data-id_pago="">Descargar</a>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal imagen del item -->

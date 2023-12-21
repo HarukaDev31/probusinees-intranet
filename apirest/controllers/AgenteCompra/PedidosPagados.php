@@ -40,8 +40,25 @@ class PedidosPagados extends CI_Controller {
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             //$rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerTipoServicioArray($row->Nu_Tipo_Servicio);
+			$dropdown_estado = '<div class="dropdown">';
+				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+				$dropdown_estado .= '<span class="caret"></span></button>';
+				$dropdown_estado .= '<ul class="dropdown-menu">';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Trading" title="Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',1);">Trading</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="C. Trading" title="C. Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',2);">C. Trading</a></li>';
+				$dropdown_estado .= '</ul>';
+			$dropdown_estado .= '</div>';
+			
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
+				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			}
+
+            $rows[] = $dropdown_estado;
+
 			//EXCEL cliente de pedido
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
+			//$rows[] = '<button class="btn btn-xs btn-link" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
 
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($row->Nu_Estado);
 			$dropdown_estado = '<div class="dropdown">';
@@ -50,9 +67,15 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 30%" title="Pago 30%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago 30%</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 100%" title="Pago 100%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',7, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago 100%</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 70%" title="Pago 70%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',7, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago 70%</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago Servicio" title="Pago Servicio" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',9, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago Servicio</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
+			
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
+				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			}
+
             $rows[] = $dropdown_estado;
 			
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($row->Nu_Estado_China);
@@ -66,6 +89,10 @@ class PedidosPagados extends CI_Controller {
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 100%" title="Pago 100%" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Entregado</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
+			
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
+				$dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			}
             $rows[] = $dropdown_estado;//china
 			
 			//Pagos
@@ -106,20 +133,12 @@ class PedidosPagados extends CI_Controller {
 	}
 
 	public function crudPedidoGrupal(){
-		//array_debug($this->input->post());		
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		$data = array(
-			'ID_Empresa' => $this->input->post('EID_Empresa'),
-			'ID_Organizacion' => $this->input->post('EID_Organizacion'),
-			'Nu_Documento_Identidad' => $this->input->post('Nu_Documento_Identidad'),
-			'No_Entidad' => $this->input->post('No_Entidad'),
-			'Nu_Celular_Entidad' => $this->input->post('Nu_Celular_Entidad'),
-			'Txt_Email_Entidad' => $this->input->post('Txt_Email_Entidad'),
 		);
 		echo json_encode($this->PedidosPagadosModel->actualizarPedido(
 				array(
 					'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
-					'ID_Entidad' => $this->input->post('EID_Entidad'),
 				),
 				$data,
 				$this->input->post('addProducto')
@@ -719,6 +738,50 @@ class PedidosPagados extends CI_Controller {
 	public function descargarPago100($id){
 		//echo "hola";
 		$objPedido = $this->PedidosPagadosModel->descargarPago100($this->security->xss_clean($id));
+		if(is_object($objPedido)){
+			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
+				//array_debug($objPedido);
+				
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+				//$file="assets/img/arturo.jpeg";
+				if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+					die('file not found');
+				} else {
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					header('Pragma: public');
+					ob_clean();
+					flush();
+					readfile($objPedido->Txt_Url_Imagen_Producto);
+					exit;
+				}
+			} else {
+				die('Primero subir voucher de pago del 100%');
+			}
+		} else {
+			die('No existe registro');
+		}
+    }
+
+	public function cambiarTipoServicio($ID, $Nu_Estado){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->cambiarTipoServicio($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
+	}
+
+	public function addPagoClienteServicio(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->addPagoClienteServicio($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarPagoServicio($id){
+		//echo "hola";
+		$objPedido = $this->PedidosPagadosModel->descargarPagoServicio($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);

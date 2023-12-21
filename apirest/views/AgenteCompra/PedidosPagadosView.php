@@ -28,7 +28,8 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <!--<th>Empresa</th>-->
-                      <th class="no-sort">Excel</th>
+                      <!--<th class="no-sort">Excel</th>-->
+                      <th>Servicio</th>
                       <th>Perú</th>
                       <th>China</th>
                       <th class="no-sort">Pay</th>
@@ -97,18 +98,29 @@
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-6 col-md-6">
+                    <div class="col-4 col-sm-4 col-md-4">
                       <div class="form-group">
                         <button type="button" class="btn btn-primary btn-block" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">subir pago 30%</button>
                         <button type="button" id="btn-descargar_pago_30" class="btn btn-link btn-block" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()">Descargar</button>
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-6 col-md-6">
+                    <div class="col-4 col-sm-4 col-md-4">
                       <div class="form-group">
                         <button type="button" class="btn btn-primary btn-block" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">subir pago 100%</button>
                         <button type="button" id="btn-descargar_pago_100" class="btn btn-link btn-block" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()">Descargar</button>
                       </div>
+                    </div>
+
+                    <div class="col-4 col-sm-4 col-md-4">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-primary btn-block" alt="Subir pago servicio" title="Subir pago servicio" onclick="subirPagoServicio()">subir pago servicio</button>
+                        <button type="button" id="btn-descargar_pago_servicio" class="btn btn-link btn-block" alt="Descargar pago servicio" title="Descargar pago servicio" onclick="descargarPagoServicio()">Descargar</button>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-sm-12 col-md-12 mb-3">
+                      <button type="button" id="btn-excel_order_tracking" class="btn btn-success btn-block" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(1)" data-id_pedido="">Descargar <i class="fa fa-file-excel text-white"></i></button>
                     </div>
                   </div>
                     
@@ -160,9 +172,11 @@
                               <th class="text-right">Deposit_#1</th>
                               <th class="text-right">Balance</th>
                               <th class="text-right">Deposit_#2</th>
-                              <th class="text-right">Delivery</th>
+                              <th class="text-right">T. Producción</th>
+                              <th class="text-right">C. Delivery</th>
                               <th class="text-right">Supplier</th><!--proveedor-->
-                              <th class="text-right">Phone</th><!--celular-->
+                              <th class="text-right">Phone</th><!--celular imagen de tarjeta de presentación-->
+                              <th class="text-right">fecha_Entrega</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -173,12 +187,12 @@
                   </div><!-- ./table -->
 
                   <div class="row mt-3">
-                    <div class="col-12 col-md-12">
+                    <div class="col-6 col-md-6">
                       <div class="form-group">
                         <button type="button" id="btn-cancelar" class="btn btn-danger btn-lg btn-block">Salir</button>
                       </div>
                     </div>
-                    <div class="col-6 col-md-6 d-none">
+                    <div class="col-6 col-md-6">
                       <div class="form-group">
                         <button type="submit" id="btn-save" class="btn btn-success btn-lg btn-block btn-verificar">Guardar</button>
                       </div>
@@ -409,3 +423,33 @@
   <?php echo form_close(); ?>
 </div>
 <!-- modal pago 100% cliente -->
+
+<!-- modal pago servicio cliente -->
+<div class="modal fade modal-pago_cliente_servicio" id="modal-pago_cliente_servicio">
+  <?php $attributes = array('id' => 'form-pago_cliente_servicio'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_cliente_servicio">
+        <div class="row">
+          <input type="hidden" id="pago_cliente_servicio-id_cabecera" name="pago_cliente_servicio-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher pago servicio</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_cliente_servicio" name="pago_cliente_servicio" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-pago_cliente_servicio" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago servicio cliente -->

@@ -36,8 +36,7 @@ class PedidosGarantizadosModel extends CI_Model{
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
-		->where($this->table . '.Nu_Estado>=', 2)
-		->where($this->table . '.Nu_Estado<', 5);
+		->where_in($this->table . '.Nu_Estado', array(2,3,4,8));
         
 		if(isset($this->order)) {
 			$order = $this->order;
@@ -52,19 +51,13 @@ class PedidosGarantizadosModel extends CI_Model{
     }
     
     public function get_by_id($ID){
-        $this->db->select('CORRE.Fe_Month, Nu_Estado_China,
-		EMP.No_Empresa, EMP.Txt_Direccion_Empresa, EMP.Nu_Documento_Identidad AS Nu_Documento_Identidad_Empresa,
-		CONFI.No_Logo_Empresa, CONFI.No_Imagen_Logo_Empresa, CONFI.Nu_Height_Logo_Ticket,
-		CONFI.Nu_Width_Logo_Ticket, ' . $this->table . '.*,
+        $this->db->select('CORRE.Fe_Month, Nu_Estado_China, ' . $this->table . '.*,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
-		TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido, CONFI.Txt_Cuentas_Bancarias');
+		TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
-		$this->db->join($this->table_empresa . ' AS EMP', 'EMP.ID_Empresa = ' . $this->table . '.ID_Empresa', 'join');
-		$this->db->join($this->table_organizacion . ' AS ORG', 'ORG.ID_Organizacion = ' . $this->table . '.ID_Organizacion', 'join');
-		$this->db->join($this->table_configuracion . ' AS CONFI', 'CONFI.ID_Empresa = EMP.ID_Empresa', 'join');
     	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
     	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
 		$this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join');
@@ -110,6 +103,7 @@ class PedidosGarantizadosModel extends CI_Model{
 		ACPDPP.Qt_Producto_Caja,
 		ACPDPP.Qt_Cbm,
 		ACPDPP.Nu_Dias_Delivery,
+		ACPDPP.Ss_Costo_Delivery,
 		ACPDPP.Txt_Nota,
 		ACPDPP.Nu_Selecciono_Proveedor,
 		ACPDPP.Qt_Producto_Caja_Final,
@@ -136,13 +130,57 @@ class PedidosGarantizadosModel extends CI_Model{
 		$this->db->trans_begin();
 
 		foreach ($arrPost['addProducto'] as $row) {
-			$cantidad = $row['cantidad'];
-			if($row['cantidad'] < $row['cantidad_oculta'])
-				$cantidad = $row['cantidad_oculta'];
+			$cantidad = $row['cantidad_oculta'];
+			if(isset($row['cantidad'])){
+				$cantidad = $row['cantidad'];
+				if($row['cantidad'] < $row['cantidad_oculta'])
+					$cantidad = $row['cantidad_oculta'];
+			}
+			
+			$nota = '';
+			if(isset($row['nota'])){
+				$nota = nl2br($row['nota']);
+			}
+			
+			$precio = $row['precio'];
+			if($row['precio'] < $row['precio_oculta'])
+				$precio = $row['precio_oculta'];
+			
+			$moq = $row['moq'];
+			if($row['moq'] < $row['moq_oculta'])
+				$moq = $row['moq_oculta'];
+				
+			$caja = $row['caja'];
+			if($row['caja'] < $row['caja_oculta'])
+				$caja = $row['caja_oculta'];
+				
+			$cbm = $row['cbm'];
+			if($row['cbm'] < $row['cbm_oculta'])
+				$cbm = $row['cbm_oculta'];
+			
+			$delivery = $row['delivery'];
+			if($row['delivery'] < $row['delivery_oculta'])
+				$delivery = $row['delivery_oculta'];
+			
+			$costo_delivery = $row['costo_delivery'];
+			if($row['costo_delivery'] < $row['costo_delivery_oculta'])
+				$costo_delivery = $row['costo_delivery_oculta'];
+				
+			$nota_historica = $row['nota_historica'];
+			if(empty($row['nota_historica']))
+				$nota_historica = $row['nota_historica_oculta'];
+
 			$arrActualizar[] = array(
 				'ID_Pedido_Detalle_Producto_Proveedor' => $row['id_detalle'],
 				'Qt_Producto_Caja_Final' => $cantidad,
-				'Txt_Nota_Final' => nl2br($row['nota']),
+				'Txt_Nota_Final' => $nota,
+				'Ss_Precio' => $precio,
+				'Qt_Producto_Moq' => $moq,
+				'Qt_Producto_Caja' => $caja,
+				'Qt_Cbm' => $cbm,
+				'Nu_Dias_Delivery' => $delivery,
+				'Ss_Costo_Delivery' => $costo_delivery,
+				'Txt_Nota' => nl2br($nota_historica),
 			);
 		}
 		
@@ -195,14 +233,10 @@ class PedidosGarantizadosModel extends CI_Model{
     public function actualizarPedido($where, $data, $arrProducto){
 		$this->db->trans_begin();
 
-		//actualizar cabecera
-		$data_cabecera = array(
-			'Ss_Tipo_Cambio' => $data['Ss_Tipo_Cambio'],
-		);
 		$where_cabecera = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
 		);
-		$this->db->update($this->table, $data_cabecera, $where_cabecera);
+		$this->db->update($this->table, $data, $where_cabecera);
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
@@ -257,6 +291,7 @@ class PedidosGarantizadosModel extends CI_Model{
 				'Qt_Producto_Caja' => $row['qty_caja'],
 				'Qt_Cbm' => $row['cbm'],
 				'Nu_Dias_Delivery' => $row['delivery'],
+				'Ss_Costo_Delivery' => $row['costo_delivery'],
 				'Txt_Nota' => nl2br($row['nota']),
 				'No_Contacto_Proveedor' => $row['contacto_proveedor'],
 				'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
