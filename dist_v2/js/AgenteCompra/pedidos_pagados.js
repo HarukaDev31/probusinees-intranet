@@ -11,6 +11,15 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 
 $(function () {
+  //Date picker invoice
+  $( '.input-datepicker-pay' ).datepicker({
+    autoclose : true,
+    startDate : new Date(fYear, fToday.getMonth(), fDay),
+    todayHighlight  : true,
+    dateFormat: 'dd/mm/yyyy',
+    format: 'dd/mm/yyyy',
+  });
+
   //Global Autocomplete
   $( '.autocompletar' ).autoComplete({
     minChars: 0,
@@ -726,11 +735,13 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo) {
   $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
   $('.modal-message-delete').addClass('modal-success');
 
-  var sNombreEstado = 'Pendiente';
-  if(Nu_Estado==2)
-    sNombreEstado = 'Garantizado';
+  var sNombreEstado = 'Pago 30%';
+  if(Nu_Estado==7)
+    sNombreEstado = 'Pago 70%';
+  else if(Nu_Estado==9)
+    sNombreEstado = 'Pago servicio';
 
-  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {
     $modal_delete.modal('hide');
@@ -955,13 +966,13 @@ function cambiarEstadoChina(ID, Nu_Estado) {
   $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
   $('.modal-message-delete').addClass('modal-success');
 
-  var sNombreEstado = 'Pendiente';
-  if(Nu_Estado==2)
-    sNombreEstado = 'En proceso';
-  else if(Nu_Estado==2)
-    sNombreEstado = 'Cotizado';
+  var sNombreEstado = 'Producción';
+  if(Nu_Estado==5)
+    sNombreEstado = 'Inspección';
+  else if(Nu_Estado==6)
+    sNombreEstado = 'Entregado';
 
-  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {
     $modal_delete.modal('hide');
@@ -1200,7 +1211,7 @@ function cambiarTipoServicio(ID, Nu_Estado) {
   if(Nu_Estado==2)
     sNombreEstado = 'C. Trading';
 
-  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {
     $modal_delete.modal('hide');

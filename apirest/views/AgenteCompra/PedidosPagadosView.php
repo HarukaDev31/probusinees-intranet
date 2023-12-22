@@ -98,28 +98,28 @@
                       </div>
                     </div>
 
-                    <div class="col-4 col-sm-4 col-md-4">
+                    <div class="col-6 col-sm-4 col-md-3 text-center">
                       <div class="form-group">
-                        <button type="button" class="btn btn-primary btn-block" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">subir pago 30%</button>
-                        <button type="button" id="btn-descargar_pago_30" class="btn btn-link btn-block" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()">Descargar</button>
+                        <button type="button" class="btn btn-primary" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">Pagar 30%</button>
+                        <button type="button" id="btn-descargar_pago_30" class="btn btn-primary d-none" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()"><i class="fas fa-download" aria-hidden="true"></i></button>
                       </div>
                     </div>
 
-                    <div class="col-4 col-sm-4 col-md-4">
+                    <div class="col-6 col-sm-4 col-md-3 text-center">
                       <div class="form-group">
-                        <button type="button" class="btn btn-primary btn-block" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">subir pago 100%</button>
-                        <button type="button" id="btn-descargar_pago_100" class="btn btn-link btn-block" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()">Descargar</button>
+                        <button type="button" class="btn btn-primary" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">Pagar 70%</button>
+                        <button type="button" id="btn-descargar_pago_100" class="btn btn-primary d-none" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()"><i class="fas fa-download" aria-hidden="true"></i></button>
                       </div>
                     </div>
 
-                    <div class="col-4 col-sm-4 col-md-4">
+                    <div class="col-6 col-sm-4 col-md-3 text-center">
                       <div class="form-group">
-                        <button type="button" class="btn btn-primary btn-block" alt="Subir pago servicio" title="Subir pago servicio" onclick="subirPagoServicio()">subir pago servicio</button>
-                        <button type="button" id="btn-descargar_pago_servicio" class="btn btn-link btn-block" alt="Descargar pago servicio" title="Descargar pago servicio" onclick="descargarPagoServicio()">Descargar</button>
+                        <button type="button" class="btn btn-primary" alt="Subir pago servicio" title="Subir pago servicio" onclick="subirPagoServicio()">Pagar servicio</button>
+                        <button type="button" id="btn-descargar_pago_servicio" class="btn btn-primary d-none" alt="Descargar pago servicio" title="Descargar pago servicio" onclick="descargarPagoServicio()"><i class="fas fa-download" aria-hidden="true"></i></button>
                       </div>
                     </div>
 
-                    <div class="col-12 col-sm-12 col-md-12 mb-3">
+                    <div class="col-6 col-sm-12 col-md-3 mb-3">
                       <button type="button" id="btn-excel_order_tracking" class="btn btn-success btn-block" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(1)" data-id_pedido="">Descargar &nbsp;<i class="fa fa-file-excel text-white"></i></button>
                     </div>
                   </div>
@@ -374,11 +374,47 @@
         <div class="row">
           <input type="hidden" id="pago_cliente_30-id_cabecera" name="pago_cliente_30-id_cabecera" class="form-control">
 
-          <div class="col-sm-12">
+          <div class="col-12 col-sm-12">
             <label>Voucher pago 30%</label>
             <div class="form-group">
               <input class="form-control" id="pago_cliente_30" name="pago_cliente_30" type="file" accept="image/*"></input>
               <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="ID_Pais_30_Cliente" id="cbo-ID_Pais_30_Cliente" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="modal-Fe_Pago_30_Cliente" name="Fe_Pago_30_Cliente" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="modal-Ss_Pago_30_Cliente" name="Ss_Pago_30_Cliente" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="modal-Nu_Operacion_Pago_30_Cliente" name="Nu_Operacion_Pago_30_Cliente" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
             </div>
           </div>
         </div>
@@ -405,10 +441,46 @@
           <input type="hidden" id="pago_cliente_100-id_cabecera" name="pago_cliente_100-id_cabecera" class="form-control">
 
           <div class="col-sm-12">
-            <label>Voucher pago 100%</label>
+            <label>Voucher pago 70%</label>
             <div class="form-group">
               <input class="form-control" id="pago_cliente_100" name="pago_cliente_100" type="file" accept="image/*"></input>
               <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="ID_Pais_100_Cliente" id="cbo-ID_Pais_100_Cliente" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="modal-Fe_Pago_100_Cliente" name="Fe_Pago_100_Cliente" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="modal-Ss_Pago_100_Cliente" name="Ss_Pago_100_Cliente" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="modal-Nu_Operacion_Pago_100_Cliente" name="Nu_Operacion_Pago_100_Cliente" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
             </div>
           </div>
         </div>
@@ -439,6 +511,42 @@
             <div class="form-group">
               <input class="form-control" id="pago_cliente_servicio" name="pago_cliente_servicio" type="file" accept="image/*"></input>
               <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="ID_Pais_Servicio_Cliente" id="cbo-ID_Pais_Servicio_Cliente" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="modal-Fe_Pago_Servicio_Cliente" name="Fe_Pago_Servicio_Cliente" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="modal-Ss_Pago_Servicio_Cliente" name="Ss_Pago_Servicio_Cliente" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="modal-Nu_Operacion_Pago_Servicio_Cliente" name="Nu_Operacion_Pago_Servicio_Cliente" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
             </div>
           </div>
         </div>

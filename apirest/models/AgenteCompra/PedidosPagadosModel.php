@@ -336,7 +336,13 @@ class PedidosPagadosModel extends CI_Model{
 				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
 
 				$where = array('ID_Pedido_Cabecera' => $arrPost['pago_cliente_30-id_cabecera']);
-				$data = array( 'Txt_Url_Pago_30_Cliente' => $Txt_Url_Imagen_Producto );//1=SI
+				$data = array(
+					'Txt_Url_Pago_30_Cliente' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_30_Cliente' => $arrPost['ID_Pais_30_Cliente'],
+					'Fe_Pago_30_Cliente' => ToDate($arrPost['Fe_Pago_30_Cliente']),
+					'Ss_Pago_30_Cliente' => $arrPost['Ss_Pago_30_Cliente'],
+					'Nu_Operacion_Pago_30_Cliente' => $arrPost['Nu_Operacion_Pago_30_Cliente']
+				);//1=SI
 				$this->db->update($this->table, $data, $where);
 			}
 			
@@ -382,7 +388,13 @@ class PedidosPagadosModel extends CI_Model{
 				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
 
 				$where = array('ID_Pedido_Cabecera' => $arrPost['pago_cliente_100-id_cabecera']);
-				$data = array( 'Txt_Url_Pago_100_Cliente' => $Txt_Url_Imagen_Producto );//1=SI
+				$data = array(
+					'Txt_Url_Pago_100_Cliente' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_100_Cliente' => $arrPost['ID_Pais_100_Cliente'],
+					'Fe_Pago_100_Cliente' => ToDate($arrPost['Fe_Pago_100_Cliente']),
+					'Ss_Pago_100_Cliente' => $arrPost['Ss_Pago_100_Cliente'],
+					'Nu_Operacion_Pago_100_Cliente' => $arrPost['Nu_Operacion_Pago_100_Cliente']
+				);//1=SI
 				$this->db->update($this->table, $data, $where);
 			}
 			
@@ -428,7 +440,13 @@ class PedidosPagadosModel extends CI_Model{
 				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
 
 				$where = array('ID_Pedido_Cabecera' => $arrPost['pago_cliente_servicio-id_cabecera']);
-				$data = array( 'Txt_Url_Pago_Servicio_Cliente' => $Txt_Url_Imagen_Producto );//1=SI
+				$data = array(
+					'Txt_Url_Pago_Servicio_Cliente' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_Servicio_Cliente' => $arrPost['ID_Pais_Servicio_Cliente'],
+					'Fe_Pago_Servicio_Cliente' => ToDate($arrPost['Fe_Pago_Servicio_Cliente']),
+					'Ss_Pago_Servicio_Cliente' => $arrPost['Ss_Pago_Servicio_Cliente'],
+					'Nu_Operacion_Pago_Servicio_Cliente' => $arrPost['Nu_Operacion_Pago_Servicio_Cliente']
+				);//1=SI
 				$this->db->update($this->table, $data, $where);
 			}
 			
