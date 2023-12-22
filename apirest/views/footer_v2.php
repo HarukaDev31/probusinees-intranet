@@ -14,7 +14,7 @@
 </div>
 <!-- ./wrapper -->
 
-<?php $iControlVersionDashboard = '1.0.160'; ?>
+<?php $iControlVersionDashboard = '1.0.165'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -116,6 +116,16 @@
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
 
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_pagados.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_historial_pagos) && $js_historial_pagos==true) : ?>
+  
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/historial_pagos.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <!-- Usuarios y opciones -->
