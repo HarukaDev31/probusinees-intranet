@@ -25,10 +25,14 @@
   <?php if (isset($js_permiso_usuario) && $js_permiso_usuario==true) : ?>
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
   <?php endif; ?>
+  
+  <?php if (isset($js_pedidos_garantizados) && $js_pedidos_garantizados==true) : ?>
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <?php endif; ?>
 
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=6.2.0'; ?>">
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=8.2.0'; ?>">
 
   <meta name="theme-color" content="#FF6700">
   <meta name="msapplication-navbutton-color" content="#FF6700"/>

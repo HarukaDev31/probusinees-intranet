@@ -29,6 +29,12 @@ function ParseDateString(fecha, tipo_fecha, caracter){
     var _FE = fecha.split(caracter);
     return _FE[2] + '/' + _FE[1] + '/' + _FE[0];
   }
+  
+  if (tipo_fecha == 'fecha_hora_bd') {// Caracter -> (-) y formato de fecha BD (YYY-MM-DD)
+    var arrFechaHora = fecha.split(caracter);
+    var Fecha = arrFechaHora[0].split('-');
+    return Fecha[2] + '/' + Fecha[1] + '/' + Fecha[0] + ' ' + arrFechaHora[1];
+  }
 }
 
 (function() {

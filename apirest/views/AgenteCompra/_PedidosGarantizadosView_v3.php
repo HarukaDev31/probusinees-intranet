@@ -367,46 +367,68 @@
 <!-- /.modal imagen del item -->
 
 <div class="modal fade modal-chat_producto" id="modal-default">
-  <div class="modal-dialog"><!-- modal-dialog-scrollable -->
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title font-weight-bold" id="title-chat_producto">Producto</h4>
+        <h4 class="modal-title">Producto</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="modal-body-chat_producto">
         <div class="row">
           <div class="col-md-12">
             <!-- DIRECT CHAT PRIMARY -->
-            <div class="card card-success card-outline direct-chat direct-chat-primary">
+            <div class="card card-primary card-outline direct-chat direct-chat-primary">
               <div class="card-header">
                 <h3 class="card-title">Chat</h3>
               </div>
               <!-- /.card-header -->
-              <div class="card-body" id="card-chat_item">
+              <div class="card-body">
+                <!-- Conversations are loaded here -->
+                <div class="direct-chat-messages">
+                  <!-- Message. Default to the left -->
+                  <div class="direct-chat-msg">
+                    <div class="direct-chat-infos clearfix">
+                      <span class="direct-chat-name float-left">Alexander Pierce</span>
+                      <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
+                    </div>
+                    <!-- /.direct-chat-infos -->
+                    <img class="direct-chat-img" src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" alt="a">
+                    <!-- /.direct-chat-img -->
+                    <div class="direct-chat-text">
+                      Is this template really for free? That's unbelievable!
+                    </div>
+                    <!-- /.direct-chat-text -->
+                  </div>
+                  <!-- /.direct-chat-msg -->
+
+                  <!-- Message to the right -->
+                  <div class="direct-chat-msg right">
+                    <div class="direct-chat-infos clearfix">
+                      <span class="direct-chat-name float-right">Sarah Bullock</span>
+                      <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
+                    </div>
+                    <!-- /.direct-chat-infos -->
+                    <img class="direct-chat-img" src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" alt="b">
+                    <!-- /.direct-chat-img -->
+                    <div class="direct-chat-text">
+                      You better believe it!
+                    </div>
+                    <!-- /.direct-chat-text -->
+                  </div>
+                  <!-- /.direct-chat-msg -->
+                </div>
+                <!--/.direct-chat-messages-->
               </div>
               <!-- /.card-body -->
               <div class="card-footer">
-                <?php
-                $attributes = array('id' => 'form-chat_producto');
-                echo form_open('', $attributes);
-                ?>
-                  <input type="hidden" name="chat_producto-ID_Empresa_item" id="txt-chat_producto-ID_Empresa_item" class="form-control form-control-lg">
-                  <input type="hidden" name="chat_producto-ID_Organizacion_item" id="txt-chat_producto-ID_Organizacion_item" class="form-control form-control-lg">
-                  <input type="hidden" name="chat_producto-ID_Pedido_Cabecera_item" id="txt-chat_producto-ID_Pedido_Cabecera_item" class="form-control form-control-lg">
-                  <input type="hidden" name="chat_producto-ID_Pedido_Detalle_item" id="txt-chat_producto-ID_Pedido_Detalle_item" class="form-control form-control-lg">
-                  
-                  <div class="form-group">
-                    <div class="input-group">
-                      <!--<input type="text" name="message_chat" id="message_chat" placeholder="Escribir mensaje ..." class="form-control form-control-lg">-->
-                      
-                      <textarea name="message_chat" id="message_chat" class="form-control" rows="1" placeholder="Opcional" style="height: auto;"></textarea>
-                      <span class="input-group-append">
-                        <button type="button" id="btn-enviar_mensaje" class="btn btn-success btn-lg">Enviar</button>
-                      </span>
-                    </div>
-                    <span class="help-block text-danger" id="error"></span>
+                <form action="#" method="post">
+                  <div class="input-group">
+                    <input type="text" name="message" placeholder="Escribir mensaje ..." class="form-control form-control-lg">
+                    <span class="input-group-append">
+                      <button type="button" class="btn btn-primary btn-lg">Enviar</button>
+                    </span>
                   </div>
-                <?php echo form_close(); ?>
+                </form>
               </div>
               <!-- /.card-footer-->
             </div>

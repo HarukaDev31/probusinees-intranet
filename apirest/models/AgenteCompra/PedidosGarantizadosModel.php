@@ -55,7 +55,7 @@ class PedidosGarantizadosModel extends CI_Model{
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
-		TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido');
+		IGPD.Nu_Envio_Mensaje_Chat_Producto, TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
     	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
@@ -108,7 +108,9 @@ class PedidosGarantizadosModel extends CI_Model{
 		ACPDPP.Nu_Selecciono_Proveedor,
 		ACPDPP.Qt_Producto_Caja_Final,
 		ACPDPP.Txt_Nota_Final,
-		ACPDPPI.Txt_Url_Imagen_Producto
+		ACPDPPI.Txt_Url_Imagen_Producto,
+		ACPDPP.No_Contacto_Proveedor,
+		ACPDPP.Txt_Url_Imagen_Proveedor
 		');
         $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP');
 		$this->db->join($this->table . ' AS ACPC', 'ACPC.ID_Pedido_Cabecera = ACPDPP.ID_Pedido_Cabecera', 'join');
@@ -126,10 +128,42 @@ class PedidosGarantizadosModel extends CI_Model{
         return $query->result();
     }
 
-    public function actualizarElegirItemProductos($arrPost){
+    public function actualizarElegirItemProductos($arrPost, $data_files){
 		$this->db->trans_begin();
 
-		foreach ($arrPost['addProducto'] as $row) {
+		//array_debug($data_files['addProveedor']);
+
+		$path = "assets/images/contacto_proveedores/";
+		//foreach ($arrPost['addProducto'] as $row) {
+		foreach($arrPost['addProducto'] as $key => $row) {
+			$Txt_Url_Imagen_Proveedor='';
+			if(isset($data_files['addProveedor']) && !empty($data_files['addProveedor']) && !empty($data_files['addProveedor']['name'][$key])) {
+				$_FILES['img_proveedor']['name'] = $data_files['addProveedor']['name'][$key];
+				$_FILES['img_proveedor']['type'] = $data_files['addProveedor']['type'][$key];
+				$_FILES['img_proveedor']['tmp_name'] = $data_files['addProveedor']['tmp_name'][$key];
+				$_FILES['img_proveedor']['error'] = $data_files['addProveedor']['error'][$key];
+				$_FILES['img_proveedor']['size'] = $data_files['addProveedor']['size'][$key];
+
+				$config['upload_path'] = $path;
+				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+				$config['max_size'] = 3072;//1024 KB = 3 MB
+				$config['encrypt_name'] = TRUE;
+				$config['max_filename'] = '255';
+		
+				$this->load->library('upload', $config);
+				if (!$this->upload->do_upload('img_proveedor')){
+					$this->db->trans_rollback();
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . strip_tags($this->upload->display_errors()),
+					);
+				} else {
+					$arrUploadFile = $this->upload->data();
+					$Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
+				}
+			}
+
+
 			$cantidad = $row['cantidad_oculta'];
 			if(isset($row['cantidad'])){
 				$cantidad = $row['cantidad'];
@@ -169,6 +203,10 @@ class PedidosGarantizadosModel extends CI_Model{
 			$nota_historica = $row['nota_historica'];
 			if(empty($row['nota_historica']))
 				$nota_historica = $row['nota_historica_oculta'];
+				
+			$contacto_proveedor = $row['contacto_proveedor'];
+			if(empty($row['contacto_proveedor']))
+				$contacto_proveedor = $row['contacto_proveedor'];
 
 			$arrActualizar[] = array(
 				'ID_Pedido_Detalle_Producto_Proveedor' => $row['id_detalle'],
@@ -181,6 +219,8 @@ class PedidosGarantizadosModel extends CI_Model{
 				'Nu_Dias_Delivery' => $delivery,
 				'Ss_Costo_Delivery' => $costo_delivery,
 				'Txt_Nota' => nl2br($nota_historica),
+				'No_Contacto_Proveedor' => $contacto_proveedor,
+				'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
 			);
 		}
 		
@@ -198,18 +238,12 @@ class PedidosGarantizadosModel extends CI_Model{
 	public function elegirItemProveedor($id_detalle, $ID, $status){
 		$query = "SELECT Nu_Selecciono_Proveedor FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle = " . $id_detalle . " AND Nu_Selecciono_Proveedor=1";
 		$objProveedor = $this->db->query($query)->row();
-		//if(!is_object($objProveedor)){
-			$where = array('ID_Pedido_Detalle_Producto_Proveedor' => $ID);
-			$data = array( 'Nu_Selecciono_Proveedor' => $status );//1=proveedor seleccionado
-			if ($this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0) {
-				return array('status' => 'success', 'message' => 'Proveedor seleccionado');
-			}
-			return array('status' => 'error', 'message' => 'Error al seleccionar proveedor');
-		/*
-		} else {
-			return array('status' => 'error', 'message' => 'Primero desmarcar proveedor');
+		$where = array('ID_Pedido_Detalle_Producto_Proveedor' => $ID);
+		$data = array( 'Nu_Selecciono_Proveedor' => $status );//1=proveedor seleccionado
+		if ($this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Proveedor seleccionado');
 		}
-		*/
+		return array('status' => 'error', 'message' => 'Error al seleccionar proveedor');
 	}
 
 	public function cambiarEstado($ID, $Nu_Estado){
@@ -230,8 +264,72 @@ class PedidosGarantizadosModel extends CI_Model{
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
 	}
     
-    public function actualizarPedido($where, $data, $arrProducto){
+    public function actualizarPedido($where, $data, $arrProducto, $arrProductoTable){
 		$this->db->trans_begin();
+
+		if (!empty($arrProducto)) {
+			//localhost
+			$path = "assets/images/productos/";
+			//$path = "../../agentecompra.probusiness.pe/public_html/assets/images/productos/";
+			$iCounter=0;
+			$_FILES['tmp_voucher'] = $_FILES['voucher'];
+			foreach($arrProducto as $row) {
+				//SET IMAGEN
+				$_FILES['voucher']['name'] = $_FILES['tmp_voucher']['name'][$iCounter];
+				$_FILES['voucher']['type'] = $_FILES['tmp_voucher']['type'][$iCounter];
+				$_FILES['voucher']['tmp_name'] = $_FILES['tmp_voucher']['tmp_name'][$iCounter];
+				$_FILES['voucher']['error'] = $_FILES['tmp_voucher']['error'][$iCounter];
+				$_FILES['voucher']['size'] = $_FILES['tmp_voucher']['size'][$iCounter];
+
+				$config['upload_path'] = $path;
+				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+				$config['max_size'] = 3096;//1024 KB = 1 MB
+				$config['encrypt_name'] = TRUE;
+				$config['max_filename'] = '255';
+		
+				$this->load->library('upload', $config);
+
+				if (!$this->upload->do_upload('voucher')){
+					$this->db->trans_rollback();
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen ' . $row['nombre_comercial'] . ' ' . strip_tags($this->upload->display_errors()),
+					);
+				} else {
+					$arrUploadFile = $this->upload->data();
+					$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+					$Txt_Url_Imagen_Producto = str_replace("https://intranet.probusiness.pe/../../", "https://", $Txt_Url_Imagen_Producto);
+					$Txt_Url_Imagen_Producto = str_replace("public_html/", "", $Txt_Url_Imagen_Producto);
+				}
+
+				$arrSaleOrderDetail[] = array(
+					'ID_Empresa' => $data['ID_Empresa'],
+					'ID_Organizacion' => $data['ID_Organizacion'],
+					'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+					'Txt_Producto' => $row['nombre_comercial'],
+					'Txt_Descripcion' => nl2br($row['caracteristicas']),
+					'Qt_Producto' => $row['cantidad'],
+					'Txt_Url_Imagen_Producto' => $Txt_Url_Imagen_Producto,
+					'Txt_Url_Link_Pagina_Producto' => $row['link'],
+				);
+				++$iCounter;
+			}
+			$this->db->insert_batch('agente_compra_pedido_detalle', $arrSaleOrderDetail);
+		}
+		
+		//actualizar productos de tabla de cliente
+		if (!empty($arrProductoTable)) {
+			foreach($arrProductoTable as $row) {
+				//array_debug($row);
+				$arrSaleOrderDetailUPD[] = array(
+					'ID_Pedido_Detalle' => $row['id_item'],
+					'Qt_Producto' => $row['cantidad'],
+					'Txt_Descripcion' => nl2br($row['caracteristicas']),
+				);
+			}
+    		$this->db->update_batch('agente_compra_pedido_detalle', $arrSaleOrderDetailUPD, 'ID_Pedido_Detalle');
+		}
 
 		$where_cabecera = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
@@ -488,5 +586,77 @@ Nu_Correlativo
 	public function descargarDocumentoPagoGarantizado($id){
 		$query = "SELECT Txt_Url_Pago_Garantizado AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
 		return $this->db->query($query)->row();
+	}
+
+	public function sendMessage($data){
+		$this->db->trans_begin();
+	
+		$arrMessage = array(
+			'ID_Empresa' => $data['chat_producto-ID_Empresa_item'],
+			'ID_Organizacion' => $data['chat_producto-ID_Organizacion_item'],
+			'ID_Pedido_Cabecera' => $data['chat_producto-ID_Pedido_Cabecera_item'],
+			'ID_Pedido_Detalle' => $data['chat_producto-ID_Pedido_Detalle_item'],
+		);
+		
+		if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1peru
+			$arrMessageUser = array(
+				'ID_Usuario_Remitente' => $this->user->ID_Usuario,
+				'Txt_Usuario_Remitente' => nl2br($data['message_chat'])
+			);
+		}
+		
+		if($this->user->Nu_Tipo_Privilegio_Acceso==2){//china
+			$arrMessageUser = array(
+				'ID_Usuario_Destino' => $this->user->ID_Usuario,
+				'Txt_Usuario_Destino' => nl2br($data['message_chat'])
+			);
+		}
+
+		$arrMessage = array_merge($arrMessage, $arrMessageUser);
+
+		$this->db->insert('agente_compra_pedido_detalle_chat_producto', $arrMessage);
+		
+		$sql = "UPDATE agente_compra_pedido_detalle SET Nu_Envio_Mensaje_Chat_Producto=Nu_Envio_Mensaje_Chat_Producto+1 WHERE ID_Pedido_Detalle=" . $data['chat_producto-ID_Pedido_Detalle_item'];
+		$this->db->query($sql);
+
+		//$where = array('ID_Pedido_Detalle' => $data['chat_producto-ID_Pedido_Detalle_item']);
+		//$data = array( 'Nu_Envio_Mensaje_Chat_Producto' => 'Nu_Envio_Mensaje_Chat_Producto+1');//1=SI
+		//$this->db->update('agente_compra_pedido_detalle', $data, $where);
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return array('status' => 'error', 'message' => 'Error al enviar');
+		} else {
+			//$this->db->trans_rollback();
+			$this->db->trans_commit();
+			return array('status' => 'success', 'message' => 'Mensaje enviado');
+		}
+	}
+	
+	public function viewChatItem($id){
+		$query = "SELECT CHAT.*, USRR.No_Nombres_Apellidos AS No_Nombres_Apellidos_Remitente, USRD.No_Nombres_Apellidos AS No_Nombres_Apellidos_Destinatario FROM
+agente_compra_pedido_detalle_chat_producto AS CHAT
+LEFT JOIN usuario AS USRR ON(USRR.ID_Usuario = CHAT.ID_Usuario_Remitente)
+LEFT JOIN usuario AS USRD ON(USRD.ID_Usuario = CHAT.ID_Usuario_Destino)
+WHERE ID_Pedido_Detalle = " . $id . " ORDER BY Fe_Registro ASC";
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos'
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
 	}
 }

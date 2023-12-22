@@ -79,9 +79,10 @@ class PedidosGarantizados extends CI_Controller {
 				$dropdown_estado_china .= '</ul>';
 			$dropdown_estado_china .= '</div>';
 
-			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
-				$dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-			}
+			//comentado temporal
+			//if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
+				//$dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			//}
             $rows[] = $dropdown_estado_china;
 
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
@@ -124,7 +125,8 @@ class PedidosGarantizados extends CI_Controller {
 
 	public function actualizarElegirItemProductos(){
 		//array_debug($this->input->post());
-        echo json_encode($this->PedidosGarantizadosModel->actualizarElegirItemProductos($this->input->post()));
+		//array_debug($_FILES);
+        echo json_encode($this->PedidosGarantizadosModel->actualizarElegirItemProductos($this->input->post(), $_FILES));
     }
 
 	public function cambiarEstado($ID, $Nu_Estado){
@@ -142,6 +144,8 @@ class PedidosGarantizados extends CI_Controller {
 		
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		$data = array(
+			'ID_Empresa' => $this->input->post('EID_Empresa'),
+			'ID_Organizacion' => $this->input->post('EID_Organizacion'),
 			'Ss_Tipo_Cambio' => $this->input->post('Ss_Tipo_Cambio'),
 			'Txt_Observaciones_Garantizado' => $this->input->post('Txt_Observaciones_Garantizado'),
 		);
@@ -150,7 +154,8 @@ class PedidosGarantizados extends CI_Controller {
 					'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
 				),
 				$data,
-				$this->input->post('addProducto')
+				$this->input->post('addProducto'),
+				$this->input->post('addProductoTable')
 			)
 		);
 	}
@@ -1744,4 +1749,16 @@ class PedidosGarantizados extends CI_Controller {
 			echo json_encode($response);
 		}
     }
+
+	public function sendMessage(){
+		//array_debug($this->user->ID_Usuario);
+		//array_debug($this->input->post());
+		echo json_encode($this->PedidosGarantizadosModel->sendMessage($this->input->post()));
+		exit();
+	}
+
+	public function viewChatItem($id){
+		echo json_encode($this->PedidosGarantizadosModel->viewChatItem($id));
+		exit();
+	}
 }
