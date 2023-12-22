@@ -383,7 +383,7 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido) {
   if(Nu_Estado==2)
     sNombreEstado = 'Garantizado';
 
-  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {
     $modal_delete.modal('hide');

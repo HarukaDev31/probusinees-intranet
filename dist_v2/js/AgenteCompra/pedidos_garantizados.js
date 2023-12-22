@@ -812,14 +812,16 @@ function cambiarEstado(ID, Nu_Estado) {
   $('.modal-message-delete').addClass('modal-success');
 
   var sNombreEstado = 'Garantizado';
-  if(Nu_Estado==2)
+  if(Nu_Estado==3)
     sNombreEstado = 'Enviado';
-  else if(Nu_Estado==2)
+  else if(Nu_Estado==4)
     sNombreEstado = 'Rechazado';
-  else if(Nu_Estado==2)
+  else if(Nu_Estado==5)
+    sNombreEstado = 'Confirmado';
+  else if(Nu_Estado==8)
     sNombreEstado = 'Confirmado';
 
-  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {
     $modal_delete.modal('hide');
@@ -871,10 +873,10 @@ function cambiarEstadoChina(ID, Nu_Estado) {
   var sNombreEstado = 'Pendiente';
   if(Nu_Estado==2)
     sNombreEstado = 'En proceso';
-  else if(Nu_Estado==2)
+  else if(Nu_Estado==3)
     sNombreEstado = 'Cotizado';
 
-  $('#modal-title').text('¿Deseas cambiar estado a ' + sNombreEstado + '?');
+  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {
     $modal_delete.modal('hide');
