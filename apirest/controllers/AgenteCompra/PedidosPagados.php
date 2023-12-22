@@ -812,4 +812,9 @@ class PedidosPagados extends CI_Controller {
 			die('No existe registro');
 		}
     }
+    	
+	public function elminarItemProveedor($id){
+		//echo "hola";
+		echo json_encode($this->PedidosPagadosModel->elminarItemProveedor($this->security->xss_clean($id)));
+	}
 }

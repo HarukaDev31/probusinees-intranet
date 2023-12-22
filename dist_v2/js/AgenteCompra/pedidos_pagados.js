@@ -283,6 +283,57 @@ $(function () {
     $('#modal-agregar_inspeccion').modal('show');
   })
 
+	$(document).on('click', '.btn-eliminar_item_proveedor', function (e) {
+    e.preventDefault();
+
+    var id = $(this).data('id');
+    var id_pedido_cabecera = $(this).data('id_pedido_cabecera');
+
+    var $modal_delete = $( '#modal-message-delete' );
+    $modal_delete.modal('show');
+
+    $( '#modal-title' ).html('¿Estás seguro de eliminar?');
+
+    $( '#btn-cancel-delete' ).off('click').click(function () {
+      $modal_delete.modal('hide');
+    });
+
+    $( '#btn-save-delete' ).off('click').click(function () {
+      $( '#btn-save-delete' ).text('');
+      $( '#btn-save-delete' ).attr('disabled', true);
+      $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+      url = base_url + 'AgenteCompra/PedidosPagados/elminarItemProveedor/' + id;
+      $.ajax({
+        url : url,
+        type: "GET",
+        dataType: "JSON",
+        success: function(response){
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $modal_delete.modal('hide');
+
+            verPedido(id_pedido_cabecera);
+
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+          }
+          
+          $( '#btn-save-delete' ).text('');
+          $( '#btn-save-delete' ).append( 'Guardar' );
+          $( '#btn-save-delete' ).attr('disabled', false);
+        }
+      })
+    });
+  })
+
   $("#form-agregar_inspeccion").on('submit',function(e){
     e.preventDefault();
 
@@ -588,7 +639,7 @@ function verPedido(ID){
         var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
         var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
 
-        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? detalle[i]['Fe_Entrega_Proveedor'] : fDay + '/' + fMonth + '/' + fYear);
+        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
 
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
@@ -615,15 +666,19 @@ function verPedido(ID){
 
           table_enlace_producto += "<td class='text-left td-supplier'>";
             table_enlace_producto += '<div class="input-group date" style="width:100%">';
-              table_enlace_producto += '<input type="text" id="txt-fecha_entrega_proveedor'+i+'" name="addProducto[' + id_item + '][fecha_entrega_proveedor]" class="form-control input-datepicker-today-to-more required" value="' + ParseDateString(fecha_entrega_proveedor, 'fecha_bd', '-') + '">';
+              table_enlace_producto += '<input type="text" id="txt-fecha_entrega_proveedor'+i+'" name="addProducto[' + id_item + '][fecha_entrega_proveedor]" class="form-control input-datepicker-today-to-more required" value="' + fecha_entrega_proveedor + '">';
             table_enlace_producto += '</div>';
+          table_enlace_producto += "</td>";
+
+          table_enlace_producto += "<td class='text-left td-eliminar'>";
+            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
           table_enlace_producto += "</td>";
 
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
         table_enlace_producto += "</tr>";
         
         table_enlace_producto +=
-        "<tr><td class='text-left' colspan='13'>"
+        "<tr><td class='text-left' colspan='14'>"
           if( voucher_1 == '' || voucher_1 == null ){
             table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
           } else {

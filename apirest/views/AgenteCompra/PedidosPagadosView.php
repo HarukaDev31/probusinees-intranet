@@ -120,7 +120,7 @@
                     </div>
 
                     <div class="col-12 col-sm-12 col-md-12 mb-3">
-                      <button type="button" id="btn-excel_order_tracking" class="btn btn-success btn-block" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(1)" data-id_pedido="">Descargar <i class="fa fa-file-excel text-white"></i></button>
+                      <button type="button" id="btn-excel_order_tracking" class="btn btn-success btn-block" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(1)" data-id_pedido="">Descargar &nbsp;<i class="fa fa-file-excel text-white"></i></button>
                     </div>
                   </div>
                     
@@ -177,6 +177,7 @@
                               <th class="text-right">Supplier</th><!--proveedor-->
                               <th class="text-right">Phone</th><!--celular imagen de tarjeta de presentación-->
                               <th class="text-right">fecha_Entrega</th>
+                              <th class="text-right"></th>
                             </tr>
                           </thead>
                           <tbody>

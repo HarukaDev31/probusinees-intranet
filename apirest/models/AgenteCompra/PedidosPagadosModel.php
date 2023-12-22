@@ -83,7 +83,8 @@ class PedidosPagadosModel extends CI_Model{
 		ACPDPP.Ss_Costo_Delivery,
 		ACPDPP.No_Contacto_Proveedor,
 		ACPDPP.Txt_Url_Imagen_Proveedor,
-		ACPDPP.Fe_Entrega_Proveedor');
+		ACPDPP.Fe_Entrega_Proveedor,
+		ACPDPP.Nu_Visualizacion_Item');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
     	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');		
@@ -91,8 +92,18 @@ class PedidosPagadosModel extends CI_Model{
     	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
         $this->db->where($this->table . '.ID_Pedido_Cabecera',$ID);
 		$this->db->where('ACPDPP.Nu_Selecciono_Proveedor',1);
+		$this->db->where('ACPDPP.Nu_Visualizacion_Item',1);
         $query = $this->db->get();
         return $query->result();
+    }
+
+	public function elminarItemProveedor($ID){
+        $where = array('ID_Pedido_Detalle_Producto_Proveedor' => $ID);
+        $data = array( 'Nu_Visualizacion_Item' => 0 );
+		if ($this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Eliminar');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }
 
     public function get_by_id_inspeccion($ID){
