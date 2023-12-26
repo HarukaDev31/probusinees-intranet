@@ -32,6 +32,8 @@ class HistorialPagos extends CI_Controller {
             $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
 
+			$rows[] = (!empty($row->Txt_Url_Pago_Garantizado) ? '<img class="img-fluid img-table_item" data-url_img="' . $row->Txt_Url_Pago_30_Cliente . '" src="' . $row->Txt_Url_Pago_Garantizado . '" title="" alt="" style="cursor:pointer; max-height:100px;" />' : '');
+
             $rows[] = $row->No_Pais_2;
             $rows[] = (!empty($row->Fe_Pago_30_Cliente) ? ToDateBD($row->Fe_Pago_30_Cliente) : '');
             $rows[] = $row->Ss_Pago_30_Cliente;
@@ -61,6 +63,9 @@ class HistorialPagos extends CI_Controller {
             $data[] = $rows;
         }
         $output = array(
+	        'draw' => $this->input->post('draw'),
+	        'recordsTotal' => $this->HistorialPagosModel->count_all(),
+	        'recordsFiltered' => $this->HistorialPagosModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);

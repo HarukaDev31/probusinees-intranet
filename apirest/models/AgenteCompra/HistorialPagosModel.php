@@ -19,9 +19,9 @@ class HistorialPagosModel extends CI_Model{
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, P2.No_Pais AS No_Pais_2, P3.No_Pais AS No_Pais_3, P4.No_Pais AS No_Pais_4')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
-    	->join($this->table_pais . ' AS P2', 'P2.ID_Pais = ' . $this->table . '.ID_Pais_30_Cliente', 'join')
-    	->join($this->table_pais . ' AS P3', 'P3.ID_Pais = ' . $this->table . '.ID_Pais_100_Cliente', 'join')
-    	->join($this->table_pais . ' AS P4', 'P4.ID_Pais = ' . $this->table . '.ID_Pais_Servicio_Cliente', 'join')
+    	->join($this->table_pais . ' AS P2', 'P2.ID_Pais = ' . $this->table . '.ID_Pais_30_Cliente', 'left')
+    	->join($this->table_pais . ' AS P3', 'P3.ID_Pais = ' . $this->table . '.ID_Pais_100_Cliente', 'left')
+    	->join($this->table_pais . ' AS P4', 'P4.ID_Pais = ' . $this->table . '.ID_Pais_Servicio_Cliente', 'left')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
@@ -34,11 +34,24 @@ class HistorialPagosModel extends CI_Model{
 			$this->db->order_by(key($order), $order[key($order)]);
 		}
     }
-	
-	function get_datatables(){
+    
+    function get_datatables(){
         $this->_get_datatables_query();
+        if($_POST['length'] != -1)
+        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
+    }
+    
+    function count_filtered(){
+        $this->_get_datatables_query();
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+ 
+    public function count_all(){
+        $this->db->from($this->table);
+        return $this->db->count_all_results();
     }
     
     public function get_by_id($ID){

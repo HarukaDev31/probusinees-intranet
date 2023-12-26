@@ -45,9 +45,11 @@
                 <table id="table-Cliente" class="table table-bordered table-hover">
                   <thead>
                     <tr>
-                      <th>Perú</th>
+                      <th>País</th>
                       <th>ID</th>
                       <th>F. Emisión</th>
+
+                      <th>Garantizado</th>
 
                       <th>Pais 30%</th>
                       <th>Pago 30%</th>

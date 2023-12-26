@@ -532,15 +532,13 @@ class PedidosGarantizados extends CI_Controller {
 					
 					$objDrawing->setName($row->Txt_Producto);
 					$objDrawing->setDescription($row->Txt_Descripcion);
-					
+
 					//pruebas localhost
-					$row->Txt_Url_Imagen_Producto = 'assets/img/unicpn.png';
+					//$row->Txt_Url_Imagen_Producto = 'assets/img/unicpn.png';
 
 					//cloud
-					/*
 					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
 					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
-					*/
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 						$objDrawing->setWidthAndHeight(148,500);
@@ -1304,13 +1302,11 @@ class PedidosGarantizados extends CI_Controller {
 					$objDrawing->setDescription($row->Txt_Descripcion);
 					
 					//pruebas localhost
-					$row->Txt_Url_Imagen_Producto = 'assets/img/unicpn.png';
+					//$row->Txt_Url_Imagen_Producto = 'assets/img/unicpn.png';
 
 					//cloud
-					/*
 					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
 					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
-					*/
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 						$objDrawing->setWidthAndHeight(148,500);
@@ -1684,7 +1680,6 @@ class PedidosGarantizados extends CI_Controller {
 		if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
 			die('file not found');
 		} else {
-			
 			header('Content-Description: File Transfer');
 			header('Content-Type: application/octet-stream');
 			header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));

@@ -66,6 +66,7 @@ class PedidosPagados extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Enviado" title="Enviado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Enviado</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 30%" title="Pago 30%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago 30%</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 70%" title="Pago 70%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',7, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago 70%</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago Servicio" title="Pago Servicio" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',9, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago Servicio</a></li>';
@@ -449,22 +450,20 @@ class PedidosPagados extends CI_Controller {
 					$objDrawing->setName($row->Txt_Producto);
 					
 					//pruebas localhost
-					$objDrawing->setPath('assets/img/unicpn.png');
+					//$objDrawing->setPath('assets/img/unicpn.png');
 
 					//cloud
-					/*
 					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
 					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
-					*/
 						$objDrawing->setWidthAndHeight(148,500);
 						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(130);
 						$objDrawing->setResizeProportional(true);
 
 						$objDrawing->setCoordinates('B' . $fila);
 						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-					//}
+					}
 				} else {
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
 					->setCellValue('B' . $fila, '');
