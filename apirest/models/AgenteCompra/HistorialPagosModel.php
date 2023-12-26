@@ -27,7 +27,7 @@ class HistorialPagosModel extends CI_Model{
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where_in($this->table . '.Nu_Estado', array(5,6,7,9));
 
-		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
+		$this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
 
 		if(isset($this->order)) {
 			$order = $this->order;

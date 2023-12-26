@@ -20,6 +20,28 @@
           <div class="card">
             <div class="card-body">
           	  <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control" value="<?php echo $this->router->method; ?>">
+              
+              <div class="row mb-3">
+                <div class="col-6 col-sm-4">
+                  <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
+                  <div class="form-group">
+                    <input type="text" id="txt-Fe_Inicio" class="form-control input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                    <span class="help-block text-danger" id="error"></span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-4">
+                  <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
+                  <div class="form-group">
+                    <input type="text" id="txt-Fe_Fin" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                    <span class="help-block text-danger" id="error"></span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-4">
+                  <label>&nbsp;</label>
+                  <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+                </div>
+              </div>
+
               <div class="table-responsive div-Listar">
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">

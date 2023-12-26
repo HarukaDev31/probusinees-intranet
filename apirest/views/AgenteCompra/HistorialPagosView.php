@@ -16,34 +16,34 @@
         <div class="col-12">
           <div class="card">
             <div class="card-body">
-              <div class="table-responsive">
-                <div class="row mb-3">
-                  <div class="col-6 col-sm-4">
-                    <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
-                    <div class="form-group">
-                      <input type="text" id="txt-Fe_Inicio" class="form-control input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
-                      <span class="help-block text-danger" id="error"></span>
-                    </div>
-                  </div>
-                  <div class="col-6 col-sm-4">
-                    <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
-                    <div class="form-group">
-                      <input type="text" id="txt-Fe_Fin" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                      <span class="help-block text-danger" id="error"></span>
-                    </div>
-                  </div>
-                  <div class="col-6 col-sm-2">
-                    <label>&nbsp;</label>
-                    <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
-                  </div>
-                  <div class="col-6 col-sm-2">
-                    <label>&nbsp;</label>
-                    <button type="button" id="btn-excel_reporte" class="btn btn-success btn-block btn-reporte" data-type="excel"><i class="fa fa-file-excel-o text-white"></i> Excel</button>
+              <div class="row mb-3">
+                <div class="col-6 col-sm-4">
+                  <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
+                  <div class="form-group">
+                    <input type="text" id="txt-Fe_Inicio" class="form-control input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                    <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
+                <div class="col-6 col-sm-4">
+                  <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
+                  <div class="form-group">
+                    <input type="text" id="txt-Fe_Fin" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                    <span class="help-block text-danger" id="error"></span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-2">
+                  <label>&nbsp;</label>
+                  <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+                </div>
+                <div class="col-6 col-sm-2">
+                  <label>&nbsp;</label>
+                  <button type="button" id="btn-excel_reporte" class="btn btn-success btn-block btn-reporte" data-type="excel"><i class="fa fa-file-excel-o text-white"></i> Excel</button>
+                </div>
+              </div>
 
-                <table id="table-Cliente" class="table table-bordered table-hover">
-                  <thead>
+              <div class="table-responsive">
+                <table id="table-Cliente" class="table table-bordered table-hover table-striped">
+                  <thead class="thead-light">
                     <tr>
                       <th>País</th>
                       <th>ID</th>

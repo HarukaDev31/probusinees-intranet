@@ -1,7 +1,8 @@
-  <!-- /.content-wrapper -->
+<?php $iControlVersionDashboard = '1.0.169'; ?>
+<!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      <b>Version</b> 1.0.0
+      <b>Version</b> <?php echo $iControlVersionDashboard; ?>
     </div>
     <strong>&copy; 2023 <a style="color: #FF500B !important" href="https://probusiness.pe" target="_blank" alt="ProBusiness" rel="noopener noreferrer">ProBusiness</a></strong>
   </footer>
@@ -13,8 +14,6 @@
   <!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
-
-<?php $iControlVersionDashboard = '1.0.165'; ?>
 
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
@@ -99,16 +98,29 @@
 
 <!-- agente de compra -->
 <?php if (isset($js_pedidos_agente) && $js_pedidos_agente==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_agente.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <?php if (isset($js_pedidos_garantizados) && $js_pedidos_garantizados==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_garantizados.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <?php if (isset($js_pedidos_pagados) && $js_pedidos_pagados==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+
+
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 
 <!-- datepicker -->
@@ -119,7 +131,6 @@
 <?php endif; ?>
 
 <?php if (isset($js_historial_pagos) && $js_historial_pagos==true) : ?>
-  
 <!-- datepicker -->
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>

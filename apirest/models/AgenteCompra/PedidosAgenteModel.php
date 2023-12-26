@@ -32,7 +32,9 @@ class PedidosAgenteModel extends CI_Model{
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where($this->table . '.Nu_Estado=', 1);
-        
+
+		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
+
 		if($this->user->Nu_Tipo_Privilegio_Acceso==4){//4=cliente
 			$this->db->where($this->table . '.ID_Usuario_Pedido',$this->user->ID_Usuario);
 		}
@@ -42,11 +44,24 @@ class PedidosAgenteModel extends CI_Model{
 			$this->db->order_by(key($order), $order[key($order)]);
 		}
     }
-	
-	function get_datatables(){
+    
+    function get_datatables(){
         $this->_get_datatables_query();
+        if($_POST['length'] != -1)
+        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
+    }
+    
+    function count_filtered(){
+        $this->_get_datatables_query();
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+ 
+    public function count_all(){
+        $this->db->from($this->table);
+        return $this->db->count_all_results();
     }
     
     public function get_by_id($ID){

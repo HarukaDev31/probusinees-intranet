@@ -38,16 +38,31 @@ class PedidosPagadosModel extends CI_Model{
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where_in($this->table . '.Nu_Estado', array(5,6,7,9));
         
+		$this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
+        
 		if(isset($this->order)) {
 			$order = $this->order;
 			$this->db->order_by(key($order), $order[key($order)]);
 		}
     }
-	
-	function get_datatables(){
+    
+    function get_datatables(){
         $this->_get_datatables_query();
+        if($_POST['length'] != -1)
+        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
+    }
+    
+    function count_filtered(){
+        $this->_get_datatables_query();
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+ 
+    public function count_all(){
+        $this->db->from($this->table);
+        return $this->db->count_all_results();
     }
 
     public function get_by_id($ID){

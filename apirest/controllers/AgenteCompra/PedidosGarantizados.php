@@ -102,6 +102,9 @@ class PedidosGarantizados extends CI_Controller {
             $data[] = $rows;
         }
         $output = array(
+	        'draw' => $this->input->post('draw'),
+	        'recordsTotal' => $this->PedidosGarantizadosModel->count_all(),
+	        'recordsFiltered' => $this->PedidosGarantizadosModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);

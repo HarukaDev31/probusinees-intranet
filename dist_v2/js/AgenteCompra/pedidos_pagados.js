@@ -12,6 +12,15 @@ var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth(
 
 $(function () {
   //Date picker invoice
+  $( '.input-report' ).datepicker({
+    autoclose : true,
+    startDate : new Date(fYear, fToday.getMonth(), '01'),
+    todayHighlight  : true,
+    dateFormat: 'dd/mm/yyyy',
+    format: 'dd/mm/yyyy',
+  });
+
+  //Date picker invoice
   $( '.input-datepicker-pay' ).datepicker({
     autoclose : true,
     startDate : new Date(fYear, fToday.getMonth(), fDay),
@@ -93,13 +102,12 @@ $(function () {
         columns: ':visible'
       }
     }],
-    "paging": true,
-    "lengthChange": true,
-    "searching": true,
-    "ordering": true,
-    "info": true,
-    "autoWidth": false,
-    "responsive": false,
+    'searching'   : false,
+    'bStateSave'  : true,
+    'processing'  : true,
+    'serverSide'  : true,
+    'info'        : true,
+    'autoWidth'   : false,
     'pagingType'  : 'full_numbers',
     'oLanguage' : {
       'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
@@ -124,7 +132,9 @@ $(function () {
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
         data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
-        data.Global_Filter = $( '#txt-Global_Filter' ).val();
+        data.Global_Filter = $( '#txt-Global_Filter' ).val(),
+        data.Filtro_Fe_Inicio       = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
+        data.Filtro_Fe_Fin          = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
       },
     },
     'columnDefs': [
@@ -142,6 +152,10 @@ $(function () {
   $('#table-Pedidos_filter input').removeClass('form-control-sm');
   $('#table-Pedidos_filter input').addClass('form-control-md');
   $('#table-Pedidos_filter input').addClass("width_full");
+
+  $('#btn-html_reporte').click(function () {
+    reload_table_Entidad();
+  });
 
   $( '.div-AgregarEditar' ).hide();
 

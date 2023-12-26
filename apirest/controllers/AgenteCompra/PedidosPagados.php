@@ -119,6 +119,9 @@ class PedidosPagados extends CI_Controller {
             $data[] = $rows;
         }
         $output = array(
+	        'draw' => $this->input->post('draw'),
+	        'recordsTotal' => $this->PedidosPagadosModel->count_all(),
+	        'recordsFiltered' => $this->PedidosPagadosModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);
