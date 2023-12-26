@@ -54,6 +54,12 @@ class HistorialPagosModel extends CI_Model{
         return $this->db->count_all_results();
     }
     
+    function get_datatables_excel(){
+        $this->_get_datatables_query();
+        $query = $this->db->get();
+        return $query->result();
+    }
+
     public function get_by_id($ID){
         $this->db->select($this->table . '.*, IGD.ID_Producto, ITEM.No_Producto');
         $this->db->from($this->table);

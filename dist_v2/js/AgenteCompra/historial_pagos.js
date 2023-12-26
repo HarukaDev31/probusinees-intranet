@@ -8,7 +8,7 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 //28 caracteres
 // FIN AUTOCOMPLETE
 
-var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
+var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate(), Fe_Inicio='', Fe_Fin='';
 
 $(function () {
   $("#table-Cliente").on('click', '.img-table_item', function () {
@@ -142,69 +142,23 @@ $(function () {
     reload_table_Entidad();
   });
 
-  $('.btn-generar_ventas_x_familia').click(function () {
-    if ($('#cbo-filtro_monedas').val() == '0') {
-      $('#cbo-filtro_monedas').closest('.form-group').find('.help-block').html('Seleccionar moneda');
-      $('#cbo-filtro_monedas').closest('.form-group').removeClass('has-success').addClass('has-error');
-    } else {
-      $('.form-group').removeClass('has-error');
-      $('.help-block').empty();
-    
-      var ID_Almacen, Fe_Inicio, Fe_Fin, iIdMoneda, iIdFamilia, iIdItem, sNombreItem, iIdSubFamilia, Nu_Agrupar_Empresa, ID_Marca, ID_Variante_Item, ID_Variante_Item_Detalle_1, ID_Variante_Item2, ID_Variante_Item_Detalle_2, ID_Variante_Item3, ID_Variante_Item_Detalle_3, Nu_Tipo_Impuesto;
+  $('#btn-excel_reporte').click(function () {
+    $('.form-group').removeClass('has-error');
+    $('.help-block').empty();
       
-      Fe_Inicio = ParseDateString($( '#txt-Filtro_Fe_Inicio' ).val(), 1, '/');
-      Fe_Fin = ParseDateString($( '#txt-Filtro_Fe_Fin' ).val(), 1, '/');
-      iIdMoneda = $( '#cbo-filtro_monedas' ).val();
-      iIdFamilia = $('#cbo-familia').val();
-      iIdItem = ($('#txt-ID_Producto').val().length === 0 ? '-' : $('#txt-ID_Producto').val());
-      sNombreItem = ($('#txt-No_Producto').val().length === 0 ? '-' : $('#txt-No_Producto').val());
-      iIdSubFamilia = $('#cbo-sub_categoria').val();
-      ID_Almacen = $('#cbo-Almacenes_VentasxFamilia').val();
-      Nu_Agrupar_Empresa = $('[name="radio-agrupar_x_empresa"]:checked').attr('value');
-      iFiltroBusquedaNombre = ($("#checkbox-busqueda_producto").prop("checked") == true ? 1 : 0);
-      ID_Marca = $( '#cbo-filtro_marca' ).val();
-      ID_Variante_Item = $( '#cbo-filtro_variante_1' ).val();
-      ID_Variante_Item_Detalle_1 = $( '#cbo-filtro_valor_1' ).val();
-      ID_Variante_Item2 = $( '#cbo-filtro_variante_2' ).val();
-      ID_Variante_Item_Detalle_2 = $( '#cbo-filtro_valor_2' ).val();
-      ID_Variante_Item3 = $( '#cbo-filtro_variante_3' ).val();
-      ID_Variante_Item_Detalle_3 = $( '#cbo-filtro_valor_3' ).val();
-      Nu_Tipo_Impuesto = $('#cbo-regalo').val();
+    Fe_Inicio = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
+    Fe_Fin = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
 
-      var arrPost = {
-        Fe_Inicio : Fe_Inicio,
-        Fe_Fin: Fe_Fin,
-        iIdMoneda: iIdMoneda,
-        iIdFamilia: iIdFamilia,
-        iIdItem: iIdItem,
-        sNombreItem: sNombreItem,
-        iIdSubFamilia: iIdSubFamilia,
-        ID_Almacen: ID_Almacen,
-        Nu_Agrupar_Empresa:Nu_Agrupar_Empresa,
-        iFiltroBusquedaNombre: iFiltroBusquedaNombre,
-        ID_Marca: ID_Marca,
-        ID_Variante_Item: ID_Variante_Item,
-        ID_Variante_Item_Detalle_1: ID_Variante_Item_Detalle_1,
-        ID_Variante_Item2: ID_Variante_Item2,
-        ID_Variante_Item_Detalle_2: ID_Variante_Item_Detalle_2,
-        ID_Variante_Item3: ID_Variante_Item3,
-        ID_Variante_Item_Detalle_3: ID_Variante_Item_Detalle_3,
-        Nu_Tipo_Impuesto:Nu_Tipo_Impuesto
-      };
-        
-      if ($(this).data('type') == 'excel') {
-        $( '#btn-excel_ventas_x_familia' ).text('');
-        $( '#btn-excel_ventas_x_familia' ).attr('disabled', true);
-        $( '#btn-excel_ventas_x_familia' ).append( 'Cargando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-        
-        url = base_url + 'Ventas/informes_venta/VentasxFamiliaController/sendReporteEXCEL/' + Fe_Inicio + '/' + Fe_Fin + '/' + iIdMoneda + '/' + iIdFamilia + '/' + iIdItem + '/' + encodeURIComponent(sNombreItem) + '/' + iIdSubFamilia + '/' + ID_Almacen + '/' + Nu_Agrupar_Empresa + '/' + iFiltroBusquedaNombre + '/' + ID_Marca + '/' + ID_Variante_Item + '/' + ID_Variante_Item_Detalle_1 + '/' + ID_Variante_Item2 + '/' + ID_Variante_Item_Detalle_2 + '/' + ID_Variante_Item3 + '/' + ID_Variante_Item_Detalle_3  + '/' + Nu_Tipo_Impuesto;
-        window.open(url,'_blank');
-        
-        $( '#btn-excel_ventas_x_familia' ).text('');
-        $( '#btn-excel_ventas_x_familia' ).append( '<i class="fa fa-file-excel-o color_icon_excel"></i> Excel' );
-        $( '#btn-excel_ventas_x_familia' ).attr('disabled', false);
-      }// ./ if
-    }
+    $( '#btn-excel_reporte' ).text('');
+    $( '#btn-excel_reporte' ).attr('disabled', true);
+    $( '#btn-excel_reporte' ).append( 'Cargando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+    
+    url = base_url + 'AgenteCompra/HistorialPagos/sendReporteEXCEL/' + Fe_Inicio + '/' + Fe_Fin;
+    window.open(url,'_blank');
+    
+    $( '#btn-excel_reporte' ).text('');
+    $( '#btn-excel_reporte' ).append( '<i class="fa fa-file-excel-o color_icon_excel"></i> Excel' );
+    $( '#btn-excel_reporte' ).attr('disabled', false);
   })//./ btn
 })
 

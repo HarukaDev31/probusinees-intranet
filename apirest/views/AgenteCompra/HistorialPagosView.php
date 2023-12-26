@@ -52,19 +52,19 @@
                       <th>Garantizado</th>
 
                       <th>Pais 30%</th>
-                      <th>Pago 30%</th>
+                      <th>F. Pago 30%</th>
                       <th>Importe 30%</th>
                       <th>Operacion 30%</th>
                       <th>Voucher</th>
                       
-                      <th>Pais 100%</th>
-                      <th>Pago 100%</th>
-                      <th>Importe 100%</th>
-                      <th>Operacion 100%</th>
+                      <th>Pais 70%</th>
+                      <th>F. Pago 70%</th>
+                      <th>Importe 70%</th>
+                      <th>Operacion 70%</th>
                       <th>Voucher</th>
                       
                       <th>Pais Servicio</th>
-                      <th>Pago Servicio</th>
+                      <th>F. Pago Servicio</th>
                       <th>Importe Servicio</th>
                       <th>Operacion Servicio</th>
                       <th>Voucher</th>
