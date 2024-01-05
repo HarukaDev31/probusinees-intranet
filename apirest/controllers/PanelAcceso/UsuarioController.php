@@ -40,8 +40,9 @@ class UsuarioController extends CI_Controller {
 
             $rows[] = (!empty($row->No_Grupo) ? '<button class="btn btn-xs btn-link btn-upd" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verUsuario(\'' . $row->ID_Usuario . '\')"><i class="far fa-2x fa-edit" aria-hidden="true"></i></button>' : '');
 
-			$btn_elminar = '<button class="btn btn-xs btn-link btn-upd" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarUsuario(\'' . $row->ID_Usuario . '\', \'' . $action . '\')"><i class="fa fa-2x fa-trash-o" aria-hidden="true"></i></button>';
-            $rows[] = ($row->ID_Usuario != 1 ? $btn_elminar : '');
+			$btn_elminar = '<button class="btn btn-xs btn-link btn-upd" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarUsuario(\'' . $row->ID_Usuario . '\', \'' . $action . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = $btn_elminar;
+            //$rows[] = ($row->ID_Usuario != 1 ? $btn_elminar : '');
             $data[] = $rows;
         }
         $output = array(

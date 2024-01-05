@@ -142,7 +142,7 @@ MNU.Nu_Orden;";
 				'Nu_Consultar'		=> 1,
 				'Nu_Agregar'		=> 1,
 				'Nu_Editar'			=> 1,
-				'Nu_Eliminar'		=> 0,
+				'Nu_Eliminar'		=> 1,
 			);
 			$this->db->insert($this->table_menu_acceso, $menu_acceso);
 			$menu_acceso = array(
