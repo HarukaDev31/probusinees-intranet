@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.0.171'; ?>
+<?php $iControlVersionDashboard = '1.0.172'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -163,6 +163,16 @@
 <link rel="stylesheet" href="<?php echo base_url() . 'assets/dropzone/css/dropzone.min.css'; ?>">
 <script src="<?php echo base_url() . 'assets/dropzone/js/dropzone.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/Logistica/ReglasLogistica/producto_importacion.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<!-- Curso -->
+<?php if (isset($js_pedidos_curso) && $js_pedidos_curso==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/Curso/pedidos_curso.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">
