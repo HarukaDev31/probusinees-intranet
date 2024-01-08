@@ -22,6 +22,17 @@ class HelperImportacionModel extends CI_Model{
 			return array('No_Estado' => 'Rechazado','No_Class_Estado' => 'danger');
 	}
 
+	function obtenerEstadoProcesoUsuarioCursoArray($iEstado){
+		if( $iEstado == 1 )
+			return array('No_Estado' => 'Pendiente','No_Class_Estado' => 'secondary');
+		else if( $iEstado == 2 )
+			return array('No_Estado' => 'Creado','No_Class_Estado' => 'primary');
+		else if( $iEstado == 3 )
+			return array('No_Estado' => 'No creado','No_Class_Estado' => 'danger');
+		else
+			return array('No_Estado' => 'Otros','No_Class_Estado' => 'secondary');
+	}
+
 	function obtenerTipoServicioArray($iEstado){
 		if( $iEstado == 1 )
 			return array('No_Estado' => 'Trading','No_Class_Estado' => 'success');

@@ -11,6 +11,7 @@ class PedidosCursoModel extends CI_Model{
 	var $table_provincia = 'provincia';
 	var $table_distrito = 'distrito';
 	var $table_tipo_documento_identidad = 'tipo_documento_identidad';
+	var $table_usuario = 'usuario';
 	var $table_pais = 'pais';
 	
     var $order = array('Fe_Registro' => 'desc');
@@ -20,11 +21,12 @@ class PedidosCursoModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, P.No_Pais, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, M.No_Signo')
+        $this->db->select($this->table . '.*, P.No_Pais, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_moneda . ' AS M', 'M.ID_Moneda = ' . $this->table . '.ID_Moneda', 'join')
+    	->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'join')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
 
 		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
@@ -53,4 +55,36 @@ class PedidosCursoModel extends CI_Model{
         $this->db->from($this->table);
         return $this->db->count_all_results();
     }
+
+    public function actualizarPedido($where, $data){
+        if ( $this->db->update('pedido_curso', $data, $where) > 0 )
+            return array('status' => 'success', 'message' => 'Registro modificado');
+        return array('status' => 'error', 'message' => 'Error al modificar');
+    }
+
+	public function getUsuario($id){
+		$query = "SELECT No_Usuario, No_Password, No_Nombres_Apellidos FROM usuario WHERE ID_Usuario = " . $id . " LIMIT 1";
+		
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
+	}
 }

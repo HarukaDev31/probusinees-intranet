@@ -51,7 +51,10 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Total</th>
-                      <th>Estado</th>
+                      <th>Estado Pago</th>
+                      <th>Estado Curso</th>
+                      <th>Moodle</th>
+                      <th>Compartir</th>
                     </tr>
                   </thead>
                 </table>
