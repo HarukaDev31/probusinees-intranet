@@ -155,7 +155,7 @@ class PedidosCurso extends CI_Controller {
 			$message_email = $this->load->view('correos/cuenta_moodle', $data_email, true);
 			
 			$this->email->from('noreply@lae.one', 'ProBusiness');//de
-			$this->email->to($this->input->post('acme-email'));//para
+			$this->email->to($result->No_Usuario);//para
 			$this->email->subject('🎉 Bienvenido al curso');
 			$this->email->message($message_email);
 			$this->email->set_newline("\r\n");
@@ -171,7 +171,8 @@ class PedidosCurso extends CI_Controller {
 			} else {
 				$response = array(
 					'status' => 'error',
-					'message' => 'No se pudo enviar email, inténtelo más tarde.'
+					'message' => 'No se pudo enviar email, inténtelo más tarde.',
+					'error_message_mail' => $this->email->print_debugger()
 				);
 				echo json_encode($response);
 				exit();
