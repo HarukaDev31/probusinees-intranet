@@ -25,17 +25,19 @@
           <div class="card">
             <div class="card-body">
               <div class="table-responsive div-Listar">
-                <table id="table-Cliente" class="table table-bordered table-hover">
-                  <thead>
+                <table id="table-Cliente" class="table-nota table table-hover table-striped table-bordered">
+                  <thead class="thead-light">
                     <tr>
+                      <th>Servicio</th>
                       <th>Tipo Doc.</th>
                       <th>Num Doc.</th>
                       <th>Nombre</th>
                       <th>Celular</th>
                       <th>Correo</th>
-                      <th>Dirección</th>
+                      <!--<th>Dirección</th>-->
+                      <th class="">Mensaje</th>
                       <th class="no-hidden">F. Registro</th>
-                      <th class="no-sort">Estado</th>
+                      <th>Estado</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Editar</th>
                       <?php endif; ?>

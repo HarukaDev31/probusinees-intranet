@@ -5,7 +5,7 @@ var accion_cliente = '';
 $(function () {  
     url = base_url + 'Ventas/ReglasVenta/ClienteController/ajax_list';
     table_Entidad = $( '#table-Cliente' ).DataTable({
-        dom: "<'row'<'col-sm-12 col-md-5'B><'col-sm-12 col-md-2'><'col-sm-12 col-md-5'f>>" +
+        dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
         buttons     : [{

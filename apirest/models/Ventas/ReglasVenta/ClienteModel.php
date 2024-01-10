@@ -141,7 +141,7 @@ class ClienteModel extends CI_Model{
         	$this->db->like('Nu_Documento_Identidad', $this->input->post('Global_Filter'));
         }
         
-        $this->db->select('ID_Empresa, ID_Entidad, TDI.No_Tipo_Documento_Identidad_Breve, Nu_Documento_Identidad, No_Entidad, Nu_Celular_Entidad, Txt_Email_Entidad, Nu_Dias_Credito, Txt_Direccion_Entidad, No_Contacto, DISTRI.No_Distrito, ' . $this->table . '.Nu_Estado, Txt_Descripcion, Fe_Registro')
+        $this->db->select('ID_Empresa, ID_Entidad, TDI.No_Tipo_Documento_Identidad_Breve, Nu_Documento_Identidad, No_Entidad, Nu_Celular_Entidad, Txt_Email_Entidad, Nu_Dias_Credito, Txt_Direccion_Entidad, No_Contacto, DISTRI.No_Distrito, ' . $this->table . '.Nu_Estado, Txt_Descripcion, Fe_Registro, Nu_Agente_Compra, Nu_Carga_Consolidada, Nu_Importacion_Grupal, Nu_Curso, Nu_Viaje_Negocios')
 		->from($this->table)
     	->join($this->table_distrito . ' AS DISTRI', 'DISTRI.ID_Distrito = ' . $this->table . '.ID_Distrito', 'left')
     	->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = ' . $this->table . '.ID_Tipo_Documento_Identidad', 'join')

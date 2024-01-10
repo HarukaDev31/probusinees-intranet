@@ -167,12 +167,33 @@ class ClienteController extends CI_Controller {
         $action = 'delete';
         foreach ($arrData as $row) {
 			$rows = array();
+			
+			$sTipoServicio='';
+			$sTipoServicio .= '<span class="badge bg-secondary">Otros</span>';
+			if($row->Nu_Agente_Compra==1){
+				$sTipoServicio .= '<br><span class="badge bg-primary">Agente de Compra</span>';
+			}
+			if($row->Nu_Carga_Consolidada==1){
+				$sTipoServicio .= '<br><span class="badge bg-warning">Carga Consolidada</span>';
+			}
+			if($row->Nu_Importacion_Grupal==1){
+				$sTipoServicio .= '<br><span class="badge bg-dark">Importación Grupal</span>';
+			}
+			if($row->Nu_Curso==1){
+				$sTipoServicio .= '<br><span class="badge bg-info">Curso</span>';
+			}
+			if($row->Nu_Viaje_Negocios==1){
+				$sTipoServicio .= '<br><span class="badge bg-success">Viaje de Negocios</span>';
+			}
+
+			$rows[] = $sTipoServicio;
+
             $rows[] = $row->No_Tipo_Documento_Identidad_Breve;
             $rows[] = $row->Nu_Documento_Identidad;
 			$rows[] = $row->No_Entidad;
 			$rows[] = $row->Nu_Celular_Entidad;
 			$rows[] = $row->Txt_Email_Entidad;
-			$rows[] = $row->Txt_Direccion_Entidad;
+			$rows[] = $row->Txt_Descripcion;
 			$rows[] = allTypeDate($row->Fe_Registro, '-', 0);
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
             $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
