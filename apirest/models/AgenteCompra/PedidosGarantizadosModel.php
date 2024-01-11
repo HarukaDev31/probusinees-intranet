@@ -653,7 +653,7 @@ Nu_Correlativo
 agente_compra_pedido_detalle_chat_producto AS CHAT
 LEFT JOIN usuario AS USRR ON(USRR.ID_Usuario = CHAT.ID_Usuario_Remitente)
 LEFT JOIN usuario AS USRD ON(USRD.ID_Usuario = CHAT.ID_Usuario_Destino)
-WHERE ID_Pedido_Detalle = " . $id . " ORDER BY Fe_Registro ASC";
+WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 		if ( !$this->db->simple_query($query) ){
 			$error = $this->db->error();
 			return array(

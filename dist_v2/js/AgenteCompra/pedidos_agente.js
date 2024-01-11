@@ -14,7 +14,7 @@ $(function () {
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,
-    startDate : new Date(fYear, fToday.getMonth(), '01'),
+    startDate : new Date('2023', '10', '01'),
     todayHighlight  : true,
     dateFormat: 'dd/mm/yyyy',
     format: 'dd/mm/yyyy',

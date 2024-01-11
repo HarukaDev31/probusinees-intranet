@@ -19,7 +19,7 @@
         <div class="col-12">
           <div class="card">
             <div class="card-body">
-              <div class="row mb-3">
+              <div class="row mb-3 div-Listar">
                 <div class="col-6 col-sm-4">
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">

@@ -14,7 +14,7 @@ $(function () {
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,
-    startDate : new Date(fYear, fToday.getMonth(), '01'),
+    startDate : new Date('2023', '10', '01'),
     todayHighlight  : true,
     dateFormat: 'dd/mm/yyyy',
     format: 'dd/mm/yyyy',
@@ -692,7 +692,7 @@ function verPedido(ID){
               table_enlace_producto += '<input type="text" id="txt-fecha_entrega_proveedor'+i+'" name="addProducto[' + id_item + '][fecha_entrega_proveedor]" class="form-control input-datepicker-today-to-more required" value="' + fecha_entrega_proveedor + '">';
             table_enlace_producto += '</div>';
           table_enlace_producto += "</td>";
-
+          
           table_enlace_producto += "<td class='text-left td-eliminar'>";
             table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
           table_enlace_producto += "</td>";
@@ -1085,6 +1085,9 @@ function subirInspeccion(ID){
 
         var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
         var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
+        
+        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
+
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
@@ -1098,15 +1101,35 @@ function subirInspeccion(ID){
           +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
           +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
           +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
-          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"          
           +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-          +"<td class='text-left td-supplier'></td>"
-          +"<td class='text-left td-phone'></td>"
+          +"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>"
+          +"<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
+          +"<td class='text-left td-phone'>";
+
+          if(detalle[i]['Txt_Url_Imagen_Proveedor'] != '' && detalle[i]['Txt_Url_Imagen_Proveedor'] != null){
+            table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+          }
+          table_enlace_producto += "</td>";
+
+          table_enlace_producto += "<td class='text-left td-supplier'>";
+            table_enlace_producto += '<div class="input-group date" style="width:100%">';
+              table_enlace_producto += '<input type="text" id="txt-fecha_entrega_proveedor'+i+'" name="addProducto[' + id_item + '][fecha_entrega_proveedor]" class="form-control input-datepicker-today-to-more required" value="' + fecha_entrega_proveedor + '">';
+            table_enlace_producto += '</div>';
+          table_enlace_producto += "</td>";
+          
+          table_enlace_producto += "<td class='text-left td-eliminar'>";
+            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
+          table_enlace_producto += "</td>";
+
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
         table_enlace_producto += "</tr>";
 
+          //table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
+        //table_enlace_producto += "</tr>";
+
         table_enlace_producto +=
-        "<tr><td class='text-left' colspan='12'>"
+        "<tr><td class='text-left' colspan='15'>"
           if(detalle[i]['Nu_Agrego_Inspeccion']==0) {//0=No
             table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
           } else {
@@ -1118,6 +1141,15 @@ function subirInspeccion(ID){
       
       $('#span-total_cantidad_items').html(i);
       $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+      
+      //Date picker invoice
+      $( '.input-datepicker-today-to-more' ).datepicker({
+        autoclose : true,
+        startDate : new Date(fYear, fToday.getMonth(), fDay),
+        todayHighlight  : true,
+        dateFormat: 'dd/mm/yyyy',
+        format: 'dd/mm/yyyy',
+      });
     },
     error: function (jqXHR, textStatus, errorThrown) {
 	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');

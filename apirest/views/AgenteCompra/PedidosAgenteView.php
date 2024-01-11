@@ -21,7 +21,7 @@
             <div class="card-body">
           	  <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control" value="<?php echo $this->router->method; ?>">
               
-              <div class="row mb-3">
+              <div class="row mb-3 div-Listar">
                 <div class="col-6 col-sm-4">
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">

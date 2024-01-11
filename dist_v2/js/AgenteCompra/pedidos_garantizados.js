@@ -14,7 +14,7 @@ $(function () {
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,
-    startDate : new Date(fYear, fToday.getMonth(), '01'),
+    startDate : new Date('2023', '10', '01'),
     todayHighlight  : true,
     dateFormat: 'dd/mm/yyyy',
     format: 'dd/mm/yyyy',
@@ -1611,6 +1611,37 @@ function viewChatItem(id_item){
       if(response.status=='success') {
         var result = response.result;
         div_chat_item += '<div class="direct-chat-messages">';
+        var sClassL = '', sClassR = '', sClassLR = '', sMessage = '', sName='';
+          for (i = 0; i < result.length; i++) {
+            if(result[i].Txt_Usuario_Remitente!='' && result[i].Txt_Usuario_Remitente!=null){
+              sClassLR = '';
+              sClassL = 'left';
+              sClassR = 'right';
+              sMessage = result[i].Txt_Usuario_Remitente;
+              sName = result[i].No_Nombres_Apellidos_Remitente;
+            } else {
+              sClassLR = 'right';
+              sClassL = 'right';
+              sClassR = 'left';
+              sMessage = result[i].Txt_Usuario_Destino;
+              sName = result[i].No_Nombres_Apellidos_Destinatario;
+            }
+
+            div_chat_item += '<div class="direct-chat-msg ' + sClassLR + '">';
+              div_chat_item += '<div class="direct-chat-infos clearfix">';
+                div_chat_item += '<span class="direct-chat-name float-' + sClassL + '">' + sName + '</span>';
+                div_chat_item += '<span class="direct-chat-timestamp float-' + sClassR + '">' + ParseDateString(result[i].Fe_Registro, 'fecha_hora_bd', ' ') + '</span>';
+              div_chat_item += '</div>';
+              div_chat_item += '<img class="direct-chat-img" src="' + base_url + 'dist_v2/img/user_all.png?ver=1.0" alt="a">';
+              div_chat_item += '<div class="direct-chat-text">';
+                div_chat_item += sMessage;
+              div_chat_item += '</div><br>';
+            div_chat_item += '</div>';
+          }
+        div_chat_item += '</div>';
+
+        /*
+        div_chat_item += '<div class="direct-chat-messages">';
           div_chat_item += '<div class="direct-chat-msg">';
             for (i = 0; i < result.length; i++) {
               if(result[i].Txt_Usuario_Remitente!='' && result[i].Txt_Usuario_Remitente!=null){
@@ -1641,6 +1672,7 @@ function viewChatItem(id_item){
             }
           div_chat_item += '</div>';
         div_chat_item += '</div>';
+        */
 
         $( '#card-chat_item' ).append(div_chat_item);
       }

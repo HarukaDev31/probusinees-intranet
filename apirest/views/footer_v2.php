@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.0.178'; ?>
+<?php $iControlVersionDashboard = '1.0.185'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
