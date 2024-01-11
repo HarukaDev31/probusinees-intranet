@@ -26,7 +26,7 @@ class PedidosAgenteModel extends CI_Model{
 	public function _get_datatables_query(){
         $this->db->select($this->table . '.*, P.No_Pais, 
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Entidad')
+		CLI.No_Contacto1, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Entidad')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
