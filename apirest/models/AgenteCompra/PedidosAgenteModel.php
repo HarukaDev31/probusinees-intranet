@@ -33,11 +33,7 @@ class PedidosAgenteModel extends CI_Model{
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where($this->table . '.Nu_Estado=', 1);
 
-		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
-
-		if($this->user->Nu_Tipo_Privilegio_Acceso==4){//4=cliente
-			$this->db->where($this->table . '.ID_Usuario_Pedido',$this->user->ID_Usuario);
-		}
+		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
 
 		if(isset($this->order)) {
 			$order = $this->order;
