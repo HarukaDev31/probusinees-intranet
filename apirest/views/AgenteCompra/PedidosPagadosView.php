@@ -404,7 +404,7 @@
           </div>
 
           <div class="col-6 col-sm-3">
-            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <label class="fw-bold mb-2">Empresa <span class="label-advertencia text-danger"> *</span></label>
             <div class="form-group">
               <select name="ID_Pais_30_Cliente" id="cbo-ID_Pais_30_Cliente" class="form-control">
                 <option value="0" selected="selected">- Seleccionar -</option>
@@ -432,7 +432,7 @@
           </div>
 
           <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
-            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
             <div class="form-group">
               <input type="text" inputmode="numeric" id="modal-Nu_Operacion_Pago_30_Cliente" name="Nu_Operacion_Pago_30_Cliente" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
               <span class="help-block" id="error"></span>
