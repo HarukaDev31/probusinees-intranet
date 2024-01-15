@@ -409,7 +409,7 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido) {
     
     $( '#btn-save-delete' ).text('');
     $( '#btn-save-delete' ).attr('disabled', true);
-    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+    $( '#btn-save-delete' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
     url = base_url + 'AgenteCompra/PedidosAgente/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + id_correlativo;
     $.ajax({
@@ -517,7 +517,7 @@ function form_pedido(){
   } else {
     $( '#btn-save' ).text('');
     $( '#btn-save' ).attr('disabled', true);
-    $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+    $( '#btn-save' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
     
     var postData = new FormData($("#form-pedido")[0]);
     //$('#form-pedido').serialize(),
@@ -694,7 +694,7 @@ function removerAsignarPedido(ID, id_usuario) {
     
     $( '#btn-save-delete' ).text('');
     $( '#btn-save-delete' ).attr('disabled', true);
-    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+    $( '#btn-save-delete' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
     url = base_url + 'AgenteCompra/PedidosAgente/removerAsignarPedido/' + ID + '/' + id_usuario;
     $.ajax({

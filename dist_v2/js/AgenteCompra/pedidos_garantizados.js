@@ -417,6 +417,10 @@ $(function () {
     $('#div-elegir_item_proveedor').show();
 
 	  $( '#table-elegir_productos_proveedor tbody' ).empty();
+    
+    var html = '';
+    html = '<tr><td class="text-left" colspan="12">Cargando <div class="spinner-border" role="status"><span class="sr-only"></span></div></td></tr>';
+    $( '#table-elegir_productos_proveedor' ).append(html);
 
     var id = $(this).data('id_pedido_cabecera');
     var id_detalle = $(this).data('id_pedido_detalle');
@@ -461,6 +465,10 @@ $(function () {
   $(document).on('click', '#btn-save_detalle_elegir_proveedor', function (e) {
     e.preventDefault();
 
+    $( '#btn-save_detalle_elegir_proveedor' ).text('');
+    $( '#btn-save_detalle_elegir_proveedor' ).attr('disabled', true);
+    $( '#btn-save_detalle_elegir_proveedor' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
+
     var postData = new FormData($("#form-arrItemsProveedor")[0]);
     url = base_url + 'AgenteCompra/PedidosGarantizados/actualizarElegirItemProductos';
     $.ajax({
@@ -489,9 +497,9 @@ $(function () {
           setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
         }
         
-        $( '#btn-save' ).text('');
-        $( '#btn-save' ).append( 'Guardar' );
-        $( '#btn-save' ).attr('disabled', false);
+        $( '#btn-save_detalle_elegir_proveedor' ).text('');
+        $( '#btn-save_detalle_elegir_proveedor' ).html( 'Guardar' );
+        $( '#btn-save_detalle_elegir_proveedor' ).attr('disabled', false);
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
@@ -504,9 +512,9 @@ $(function () {
         //Message for developer
         console.log(jqXHR.responseText);
         
-        $( '#btn-save' ).text('');
-        $( '#btn-save' ).append( 'Guardar' );
-        $( '#btn-save' ).attr('disabled', false);
+        $( '#btn-save_detalle_elegir_proveedor' ).text('');
+        $( '#btn-save_detalle_elegir_proveedor' ).append( 'Guardar' );
+        $( '#btn-save_detalle_elegir_proveedor' ).attr('disabled', false);
       }
     });
   });
@@ -1010,7 +1018,7 @@ function form_pedido(){
   } else {
     $( '#btn-save' ).text('');
     $( '#btn-save' ).attr('disabled', true);
-    $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+    $( '#btn-save' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
     
     var postData = new FormData($("#form-pedido")[0]);
     url = base_url + 'AgenteCompra/PedidosGarantizados/crudPedidoGrupal';
@@ -1297,6 +1305,8 @@ function getItemProveedor(id_detalle){
     success: function(response){
       var detalle = response;
 
+      $( '#table-elegir_productos_proveedor tbody' ).empty();
+
       console.log(detalle);
       var table_enlace_producto = "", id_item_tmp = 0;
       for (i = 0; i < detalle.length; i++) {
@@ -1382,8 +1392,16 @@ function getItemProveedor(id_detalle){
               table_enlace_producto += '<button type="button" id="btn-seleccionar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-check"></i>&nbsp; marcar proveedor</button>';
             } else {
               table_enlace_producto += '<button type="button" id="btn-desmarcar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-times"></i>&nbsp; desmarcar proveedor</button>';
-              table_enlace_producto += '<input type="text" id="modal-cantidad' + i + '" data-correlativo="' + i + '" inputmode="numeric" name="addProducto[' + i + '][cantidad]" class="arrProducto form-control required cantidad input-numeric mt-3" placeholder="Cantidad" value="' + cantidad_html + '" autocomplete="off" />';
-              table_enlace_producto += '<textarea id="modal-nota' + i + '" name="addProducto[' + i + '][nota]" class="mt-3 form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + clearHTMLTextArea(nota_final) + '</textarea>';
+              
+              table_enlace_producto += '<div class="row">';
+                table_enlace_producto += '<div class="col-1 col-sm-1 mt-3">';
+                  table_enlace_producto += '<label>qty_caja</label>';
+                  table_enlace_producto += '<input type="text" id="modal-cantidad' + i + '" data-correlativo="' + i + '" inputmode="numeric" name="addProducto[' + i + '][cantidad]" class="arrProducto form-control required cantidad input-numeric" placeholder="Cantidad" value="' + cantidad_html + '" autocomplete="off" />';
+                table_enlace_producto += '</div>';
+                table_enlace_producto += '<div class="text-left col-11 col-sm-11 mt-3">';
+                  table_enlace_producto += '<label>Observaciones</label>';
+                  table_enlace_producto += '<textarea id="modal-nota' + i + '" name="addProducto[' + i + '][nota]" class="form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + clearHTMLTextArea(nota_final) + '</textarea>';
+                table_enlace_producto += '</div>';
             }  
             table_enlace_producto += '<input type="hidden" id="modal-id_detalle' + i + '" name="addProducto[' + i + '][id_detalle]" class="form-control" value="' + id_item + '">';
             table_enlace_producto += '<input type="hidden" id="modal-cantidad_oculta' + i + '" name="addProducto[' + i + '][cantidad_oculta]" class="form-control" value="' + detalle[i]['Qt_Producto_Caja'] + '">';

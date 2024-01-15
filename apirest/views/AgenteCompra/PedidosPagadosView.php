@@ -195,9 +195,9 @@
                               <th class="text-right">Deposit_#2</th>
                               <th class="text-right">T. Producción</th>
                               <th class="text-right">C. Delivery</th>
-                              <th class="text-right">Supplier</th><!--proveedor-->
-                              <th class="text-right">Phone</th><!--celular imagen de tarjeta de presentación-->
                               <th class="text-right">fecha_Entrega</th>
+                              <th class="text-right">Supplier</th><!--proveedor-->
+                              <th class="text-right">Phone_Image_Supplier</th><!--celular imagen de tarjeta de presentación-->
                               <th class="text-right"></th>
                             </tr>
                           </thead>

@@ -96,7 +96,8 @@ class PedidosGarantizadosModel extends CI_Model{
 		ACPDPP.Ss_Precio,
 		ACPDPP.Qt_Producto_Caja,
 		ACPDPP.Qt_Cbm,
-		ACPDPP.Nu_Dias_Delivery');
+		ACPDPP.Nu_Dias_Delivery,
+		ACPDPP.Ss_Costo_Delivery');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
     	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');

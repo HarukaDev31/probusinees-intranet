@@ -290,8 +290,8 @@ class PedidosGarantizados extends CI_Controller {
 		$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(40);
 		$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($style_align_center);
 
-		$objPHPExcel->getActiveSheet()->getStyle('B'.$fila.':N'.$fila)->applyFromArray($BStyle_top_general);
-		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':N'.$fila);
+		$objPHPExcel->getActiveSheet()->getStyle('B'.$fila.':O'.$fila)->applyFromArray($BStyle_top_general);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':O'.$fila);
 		$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->getFont()->setBold(true);
 		// /. Title
 		
@@ -301,10 +301,10 @@ class PedidosGarantizados extends CI_Controller {
 		$objPHPExcel->getActiveSheet()->getStyle('B4')->applyFromArray($BStyle_left_general);
 		$objPHPExcel->getActiveSheet()->getStyle('B6')->applyFromArray($BStyle_left_general);
 		
-		$objPHPExcel->getActiveSheet()->getStyle('N2')->applyFromArray($BStyle_right_general);
-		$objPHPExcel->getActiveSheet()->getStyle('N3')->applyFromArray($BStyle_right_general);
-		$objPHPExcel->getActiveSheet()->getStyle('N4')->applyFromArray($BStyle_right_general);
-		$objPHPExcel->getActiveSheet()->getStyle('N6')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O2')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O3')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O4')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O6')->applyFromArray($BStyle_right_general);
 
 		if( !empty($data) ){
 			$styleArray = array(
@@ -335,12 +335,12 @@ class PedidosGarantizados extends CI_Controller {
 			
 			$fila=4;
 			$objPHPExcel->getActiveSheet()->getStyle('C'.$fila)->applyFromArray($style_align_center);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'N° COTIZACIÓN: ' . $sCorrelativoCotizacion);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'N° Cotización: ' . $sCorrelativoCotizacion);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':D'.$fila);
 			$styleArray = array(
 				'font'  => array(
 					//'bold'  => true,
-					'color' => array('rgb' => 'FF0000'),
+					'color' => array('rgb' => 'FFFFFF'),
 					//'size'  => 15,
 					//'name'  => 'Verdana'
 				),
@@ -354,7 +354,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('E'.$fila, 'AGENTE');
 			$styleArray = array(
 				'font'  => array(
-					'color' => array('rgb' => 'FF0000'),
+					'color' => array('rgb' => 'FFFFFF'),
 				),
 				'alignment' => array(
 					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
@@ -400,10 +400,10 @@ class PedidosGarantizados extends CI_Controller {
 			);
 			$objPHPExcel->getActiveSheet()->getStyle('I'.$fila)->applyFromArray($styleArray);
 
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K'.$fila.':N'.$fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K'.$fila.':O'.$fila);
 
 			$objPHPExcel->getActiveSheet()
-			->getStyle('B' . $fila . ':' . 'N' . $fila)
+			->getStyle('B' . $fila . ':' . 'O' . $fila)
 			->applyFromArray(
 				array(
 					'fill' => array(
@@ -413,7 +413,7 @@ class PedidosGarantizados extends CI_Controller {
 				)
 			);
 		
-			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':O' . $fila)->getFont()->setBold(true);
 
 			$fila = 6;
 			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth("5");
@@ -430,6 +430,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth("20");
 			$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth("20");
 			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth("40");
+			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth("20");
 
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)
 			->setCellValue('B' . $fila, 'N')
@@ -445,6 +446,7 @@ class PedidosGarantizados extends CI_Controller {
 			->setCellValue('L' . $fila, 'CBM / CAJA')
 			->setCellValue('M' . $fila, 'CBM TOTAL')
 			->setCellValue('N' . $fila, 'TIEMPO PRODUCCION')
+			->setCellValue('O' . $fila, 'COSTO DELIVERY')
 			;
 
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
@@ -498,11 +500,15 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_top_general);
 			$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_right_general);
 			$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_bottom_general);
 
-			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->getFont()->setBold(true);
-			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':O' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
 			$objPHPExcel->getActiveSheet()
-			->getStyle('B' . $fila . ':' . 'N' . $fila)
+			->getStyle('B' . $fila . ':' . 'O' . $fila)
 			->applyFromArray(
 				array(
 					'fill' => array(
@@ -575,6 +581,7 @@ class PedidosGarantizados extends CI_Controller {
 				->setCellValue('L' . $fila, $row->Qt_Cbm)
 				->setCellValue('M' . $fila, $fCbmTotal)
 				->setCellValue('N' . $fila, $row->Nu_Dias_Delivery)
+				->setCellValue('O' . $fila, $row->Ss_Costo_Delivery)
 				;
 
 				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
@@ -642,6 +649,11 @@ class PedidosGarantizados extends CI_Controller {
 				$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_right_general);
 				$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_bottom_general);
 
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_bottom_general);
+
 				$fCostoTotalGeneral += $fCostoTotal;//precio en dolares
 				$fCostoTotalYuanesGeneral += $fCostoTotalYuanes;//precio en dolares
 				$fCbmTotalGeneral += $fCbmTotal;
@@ -678,7 +690,7 @@ class PedidosGarantizados extends CI_Controller {
 				)
 			);
 		
-			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':O' . $fila)->getFont()->setBold(true);
 
 			$fila++;
 			$fila++;
@@ -1056,9 +1068,9 @@ class PedidosGarantizados extends CI_Controller {
 		$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 		$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(30);
 
-		$objPHPExcel->getActiveSheet()->getStyle('B'.$fila.':N'.$fila)->applyFromArray($BStyle_top_general);
+		$objPHPExcel->getActiveSheet()->getStyle('B'.$fila.':O'.$fila)->applyFromArray($BStyle_top_general);
 		$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($style_align_center);
-		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':N'.$fila);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':O'.$fila);
 		$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->getFont()->setBold(true);
 		// /. Title
 		
@@ -1068,10 +1080,10 @@ class PedidosGarantizados extends CI_Controller {
 		$objPHPExcel->getActiveSheet()->getStyle('B4')->applyFromArray($BStyle_left_general);
 		$objPHPExcel->getActiveSheet()->getStyle('B6')->applyFromArray($BStyle_left_general);
 		
-		$objPHPExcel->getActiveSheet()->getStyle('N2')->applyFromArray($BStyle_right_general);
-		$objPHPExcel->getActiveSheet()->getStyle('N3')->applyFromArray($BStyle_right_general);
-		$objPHPExcel->getActiveSheet()->getStyle('N4')->applyFromArray($BStyle_right_general);
-		$objPHPExcel->getActiveSheet()->getStyle('N6')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O2')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O3')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O4')->applyFromArray($BStyle_right_general);
+		$objPHPExcel->getActiveSheet()->getStyle('O6')->applyFromArray($BStyle_right_general);
 
 		if( !empty($data) ){
 			$styleArray = array(
@@ -1103,12 +1115,12 @@ class PedidosGarantizados extends CI_Controller {
 			
 			$fila=4;
 			$objPHPExcel->getActiveSheet()->getStyle('C'.$fila)->applyFromArray($style_align_center);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'N° COTIZACIÓN: ' . $sCorrelativoCotizacion);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'N° Cotización: ' . $sCorrelativoCotizacion);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B'.$fila.':D'.$fila);
 			$styleArray = array(
 				'font'  => array(
 					//'bold'  => true,
-					'color' => array('rgb' => 'FF0000'),
+					'color' => array('rgb' => 'FFFFFF'),
 					//'size'  => 15,
 					//'name'  => 'Verdana'
 				),
@@ -1122,7 +1134,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('E'.$fila, 'AGENTE');
 			$styleArray = array(
 				'font'  => array(
-					'color' => array('rgb' => 'FF0000'),
+					'color' => array('rgb' => 'FFFFFF'),
 				),
 				'alignment' => array(
 					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
@@ -1168,7 +1180,7 @@ class PedidosGarantizados extends CI_Controller {
 			);
 			$objPHPExcel->getActiveSheet()->getStyle('I'.$fila)->applyFromArray($styleArray);
 
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K'.$fila.':N'.$fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K'.$fila.':O'.$fila);
 
 			$objPHPExcel->getActiveSheet()
 			->getStyle('B' . $fila . ':' . 'N' . $fila)
@@ -1181,7 +1193,7 @@ class PedidosGarantizados extends CI_Controller {
 				)
 			);
 		
-			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':O' . $fila)->getFont()->setBold(true);
 
 			$fila = 6;
 			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth("5");
@@ -1198,6 +1210,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth("20");
 			$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth("20");
 			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth("40");
+			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth("20");
 
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)
 			->setCellValue('B' . $fila, 'N')
@@ -1213,6 +1226,7 @@ class PedidosGarantizados extends CI_Controller {
 			->setCellValue('L' . $fila, 'CBM / CAJA')
 			->setCellValue('M' . $fila, 'CBM TOTAL')
 			->setCellValue('N' . $fila, 'TIEMPO PRODUCCION')
+			->setCellValue('O' . $fila, 'COSTO DELIVERY')
 			;
 
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
@@ -1266,11 +1280,15 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_top_general);
 			$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_right_general);
 			$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_bottom_general);
+			
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_top_general);
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_right_general);
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_bottom_general);
 
-			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->getFont()->setBold(true);
-			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':N' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':O' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
 			$objPHPExcel->getActiveSheet()
-			->getStyle('B' . $fila . ':' . 'N' . $fila)
+			->getStyle('B' . $fila . ':' . 'O' . $fila)
 			->applyFromArray(
 				array(
 					'fill' => array(
@@ -1343,6 +1361,7 @@ class PedidosGarantizados extends CI_Controller {
 				->setCellValue('L' . $fila, $row->Qt_Cbm)
 				->setCellValue('M' . $fila, $fCbmTotal)
 				->setCellValue('N' . $fila, $row->Nu_Dias_Delivery)
+				->setCellValue('O' . $fila, $row->Ss_Costo_Delivery)
 				;
 
 				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
@@ -1409,6 +1428,11 @@ class PedidosGarantizados extends CI_Controller {
 				$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_left_general);
 				$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_right_general);
 				$objPHPExcel->getActiveSheet()->getStyle('N' . $fila)->applyFromArray($BStyle_bottom_general);
+
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_top_general);
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_left_general);
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_right_general);
+				$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($BStyle_bottom_general);
 
 				$fCostoTotalGeneral += $fCostoTotal;//precio en dolares
 				$fCostoTotalYuanesGeneral += $fCostoTotalYuanes;//precio en dolares
