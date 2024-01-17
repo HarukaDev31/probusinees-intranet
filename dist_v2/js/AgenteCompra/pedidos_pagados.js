@@ -10,6 +10,10 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 
+if (fMonth < 10) {
+  fMonth = '0' + fMonth;
+}
+
 $(function () {
   //Date picker invoice
   $( '.input-report' ).datepicker({
@@ -648,7 +652,7 @@ function verPedido(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
       
-      var table_enlace_producto = "";
+      var table_enlace_producto = "", iDiasVencimiento = 0;
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
@@ -661,6 +665,16 @@ function verPedido(ID){
         var fTotal = (cantidad_item * precio_china);
         var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
         var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
+
+        console.log( 'entro' );
+        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
+          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
+          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
+
+          var diff = fechaFin - fechaInicio;
+          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
+          console.log( iDiasVencimiento );
+        }
 
         var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
 
@@ -1074,7 +1088,7 @@ function subirInspeccion(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
 
-      var table_enlace_producto = "";
+      var table_enlace_producto = "", iDiasVencimiento=0, sClassColorTr = '';
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
@@ -1087,10 +1101,22 @@ function subirInspeccion(ID){
         var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
         var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
         
+        sClassColorTr = '';
+        iDiasVencimiento = 0;
+        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
+          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
+          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
+
+          var diff = fechaFin - fechaInicio;
+          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
+          if(iDiasVencimiento<5)
+            sClassColorTr = 'table-warning';
+        }
+
         var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
 
         table_enlace_producto +=
-        "<tr id='tr_enlace_producto" + id_item + "'>"
+        "<tr id='tr_enlace_producto" + id_item + "' class='" + sClassColorTr + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
           + "<td class='text-center td-name' width='30%'>"
             + "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
