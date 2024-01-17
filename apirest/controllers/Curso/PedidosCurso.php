@@ -40,7 +40,7 @@ class PedidosCurso extends CI_Controller {
             $rows[] = $row->No_Pais;
             $rows[] = $row->ID_Pedido_Curso;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad . "<br>" . $row->Nu_Celular_Entidad . "<br>" . $row->Txt_Email_Entidad;
+            $rows[] = $row->No_Entidad . "<br>" . $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad . "<br>" . $row->Nu_Celular_Entidad . "<br>" . $row->Txt_Email_Entidad;
 		
 			$rows[] = $row->No_Signo . ' ' . round($row->Ss_Total, 2);
 			

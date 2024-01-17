@@ -79,10 +79,9 @@ $(function () {
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
         data.sMethod = $('#hidden-sMethod').val(),
-        data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
-        data.Global_Filter = $( '#txt-Global_Filter' ).val(),
-        data.Filtro_Fe_Inicio       = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
-        data.Filtro_Fe_Fin          = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
+        data.estado_pago = $( '#cbo-filtro-estado_pago' ).val(),
+        data.Filtro_Fe_Inicio = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
+        data.Filtro_Fe_Fin = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
       },
     },
     'columnDefs': [
