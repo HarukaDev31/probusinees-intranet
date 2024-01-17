@@ -509,8 +509,8 @@ class PedidosAgente extends CI_Controller {
 				if( !empty($row->Txt_Url_Imagen_Producto) ){
 					$objDrawing = new PHPExcel_Worksheet_Drawing();
 					
-					$objDrawing->setName($row->Txt_Producto);
-					$objDrawing->setDescription($row->Txt_Descripcion);
+					//$objDrawing->setName($row->Txt_Producto);
+					//$objDrawing->setDescription($row->Txt_Descripcion);
 					
 					//pruebas localhost
 					//$objDrawing->setPath('assets/img/arturo.jpeg');
@@ -537,7 +537,7 @@ class PedidosAgente extends CI_Controller {
 				->setCellValue('C' . $fila, $row->Txt_Producto)
 				->setCellValue('D' . $fila, $row->Txt_Descripcion)
 				->setCellValue('E' . $fila, $row->Qt_Producto)
-				->setCellValue('F' . $fila, 'Link')
+				//->setCellValue('F' . $fila, 'Link')
 				//->setCellValue('F' . $fila, $row->Txt_Url_Link_Pagina_Producto)
 				;
 				
