@@ -652,7 +652,7 @@ function verPedido(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
       
-      var table_enlace_producto = "", iDiasVencimiento = 0;
+      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "";
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
@@ -666,14 +666,16 @@ function verPedido(ID){
         var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
         var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
 
-        console.log( 'entro' );
+        sClassColorTr = '';
+        iDiasVencimiento = 0;
         if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
           var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
           var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
 
           var diff = fechaFin - fechaInicio;
           iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
-          console.log( iDiasVencimiento );
+          if(iDiasVencimiento<5)
+            sClassColorTr = 'table-warning';
         }
 
         var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
