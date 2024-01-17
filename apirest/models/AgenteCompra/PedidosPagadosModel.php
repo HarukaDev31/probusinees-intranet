@@ -138,11 +138,19 @@ class PedidosPagadosModel extends CI_Model{
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }
 
-	public function cambiarEstadoChina($ID, $Nu_Estado){
+	public function cambiarEstadoChina($ID, $Nu_Estado, $sCorrelativo){
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado_China' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
-			return array('status' => 'success', 'message' => 'Actualizado');
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($Nu_Estado);
+			//registrar evento de notificacion
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Pagados',
+				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
+				''
+			);
+			return array('status' => 'success', 'message' => 'Actualizado', 'notificacion' => $notificacion);
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
 	}
@@ -151,7 +159,7 @@ class PedidosPagadosModel extends CI_Model{
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Tipo_Servicio' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
-			return array('status' => 'success', 'message' => 'Actualizado');
+			return array('status' => 'success', 'message' => 'Actualizado', 'notificacion' => $notificacion);
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
 	}

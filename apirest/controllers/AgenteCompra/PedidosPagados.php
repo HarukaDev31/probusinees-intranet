@@ -14,6 +14,9 @@ class PedidosPagados extends CI_Controller {
 		$this->load->database('LAE_SYSTEMS');
 		$this->load->model('AgenteCompra/PedidosPagadosModel');
 		$this->load->model('HelperImportacionModel');
+		$this->load->model('NotificacionModel');
+		$this->load->model('MenuModel');
+
 		if(!isset($this->session->userdata['usuario'])) {
 			redirect('');
 		}
@@ -34,8 +37,9 @@ class PedidosPagados extends CI_Controller {
         foreach ($arrData as $row) {
 			$rows = array();
 
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
             $rows[] = $row->No_Pais;
-            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
+            $rows[] = $sCorrelativoCotizacion;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             //$rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
@@ -85,9 +89,9 @@ class PedidosPagados extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Producción" title="Producción" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Producción</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Inspección" title="Inspección" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Inspección</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Entregado" title="Entregado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Entregado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Producción" title="Producción" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Producción</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Inspección" title="Inspección" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Inspección</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Entregado" title="Entregado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Entregado</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
@@ -640,9 +644,9 @@ class PedidosPagados extends CI_Controller {
 		}
 	}
 
-	public function cambiarEstadoChina($ID, $Nu_Estado){
+	public function cambiarEstadoChina($ID, $Nu_Estado, $sCorrelativo){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->cambiarEstadoChina($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
+    	echo json_encode($this->PedidosPagadosModel->cambiarEstadoChina($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
 	}
 
 	public function addInspeccionProveedor(){

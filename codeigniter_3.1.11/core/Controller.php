@@ -103,7 +103,9 @@ class CI_Controller {
 			
 			// Datos de notificaciones y FE
 			//$this->notificaciones = $this->ConfiguracionModel->inicio();
-			$this->notificaciones = array();
+			//$this->notificaciones = array();
+			
+			$this->notificaciones = $this->NotificacionModel->obtenerNotificacionUsuario($this->user->ID_Usuario);
 
 			//if($this->router->class == 'AccesoController' && $this->router->method != 'logout') redirect('InicioController');
 

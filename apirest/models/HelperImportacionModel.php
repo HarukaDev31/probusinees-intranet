@@ -11,6 +11,12 @@ class HelperImportacionModel extends CI_Model{
 		return array('No_Estado' => 'Inactivo','No_Class_Estado' => 'danger');
 	}
 
+	function obtenerEstadoNotificacionArray($iEstado){
+		if( $iEstado == 1 )
+			return array('No_Estado' => 'Recibir','No_Class_Estado' => 'success');
+		return array('No_Estado' => 'Desactivar','No_Class_Estado' => 'danger');
+	}
+
 	function obtenerEstadoRegistroPagosArray($iEstado){
 		if( $iEstado == 1 )
 			return array('No_Estado' => 'Pendiente','No_Class_Estado' => 'secondary');

@@ -81,6 +81,57 @@
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         <!-- Messages Dropdown Menu -->
+        
+        <?php if($this->user->Nu_Notificacion==1) { ?>
+          <?php if($this->notificaciones['status']=='success') { ?>
+            <?php
+              $iCantidadNotificaciones = 0;
+              foreach($this->notificaciones['result'] as $row) {
+                ++$iCantidadNotificaciones;
+              }
+            ?>
+            <li class="nav-item dropdown">
+              <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
+                <i class="far fa-bell"></i>
+                <span class="badge badge-danger navbar-badge"><?php echo $iCantidadNotificaciones; ?></span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <?php
+                  $iCantidadNotificaciones = 0;
+                  foreach($this->notificaciones['result'] as $row) {
+                    if($iCantidadNotificaciones == 5){
+                      break;
+                    }
+                    $segundos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'segundos');
+                    $minutos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'minutos');
+                    $horas = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'horas');
+                    $dias = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'dias');
+
+                    $time = ($dias > 0 ? $dias . ' día' : '') . ($horas > 0 ? $horas . ' H ' : '') . ($minutos > 0 ? $minutos . ' m ' : '') . $segundos . ' s';
+                ?>
+                <a href="#" class="dropdown-item">
+                  <div class="media">
+                    <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                    <div class="media-body">
+                      <h3 class="dropdown-item-title">
+                        <?php echo $row->No_Usuario_Evento; ?>
+                      </h3>
+                      <p class="text-sm"><?php echo $row->No_Evento; ?></p>
+                      <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i><?php echo $time; ?></p>
+                    </div>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <?php
+                    ++$iCantidadNotificaciones;
+                  }
+                ?>
+                <a href="#" class="dropdown-item dropdown-footer" data-toggle="modal" data-target="#modal-notification">Ver notificaciones</a>
+              </div>
+            </li>
+          <?php } ?>
+        <?php } ?>
+
         <li class="nav-item">
           <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
             <i class="fas fa-th-large"></i>

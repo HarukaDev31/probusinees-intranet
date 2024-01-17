@@ -23,7 +23,7 @@ class PerfilUsuarioModel extends CI_Model{
         if( $this->input->post('Perfil_Usuario') == 'Perfil_Usuario' )
             $this->db->like('No_Grupo', $this->input->post('Global_Filter'));
                 
-        $this->db->select('EMP.ID_Empresa, EMP.No_Empresa, ORG.ID_Organizacion, ORG.No_Organizacion, ID_Grupo, Nu_Tipo_Privilegio_Acceso, No_Grupo, No_Grupo_Descripcion, ' . $this->table . '.Nu_Estado')
+        $this->db->select('EMP.ID_Empresa, EMP.No_Empresa, ORG.ID_Organizacion, ORG.No_Organizacion, ID_Grupo, Nu_Tipo_Privilegio_Acceso, No_Grupo, No_Grupo_Descripcion, Nu_Notificacion, ' . $this->table . '.Nu_Estado')
         ->from($this->table)
         ->join($this->table_empresa . ' AS EMP', 'EMP.ID_Empresa = ' . $this->table . '.ID_Empresa', 'join')
         ->join($this->table_organizacion . ' AS ORG', 'ORG.ID_Organizacion = ' . $this->table . '.ID_Organizacion', 'join');
@@ -88,5 +88,14 @@ class PerfilUsuarioModel extends CI_Model{
 		        return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro eliminado');
 		}
         return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al eliminar');
+	}
+
+	public function cambiarNotificacion($ID, $Nu_Estado){
+        $where = array('ID_Grupo' => $ID);
+        $data = array( 'Nu_Notificacion' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar');
 	}
 }

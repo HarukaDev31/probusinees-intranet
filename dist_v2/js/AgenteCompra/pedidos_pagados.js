@@ -990,7 +990,7 @@ function loadFile(event, id){
   }
 }
 
-function cambiarEstadoChina(ID, Nu_Estado) {
+function cambiarEstadoChina(ID, Nu_Estado, iIdCorrelativo, sCorrelativo) {
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
@@ -1015,7 +1015,7 @@ function cambiarEstadoChina(ID, Nu_Estado) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstadoChina/' + ID + '/' + Nu_Estado;
+    url = base_url + 'AgenteCompra/PedidosPagados/cambiarEstadoChina/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
     $.ajax({
       url: url,
       type: "GET",

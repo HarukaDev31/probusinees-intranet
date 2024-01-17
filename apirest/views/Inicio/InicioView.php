@@ -7,6 +7,8 @@
       <div class="row mb-2">
         <div class="col-sm-6">
           <h1>Inicio</h1>
+          <?php //array_debug($this->user); ?>
+          <?php //array_debug($this->notificaciones); ?>
         </div>
       </div>
     </div><!-- /.container-fluid -->

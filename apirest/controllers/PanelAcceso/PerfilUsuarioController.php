@@ -8,7 +8,7 @@ class PerfilUsuarioController extends CI_Controller {
 		$this->load->library('session');
 		$this->load->database('LAE_SYSTEMS');
 		$this->load->model('PanelAcceso/PerfilUsuarioModel');
-		$this->load->model('HelperModel');
+		$this->load->model('HelperImportacionModel');
 	}
 	
 	public function listarPerfilUsuarios(){
@@ -43,7 +43,19 @@ class PerfilUsuarioController extends CI_Controller {
             $rows[] = $row->No_Grupo;
             $rows[] = $row->No_Grupo_Descripcion;
 			
-			$arrEstadoRegistro = $this->HelperModel->obtenerEstadoRegistroArray($row->Nu_Estado);
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoNotificacionArray($row->Nu_Notificacion);
+			$dropdown_estado = '<div class="dropdown">';
+				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+				$dropdown_estado .= '<span class="caret"></span></button>';
+				$dropdown_estado .= '<ul class="dropdown-menu">';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Recibir" title="Recibir" href="javascript:void(0)" onclick="cambiarNotificacion(\'' . $row->ID_Grupo . '\',1);">Recibir</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Inactivo" title="Inactivo" href="javascript:void(0)" onclick="cambiarNotificacion(\'' . $row->ID_Grupo . '\',0);">Desactivar</a></li>';
+				$dropdown_estado .= '</ul>';
+			$dropdown_estado .= '</div>';
+            $rows[] = $dropdown_estado;
+
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroArray($row->Nu_Estado);
             $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			
             $rows[] = '<button class="btn btn-xs btn-link btn-upd" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verPerfilUsuario(\'' . $row->ID_Grupo . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
@@ -81,5 +93,10 @@ class PerfilUsuarioController extends CI_Controller {
 	public function eliminarPerfilUsuario($ID){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		echo json_encode($this->PerfilUsuarioModel->eliminarPerfilUsuario($this->security->xss_clean($ID)));
+	}
+
+	public function cambiarNotificacion($ID, $Nu_Estado){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PerfilUsuarioModel->cambiarNotificacion($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
 	}
 }

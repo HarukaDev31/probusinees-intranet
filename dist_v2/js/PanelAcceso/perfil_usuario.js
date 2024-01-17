@@ -443,3 +443,55 @@ function _eliminarPerfilUsuario($modal_delete, ID){
 function reload_table_peril_usuario(){
   table_perfil_usuario.ajax.reload(null,false);
 }
+
+function cambiarNotificacion(ID, Nu_Estado) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  var sNombreEstado = 'Recibir notificaciones';
+  if(Nu_Estado==2)
+    sNombreEstado = 'Desactivar notificaciones';
+
+  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'PanelAcceso/PerfilUsuarioController/cambiarNotificacion/' + ID + '/' + Nu_Estado;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_peril_usuario();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
+}

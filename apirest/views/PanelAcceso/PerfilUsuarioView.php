@@ -81,6 +81,7 @@
                       <th>Privilegio</th>
                       <th>Cargo</th>
                       <th>Descripción</th>
+                      <th>Notificación</th>
                       <th class="no-sort">Estado</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Editar</th>

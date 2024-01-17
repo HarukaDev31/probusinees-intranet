@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.0.201'; ?>
+<?php $iControlVersionDashboard = '1.0.203'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -214,6 +214,60 @@
       <div class="modal-header">
         <h4 class="modal-title-message text-center"></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal notification -->
+<div class="modal fade" id="modal-notification" aria-modal="true" role="dialog">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Notificaciones</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+        <?php if($this->user->Nu_Notificacion==1) { ?>
+          <?php if($this->notificaciones['status']=='success') {
+              $iCantidadNotificaciones = 0;
+              foreach($this->notificaciones['result'] as $row) {
+                if($iCantidadNotificaciones == 5){
+                  break;
+                }
+                $segundos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'segundos');
+                $minutos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'minutos');
+                $horas = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'horas');
+                $dias = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'dias');
+
+                $time = ($dias > 0 ? $dias . ' día' : '') . ($horas > 0 ? $horas . ' H ' : '') . ($minutos > 0 ? $minutos . ' m ' : '') . $segundos . ' s';
+            ?>
+            <a href="#" class="dropdown-item">
+              <div class="media">
+                <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                <div class="media-body">
+                  <h3 class="dropdown-item-title">
+                    <?php echo $row->No_Usuario_Evento; ?>
+                  </h3>
+                  <p class="text-sm"><?php echo $row->No_Evento; ?></p>
+                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i><?php echo $time; ?></p>
+                </div>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <?php
+                ++$iCantidadNotificaciones;
+              }
+            ?>
+          <?php } ?>
+        <?php } ?>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-secondary col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save-delete" class="btn btn-primary col">Aceptar</button>
       </div>
     </div>
   </div>
