@@ -548,7 +548,7 @@ class PedidosAgente extends CI_Controller {
 
 				if( !empty($row->Txt_Url_Link_Pagina_Producto) ){
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
-					->setCellValue('F' . $fila, 'Link')
+					->setCellValue('F' . $fila, 'Link');
 
 					$objPHPExcel->getActiveSheet()->getCell('F' . $fila)
 					->getHyperlink()
