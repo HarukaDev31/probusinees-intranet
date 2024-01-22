@@ -319,6 +319,8 @@ $(function () {
     $( '#txt-EID_Organizacion_item' ).val($(this).data('id_organizacion'));
     $( '#txt-EID_Pedido_Cabecera_item' ).val($(this).data('id_pedido_cabecera'));
     $( '#txt-EID_Pedido_Detalle_item' ).val($(this).data('id_pedido_detalle'));
+    $( '#txt-Item_ECorrelativo' ).val($(this).data('correlativo'));
+    $( '#txt-Item_Ename_producto' ).val($(this).data('name_producto'));
   })
   
 	$(document).on('click', '.btn-seleccionar_proveedor', function (e) {
@@ -326,8 +328,10 @@ $(function () {
 
     var id_detalle = $(this).data('id_detalle');
     var id = $(this).data('id');
+    var correlativo = $(this).data('correlativo');
+    var name_item = $(this).data('name_item');
     
-    url = base_url + 'AgenteCompra/PedidosGarantizados/elegirItemProveedor/' + id_detalle + '/' + id + '/' + 1;
+    url = base_url + 'AgenteCompra/PedidosGarantizados/elegirItemProveedor/' + id_detalle + '/' + id + '/' + 1 + '/' + correlativo + '/' + encodeURIComponent(name_item);;
     $.ajax({
       url : url,
       type: "GET",
@@ -369,8 +373,13 @@ $(function () {
 
     var id_detalle = $(this).data('id_detalle');
     var id = $(this).data('id');
+    var correlativo = $(this).data('correlativo');
+    var name_item = $(this).data('name_item');
     
-    url = base_url + 'AgenteCompra/PedidosGarantizados/elegirItemProveedor/' + id_detalle + '/' + id + '/' + 0;
+    console.log('correlativo ' + correlativo);
+    console.log('name_item ' + name_item);
+
+    url = base_url + 'AgenteCompra/PedidosGarantizados/elegirItemProveedor/' + id_detalle + '/' + id + '/' + 0 + '/' + correlativo + '/' + encodeURIComponent(name_item);
     $.ajax({
       url : url,
       type: "GET",
@@ -429,6 +438,8 @@ $(function () {
     $( '#txt-EID_Organizacion_item' ).val($(this).data('id_organizacion'));
     $( '#txt-EID_Pedido_Cabecera_item' ).val(id);
     $( '#txt-EID_Pedido_Detalle_item' ).val(id_detalle);
+    $( '#txt-Item_ECorrelativo_Editar' ).val($(this).data('correlativo'));
+    $( '#txt-Item_Ename_producto_Editar' ).val($(this).data('name_producto'));
 
     getItemProveedor(id_detalle);
   })
@@ -707,7 +718,9 @@ function verPedido(ID){
 
   $('#div-arrItemsPedidos').html('');
 
-  $('#span-id_pedido').html('Nro. ' + ID);
+  //$('#span-id_pedido').html('Nro. ' + ID);
+
+  $('#span-id_pedido').html('');
 
   url = base_url + 'AgenteCompra/PedidosGarantizados/ajax_edit/' + ID;
   $.ajax({
@@ -718,12 +731,16 @@ function verPedido(ID){
       var detalle = response;
       response = response[0];
 
+      $('#span-id_pedido').html(response.sCorrelativoCotizacion);
+
       $( '.div-AgregarEditar' ).show();
             
       $( '[name="EID_Pedido_Cabecera"]' ).val(response.ID_Pedido_Cabecera);
       $( '[name="EID_Entidad"]' ).val(response.ID_Entidad);
       $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
       $( '[name="EID_Organizacion"]' ).val(response.ID_Organizacion);
+      $( '[name="ECorrelativo"]' ).val(response.sCorrelativoCotizacion);
+      $( '[name="Item_ECorrelativo"]' ).val(response.Item_ECorrelativo);
 
       $( '[name="No_Contacto"]' ).val(response.No_Contacto);
       $( '[name="Txt_Email_Contacto"]' ).val(response.Txt_Email_Contacto);
@@ -799,14 +816,14 @@ function verPedido(ID){
           if(response.Nu_Estado_China!=3) {//cotizacio china
             table_enlace_producto += '<div class="row">';
               table_enlace_producto += '<div class="col">';
-                table_enlace_producto += '<button type="button" id="btn-add_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Agregar Proveedor</button>';
+                table_enlace_producto += '<button type="button" id="btn-add_proveedor' + id_item + '" data-name_producto="' + nombre_producto + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-correlativo="' + response.sCorrelativoCotizacion + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Agregar Proveedor</button>';
               table_enlace_producto += '</div>';
               table_enlace_producto += '<div class="col">';
-                table_enlace_producto += '<button type="button" id="btn-elegir_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-secondary btn-block btn-elegir_proveedor"><i class="far fa-edit"></i>&nbsp; Editar Proveedor</button>';
+                table_enlace_producto += '<button type="button" id="btn-elegir_proveedor' + id_item + '" data-name_producto="' + nombre_producto + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-correlativo="' + response.sCorrelativoCotizacion + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-secondary btn-block btn-elegir_proveedor"><i class="far fa-edit"></i>&nbsp; Editar Proveedor</button>';
               table_enlace_producto += '</div>';
             table_enlace_producto += '</div>';
           } else {
-            table_enlace_producto += '<button type="button" id="btn-elegir_proveedor' + id_item + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
+            table_enlace_producto += '<button type="button" id="btn-elegir_proveedor' + id_item + '" data-name_producto="' + nombre_producto + '" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-correlativo="' + response.sCorrelativoCotizacion + '" data-id_pedido_detalle="' + id_item + '" class="btn btn-danger btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
           }
         table_enlace_producto += "</td></tr>";
       }
@@ -887,7 +904,7 @@ function cambiarEstado(ID, Nu_Estado) {
   });
 }
 
-function cambiarEstadoChina(ID, Nu_Estado) {
+function cambiarEstadoChina(ID, Nu_Estado, sCorrelativo) {
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
@@ -912,7 +929,7 @@ function cambiarEstadoChina(ID, Nu_Estado) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstadoChina/' + ID + '/' + Nu_Estado;
+    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstadoChina/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
     $.ajax({
       url: url,
       type: "GET",
@@ -1389,9 +1406,9 @@ function getItemProveedor(id_detalle){
           table_enlace_producto +=
           "<tr><td class='text-center' colspan='11'>"
             if(detalle[i]['Nu_Selecciono_Proveedor']==0){
-              table_enlace_producto += '<button type="button" id="btn-seleccionar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-check"></i>&nbsp; marcar proveedor</button>';
+              table_enlace_producto += '<button type="button" id="btn-seleccionar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" data-correlativo="' + $('#txt-Item_ECorrelativo_Editar').val() + '" data-name_item="' + $('#txt-Item_Ename_producto_Editar').val() + '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-check"></i>&nbsp; marcar proveedor</button>';
             } else {
-              table_enlace_producto += '<button type="button" id="btn-desmarcar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-times"></i>&nbsp; desmarcar proveedor</button>';
+              table_enlace_producto += '<button type="button" id="btn-desmarcar_proveedor' + id_item + '" data-id_detalle="' + id_detalle + '" data-id="' + id_item + '" data-correlativo="' + $('#txt-Item_ECorrelativo_Editar').val() + '" data-name_item="' + $('#txt-Item_Ename_producto_Editar').val() + '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-times"></i>&nbsp; desmarcar proveedor</button>';
               
               table_enlace_producto += '<div class="row">';
                 table_enlace_producto += '<div class="col-1 col-sm-1 mt-3">';

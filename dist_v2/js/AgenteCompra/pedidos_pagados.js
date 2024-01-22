@@ -273,6 +273,7 @@ $(function () {
     var id_detalle = $(this).data('id_pedido_detalle');
     var id = $(this).data('id');
     var tipo_pago = $(this).data('tipo_pago');
+    var correlativo = $(this).data('correlativo');
 
     $( '[name="proveedor-id_empresa"]' ).val(id_empresa);
     $( '[name="proveedor-id_organizacion"]' ).val(id_organizacion);
@@ -280,6 +281,7 @@ $(function () {
     $( '[name="proveedor-id_detalle"]' ).val(id_detalle);
     $( '[name="proveedor-id"]' ).val(id);
     $( '[name="proveedor-tipo_pago"]' ).val(tipo_pago);
+    $( '[name="proveedor-correlativo"]' ).val(correlativo);
 
     $('#modal-agregar_pago').modal('show');
 
@@ -299,6 +301,7 @@ $(function () {
     var id_detalle = $(this).data('id_pedido_detalle');
     var id = $(this).data('id');
     var tipo_pago = $(this).data('tipo_pago');
+    var correlativo = $(this).data('correlativo');
 
     $( '[name="proveedor-id_empresa"]' ).val(id_empresa);
     $( '[name="proveedor-id_organizacion"]' ).val(id_organizacion);
@@ -306,6 +309,7 @@ $(function () {
     $( '[name="proveedor-id_detalle"]' ).val(id_detalle);
     $( '[name="proveedor-id"]' ).val(id);
     $( '[name="proveedor-tipo_pago"]' ).val(tipo_pago);
+    $( '[name="proveedor-correlativo"]' ).val(correlativo);
 
     $('#modal-agregar_inspeccion').modal('show');
   })
@@ -315,6 +319,8 @@ $(function () {
 
     var id = $(this).data('id');
     var id_pedido_cabecera = $(this).data('id_pedido_cabecera');
+    var correlativo = $(this).data('correlativo');
+    var name_item = $(this).data('name_item');
 
     var $modal_delete = $( '#modal-message-delete' );
     $modal_delete.modal('show');
@@ -330,7 +336,7 @@ $(function () {
       $( '#btn-save-delete' ).attr('disabled', true);
       $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-      url = base_url + 'AgenteCompra/PedidosPagados/elminarItemProveedor/' + id;
+      url = base_url + 'AgenteCompra/PedidosPagados/elminarItemProveedor/' + id + '/' + correlativo + '/' + name_item;
       $.ajax({
         url : url,
         type: "GET",
@@ -711,7 +717,7 @@ function verPedido(ID){
           table_enlace_producto += "</td>";
           
           table_enlace_producto += "<td class='text-left td-eliminar'>";
-            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
+            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
           table_enlace_producto += "</td>";
 
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
@@ -720,13 +726,13 @@ function verPedido(ID){
         table_enlace_producto +=
         "<tr><td class='text-left' colspan='14'>"
           if( voucher_1 == '' || voucher_1 == null ){
-            table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
+            table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
           } else {
-            table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_1_Proveedor +  ' (Deposit_#1)</button>';
+            table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_1_Proveedor +  ' (Deposit_#1)</button>';
             if( voucher_2 == '' || voucher_2 == null ){
-              table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
+              table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
             } else {
-              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_2_Proveedor + ' (Deposit_#2)</button>';
+              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_2_Proveedor + ' (Deposit_#2)</button>';
             }
           }
         table_enlace_producto +=
@@ -759,7 +765,7 @@ function verPedido(ID){
   })
 }
 
-function cambiarEstado(ID, Nu_Estado, id_correlativo) {
+function cambiarEstado(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
@@ -784,7 +790,7 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + id_correlativo;
+    url = base_url + 'AgenteCompra/PedidosPagados/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
     $.ajax({
       url: url,
       type: "GET",
@@ -1149,7 +1155,7 @@ function subirInspeccion(ID){
 
           
           table_enlace_producto += "<td class='text-left td-eliminar'>";
-            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
+            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
           table_enlace_producto += "</td>";
 
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
@@ -1161,9 +1167,9 @@ function subirInspeccion(ID){
         table_enlace_producto +=
         "<tr><td class='text-left' colspan='15'>"
           if(detalle[i]['Nu_Agrego_Inspeccion']==0) {//0=No
-            table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
+            table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
           } else {
-            table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
+            table_enlace_producto += '<button type="button" id="btn-agregar_inspeccion' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-primary btn-block btn-agregar_inspeccion" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '"><i class="fas fa-images"></i>&nbsp; Subir fotos</button>';
             table_enlace_producto += '<button type="button" id="btn-ver_inspeccion' + id_item + '" onclick=verInspeccion(' + id_item + ') class="text-left btn btn-secondary btn-block btn-ver_inspeccion"><i class="fas fa-search"></i>&nbsp; Ver fotos</button>';
           }
         table_enlace_producto += "</td></tr>";
@@ -1232,8 +1238,9 @@ function verInspeccion(ID){
   })
 }
 
-function documentoEntregado(id){
+function documentoEntregado(id, sCorrelativo){
   $( '[name="documento-id_cabecera"]' ).val(id);
+  $( '[name="documento-correlativo"]' ).val(sCorrelativo);
 
   $('#modal-documento_entrega').modal('show');
   $( '#form-documento_entrega' )[0].reset();

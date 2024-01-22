@@ -70,10 +70,10 @@ class PedidosPagados extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Enviado" title="Enviado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3);">Volver a Garantizado</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 30%" title="Pago 30%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago 30%</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 70%" title="Pago 70%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',7, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago 70%</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago Servicio" title="Pago Servicio" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',9, \'' . $row->ID_Agente_Compra_Correlativo . '\');">Pago Servicio</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Enviado" title="Enviado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Volver a Garantizado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 30%" title="Pago 30%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Pago 30%</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 70%" title="Pago 70%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',7, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Pago 70%</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago Servicio" title="Pago Servicio" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',9, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Pago Servicio</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
@@ -112,7 +112,7 @@ class PedidosPagados extends CI_Controller {
 			//entregado
 			$btn_entregado = '';
 			if($row->Nu_Estado_China==6)
-				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
+				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
 
 			if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
 				$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="descargarDocumentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
@@ -130,14 +130,20 @@ class PedidosPagados extends CI_Controller {
         );
         echo json_encode($output);
     }
-    	
+
 	public function ajax_edit($ID){
-        echo json_encode($this->PedidosPagadosModel->get_by_id($this->security->xss_clean($ID)));
+		$arrReponse = $this->PedidosPagadosModel->get_by_id($this->security->xss_clean($ID));
+		$sCorrelativoCotizacion = '';
+		foreach ($arrReponse as $row) {
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
+			$row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
+		}
+        echo json_encode($arrReponse);
     }
 
-	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){
+	public function cambiarEstado($ID, $Nu_Estado, $sCorrelativo){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($id_correlativo)));
+    	echo json_encode($this->PedidosPagadosModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
 	}
 
 	public function crudPedidoGrupal(){
@@ -819,8 +825,8 @@ class PedidosPagados extends CI_Controller {
 		}
     }
     	
-	public function elminarItemProveedor($id){
+	public function elminarItemProveedor($id, $correlativo, $name_item){
 		//echo "hola";
-		echo json_encode($this->PedidosPagadosModel->elminarItemProveedor($this->security->xss_clean($id)));
+		echo json_encode($this->PedidosPagadosModel->elminarItemProveedor($this->security->xss_clean($id), $this->security->xss_clean($correlativo), $this->security->xss_clean($name_item)));
 	}
 }

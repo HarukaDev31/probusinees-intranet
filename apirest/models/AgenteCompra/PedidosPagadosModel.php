@@ -112,10 +112,17 @@ class PedidosPagadosModel extends CI_Model{
         return $query->result();
     }
 
-	public function elminarItemProveedor($ID){
+	public function elminarItemProveedor($ID, $correlativo, $name_item){
         $where = array('ID_Pedido_Detalle_Producto_Proveedor' => $ID);
         $data = array( 'Nu_Visualizacion_Item' => 0 );
 		if ($this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0) {
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Pagados',
+				'Cotización ' . $correlativo . ' se eliminó producto ' . $name_item,
+				''
+			);
+
 			return array('status' => 'success', 'message' => 'Eliminar');
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
@@ -129,11 +136,22 @@ class PedidosPagadosModel extends CI_Model{
         return $query->result();
     }
 
-	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){
+	public function cambiarEstado($ID, $Nu_Estado, $sCorrelativo){
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
+			/*
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($Nu_Estado);
+			//registrar evento de notificacion
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Pagados',
+				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
+				''
+			);
+
 			return array('status' => 'success', 'message' => 'Actualizado');
+			*/
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }
@@ -219,6 +237,14 @@ class PedidosPagadosModel extends CI_Model{
 			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
 		} else {
 			//$this->db->trans_rollback();
+			//registrar evento de notificacion
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Pagados',
+				'Cotización ' . $arrPost['proveedor-correlativo'] . ' se agrego pago a proveedor',
+				''
+			);
+
 			$this->db->trans_commit();
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
 		}
@@ -281,6 +307,14 @@ class PedidosPagadosModel extends CI_Model{
 				return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
 			} else {
 				//$this->db->trans_rollback();
+				
+				$notificacion = $this->NotificacionModel->procesarNotificacion(
+					$this->user->No_Usuario,
+					'Pedidos Pagados',
+					'Cotización ' . $arrPost['proveedor-correlativo'] . ' se subió fotos de productos de inspección',
+					''
+				);
+
 				$this->db->trans_commit();
 				return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
 			}
@@ -322,6 +356,13 @@ class PedidosPagadosModel extends CI_Model{
 				return array('status' => 'error', 'message' => 'Error al insertar');
 			} else {
 				//$this->db->trans_rollback();
+				$notificacion = $this->NotificacionModel->procesarNotificacion(
+					$this->user->No_Usuario,
+					'Pedidos Pagados',
+					'Cotización ' . $arrPost['documento-correlativo'] . ' invoice se guardo documento',
+					''
+				);
+
 				$this->db->trans_commit();
 				return array('status' => 'success', 'message' => 'Documento guardado');
 			}

@@ -77,6 +77,7 @@
                   <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
                   <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
                   <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
+                  <input type="hidden" id="txt-ECorrelativo" name="ECorrelativo" class="form-control">
                   
                   <div class="row">
                     <div class="col-12 col-sm-12 col-md-12 d-none">
@@ -229,6 +230,8 @@
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Detalle_item" name="EID_Pedido_Detalle_item" class="form-control">
+                  <input type="hidden" id="txt-Item_ECorrelativo" name="Item_ECorrelativo" class="form-control">
+                  <input type="hidden" id="txt-Item_Ename_producto" name="Item_Ename_producto" class="form-control">
                                     
                   <div id="div-arrItems" class="div-agregar_proveedor"></div>
 
@@ -263,6 +266,8 @@
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Detalle_item" name="EID_Pedido_Detalle_item" class="form-control">
+                  <input type="hidden" id="txt-Item_ECorrelativo_Editar" name="Item_ECorrelativo_Editar" class="form-control">
+                  <input type="hidden" id="txt-Item_Ename_producto_Editar" name="Item_Ename_producto_Editar" class="form-control">
 
                   <div id="div-arrItemsProveedor" class="col-xs-12 col-sm-12 col-md-12">
                     <h3>Productos</h3>

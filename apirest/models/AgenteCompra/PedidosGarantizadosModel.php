@@ -246,17 +246,33 @@ class PedidosGarantizadosModel extends CI_Model{
 			$this->db->trans_rollback();
 			return array('status' => 'error', 'message' => 'error al actualizar datos');
 		} else {
+			//registrar evento de notificacion
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Garantizados',
+				'Cotización ' . $arrPost['Item_ECorrelativo_Editar'] . ' edito proveedor de ' . $arrPost['Item_Ename_producto_Editar'],
+				''
+			);
+
 			$this->db->trans_commit();
 			return array('status' => 'success', 'message' => 'Datos actualizados');
 		}
     }
 
-	public function elegirItemProveedor($id_detalle, $ID, $status){
+	public function elegirItemProveedor($id_detalle, $ID, $status, $sCorrelativoCotizacion, $sNameItem){
 		$query = "SELECT Nu_Selecciono_Proveedor FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle = " . $id_detalle . " AND Nu_Selecciono_Proveedor=1";
 		$objProveedor = $this->db->query($query)->row();
 		$where = array('ID_Pedido_Detalle_Producto_Proveedor' => $ID);
 		$data = array( 'Nu_Selecciono_Proveedor' => $status );//1=proveedor seleccionado
 		if ($this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0) {
+			$sElegirProveedor = ($status == 1 ? 'marco proveedor' : 'desmarco proveedor');
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Garantizados',
+				'Cotización ' . $sCorrelativoCotizacion . ' ' . $sElegirProveedor . ' de ' . $sNameItem,
+				''
+			);
+
 			return array('status' => 'success', 'message' => 'Proveedor seleccionado');
 		}
 		return array('status' => 'error', 'message' => 'Error al seleccionar proveedor');
@@ -271,16 +287,25 @@ class PedidosGarantizadosModel extends CI_Model{
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
 	}
 
-	public function cambiarEstadoChina($ID, $Nu_Estado){
+	public function cambiarEstadoChina($ID, $Nu_Estado, $sCorrelativo){
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado_China' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($Nu_Estado);
+			//registrar evento de notificacion
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Garantizados',
+				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
+				''
+			);
+
 			return array('status' => 'success', 'message' => 'Actualizado');
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
 	}
     
-    public function actualizarPedido($where, $data, $arrProducto, $arrProductoTable){
+    public function actualizarPedido($where, $data, $arrProducto, $arrProductoTable, $sCorrelativo){
 		$this->db->trans_begin();
 
 		if (!empty($arrProducto)) {
@@ -356,6 +381,13 @@ class PedidosGarantizadosModel extends CI_Model{
 			$this->db->trans_rollback();
 			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
 		} else {
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Garantizados',
+				'Cotización ' . $sCorrelativo . ' se actualizo',
+				''
+			);
+
 			$this->db->trans_commit();
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
 		}
@@ -506,6 +538,15 @@ class PedidosGarantizadosModel extends CI_Model{
 		} else {
 			//$this->db->trans_rollback();
 			$this->db->trans_commit();
+			
+			//registrar evento de notificacion
+			$notificacion = $this->NotificacionModel->procesarNotificacion(
+				$this->user->No_Usuario,
+				'Pedidos Garantizados',
+				'Cotización ' . $data['Item_ECorrelativo'] . ' nuevo proveedor de ' . $data['Item_Ename_producto'],
+				''
+			);
+
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
 		}
     }

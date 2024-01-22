@@ -267,6 +267,7 @@
           <input type="hidden" id="proveedor-id_detalle" name="proveedor-id_detalle" class="form-control">
           <input type="hidden" id="proveedor-id" name="proveedor-id" class="form-control">
           <input type="hidden" id="proveedor-tipo_pago" name="proveedor-tipo_pago" class="form-control">
+          <input type="hidden" id="proveedor-correlativo" name="proveedor-correlativo" class="form-control">
 
           <div class="col-12 col-sm-6 text-center">
             <label>Amount</label>
@@ -315,6 +316,7 @@
           <input type="hidden" id="proveedor-id_detalle" name="proveedor-id_detalle" class="form-control">
           <input type="hidden" id="proveedor-id" name="proveedor-id" class="form-control">
           <input type="hidden" id="proveedor-tipo_pago" name="proveedor-tipo_pago" class="form-control">
+          <input type="hidden" id="proveedor-correlativo" name="proveedor-correlativo" class="form-control">
 
           <div class="col-sm-12">
             <label>Inspección</label>
@@ -364,11 +366,11 @@
       <div class="modal-body" id="modal-body-documento_entrega">
         <div class="row">
           <input type="hidden" id="documento-id_cabecera" name="documento-id_cabecera" class="form-control">
-
+          <input type="hidden" id="documento-correlativo" name="documento-correlativo" class="form-control">
           <div class="col-sm-12">
             <label>Documento</label>
             <div class="form-group">
-              <input class="form-control" id="image_documento" name="image_documento" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf"></input>
+              <input class="form-control" id="image_documento" name="image_documento" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>

@@ -68,6 +68,8 @@
   <input type="hidden" id="hidden-ID_Pais_Usuario" name="ID_Pais_Usuario" class="form-control" value="<?php echo $this->user->ID_Pais; ?>">
   <input type="hidden" id="hidden-No_Signo_Global" name="No_Signo_Global" class="form-control" value="<?php echo $this->user->No_Signo; ?>">
 
+  <input type="hidden" id="hidden-id_menu" class="form-control" value="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu; ?>">
+  
   <div class="wrapper">
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -99,7 +101,7 @@
                 <?php
                   $iCantidadNotificaciones = 0;
                   foreach($this->notificaciones['result'] as $row) {
-                    if($iCantidadNotificaciones == 5){
+                    if($iCantidadNotificaciones == 3){
                       break;
                     }
                     $segundos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'segundos');
@@ -107,7 +109,7 @@
                     $horas = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'horas');
                     $dias = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'dias');
 
-                    $time = ($dias > 0 ? $dias . ' día' : '') . ($horas > 0 ? $horas . ' H ' : '') . ($minutos > 0 ? $minutos . ' m ' : '') . $segundos . ' s';
+                    $time = ($dias > 0 ? $dias . ' día ' : '') . ($horas > 0 ? $horas . ' H ' : '') . ($minutos > 0 ? $minutos . ' m ' : '') . $segundos . ' s';
                 ?>
                 <a href="#" class="dropdown-item">
                   <div class="media">
@@ -116,7 +118,8 @@
                       <h3 class="dropdown-item-title">
                         <?php echo $row->No_Usuario_Evento; ?>
                       </h3>
-                      <p class="text-sm"><?php echo $row->No_Evento; ?></p>
+                      <span class="badge bg-success"><?php echo $row->No_Menu; ?></span>
+                      <p class="text-sm"><?php echo substr($row->No_Evento, 0, 50); ?></p>
                       <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i><?php echo $time; ?></p>
                     </div>
                   </div>

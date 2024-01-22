@@ -34,8 +34,9 @@ class PedidosGarantizados extends CI_Controller {
         foreach ($arrData as $row) {
 			$rows = array();
 
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
             $rows[] = $row->No_Pais;
-            $rows[] = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
+            $rows[] = $sCorrelativoCotizacion;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
@@ -73,9 +74,9 @@ class PedidosGarantizados extends CI_Controller {
 					$dropdown_estado_china .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado_china .= '<span class="caret"></span></button>';
 				$dropdown_estado_china .= '<ul class="dropdown-menu">';
-					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',1);">Pendiente</a></li>';
-					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="En proceso" title="En proceso" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',2);">En proceso</a></li>';
-					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Cotizado" title="Cotizado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',3);">Cotizado</a></li>';
+					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $sCorrelativoCotizacion. '\');">Pendiente</a></li>';
+					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="En proceso" title="En proceso" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $sCorrelativoCotizacion. '\');">En proceso</a></li>';
+					$dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Cotizado" title="Cotizado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $sCorrelativoCotizacion. '\');">Cotizado</a></li>';
 				$dropdown_estado_china .= '</ul>';
 			$dropdown_estado_china .= '</div>';
 
@@ -111,7 +112,14 @@ class PedidosGarantizados extends CI_Controller {
     }
     	
 	public function ajax_edit($ID){
-        echo json_encode($this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID)));
+		$arrReponse = $this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID));
+		$sCorrelativoCotizacion = '';
+		foreach ($arrReponse as $row) {
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
+			$row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
+		}
+        echo json_encode($arrReponse);
+        //echo json_encode($this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID)));
     }
     	
 	public function getItemProveedor($ID){
@@ -122,8 +130,8 @@ class PedidosGarantizados extends CI_Controller {
         echo json_encode($this->PedidosGarantizadosModel->getItemImagenProveedor($this->security->xss_clean($ID)));
     }
     	
-	public function elegirItemProveedor($id_detalle, $ID, $status){
-        echo json_encode($this->PedidosGarantizadosModel->elegirItemProveedor($this->security->xss_clean($id_detalle), $this->security->xss_clean($ID), $this->security->xss_clean($status)));
+	public function elegirItemProveedor($id_detalle, $ID, $status, $sCorrelativoCotizacion, $sNameItem){
+        echo json_encode($this->PedidosGarantizadosModel->elegirItemProveedor($this->security->xss_clean($id_detalle), $this->security->xss_clean($ID), $this->security->xss_clean($status), $this->security->xss_clean($sCorrelativoCotizacion), $this->security->xss_clean($sNameItem)));
     }
 
 	public function actualizarElegirItemProductos(){
@@ -137,9 +145,9 @@ class PedidosGarantizados extends CI_Controller {
     	echo json_encode($this->PedidosGarantizadosModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
 	}
 
-	public function cambiarEstadoChina($ID, $Nu_Estado){
+	public function cambiarEstadoChina($ID, $Nu_Estado, $sCorrelativoCotizacion){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosGarantizadosModel->cambiarEstadoChina($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
+    	echo json_encode($this->PedidosGarantizadosModel->cambiarEstadoChina($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativoCotizacion)));
 	}
 
 	public function crudPedidoGrupal(){
@@ -158,7 +166,8 @@ class PedidosGarantizados extends CI_Controller {
 				),
 				$data,
 				$this->input->post('addProducto'),
-				$this->input->post('addProductoTable')
+				$this->input->post('addProductoTable'),
+				$this->input->post('ECorrelativo')
 			)
 		);
 	}

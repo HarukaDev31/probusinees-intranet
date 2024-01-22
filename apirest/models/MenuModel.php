@@ -106,6 +106,7 @@ AND GRPUSR.ID_Grupo=" . $this->user->ID_Grupo . " LIMIT 1";
 	public function verificarAccesoMenuCRUD(){
 		$sql = "SELECT" . $this->select_distinct . "
 MNU.No_Menu,
+MNU.ID_Menu,
 MNU.Txt_Css_Icons,
 MNU.Txt_Url_Video,
 MNUACCESS.Nu_Consultar, MNUACCESS.Nu_Agregar, MNUACCESS.Nu_Editar, MNUACCESS.Nu_Eliminar
