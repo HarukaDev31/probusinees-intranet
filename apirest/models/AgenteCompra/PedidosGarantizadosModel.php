@@ -632,6 +632,14 @@ Nu_Correlativo
 				return array('status' => 'error', 'message' => 'Error al insertar');
 			} else {
 				//$this->db->trans_rollback();
+				//registrar evento de notificacion
+				$notificacion = $this->NotificacionModel->procesarNotificacion(
+					$this->user->No_Usuario,
+					'Pedidos Garantizados',
+					'Cotización ' . $arrPost['documento_pago_garantizado-correlativo'] . ' se realizo pago garantía',
+					''
+				);
+
 				$this->db->trans_commit();
 				return array('status' => 'success', 'message' => 'Voucher guardado');
 			}

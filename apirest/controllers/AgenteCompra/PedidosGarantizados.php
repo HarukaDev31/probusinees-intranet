@@ -92,7 +92,7 @@ class PedidosGarantizados extends CI_Controller {
 			//entregado
 			$btn_entregado = '';
 			if($row->Nu_Estado==2)
-				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir pago" title="Subir pago" href="javascript:void(0)" onclick="documentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
+				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir pago" title="Subir pago" href="javascript:void(0)" onclick="documentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion. '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
 
 			if(!empty($row->Txt_Url_Pago_Garantizado)) {
 				$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Subir pago" title="Subir pago" href="javascript:void(0)" onclick="descargarDocumentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';

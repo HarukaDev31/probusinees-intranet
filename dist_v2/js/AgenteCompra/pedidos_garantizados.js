@@ -39,6 +39,10 @@ $(function () {
     $('.help-block').empty();
     $('.form-group').removeClass('has-error');
 
+    $( '#btn-guardar_documento_pago_garantizado' ).text('');
+    $( '#btn-guardar_documento_pago_garantizado' ).attr('disabled', true);
+    $( '#btn-guardar_documento_pago_garantizado' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
     if(document.getElementById('image_documento').files.length == 0) {
       $('#image_documento').closest('.form-group').find('.help-block').html('Empty file');
       $('#image_documento').closest('.form-group').removeClass('has-success').addClass('has-error');
@@ -55,6 +59,10 @@ $(function () {
       .done(function(response) {
         $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
         $('#modal-message').modal('show');
+
+        $( '#btn-guardar_documento_pago_garantizado' ).text('');
+        $( '#btn-guardar_documento_pago_garantizado' ).append( 'Guardar' );
+        $( '#btn-guardar_documento_pago_garantizado' ).attr('disabled', false);
 
         if(response.status == 'success') {
           $('#modal-documento_pago_garantizado').modal('hide');
@@ -1454,8 +1462,9 @@ function getItemProveedor(id_detalle){
   })
 }
 
-function documentoPagoGarantizado(id){
+function documentoPagoGarantizado(id, sCorrelativo){
   $( '[name="documento_pago_garantizado-id_cabecera"]' ).val(id);
+  $( '[name="documento_pago_garantizado-correlativo"]' ).val(sCorrelativo);
 
   $('#modal-documento_pago_garantizado').modal('show');
   $( '#form-documento_pago_garantizado' )[0].reset();

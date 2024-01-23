@@ -350,6 +350,7 @@
       <div class="modal-body" id="modal-body-documento_pago_garantizado">
         <div class="row">
           <input type="hidden" id="documento_pago_garantizado-id_cabecera" name="documento_pago_garantizado-id_cabecera" class="form-control">
+          <input type="hidden" id="documento_pago_garantizado-correlativo" name="documento_pago_garantizado-correlativo" class="form-control">
 
           <div class="col-sm-12">
             <label>Voucher</label>
