@@ -69,6 +69,7 @@
                       <th>Estado Pago</th>
                       <th>Estado Curso</th>
                       <th>Moodle</th>
+                      <th>Ref. Pago</th>
                       <th>Compartir</th>
                     </tr>
                   </thead>

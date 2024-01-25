@@ -55,6 +55,8 @@ class PedidosCurso extends CI_Controller {
 				$btn_usuario_moodle = '<button class="btn btn-primary" alt="Crear usuario" title="Crear usuario" href="javascript:void(0)"  onclick="crearUsuarioCursosMoodle(\'' . $row->ID_Usuario . '\', \'' . $row->ID_Pedido_Curso . '\')">Crear</button>';
             $rows[] = $row->No_Usuario . "<br>" . $this->encryption->decrypt($row->No_Password) . "<br>" . $btn_usuario_moodle;
 
+			$rows[] = $row->ID_Referencia_Pago_Online;
+
 			$btn_compartir = '<button class="btn btn-xs btn-link" alt="Enviar email" title="Enviar email" href="javascript:void(0)"  onclick="enviarEmailUsuarioMoodle(\'' . $row->ID_Usuario . '\', \'' . $row->ID_Pedido_Curso . '\')"><i class="far fa-envelope fa-2x" aria-hidden="true"></i></button>';
 			if($row->Nu_Estado==4)
 				$btn_compartir ='';
