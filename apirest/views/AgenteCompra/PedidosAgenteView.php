@@ -56,9 +56,9 @@
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                       <th class="no-sort">Ver</th>
                       <?php endif; ?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso==1) : ?>
+                      <?php //if ($this->user->Nu_Tipo_Privilegio_Acceso==1) : ?>
                       <th class="no-sort">User</th>
-                      <?php endif; ?>
+                      <?php //endif; ?>
                     </tr>
                   </thead>
                 </table>
