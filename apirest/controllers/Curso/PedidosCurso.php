@@ -40,7 +40,17 @@ class PedidosCurso extends CI_Controller {
             $rows[] = $row->No_Pais;
             $rows[] = $row->ID_Pedido_Curso;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Entidad . "<br>" . $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad . "<br>" . $row->Nu_Celular_Entidad . "<br>" . $row->Txt_Email_Entidad;
+			
+			$sWhatsAppCliente = '';
+			if($row->Nu_Estado!=2) {//2=confirmado
+				$sCodigoPaisCelular = '51';
+				$sMensaje = "Te saluda ProBusiness 👋🏻\n";
+				$sMensaje .= "No pudiste completar la compra del curso. ¿Cómo te puedo ayudar?. \n\n";
+				$sMensaje = urlencode($sMensaje);
+				$sWhatsAppCliente = ' <a href="https://api.whatsapp.com/send?phone=' . $sCodigoPaisCelular . $row->Nu_Celular_Entidad . '&text=' . $sMensaje . '" target="_blank"><i class="fab fa-whatsapp" style="color: #25d366;"></i></a>';
+			}
+
+            $rows[] = $row->No_Entidad . "<br>" . $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad . "<br>" . $row->Nu_Celular_Entidad . $sWhatsAppCliente . "<br>" . $row->Txt_Email_Entidad;
 		
 			$rows[] = $row->No_Signo . ' ' . round($row->Ss_Total, 2);
 			

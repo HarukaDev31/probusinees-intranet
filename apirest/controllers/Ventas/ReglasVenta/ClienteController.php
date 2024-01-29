@@ -168,22 +168,29 @@ class ClienteController extends CI_Controller {
         foreach ($arrData as $row) {
 			$rows = array();
 			
-			$sTipoServicio='';
+			$sTipoServicio = '';
+			$sTipoServicioWhatsApp = '';
 			$sTipoServicio .= '<span class="badge bg-secondary">Otros</span>';
+			$sTipoServicioWhatsApp = 'Otros';
 			if($row->Nu_Agente_Compra==1){
 				$sTipoServicio .= '<br><span class="badge bg-primary">Agente de Compra</span>';
+				$sTipoServicioWhatsApp .= 'Agente de Compra';
 			}
 			if($row->Nu_Carga_Consolidada==1){
 				$sTipoServicio .= '<br><span class="badge bg-warning">Carga Consolidada</span>';
+				$sTipoServicioWhatsApp .= 'Carga Consolidada';
 			}
 			if($row->Nu_Importacion_Grupal==1){
 				$sTipoServicio .= '<br><span class="badge bg-dark">Importación Grupal</span>';
+				$sTipoServicioWhatsApp .= 'Importación Grupal';
 			}
 			if($row->Nu_Curso==1){
 				$sTipoServicio .= '<br><span class="badge bg-info">Curso</span>';
+				$sTipoServicioWhatsApp .= 'Curso';
 			}
 			if($row->Nu_Viaje_Negocios==1){
 				$sTipoServicio .= '<br><span class="badge bg-success">Viaje de Negocios</span>';
+				$sTipoServicioWhatsApp .= 'Viaje de Negocios';
 			}
 
 			$rows[] = $sTipoServicio;
@@ -191,7 +198,18 @@ class ClienteController extends CI_Controller {
             $rows[] = $row->No_Tipo_Documento_Identidad_Breve;
             $rows[] = $row->Nu_Documento_Identidad;
 			$rows[] = $row->No_Entidad;
-			$rows[] = $row->Nu_Celular_Entidad;
+
+			//whatsapp
+			//$whatsapp = 'https://api.whatsapp.com/send?phone=51953314683&text=Te+saluda+ProBusiness+%F0%9F%91%8B%F0%9F%8F%BB%2C%0ATe+registraste+en+nuestra+plataforma+para+el+servicio+de+carga+consolidada.';
+
+			$sCodigoPaisCelular = '51';
+			$sMensaje = "Te saluda ProBusiness 👋🏻\n";
+            $sMensaje .= "Te registraste en nuestra plataforma para el servicio de " . $sTipoServicioWhatsApp . ". \n\n";
+            $sMensaje = urlencode($sMensaje);
+            $sWhatsAppCliente = ' <a href="https://api.whatsapp.com/send?phone=' . $sCodigoPaisCelular . $row->Nu_Celular_Entidad . '&text=' . $sMensaje . '" target="_blank"><i class="fab fa-whatsapp" style="color: #25d366;"></i></a>';
+
+			$rows[] = $row->Nu_Celular_Entidad . $sWhatsAppCliente;
+
 			$rows[] = $row->Txt_Email_Entidad;
 			$rows[] = $row->Txt_Descripcion;
 			$rows[] = allTypeDate($row->Fe_Registro, '-', 0);
