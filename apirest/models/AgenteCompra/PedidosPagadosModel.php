@@ -140,7 +140,6 @@ class PedidosPagadosModel extends CI_Model{
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
-			/*
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($Nu_Estado);
 			//registrar evento de notificacion
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
@@ -151,7 +150,6 @@ class PedidosPagadosModel extends CI_Model{
 			);
 
 			return array('status' => 'success', 'message' => 'Actualizado');
-			*/
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }

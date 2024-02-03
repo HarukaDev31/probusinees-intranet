@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.0.212'; ?>
+<?php $iControlVersionDashboard = '1.0.218'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -173,6 +173,16 @@
 
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/Curso/pedidos_curso.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<!-- carga consolidada -->
+<?php if (isset($js_pedidos_cargaconsolidada) && $js_pedidos_cargaconsolidada==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+
+<script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/pedidos_cargaconsolidada.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">

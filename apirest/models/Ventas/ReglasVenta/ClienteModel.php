@@ -140,14 +140,34 @@ class ClienteModel extends CI_Model{
         } else if( !empty($this->input->post('Global_Filter')) && $this->input->post('Filtros_Entidades') == 'NumeroDocumentoIdentidad' ){
         	$this->db->like('Nu_Documento_Identidad', $this->input->post('Global_Filter'));
         }
-        
+
+		if( $this->input->post('tipo_servicio') == '2' ){
+        	$this->db->where('Nu_Agente_Compra', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '3' ){
+        	$this->db->where('Nu_Carga_Consolidada', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '4' ){
+        	$this->db->where('Nu_Importacion_Grupal', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '5' ){
+        	$this->db->where('Nu_Curso', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '6' ){
+        	$this->db->where('Nu_Viaje_Negocios', 1);
+        }
+
         $this->db->select('ID_Empresa, ID_Entidad, TDI.No_Tipo_Documento_Identidad_Breve, Nu_Documento_Identidad, No_Entidad, Nu_Celular_Entidad, Txt_Email_Entidad, Nu_Dias_Credito, Txt_Direccion_Entidad, No_Contacto, DISTRI.No_Distrito, ' . $this->table . '.Nu_Estado, Txt_Descripcion, Fe_Registro, Nu_Agente_Compra, Nu_Carga_Consolidada, Nu_Importacion_Grupal, Nu_Curso, Nu_Viaje_Negocios')
 		->from($this->table)
     	->join($this->table_distrito . ' AS DISTRI', 'DISTRI.ID_Distrito = ' . $this->table . '.ID_Distrito', 'left')
     	->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = ' . $this->table . '.ID_Tipo_Documento_Identidad', 'join')
     	->where('ID_Empresa', $this->user->ID_Empresa)
 		->where_in('Nu_Tipo_Entidad', array('0','2','3'));
-         
+
         if(isset($_POST['order'])){
             $this->db->order_by($this->column_order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
         } else if(isset($this->order)) {

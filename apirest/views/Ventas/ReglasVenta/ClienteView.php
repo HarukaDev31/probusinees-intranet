@@ -10,11 +10,6 @@
         <?php
         //array_debug($this->MenuModel->verificarAccesoMenuCRUD());
         ?>
-        <div class="col-sm-4 div-Listar">
-          <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
-            <button type="button" class="btn btn-primary btn-block" onclick="agregarCliente()"><i class="fa fa-plus-circle"></i> Crear</button>
-          <?php endif; ?>
-        </div>
       </div>
     </div><!-- /.container-fluid -->
   </section>
@@ -24,6 +19,34 @@
         <div class="col-12">
           <div class="card">
             <div class="card-body">
+              <div class="row mb-3 div-Listar">
+                <div class="col-6 col-sm-6">
+                  <label>Pago</label>
+                  <div class="form-group">
+                    <select id="cbo-filtro-tipo_servicio" name="" class="form-control required" style="width: 100%;">
+                      <option value="0" selected="selected">Todos</option>
+                      <option value="1">Otros</option>
+                      <option value="2">Agente de Compra</option>
+                      <option value="3">Carga Consolidada</option>
+                      <option value="4">Importación Grupal</option>
+                      <option value="5">Curso</option>
+                      <option value="6">Viaje de Negocios</option>
+                    </select>
+                    <span class="help-block" id="error"></span>
+                  </div>
+                </div>
+
+                <div class="col-6 col-sm-3">
+                  <label>&nbsp;</label>
+                  <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+                </div>
+
+                <div class="col-6 col-sm-3">
+                  <label>&nbsp;</label>
+                  <button type="button" class="btn btn-success btn-block" onclick="agregarCliente()"><i class="fa fa-plus-circle"></i> Crear</button>
+                </div>
+              </div>
+
               <div class="table-responsive div-Listar">
                 <table id="table-Cliente" class="table-nota table table-hover table-striped table-bordered">
                   <thead class="thead-light">
@@ -142,14 +165,14 @@
                   </div>
                   
                   <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-3 hidden">
+                    <div class="col-xs-6 col-sm-3 col-md-3">
                       <div class="form-group">
                         <label>País</label>
                         <select id="cbo-Paises" name="ID_Pais" class="form-control select2" style="width: 100%;"></select>
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>
-                    <div class="col-xs-6 col-sm-4 col-md-4 div-mas_opciones">
+                    <div class="col-xs-6 col-sm-3 col-md-3 div-mas_opciones">
                       <div class="form-group">
                         <label>Departamento</label>
                         <select id="cbo-Departamentos" name="ID_Departamento" class="form-control select2" style="width: 100%;"></select>
@@ -157,14 +180,14 @@
                       </div>
                     </div>
                     
-                    <div class="col-xs-6 col-sm-4 col-md-4 div-mas_opciones">
+                    <div class="col-xs-6 col-sm-3 col-md-3 div-mas_opciones">
                       <div class="form-group">
                         <label>Provincia</label>
                         <select id="cbo-Provincias" name="ID_Provincia" class="form-control select2" style="width: 100%;"></select>
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>
-                    <div class="col-xs-12 col-sm-4 col-md-4 div-mas_opciones">
+                    <div class="col-xs-12 col-sm-3 col-md-3 div-mas_opciones">
                       <div class="form-group">
                         <label>Distrito</label>
                         <select id="cbo-Distritos" name="ID_Distrito" class="form-control select2" style="width: 100%;"></select>
@@ -175,7 +198,7 @@
                   
                   <div class="row">
                     <div class="col-xs-12 col-sm-5 col-md-4 div-mas_opciones">
-                      <label><?php echo $sCampoNombreContacto; ?></label>
+                      <label>Contacto</label>
                       <div class="form-group">
                         <input type="text" name="No_Contacto" placeholder="Opcional" class="form-control" maxlength="100" autocomplete="off">
                         <span class="help-block" id="error"></span>

@@ -2,205 +2,211 @@ var url;
 var table_Entidad;
 var accion_cliente = '';
 
-$(function () {  
-    url = base_url + 'Ventas/ReglasVenta/ClienteController/ajax_list';
-    table_Entidad = $( '#table-Cliente' ).DataTable({
-        dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-        buttons     : [{
-        extend    : 'excel',
-        text      : '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-        titleAttr : 'Excel',
-        exportOptions: {
-            columns: ':visible'
-        }
+$(function () {
+  url = base_url + 'Ventas/ReglasVenta/ClienteController/ajax_list';
+  table_Entidad = $( '#table-Cliente' ).DataTable({
+    //dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'>>" +
+    dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+    "<'row'<'col-sm-12'tr>>" +
+    "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+    buttons     : [{
+    extend    : 'excel',
+    text      : '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+    titleAttr : 'Excel',
+    exportOptions: {
+        columns: ':visible'
+    }
+    },
+    {
+    extend    : 'pdf',
+    text      : '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+    titleAttr : 'PDF',
+    exportOptions: {
+        columns: ':visible'
+    }
+    },
+    {
+    extend    : 'colvis',
+    text      : '<i class="fa fa-ellipsis-v"></i> Columnas',
+    titleAttr : 'Columnas',
+    exportOptions: {
+        columns: ':visible'
+    }
+    }],
+    "paging": true,
+    "lengthChange": true,
+    "searching": true,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": false,
+    'pagingType'  : 'full_numbers',
+    'oLanguage' : {
+    'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
+    'sLengthMenu'        : '_MENU_',
+    'sSearch'            : 'Buscar por: ',
+    'sSearchPlaceholder' : '',
+    'sZeroRecords'       : 'No se encontraron registros',
+    'sInfoEmpty'         : 'No hay registros',
+    'sLoadingRecords'    : 'Cargando...',
+    'sProcessing'        : 'Procesando...',
+    'oPaginate'          : {
+        'sFirst'    : '<<',
+        'sLast'     : '>>',
+        'sPrevious' : '<',
+        'sNext'     : '>',
+    },
+    },
+    'order': [],
+    'ajax': {
+      'url'       : url,
+      'type'      : 'POST',
+      'dataType'  : 'JSON',
+      'data'      : function ( data ) {
+        data.tipo_servicio = $( '#cbo-filtro-tipo_servicio' ).val(),
+        data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
+        data.Global_Filter = $( '#txt-Global_Filter' ).val();
+      },
+    },
+    'columnDefs': [
+    {
+        'targets': 'no-hidden',
+        "visible": false, 
+    },{
+    'className' : 'text-center',
+    'targets'   : 'no-sort',
+    'orderable' : false,
+    },],
+    'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
+});
+
+$('#table-Cliente_filter input').removeClass('form-control-sm');
+$('#table-Cliente_filter input').addClass('form-control-md');
+$('#table-Cliente_filter input').addClass("width_full");
+
+$( "#form-Cliente" ).validate({
+    rules:{
+        ID_Tipo_Documento_Identidad: {
+            required: true,
         },
-        {
-        extend    : 'pdf',
-        text      : '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-        titleAttr : 'PDF',
-        exportOptions: {
-            columns: ':visible'
-        }
+        No_Entidad: {
+            required: true,
+            maxlength: 100
         },
-        {
-        extend    : 'colvis',
-        text      : '<i class="fa fa-ellipsis-v"></i> Columnas',
-        titleAttr : 'Columnas',
-        exportOptions: {
-            columns: ':visible'
-        }
-        }],
-        "paging": true,
-        "lengthChange": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": false,
-        'pagingType'  : 'full_numbers',
-        'oLanguage' : {
-        'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-        'sLengthMenu'        : '_MENU_',
-        'sSearch'            : 'Buscar por: ',
-        'sSearchPlaceholder' : '',
-        'sZeroRecords'       : 'No se encontraron registros',
-        'sInfoEmpty'         : 'No hay registros',
-        'sLoadingRecords'    : 'Cargando...',
-        'sProcessing'        : 'Procesando...',
-        'oPaginate'          : {
-            'sFirst'    : '<<',
-            'sLast'     : '>>',
-            'sPrevious' : '<',
-            'sNext'     : '>',
+        Nu_Telefono_Entidad: {
+            minlength: 8,
+            maxlength: 8
         },
+        Nu_Celular_Entidad: {
+            minlength: 9,
+            maxlength: 9
         },
-        'order': [],
-        'ajax': {
-        'url'       : url,
-        'type'      : 'POST',
-        'dataType'  : 'JSON',
-        'data'      : function ( data ) {
-            data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
-            data.Global_Filter = $( '#txt-Global_Filter' ).val();
+        /*
+        Txt_Email_Entidad:{
+            validemail: true,
         },
+        */
+        Nu_Celular_Contacto: {
+            minlength: 9,
+            maxlength: 9
         },
-        'columnDefs': [
-        {
-            'targets': 'no-hidden',
-            "visible": false, 
-        },{
-        'className' : 'text-center',
-        'targets'   : 'no-sort',
-        'orderable' : false,
-        },],
-        'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
-    });
-    
-    $('#table-Cliente_filter input').removeClass('form-control-sm');
-    $('#table-Cliente_filter input').addClass('form-control-md');
-    $('#table-Cliente_filter input').addClass("width_full");
-  
-    $( "#form-Cliente" ).validate({
-        rules:{
-            ID_Tipo_Documento_Identidad: {
-                required: true,
-            },
-            No_Entidad: {
-                required: true,
-                maxlength: 100
-            },
-            Nu_Telefono_Entidad: {
-                minlength: 8,
-                maxlength: 8
-            },
-            Nu_Celular_Entidad: {
-                minlength: 9,
-                maxlength: 9
-            },
-            /*
-            Txt_Email_Entidad:{
-                validemail: true,
-            },
-            */
-            Nu_Celular_Contacto: {
-                minlength: 9,
-                maxlength: 9
-            },
-            /*
-            Txt_Email_Contacto:{
-                validemail: true,
-            },
-            */
+        /*
+        Txt_Email_Contacto:{
+            validemail: true,
         },
-        messages:{
-            ID_Tipo_Documento_Identidad:{
-                required: "Seleccionar tipo doc.",
-            },
-            No_Entidad:{
-                required: "Ingresar nombre",
-                maxlength: "Máximo 100 dígitos"
-            },
-            Nu_Telefono_Entidad:{
-                minlength: "Debe ingresar 7 dígitos",
-                maxlength: "Debe ingresar 7 dígitos"
-            },
-            Nu_Celular_Entidad:{
-                minlength: "Debe ingresar 9 dígitos",
-                maxlength: "Debe ingresar 9 dígitos"
-            },
-            /*
-            Txt_Email_Entidad:{
-                validemail: "Ingresar correo válido",
-            },
-            */
-            Nu_Celular_Contacto:{
-                minlength: "Debe ingresar 9 dígitos",
-                maxlength: "Debe ingresar 9 dígitos"
-            },
-            /*
-            Txt_Email_Contacto:{
-                validemail: "Ingresar correo válido",
-            },
-            */
+        */
+    },
+    messages:{
+        ID_Tipo_Documento_Identidad:{
+            required: "Seleccionar tipo doc.",
         },
-        errorPlacement : function(error, element) {
-            $(element).closest('.form-group').find('.help-block').html(error.html());
+        No_Entidad:{
+            required: "Ingresar nombre",
+            maxlength: "Máximo 100 dígitos"
         },
-        highlight : function(element) {
-            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        Nu_Telefono_Entidad:{
+            minlength: "Debe ingresar 7 dígitos",
+            maxlength: "Debe ingresar 7 dígitos"
         },
-        unhighlight: function(element, errorClass, validClass) {
-            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
-            $(element).closest('.form-group').find('.help-block').html('');
+        Nu_Celular_Entidad:{
+            minlength: "Debe ingresar 9 dígitos",
+            maxlength: "Debe ingresar 9 dígitos"
         },
-        submitHandler: form_Entidad
+        /*
+        Txt_Email_Entidad:{
+            validemail: "Ingresar correo válido",
+        },
+        */
+        Nu_Celular_Contacto:{
+            minlength: "Debe ingresar 9 dígitos",
+            maxlength: "Debe ingresar 9 dígitos"
+        },
+        /*
+        Txt_Email_Contacto:{
+            validemail: "Ingresar correo válido",
+        },
+        */
+    },
+    errorPlacement : function(error, element) {
+        $(element).closest('.form-group').find('.help-block').html(error.html());
+    },
+    highlight : function(element) {
+        $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+    },
+    unhighlight: function(element, errorClass, validClass) {
+        $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+        $(element).closest('.form-group').find('.help-block').html('');
+    },
+    submitHandler: form_Entidad
 	});
+  
+  $('#btn-html_reporte').click(function () {
+    reload_table_Entidad();
+  });
     
-    /* Tipo Documento Identidad */
-    $( '#cbo-TiposDocumentoIdentidad' ).change(function(){
-        $('.div-api').show();
-        if ( $(this).val() == 2 ) {//DNI
-            $( '#label-Nombre_Documento_Identidad' ).text('DNI');
-            $( '#label-No_Entidad' ).text('Nombre(s) y Apellidos');
-            $( '#txt-Nu_Documento_Identidad' ).attr('maxlength', $(this).find(':selected').data('nu_cantidad_caracteres'));
-        } else if ( $(this).val() == 4 ) {//RUC
-            $( '#label-Nombre_Documento_Identidad' ).text('RUC');
-            $( '#label-No_Entidad' ).text('Razón Social');
-            $( '#txt-Nu_Documento_Identidad' ).attr('maxlength', $(this).find(':selected').data('nu_cantidad_caracteres'));
-        } else {
-        $('.div-api').hide();
-        $( '#label-Nombre_Documento_Identidad' ).text('DOCUMENTO');
-            $( '#label-No_Entidad' ).text('Nombre(s) y Apellidos');
-            $( '#txt-Nu_Documento_Identidad' ).attr('maxlength', $(this).find(':selected').data('nu_cantidad_caracteres'));
-        }
-    })
-        
-    $( '#cbo-Departamentos' ).change(function(){
+  /* Tipo Documento Identidad */
+  $( '#cbo-TiposDocumentoIdentidad' ).change(function(){
+    $('.div-api').show();
+    if ( $(this).val() == 2 ) {//DNI
+        $( '#label-Nombre_Documento_Identidad' ).text('DNI');
+        $( '#label-No_Entidad' ).text('Nombre(s) y Apellidos');
+        $( '#txt-Nu_Documento_Identidad' ).attr('maxlength', $(this).find(':selected').data('nu_cantidad_caracteres'));
+    } else if ( $(this).val() == 4 ) {//RUC
+        $( '#label-Nombre_Documento_Identidad' ).text('RUC');
+        $( '#label-No_Entidad' ).text('Razón Social');
+        $( '#txt-Nu_Documento_Identidad' ).attr('maxlength', $(this).find(':selected').data('nu_cantidad_caracteres'));
+    } else {
+    $('.div-api').hide();
+    $( '#label-Nombre_Documento_Identidad' ).text('DOCUMENTO');
+        $( '#label-No_Entidad' ).text('Nombre(s) y Apellidos');
+        $( '#txt-Nu_Documento_Identidad' ).attr('maxlength', $(this).find(':selected').data('nu_cantidad_caracteres'));
+    }
+  })
+  
+  $( '#cbo-Departamentos' ).change(function(){
     $('#cbo-Provincias').html('');
     $('#cbo-Distritos').html('');
-        if ( $(this).val() > 0 ) {
-        url = base_url + 'HelperController/getProvincias';
-        $.post( url, {ID_Departamento : $(this).val()}, function( response ){
-        $( '#cbo-Provincias' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
-        for (var i = 0; i < response.length; i++)
-            $( '#cbo-Provincias' ).append( '<option value="' + response[i].ID_Provincia + '">' + response[i].No_Provincia + '</option>' );
-        }, 'JSON');
-        }
-    })
-    
-    $( '#cbo-Provincias' ).change(function(){
-        $( '#cbo-Distritos' ).html('');
-        if ( $(this).val() > 0 ) {
-        url = base_url + 'HelperController/getDistritos';
-        $.post( url, {ID_Provincia : $(this).val()}, function( response ){
-        $( '#cbo-Distritos' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
-        for (var i = 0; i < response.length; i++)
-            $( '#cbo-Distritos' ).append( '<option value="' + response[i].ID_Distrito + '">' + response[i].No_Distrito + '</option>' );
-        }, 'JSON');
-        }
-    })
+    if ( $(this).val() > 0 ) {
+      url = base_url + 'HelperController/getProvincias';
+      $.post( url, {ID_Departamento : $(this).val()}, function( response ){
+      $( '#cbo-Provincias' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
+      for (var i = 0; i < response.length; i++)
+          $( '#cbo-Provincias' ).append( '<option value="' + response[i].ID_Provincia + '">' + response[i].No_Provincia + '</option>' );
+      }, 'JSON');
+    }
+  })
+  
+  $( '#cbo-Provincias' ).change(function(){
+    $( '#cbo-Distritos' ).html('');
+    if ( $(this).val() > 0 ) {
+      url = base_url + 'HelperController/getDistritos';
+      $.post( url, {ID_Provincia : $(this).val()}, function( response ){
+      $( '#cbo-Distritos' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
+      for (var i = 0; i < response.length; i++)
+          $( '#cbo-Distritos' ).append( '<option value="' + response[i].ID_Distrito + '">' + response[i].No_Distrito + '</option>' );
+      }, 'JSON');
+    }
+  })
 })
 
 function agregarCliente(){

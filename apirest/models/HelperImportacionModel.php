@@ -96,6 +96,17 @@ class HelperImportacionModel extends CI_Model{
 			return array('No_Estado' => 'Entregado','No_Class_Estado' => 'success');
 	}
 
+	function obtenerTipoCanal($iEstado){
+		if( $iEstado == 0 )
+			return array('No_Estado' => 'Ninguno','No_Class_Estado' => 'secondary');
+		else if( $iEstado == 1 )
+			return array('No_Estado' => 'Verde','No_Class_Estado' => 'success');
+		else if( $iEstado == 2 )
+			return array('No_Estado' => 'Naranja','No_Class_Estado' => 'warning');
+		else
+			return array('No_Estado' => 'Rojo','No_Class_Estado' => 'danger');
+	}
+
 	public function getCategorias(){
 		$query = "SELECT ID_Familia AS ID, No_Familia AS Nombre FROM familia WHERE ID_Empresa = " . $this->user->ID_Empresa;
 		if ( !$this->db->simple_query($query) ){
