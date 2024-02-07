@@ -13,6 +13,63 @@ var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth(
 $(function () {
   $('.select2').select2();
 
+  $(document).on('click', '#btn-guardar_personal_china', function (e) {
+    e.preventDefault();
+    if ( $( '#cbo-guardar_personal_china-ID_Usuario' ).val() == 0){
+      $( '#cbo-guardar_personal_china-ID_Usuario' ).closest('.form-group').find('.help-block').html('Seleccionar usuario');
+      $( '#cbo-guardar_personal_china-ID_Usuario' ).closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      $( '#btn-guardar_personal_china' ).text('');
+      $( '#btn-guardar_personal_china' ).attr('disabled', true);
+      $( '#btn-guardar_personal_china' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
+
+      url = base_url + 'AgenteCompra/PedidosGarantizados/asignarUsuarioPedidoChina';
+      $.ajax({
+        type		  : 'POST',
+        dataType	: 'JSON',
+        url		    : url,
+        data		  : $('#form-guardar_personal_china').serialize(),
+        success : function( response ){
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $('.modal-guardar_personal_china').modal('hide');
+
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+
+            reload_table_Entidad();
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+          }
+          
+          $( '#btn-guardar_personal_china' ).text('');
+          $( '#btn-guardar_personal_china' ).html( 'Guardar' );
+          $( '#btn-guardar_personal_china' ).attr('disabled', false);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+          
+          $( '#modal-message' ).modal('show');
+          $( '.modal-message' ).addClass( 'modal-danger' );
+          $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-guardar_personal_china' ).text('');
+          $( '#btn-guardar_personal_china' ).append( 'Guardar' );
+          $( '#btn-guardar_personal_china' ).attr('disabled', false);
+        }
+      });
+    }
+  });
+
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,
@@ -1745,26 +1802,80 @@ function viewChatItem(id_item){
 }
   
 //chat de novedades de producto
-function asignarPedido(ID_Pedido_Cabecera){
-  $('#txt-guardar_personal_china-ID_Pedido_Cabecera').val(ID_Pedido_Cabecera);
-  $('.modal-guardar_personal_china').modal('show');
+function asignarPedido(ID_Pedido_Cabecera,Nu_Estado){
+  if(Nu_Estado!=3) {//3 - Enviado
+    $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+    $('#modal-message').modal('show');
 
-  $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">Buscando...</option>');
-	url = base_url + 'HelperImportacionController/getUsuarioChina';
-	$.post(url, {}, function (response) {
-    console.log(response);
-		if (response.status == 'success') {
-			$('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">- Seleccionar -</option>');
-			var l = response.result.length;
-			for (var x = 0; x < l; x++) {
-				$('#cbo-guardar_personal_china-ID_Usuario').append('<option value="' + response.result[x].ID + '">' + response.result[x].Nombre + '</option>');
-			}
-		} else {
-      $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">Sin registro</option>');
-			if (response.sMessageSQL !== undefined) {
-				console.log(response.sMessageSQL);
-			}
-			console.log(response.message);
-		}
-	}, 'JSON');
+    $('#moda-message-content').addClass( 'bg-warning');
+    $('.modal-title-message').html('Primero el estado debe ser <strong>ENVIADO</strong> para asignar.');
+
+    setTimeout(function () { $('#modal-message').modal('hide'); }, 3100);
+  } else {
+    $('#txt-guardar_personal_china-ID_Pedido_Cabecera').val(ID_Pedido_Cabecera);
+    $('.modal-guardar_personal_china').modal('show');
+
+    $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">Buscando...</option>');
+    url = base_url + 'HelperImportacionController/getUsuarioChina';
+    $.post(url, {}, function (response) {
+      console.log(response);
+      if (response.status == 'success') {
+        $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">- Seleccionar -</option>');
+        var l = response.result.length;
+        for (var x = 0; x < l; x++) {
+          $('#cbo-guardar_personal_china-ID_Usuario').append('<option value="' + response.result[x].ID + '">' + response.result[x].Nombre + '</option>');
+        }
+      } else {
+        $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">Sin registro</option>');
+        if (response.sMessageSQL !== undefined) {
+          console.log(response.sMessageSQL);
+        }
+        console.log(response.message);
+      }
+    }, 'JSON');
+  }
+}
+
+function removerAsignarPedido(ID, id_usuario) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  $('#modal-title').text('¿Deseas quitar asignación Nro. Pedido ' + ID + ' ?');
+
+  $('#btn-save-delete').off('click').click(function () {
+    
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
+
+    url = base_url + 'AgenteCompra/PedidosGarantizados/removerAsignarPedido/' + ID + '/' + id_usuario;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      }
+    });
+  });
 }

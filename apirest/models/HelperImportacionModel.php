@@ -163,5 +163,29 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 			'message' => 'No se encontro registro',
 		);
 	}
+	
+	//Nu_Tipo_Incoterms
+	function obtenerIncoterms($iEstado){
+		if( $iEstado == 0 )
+			return array('No_Estado' => 'Ninguno','No_Class_Estado' => 'secondary');
+		else if( $iEstado == 1 )
+			return array('No_Estado' => 'EXW','No_Class_Estado' => 'success');
+		else if( $iEstado == 2 )
+			return array('No_Estado' => 'FOB','No_Class_Estado' => 'success');
+		else if( $iEstado == 3 )
+			return array('No_Estado' => 'CIF','No_Class_Estado' => 'success');
+		else if( $iEstado == 4 )
+			return array('No_Estado' => 'DDP','No_Class_Estado' => 'success');
+	}
+	
+	//Nu_Tipo_Transporte_Maritimo
+	function obtenerTransporteMaritimo($iEstado){
+		if( $iEstado == 0 )
+			return array('No_Estado' => 'Ninguno','No_Class_Estado' => 'secondary');
+		else if( $iEstado == 1 )
+			return array('No_Estado' => 'FCL','No_Class_Estado' => 'success');
+		else
+			return array('No_Estado' => 'LCL','No_Class_Estado' => 'success');
+	}
 }
 ?>

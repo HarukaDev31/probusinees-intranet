@@ -31,7 +31,7 @@ class PedidosAgenteModel extends CI_Model{
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
-    	//->join($this->table_usuario_intero . ' AS USRINTERNO', 'USRINTERNO.ID_Usuario_Interno_Empresa  = ' . $this->table . '.ID_Usuario', 'left')
+    	//->join($this->table_usuario_intero . ' AS USRINTERNO', 'USRINTERNO.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where($this->table . '.Nu_Estado=', 1);
 
@@ -307,13 +307,14 @@ Nu_Correlativo
 		}
 		return array('status' => 'error', 'message' => 'Error al eliminar asignación pedido');
 	}
+	
 	public function generarEstadoProcesoAgenteCompra($arrDataTour){
 		
 		$proceso_agente_compra_pedido[]=array(
 			'ID_Empresa' => $this->user->ID_Empresa,
 			'ID_Organizacion' => $this->user->ID_Organizacion,
 			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
-			'No_Proceso' => 'Pedidos Garantizados',
+			'No_Proceso' => '1. Pedidos Garantizados',
 			'Txt_Url_Menu' => 'AgenteCompra/PedidosGarantizados/listar',
 			'Nu_Orden' => '1',
 			'Nu_Estado_Proceso' => '0',
@@ -326,7 +327,7 @@ Nu_Correlativo
 			'ID_Empresa' => $this->user->ID_Empresa,
 			'ID_Organizacion' => $this->user->ID_Organizacion,
 			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
-			'No_Proceso' => 'Selección de Proveedores',
+			'No_Proceso' => '2. Selección de Proveedores',
 			'Txt_Url_Menu' => 'AgenteCompra/PedidosGarantizados/listar',
 			'Nu_Orden' => '2',
 			'Nu_Estado_Proceso' => '0',
@@ -339,12 +340,25 @@ Nu_Correlativo
 			'ID_Empresa' => $this->user->ID_Empresa,
 			'ID_Organizacion' => $this->user->ID_Organizacion,
 			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
-			'No_Proceso' => 'O.C. Aprobadas',
+			'No_Proceso' => '3. (A) O.C. Aprobadas',
 			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
 			'Nu_Orden' => '3',
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '3',
+			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '3. (B) O.C. Aprobadas',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '4',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '4',
 			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
 		);
 		

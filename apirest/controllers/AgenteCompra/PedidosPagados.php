@@ -22,11 +22,14 @@ class PedidosPagados extends CI_Controller {
 		}
 	}
 	
-	public function listar(){
+	public function listar($sCorrelativoCotizacion = '', $ID_Pedido_Cabecera = ''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
 			$this->load->view('header_v2');
-			$this->load->view('AgenteCompra/PedidosPagadosView');
+			$this->load->view('AgenteCompra/PedidosPagadosView', array(
+				'sCorrelativoCotizacion' => $sCorrelativoCotizacion,
+				'ID_Pedido_Cabecera' => $ID_Pedido_Cabecera
+			));
 			$this->load->view('footer_v2', array("js_pedidos_pagados" => true));
 		}
 	}
@@ -52,6 +55,46 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado .= '<ul class="dropdown-menu">';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Trading" title="Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',1);">Trading</a></li>';
 					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="C. Trading" title="C. Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',2);">C. Trading</a></li>';
+				$dropdown_estado .= '</ul>';
+			$dropdown_estado .= '</div>';
+			
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
+				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			}
+			
+			$btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">(+) Comisión</button>';
+			if($row->Ss_Comision_Interna_Trading>0)
+				$btn_comision_trading = '$ ' . $row->Ss_Comision_Interna_Trading;
+				
+            $rows[] = $dropdown_estado . $btn_comision_trading;
+
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerIncoterms($row->Nu_Tipo_Incoterms);
+			$dropdown_estado = '<div class="dropdown">';
+				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+				$dropdown_estado .= '<span class="caret"></span></button>';
+				$dropdown_estado .= '<ul class="dropdown-menu">';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="EXW" title="EXW" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">EXW</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="FOB" title="FOB" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">FOB</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="CIF" title="CIF" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">CIF</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="DDP" title="DDP" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">DDP</a></li>';
+				$dropdown_estado .= '</ul>';
+			$dropdown_estado .= '</div>';
+			
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
+				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			}
+
+            $rows[] = $dropdown_estado;
+
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerTransporteMaritimo($row->Nu_Tipo_Transporte_Maritimo);
+			$dropdown_estado = '<div class="dropdown">';
+				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+				$dropdown_estado .= '<span class="caret"></span></button>';
+				$dropdown_estado .= '<ul class="dropdown-menu">';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="FCL" title="FCL" href="javascript:void(0)" onclick="cambiarTransporte(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">FCL</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="LCL" title="LCL" href="javascript:void(0)" onclick="cambiarTransporte(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">LCL</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
@@ -123,9 +166,6 @@ class PedidosPagados extends CI_Controller {
             $data[] = $rows;
         }
         $output = array(
-	        'draw' => $this->input->post('draw'),
-	        'recordsTotal' => $this->PedidosPagadosModel->count_all(),
-	        'recordsFiltered' => $this->PedidosPagadosModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);
@@ -828,5 +868,27 @@ class PedidosPagados extends CI_Controller {
 	public function elminarItemProveedor($id, $correlativo, $name_item){
 		//echo "hola";
 		echo json_encode($this->PedidosPagadosModel->elminarItemProveedor($this->security->xss_clean($id), $this->security->xss_clean($correlativo), $this->security->xss_clean($name_item)));
+	}
+
+	public function cambiarIncoterms($ID, $Nu_Estado, $sCorrelativo){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->cambiarIncoterms($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
+	}
+
+	public function cambiarTransporte($ID, $Nu_Estado, $sCorrelativo){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->cambiarTransporte($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
+	}
+
+	public function agregarComisionTrading(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+
+		$arrData = $_POST['arrData'];
+		$data = array(
+			'Ss_Comision_Interna_Trading' => $arrData['precio_comision_trading']
+		);
+		$response = $this->PedidosPagadosModel->agregarComisionTrading(array('ID_Pedido_Cabecera' => $arrData['id_pedido_cabecera']), $data);
+		echo json_encode($response);
+		exit();
 	}
 }

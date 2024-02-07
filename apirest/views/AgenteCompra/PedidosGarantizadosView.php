@@ -172,16 +172,18 @@
                       </div>
                     </div>
                     
+                    <!--
                     <div class="col-12 col-sm-12 col-md-12 mb-3" id="div-button-add_item">
-                      <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col shadow">Agregar producto</button>
+                      
                     </div>
+                      -->
 
                     <div class="col-12 col-sm-12 col-md-12 mb-3 div-articulos">
                       <div id="div-arrItemsPedidos"></div>
                     </div>
 
                     <div class="col-xs-12 col-sm-12 col-md-12">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
+                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos <button type="button" id="btn-add_item" class="btn btn-danger shadow">Agregar</button></h3>
 
                       <div class="table-responsive div-Compuesto">
                         <table id="table-Producto_Enlace" class="table table-bordered table-hover table-striped">
@@ -444,7 +446,11 @@
 </div>
 
 <!-- asignar pedido personal de china -->
-<div class="modal fade modal-guardar_personal_china" id="modal-default">
+<?php
+  $attributes = array('id' => 'form-guardar_personal_china');
+  echo form_open('', $attributes);
+?>
+<div class="modal fade modal-guardar_personal_china" id="modal-guardar_personal_china">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-guardar_personal_china">
@@ -455,6 +461,7 @@
             <select id="cbo-guardar_personal_china-ID_Usuario" name="cbo-guardar_personal_china-ID_Usuario" class="form-control select2" style="width: 100%;">
               <option selected="selected" value="0"></option>
             </select>
+            <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
       </div>
@@ -468,3 +475,4 @@
   <!-- /.modal-dialog -->
 </div>
 <!-- ./ asignar pedido personal de china -->
+<?php echo form_close(); ?>

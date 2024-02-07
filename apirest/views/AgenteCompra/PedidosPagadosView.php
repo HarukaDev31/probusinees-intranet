@@ -20,6 +20,8 @@
           <div class="card">
             <div class="card-body">
               <div class="row mb-3 div-Listar">
+                <input type="hidden" id="hidden-sCorrelativoCotizacion" name="sCorrelativoCotizacion" class="form-control" value="<?php echo $sCorrelativoCotizacion; ?>">
+                <input type="hidden" id="hidden-ID_Pedido_Cabecera" name="ID_Pedido_Cabecera" class="form-control" value="<?php echo $ID_Pedido_Cabecera; ?>">
                 <div class="col-6 col-sm-4">
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
@@ -51,6 +53,8 @@
                       <!--<th>Empresa</th>-->
                       <!--<th class="no-sort">Excel</th>-->
                       <th>Servicio</th>
+                      <th>Incoterms</th>
+                      <th>Envío</th>
                       <th>Perú</th>
                       <th>China</th>
                       <th class="no-sort">Pay</th>
@@ -585,3 +589,29 @@
   <?php echo form_close(); ?>
 </div>
 <!-- modal pago servicio cliente -->
+
+<!-- Modal comision_trading -->
+<div class="modal fade modal-comision_trading" id="modal-default">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center">Comisión</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="hidden-modal-id_pedido_cabecera_comision_trading" class="form-control" autocomplete="off">
+        <div class="col-xs-12">
+          <label>Importe</label>
+          <div class="form-group">
+            <input type="text" inputmode="decimal" id="txt-modal-precio_comision_trading" class="form-control required input-decimal" maxlength="13" autocomplete="off">
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_comision_trading" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /. Modal comision_trading -->

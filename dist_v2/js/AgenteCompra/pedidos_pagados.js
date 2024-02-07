@@ -15,6 +15,73 @@ if (fMonth < 10) {
 }
 
 $(function () {
+  //cambiar precio delivery
+  $('#btn-save_comision_trading').off('click').click(function () {
+    if($( '#txt-modal-precio_comision_trading' ).val().length==0){
+      $( '#txt-modal-precio_comision_trading' ).closest('.form-group').find('.help-block').html('Ingresar precio');
+      $( '#txt-modal-precio_comision_trading' ).closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else if(parseFloat($( '#txt-modal-precio_comision_trading' ).val())<=0.00 || isNaN(parseFloat($( '#txt-modal-precio_comision_trading' ).val()))){
+      $( '#txt-modal-precio_comision_trading' ).closest('.form-group').find('.help-block').html('Ingresar precio');
+      $( '#txt-modal-precio_comision_trading' ).closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      $( '#btn-save_comision_trading' ).text('');
+      $( '#btn-save_comision_trading' ).attr('disabled', true);
+      $( '#btn-save_comision_trading' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+      var arrData = Array();
+      arrData = {
+        'id_pedido_cabecera' : $( '#hidden-modal-id_pedido_cabecera_comision_trading' ).val(),
+        'precio_comision_trading' : $( '#txt-modal-precio_comision_trading' ).val()
+      }
+
+      url = base_url + 'AgenteCompra/PedidosPagados/agregarComisionTrading';
+      $.ajax({
+        type		  : 'POST',
+        dataType	: 'JSON',
+        url		    : url,
+        data		  : {
+          arrData : arrData
+        },
+        success: function (response) {
+          $('.modal-comision_trading').modal('hide');
+
+          $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+          $('#modal-message').modal('show');
+
+          if (response.status == 'success') {
+            $('.modal-message').addClass(response.style_modal);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+            reload_table_Entidad();
+          } else {
+            $('.modal-message').addClass(response.style_modal);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+          }
+        
+          $( '#btn-save_comision_trading' ).text('');
+          $( '#btn-save_comision_trading' ).append( 'Guardar' );
+          $( '#btn-save_comision_trading' ).attr('disabled', false);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+          
+          $( '#modal-message' ).modal('show');
+          $( '.modal-message' ).addClass( 'modal-danger' );
+          $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-save_comision_trading' ).text('');
+          $( '#btn-save_comision_trading' ).append( 'Guardar' );
+          $( '#btn-save_comision_trading' ).attr('disabled', false);
+        }
+      });
+    }
+  });
+
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,
@@ -106,12 +173,13 @@ $(function () {
         columns: ':visible'
       }
     }],
-    'searching'   : false,
-    'bStateSave'  : true,
-    'processing'  : true,
-    'serverSide'  : true,
-    'info'        : true,
-    'autoWidth'   : false,
+    "paging": true,
+    "lengthChange": true,
+    "searching": true,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": false,
     'pagingType'  : 'full_numbers',
     'oLanguage' : {
       'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
@@ -135,10 +203,15 @@ $(function () {
       'type'      : 'POST',
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
+        data.sCorrelativoCotizacion = $( '#hidden-sCorrelativoCotizacion' ).val(),
+        data.ID_Pedido_Cabecera = $( '#hidden-ID_Pedido_Cabecera' ).val(),
         data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
         data.Global_Filter = $( '#txt-Global_Filter' ).val(),
         data.Filtro_Fe_Inicio       = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
         data.Filtro_Fe_Fin          = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
+      },
+      complete: function () {
+        $('.width_full').val($('#hidden-sCorrelativoCotizacion').val());
       },
     },
     'columnDefs': [
@@ -153,6 +226,12 @@ $(function () {
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
   
+  jQuery(document).on('keyup', '.width_full', function (ev) {
+    $('#hidden-sCorrelativoCotizacion').val('');
+    $('#hidden-ID_Pedido_Cabecera').val('');
+    reload_table_Entidad();
+  })
+
   $('#table-Pedidos_filter input').removeClass('form-control-sm');
   $('#table-Pedidos_filter input').addClass('form-control-md');
   $('#table-Pedidos_filter input').addClass("width_full");
@@ -1357,4 +1436,127 @@ function descargarPagoServicio(){
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function cambiarIncoterms(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  var sNombreEstado = 'EXW';
+  if(Nu_Estado==2)
+    sNombreEstado = 'FOB';
+  else if(Nu_Estado==3)
+    sNombreEstado = 'CIF';
+  else if(Nu_Estado==4)
+    sNombreEstado = 'DDP';
+
+  $('#modal-title').html('¿Deseas cambiar a <strong>' + sNombreEstado + '</strong>?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'AgenteCompra/PedidosPagados/cambiarIncoterms/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
+}
+
+function cambiarTransporte(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  var sNombreEstado = 'FCL';
+  if(Nu_Estado==2)
+    sNombreEstado = 'LCL';
+
+  $('#modal-title').html('¿Deseas cambiar a <strong>' + sNombreEstado + '</strong>?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'AgenteCompra/PedidosPagados/cambiarTransporte/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
+}
+
+function agregarComisionTrading(ID){
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '#hidden-modal-id_pedido_cabecera_comision_trading' ).val(ID);
+	$( '.modal-comision_trading' ).modal('show');
+  $( '#txt-modal-precio_comision_trading' ).val('');
+  $( '.modal-comision_trading' ).on('shown.bs.modal', function() {
+    $( '#txt-modal-precio_comision_trading' ).focus();
+  })
 }

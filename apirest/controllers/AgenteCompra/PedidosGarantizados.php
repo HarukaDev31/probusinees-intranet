@@ -105,9 +105,9 @@ class PedidosGarantizados extends CI_Controller {
 
 			$btn_asignar_personal_china = '';
 			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
-				$btn_asignar_personal_china = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
+				$btn_asignar_personal_china = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->Nu_Estado . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
 				if(!empty($row->ID_Usuario_Interno_Empresa_China)){
-					$btn_asignar_personal_china = '<span class="badge bg-secondary">Asignado</span>';
+					$btn_asignar_personal_china = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
 					$btn_asignar_personal_china .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Interno_Empresa_China . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
 				}
 			}
@@ -140,7 +140,7 @@ class PedidosGarantizados extends CI_Controller {
         echo json_encode($this->PedidosGarantizadosModel->getItemImagenProveedor($this->security->xss_clean($ID)));
     }
     	
-	public function elegirItemProveedor($id_detalle, $ID, $status, $sCorrelativoCotizacion, $sNameItem){
+	public function elegirItemProveedor($id_detalle, $ID, $status, $sCorrelativoCotizacion, $sNameItem=''){
         echo json_encode($this->PedidosGarantizadosModel->elegirItemProveedor($this->security->xss_clean($id_detalle), $this->security->xss_clean($ID), $this->security->xss_clean($status), $this->security->xss_clean($sCorrelativoCotizacion), $this->security->xss_clean($sNameItem)));
     }
 
@@ -1801,5 +1801,16 @@ class PedidosGarantizados extends CI_Controller {
 	public function viewChatItem($id){
 		echo json_encode($this->PedidosGarantizadosModel->viewChatItem($id));
 		exit();
+	}
+
+	public function asignarUsuarioPedidoChina(){
+		//array_debug($this->input->post());
+		echo json_encode($this->PedidosGarantizadosModel->asignarUsuarioPedidoChina($this->input->post()));
+		exit();
+	}
+
+	public function removerAsignarPedido($ID, $id_usuario){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosGarantizadosModel->removerAsignarPedido($this->security->xss_clean($ID), $this->security->xss_clean($id_usuario)));
 	}
 }

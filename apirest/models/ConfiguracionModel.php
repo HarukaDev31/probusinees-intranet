@@ -678,7 +678,7 @@ agente_compra_pedido_cabecera AS ACPC
 JOIN agente_compra_correlativo AS CORRE ON(CORRE.ID_Agente_Compra_Correlativo = ACPC.ID_Agente_Compra_Correlativo)
 JOIN entidad AS CLI ON(CLI.ID_Entidad = ACPC.ID_Entidad)
 WHERE
-ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario;//ver cual interesa más primeros pedidos o los ultimos arriba?
+ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario . " ORDER BY ACPC.Fe_Registro_Hora_Cotizacion DESC";//ver cual interesa más primeros pedidos o los ultimos arriba?
 		if ( !$this->db->simple_query($query) ){
 			$error = $this->db->error();
 			return array(

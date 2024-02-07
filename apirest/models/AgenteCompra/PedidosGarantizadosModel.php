@@ -19,6 +19,7 @@ class PedidosGarantizadosModel extends CI_Model{
 	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	var $table_pais = 'pais';
 	var $table_agente_compra_correlativo = 'agente_compra_correlativo';
+	var $table_usuario_intero = 'usuario';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -30,11 +31,12 @@ class PedidosGarantizadosModel extends CI_Model{
         $this->db->select($this->table . '.*, P.No_Pais, 
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
-		CORRE.Fe_Month')
+		CORRE.Fe_Month, USRCHINA.No_Usuario')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
+    	->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where_in($this->table . '.Nu_Estado', array(2,3,4,8));
         
@@ -279,6 +281,14 @@ class PedidosGarantizadosModel extends CI_Model{
 			$data = array_merge($data, array(
 				'Fe_Emision_OC_Aprobada' => dateNow('fecha')
 			));
+
+			//marcar progreso de pedido completado 2/3
+			$where_progreso = array(
+				'ID_Pedido_Cabecera' => $ID,
+				'Nu_ID_Interno' => 2
+			);
+			$data_progreso = array('Nu_Estado_Proceso' => 1);
+			$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
 		}
 
 		if ($this->db->update($this->table, $data, $where) > 0) {
@@ -723,5 +733,32 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'status' => 'warning',
 			'message' => 'No se encontro registro',
 		);
+	}
+
+	public function asignarUsuarioPedidoChina($arrPost){
+        $where = array('ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera']);
+        $data = array( 'ID_Usuario_Interno_Empresa_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			$where_progreso = array(
+				'ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera'],
+				'Nu_ID_Interno' => 1
+			);
+			$data_progreso = array('Nu_Estado_Proceso' => 1);
+			if ($this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
+				return array('status' => 'success', 'message' => 'Actualizado');
+			} else {
+				return array('status' => 'error', 'message' => 'Error al actualizar y agregar progreso compra');
+			}
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+	}
+
+	public function removerAsignarPedido($ID, $id_usuario){
+		$where = array('ID_Pedido_Cabecera' => $ID);
+		$data = array( 'ID_Usuario_Interno_Empresa_China' => 0 );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Se quitó asignación');
+		}
+		return array('status' => 'error', 'message' => 'Error al eliminar asignación pedido');
 	}
 }

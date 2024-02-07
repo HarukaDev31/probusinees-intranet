@@ -41,29 +41,20 @@ class PedidosPagadosModel extends CI_Model{
 		//$this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
 		$this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
         
+		if(!empty($this->input->post('ID_Pedido_Cabecera'))){
+        	$this->db->where($this->table . '.ID_Pedido_Cabecera', $this->input->post('ID_Pedido_Cabecera'));
+		}
+
 		if(isset($this->order)) {
 			$order = $this->order;
 			$this->db->order_by(key($order), $order[key($order)]);
 		}
     }
-    
-    function get_datatables(){
+
+	function get_datatables(){
         $this->_get_datatables_query();
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
-    }
-    
-    function count_filtered(){
-        $this->_get_datatables_query();
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
- 
-    public function count_all(){
-        $this->db->from($this->table);
-        return $this->db->count_all_results();
     }
 
     public function get_by_id($ID){
@@ -167,15 +158,6 @@ class PedidosPagadosModel extends CI_Model{
 				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
 				''
 			);
-			return array('status' => 'success', 'message' => 'Actualizado', 'notificacion' => $notificacion);
-		}
-		return array('status' => 'error', 'message' => 'Error al cambiar estado');
-	}
-
-	public function cambiarTipoServicio($ID, $Nu_Estado){
-        $where = array('ID_Pedido_Cabecera' => $ID);
-        $data = array( 'Nu_Tipo_Servicio' => $Nu_Estado );
-		if ($this->db->update($this->table, $data, $where) > 0) {
 			return array('status' => 'success', 'message' => 'Actualizado', 'notificacion' => $notificacion);
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
@@ -554,4 +536,66 @@ class PedidosPagadosModel extends CI_Model{
 			return array('status' => 'success', 'message' => 'Registro modificado');
 		}
     }
+
+	public function cambiarTipoServicio($ID, $Nu_Estado){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Tipo_Servicio' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			$arrParams = array('ID_Pedido_Cabecera' => $ID);
+			$this->actualizarProgresoPedido($arrParams);
+
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+	}
+
+    public function agregarComisionTrading($where, $data){
+		if ( $this->db->update($this->table, $data, $where) > 0 ) {
+			$arrParams = array('ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera']);
+			$this->actualizarProgresoPedido($arrParams);
+
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Se agrego comisión');
+		}
+        return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al agregar comisión');
+    }
+
+	public function cambiarIncoterms($ID, $Nu_Estado, $sCorrelativo){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Tipo_Incoterms' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			$arrParams = array('ID_Pedido_Cabecera' => $ID);
+			$this->actualizarProgresoPedido($arrParams);
+
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+    }
+
+	public function cambiarTransporte($ID, $Nu_Estado, $sCorrelativo){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Tipo_Transporte_Maritimo' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			$arrParams = array('ID_Pedido_Cabecera' => $ID);
+			$this->actualizarProgresoPedido($arrParams);
+
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+    }
+
+	public function actualizarProgresoPedido($arrParams){
+        $query ="SELECT Nu_Tipo_Servicio, Ss_Comision_Interna_Trading, Nu_Tipo_Incoterms, Nu_Tipo_Transporte_Maritimo FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $arrParams['ID_Pedido_Cabecera'] . " LIMIT 1";
+        $objPedidoTienda = $this->db->query($query)->row();		
+		if($objPedidoTienda->Nu_Tipo_Servicio!=0 && $objPedidoTienda->Ss_Comision_Interna_Trading > 0.00 && $objPedidoTienda->Nu_Tipo_Incoterms!=0 && $objPedidoTienda->Nu_Tipo_Transporte_Maritimo!=0) {
+			$where_progreso = array(
+				'ID_Pedido_Cabecera' => $arrParams['ID_Pedido_Cabecera'],
+				'Nu_ID_Interno' => 3
+			);
+			$data_progreso = array('Nu_Estado_Proceso' => 1);
+			if ($this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
+				return array('status' => 'success', 'message' => 'Actualizado');
+			}
+			return array('status' => 'error', 'message' => 'Error al actualizar y agregar progreso compra');
+		}
+	}
 }
