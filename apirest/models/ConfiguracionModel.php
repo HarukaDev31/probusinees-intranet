@@ -661,4 +661,80 @@ Nu_Orden_Slider;";
 			'sMessage' => 'No se encontro registro',
 		);
 	}
+	
+	public function obtenerPedidosXUsuario(){
+		$query = "SELECT
+ACPC.ID_Pedido_Cabecera,
+ACPC.Fe_Emision_Cotizacion,
+CORRE.Fe_Month,
+ACPC.Nu_Correlativo,
+CLI.No_Entidad,
+CLI.Nu_Documento_Identidad,
+CLI.No_Contacto,
+CLI.Nu_Celular_Contacto,
+CLI.Txt_Email_Contacto
+FROM
+agente_compra_pedido_cabecera AS ACPC
+JOIN agente_compra_correlativo AS CORRE ON(CORRE.ID_Agente_Compra_Correlativo = ACPC.ID_Agente_Compra_Correlativo)
+JOIN entidad AS CLI ON(CLI.ID_Entidad = ACPC.ID_Entidad)
+WHERE
+ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario;//ver cual interesa más primeros pedidos o los ultimos arriba?
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
+	}
+	
+	public function obtenerPedidosXUsuarioDetalle($ID_Pedido_Cabecera){
+		$query = "SELECT
+PACP.No_Proceso,
+PACP.Nu_Estado_Proceso
+FROM
+proceso_agente_compra_pedido AS PACP
+WHERE
+PACP.ID_Pedido_Cabecera = " . $ID_Pedido_Cabecera . " ORDER BY PACP.Nu_Orden";
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
+	}
+
+    public function verificarEstadoProcesoAgenteCompra($ID_Pedido_Cabecera){
+        $query ="SELECT Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera=".$ID_Pedido_Cabecera;
+		return $this->db->query($query)->result();
+    }
 }

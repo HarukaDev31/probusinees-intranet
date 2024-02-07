@@ -69,7 +69,7 @@ class HelperImportacionModel extends CI_Model{
 		else if( $iEstado == 4 )
 			return array('No_Estado' => 'Rechazado','No_Class_Estado' => 'danger');
 		else if( $iEstado == 5 )
-			return array('No_Estado' => 'Confirmado','No_Class_Estado' => 'success');
+			return array('No_Estado' => 'Aprobado','No_Class_Estado' => 'success');
 		else if( $iEstado == 6 )
 			return array('No_Estado' => 'Pago 30%','No_Class_Estado' => 'primary');
 		else if( $iEstado == 7 )

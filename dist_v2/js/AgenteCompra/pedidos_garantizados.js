@@ -765,7 +765,7 @@ function verPedido(ID){
       else if(response.Nu_Estado_Pedido == 3)
         sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
       else if(response.Nu_Estado_Pedido == 4)
-        sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
+        sNombreEstado = '<span class="badge badge-pill badge-danger">Rechazado</span>';
       $( '#div-estado' ).html(sNombreEstado);
 
       var table_enlace_producto = "";
@@ -866,9 +866,9 @@ function cambiarEstado(ID, Nu_Estado) {
   else if(Nu_Estado==4)
     sNombreEstado = 'Rechazado';
   else if(Nu_Estado==5)
-    sNombreEstado = 'Confirmado';
+    sNombreEstado = 'Aprobado';
   else if(Nu_Estado==8)
-    sNombreEstado = 'Confirmado';
+    sNombreEstado = 'Obervado';
 
   $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 

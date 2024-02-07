@@ -57,7 +57,7 @@
                       <th class="no-sort">Ver</th>
                       <?php endif; ?>
                       <?php //if ($this->user->Nu_Tipo_Privilegio_Acceso==1) : ?>
-                      <th class="no-sort">User</th>
+                      <th class="no-sort">Cliente</th>
                       <?php //endif; ?>
                     </tr>
                   </thead>

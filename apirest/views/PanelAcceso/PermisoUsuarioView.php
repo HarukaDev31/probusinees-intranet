@@ -18,7 +18,7 @@
             <div class="card-body">
               <div class="row div-Filtros">
                 <br>
-                <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="col-xs-12 col-sm-12 col-md-12 d-none">
                   <div class="alert alert-success">
                     <strong>Nota:</strong> Solo los usuarios con <b>Cargo = Gerencia</b>. Tendrán acceso al módulo <b>Configuración</b>.
                   </div>

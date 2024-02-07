@@ -16,6 +16,7 @@ class PedidosAgenteModel extends CI_Model{
 	var $table_tipo_documento_identidad = 'tipo_documento_identidad';
 	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	var $table_pais = 'pais';
+	var $table_usuario_intero = 'usuario';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -24,12 +25,13 @@ class PedidosAgenteModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, P.No_Pais, 
+        $this->db->select($this->table . '.*, P.No_Pais,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Entidad')
+		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Entidad')//, USRINTERNO.No_Usuario
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
+    	//->join($this->table_usuario_intero . ' AS USRINTERNO', 'USRINTERNO.ID_Usuario_Interno_Empresa  = ' . $this->table . '.ID_Usuario', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where($this->table . '.Nu_Estado=', 1);
 
@@ -85,7 +87,7 @@ class PedidosAgenteModel extends CI_Model{
         return $query->result();
     }
 
-	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){
+	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){		
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
@@ -96,13 +98,21 @@ class PedidosAgenteModel extends CI_Model{
 					$ID_Agente_Compra_Correlativo = $arrCorrelativo['result']['id_correlativo'];
 					$Nu_Correlativo = $arrCorrelativo['result']['numero_correlativo'];
 
+					//insertar estado proceso agente compra
+					$arrDataTour = array(
+						'ID_Pedido_Cabecera' => $ID
+					);
+					$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
+
 					//actualizar tabla para agregar correlativo
 					$data = array(
 						'ID_Agente_Compra_Correlativo' => $ID_Agente_Compra_Correlativo,
 						'Nu_Correlativo' => $Nu_Correlativo,
 						'Fe_Emision_Cotizacion' => dateNow('fecha'),
-						'Fe_Registro_Hora_Cotizacion' => dateNow('fecha_hora')
+						'Fe_Registro_Hora_Cotizacion' => dateNow('fecha_hora'),
+						'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario
 					);
+
 					if ($this->db->update($this->table, $data, $where) > 0) {
 						return array('status' => 'success', 'message' => 'Correlativo generado');
 					} else {
@@ -241,7 +251,7 @@ Nu_Correlativo
 			$ID_Agente_Compra_Correlativo = $this->db->insert_id();
 		}
 		$Nu_Correlativo = $this->db->query("SELECT Nu_Correlativo FROM agente_compra_correlativo WHERE ID_Agente_Compra_Correlativo = " . $ID_Agente_Compra_Correlativo . " LIMIT 1")->row()->Nu_Correlativo;
-		if($Nu_Correlativo>0){
+		if(!empty($Nu_Correlativo)){
 			return array(
 				'status' => 'success',
 				'result' => array(
@@ -296,5 +306,47 @@ Nu_Correlativo
 			}
 		}
 		return array('status' => 'error', 'message' => 'Error al eliminar asignación pedido');
+	}
+	public function generarEstadoProcesoAgenteCompra($arrDataTour){
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => 'Pedidos Garantizados',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '1',
+			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => 'Selección de Proveedores',
+			'Nu_Orden' => '2',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '2',
+			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => 'O.C. Aprobadas',
+			'Nu_Orden' => '3',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '3',
+			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+		);
+		
+		if ($this->db->insert_batch('proceso_agente_compra_pedido', $proceso_agente_compra_pedido)>0)
+			return array('status' => 'success', 'message' => 'Registro guardado');
+		return array('status' => 'error', 'message' => 'Error al guardar');
 	}
 }

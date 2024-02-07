@@ -280,7 +280,16 @@ class PedidosGarantizadosModel extends CI_Model{
 
 	public function cambiarEstado($ID, $Nu_Estado){
         $where = array('ID_Pedido_Cabecera' => $ID);
-        $data = array( 'Nu_Estado' => $Nu_Estado );
+        $data = array(
+			'Nu_Estado' => $Nu_Estado
+		);
+
+		if($Nu_Estado==5){//aprobado creo nueva fecha de emision para O.C. Aprobadas
+			$data = array_merge($data, array(
+				'Fe_Emision_OC_Aprobada' => dateNow('fecha')
+			));
+		}
+
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			return array('status' => 'success', 'message' => 'Actualizado');
 		}

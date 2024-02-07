@@ -32,7 +32,7 @@
 
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=8.2.0'; ?>">
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=8.5.0'; ?>">
 
   <meta name="theme-color" content="#FF6700">
   <meta name="msapplication-navbutton-color" content="#FF6700"/>
@@ -68,7 +68,7 @@
   <input type="hidden" id="hidden-ID_Pais_Usuario" name="ID_Pais_Usuario" class="form-control" value="<?php echo $this->user->ID_Pais; ?>">
   <input type="hidden" id="hidden-No_Signo_Global" name="No_Signo_Global" class="form-control" value="<?php echo $this->user->No_Signo; ?>">
 
-  <input type="hidden" id="hidden-id_menu" class="form-control" value="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu; ?>">
+  <input type="hidden" id="hidden-id_menu" class="form-control" value="<?php echo (isset($this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu) ? $this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu : 0); ?>">
   
   <div class="wrapper">
     <!-- Navbar -->
@@ -166,7 +166,11 @@
             <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block"><?php echo $this->user->No_Nombres_Apellidos; ?></a>
+            <a href="#" class="d-block">
+              <?php echo $this->user->No_Nombres_Apellidos; ?>
+              <br>
+              <span class="badge bg-success"><?php echo $this->user->No_Grupo; ?></span>
+            </a>
           </div>
         </div>
 
