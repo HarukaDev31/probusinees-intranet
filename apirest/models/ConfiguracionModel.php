@@ -705,7 +705,8 @@ ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario;//ver cual interes
 	public function obtenerPedidosXUsuarioDetalle($ID_Pedido_Cabecera){
 		$query = "SELECT
 PACP.No_Proceso,
-PACP.Nu_Estado_Proceso
+PACP.Nu_Estado_Proceso,
+PACP.Txt_Url_Menu
 FROM
 proceso_agente_compra_pedido AS PACP
 WHERE

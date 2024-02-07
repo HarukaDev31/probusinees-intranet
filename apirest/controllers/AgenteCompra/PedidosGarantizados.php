@@ -19,11 +19,14 @@ class PedidosGarantizados extends CI_Controller {
 		}
 	}
 	
-	public function listar(){
+	public function listar($sCorrelativoCotizacion = '', $ID_Pedido_Cabecera = ''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
-			$this->load->view('AgenteCompra/PedidosGarantizadosView');
+			$this->load->view('header_v2',  array("js_pedidos_garantizados" => true));
+			$this->load->view('AgenteCompra/PedidosGarantizadosView', array(
+				'sCorrelativoCotizacion' => $sCorrelativoCotizacion,
+				'ID_Pedido_Cabecera' => $ID_Pedido_Cabecera
+			));
 			$this->load->view('footer_v2', array("js_pedidos_garantizados" => true));
 		}
 	}
@@ -100,12 +103,19 @@ class PedidosGarantizados extends CI_Controller {
 			
 			$rows[] = $btn_entregado;
 
+			$btn_asignar_personal_china = '';
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
+				$btn_asignar_personal_china = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
+				if(!empty($row->ID_Usuario_Interno_Empresa_China)){
+					$btn_asignar_personal_china = '<span class="badge bg-secondary">Asignado</span>';
+					$btn_asignar_personal_china .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Interno_Empresa_China . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+				}
+			}
+			$rows[] = $btn_asignar_personal_china;
+			
             $data[] = $rows;
         }
         $output = array(
-	        'draw' => $this->input->post('draw'),
-	        'recordsTotal' => $this->PedidosGarantizadosModel->count_all(),
-	        'recordsFiltered' => $this->PedidosGarantizadosModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);

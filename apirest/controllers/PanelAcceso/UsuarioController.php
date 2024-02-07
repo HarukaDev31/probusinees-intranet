@@ -104,7 +104,7 @@ class UsuarioController extends CI_Controller {
 			$data = array_merge($data, array('Nu_Celular' => $Nu_Celular));
 		}
 		echo json_encode(
-		($_POST['EID_Organizacion'] != '' || $_POST['EID_Grupo'] != '' && $_POST['EID_Usuario'] != '') ?
+		($_POST['EID_Usuario'] != '') ?
 			$this->UsuarioModel->actualizarUsuario(array('ID_Organizacion' => $this->input->post('EID_Organizacion'), 'ID_Grupo' => $this->input->post('EID_Grupo'), 'ID_Usuario' => $this->input->post('EID_Usuario')), $data, $this->input->post('EID_Grupo'), $this->input->post('ENo_Usuario'), $this->input->post('ENu_Celular'), $this->input->post('ETxt_Email'), $this->input->post('ENu_Estado'))
 		:
 			$this->UsuarioModel->agregarUsuario($data)

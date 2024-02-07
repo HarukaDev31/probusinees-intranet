@@ -11,6 +11,8 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 
 $(function () {
+  $('.select2').select2();
+
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,
@@ -153,12 +155,13 @@ $(function () {
         columns: ':visible'
       }
     }],
-    'searching'   : false,
-    'bStateSave'  : true,
-    'processing'  : true,
-    'serverSide'  : true,
-    'info'        : true,
-    'autoWidth'   : false,
+    "paging": true,
+    "lengthChange": true,
+    "searching": true,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": false,
     'pagingType'  : 'full_numbers',
     'oLanguage' : {
       'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
@@ -182,10 +185,15 @@ $(function () {
       'type'      : 'POST',
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
+        data.sCorrelativoCotizacion = $( '#hidden-sCorrelativoCotizacion' ).val(),
+        data.ID_Pedido_Cabecera = $( '#hidden-ID_Pedido_Cabecera' ).val(),
         data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
         data.Global_Filter = $( '#txt-Global_Filter' ).val(),
         data.Filtro_Fe_Inicio       = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
         data.Filtro_Fe_Fin          = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
+      },
+      complete: function () {
+        $('.width_full').val($('#hidden-sCorrelativoCotizacion').val());
       },
     },
     'columnDefs': [
@@ -200,6 +208,18 @@ $(function () {
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
   
+  /*
+	$(".width_full").keyup(function (e) {
+    console.log('ga');
+    $('#hidden-sCorrelativoCotizacion').val('');
+  })
+  */
+  jQuery(document).on('keyup', '.width_full', function (ev) {
+    $('#hidden-sCorrelativoCotizacion').val('');
+    $('#hidden-ID_Pedido_Cabecera').val('');
+    reload_table_Entidad();
+  })
+
   $('#table-Pedidos_filter input').removeClass('form-control-sm');
   $('#table-Pedidos_filter input').addClass('form-control-md');
   $('#table-Pedidos_filter input').addClass("width_full");
@@ -1722,4 +1742,29 @@ function viewChatItem(id_item){
       }
     }
   });
+}
+  
+//chat de novedades de producto
+function asignarPedido(ID_Pedido_Cabecera){
+  $('#txt-guardar_personal_china-ID_Pedido_Cabecera').val(ID_Pedido_Cabecera);
+  $('.modal-guardar_personal_china').modal('show');
+
+  $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">Buscando...</option>');
+	url = base_url + 'HelperImportacionController/getUsuarioChina';
+	$.post(url, {}, function (response) {
+    console.log(response);
+		if (response.status == 'success') {
+			$('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">- Seleccionar -</option>');
+			var l = response.result.length;
+			for (var x = 0; x < l; x++) {
+				$('#cbo-guardar_personal_china-ID_Usuario').append('<option value="' + response.result[x].ID + '">' + response.result[x].Nombre + '</option>');
+			}
+		} else {
+      $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">Sin registro</option>');
+			if (response.sMessageSQL !== undefined) {
+				console.log(response.sMessageSQL);
+			}
+			console.log(response.message);
+		}
+	}, 'JSON');
 }

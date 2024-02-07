@@ -131,5 +131,37 @@ class HelperImportacionModel extends CI_Model{
 			'sMessage' => 'No se encontro registro',
 		);
 	}
+
+	public function getUsuarioChina(){
+		$query = "SELECT
+USR.ID_Usuario AS ID,
+USR.No_Usuario AS Nombre
+FROM
+usuario AS USR
+JOIN grupo_usuario AS GRPUSR ON(USR.ID_Usuario = GRPUSR.ID_Usuario)
+JOIN grupo AS GRP ON(GRP.ID_Grupo = GRPUSR.ID_Grupo)
+WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegio_Acceso=2 AND USR.Nu_Estado=1";//2=china
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
+	}
 }
 ?>

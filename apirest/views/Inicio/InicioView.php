@@ -12,8 +12,8 @@
           <?php //array_debug($arrResponsePedidoXUsuario); ?>
 
           <?php if($arrResponsePedidoXUsuario['status']=='success'){ ?>
-          <div class="card">
-            <div class="card-header text-center border-0 pb-1 mt-2">
+          <div class="card card-dark">
+            <div class="card-header text-center border-0 pb-2 pt-2">
               <h4 class="mb-0">Pedidos Garantizados / O.C. Aprobadas</h4>
             </div>
             
@@ -30,19 +30,20 @@
                   //array_debug($arrResponseVerificarProceso);
                   $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
                 ?>
-                  <div class="card card-primary">
+                  <div class="card card-light">
                     <div class="card-header">
                       <h4 class="card-title w-100">
                         <a class="d-block w-100" data-toggle="collapse" href="#collapse-<?php echo $row->ID_Pedido_Cabecera; ?>">
                           <div class="row">
                             <div class="col-2 col-sm-2">
-                              <?php echo $sCorrelativoCotizacion; ?>
+                              <label><?php echo $sCorrelativoCotizacion; ?></label>
                             </div>
                             <div class="col-8 col-sm-8">
-                              Cliente: <?php echo $row->No_Contacto; ?> / <div class="d-none d-sm-block">Empresa: <?php echo $row->No_Entidad; ?></div>
+                              <!--<span>Cliente: <?php echo $row->No_Contacto; ?> / <label class="d-none d-sm-block">Empresa: <?php echo $row->No_Entidad; ?></label></span>-->
+                              <div>Cliente: <?php echo $row->No_Contacto; ?> / Empresa: <?php echo $row->No_Entidad; ?></div>
                             </div>
                             <div class="col-2 col-sm-2 text-right">
-                              <span class="badge bg-secondary"><?php echo $iProgreso; ?> / 3</span>
+                              <span class="badge bg-primary"><?php echo $iProgreso; ?> / 3</span>
                             </div>
                           </div>
                         </a>
@@ -53,15 +54,15 @@
                       $arrResponseVerificarProcesoDetalle = $this->ConfiguracionModel->obtenerPedidosXUsuarioDetalle($row->ID_Pedido_Cabecera);
                       if ($arrResponseVerificarProcesoDetalle['status']=='success' && $this->empresa->Nu_Lae_Gestion==1) {
                       ?>
-                      <div class="card-body pt-0 px-1">
+                      <div class="card-body pt-0 px-1 pb-0">
                         <div class="col-xs-12 col-sm-12 col-md-12">
-                          <div class="container-tour" style="background: #d5ebff; margin: 3% 0;border-radius: 12px;">
+                          <div class="container-tour bg-light" style="margin: 3% 0;border-radius: 12px;">
                             <div class="tour-item">
-                              <?php foreach ($arrResponseVerificarProcesoDetalle['result'] as $row) { ?>
-                                <a href="#"><?php //echo base_url() . $row->Txt_Url_Menu; ?>
-                                  <i class="fa fa-check-circle check-gestion <?php echo ($row->Nu_Estado_Proceso == 1 ? 'active' : ''); ?>"></i>
+                              <?php foreach ($arrResponseVerificarProcesoDetalle['result'] as $row_menu) { ?>
+                                <a href="<?php echo base_url() . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera; ?>">
+                                  <i class="fa fa-check-circle check-gestion <?php echo ($row_menu->Nu_Estado_Proceso == 1 ? 'active' : ''); ?>"></i>
                                   <div>
-                                    <label><?php echo $row->No_Proceso; ?></label>
+                                    <label><?php echo $row_menu->No_Proceso; ?></label>
                                   </div>
                                 </a>
                               <?php } ?>

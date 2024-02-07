@@ -20,6 +20,8 @@
           <div class="card">
             <div class="card-body">
               <div class="row mb-3 div-Listar">
+                <input type="hidden" id="hidden-sCorrelativoCotizacion" name="sCorrelativoCotizacion" class="form-control" value="<?php echo $sCorrelativoCotizacion; ?>">
+                <input type="hidden" id="hidden-ID_Pedido_Cabecera" name="ID_Pedido_Cabecera" class="form-control" value="<?php echo $ID_Pedido_Cabecera; ?>">
                 <div class="col-6 col-sm-4">
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
@@ -50,18 +52,13 @@
                       <th>Cliente</th>
                       <th>Empresa</th>
                       <th class="no-sort">Excel</th>
-                      <!--<th class="no-sort">PDF</th>-->
                       <th>Perú</th>
                       <th>China</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>
                       <th class="no-sort">Pay</th>
-                      <!--
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Eliminar == 1) : ?>
-                        <th class="no-sort">Eliminar</th>
-                      <?php endif; ?>
-                      -->
+                      <th class="no-sort">Personal</th>
                     </tr>
                   </thead>
                 </table>
@@ -445,3 +442,29 @@
     </div>
   </div>
 </div>
+
+<!-- asignar pedido personal de china -->
+<div class="modal fade modal-guardar_personal_china" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-guardar_personal_china">
+        <input type="hidden" id="txt-guardar_personal_china-ID_Pedido_Cabecera" name="guardar_personal_china-ID_Pedido_Cabecera" class="form-control form-control-lg">
+        <div class="col-xs-12">
+          <label>Usuario</label>
+          <div class="form-group">
+            <select id="cbo-guardar_personal_china-ID_Usuario" name="cbo-guardar_personal_china-ID_Usuario" class="form-control select2" style="width: 100%;">
+              <option selected="selected" value="0"></option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="btn-guardar_personal_china" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- ./ asignar pedido personal de china -->
