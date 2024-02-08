@@ -46,6 +46,14 @@ class AutocompleteController extends CI_Controller {
 		}
 	}
 	
+	public function getAllClientCargaConsolidada(){
+		if ( $this->input->is_ajax_request() && $this->input->post('global_table') && $this->input->post('global_search') ){
+			$global_table = $this->input->post('global_table');
+			$global_search = $this->input->post('global_search');
+			echo json_encode($this->AutocompleteModel->getAllClientCargaConsolidada($global_table, $global_search));
+		}
+	}
+	
 	public function getAllProvider(){
 		if ( $this->input->is_ajax_request() && $this->input->post('global_table') && $this->input->post('global_search') ){
 			$global_table = $this->input->post('global_table');

@@ -62,7 +62,7 @@
                       <th>Liberación</th>
                       <th>Canal</th>
                       <th>Entrega</th>
-                      <th>Sms</th>
+                      <th>Mensaje</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                       <th class="no-sort">Ver</th>
                       <?php endif; ?>
@@ -134,7 +134,7 @@
                       <div class="form-group">
                         <label>Cliente<span class="label-advertencia text-danger"> *</span></label>
                         <input type="hidden" id="txt-ID_Entidad" name="" class="form-control">
-                        <input type="text" id="txt-No_Entidad" class="form-control autocompletar clearable" data-global-class_method="AutocompleteController/getAllClient" data-global-table="entidad" placeholder="Buscar por Nombre / DNI / RUC / OTROS" value="" autocomplete="off">
+                        <input type="text" id="txt-No_Entidad" class="form-control autocompletar clearable" data-global-class_method="AutocompleteController/getAllClientCargaConsolidada" data-global-table="entidad" placeholder="Buscar por Nombre / DNI / RUC / OTROS" value="" autocomplete="off">
                         <span class="text-danger help-block" id="error"></span>
                       </div>
                     </div>
@@ -182,21 +182,28 @@
 <!-- /.content-wrapper -->
 
 <!-- modal ver imagen del item -->
-<div class="modal fade modal-ver_item" id="modal-default">
+<div class="modal fade modal-enviar_mensaje" id="modal-enviar_mensaje">
+  <?php $attributes = array('id' => 'form-enviar_mensaje'); echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-body" id="modal-body-ver_item">
-        <div class="col-xs-12 text-center">
-          <img class="img-responsive img-fluid" style=" display: block; margin-left: auto; margin-right: auto;" src="">
+      <div class="modal-body" id="modal-body-enviar_mensaje">
+        <input type="hidden" id="enviar_mensaje-id_pedido_cabecera" name="enviar_mensaje-id_pedido_cabecera" class="form-control" autocomplete="off">
+        <div class="col-xs-12 text-left">
+          <label>Mensaje</label>
+          <div class="form-group">
+            <textarea class="form-control required" rows="3" name="enviar_mensaje-No_Seguimiento" placeholder="Escribir..."></textarea>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
         </div>
       </div>
       <div class="modal-footer justify-content-between">
         <button type="button" class="col btn btn-danger btn-lg btn-block" data-dismiss="modal">Salir</button>
-        <a id="a-download_image" class="col btn btn-primary btn-lg btn-block" data-id_item="">Descargar</a>
+        <button type="submit" id="btn-enviar_mensaje" class="col btn btn-success btn-lg btn-block">Guardar</button>
       </div>
     </div>
     <!-- /.modal-content -->
   </div>
   <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
 </div>
 <!-- /.modal imagen del item -->

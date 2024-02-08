@@ -149,6 +149,35 @@ LIMIT 10";
 		return $this->db->query($sql)->result();
     }
     
+	public function getAllClientCargaConsolidada($global_table, $global_search){
+	    $sql = "SELECT
+ID_Entidad AS ID,
+Nu_Documento_Identidad AS Codigo,
+No_Entidad AS Nombre,
+Txt_Direccion_Entidad,
+Nu_Telefono_Entidad,
+Nu_Celular_Entidad,
+Txt_Email_Entidad,
+Nu_Estado,
+Nu_Dias_Credito,
+ID_Tipo_Documento_Identidad,
+ID_Departamento,
+ID_Provincia,
+ID_Distrito
+FROM
+entidad
+WHERE
+ID_Empresa = " . $this->user->ID_Empresa . "
+AND Nu_Tipo_Entidad = 0
+AND Nu_Estado = 1
+AND Nu_Carga_Consolidada = 1
+AND (Nu_Documento_Identidad LIKE '%" . $this->db->escape_like_str($global_search) . "%' ESCAPE '!' OR No_Entidad LIKE '%" . $this->db->escape_like_str($global_search) . "%' ESCAPE '!')
+ORDER BY
+Nombre DESC
+LIMIT 10";
+		return $this->db->query($sql)->result();
+    }
+    
 	public function getAllProvider($global_table, $global_search){
 	    $sql = "SELECT
 ID_Entidad AS ID,

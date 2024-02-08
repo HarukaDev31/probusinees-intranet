@@ -2,8 +2,9 @@
 class PedidosCargaConsolidadaModel extends CI_Model{
 	var $table = 'carga_consolidada_pedido_cabecera';
 	var $table_carga_consolidada_pedido_detalle = 'carga_consolidada_pedido_detalle';
+	var $table_carga_consolidada_seguimiento = 'carga_consolidada_seguimiento';
 	var $table_cliente = 'entidad';
-	
+
     var $order = array('Fe_Registro' => 'desc');
 		
 	public function __construct(){
@@ -104,5 +105,61 @@ class PedidosCargaConsolidadaModel extends CI_Model{
 			return array('status' => 'success', 'message' => 'Actualizado');
 		}
 		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+    }
+	
+	public function sendMessage($arrPost){
+        $data = array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrPost['enviar_mensaje-id_pedido_cabecera'],
+			'No_Seguimiento' => $arrPost['enviar_mensaje-No_Seguimiento']
+		);
+		if ($this->db->insert($this->table_carga_consolidada_seguimiento, $data) > 0) {
+			return array('status' => 'success', 'message' => 'Se envío seguimiento');
+		}
+		return array('status' => 'error', 'message' => 'Error al enviar seguimiento');
+    }
+	
+	public function obtenerCantidadMensaje($ID_Pedido_Cabecera){
+		$query = "SELECT 1 FROM " . $this->table_carga_consolidada_seguimiento . " WHERE ID_Pedido_Cabecera = " . $ID_Pedido_Cabecera;
+		$arrData = $this->db->query($query)->result();
+		$iCantidadMensaje = 0;
+		foreach ($arrData as $row) {
+			++$iCantidadMensaje;
+		}
+		return $iCantidadMensaje;
+    }
+	
+	public function obtenerEntidad($arrPost){
+		$query = "SELECT
+DET.ID_Entidad AS id,
+CLI.No_Entidad AS nombre,
+CLI.Txt_Email_Entidad AS correo
+FROM
+" . $this->table_carga_consolidada_pedido_detalle . " AS DET
+JOIN entidad AS CLI ON(CLI.ID_Entidad = DET.ID_Entidad)
+WHERE
+DET.ID_Pedido_Cabecera = " . $arrPost['enviar_mensaje-id_pedido_cabecera'];
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos entidad',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
     }
 }

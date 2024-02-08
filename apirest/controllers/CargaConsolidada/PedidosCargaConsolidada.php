@@ -79,8 +79,22 @@ class PedidosCargaConsolidada extends CI_Controller {
 
 			$rows[] = $dEntrega;
 
+			$btn_enviar_mensaje = '<button class="btn btn-xs btn-link p-0" alt="Seguimiento" title="Seguimiento" href="javascript:void(0)" onclick="enviarSeguimiento(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-comments fa-2x" aria-hidden="true"></i>';
 			
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Seguimiento" title="Seguimiento" href="javascript:void(0)" onclick="enviarSeguimiento(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-comments fa-2x" aria-hidden="true"></i></button>';
+			$iCantidadMensaje = $this->PedidosCargaConsolidadaModel->obtenerCantidadMensaje($row->ID_Pedido_Cabecera);
+			$btn_enviar_mensaje .= ($iCantidadMensaje > 0 ? '<span class="badge badge-danger">' . $iCantidadMensaje . '</span>' : '');
+			
+			$btn_enviar_mensaje .= '</button>';
+
+			$btn_ver_mensaje = '<button class="btn btn-xs btn-link p-0" alt="Ver seguimiento" title="Ver seguimiento" href="javascript:void(0)" onclick="verSeguimiento(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-eye fa-2x" aria-hidden="true"></i>';
+			
+			$iCantidadMensaje = $this->PedidosCargaConsolidadaModel->obtenerCantidadMensaje($row->ID_Pedido_Cabecera);
+			$btn_ver_mensaje .= ($iCantidadMensaje > 0 ? '<span class="badge badge-danger">' . $iCantidadMensaje . '</span>' : '');
+			
+			$btn_ver_mensaje .= '</button>';
+
+			$rows[] = $btn_enviar_mensaje . '&nbsp;&nbsp;' . $btn_ver_mensaje;
+
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
 			$data[] = $rows;
@@ -101,11 +115,11 @@ class PedidosCargaConsolidada extends CI_Controller {
 			'ID_Empresa'			=> $this->user->ID_Empresa,
 			'ID_Organizacion'		=> $this->user->ID_Organizacion,//Organizacion
 			'No_Carga_Consolidada'	=> $this->input->post('No_Carga_Consolidada'),
-			'Fe_Inicio'	=> ToDate($this->input->post('Fe_Inicio')),
-			'Fe_Termino'	=> ToDate($this->input->post('Fe_Termino')),
-			'Fe_Carga'	=> ToDate($this->input->post('Fe_Carga')),
-			'Fe_Zarpe'	=> ToDate($this->input->post('Fe_Zarpe')),
-			'Fe_Llegada'	=> ToDate($this->input->post('Fe_Llegada')),
+			'Fe_Inicio'				=> ToDate($this->input->post('Fe_Inicio')),
+			'Fe_Termino'			=> ToDate($this->input->post('Fe_Termino')),
+			'Fe_Carga'				=> ToDate($this->input->post('Fe_Carga')),
+			'Fe_Zarpe'				=> ToDate($this->input->post('Fe_Zarpe')),
+			'Fe_Llegada'			=> ToDate($this->input->post('Fe_Llegada')),
 		);
 		echo json_encode(
 		$this->input->post('EID_Pedido_Cabecera') != '' ?
@@ -123,5 +137,92 @@ class PedidosCargaConsolidada extends CI_Controller {
 	public function cambiarEstado($ID, $Nu_Estado){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     	echo json_encode($this->PedidosCargaConsolidadaModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
+	}
+
+	public function sendMessage(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+		$arrResponse = $this->PedidosCargaConsolidadaModel->sendMessage($this->input->post());
+		if($arrResponse['status'] == 'success'){
+			//aquí voy hacer un foreach de todos los correos que debo de enviar
+			$arrResponseEntidad = $this->PedidosCargaConsolidadaModel->obtenerEntidad($this->input->post());
+			if($arrResponseEntidad['status'] == 'success'){
+				$iCantidadEmail = 0;
+				foreach ($arrResponseEntidad['result'] as $row) {
+					$bStatusEnviarCorreo = true;
+					if(!empty($row->correo)){
+						if (!filter_var($row->correo, FILTER_VALIDATE_EMAIL)) {
+							$bStatusEnviarCorreo = false;
+						}
+				
+						if (!is_valid_email($row->correo)) {
+							$bStatusEnviarCorreo = false;
+						}
+				
+						if (!is_valid_email_expresion_regular($row->correo)) {
+							$bStatusEnviarCorreo = false;
+						}
+
+						if($bStatusEnviarCorreo==true){//enviar correo
+							$arrData = array(
+								'email' => $row->correo,
+								'name' => $row->nombre,
+								'message' => $this->input->post('enviar_mensaje-No_Seguimiento')
+							);
+							$arrResponseEmail = $this->enviarCorreoSeguimiento($arrData);
+							++$iCantidadEmail;
+						}
+
+						sleep(1);
+					}
+					//también debo de capturar a los que no envío por error
+				}
+
+				$response = array(
+					'status' => 'success',
+					'message' => 'Se envío email ' . $iCantidadEmail
+				);
+				echo json_encode($response);
+				exit();
+			} else {
+				echo json_encode($arrResponseEntidad);
+				exit();
+			}
+		} else {
+			echo json_encode($arrResponse);
+			exit();
+		}
+    	//echo json_encode($this->PedidosCargaConsolidadaModel->sendMessage($this->input->post()));
+	}
+	
+	public function enviarCorreoSeguimiento($arrData){
+		// enviar correo con las credenciales
+		$this->load->library('email');
+
+		$data_email["email"] = $arrData['email'];
+		$data_email["name"] = $arrData['name'];
+		$data_email["message"] = $arrData['message'];
+		$message_email = $this->load->view('correos/seguimiento_carga_consolidada', $data_email, true);
+		
+		$this->email->from('noreply@lae.one', 'ProBusiness');//de
+		$this->email->to($arrData['email']);//para
+		$this->email->subject('✅ Seguimiento tu carga');
+		$this->email->message($message_email);
+		$this->email->set_newline("\r\n");
+
+		$isSend = $this->email->send();
+		if($isSend) {
+			$response = array(
+				'status' => 'success',
+				'message' => 'Se envío email'
+			);
+			return $response;
+		} else {
+			$response = array(
+				'status' => 'error',
+				'message' => 'No se pudo enviar email, inténtelo más tarde.',
+				'error_message_mail' => $this->email->print_debugger()
+			);
+			return $response;
+		}
 	}
 }

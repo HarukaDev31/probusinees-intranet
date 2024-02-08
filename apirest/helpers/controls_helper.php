@@ -381,3 +381,30 @@ function limpiarCaracteresEspeciales($cadena) {
 	$texto = str_replace($no_permitidas, $permitidas, $cadena);
 	return $texto;
 }
+
+/**
+ *
+ * Valida un email usando funciones de manejo de strings. 
+ *  Devuelve true si es correcto o false en caso contrario
+ *
+ * @param    string  $str la dirección a validar
+ * @return   boolean
+ *
+ */
+function is_valid_email($str){
+	return (false !== strpos($str, "@") && false !== strpos($str, "."));
+}
+  
+/**
+ *
+ * Valida un email usando expresiones regulares. 
+ *  Devuelve true si es correcto o false en caso contrario
+ *
+ * @param    string  $str la dirección a validar
+ * @return   boolean
+ *
+ */
+function is_valid_email_expresion_regular($str){
+	$matches = null;
+	return (1 === preg_match('/^[A-z0-9\\._-]+@[A-z0-9][A-z0-9-]*(\\.[A-z0-9_-]+)*\\.([A-z]{2,6})$/', $str, $matches));
+}

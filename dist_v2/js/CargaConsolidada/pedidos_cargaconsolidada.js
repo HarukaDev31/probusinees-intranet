@@ -11,6 +11,70 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 
 $(function () {
+  
+  $("#form-enviar_mensaje").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+    
+    if ($( '[name="enviar_mensaje-No_Seguimiento"]' ).val() == '' || $( '[name="enviar_mensaje-No_Seguimiento"]' ).val() == null || $( '[name="enviar_mensaje-No_Seguimiento"]' ).val().length==0) {
+      $( '[name="enviar_mensaje-No_Seguimiento"]' ).closest('.form-group').find('.help-block').html('Debes escribir mensaje');
+      $( '[name="enviar_mensaje-No_Seguimiento"]' ).closest('.form-group').removeClass('has-success').addClass('has-error');
+      $( '[name="enviar_mensaje-No_Seguimiento"]' ).focus();
+    } else {
+      $( '#btn-enviar_mensaje' ).text('');
+      $( '#btn-enviar_mensaje' ).attr('disabled', true);
+      $( '#btn-enviar_mensaje' ).html( 'Enviando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+      
+      url = base_url + 'CargaConsolidada/PedidosCargaConsolidada/sendMessage';
+      $.ajax({
+        type		  : 'POST',
+        dataType	: 'JSON',
+        url		    : url,
+        data		  : $('#form-enviar_mensaje').serialize(),
+        success : function( response ){  
+          $( '.modal-enviar_mensaje' ).modal('hide');
+
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');  
+          
+          if (response.status == 'success'){
+            $( '#form-enviar_mensaje' )[0].reset();
+            
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+            reload_table_Entidad();
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+          }
+          
+          $( '#btn-enviar_mensaje' ).text('');
+          $( '#btn-enviar_mensaje' ).html( 'Enviar' );
+          $( '#btn-enviar_mensaje' ).attr('disabled', false);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+          
+          $( '#modal-message' ).modal('show');
+          $( '.modal-message' ).addClass( 'modal-danger' );
+          $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-enviar_mensaje' ).text('');
+          $( '#btn-enviar_mensaje' ).html( 'Enviar' );
+          $( '#btn-enviar_mensaje' ).attr('disabled', false);
+        }
+      });
+    }
+  })
+  
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,
@@ -449,7 +513,6 @@ function cambiarEstado(ID, Nu_Estado) {
   });
 
   $('#btn-save-delete').off('click').click(function () {
-    
     $( '#btn-save-delete' ).text('');
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
@@ -482,4 +545,16 @@ function cambiarEstado(ID, Nu_Estado) {
       }
     });
   });
+}
+
+function enviarSeguimiento(ID){
+  $( '#form-enviar_mensaje' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '#enviar_mensaje-id_pedido_cabecera' ).val(ID);
+
+  $('#modal-enviar_mensaje').modal('show');
+  $( '#form-enviar_mensaje' )[0].reset();
 }
