@@ -69,6 +69,19 @@ class PedidosPagadosModel extends CI_Model{
 		' . $this->table . '.Txt_Url_Pago_30_Cliente,
 		' . $this->table . '.Txt_Url_Pago_100_Cliente,
 		' . $this->table . '.Txt_Url_Pago_Servicio_Cliente,
+		' . $this->table . '.Txt_Url_Pago_Otros_Flete,
+		' . $this->table . '.Txt_Url_Pago_Otros_Costo_Origen,
+		' . $this->table . '.Txt_Url_Pago_Otros_Costo_Fta,
+		' . $this->table . '.Txt_Url_Pago_Otros_Cuadrilla,
+		' . $this->table . '.Txt_Url_Pago_Otros_Costos,
+		' . $this->table . '.Ss_Pago_30_Cliente,
+		' . $this->table . '.Ss_Pago_100_Cliente,
+		' . $this->table . '.Ss_Pago_Servicio_Cliente,
+		' . $this->table . '.Ss_Pago_Otros_Flete,
+		' . $this->table . '.Ss_Pago_Otros_Costo_Origen,
+		' . $this->table . '.Ss_Pago_Otros_Costo_Fta,
+		' . $this->table . '.Ss_Pago_Otros_Cuadrilla,
+		' . $this->table . '.Ss_Pago_Otros_Costos,
 		CORRE.Fe_Month,
 		CLI.No_Contacto,
 		CLI.Txt_Email_Contacto,
@@ -391,6 +404,9 @@ class PedidosPagadosModel extends CI_Model{
 				$this->db->update($this->table, $data, $where);
 			}
 			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['pago_cliente_30-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 				return array('status' => 'error', 'message' => 'Error al insertar');
@@ -443,6 +459,9 @@ class PedidosPagadosModel extends CI_Model{
 				$this->db->update($this->table, $data, $where);
 			}
 			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['pago_cliente_100-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 				return array('status' => 'error', 'message' => 'Error al insertar');
@@ -495,6 +514,9 @@ class PedidosPagadosModel extends CI_Model{
 				$this->db->update($this->table, $data, $where);
 			}
 			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['pago_cliente_servicio-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 				return array('status' => 'error', 'message' => 'Error al insertar');
@@ -597,5 +619,303 @@ class PedidosPagadosModel extends CI_Model{
 			}
 			return array('status' => 'error', 'message' => 'Error al actualizar y agregar progreso compra');
 		}
+	}
+
+	public function actualizarProgresoPedidoFinal($arrParams){
+        $query ="SELECT Ss_Pago_30_Cliente, Ss_Pago_100_Cliente, Ss_Pago_Servicio_Cliente, Ss_Pago_Otros_Flete, Ss_Pago_Otros_Costo_Origen, Ss_Pago_Otros_Costo_Fta, Ss_Pago_Otros_Cuadrilla, Ss_Pago_Otros_Costos FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $arrParams['ID_Pedido_Cabecera'] . " LIMIT 1";
+        $objPedidoTienda = $this->db->query($query)->row();
+		if(
+			$objPedidoTienda->Ss_Pago_30_Cliente > 0.00 &&
+			$objPedidoTienda->Ss_Pago_100_Cliente > 0.00 &&
+			$objPedidoTienda->Ss_Pago_Servicio_Cliente > 0.00 &&
+			$objPedidoTienda->Ss_Pago_Otros_Flete > 0.00 &&
+			$objPedidoTienda->Ss_Pago_Otros_Costo_Origen > 0.00 &&
+			$objPedidoTienda->Ss_Pago_Otros_Costo_Fta > 0.00
+		) {
+			$where_progreso = array(
+				'ID_Pedido_Cabecera' => $arrParams['ID_Pedido_Cabecera'],
+				'Nu_ID_Interno' => 4
+			);
+			$data_progreso = array('Nu_Estado_Proceso' => 1);
+			if ($this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
+				return array('status' => 'success', 'message' => 'Actualizado');
+			}
+			return array('status' => 'error', 'message' => 'Error al actualizar y agregar progreso compra');
+		}
+	}
+
+	public function addPagoFlete($arrPost, $data_files){
+		if (isset($data_files['pago_flete']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/pagos_clientes/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('pago_flete')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['pago_flete-id_cabecera']);
+				$data = array(
+					'Txt_Url_Pago_Otros_Flete' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_Otros_Flete' => $arrPost['pago_flete-ID_Pais_Otros_Flete'],
+					'Fe_Pago_Otros_Flete' => ToDate($arrPost['pago_flete-Fe_Pago']),
+					'Ss_Pago_Otros_Flete' => $arrPost['pago_flete-Ss_Pago_Otros_Flete'],
+					'Nu_Operacion_Pago_Otros_Flete' => $arrPost['pago_flete-Nu_Operacion_Pago_Otros_Flete']
+				);//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['pago_flete-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarPagoFlete($id){
+		$query = "SELECT Txt_Url_Pago_Otros_Flete AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+	public function addPagoCostosOrigen($arrPost, $data_files){
+		if (isset($data_files['costos_origen']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/pagos_clientes/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('costos_origen')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['costos_origen-id_cabecera']);
+				$data = array(
+					'Txt_Url_Pago_Otros_Costo_Origen' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_Otros_Costo_Origen' => $arrPost['costos_origen-ID_Pais_Otros_Costo_Origen'],
+					'Fe_Pago_Otros_Costo_Origen' => ToDate($arrPost['costos_origen-Fe_Pago_Otros_Costo_Origen']),
+					'Ss_Pago_Otros_Costo_Origen' => $arrPost['costos_origen-Ss_Pago_Otros_Costo_Origen'],
+					'Nu_Operacion_Pago_Otros_Costo_Origen' => $arrPost['costos_origen-Nu_Operacion_Pago_Otros_Costo_Origen']
+				);//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['costos_origen-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarPagoCostosOrigen($id){
+		$query = "SELECT Txt_Url_Pago_Otros_Costo_Origen AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+	public function addPagoFta($arrPost, $data_files){
+		if (isset($data_files['pago_fta']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/pagos_clientes/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('pago_fta')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['pago_fta-id_cabecera']);
+				$data = array(
+					'Txt_Url_Pago_Otros_Costo_Fta' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_Otros_Costo_Fta' => $arrPost['pago_fta-ID_Pais_Otros_Costo_Fta'],
+					'Fe_Pago_Otros_Costo_Fta' => ToDate($arrPost['pago_fta-Fe_Pago_Otros_Costo_Fta']),
+					'Ss_Pago_Otros_Costo_Fta' => $arrPost['pago_fta-Ss_Pago_Otros_Costo_Fta'],
+					'Nu_Operacion_Pago_Otros_Costo_Fta' => $arrPost['pago_fta-Nu_Operacion_Pago_Otros_Costo_Fta']
+				);//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['pago_fta-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarPagoFTA($id){
+		$query = "SELECT Txt_Url_Pago_Otros_Costo_Fta AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+	public function addOtrosCuadrilla($arrPost, $data_files){
+		if (isset($data_files['otros_cuadrilla']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/pagos_clientes/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('otros_cuadrilla')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['otros_cuadrilla-id_cabecera']);
+				$data = array(
+					'Txt_Url_Pago_Otros_Cuadrilla' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_Otros_Cuadrilla' => $arrPost['otros_cuadrilla-ID_Pais_Otros_Cuadrilla'],
+					'Fe_Pago_Otros_Cuadrilla' => ToDate($arrPost['otros_cuadrilla-Fe_Pago_Otros_Cuadrilla']),
+					'Ss_Pago_Otros_Cuadrilla' => $arrPost['otros_cuadrilla-Ss_Pago_Otros_Cuadrilla'],
+					'Nu_Operacion_Pago_Otros_Cuadrilla' => $arrPost['otros_cuadrilla-Nu_Operacion_Pago_Otros_Cuadrilla']
+				);//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['otros_cuadrilla-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarPagoCuadrilla($id){
+		$query = "SELECT Txt_Url_Pago_Otros_Cuadrilla AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+	public function addOtrosCostos($arrPost, $data_files){
+		if (isset($data_files['otros_costos']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/pagos_clientes/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('otros_costos')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['otros_costos-id_cabecera']);
+				$data = array(
+					'Txt_Url_Pago_Otros_Costos' => $Txt_Url_Imagen_Producto,
+					'ID_Pais_Otros_Costos' => $arrPost['otros_costos-ID_Pais_Otros_Costos'],
+					'Fe_Pago_Otros_Costos' => ToDate($arrPost['otros_costos-Fe_Pago_Otros_Costos']),
+					'Ss_Pago_Otros_Costos' => $arrPost['otros_costos-Ss_Pago_Otros_Costos'],
+					'Nu_Operacion_Pago_Otros_Costos' => $arrPost['otros_costos-Nu_Operacion_Pago_Otros_Costos']
+				);//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			$arrParams = array('ID_Pedido_Cabecera' => $arrPost['otros_costos-id_cabecera']);
+			$this->actualizarProgresoPedidoFinal($arrParams);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarPagoOtrosCostos($id){
+		$query = "SELECT Txt_Url_Pago_Otros_Costos AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
 	}
 }

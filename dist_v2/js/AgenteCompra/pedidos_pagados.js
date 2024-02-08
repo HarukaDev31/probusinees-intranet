@@ -576,6 +576,8 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-pago_cliente_30').modal('hide');
 
+          verPedido($('#pago_cliente_30-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
@@ -614,6 +616,8 @@ $(function () {
 
         if(response.status == 'success') {
           $('#modal-pago_cliente_100').modal('hide');
+
+          verPedido($('#pago_cliente_100-id_cabecera').val());
 
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
@@ -654,6 +658,8 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-pago_cliente_servicio').modal('hide');
 
+          verPedido($('#pago_cliente_servicio-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
@@ -667,6 +673,211 @@ $(function () {
     }
   });
 
+  $("#form-pago_flete").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('pago_flete').files.length == 0) {
+      $('#pago_flete').closest('.form-group').find('.help-block').html('Empty file');
+      $('#pago_flete').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-pago_flete")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addPagoFlete',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-pago_flete').modal('hide');
+
+          verPedido($('#pago_flete-id_cabecera').val());
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+
+  $("#form-costos_origen").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('costos_origen').files.length == 0) {
+      $('#costos_origen').closest('.form-group').find('.help-block').html('Empty file');
+      $('#costos_origen').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-costos_origen")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addPagoCostosOrigen',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-costos_origen').modal('hide');
+
+          verPedido($('#costos_origen-id_cabecera').val());
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+
+  $("#form-pago_fta").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('pago_fta').files.length == 0) {
+      $('#pago_fta').closest('.form-group').find('.help-block').html('Empty file');
+      $('#pago_fta').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-pago_fta")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addPagoFta',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-pago_fta').modal('hide');
+
+          verPedido($('#pago_fta-id_cabecera').val());
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+
+  $("#form-otros_cuadrilla").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('otros_cuadrilla').files.length == 0) {
+      $('#otros_cuadrilla').closest('.form-group').find('.help-block').html('Empty file');
+      $('#otros_cuadrilla').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-otros_cuadrilla")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addOtrosCuadrilla',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-otros_cuadrilla').modal('hide');
+
+          verPedido($('#otros_cuadrilla-id_cabecera').val());
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+
+  $("#form-otros_costos").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('otros_costos').files.length == 0) {
+      $('#otros_costos').closest('.form-group').find('.help-block').html('Empty file');
+      $('#otros_costos').closest('.form-group').removeClass('has-success').addClass('has-error');
+    } else {
+      var postData = new FormData($("#form-otros_costos")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addOtrosCostos',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-otros_costos').modal('hide');
+
+          verPedido($('#otros_costos-id_cabecera').val());
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
+  
   $('#span-id_pedido').html('');
 })
 
@@ -714,18 +925,75 @@ function verPedido(ID){
       $( '#btn-excel_order_tracking' ).attr('data-id_pedido', response.ID_Pedido_Cabecera); // sets 
 
       $('#btn-descargar_pago_30').hide();
+      $('#span-pago_30').html('');
       if( response.Txt_Url_Pago_30_Cliente != '' && response.Txt_Url_Pago_30_Cliente != null ){
         $('#btn-descargar_pago_30').show();
+        $('#btn-descargar_pago_30').removeClass('d-none');
+
+        $('#span-pago_30').html('$ ' + response.Ss_Pago_30_Cliente);
       }
 
       $('#btn-descargar_pago_100').hide();
+      $('#span-pago_100').html('');
       if( response.Txt_Url_Pago_100_Cliente != '' && response.Txt_Url_Pago_100_Cliente != null ){
         $('#btn-descargar_pago_100').show();
+        $('#btn-descargar_pago_100').removeClass('d-none');
+
+        $('#span-pago_100').html('$ ' + response.Ss_Pago_100_Cliente);
       }
 
       $('#btn-descargar_pago_servicio').hide();
+      $('#span-pago_servicio').html('');
       if( response.Txt_Url_Pago_Servicio_Cliente != '' && response.Txt_Url_Pago_Servicio_Cliente != null ){
         $('#btn-descargar_pago_servicio').show();
+        $('#btn-descargar_pago_servicio').removeClass('d-none');
+
+        $('#span-pago_servicio').html('$ ' + response.Ss_Pago_Servicio_Cliente);
+      }
+
+      $('#btn-descargar_flete').hide();
+      $('#span-flete').html('');
+      if( response.Txt_Url_Pago_Otros_Flete != '' && response.Txt_Url_Pago_Otros_Flete != null ){
+        $('#btn-descargar_flete').show();
+        $('#btn-descargar_flete').removeClass('d-none');
+
+        $('#span-flete').html('$ ' + response.Ss_Pago_Otros_Flete);
+      }
+
+      $('#btn-descargar_costo_origen').hide();
+      $('#span-costo_origen').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Origen != '' && response.Txt_Url_Pago_Otros_Costo_Origen != null ){
+        $('#btn-descargar_costo_origen').show();
+        $('#btn-descargar_costo_origen').removeClass('d-none');
+
+        $('#span-costo_origen').html('$ ' + response.Ss_Pago_Otros_Costo_Origen);
+      }
+
+      $('#btn-descargar_fta').hide();
+      $('#span-fta').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Fta != '' && response.Txt_Url_Pago_Otros_Costo_Fta != null ){
+        $('#btn-descargar_fta').show();
+        $('#btn-descargar_fta').removeClass('d-none');
+
+        $('#span-fta').html('$ ' + response.Ss_Pago_Otros_Costo_Fta);
+      }
+
+      $('#btn-descargar_pago_cuadrilla').hide();
+      $('#span-cuadrilla').html('');
+      if( response.Txt_Url_Pago_Otros_Cuadrilla != '' && response.Txt_Url_Pago_Otros_Cuadrilla != null ){
+        $('#btn-descargar_pago_cuadrilla').show();
+        $('#btn-descargar_pago_cuadrilla').removeClass('d-none');
+
+        $('#span-cuadrilla').html('$ ' + response.Ss_Pago_Otros_Cuadrilla);
+      }
+
+      $('#btn-descargar_otros_costos').hide();
+      $('#span-otros_costo').html('');
+      if( response.Txt_Url_Pago_Otros_Costos != '' && response.Txt_Url_Pago_Otros_Costos != null ){
+        $('#btn-descargar_otros_costos').show();
+        $('#btn-descargar_otros_costos').removeClass('d-none');
+
+        $('#span-otros_costo').html('$ ' + response.Ss_Pago_Otros_Costos);
       }
 
       var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
@@ -737,10 +1005,12 @@ function verPedido(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
       
-      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "";
+      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0;
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
+
+        fTotalCliente += (cantidad_item * (precio_china * parseFloat(response.Ss_Tipo_Cambio)));
 
         var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
         var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
@@ -820,6 +1090,21 @@ function verPedido(ID){
       
       $('#span-total_cantidad_items').html(i);
       $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+
+      $( '#span-total_cliente' ).html('$ ' + fTotalCliente.toFixed(2));
+
+      //PAGOS
+      //Ss_Pago_30_Cliente
+      //Ss_Pago_100_Cliente
+      //Ss_Pago_Servicio_Cliente
+
+      //OTROS
+      //Ss_Pago_Otros_Flete
+      //Ss_Pago_Otros_Costo_Origen
+      //Ss_Pago_Otros_Costo_Fta
+      //Ss_Pago_Otros_Cuadrilla
+      //Ss_Pago_Otros_Costos
+      $( '#span-saldo_cliente' ).html('$ ' + (fTotalCliente - (parseFloat(response.Ss_Pago_30_Cliente) + parseFloat(response.Ss_Pago_100_Cliente) + parseFloat(response.Ss_Pago_Servicio_Cliente))));
       
       //Date picker invoice
       $( '.input-datepicker-today-to-more' ).datepicker({
@@ -1559,4 +1844,79 @@ function agregarComisionTrading(ID){
   $( '.modal-comision_trading' ).on('shown.bs.modal', function() {
     $( '#txt-modal-precio_comision_trading' ).focus();
   })
+}
+
+function subirPagoFlete(){
+  $( '[name="pago_flete-id_cabecera"]' ).val($('#txt-EID_Pedido_Cabecera').val());
+
+  $('#modal-pago_flete').modal('show');
+  $( '#form-pago_flete' )[0].reset();
+}
+
+function descargarPagoFlete(){
+  var id = $('#txt-EID_Pedido_Cabecera').val();
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoFlete/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function subirPagoCostoOrigen(){
+  $( '[name="costos_origen-id_cabecera"]' ).val($('#txt-EID_Pedido_Cabecera').val());
+
+  $('#modal-costos_origen').modal('show');
+  $( '#form-costos_origen' )[0].reset();
+}
+
+function descargarPagoCostosOrigen(){
+  var id = $('#txt-EID_Pedido_Cabecera').val();
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoCostosOrigen/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function subirPagoFTA(){
+  $( '[name="pago_fta-id_cabecera"]' ).val($('#txt-EID_Pedido_Cabecera').val());
+
+  $('#modal-pago_fta').modal('show');
+  $( '#form-pago_fta' )[0].reset();
+}
+
+function descargarPagoFTA(){
+  var id = $('#txt-EID_Pedido_Cabecera').val();
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoFTA/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function subirPagoCuadrilla(){
+  $( '[name="otros_cuadrilla-id_cabecera"]' ).val($('#txt-EID_Pedido_Cabecera').val());
+
+  $('#modal-otros_cuadrilla').modal('show');
+  $( '#form-otros_cuadrilla' )[0].reset();
+}
+
+function descargarPagoCuadrilla(){
+  var id = $('#txt-EID_Pedido_Cabecera').val();
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoCuadrilla/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function subirPagoOtrosCostos(){
+  $( '[name="otros_costos-id_cabecera"]' ).val($('#txt-EID_Pedido_Cabecera').val());
+
+  $('#modal-otros_costos').modal('show');
+  $( '#form-otros_costos' )[0].reset();
+}
+
+function descargarPagoOtrosCostos(){
+  var id = $('#txt-EID_Pedido_Cabecera').val();
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoOtrosCostos/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
 }

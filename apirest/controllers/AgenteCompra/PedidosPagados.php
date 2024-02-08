@@ -891,4 +891,199 @@ class PedidosPagados extends CI_Controller {
 		echo json_encode($response);
 		exit();
 	}
+
+	public function addPagoFlete(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->addPagoFlete($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarPagoFlete($id){
+		//echo "hola";
+		$objPedido = $this->PedidosPagadosModel->descargarPagoFlete($this->security->xss_clean($id));
+		if(is_object($objPedido)){
+			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
+				//array_debug($objPedido);
+				
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+				//$file="assets/img/arturo.jpeg";
+				if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+					die('file not found');
+				} else {
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					header('Pragma: public');
+					ob_clean();
+					flush();
+					readfile($objPedido->Txt_Url_Imagen_Producto);
+					exit;
+				}
+			} else {
+				die('Primero subir voucher de pago del 100%');
+			}
+		} else {
+			die('No existe registro');
+		}
+    }
+
+	public function addPagoCostosOrigen(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->addPagoCostosOrigen($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarPagoCostosOrigen($id){
+		//echo "hola";
+		$objPedido = $this->PedidosPagadosModel->descargarPagoCostosOrigen($this->security->xss_clean($id));
+		if(is_object($objPedido)){
+			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
+				//array_debug($objPedido);
+				
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+				//$file="assets/img/arturo.jpeg";
+				if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+					die('file not found');
+				} else {
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					header('Pragma: public');
+					ob_clean();
+					flush();
+					readfile($objPedido->Txt_Url_Imagen_Producto);
+					exit;
+				}
+			} else {
+				die('Primero subir voucher de pago del 100%');
+			}
+		} else {
+			die('No existe registro');
+		}
+    }
+
+	public function addPagoFta(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->addPagoFta($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarPagoFTA($id){
+		//echo "hola";
+		$objPedido = $this->PedidosPagadosModel->descargarPagoFTA($this->security->xss_clean($id));
+		if(is_object($objPedido)){
+			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
+				//array_debug($objPedido);
+				
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+				//$file="assets/img/arturo.jpeg";
+				if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+					die('file not found');
+				} else {
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					header('Pragma: public');
+					ob_clean();
+					flush();
+					readfile($objPedido->Txt_Url_Imagen_Producto);
+					exit;
+				}
+			} else {
+				die('Primero subir voucher de pago del 100%');
+			}
+		} else {
+			die('No existe registro');
+		}
+    }
+
+	public function addOtrosCuadrilla(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->addOtrosCuadrilla($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarPagoCuadrilla($id){
+		//echo "hola";
+		$objPedido = $this->PedidosPagadosModel->descargarPagoCuadrilla($this->security->xss_clean($id));
+		if(is_object($objPedido)){
+			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
+				//array_debug($objPedido);
+				
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+				//$file="assets/img/arturo.jpeg";
+				if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+					die('file not found');
+				} else {
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					header('Pragma: public');
+					ob_clean();
+					flush();
+					readfile($objPedido->Txt_Url_Imagen_Producto);
+					exit;
+				}
+			} else {
+				die('Primero subir voucher de pago del 100%');
+			}
+		} else {
+			die('No existe registro');
+		}
+    }
+
+	public function addOtrosCostos(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosPagadosModel->addOtrosCostos($this->input->post(), $_FILES));
+	}
+    	
+	public function descargarPagoOtrosCostos($id){
+		//echo "hola";
+		$objPedido = $this->PedidosPagadosModel->descargarPagoOtrosCostos($this->security->xss_clean($id));
+		if(is_object($objPedido)){
+			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
+				//array_debug($objPedido);
+				
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
+				$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
+
+				//$file="assets/img/arturo.jpeg";
+				if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
+					die('file not found');
+				} else {
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					header('Pragma: public');
+					ob_clean();
+					flush();
+					readfile($objPedido->Txt_Url_Imagen_Producto);
+					exit;
+				}
+			} else {
+				die('Primero subir voucher de pago del 100%');
+			}
+		} else {
+			die('No existe registro');
+		}
+    }
 }
