@@ -896,7 +896,7 @@ function verPedido(ID){
 	$( '#table-Producto_Enlace tbody' ).empty();
   $( '#table-Producto_Enlace' ).show();
 
-  $('#span-id_pedido').html('Nro. ' + ID);
+  //$('#span-id_pedido').html('Nro. ' + ID);
 
   url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
   $.ajax({
@@ -908,6 +908,8 @@ function verPedido(ID){
       var detalle = response;
       response = response[0];
 
+      $('#span-id_pedido').html(response.sCorrelativoCotizacion);
+      
       $( '.div-AgregarEditar' ).show();
             
       $( '[name="EID_Pedido_Cabecera"]' ).val(response.ID_Pedido_Cabecera);
@@ -1141,8 +1143,10 @@ function cambiarEstado(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
     sNombreEstado = 'Pago 70%';
   else if(Nu_Estado==9)
     sNombreEstado = 'Pago servicio';
+  else if(Nu_Estado==3)
+    sNombreEstado = 'Volver a Garantizado';
 
-  $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
+  $('#modal-title').html('¿Deseas cambiar a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {
     $modal_delete.modal('hide');
@@ -1426,7 +1430,7 @@ function subirInspeccion(ID){
 	$( '#table-Producto_Enlace tbody' ).empty();
   $( '#table-Producto_Enlace' ).show();
 
-  $('#span-id_pedido').html('Nro. ' + ID);
+  //$('#span-id_pedido').html('Nro. ' + ID);
 
   url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
   $.ajax({
@@ -1437,6 +1441,8 @@ function subirInspeccion(ID){
       console.log(response);
       var detalle = response;
       response = response[0];
+
+      $('#span-id_pedido').html(response.sCorrelativoCotizacion);
 
       $( '.div-AgregarEditar' ).show();
             

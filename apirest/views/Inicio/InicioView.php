@@ -43,7 +43,7 @@
                               <div>Cliente: <?php echo $row->No_Contacto; ?> / Empresa: <?php echo $row->No_Entidad; ?></div>
                             </div>
                             <div class="col-2 col-sm-2 text-right">
-                              <span class="badge bg-primary"><?php echo $iProgreso; ?> / 3</span>
+                              <span class="badge bg-primary"><?php echo $iProgreso; ?> / 4</span>
                             </div>
                           </div>
                         </a>
@@ -53,10 +53,22 @@
                       <?php
                       $arrResponseVerificarProcesoDetalle = $this->ConfiguracionModel->obtenerPedidosXUsuarioDetalle($row->ID_Pedido_Cabecera);
                       if ($arrResponseVerificarProcesoDetalle['status']=='success' && $this->empresa->Nu_Lae_Gestion==1) {
+                        $iCantidadLineaCarga = 0;
+                        foreach ($arrResponseVerificarProcesoDetalle['result'] as $row_menu) {
+                          $iCantidadLineaCarga += ($row_menu->Nu_Estado_Proceso==1 ? 25 : 0);
+                        }
                       ?>
                       <div class="card-body pt-0 px-1 pb-0">
                         <div class="col-xs-12 col-sm-12 col-md-12">
                           <div class="container-tour bg-light" style="margin: 3% 0;border-radius: 12px;">
+                            <div class="container-carga">
+                              <div class="box-linea">
+                                <div class="linea-carga-gestion" style="width: <?php echo $iCantidadLineaCarga; ?>%;"></div>
+                              </div>
+                              <div class="texto-porcentaje size-load" style="">
+                                <span><?php echo $iCantidadLineaCarga; ?> %</span>
+                              </div>
+                            </div>
                             <div class="tour-item">
                               <?php foreach ($arrResponseVerificarProcesoDetalle['result'] as $row_menu) { ?>
                                 <a href="<?php echo base_url() . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera; ?>">

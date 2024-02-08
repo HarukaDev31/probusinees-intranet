@@ -141,7 +141,6 @@
 .texto-porcentaje span{
   text-align: center;
   font-weight: 700;
-  font-size: 1.8rem;
 }
 .tour-item a{
   display: flex;
@@ -195,4 +194,51 @@
   margin: auto 0;
   border-radius: 15px;
   background: linear-gradient(265.33deg, #4276FF 3.37%, #0027FB 79.46%);
+}
+
+
+.size-load {
+  width: 20%;
+}
+.texto-porcentaje span{
+  font-size: 1.2rem;
+}
+
+@media (min-width: 576px) {
+  .size-load {
+    width: 20%;
+  }
+  .texto-porcentaje span{
+    font-size: 1.2rem;
+  }
+}
+
+/* md */
+@media (min-width: 768px) {
+  .size-load {
+    width: 13%;
+  }
+  .texto-porcentaje span{
+    font-size: 1.8rem;
+  }
+}
+
+/* lg */
+@media (min-width: 992px) {
+  .size-load {
+    width: 13%;
+  }
+  .texto-porcentaje span{
+    font-size: 1.8rem;
+  }
+}
+
+/* xl */
+@media (min-width: 1200px) {
+  .size-load {
+    width: 13%;
+  }
+  .texto-porcentaje span{
+    font-size: 1.8rem;
+  }
 }

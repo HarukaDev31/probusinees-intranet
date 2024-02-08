@@ -638,9 +638,15 @@ class PedidosPagadosModel extends CI_Model{
 			);
 			$data_progreso = array('Nu_Estado_Proceso' => 1);
 			if ($this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
-				return array('status' => 'success', 'message' => 'Actualizado');
+				$where = array('ID_Pedido_Cabecera' => $arrParams['ID_Pedido_Cabecera']);
+				$data = array('Nu_Etapa_Pedido' => 1);
+				if ($this->db->update($this->table, $data, $where) > 0) {
+					return array('status' => 'success', 'message' => 'Actualizado');
+				} else {
+					return array('status' => 'error', 'message' => 'Error al finalizar etapa');
+				}
 			}
-			return array('status' => 'error', 'message' => 'Error al actualizar y agregar progreso compra');
+			return array('status' => 'error', 'message' => 'Error al actualizar y agregar finalizar etapa');
 		}
 	}
 

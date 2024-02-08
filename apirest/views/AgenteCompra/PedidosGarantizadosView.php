@@ -6,7 +6,7 @@
         <div class="col-sm-8">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?>
-            &nbsp;<span id="span-id_pedido" class="badge badge-primary"></span>
+            &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
           </h1>
         </div>
       </div>
