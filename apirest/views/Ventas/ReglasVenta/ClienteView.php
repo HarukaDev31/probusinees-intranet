@@ -20,8 +20,8 @@
           <div class="card">
             <div class="card-body">
               <div class="row mb-3 div-Listar">
-                <div class="col-6 col-sm-6">
-                  <label>Pago</label>
+                <div class="col-12 col-sm-6">
+                  <label>Servicio</label>
                   <div class="form-group">
                     <select id="cbo-filtro-tipo_servicio" name="" class="form-control required" style="width: 100%;">
                       <option value="0" selected="selected">Todos</option>
@@ -36,15 +36,22 @@
                   </div>
                 </div>
 
-                <div class="col-6 col-sm-3">
-                  <label>&nbsp;</label>
+                <div class="col-6 col-sm-2">
+                  <label class="d-none d-sm-block">&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
 
-                <div class="col-6 col-sm-3">
-                  <label>&nbsp;</label>
-                  <button type="button" class="btn btn-success btn-block" onclick="agregarCliente()"><i class="fa fa-plus-circle"></i> Crear</button>
-                </div>
+                <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
+                  <div class="col-6 col-sm-2">
+                    <label class="d-none d-sm-block">&nbsp;</label>
+                    <button type="button" class="btn btn-success btn-block" onclick="agregarCliente()"><i class="fa fa-plus-circle"></i> Crear</button>
+                  </div>
+                
+                  <div class="col-12 col-sm-2">
+                    <label class="d-none d-sm-block">&nbsp;</label>
+                    <button type="button" class="btn btn-default btn-block" onclick="importarExcelCliente()"><i class="fa fa-file-excel text-success"></i> Importar</button>
+                  </div>
+                <?php endif; ?>
               </div>
 
               <div class="table-responsive div-Listar">
@@ -268,3 +275,84 @@
   <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+<!-- Importar Clientes -->
+<div class="modal fade modal_importar_cliente" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form name="importa" method="post" action="<?php echo base_url(); ?>Ventas/ReglasVenta/ClienteController/importarExcelCliente" enctype="multipart/form-data">
+          <div class="row">
+    				<div class="col-sm-12 text-center">
+              <h3>Importación de Clientes</h3>
+            </div>
+            
+            <div class="col-md-12"><br>
+              <div class="alert alert-light">
+                <i class="fa fa-warning"></i> <label>Indicaciones:</label>
+                <br>- El formato requerido es <b>.xlsx</b>
+                <br>- El archivo <b>.xlsx</b> no debe contener estilos, gráficos o fórmulas
+                <br>- No guardar la plantilla porque el formato puede ser actualizado sin previo aviso
+                <br>- La plantilla que se debe utilizar es la siguiente, dar clic en el siguiente botón
+                <br>&nbsp;
+                <a id="a-download-client" href="<?php echo base_url(); ?>DownloadController/download/Probusiness_Plantilla_Clientes.xlsx" class="btn btn-success btn-md btn-block"><span class="fa fa-cloud-download"></span> Descargar plantilla</a>
+              </div>
+            </div>
+
+    				<div class="col-sm-12">
+              <label>Archivo</label>
+    				  <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-cloud-upload" aria-hidden="true"></i></span>
+                  <label class="btn btn-default" for="my-file-selector_cliente"  style="width: 100%;">
+                    <input type="file" id="my-file-selector_cliente" name="excel-archivo_cliente" multiple=false accept=".xlsx" required style="display:none" onchange="$('#upload-file-info_cliente').html(this.files[0].name)">Buscar...
+                  </label>
+                  <span class='label label-info' id="upload-file-info_cliente"></span>
+                </div>
+                <span class="help-block" id="error"></span>
+              </div>
+            </div>
+            
+            <div class="col-xs-6 col-md-6">
+              <div class="form-group">
+                <button type="button" id="btn-cancel-client" class="btn btn-danger btn-md btn-block" data-dismiss="modal"><span class="fa fa-sign-out"></span> Cancelar</button>
+              </div>
+            </div>
+            
+            <div class="col-xs-6 col-md-6">
+              <div class="form-group">
+                <button type="submit" id="btn-excel-importar_cliente" class="btn btn-success btn-md btn-block" onclick="submit();"><span class="fa fa-cloud-upload"></span> Subir excel</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.modal Importar Clientes -->
+
+<?php
+$i=0;
+if ( !empty($sStatus) ){
+  $i=1;
+  $sClassModal = 'success';
+  $sMessage = 'Datos cargados satisfactoriamente';
+  if ( $sStatus == 'error-sindatos' ) {
+    $sMessage = 'Llenar los campos obligatorios o los valores no son iguales a las columna del excel';
+    $sClassModal = 'danger';  
+  } else if ( $sStatus == 'error-bd' ) {
+    $sMessage = quitarCaracteresEspeciales($sMessageErrorBD);
+    $sClassModal = 'danger';  
+  } else if ( $sStatus == 'error-archivo_no_existe' ) {
+    $sMessage = 'El archivo no existe';
+    $sClassModal = 'danger';  
+  } else if ( $sStatus == 'error-copiar_archivo' ) {
+    $sMessage = 'Error al copiar archivo al servidor';
+    $sClassModal = 'danger';  
+  }
+?>
+<script>
+  alert('<?php echo $sMessage; ?>');
+</script>
+<?php } ?>

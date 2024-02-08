@@ -67,6 +67,11 @@ class ClienteModel extends CI_Model{
 					'Txt_Descripcion' => $row['Txt_Descripcion'],
 					'Nu_Dias_Credito' => $row['Nu_Dias_Credito'],
 					'Nu_Estado' => 1,
+					'Nu_Agente_Compra' => $row['Nu_Agente_Compra'],
+					'Nu_Carga_Consolidada' => $row['Nu_Carga_Consolidada'],
+					'Nu_Importacion_Grupal' => $row['Nu_Importacion_Grupal'],
+					'Nu_Curso' => $row['Nu_Curso'],
+					'Nu_Viaje_Negocios' => $row['Nu_Viaje_Negocios']
             	);
 				if ( !empty($ID_Pais) ){
 					$_arrCliente = array_merge($_arrCliente, array("ID_Pais" => $ID_Pais));
@@ -101,6 +106,11 @@ class ClienteModel extends CI_Model{
 					'Txt_Descripcion' => $row['Txt_Descripcion'],
 					'Nu_Dias_Credito' => $row['Nu_Dias_Credito'],
 					'Nu_Estado' => 1,
+					'Nu_Agente_Compra' => $row['Nu_Agente_Compra'],
+					'Nu_Carga_Consolidada' => $row['Nu_Carga_Consolidada'],
+					'Nu_Importacion_Grupal' => $row['Nu_Importacion_Grupal'],
+					'Nu_Curso' => $row['Nu_Curso'],
+					'Nu_Viaje_Negocios' => $row['Nu_Viaje_Negocios']
             	);
 				if ( !empty($ID_Pais) ){
 					$_arrClienteUPD = array_merge($_arrClienteUPD, array("ID_Pais" => $ID_Pais));

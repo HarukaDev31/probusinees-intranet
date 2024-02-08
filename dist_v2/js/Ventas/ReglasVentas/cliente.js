@@ -2,7 +2,26 @@ var url;
 var table_Entidad;
 var accion_cliente = '';
 
+function importarExcelCliente(){
+  $( ".modal_importar_cliente" ).modal( "show" );
+}
+
 $(function () {
+  // Validate exist file excel product
+	$( document ).on('click', '#btn-excel-importar_cliente', function(event) {
+	  if ( $( "#my-file-selector_cliente" ).val().length === 0 ) {
+      $( '#my-file-selector_cliente' ).closest('.form-group').find('.help-block').html('Seleccionar archivo');
+		  $( '#my-file-selector_cliente' ).closest('.form-group').removeClass('has-success').addClass('has-error');
+	  } else {
+      $( '#btn-cancel-client' ).attr('disabled', true);
+      $( '#a-download-client' ).attr('disabled', true);
+	    
+      $( '#btn-excel-importar_cliente' ).text('');
+      $( '#btn-excel-importar_cliente' ).attr('disabled', true);
+      $( '#btn-excel-importar_cliente' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+	  }
+  })
+
   url = base_url + 'Ventas/ReglasVenta/ClienteController/ajax_list';
   table_Entidad = $( '#table-Cliente' ).DataTable({
     //dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'>>" +

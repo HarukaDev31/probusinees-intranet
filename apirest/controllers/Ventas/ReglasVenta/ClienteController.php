@@ -45,6 +45,11 @@ class ClienteController extends CI_Controller {
 		                'DISTRTIO'						=> 'N',
 		                'DESCRIPCION'					=> 'O',
 		                'DIAS_CREDITO'					=> 'P',
+		                'AGENTE_COMPRA'					=> 'Q',
+		                'CARGA_CONSOLIDADA'				=> 'R',
+		                'IMPORTACION_GRUPAL'			=> 'S',
+		                'CURSO'							=> 'T',
+		                'VIAJE_CHINA'					=> 'U',
 		            );
 	                
 	                $arrCliente = array();
@@ -81,6 +86,26 @@ class ClienteController extends CI_Controller {
 	                	$sDiasCredito = filter_var(trim($objPHPExcel->getActiveSheet()->getCell($column['DIAS_CREDITO'] . $i)->getCalculatedValue()));
                         $sDiasCredito = str_replace("'", "\'", $sDiasCredito);
                         
+	                	$iEstadoAgenteCompra = filter_var(trim($objPHPExcel->getActiveSheet()->getCell($column['AGENTE_COMPRA'] . $i)->getCalculatedValue()));
+						$iEstadoAgenteCompra = quitarCaracteresEspeciales($iEstadoAgenteCompra);
+						$Nu_Agente_Compra = ($iEstadoAgenteCompra==1 ? 1 : 0);
+                        
+	                	$iEstadoCargaConsolidada = filter_var(trim($objPHPExcel->getActiveSheet()->getCell($column['CARGA_CONSOLIDADA'] . $i)->getCalculatedValue()));
+						$iEstadoCargaConsolidada = quitarCaracteresEspeciales($iEstadoCargaConsolidada);
+						$Nu_Carga_Consolidada = ($iEstadoCargaConsolidada==1 ? 1 : 0);
+                        
+	                	$iEstadoImportacionGrupal = filter_var(trim($objPHPExcel->getActiveSheet()->getCell($column['IMPORTACION_GRUPAL'] . $i)->getCalculatedValue()));
+						$iEstadoImportacionGrupal = quitarCaracteresEspeciales($iEstadoImportacionGrupal);
+						$Nu_Importacion_Grupal = ($iEstadoImportacionGrupal==1 ? 1 : 0);
+                        
+	                	$iEstadoCurso = filter_var(trim($objPHPExcel->getActiveSheet()->getCell($column['CURSO'] . $i)->getCalculatedValue()));
+						$iEstadoCurso = quitarCaracteresEspeciales($iEstadoCurso);
+						$Nu_Curso = ($iEstadoCurso==1 ? 1 : 0);
+                        
+	                	$iEstadoViajeChina = filter_var(trim($objPHPExcel->getActiveSheet()->getCell($column['VIAJE_CHINA'] . $i)->getCalculatedValue()));
+						$iEstadoViajeChina = quitarCaracteresEspeciales($iEstadoViajeChina);
+						$Nu_Viaje_Negocios = ($iEstadoViajeChina==1 ? 1 : 0);
+
                         if (
                         	(
                         		$ID_Tipo_Documento_Identidad == 1 ||
@@ -106,7 +131,12 @@ class ClienteController extends CI_Controller {
 								'No_Provincia'					=> $No_Provincia,
 								'No_Distrito'					=> $No_Distrito,
 								'Txt_Descripcion'				=> $Txt_Descripcion,
-								'Nu_Dias_Credito'			=> $sDiasCredito,
+								'Nu_Dias_Credito'				=> $sDiasCredito,
+								'Nu_Agente_Compra'				=> $Nu_Agente_Compra,
+								'Nu_Carga_Consolidada'			=> $Nu_Carga_Consolidada,
+								'Nu_Importacion_Grupal'			=> $Nu_Importacion_Grupal,
+								'Nu_Curso'						=> $Nu_Curso,
+								'Nu_Viaje_Negocios'				=> $Nu_Viaje_Negocios,
 		                	);
                         } else {
                         	$iCantidadNoProcesados++;
@@ -153,11 +183,6 @@ class ClienteController extends CI_Controller {
 			$this->load->view('header_v2');
 			$this->load->view('Ventas/ReglasVenta/ClienteView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados));
 			$this->load->view('footer_v2', array("js_cliente" => true));
-			/*
-			$this->load->view('header');
-			$this->load->view('Ventas/ReglasVenta/ClienteView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados));
-			$this->load->view('footer', array("js_cliente" => true));
-			*/
 		}
 	}
 
