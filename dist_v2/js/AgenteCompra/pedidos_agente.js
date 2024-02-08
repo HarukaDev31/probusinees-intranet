@@ -334,10 +334,13 @@ function verPedido(ID){
             if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
               //table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span><br>";
               table_enlace_producto += '<div class="row">';
-                table_enlace_producto += '<div class="col text-right">';
+                table_enlace_producto += '<div class="col-12 col-md-6 text-right d-none d-sm-block">';
                   table_enlace_producto += "<span class='mt-3'>Cantidad</span>";
                 table_enlace_producto += '</div>';
-                table_enlace_producto += '<div class="col">';
+                table_enlace_producto += '<div class="col-12 col-md-6 text-left d-block d-sm-none">';
+                  table_enlace_producto += "<span class='mt-3'>Cantidad</span>";
+                table_enlace_producto += '</div>';
+                table_enlace_producto += '<div class="col-12 col-md-3">';
                   table_enlace_producto += '<input type="hidden" name="addProductoTable[' + id_item + '][id_item]" value="' + id_item + '">';
                   table_enlace_producto += '<input type="text" inputmode="decimal" class="form-control input-decimal" name="addProductoTable[' + id_item + '][cantidad]" value="' + Math.round10(cantidad_item, -2) + '"><br>';
                 table_enlace_producto += '</div>';

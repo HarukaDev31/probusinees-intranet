@@ -6,7 +6,7 @@
         <div class="col-sm-8">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?>
-            &nbsp;<span id="span-id_pedido" class="badge badge-primary"></span>
+            &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
           </h1>
         </div>
       </div>
@@ -36,8 +36,8 @@
                     <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
-                <div class="col-6 col-sm-4">
-                  <label>&nbsp;</label>
+                <div class="col-12 col-sm-4">
+                  <label class="d-none d-sm-block">&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
               </div>
@@ -158,7 +158,6 @@
                     </div>
                     
                     <div class="col-12 col-sm-12 col-md-12 mb-3" id="div-button-add_item">
-                      <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col shadow">Agregar producto</button>
                     </div>
 
                     <div class="col-12 col-sm-12 col-md-12 mb-3 div-articulos">
@@ -166,7 +165,7 @@
                     </div>
 
                     <div class="col-xs-12 col-sm-12 col-md-12">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos</h3>
+                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos <button type="button" id="btn-add_item" class="btn btn-danger shadow">Agregar</button></h3>
 
                       <div class="table-responsive div-Compuesto">
                         <table id="table-Producto_Enlace" class="table table-bordered table-hover table-striped">

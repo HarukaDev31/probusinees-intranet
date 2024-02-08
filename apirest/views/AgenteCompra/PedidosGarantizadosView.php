@@ -36,8 +36,8 @@
                     <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
-                <div class="col-6 col-sm-4">
-                  <label>&nbsp;</label>
+                <div class="col-12 col-sm-4">
+                  <label class="d-none d-sm-block">&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
               </div>
@@ -172,11 +172,8 @@
                       </div>
                     </div>
                     
-                    <!--
                     <div class="col-12 col-sm-12 col-md-12 mb-3" id="div-button-add_item">
-                      
                     </div>
-                      -->
 
                     <div class="col-12 col-sm-12 col-md-12 mb-3 div-articulos">
                       <div id="div-arrItemsPedidos"></div>
