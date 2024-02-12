@@ -160,7 +160,7 @@ FROM
 JOIN entidad AS CLI ON(CLI.ID_Entidad = DET.ID_Entidad)
 JOIN " . $this->table_carga_consolidada_cabecera_checklist . " AS CCCC ON(CCCC.ID_Pedido_Cabecera = DET.ID_Pedido_Cabecera)
 WHERE
-DET.ID_Pedido_Cabecera = " . $arrParams['ID_Pedido_Cabecera'];
+DET.ID_Pedido_Cabecera = " . $arrParams['ID_Pedido_Cabecera'] . " AND CCCC.ID_Pedido_Cabecera_Checklist=" . $arrParams['ID_Pedido_Cabecera_Checklist'];
 		if ( !$this->db->simple_query($query) ){
 			$error = $this->db->error();
 			return array(
@@ -214,7 +214,10 @@ DET.ID_Pedido_Cabecera = " . $arrParams['ID_Pedido_Cabecera'];
         $data = array('Nu_Tarea' => $Nu_Estado);
 		if ($this->db->update($this->table_carga_consolidada_cabecera_checklist, $data, $where) > 0) {
 			if($Nu_Estado==1){//1=completada tarea enviar mensaje
-				$arrParams = array('ID_Pedido_Cabecera' => $ID_Pedido_Cabecera);
+				$arrParams = array(
+					'ID_Pedido_Cabecera' => $ID_Pedido_Cabecera,
+					'ID_Pedido_Cabecera_Checklist' => $ID,
+				);
 				$this->sendMessageTodos($arrParams);
 			}
 
