@@ -62,7 +62,9 @@
                       <th>Liberación</th>
                       <th>Canal</th>
                       <th>Entrega</th>
-                      <th>Mensaje</th>
+                      <!--<th>Categoría</th>-->
+                      <th>Actividad</th>
+                      <th>Tarea</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                       <th class="no-sort">Ver</th>
                       <?php endif; ?>

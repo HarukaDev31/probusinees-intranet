@@ -101,8 +101,8 @@ class PedidosCargaConsolidada extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstadoTarea(\'' . $row->ID_Pedido_Cabecera_Checklist . '\',0, \'' . $row->ID_Pedido_Cabecera . '\');">Pendiente</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Completada" title="Completada" href="javascript:void(0)" onclick="cambiarEstadoTarea(\'' . $row->ID_Pedido_Cabecera_Checklist . '\',1, \'' . $row->ID_Pedido_Cabecera . '\');">Completada</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstadoTarea(\'' . $row->ID_Pedido_Cabecera_Checklist . '\',0);">Pendiente</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Completada" title="Completada" href="javascript:void(0)" onclick="cambiarEstadoTarea(\'' . $row->ID_Pedido_Cabecera_Checklist . '\',1);">Completada</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			$rows[] = $dropdown_estado;
@@ -169,8 +169,101 @@ class PedidosCargaConsolidada extends CI_Controller {
     	echo json_encode($this->PedidosCargaConsolidadaModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
 	}
 
-	public function cambiarEstadoTarea($ID, $Nu_Estado, $ID_Pedido_Cabecera){
+	public function sendMessage(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosCargaConsolidadaModel->cambiarEstadoTarea($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($ID_Pedido_Cabecera)));
+		$arrResponse = $this->PedidosCargaConsolidadaModel->sendMessage($this->input->post());
+		if($arrResponse['status'] == 'success'){
+			//aquí voy hacer un foreach de todos los correos que debo de enviar
+			$arrResponseEntidad = $this->PedidosCargaConsolidadaModel->obtenerEntidad($this->input->post());
+			if($arrResponseEntidad['status'] == 'success'){
+				$iCantidadEmail = 0;
+				foreach ($arrResponseEntidad['result'] as $row) {
+					$bStatusEnviarCorreo = true;
+					if(!empty($row->correo)){
+						if (!filter_var($row->correo, FILTER_VALIDATE_EMAIL)) {
+							$bStatusEnviarCorreo = false;
+						}
+				
+						if (!is_valid_email($row->correo)) {
+							$bStatusEnviarCorreo = false;
+						}
+				
+						if (!is_valid_email_expresion_regular($row->correo)) {
+							$bStatusEnviarCorreo = false;
+						}
+
+						if($bStatusEnviarCorreo==true){//enviar correo
+							$arrData = array(
+								'email' => $row->correo,
+								'name' => $row->nombre,
+								'message' => $this->input->post('enviar_mensaje-No_Seguimiento')
+							);
+							$arrResponseEmail = $this->enviarCorreoSeguimiento($arrData);
+							++$iCantidadEmail;
+						}
+
+						sleep(1);
+					}
+					//también debo de capturar a los que no envío por error
+				}
+
+				$response = array(
+					'status' => 'success',
+					'message' => 'Se envío email ' . $iCantidadEmail
+				);
+				echo json_encode($response);
+				exit();
+			} else {
+				echo json_encode($arrResponseEntidad);
+				exit();
+			}
+		} else {
+			echo json_encode($arrResponse);
+			exit();
+		}
+    	//echo json_encode($this->PedidosCargaConsolidadaModel->sendMessage($this->input->post()));
+	}
+	
+	public function enviarCorreoSeguimiento($arrData){
+		// enviar correo con las credenciales
+		$this->load->library('email');
+
+		$data_email["email"] = $arrData['email'];
+		$data_email["name"] = $arrData['name'];
+		$data_email["message"] = $arrData['message'];
+		$message_email = $this->load->view('correos/seguimiento_carga_consolidada', $data_email, true);
+		
+		$this->email->from('noreply@lae.one', 'ProBusiness');//de
+		$this->email->to($arrData['email']);//para
+		//$this->email->to('one@example.com, two@example.com, three@example.com');
+		/*
+		$this->email->to(
+			array('one@example.com', 'two@example.com', 'three@example.com')
+		);
+		*/
+		$this->email->subject('✅ Seguimiento tu carga');
+		$this->email->message($message_email);
+		$this->email->set_newline("\r\n");
+
+		$isSend = $this->email->send();
+		if($isSend) {
+			$response = array(
+				'status' => 'success',
+				'message' => 'Se envío email'
+			);
+			return $response;
+		} else {
+			$response = array(
+				'status' => 'error',
+				'message' => 'No se pudo enviar email, inténtelo más tarde.',
+				'error_message_mail' => $this->email->print_debugger()
+			);
+			return $response;
+		}
+	}
+
+	public function cambiarEstadoTarea($ID, $Nu_Estado){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosCargaConsolidadaModel->cambiarEstadoTarea($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado)));
 	}
 }

@@ -558,3 +558,56 @@ function enviarSeguimiento(ID){
   $('#modal-enviar_mensaje').modal('show');
   $( '#form-enviar_mensaje' )[0].reset();
 }
+
+function cambiarEstadoTarea(ID, Nu_Estado, ID_Pedido_Cabecera) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  var sNombreEstado = 'Pendiente';
+  if(Nu_Estado==1)
+    sNombreEstado = 'Completada';
+
+  $('#modal-title').html('¿Deseas cambiar tarea a <strong>' + sNombreEstado + '</strong>?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'CargaConsolidada/PedidosCargaConsolidada/cambiarEstadoTarea/' + ID + '/' + Nu_Estado + '/' + ID_Pedido_Cabecera;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
+}
