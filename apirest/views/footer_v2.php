@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.1.33'; ?>
+<?php $iControlVersionDashboard = '1.1.47'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -184,7 +184,14 @@
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
 
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
+
 <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/pedidos_cargaconsolidada.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_consolidado) && $js_consolidado==true) : ?>
+<script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/consolidado.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">

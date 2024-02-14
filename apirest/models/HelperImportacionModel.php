@@ -5,6 +5,12 @@ class HelperImportacionModel extends CI_Model{
 		parent::__construct();
 	}
 
+	function obtenerEstadoConsolidadoArray($iEstado){
+		if( $iEstado == 1 )
+			return array('No_Estado' => 'Completada','No_Class_Estado' => 'success');
+		return array('No_Estado' => 'En proceso','No_Class_Estado' => 'warning');
+	}
+
 	function obtenerEstadoTareaChecklist($iEstado){
 		if( $iEstado == 1 )
 			return array('No_Estado' => 'Completada','No_Class_Estado' => 'success');

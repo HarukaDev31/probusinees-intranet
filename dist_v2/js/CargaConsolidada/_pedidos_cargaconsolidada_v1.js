@@ -11,7 +11,6 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 
 $(function () {
-  $('.select2').select2();
   
   $("#form-enviar_mensaje").on('submit',function(e){
     e.preventDefault();
@@ -41,13 +40,12 @@ $(function () {
           $('#modal-message').modal('show');  
           
           if (response.status == 'success'){
+            $( '#form-enviar_mensaje' )[0].reset();
             
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
-            verPedido($( '[name="enviar_mensaje-id_pedido_cabecera"]' ).val());
-
-            $( '#form-enviar_mensaje' )[0].reset();
+            reload_table_Entidad();
           } else {
             $('#moda-message-content').addClass( 'bg-danger' );
             $('.modal-title-message').text(response.message);
@@ -192,7 +190,7 @@ $(function () {
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
         data.sMethod                = $('#hidden-sMethod').val(),
-        data.ID_Carga_Consolidada   = $( '#cbo-filtro-ID_Carga_Consolidada' ).val(),
+        data.Filtros_Entidades      = $( '#cbo-Filtros_Entidades' ).val(),
         data.Global_Filter          = $( '#txt-Global_Filter' ).val(),
         data.Filtro_Fe_Inicio       = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
         data.Filtro_Fe_Fin          = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
@@ -277,32 +275,9 @@ function verPedido(ID){
       $( '.title_Entidad' ).text('Modifcar Pedido');
       
       var ID_Pedido_Cabecera = response[0].ID_Pedido_Cabecera;
-      var ID_Carga_Consolidada = response[0].ID_Carga_Consolidada;
       $( '[name="EID_Pedido_Cabecera"]' ).val(ID_Pedido_Cabecera);
       
-      //$( '[name="No_Carga_Consolidada"]' ).val(response[0].No_Carga_Consolidada);
-      var selected='';
-      $('#cbo-ID_Carga_Consolidada').html('<option value="" selected="selected">- Sin registro -</option>');
-      url = base_url + 'CargaConsolidada/PedidosCargaConsolidada/obtenerConsolidado';
-      $.post(url, { Nu_Estado: 0}, function (responseCarga) {
-        if (responseCarga.status == 'success') {
-          var l = responseCarga.result.length;
-          $('#cbo-ID_Carga_Consolidada').html('<option value="" selected="selected">- Seleccionar -</option>');
-          for (var x = 0; x < l; x++) {
-            selected = '';
-            if(ID_Carga_Consolidada == responseCarga.result[x].id)
-              selected = 'selected="selected"';
-            $('#cbo-ID_Carga_Consolidada').append('<option value="' + responseCarga.result[x].id + '" ' + selected + '>' + responseCarga.result[x].nombre + '</option>');
-          }
-        } else {
-          if (responseCarga.sMessageSQL !== undefined) {
-            console.log(responseCarga.sMessageSQL);
-          }
-          $('#modal-message').modal('show');
-          $('.modal-title-message').text(responseCarga.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 1200);
-        }
-      }, 'JSON');
+      $( '[name="No_Carga_Consolidada"]' ).val(response[0].No_Carga_Consolidada);
 
       $( '[name="Fe_Inicio"]' ).val(ParseDateString(response[0].Fe_Inicio, 'fecha_bd', '-'));
       $( '[name="Fe_Termino"]' ).val(ParseDateString(response[0].Fe_Termino, 'fecha_bd', '-'));
@@ -310,45 +285,18 @@ function verPedido(ID){
       $( '[name="Fe_Zarpe"]' ).val(ParseDateString(response[0].Fe_Zarpe, 'fecha_bd', '-'));
       $( '[name="Fe_Llegada"]' ).val(ParseDateString(response[0].Fe_Llegada, 'fecha_bd', '-'));
 
-      var table_temporal_cliente = '', sSpanTipoTarea = '';
+      var table_temporal_cliente = '';
       for (let index = 0; index < response.length; index++) {
         const element = response[index];
-        
-			  //$span_categoria = '<span class="badge bg-success">' . $sCategoria . '</span>';
-        sSpanTipoTarea = '';
-        if(element.Nu_Tipo_Tarea==1){//1
-          sSpanTipoTarea = '<span class="badge bg-secondary">Ajuste de Valor</span><br>';
-        }
-
         table_temporal_cliente +=
         "<tr id='tr_entidad" + element.ID_Entidad + "'>"
-          + "<td class='text-left' style='display:none;'>" + element.ID_Entidad + "</td>";
-          //+ "<td class='text-left'>" + element.No_Entidad + "</td>";
+          + "<td class='text-left' style='display:none;'>" + element.ID_Entidad + "</td>"
+          + "<td class='text-left'>" + element.No_Entidad + "</td>";
           table_temporal_cliente += '<td class="text-left">';
-          table_temporal_cliente += element.No_Entidad + ' &nbsp;<button type="button" class="btn btn-xs btn-link p-0" alt="Agregar tarea" title="Agregar tarea" href="javascript:void(0)" onclick="enviarSeguimiento(' + ID_Pedido_Cabecera + ', ' + element.ID_Entidad + ')"><i class="fas fa-comments fa-2x" aria-hidden="true"></i></td>';
+          table_temporal_cliente += '<button class="btn btn-xs btn-link p-0" alt="Agregar tarea" title="Agregar tarea" href="javascript:void(0)" onclick="enviarSeguimiento(' + ID_Pedido_Cabecera + ', ' + element.ID_Entidad + ')"><i class="fas fa-comments fa-2x" aria-hidden="true"></i></td>';
           table_temporal_cliente += '</td>';
-          table_temporal_cliente += "<td class='text-left'>" + sSpanTipoTarea + element.No_Seguimiento + "</td>";
-          table_temporal_cliente += "<td class='text-right'>";
-          table_temporal_cliente += element.Ss_Total;
-          if(element.Txt_Url_Imagen_Deposito_Segundo_Pago != '' && element.Txt_Url_Imagen_Deposito_Segundo_Pago !== undefined){
-            table_temporal_cliente += '<br><span class="badge bg-warning">Sin voucher</span><br>';
-          }
-          table_temporal_cliente += "</td>";//si sube vocuher mostrara abajo esa etiqueta
-          table_temporal_cliente += '<td class="text-center">';
-            if(element.Nu_Tarea == 0){
-              table_temporal_cliente += '<span class="badge bg-warning">Pendiente</span><br>';
-              table_temporal_cliente += '<button type="button" class="btn btn-success" alt="Completar tarea" title="Completar tarea" href="javascript:void(0)" onclick="completarTareaCliente(' + ID_Pedido_Cabecera + ', ' + element.ID_Entidad + ', ' + element.ID_Seguimiento_Cliente + ')">Completar</td>';
-            } else if (element.Nu_Tarea == 1){//completada
-              table_temporal_cliente += '<span class="badge bg-success">Completada</span>';
-            }
-          table_temporal_cliente += '</td>';
-          
-          /*
-          table_temporal_cliente += '<td class="text-left">';
-            table_temporal_cliente += '<button type="button" class="btn btn-xs btn-link p-0" alt="Agregar tarea" title="Agregar tarea" href="javascript:void(0)" onclick="enviarSeguimiento(' + ID_Pedido_Cabecera + ', ' + element.ID_Entidad + ')"><i class="fas fa-comments fa-2x" aria-hidden="true"></i></td>';
-          table_temporal_cliente += '</td>';
-          */
-        table_temporal_cliente += "<td class='text-center'><button type='button' id='btn-delete_cliente' class='btn btn-xs btn-link' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>"
+        table_temporal_cliente +=
+          + "<td class='text-center'><button type='button' id='btn-delete_cliente' class='btn btn-xs btn-link' alt='Eliminar' title='Eliminar'><i class='fas fa-trash-alt fa-2x' aria-hidden='true'></i></button></td>"
           + "<input type='hidden' name='arrEntidad[][ID_Entidad]' value='" + element.ID_Entidad + "' class='form-control'>"
         + "</tr>";
       }
@@ -485,29 +433,6 @@ function agregarPedido(){
 
   $( '[name="EID_Pedido_Cabecera"]' ).val('');
 
-  var selected='';
-  $('#cbo-ID_Carga_Consolidada').html('<option value="" selected="selected">- Sin registro -</option>');
-  url = base_url + 'CargaConsolidada/PedidosCargaConsolidada/obtenerConsolidado';
-  $.post(url, { Nu_Estado: 0}, function (response) {
-    if (response.status == 'success') {
-      var l = response.result.length;
-      $('#cbo-ID_Carga_Consolidada').html('<option value="" selected="selected">- Seleccionar -</option>');
-      for (var x = 0; x < l; x++) {
-        selected = '';
-        if($('#cbo-filtro-ID_Carga_Consolidada').val() == response.result[x].id)
-          selected = 'selected="selected"';
-        $('#cbo-ID_Carga_Consolidada').append('<option value="' + response.result[x].id + '" ' + selected + '>' + response.result[x].nombre + '</option>');
-      }
-    } else {
-      if (response.sMessageSQL !== undefined) {
-        console.log(response.sMessageSQL);
-      }
-      $('#modal-message').modal('show');
-      $('.modal-title-message').text(response.message);
-      setTimeout(function () { $('#modal-message').modal('hide'); }, 1200);
-    }
-  }, 'JSON');
-
   $( '#table-clientes tbody' ).empty();
 }
 
@@ -627,14 +552,13 @@ function cambiarEstado(ID, Nu_Estado) {
   });
 }
 
-function enviarSeguimiento(ID_Pedido_Cabecera, ID_Entidad){
+function enviarSeguimiento(ID){
   $( '#form-enviar_mensaje' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
 
-  $( '#enviar_mensaje-id_pedido_cabecera' ).val(ID_Pedido_Cabecera);
-  $( '#enviar_mensaje-id_entidad' ).val(ID_Entidad);
+  $( '#enviar_mensaje-id_pedido_cabecera' ).val(ID);
 
   $('#modal-enviar_mensaje').modal('show');
   $( '#form-enviar_mensaje' )[0].reset();
@@ -683,55 +607,6 @@ function cambiarEstadoTarea(ID, Nu_Estado, ID_Pedido_Cabecera) {
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           reload_table_Entidad();
-        } else {
-          $('.modal-message').addClass(response.style_modal);
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
-        }
-      }
-    });
-  });
-}
-
-function completarTareaCliente(ID_Pedido_Cabecera, ID_Entidad, ID_Seguimiento_Cliente) {
-  var $modal_delete = $('#modal-message-delete');
-  $modal_delete.modal('show');
-
-  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
-  $('.modal-message-delete').addClass('modal-success');
-
-  $('#modal-title').html('¿Deseas <strong>completar</strong> la tarea?');
-
-  $('#btn-cancel-delete').off('click').click(function () {
-    $modal_delete.modal('hide');
-  });
-
-  $('#btn-save-delete').off('click').click(function () {
-    $( '#btn-save-delete' ).text('');
-    $( '#btn-save-delete' ).attr('disabled', true);
-    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-
-    url = base_url + 'CargaConsolidada/PedidosCargaConsolidada/completarTareaCliente/' + ID_Pedido_Cabecera + '/' + ID_Entidad + '/' + ID_Seguimiento_Cliente;
-    $.ajax({
-      url: url,
-      type: "GET",
-      dataType: "JSON",
-      success: function (response) {
-        $modal_delete.modal('hide');
-
-        $( '#btn-save-delete' ).text('');
-        $( '#btn-save-delete' ).append( 'Aceptar' );
-        $( '#btn-save-delete' ).attr('disabled', false);
-
-        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
-        $('#modal-message').modal('show');
-
-        if (response.status == 'success') {
-          $('.modal-message').addClass(response.style_modal);
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
-          
-          verPedido(ID_Pedido_Cabecera);
         } else {
           $('.modal-message').addClass(response.style_modal);
           $('.modal-title-message').text(response.message);

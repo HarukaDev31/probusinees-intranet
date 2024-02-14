@@ -19,11 +19,15 @@ class PedidosCargaConsolidada extends CI_Controller {
 		}
 	}
 	
-	public function listar(){
+	public function listar($ID_Carga_Consolidada=0){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
-			$this->load->view('CargaConsolidada/PedidosCargaConsolidadaView');
+			$arrResponseConsolidado = $this->PedidosCargaConsolidadaModel->obtenerConsolidado(0);
+			$this->load->view('header_v2', array("js_pedidos_cargaconsolidada" => true));
+			$this->load->view('CargaConsolidada/PedidosCargaConsolidadaView', array(
+				'arrResponseConsolidado' => $arrResponseConsolidado,
+				'ID_Carga_Consolidada' => $ID_Carga_Consolidada,
+			));
 			$this->load->view('footer_v2', array("js_pedidos_cargaconsolidada" => true));
 		}
 	}
@@ -144,7 +148,7 @@ class PedidosCargaConsolidada extends CI_Controller {
 		$data = array(
 			'ID_Empresa'			=> $this->user->ID_Empresa,
 			'ID_Organizacion'		=> $this->user->ID_Organizacion,//Organizacion
-			'No_Carga_Consolidada'	=> $this->input->post('No_Carga_Consolidada'),
+			'ID_Carga_Consolidada'	=> $this->input->post('ID_Carga_Consolidada'),
 			'Fe_Inicio'				=> ToDate($this->input->post('Fe_Inicio')),
 			'Fe_Termino'			=> ToDate($this->input->post('Fe_Termino')),
 			'Fe_Carga'				=> ToDate($this->input->post('Fe_Carga')),
@@ -172,5 +176,20 @@ class PedidosCargaConsolidada extends CI_Controller {
 	public function cambiarEstadoTarea($ID, $Nu_Estado, $ID_Pedido_Cabecera){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     	echo json_encode($this->PedidosCargaConsolidadaModel->cambiarEstadoTarea($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($ID_Pedido_Cabecera)));
+	}
+	
+	public function sendMessage(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+		echo json_encode($this->PedidosCargaConsolidadaModel->sendMessage($this->input->post()));
+	}
+
+	public function completarTareaCliente($ID_Pedido_Cabecera, $ID_Entidad, $ID_Seguimiento_Cliente){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosCargaConsolidadaModel->completarTareaCliente($this->security->xss_clean($ID_Pedido_Cabecera), $this->security->xss_clean($ID_Entidad), $this->security->xss_clean($ID_Seguimiento_Cliente)));
+	}
+
+	public function obtenerConsolidado(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosCargaConsolidadaModel->obtenerConsolidado($this->input->post('Nu_Estado')));
 	}
 }
