@@ -179,7 +179,7 @@
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>
-                    <div class="col-xs-6 col-sm-3 col-md-3 div-mas_opciones">
+                    <div class="col-xs-6 col-sm-3 col-md-3 div-pais div-mas_opciones">
                       <div class="form-group">
                         <label>Departamento</label>
                         <select id="cbo-Departamentos" name="ID_Departamento" class="form-control select2" style="width: 100%;"></select>
@@ -187,14 +187,14 @@
                       </div>
                     </div>
                     
-                    <div class="col-xs-6 col-sm-3 col-md-3 div-mas_opciones">
+                    <div class="col-xs-6 col-sm-3 col-md-3 div-pais div-mas_opciones">
                       <div class="form-group">
                         <label>Provincia</label>
                         <select id="cbo-Provincias" name="ID_Provincia" class="form-control select2" style="width: 100%;"></select>
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>
-                    <div class="col-xs-12 col-sm-3 col-md-3 div-mas_opciones">
+                    <div class="col-xs-12 col-sm-3 col-md-3 div-pais div-mas_opciones">
                       <div class="form-group">
                         <label>Distrito</label>
                         <select id="cbo-Distritos" name="ID_Distrito" class="form-control select2" style="width: 100%;"></select>
@@ -212,9 +212,9 @@
                       </div>
                     </div>
                     
-                    <div class="col-xs-6 col-sm-3 col-md-2 div-mas_opciones">
+                    <div class="col-xs-6 col-sm-3 d-none col-md-2 div-mas_opciones">
                       <label>F. Nacimiento</label>
-                      <div class="form-group">                    
+                      <div class="form-group">
                         <div class="input-group date" style="width:100%">
                           <input type="text" name="Fe_Nacimiento" placeholder="Opcional" class="form-control date-picker-chid" data-inputmask="'alias': 'dd/mm/yyyy'" data-mask>
                         </div>

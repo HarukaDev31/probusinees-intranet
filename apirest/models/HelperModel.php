@@ -246,7 +246,7 @@ No_Almacen;";
 	}
 
 	public function getPaises(){
-		$this->db->where('ID_Pais', $this->user->ID_Pais);//agregado el 11/08 para pais
+		//$this->db->where('ID_Pais', $this->user->ID_Pais);//agregado el 11/08 para pais
 		$this->db->where('Nu_Estado', 1);
 		$this->db->order_by('No_Pais');
 		return $this->db->get('pais')->result();

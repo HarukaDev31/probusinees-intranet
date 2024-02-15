@@ -51,14 +51,14 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <th class="no-sort">Excel</th>
+                      <th class="no-sort">Garantía</th>
                       <th>Perú</th>
+                      <th class="no-sort">Personal</th>
                       <th>China</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>
-                      <th class="no-sort">Pay</th>
-                      <th class="no-sort">Personal</th>
+                      <th class="no-sort">Excel</th>
                     </tr>
                   </thead>
                 </table>

@@ -7,6 +7,8 @@ function importarExcelCliente(){
 }
 
 $(function () {
+  $('.select2').select2();
+
   // Validate exist file excel product
 	$( document ).on('click', '#btn-excel-importar_cliente', function(event) {
 	  if ( $( "#my-file-selector_cliente" ).val().length === 0 ) {
@@ -201,6 +203,23 @@ $( "#form-Cliente" ).validate({
         $( '#txt-Nu_Documento_Identidad' ).attr('maxlength', $(this).find(':selected').data('nu_cantidad_caracteres'));
     }
   })
+
+  $( '#cbo-Paises' ).change(function(){
+    $('#cbo-Departamentos').html('');
+    $('#cbo-Provincias').html('');
+    $('#cbo-Distritos').html('');
+    if ( $(this).val() == 1 ) {
+      $('.div-pais').show();
+      url = base_url + 'HelperController/getDepartamentos';
+      $.post( url, {ID_Pais : $(this).val()}, function( response ){
+      $( '#cbo-Departamentos' ).html('<option value="0" selected="selected">- Seleccionar -</option>');
+      for (var i = 0; i < response.length; i++)
+        $( '#cbo-Departamentos' ).append( '<option value="' + response[i].ID_Departamento + '">' + response[i].No_Departamento + '</option>' );
+      }, 'JSON');
+    } else {
+      $('.div-pais').hide();
+    }
+  })
   
   $( '#cbo-Departamentos' ).change(function(){
     $('#cbo-Provincias').html('');
@@ -270,7 +289,18 @@ function agregarCliente(){
         $( '#cbo-TiposDocumentoIdentidad' ).append( '<option value="' + response[i]['ID_Tipo_Documento_Identidad'] + '" data-nu_cantidad_caracteres="' + response[i]['Nu_Cantidad_Caracteres'] + '">' + response[i]['No_Tipo_Documento_Identidad_Breve'] + '</option>' );
     }, 'JSON');
     
-    $( '#cbo-Paises' ).html('<option value="1" selected="selected">- Peru -</option>');
+    //$( '#cbo-Paises' ).html('<option value="1" selected="selected">- Peru -</option>');
+    var selected;
+    url = base_url + 'HelperController/getPaises';
+    $.post( url, {}, function( responsePaises ){
+      $( '#cbo-Paises' ).html('');
+      for (var i = 0; i < responsePaises.length; i++){
+        selected = '';
+        if(1 == responsePaises[i].ID_Pais)
+          selected = 'selected="selected"';
+        $( '#cbo-Paises' ).append( '<option value="' + responsePaises[i].ID_Pais + '" ' + selected + '>' + responsePaises[i].No_Pais + '</option>' );
+      }
+    }, 'JSON');
   
     // Departamento - Provincia - Distrito
     $('#cbo-Departamentos').html('<option value="0" selected="selected">- Seleccionar -</option>');
@@ -306,7 +336,7 @@ function agregarCliente(){
     $( '.form-group' ).removeClass('has-success');
     $( '.help-block' ).empty();
   
-    $('#cbo-Paises').html('<option value="1" selected="selected">- Peru -</option>');
+    //$('#cbo-Paises').html('<option value="1" selected="selected">- Peru -</option>');
     
     url = base_url + 'Ventas/ReglasVenta/ClienteController/ajax_edit/' + ID;
     $.ajax({
@@ -360,8 +390,19 @@ function agregarCliente(){
         $( '[name="Nu_Celular_Entidad"]' ).val(response.Nu_Celular_Entidad);
         $( '[name="Txt_Email_Entidad"]' ).val(response.Txt_Email_Entidad);
               
+        url = base_url + 'HelperController/getPaises';
+        $.post( url, {}, function( responsePaises ){
+          $( '#cbo-Paises' ).html('');
+          for (var i = 0; i < responsePaises.length; i++){
+            selected = '';
+            if(response.ID_Pais == responsePaises[i].ID_Pais)
+              selected = 'selected="selected"';
+            $( '#cbo-Paises' ).append( '<option value="' + responsePaises[i].ID_Pais + '" ' + selected + '>' + responsePaises[i].No_Pais + '</option>' );
+          }
+        }, 'JSON');
+
         url = base_url + 'HelperController/getDepartamentos';
-        $.post( url, {ID_Pais : 1}, function( responseDepartamentos ){
+        $.post( url, {ID_Pais : response.ID_Pais}, function( responseDepartamentos ){
           $( '#cbo-Departamentos' ).html('');
           for (var i = 0; i < responseDepartamentos.length; i++){
             selected = '';

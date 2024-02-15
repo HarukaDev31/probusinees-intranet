@@ -38,19 +38,29 @@ class PedidosAgente extends CI_Controller {
             $rows[] = $row->No_Pais;
             $rows[] = $row->ID_Pedido_Cabecera;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto . "<br>" . $row->Txt_Email_Entidad;
+            //$rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto . "<br>" . $row->Txt_Email_Entidad;
+			$rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 			
 			//EXCEL cliente de pedido
 			$rows[] = '<button class="btn btn-xs btn-link" alt="PDF" title="PDF" href="javascript:void(0)" onclick="generarExcelPedidoCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
 
-			//PDF cliente de pedido
-			//$rows[] = '<button class="btn btn-xs btn-link" alt="PDF" title="PDF" href="javascript:void(0)" onclick="generarPDFPedidoCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-pdf text-danger fa-2x"></i></button>';
+			$btn_ver = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			if ( $this->MenuModel->verificarAccesoMenuInterno($sMethod)->Nu_Editar == 0)
+				$btn_ver = '';
+			$rows[] = $btn_ver;
 
-            //$rows[] = round($row->Qt_Total, 2);
+			$btn_asignar_usuario = '';
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
+				$btn_asignar_usuario = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
+				if(!empty($row->ID_Usuario_Pedido)){
+					$btn_asignar_usuario = '<span class="badge bg-secondary">Asignado</span>';
+					$btn_asignar_usuario .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Pedido . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+				}
+			}
+			$rows[] = $btn_asignar_usuario;
+			
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($row->Nu_Estado);
-            //$rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-
 			$dropdown_estado = '<div class="dropdown">';
 				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
@@ -61,22 +71,7 @@ class PedidosAgente extends CI_Controller {
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
             $rows[] = $dropdown_estado;
-
-			$btn_ver = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-			if ( $this->MenuModel->verificarAccesoMenuInterno($sMethod)->Nu_Editar == 0)
-				$btn_ver = '';
-			$rows[] = $btn_ver;
-
-			$btn_asignar_usuario = '';
-			//if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
-				$btn_asignar_usuario = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
-				if(!empty($row->ID_Usuario_Pedido)){
-					$btn_asignar_usuario = '<span class="badge bg-secondary">Asignado</span>';
-					$btn_asignar_usuario .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Pedido . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
-				}
-			//}
-			$rows[] = $btn_asignar_usuario;
-			//$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+			
             $data[] = $rows;
         }
         $output = array(

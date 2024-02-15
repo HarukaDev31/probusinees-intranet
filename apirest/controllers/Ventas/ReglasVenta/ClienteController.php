@@ -180,7 +180,7 @@ class ClienteController extends CI_Controller {
 	public function listarClientes($sStatus='', $iCantidadNoProcesados=''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
+			$this->load->view('header_v2', array("js_cliente" => true));
 			$this->load->view('Ventas/ReglasVenta/ClienteView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados));
 			$this->load->view('footer_v2', array("js_cliente" => true));
 		}

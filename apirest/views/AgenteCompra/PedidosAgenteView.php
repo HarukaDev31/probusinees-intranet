@@ -51,14 +51,12 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <th class="no-sort">Excel</th>
-                      <th>Estado</th>
+                      <th class="no-sort">Cotización</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                       <th class="no-sort">Ver</th>
                       <?php endif; ?>
-                      <?php //if ($this->user->Nu_Tipo_Privilegio_Acceso==1) : ?>
                       <th class="no-sort">Cliente</th>
-                      <?php //endif; ?>
+                      <th>Estado</th>
                     </tr>
                   </thead>
                 </table>

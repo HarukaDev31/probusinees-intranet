@@ -10,8 +10,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <meta name="color-scheme" content="light dark">
     <!-- Favicon and touch icons -->
     <!--====== Favicon Icon ======-->
-    <link rel="shortcut icon" href="<?php echo base_url() . 'assets/ico/favicon.ico?ver=1.0'; ?>" type="image/x-icon">
-    <link rel="icon" href="<?php echo base_url() . 'assets/ico/favicon.ico?ver=1.0" type="image/x-icon'; ?>">
+    <link rel="shortcut icon" href="<?php echo base_url("assets/ico/favicon.ico?ver=10.0.0"); ?>">
+    <link rel="apple-touch-icon-precomposed" sizes="192x192" href="<?php echo base_url("assets/ico/android-chrome-512x512.png?ver=10.0.0"); ?>">
+    <link rel="apple-touch-icon-precomposed" sizes="192x192" href="<?php echo base_url("assets/ico/android-chrome-192x192.png?ver=10.0.0"); ?>">
+    <link rel="apple-touch-icon-precomposed" sizes="32x32" href="<?php echo base_url("assets/ico/favicon-32x32.png?ver=10.0.0"); ?>">
+    <link rel="apple-touch-icon-precomposed" sizes="16x16" href="<?php echo base_url("assets/ico/favicon-16x16.png?ver=10.0.0"); ?>">
+    <link rel="apple-touch-icon-precomposed" sizes="16x16" href="<?php echo base_url("assets/ico/apple-touch-icon.png?ver=10.0.0"); ?>">
+    <link rel="manifest" href="<?php echo base_url("assets/ico/site.webmanifest"); ?>">
+    <link rel="shortcut icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
+	  <link rel="icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
     
     <title>ProBusiness | Login</title>
     <meta name="author" content="Ecxlae">
@@ -24,7 +31,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <!-- Selected -->
     <!-- <link rel="stylesheet" href="<?php echo base_url("bower_components/select2/dist/css/select2.min.css"); ?>"> -->
     <!-- Ecxlae -->
-    <link rel="stylesheet" href="<?php echo base_url("assets/css/login.css?ver=3.32.0"); ?>">
+    <link rel="stylesheet" href="<?php echo base_url("assets/css/login.css?ver=5.32.0"); ?>">
     
     <meta name="theme-color" content="#FF6700">
 		<meta name="msapplication-navbutton-color" content="#FF6700"/>
