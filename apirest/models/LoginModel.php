@@ -350,4 +350,14 @@ LIMIT 1;";
 			);
 		}
 	}
+
+    public function actualizarCliente($where, $data, $ENo_Entidad){
+		if( $ENo_Entidad != $data['No_Entidad'] && $data['No_Entidad'] != '' && $this->db->query("SELECT COUNT(*) AS existe FROM entidad WHERE Nu_Tipo_Entidad=0 AND Nu_Documento_Identidad='" . $data['Nu_Documento_Identidad'] . "' LIMIT 1")->row()->existe > 0 ){
+			return array('status' => 'warning', 'style_modal' => 'modal-warning', 'message' => 'Ya existe nombre empresa');
+		} else {
+			if ( $this->db->update('entidad', $data, $where) > 0 )
+				return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+		}
+    }
 }

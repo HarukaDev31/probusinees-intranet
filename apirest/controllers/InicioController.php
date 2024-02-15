@@ -22,7 +22,7 @@ class InicioController extends CI_Controller {
 		if(isset($this->session->userdata['usuario'])) {
 			//captar las ordenes que solo le pertence a ese usuario
 			$arrResponsePedidoXUsuario = $this->ConfiguracionModel->obtenerPedidosXUsuario();
-			$this->load->view('header_v2');
+			$this->load->view('header_v2', array("js_inicio" => true));
 			$this->load->view('Inicio/InicioView',array(
 				'arrResponsePedidoXUsuario' => $arrResponsePedidoXUsuario
 			));
@@ -187,6 +187,42 @@ class InicioController extends CI_Controller {
 			}
 		} else {
 			redirect('DeliveryDropshippingController/listar');
+		}
+	}
+
+	public function crudCliente(){
+		if(isset($this->session->userdata['usuario'])) {
+			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+			//array_debug($this->input->post());
+			
+			$sNumeroDocumentoIdentidad = strtoupper(trim($this->input->post('Nu_Documento_Identidad')));
+			$iTipoDocumentoIdentidad = '4';//4=RUC
+			$sTipoDocumentoIdentidad = 'RUC';
+			if ( strlen($sNumeroDocumentoIdentidad) != 11 ) {
+				$iTipoDocumentoIdentidad = '1';//1=OTROS
+				$sTipoDocumentoIdentidad = 'OTROS';
+			}
+			
+			$sNumeroDocumentoIdentidadExterno = strtoupper(trim($this->input->post('Nu_Documento_Identidad_Externo')));
+			$iTipoDocumentoIdentidadExterno = '4';//4=RUC
+			$sTipoDocumentoIdentidadExterno = 'RUC';
+			if ( strlen($sNumeroDocumentoIdentidadExterno) != 11 ) {
+				$iTipoDocumentoIdentidadExterno = '1';//1=OTROS
+				$sTipoDocumentoIdentidadExterno = 'OTROS';
+			}
+
+			$data = array(
+				'ID_Tipo_Documento_Identidad'		=> $iTipoDocumentoIdentidad,
+				'Nu_Documento_Identidad'			=> $sNumeroDocumentoIdentidad,
+				'No_Entidad'						=> $this->input->post('No_Entidad'),
+				'No_Contacto'						=> $this->input->post('No_Contacto'),
+				'ID_Tipo_Documento_Identidad_Externo' => $iTipoDocumentoIdentidadExterno,
+				'Nu_Documento_Identidad_Externo'	=> $sNumeroDocumentoIdentidadExterno,
+			);
+
+			echo json_encode($this->LoginModel->actualizarCliente(array('ID_Entidad' => $this->input->post('ID_Entidad')), $data, $this->input->post('ENo_Entidad')));
+		} else {
+			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
 	}
 }

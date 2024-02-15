@@ -663,11 +663,15 @@ Nu_Orden_Slider;";
 	}
 	
 	public function obtenerPedidosXUsuario(){
+		//->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
+		//->where_in($this->table . '.Nu_Estado', array(5,6,7,9));//pagados / oc
 		$query = "SELECT
 ACPC.ID_Pedido_Cabecera,
 ACPC.Fe_Emision_Cotizacion,
 CORRE.Fe_Month,
 ACPC.Nu_Correlativo,
+ACPC.Nu_Estado AS Nu_Estado_Pedido,
+CLI.ID_Entidad,
 CLI.No_Entidad,
 CLI.Nu_Documento_Identidad,
 CLI.No_Contacto,
@@ -735,7 +739,7 @@ PACP.ID_Pedido_Cabecera = " . $ID_Pedido_Cabecera . " ORDER BY PACP.Nu_Orden";
 	}
 
     public function verificarEstadoProcesoAgenteCompra($ID_Pedido_Cabecera){
-        $query ="SELECT Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera=".$ID_Pedido_Cabecera;
+        $query ="SELECT Nu_ID_Interno, Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera=".$ID_Pedido_Cabecera;
 		return $this->db->query($query)->result();
     }
 }

@@ -29,6 +29,10 @@
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/daterangepicker/daterangepicker.css"); ?>">
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"); ?>">
   
+  <?php if (isset($js_inicio) && $js_inicio==true) : ?>
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <?php endif; ?>
+
   <?php if (isset($js_permiso_usuario) && $js_permiso_usuario==true) : ?>
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
   <?php endif; ?>
@@ -39,7 +43,6 @@
     
   <?php if (isset($js_pedidos_garantizados) && $js_pedidos_garantizados==true) : ?>
     <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <?php endif; ?>
     
   <?php if (isset($js_pedidos_cargaconsolidada) && $js_pedidos_cargaconsolidada==true) : ?>
