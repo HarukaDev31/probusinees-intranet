@@ -158,6 +158,7 @@ $(function () {
         columns: ':visible'
     }
     }],
+    'processing'  : true,
     "paging": true,
     "lengthChange": true,
     "searching": true,
@@ -188,6 +189,7 @@ $(function () {
       'type'      : 'POST',
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
+        data.tipo_servicio = $( '#cbo-filtro-tipo_servicio' ).val()
       },
     },
     'columnDefs': [
@@ -206,6 +208,10 @@ $(function () {
   $('#table-Proveedor_filter input').addClass('form-control-md');
   $('#table-Proveedor_filter input').addClass("width_full");
   
+  $('#btn-html_reporte').click(function () {
+    reload_table_proveedor();
+  });
+
   $( '#form-Proveedor' ).validate({
 		rules:{
 			ID_Tipo_Documento_Identidad: {

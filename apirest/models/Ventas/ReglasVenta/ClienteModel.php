@@ -145,12 +145,6 @@ class ClienteModel extends CI_Model{
     }
 	
 	public function _get_datatables_query(){
-        if( !empty($this->input->post('Global_Filter')) && $this->input->post('Filtros_Entidades') == 'Cliente' ){
-            $this->db->like('No_Entidad', $this->input->post('Global_Filter'));
-        } else if( !empty($this->input->post('Global_Filter')) && $this->input->post('Filtros_Entidades') == 'NumeroDocumentoIdentidad' ){
-        	$this->db->like('Nu_Documento_Identidad', $this->input->post('Global_Filter'));
-        }
-
 		if( $this->input->post('tipo_servicio') == '2' ){
         	$this->db->where('Nu_Agente_Compra', 1);
         }

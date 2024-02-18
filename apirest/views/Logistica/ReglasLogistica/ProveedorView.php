@@ -20,13 +20,36 @@
           <div class="card">
             <div class="card-body">
               <div class="row mb-3 div-Listar">
+                <div class="col-12 col-sm-6">
+                  <label>Servicio</label>
+                  <div class="form-group">
+                    <select id="cbo-filtro-tipo_servicio" name="" class="form-control required" style="width: 100%;">
+                      <option value="0" selected="selected">Todos</option>
+                      <option value="1">Otros</option>
+                      <option value="2">Agente de Compra</option>
+                      <option value="3">Carga Consolidada</option>
+                      <option value="4">Importación Grupal</option>
+                      <option value="5">Curso</option>
+                      <option value="6">Viaje de Negocios</option>
+                    </select>
+                    <span class="help-block" id="error"></span>
+                  </div>
+                </div>
+
+                <div class="col-6 col-sm-2">
+                  <label class="d-none d-sm-block">&nbsp;</label>
+                  <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+                </div>
+
                 <div class="col-6 col-md-2">
+                  <label class="d-none d-sm-block">&nbsp;</label>
                   <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
                   <button type="button" class="btn btn-success btn-block" onclick="agregarProveedor()"><i class="fa fa-plus-circle"></i> Agregar</button>
                   <?php endif; ?>
                 </div>
                 
                 <div class="col-6 col-md-2">
+                  <label class="d-none d-sm-block">&nbsp;</label>
                   <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Agregar == 1) : ?>
                     <button type="button" class="btn btn-default btn-block" onclick="importarExcelProveedor()"><i class="fa fa-file-excel text-success"></i> Importar</button>
                   <?php endif; ?>
@@ -37,6 +60,7 @@
                 <table id="table-Proveedor" class="table-nota table table-hover table-striped table-bordered">
                   <thead class="thead-light">
                     <tr>
+                      <th>Servicio</th>
                       <th>Tipo Doc.</th>
                       <th>Num. Doc.</th>
                       <th>Nombre</th>

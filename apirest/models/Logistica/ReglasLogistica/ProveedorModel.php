@@ -132,7 +132,27 @@ class ProveedorModel extends CI_Model{
     }
 	
 	public function _get_datatables_query(){
-        $this->db->select('ID_Entidad, TDI.No_Tipo_Documento_Identidad_Breve, Nu_Documento_Identidad, No_Entidad, Nu_Celular_Entidad, Txt_Email_Entidad, Nu_Dias_Credito, Txt_Direccion_Entidad, DISTRI.No_Distrito, ' . $this->table . '.Nu_Estado')
+		if( $this->input->post('tipo_servicio') == '2' ){
+        	$this->db->where('Nu_Agente_Compra', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '3' ){
+        	$this->db->where('Nu_Carga_Consolidada', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '4' ){
+        	$this->db->where('Nu_Importacion_Grupal', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '5' ){
+        	$this->db->where('Nu_Curso', 1);
+        }
+
+		if( $this->input->post('tipo_servicio') == '6' ){
+        	$this->db->where('Nu_Viaje_Negocios', 1);
+        }
+		
+        $this->db->select('ID_Entidad, TDI.No_Tipo_Documento_Identidad_Breve, Nu_Documento_Identidad, No_Entidad, Nu_Celular_Entidad, Txt_Email_Entidad, Nu_Dias_Credito, Txt_Direccion_Entidad, DISTRI.No_Distrito, ' . $this->table . '.Nu_Estado, Txt_Descripcion, Fe_Registro, Nu_Agente_Compra, Nu_Carga_Consolidada, Nu_Importacion_Grupal, Nu_Curso, Nu_Viaje_Negocios')
 		->from($this->table)
     	->join($this->table_distrito . ' AS DISTRI', 'DISTRI.ID_Distrito = ' . $this->table . '.ID_Distrito', 'left')
     	->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = ' . $this->table . '.ID_Tipo_Documento_Identidad', 'join')

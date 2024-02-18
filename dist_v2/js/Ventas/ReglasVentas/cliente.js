@@ -54,6 +54,7 @@ $(function () {
         columns: ':visible'
     }
     }],
+    'processing'  : true,
     "paging": true,
     "lengthChange": true,
     "searching": true,
@@ -84,9 +85,7 @@ $(function () {
       'type'      : 'POST',
       'dataType'  : 'JSON',
       'data'      : function ( data ) {
-        data.tipo_servicio = $( '#cbo-filtro-tipo_servicio' ).val(),
-        data.Filtros_Entidades = $( '#cbo-Filtros_Entidades' ).val(),
-        data.Global_Filter = $( '#txt-Global_Filter' ).val();
+        data.tipo_servicio = $( '#cbo-filtro-tipo_servicio' ).val()
       },
     },
     'columnDefs': [
