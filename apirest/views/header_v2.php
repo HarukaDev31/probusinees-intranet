@@ -40,6 +40,10 @@
   <?php if (isset($js_cliente) && $js_cliente==true) : ?>
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
   <?php endif; ?>
+  
+  <?php if (isset($js_proveedor) && $js_proveedor==true) : ?>
+  <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
+  <?php endif; ?>
     
   <?php if (isset($js_pedidos_garantizados) && $js_pedidos_garantizados==true) : ?>
     <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">

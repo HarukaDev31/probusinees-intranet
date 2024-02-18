@@ -112,6 +112,23 @@ class PedidosGarantizados extends CI_Controller {
 			$excel_consolida_trading = '<button class="btn" alt="Proforma C. Trading" title="Proforma C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
 			$rows[] = $excel_agente_compra . '<br>' . $excel_consolida_trading;
 
+			//estado peru
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoImportacionIntegral($row->Nu_Importacion_Integral);
+			$dropdown_estado = '<div class="dropdown">';
+				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+				$dropdown_estado .= '<span class="caret"></span></button>';
+				$dropdown_estado .= '<ul class="dropdown-menu">';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Si" title="Si" href="javascript:void(0)" onclick="cambiarEstadoImpotacionIntegral(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $sCorrelativoCotizacion. '\');">Si</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="No" title="No" href="javascript:void(0)" onclick="cambiarEstadoImpotacionIntegral(\'' . $row->ID_Pedido_Cabecera . '\',0, \'' . $sCorrelativoCotizacion. '\');">No</a></li>';
+				$dropdown_estado .= '</ul>';
+			$dropdown_estado .= '</div>';
+			
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
+				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			}
+            $rows[] = $dropdown_estado;
+			
             $data[] = $rows;
         }
         $output = array(
@@ -1811,5 +1828,10 @@ class PedidosGarantizados extends CI_Controller {
 	public function removerAsignarPedido($ID, $id_usuario){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     	echo json_encode($this->PedidosGarantizadosModel->removerAsignarPedido($this->security->xss_clean($ID), $this->security->xss_clean($id_usuario)));
+	}
+
+	public function cambiarEstadoImpotacionIntegral($ID, $Nu_Estado, $sCorrelativoCotizacion){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    	echo json_encode($this->PedidosGarantizadosModel->cambiarEstadoImpotacionIntegral($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativoCotizacion)));
 	}
 }

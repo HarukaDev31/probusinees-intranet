@@ -132,12 +132,6 @@ class ProveedorModel extends CI_Model{
     }
 	
 	public function _get_datatables_query(){
-        if( $this->input->post('Filtros_Entidades') == 'Proveedor' ){
-            $this->db->like('No_Entidad', $this->input->post('Global_Filter'));
-        } else if ( $this->input->post('Filtros_Entidades') == 'Codigo' ){
-        	$this->db->like('Nu_Documento_Identidad', $this->input->post('Global_Filter'));
-        }
-        
         $this->db->select('ID_Entidad, TDI.No_Tipo_Documento_Identidad_Breve, Nu_Documento_Identidad, No_Entidad, Nu_Celular_Entidad, Txt_Email_Entidad, Nu_Dias_Credito, Txt_Direccion_Entidad, DISTRI.No_Distrito, ' . $this->table . '.Nu_Estado')
 		->from($this->table)
     	->join($this->table_distrito . ' AS DISTRI', 'DISTRI.ID_Distrito = ' . $this->table . '.ID_Distrito', 'left')
@@ -155,23 +149,8 @@ class ProveedorModel extends CI_Model{
 	
 	function get_datatables(){
         $this->_get_datatables_query();
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
-    }
-    
-    function count_filtered(){
-        $this->_get_datatables_query();
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
- 
-    public function count_all(){
-        $this->db->from($this->table);
-    	$this->db->where('ID_Empresa', $this->user->ID_Empresa);
-    	$this->db->where('Nu_Tipo_Entidad', 1);
-        return $this->db->count_all_results();
     }
     
     public function get_by_id($ID){

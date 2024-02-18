@@ -9,6 +9,10 @@ $(function () {
     $( '.div-Listar' ).show();
   })
   
+  $( '.input-codigo_barra' ).on('input', function () {
+    this.value = this.value.replace(/[^a-zA-Z0-9\-#]/g,'');
+  });
+
   $( '.input-number' ).on('input', function () {
     this.value = this.value.replace(/[^0-9]/g,'');
   });
@@ -103,5 +107,11 @@ function validateDecimal(){
         this.value = '';
     } else
       this.value = this.value.replace(/[^0-9\.]/g,'');
+  });
+}
+
+function validateCodigoBarra(){
+  $( '.input-codigo_barra' ).on('input', function () {
+    this.value = this.value.replace(/[^a-zA-Z0-9\-]/g,'');
   });
 }

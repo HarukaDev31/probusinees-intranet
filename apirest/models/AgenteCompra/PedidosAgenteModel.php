@@ -314,7 +314,7 @@ Nu_Correlativo
 			'ID_Empresa' => $this->user->ID_Empresa,
 			'ID_Organizacion' => $this->user->ID_Organizacion,
 			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
-			'No_Proceso' => '1. Pedidos Garantizados',
+			'No_Proceso' => '1. Cotizaciones Garantizadas',
 			'Txt_Url_Menu' => 'AgenteCompra/PedidosGarantizados/listar',
 			'Nu_Orden' => '1',
 			'Nu_Estado_Proceso' => '0',

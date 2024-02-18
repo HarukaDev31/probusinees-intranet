@@ -59,6 +59,7 @@
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>
                       <th class="no-sort">Excel</th>
+                      <th class="no-sort">Importación Integral</th>
                     </tr>
                   </thead>
                 </table>

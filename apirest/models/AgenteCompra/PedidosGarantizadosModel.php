@@ -739,6 +739,14 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
         $where = array('ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera']);
         $data = array( 'ID_Usuario_Interno_Empresa_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
 		if ($this->db->update($this->table, $data, $where) > 0) {
+			//agregar tour para chinito
+			/*
+			$arrDataTour = array(
+				'ID_Pedido_Cabecera' => $ID
+			);
+			$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
+			*/
+
 			$where_progreso = array(
 				'ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera'],
 				'Nu_ID_Interno' => 1
@@ -760,5 +768,34 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			return array('status' => 'success', 'message' => 'Se quitó asignación');
 		}
 		return array('status' => 'error', 'message' => 'Error al eliminar asignación pedido');
+	}
+
+	public function cambiarEstadoImpotacionIntegral($ID, $Nu_Estado, $sCorrelativo){
+        $where = array('ID_Pedido_Cabecera' => $ID);
+        $data = array( 'Nu_Importacion_Integral' => $Nu_Estado );
+		if ($this->db->update($this->table, $data, $where) > 0) {
+			return array('status' => 'success', 'message' => 'Actualizado');
+		}
+		return array('status' => 'error', 'message' => 'Error al cambiar estado');
+	}
+	
+	public function generarEstadoProcesoAgenteCompra($arrDataTour){
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '1. Coordinación con Proveedores',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosGarantizados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '1',
+			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+		);
+		
+		if ($this->db->insert_batch('proceso_agente_compra_pedido', $proceso_agente_compra_pedido)>0)
+			return array('status' => 'success', 'message' => 'Registro guardado');
+		return array('status' => 'error', 'message' => 'Error al guardar');
 	}
 }

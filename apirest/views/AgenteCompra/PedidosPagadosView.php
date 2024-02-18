@@ -149,8 +149,13 @@
                         <button type="button" class="btn btn-secondary" alt="Subir Costo FTA" title="Subir Costo FTA" onclick="subirPagoFTA()">Costo FTA</button>
                         <button type="button" id="btn-descargar_fta" class="btn btn-secondary d-none" alt="Descargar Costo FTA" title="Descargar Costo FTA" onclick="descargarPagoFTA()"><span id="span-fta"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
                         
+                        <button type="button" class="btn btn-secondary" alt="Subir Costo Gastos" title="Subir Costo Gastos" onclick="subirPagoCuadrilla()">Gastos</button>
+                        <button type="button" id="btn-descargar_pago_cuadrilla" class="btn btn-secondary d-none" alt="Descargar Costo Gastos" title="Descargar Costo Gastos" onclick="descargarPagoCuadrilla()"><span id="span-cuadrilla"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+
+                        <!-- ahora lo utilizaremos para otros gastos y se agrego campo de texto libre para concepto
                         <button type="button" class="btn btn-secondary" alt="Subir Costo Cuadrilla" title="Subir Costo Cuadrilla" onclick="subirPagoCuadrilla()">Cuadrilla</button>
                         <button type="button" id="btn-descargar_pago_cuadrilla" class="btn btn-secondary d-none" alt="Descargar Costo Cuadrilla" title="Descargar Costo Cuadrilla" onclick="descargarPagoCuadrilla()"><span id="span-cuadrilla"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                        -->
                         
                         <button type="button" class="btn btn-secondary" alt="Subir Otros Costos" title="Subir Otros Costo" onclick="subirPagoOtrosCostos()">Otros Costo</button>
                         <button type="button" id="btn-descargar_otros_costos" class="btn btn-secondary d-none" alt="Descargar Otros Costo" title="Descargar Otros Costo" onclick="descargarPagoOtrosCostos()"><span id="span-otros_costo"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
@@ -727,7 +732,7 @@
           </div>
 
           <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
-            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
             <div class="form-group">
               <input type="text" inputmode="numeric" id="costos_origen-Nu_Operacion_Pago_Otros_Costo_Origen" name="costos_origen-Nu_Operacion_Pago_Otros_Costo_Origen" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
               <span class="help-block" id="error"></span>
@@ -793,7 +798,7 @@
           </div>
 
           <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
-            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
             <div class="form-group">
               <input type="text" inputmode="numeric" id="pago_fta-Nu_Operacion_Pago_Otros_Costo_Fta" name="pago_fta-Nu_Operacion_Pago_Otros_Costo_Fta" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
               <span class="help-block" id="error"></span>
@@ -821,6 +826,14 @@
       <div class="modal-body" id="modal-body-otros_cuadrilla">
         <div class="row">
           <input type="hidden" id="otros_cuadrilla-id_cabecera" name="otros_cuadrilla-id_cabecera" class="form-control">
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Nombre Gasto <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" name="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" class="form-control" value="" maxlength="50" placeholder="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
 
           <div class="col-sm-12">
             <label>Voucher</label>
@@ -859,7 +872,7 @@
           </div>
 
           <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
-            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
             <div class="form-group">
               <input type="text" inputmode="numeric" id="otros_cuadrilla-Nu_Operacion_Pago_Otros_Cuadrilla" name="otros_cuadrilla-Nu_Operacion_Pago_Otros_Cuadrilla" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
               <span class="help-block" id="error"></span>
@@ -925,7 +938,7 @@
           </div>
 
           <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
-            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
             <div class="form-group">
               <input type="text" inputmode="numeric" id="otros_costos-Nu_Operacion_Pago_Otros_Costos" name="otros_costos-Nu_Operacion_Pago_Otros_Costos" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
               <span class="help-block" id="error"></span>

@@ -1879,3 +1879,56 @@ function removerAsignarPedido(ID, id_usuario) {
     });
   });
 }
+
+function cambiarEstadoImpotacionIntegral(ID, Nu_Estado, sCorrelativo) {
+  var $modal_delete = $('#modal-message-delete');
+  $modal_delete.modal('show');
+
+  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
+  $('.modal-message-delete').addClass('modal-success');
+
+  var sNombreEstado = 'quitar';
+  if(Nu_Estado==1)
+    sNombreEstado = 'agregar';
+
+  $('#modal-title').html('¿Deseas <strong>' + sNombreEstado + '</strong> importación integral?');
+
+  $('#btn-cancel-delete').off('click').click(function () {
+    $modal_delete.modal('hide');
+  });
+
+  $('#btn-save-delete').off('click').click(function () {
+    
+    $( '#btn-save-delete' ).text('');
+    $( '#btn-save-delete' ).attr('disabled', true);
+    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstadoImpotacionIntegral/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
+    $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $modal_delete.modal('hide');
+
+        $( '#btn-save-delete' ).text('');
+        $( '#btn-save-delete' ).append( 'Aceptar' );
+        $( '#btn-save-delete' ).attr('disabled', false);
+
+        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
+        $('#modal-message').modal('show');
+
+        if (response.status == 'success') {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          reload_table_Entidad();
+        } else {
+          $('.modal-message').addClass(response.style_modal);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
+        }
+      }
+    });
+  });
+}

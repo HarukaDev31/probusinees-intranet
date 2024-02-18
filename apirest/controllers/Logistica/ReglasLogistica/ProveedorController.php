@@ -143,9 +143,13 @@ class ProveedorController extends CI_Controller {
 	public function listarProveedores($sStatus='', $iCantidadNoProcesados=''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header');
+			//$this->load->view('header');
+			//$this->load->view('Logistica/ReglasLogistica/ProveedorView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados));
+			//$this->load->view('footer', array("js_proveedor" => true));
+			
+			$this->load->view('header_v2', array("js_proveedor" => true));
 			$this->load->view('Logistica/ReglasLogistica/ProveedorView', array('sStatus' => $sStatus, 'iCantidadNoProcesados' => $iCantidadNoProcesados));
-			$this->load->view('footer', array("js_proveedor" => true));
+			$this->load->view('footer_v2', array("js_proveedor" => true));
 		}
 	}
 	
@@ -166,14 +170,12 @@ class ProveedorController extends CI_Controller {
 			$rows[] = $row->Txt_Direccion_Entidad;
 			$arrEstadoRegistro = $this->HelperModel->obtenerEstadoRegistroArray($row->Nu_Estado);
             $rows[] = '<span class="label label-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verProveedor(\'' . $row->ID_Entidad . '\')"><i class="fa fa-2x fa-pencil" aria-hidden="true"></i></button>';
-			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarProveedor(\'' . $row->ID_Entidad . '\', \'' . $action . '\')"><i class="fa fa-2x fa-trash-o" aria-hidden="true"></i></button>';
+			
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verProveedor(\'' . $row->ID_Entidad . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarProveedor(\'' . $row->ID_Entidad . '\', \'' . $action . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
         $output = array(
-	        'draw' => $this->input->post('draw'),
-	        'recordsTotal' => $this->ProveedorModel->count_all(),
-	        'recordsFiltered' => $this->ProveedorModel->count_filtered(),
 	        'data' => $data,
         );
         echo json_encode($output);

@@ -5,6 +5,12 @@ class HelperImportacionModel extends CI_Model{
 		parent::__construct();
 	}
 
+	function obtenerEstadoImportacionIntegral($iEstado){
+		if( $iEstado == 1 )
+			return array('No_Estado' => 'Si','No_Class_Estado' => 'success');
+		return array('No_Estado' => 'No','No_Class_Estado' => 'secondary');
+	}
+
 	function obtenerEstadoConsolidadoArray($iEstado){
 		if( $iEstado == 1 )
 			return array('No_Estado' => 'Completada','No_Class_Estado' => 'success');

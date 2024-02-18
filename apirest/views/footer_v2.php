@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.1.53'; ?>
+<?php $iControlVersionDashboard = '1.1.59'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -56,6 +56,11 @@
 <?php if (isset($js_cliente) && $js_cliente==true) : ?>
 <script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/Ventas/ReglasVentas/cliente.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_proveedor) && $js_proveedor==true) : ?>
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/Logistica/ReglasLogistica/proveedor.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <!-- Folder: ImportacionGrupal -->

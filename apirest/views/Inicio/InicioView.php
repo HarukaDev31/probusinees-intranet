@@ -51,7 +51,7 @@
 
             <div class="card card-dark">
               <div class="card-header text-center border-0 pb-2 pt-2">
-                <h4 class="mb-0">Pedidos Garantizados / O.C. Aprobadas</h4>
+                <h4 class="mb-0">Cotizaciones Garantizadas / O.C. Aprobadas</h4>
               </div>
               
               <div class="card-body">
@@ -65,7 +65,7 @@
                     foreach ($arrResponseVerificarProceso as $row_progreso) {
                       $iProgreso+=($row_progreso->Nu_Estado_Proceso == 1 ? 1 : 0);
                       //$btn_editar_cliente = '';
-                      if($row_progreso->Nu_ID_Interno==1) {//1=pedido pagado
+                      if($row_progreso->Nu_ID_Interno==1 && $row_progreso->Nu_Estado_Proceso == 0) {//1=pedido pagado
                         $btn_editar_cliente = '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarCliente(' . $row->ID_Entidad . ')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
                       }
                     }
@@ -140,10 +140,6 @@
 </div>
 
 <!-- Modal cliente -->
-<!--
-ALTER TABLE entidad ADD COLUMN ID_Tipo_Documento_Identidad_Externo int(11) DEFAULT 0;
-ALTER TABLE entidad ADD COLUMN Nu_Documento_Identidad_Externo varchar(16) DEFAULT 0;
--->
 <div class="modal fade modal-cliente" id="modal-default">
   <?php $attributes = array('id' => 'form-cliente'); echo form_open('', $attributes); ?>
   <div class="modal-dialog">

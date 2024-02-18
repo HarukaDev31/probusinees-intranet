@@ -840,6 +840,7 @@ class PedidosPagadosModel extends CI_Model{
 
 				$where = array('ID_Pedido_Cabecera' => $arrPost['otros_cuadrilla-id_cabecera']);
 				$data = array(
+					'No_Concepto_Pago_Cuadrilla' => $arrPost['otros_cuadrilla-No_Concepto_Pago_Cuadrilla'],
 					'Txt_Url_Pago_Otros_Cuadrilla' => $Txt_Url_Imagen_Producto,
 					'ID_Pais_Otros_Cuadrilla' => $arrPost['otros_cuadrilla-ID_Pais_Otros_Cuadrilla'],
 					'Fe_Pago_Otros_Cuadrilla' => ToDate($arrPost['otros_cuadrilla-Fe_Pago_Otros_Cuadrilla']),
