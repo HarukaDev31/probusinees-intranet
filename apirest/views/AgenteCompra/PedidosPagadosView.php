@@ -1165,13 +1165,87 @@
     <div class="modal-content">
       <div class="modal-body" id="modal-body-cambio_item_proveedor">
         <div class="row">
-          <input type="hidden" id="despacho-id_cabecera" name="despacho-id_cabecera" class="form-control">
-          <input type="hidden" id="despacho-correlativo" name="despacho-correlativo" class="form-control">
-          <div class="col-sm-12">
-            <label>F. Entrega</label>
-            <div class="form-group">
-              <input type="text" name="despacho-Fe_Entrega_Shipper_Forwarder" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-              <span class="help-block text-danger" id="error"></span>
+          <input type="hidden" id="cambio_item_proveedor-id_item" name="cambio_item_proveedor-id_item" class="form-control">
+          <input type="hidden" id="cambio_item_proveedor-id_cabecera" name="cambio_item_proveedor-id_cabecera" class="form-control">
+          <div id="card1" class="card border-0 rounded shadow-sm mt-3">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="card-body pt-3">
+                  <div class="row">
+                    <div class="col-11 col-sm-11 col-md-11 col-lg-11 mb-0 mb-sm-0">
+                      <h6 class="text-left card-title mb-2 pt-0" style="text-align: left;"><span class="fw-bold" style="font-weight: bold;">Imagen<span class="label-advertencia text-danger"> *</span></span></h6>
+                      <div class="form-group">
+                        <input class="form-control" name="voucher[1][]" type="file" accept="image/*" multiple="">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    
+                    <div class="col-1 col-sm-1 col-md-1 col-lg-1">
+                      <span class="fw-bold" style="font-weight: bold;">&nbsp;</span>
+                      <div class="d-grid gap">
+                        <button type="button" id="btn-quitar_item_1" class="btn btn-outline-danger btn-quitar_item col" data-id="1">X</button>
+                      </div>
+                    </div>
+                    <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Precio<span class="label-advertencia text-danger"> *</span></span></h6>
+                      <div class="form-group">
+                        <input type="text" id="modal-precio1" data-correlativo="1" inputmode="decimal" name="addProducto[1][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">moq<span class="label-advertencia text-danger"> *</span></span></h6>
+                      <div class="form-group">
+                        <input type="text" id="modal-moq1" data-correlativo="1" inputmode="decimal" name="addProducto[1][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span></h6>
+                      <div class="form-group">
+                        <input type="text" id="modal-qty_caja1" data-correlativo="1" inputmode="decimal" name="addProducto[1][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">cbm<span class="label-advertencia text-danger"> *</span></span></h6>
+                      <div class="form-group">
+                        <input type="text" id="modal-cbm1" data-correlativo="1" inputmode="decimal" name="addProducto[1][cbm]" class="arrProducto form-control required input-decimal" cbm="" placeholder="" value="" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">T. Producción</span></h6>
+                      <input type="text" inputmode="numeric" id="modal-delivery1" name="addProducto[1][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off">
+                    </div>
+                    <div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">C. Delivery</span></h6>
+                      <input type="text" inputmode="decimal" id="modal-costo_delivery1" name="addProducto[1][costo_delivery]" class="arrProducto form-control input-decimal" placeholder="" minlength="1" maxlength="90" autocomplete="off">
+                    </div>
+                    <div class="col-sm-12 mb-1">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Observaciones</span></h6>
+                      <div class="form-group">
+                        <textarea class="arrProducto form-control required nota" rows="1" placeholder="Opcional" id="modal-nota1" name="addProducto[1][nota]" style="height: 50px;"></textarea>
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 mb-1"><h6 class="card-title mb-2" style="font-weight:bold">
+                      <span class="fw-bold">Nombre Proveedor</span></h6>
+                      <div class="form-group">
+                        <input type="text" inputmode="text" id="modal-contacto_proveedor1" name="addProducto[1][contacto_proveedor]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 mb-0">
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Foto Proveedor</span></h6>
+                      <div class="form-group">
+                        <input class="form-control" id="modal-foto_proveedor1" name="proveedor[1]" type="file" accept="image/*">
+                        <span class="help-block text-danger" id="error"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

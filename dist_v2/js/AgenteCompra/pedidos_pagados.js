@@ -1224,6 +1224,18 @@ $(function () {
     });
   })
   
+	$(document).on('click', '.btn-cambiar_item_proveedor', function (e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+    var id_pedido_cabecera = $(this).data('id_pedido_cabecera');
+
+    $( '[name="cambio_item_proveedor-id_item"]' ).val(id);
+    $( '[name="cambio_item_proveedor-id_cabecera"]' ).val(id_pedido_cabecera);
+  
+    $('#modal-cambio_item_proveedor').modal('show');
+    $( '#form-cambio_item_proveedor' )[0].reset();
+  });
 })
 
 function reload_table_Entidad(){
