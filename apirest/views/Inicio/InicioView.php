@@ -9,7 +9,11 @@
           <h1 class="mb-3">Inicio</h1>
         </div>
 
-        <?php if($arrResponsePedidoXUsuario['status']=='success'){ ?>
+        <?php
+        //echo $this->user->ID_Usuario;
+        //array_debug($arrResponsePedidoXUsuario);
+
+        if($arrResponsePedidoXUsuario['status']=='success'){ ?>
           <?php
           $iCantidadGaranizado = 0;
           $iCantidadPagado = 0;
@@ -58,16 +62,19 @@
                 <div id="accordion">
                   <?php foreach ($arrResponsePedidoXUsuario['result'] as $row) { ?>
                   <?php
-                    //array_debug($row);
                     $arrResponseVerificarProceso = $this->ConfiguracionModel->verificarEstadoProcesoAgenteCompra($row->ID_Pedido_Cabecera);
+                    //echo count($arrResponseVerificarProceso);
+                    //array_debug($arrResponseVerificarProceso);
+                    $iCantidadPasos = count($arrResponseVerificarProceso);
                     $iProgreso=0;
-                    $btn_editar_cliente = '';
+                    //$btn_editar_cliente = '';
+                    $btn_editar_cliente = '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarCliente(' . $row->ID_Entidad . ')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
                     foreach ($arrResponseVerificarProceso as $row_progreso) {
                       $iProgreso+=($row_progreso->Nu_Estado_Proceso == 1 ? 1 : 0);
                       //$btn_editar_cliente = '';
-                      if($row_progreso->Nu_ID_Interno==1 && $row_progreso->Nu_Estado_Proceso == 0) {//1=pedido pagado
-                        $btn_editar_cliente = '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarCliente(' . $row->ID_Entidad . ')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-                      }
+                      //if($row_progreso->Nu_ID_Interno==1 && $row_progreso->Nu_Estado_Proceso == 0) {//1=pedido pagado
+                        //$btn_editar_cliente = '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarCliente(' . $row->ID_Entidad . ')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+                      //}
                     }
                     //array_debug($arrResponseVerificarProceso);
                     $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
@@ -85,7 +92,7 @@
                                 <div>Cliente: <?php echo $row->No_Contacto; ?> / Empresa: <?php echo $row->No_Entidad; ?> <?php echo $btn_editar_cliente; ?></div>
                               </div>
                               <div class="col-2 col-sm-2 text-right">
-                                <span class="badge bg-primary"><?php echo $iProgreso; ?> / 4</span>
+                                <span class="badge bg-primary"><?php echo $iProgreso; ?> / <?php echo $iCantidadPasos; ?></span>
                               </div>
                             </div>
                           </a>
@@ -94,10 +101,10 @@
                       <div id="collapse-<?php echo $row->ID_Pedido_Cabecera; ?>" class="collapse" data-parent="#accordion" style="">
                         <?php
                         $arrResponseVerificarProcesoDetalle = $this->ConfiguracionModel->obtenerPedidosXUsuarioDetalle($row->ID_Pedido_Cabecera);
-                        if ($arrResponseVerificarProcesoDetalle['status']=='success' && $this->empresa->Nu_Lae_Gestion==1) {
+                        if ($arrResponseVerificarProcesoDetalle['status']=='success') {
                           $iCantidadLineaCarga = 0;
                           foreach ($arrResponseVerificarProcesoDetalle['result'] as $row_menu) {
-                            $iCantidadLineaCarga += ($row_menu->Nu_Estado_Proceso==1 ? 25 : 0);
+                            $iCantidadLineaCarga += ($row_menu->Nu_Estado_Proceso==1 ? round((100 / $iCantidadPasos), 0) : 0);
                           }
                         ?>
                         <div class="card-body pt-0 px-1 pb-0">

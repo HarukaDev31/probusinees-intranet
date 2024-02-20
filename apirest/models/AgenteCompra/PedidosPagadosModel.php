@@ -92,6 +92,7 @@ class PedidosPagadosModel extends CI_Model{
 		IGPD.ID_Pedido_Detalle,
 		IGPD.Txt_Url_Imagen_Producto,
 		IGPD.Txt_Producto,
+		ACPDPP.ID_Entidad_Proveedor,
 		ACPDPP.Qt_Producto_Caja_Final AS Qt_Producto,
 		ACPDPP.Ss_Precio,
 		ACPDPP.Nu_Dias_Delivery,
@@ -104,7 +105,12 @@ class PedidosPagadosModel extends CI_Model{
 		ACPDPP.No_Contacto_Proveedor,
 		ACPDPP.Txt_Url_Imagen_Proveedor,
 		ACPDPP.Fe_Entrega_Proveedor,
-		ACPDPP.Nu_Visualizacion_Item');
+		ACPDPP.Nu_Visualizacion_Item,
+		ACPDPP.Qt_Producto_Caja_Final_Verificada,
+		ACPDPP.Nu_Estado_Recepcion_Carga_Proveedor_Item,
+		ACPDPP.Txt_Nota_Recepcion_Carga_Proveedor,
+		ACPDPP.Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor
+		');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
     	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');		
@@ -113,6 +119,7 @@ class PedidosPagadosModel extends CI_Model{
         $this->db->where($this->table . '.ID_Pedido_Cabecera',$ID);
 		$this->db->where('ACPDPP.Nu_Selecciono_Proveedor',1);
 		$this->db->where('ACPDPP.Nu_Visualizacion_Item',1);
+		$this->db->order_by( 'ACPDPP.ID_Entidad_Proveedor ASC' );
         $query = $this->db->get();
         return $query->result();
     }
@@ -925,4 +932,96 @@ class PedidosPagadosModel extends CI_Model{
 		$query = "SELECT Txt_Url_Pago_Otros_Costos AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
+
+    public function actualizarProveedor($where_entidad, $data, $where_detalle_item){
+		if ( $this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where_detalle_item) > 0 ) {
+			$data = array(
+				'No_Wechat' => $data['No_Wechat']
+			);
+			if ( $this->db->update('entidad', $data, $where_entidad) > 0 )
+				return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+		} else {
+			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al item proveedor');
+		}
+    }
+	
+	public function getPedidoProveedor($ID){
+		$query = "SELECT No_Wechat, No_Rubro, No_Cuenta_Bancaria, Ss_Pago_Importe_1 FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle_Producto_Proveedor = " . $ID . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+    public function reservaBooking($where, $data){
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+	
+	public function getBooking($ID){
+		$query = "SELECT Qt_Caja_Total_Booking, Qt_Cbm_Total_Booking, Qt_Peso_Total_Booking FROM agente_compra_pedido_cabecera WHERE ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+    public function actualizarRecepcionCargaItemProveedor($where, $data){
+		if ( $this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+
+    public function actualizarRecepcionCargaProveedor($where, $data){
+		if ( $this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+
+	public function subirInvoicePlProveedor($arrPost, $data_files){
+		if (isset($data_files['image_documento']['name'])) {
+			$this->db->trans_begin();
+			$path = "assets/images/invoice_pl_proveedor/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'xlsx|csv|xls|pdf|doc|docx';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('image_documento')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Detalle_Producto_Proveedor' => $arrPost['documento-id']);
+				$data = array( 'Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor' => $Txt_Url_Imagen_Producto );//1=SI
+				$this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where);
+			}
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+	
+	public function descargarInvoicePlProveedor($id){
+		$query = "SELECT Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor AS Txt_Url_Imagen_Producto FROM " . $this->table_agente_compra_pedido_detalle_producto_proveedor . " WHERE ID_Pedido_Detalle_Producto_Proveedor = " . $id . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+    public function despacho($where, $data){
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
 }

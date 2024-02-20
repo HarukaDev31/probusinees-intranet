@@ -57,8 +57,13 @@
                       <th>Envío</th>
                       <th>Perú</th>
                       <th>China</th>
+                      <th class="no-sort">Negociación</th>
+                      <th class="no-sort">Booking</th>
+                      <th class="no-sort">Recep. Carga</th>
                       <th class="no-sort">Pay</th>
                       <th class="no-sort">Insp.</th>
+                      <th class="no-sort">Invoice P.</th>
+                      <th class="no-sort">Despacho</th>
                       <th class="no-sort">Invoice</th>
                     </tr>
                   </thead>
@@ -83,7 +88,12 @@
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-6 col-md-6">
+                    <?php
+                    $sClassOcultar = '';
+                    if($this->user->Nu_Tipo_Privilegio_Acceso==2)
+                      $sClassOcultar = 'd-none';
+                    ?>
+                    <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
                       <label>Cliente</label>
                       <div class="form-group">
                         <input type="text" name="No_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -107,7 +117,7 @@
                       </div>
                     </div>
                     
-                    <div class="col-6 col-sm-6 col-md-6">
+                    <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
                       <label>Empresa</label>
                       <div class="form-group">
                         <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -123,7 +133,7 @@
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-12 col-md-6 text-left">
+                    <div class="col-6 col-sm-12 col-md-6 text-left <?php echo $sClassOcultar; ?>">
                       <label>Pagos</label>
                       <div class="form-group">
                         <button type="button" class="btn btn-secondary" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">Pagar 30%</button>
@@ -137,7 +147,7 @@
                       </div>
                     </div>
 
-                    <div class="col-6 col-sm-12 col-md-6 text-left">
+                    <div class="col-6 col-sm-12 col-md-6 text-left <?php echo $sClassOcultar; ?>">
                       <label>Otros Pagos</label>
                       <div class="form-group">
                         <button type="button" class="btn btn-secondary" alt="Subir Flete" title="Subir Flete" onclick="subirPagoFlete()">Pagar Flete</button>
@@ -232,6 +242,37 @@
                               <th class="text-right">Supplier</th><!--proveedor-->
                               <th class="text-right">Phone_Image_Supplier</th><!--celular imagen de tarjeta de presentación-->
                               <th class="text-right"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      <div class="table-responsive div-Producto_Recepcion_Carga">
+                        <table id="table-Producto_Recepcion_Carga" class="table table-bordered table-hover">
+                          <thead class="thead-light">
+                            <tr>
+                              <th style='display:none;' class="text-left">ID</th>
+                              <th class="text-left" width="50px">Product_Photo</th>
+                              <th class="text-left">Product_Name</th>
+                              <th class="text-right">Qty</th>
+                              <th class="text-center">Estado</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      <div class="table-responsive div-Invoice_Proveedor">
+                        <table id="table-Invoice_Proveedor" class="table table-bordered table-hover">
+                          <thead class="thead-light">
+                            <tr>
+                              <th style='display:none;' class="text-left">ID</th>
+                              <th class="text-center" width="50px">Supplier</th>
+                              <th class="text-center">Invoice y PL</th>
+                              <th class="text-center"></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -983,3 +1024,166 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /. Modal comision_trading -->
+
+<!-- Modal proveedor -->
+<div class="modal fade modal-proveedor" id="modal-default">
+  <?php $attributes = array('id' => 'form-proveedor'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center">Proveedor</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="proveedor-ID_Entidad" class="form-control" autocomplete="off">
+          <input type="hidden" name="proveedor-ID_Pedido_Detalle_Producto_Proveedor" class="form-control" autocomplete="off">
+
+          <div class="col-6 col-lg-8">
+            <label>Wechat</label>
+            <div class="form-group">
+              <input type="text" name="proveedor-No_Wechat" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4">
+            <label>Rubro</label>
+            <div class="form-group">
+              <input type="text" name="proveedor-No_Rubro" class="form-control" placeholder="Opcional" maxlength="50" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-8">
+            <label>Cuenta Bancaria</label>
+            <div class="form-group">
+              <input type="text" name="proveedor-No_Cuenta_Bancaria" placeholder="Ingresar" class="form-control" maxlength="100" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4">
+            <label>Importe 1</label>
+            <div class="form-group">
+              <input type="text" name="proveedor-Ss_Pago_Importe_1" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_proveedor" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal proveedor -->
+
+<!-- Modal booking -->
+<div class="modal fade modal-booking" id="modal-default">
+  <?php $attributes = array('id' => 'form-booking'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center">Reserva de Booking</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="booking-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+
+          <div class="col-12 col-lg-4">
+            <label>Cajas Total</label>
+            <div class="form-group">
+              <input type="text" name="booking-Qt_Caja_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4">
+            <label>CBM Total</label>
+            <div class="form-group">
+              <input type="text" name="booking-Qt_Cbm_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4">
+            <label>Peso Total</label>
+            <div class="form-group">
+              <input type="text" name="booking-Qt_Peso_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_booking" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal booking -->
+
+<!-- modal fecha_entrega_shipper -->
+<div class="modal fade modal-fecha_entrega_shipper" id="modal-fecha_entrega_shipper">
+  <?php $attributes = array('id' => 'form-fecha_entrega_shipper'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-fecha_entrega_shipper">
+        <div class="row">
+          <input type="hidden" id="despacho-id_cabecera" name="despacho-id_cabecera" class="form-control">
+          <input type="hidden" id="despacho-correlativo" name="despacho-correlativo" class="form-control">
+          <div class="col-sm-12">
+            <label>F. Entrega</label>
+            <div class="form-group">
+              <input type="text" name="despacho-Fe_Entrega_Shipper_Forwarder" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_fecha_entrega_shipper" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar fecha_entrega_shipper -->
+
+<!-- modal cambio_item_proveedor -->
+<div class="modal fade modal-cambio_item_proveedor" id="modal-cambio_item_proveedor">
+  <?php $attributes = array('id' => 'form-cambio_item_proveedor'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-cambio_item_proveedor">
+        <div class="row">
+          <input type="hidden" id="despacho-id_cabecera" name="despacho-id_cabecera" class="form-control">
+          <input type="hidden" id="despacho-correlativo" name="despacho-correlativo" class="form-control">
+          <div class="col-sm-12">
+            <label>F. Entrega</label>
+            <div class="form-group">
+              <input type="text" name="despacho-Fe_Entrega_Shipper_Forwarder" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_cambio_item_proveedor" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar cambio_item_proveedor -->

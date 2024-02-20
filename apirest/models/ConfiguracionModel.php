@@ -665,6 +665,9 @@ Nu_Orden_Slider;";
 	public function obtenerPedidosXUsuario(){
 		//->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
 		//->where_in($this->table . '.Nu_Estado', array(5,6,7,9));//pagados / oc
+
+		$where_id_usuario = ($this->user->Nu_Tipo_Privilegio_Acceso==1 ? " ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario : " ACPC.ID_Usuario_Interno_China = " . $this->user->ID_Usuario);
+
 		$query = "SELECT
 ACPC.ID_Pedido_Cabecera,
 ACPC.Fe_Emision_Cotizacion,
@@ -681,8 +684,7 @@ FROM
 agente_compra_pedido_cabecera AS ACPC
 JOIN agente_compra_correlativo AS CORRE ON(CORRE.ID_Agente_Compra_Correlativo = ACPC.ID_Agente_Compra_Correlativo)
 JOIN entidad AS CLI ON(CLI.ID_Entidad = ACPC.ID_Entidad)
-WHERE
-ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario . " AND ACPC.Nu_Etapa_Pedido=0 ORDER BY ACPC.Fe_Registro_Hora_Cotizacion DESC";//ver cual interesa más primeros pedidos o los ultimos arriba?
+WHERE " . $where_id_usuario . " ORDER BY ACPC.Fe_Registro_Hora_Cotizacion ASC";//ver cual interesa más primeros pedidos o los ultimos arriba?
 		if ( !$this->db->simple_query($query) ){
 			$error = $this->db->error();
 			return array(
@@ -703,6 +705,7 @@ ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario . " AND ACPC.Nu_Et
 		return array(
 			'status' => 'warning',
 			'message' => 'No se encontro registro',
+			'query' => $query,
 		);
 	}
 	
@@ -714,7 +717,7 @@ PACP.Txt_Url_Menu
 FROM
 proceso_agente_compra_pedido AS PACP
 WHERE
-PACP.ID_Pedido_Cabecera = " . $ID_Pedido_Cabecera . " ORDER BY PACP.Nu_Orden";
+PACP.ID_Pedido_Cabecera = " . $ID_Pedido_Cabecera . " AND PACP.ID_Usuario_Interno_Empresa=" . $this->user->ID_Usuario . " ORDER BY PACP.Nu_Orden";
 		if ( !$this->db->simple_query($query) ){
 			$error = $this->db->error();
 			return array(
@@ -739,7 +742,7 @@ PACP.ID_Pedido_Cabecera = " . $ID_Pedido_Cabecera . " ORDER BY PACP.Nu_Orden";
 	}
 
     public function verificarEstadoProcesoAgenteCompra($ID_Pedido_Cabecera){
-        $query ="SELECT Nu_ID_Interno, Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera=".$ID_Pedido_Cabecera;
+        $query ="SELECT Nu_ID_Interno, Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera=".$ID_Pedido_Cabecera . " AND ID_Usuario_Interno_Empresa=" . $this->user->ID_Usuario;
 		return $this->db->query($query)->result();
     }
 }

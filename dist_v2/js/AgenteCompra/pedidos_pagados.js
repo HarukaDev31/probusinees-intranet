@@ -15,6 +15,174 @@ if (fMonth < 10) {
 }
 
 $(function () {
+	$(document).on('click', '#btn-guardar_fecha_entrega_shipper', function (e) {
+    e.preventDefault();
+
+    $( '#btn-guardar_fecha_entrega_shipper' ).text('');
+    $( '#btn-guardar_fecha_entrega_shipper' ).attr('disabled', true);
+    $( '#btn-guardar_fecha_entrega_shipper' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    url = base_url + 'AgenteCompra/PedidosPagados/despacho';
+      $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : $('#form-fecha_entrega_shipper').serialize(),
+      success : function( response ){
+          //$( '#modal-loader' ).modal('hide');
+          
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $('.modal-fecha_entrega_shipper').modal('hide');
+              
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+            reload_table_Entidad();
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
+          }
+          
+          $( '#btn-guardar_fecha_entrega_shipper' ).text('');
+          $( '#btn-guardar_fecha_entrega_shipper' ).append( 'Guardar' );
+          $( '#btn-guardar_fecha_entrega_shipper' ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          //$( '#modal-loader' ).modal('hide');
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          
+          $( '#modal-message' ).modal('show');
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-guardar_fecha_entrega_shipper' ).text('');
+          $( '#btn-guardar_fecha_entrega_shipper' ).append( 'Guardar' );
+          $( '#btn-guardar_fecha_entrega_shipper' ).attr('disabled', false);
+      }
+    });
+  });
+
+	$(document).on('click', '#btn-save_proveedor', function (e) {
+    e.preventDefault();
+
+    $( '#btn-save_proveedor' ).text('');
+    $( '#btn-save_proveedor' ).attr('disabled', true);
+    $( '#btn-save_proveedor' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    //$( '#modal-loader' ).modal('show');
+
+    url = base_url + 'AgenteCompra/PedidosPagados/crudProveedor';
+      $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : $('#form-proveedor').serialize(),
+      success : function( response ){
+          //$( '#modal-loader' ).modal('hide');
+          
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $('.modal-proveedor').modal('hide');
+              
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+            
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
+          }
+          
+          $( '#btn-save_proveedor' ).text('');
+          $( '#btn-save_proveedor' ).append( 'Guardar' );
+          $( '#btn-save_proveedor' ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          //$( '#modal-loader' ).modal('hide');
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          
+          $( '#modal-message' ).modal('show');
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-save_proveedor' ).text('');
+          $( '#btn-save_proveedor' ).append( 'Guardar' );
+          $( '#btn-save_proveedor' ).attr('disabled', false);
+      }
+    });
+  });
+
+	$(document).on('click', '#btn-save_booking', function (e) {
+    e.preventDefault();
+
+    $( '#btn-save_booking' ).text('');
+    $( '#btn-save_booking' ).attr('disabled', true);
+    $( '#btn-save_booking' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    //$( '#modal-loader' ).modal('show');
+
+    url = base_url + 'AgenteCompra/PedidosPagados/reservaBooking';
+      $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : $('#form-booking').serialize(),
+      success : function( response ){
+          //$( '#modal-loader' ).modal('hide');
+          
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $('.modal-booking').modal('hide');
+              
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
+          }
+          
+          $( '#btn-save_booking' ).text('');
+          $( '#btn-save_booking' ).append( 'Guardar' );
+          $( '#btn-save_booking' ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          //$( '#modal-loader' ).modal('hide');
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          
+          $( '#modal-message' ).modal('show');
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-save_booking' ).text('');
+          $( '#btn-save_booking' ).append( 'Guardar' );
+          $( '#btn-save_booking' ).attr('disabled', false);
+      }
+    });
+  });
+
   //cambiar precio delivery
   $('#btn-save_comision_trading').off('click').click(function () {
     if($( '#txt-modal-precio_comision_trading' ).val().length==0){
@@ -879,13 +1047,190 @@ $(function () {
   });
   
   $('#span-id_pedido').html('');
+  
+	$(document).on('click', '.btn-estado_item_proveedor', function (e) {
+    e.preventDefault();
+
+    var id = $(this).data('id');
+    var id_pedido_cabecera = $(this).data('id_pedido_cabecera');
+    var cantidad = $('#input-cantidad' + id).val();
+    var estado = $(this).data('estado');
+    
+    $( '.btn-cargando_item_proveedor' + id ).text('');
+    $( '.btn-cargando_item_proveedor' + id ).attr('disabled', true);
+    $( '.btn-cargando_item_proveedor' + id ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
+
+    url = base_url + 'AgenteCompra/PedidosPagados/actualizarRecepcionCargaItemProveedor';
+    $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : {
+        id: id,
+        cantidad: cantidad,
+        estado: estado,
+      },
+      success : function( response ){
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+        
+        if (response.status == 'success'){
+          recepcionCarga(id_pedido_cabecera);
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+        }
+        
+        $( '.btn-cargando_item_proveedor' + id ).text('');
+        $( '.btn-cargando_item_proveedor' + id ).html( 'Guardar' );
+        $( '.btn-cargando_item_proveedor' + id ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+        console.log(jqXHR.responseText);
+        
+        $( '.btn-cargando_item_proveedor' + id ).text('');
+        $( '.btn-cargando_item_proveedor' + id ).append( 'Guardar' );
+        $( '.btn-cargando_item_proveedor' + id ).attr('disabled', false);
+      }
+    });
+  })
+  
+	$(document).on('click', '.btn-finalizar_item_proveedor', function (e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+    var id_pedido_cabecera = $(this).data('id_pedido_cabecera');
+    var nota = $('#textarea-nota' + id).val();
+    
+    $( '#btn-finalizar_item_proveedor' + id ).text('');
+    $( '#btn-finalizar_item_proveedor' + id ).attr('disabled', true);
+    $( '#btn-finalizar_item_proveedor' + id ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
+
+    url = base_url + 'AgenteCompra/PedidosPagados/actualizarRecepcionCargaProveedor';
+    $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : {
+        id: id,
+        nota: nota,
+      },
+      success : function( response ){
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+        
+        if (response.status == 'success'){
+          recepcionCarga(id_pedido_cabecera);
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+        }
+        
+        $( '#btn-finalizar_item_proveedor' + id ).text('');
+        $( '#btn-finalizar_item_proveedor' + id ).html( 'Guardar' );
+        $( '#btn-finalizar_item_proveedor' + id ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+        console.log(jqXHR.responseText);
+        
+        $( '#btn-finalizar_item_proveedor' + id ).text('');
+        $( '#btn-finalizar_item_proveedor' + id ).append( 'Guardar' );
+        $( '#btn-finalizar_item_proveedor' + id ).attr('disabled', false);
+      }
+    });
+  })
+  
+  
+	$(document).on('click', '.btn-image_documento', function (e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+    var id_pedido_cabecera = $(this).data('id_pedido_cabecera');
+    
+    $( '#btn-image_documento' + id ).text('');
+    $( '#btn-image_documento' + id ).attr('disabled', true);
+    $( '#btn-image_documento' + id ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
+
+    var postData = new FormData($("#form-invoice_pl_proveedor" + id)[0]);
+    url = base_url + 'AgenteCompra/PedidosPagados/subirInvoicePlProveedor';
+    $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data: postData,
+      processData: false,
+      contentType: false,
+      success : function( response ){
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+        
+        if (response.status == 'success'){
+          invoiceProveedor(id_pedido_cabecera);
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1100);
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1200);
+        }
+        
+        $( '#btn-finalizar_item_proveedor' + id ).text('');
+        $( '#btn-finalizar_item_proveedor' + id ).html( 'Guardar' );
+        $( '#btn-finalizar_item_proveedor' + id ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+        console.log(jqXHR.responseText);
+        
+        $( '#btn-finalizar_item_proveedor' + id ).text('');
+        $( '#btn-finalizar_item_proveedor' + id ).append( 'Guardar' );
+        $( '#btn-finalizar_item_proveedor' + id ).attr('disabled', false);
+      }
+    });
+  })
+  
 })
 
 function reload_table_Entidad(){
   table_Entidad.ajax.reload(null,false);
 }
 
-function verPedido(ID){
+function invoiceProveedor(ID){
   $( '.div-Listar' ).hide();
   
   $( '#form-pedido' )[0].reset();
@@ -893,8 +1238,14 @@ function verPedido(ID){
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
 
+  $( '.div-Compuesto' ).hide();
+  $( '.div-Producto_Recepcion_Carga' ).hide();
 	$( '#table-Producto_Enlace tbody' ).empty();
-  $( '#table-Producto_Enlace' ).show();
+	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
+
+  $( '.div-Invoice_Proveedor' ).show();
+	$( '#table-Invoice_Proveedor tbody' ).empty();
+  $( '#table-Invoice_Proveedor' ).show();
 
   //$('#span-id_pedido').html('Nro. ' + ID);
 
@@ -1007,7 +1358,475 @@ function verPedido(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
       
-      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0;
+      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
+      for (i = 0; i < detalle.length; i++) {
+        var cantidad_item_final_recepcion_carga = parseFloat(detalle[i]['Qt_Producto_Caja_Final_Verificada']);
+        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
+        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
+
+        fTotalCliente += (cantidad_item * (precio_china * parseFloat(response.Ss_Tipo_Cambio)));
+
+        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
+        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
+        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
+        //max-height: 350px;width: 100%; cursor:pointer
+
+        var fTotal = (cantidad_item * precio_china);
+        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
+        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
+
+        sClassColorTr = '';
+        iDiasVencimiento = 0;
+        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
+          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
+          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
+
+          var diff = fechaFin - fechaInicio;
+          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
+          if(iDiasVencimiento<5)
+            sClassColorTr = 'table-warning';
+        }
+
+        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
+
+        var nota_final = (detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] != '' && detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] != null ? detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] : '');
+
+        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
+          table_enlace_producto +="<tr>";
+            table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Contacto_Proveedor + "</th>";
+            table_enlace_producto += "<th class='text-left'>";//Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor si es diferente de vacio descargar
+              if(detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor != '' && detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor != null) {
+                table_enlace_producto += '<button class="btn btn-link" alt="Descargar Invoice y PL" title="Descargar Invoice y PL" href="javascript:void(0)" onclick="descargarInvoicePlProveedor(' + id_item + ')">Descargar</button>';
+              } else {
+                table_enlace_producto += '<form action="' + base_url + 'AgenteCompra/PedidosPagados/listar" id="form-invoice_pl_proveedor' + id_item + '" method="post" accept-charset="utf-8">';
+                  table_enlace_producto += '<input type="hidden" id="documento-id" name="documento-id" value="' + id_item + '" class="form-control"></input>';
+                  table_enlace_producto += '<input class="form-control" id="image_documento' + id_item + '" name="image_documento" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>';
+                table_enlace_producto += '</form>';
+              }
+              //table_enlace_producto += '<textarea id="textarea-nota' + id_item + '" name="addProducto[' + id_item + '][nota]" class="form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + clearHTMLTextArea(nota_final) + '</textarea>';
+            table_enlace_producto += '</th>';
+            table_enlace_producto += "<th class='text-center'>";
+              if(detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor != '' && detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor != null) {
+                table_enlace_producto += '';
+              } else {
+                table_enlace_producto += '<button type="button" id="btn-image_documento' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-primary btn-image_documento"> Subir archivo </button>';
+              }
+            table_enlace_producto += '</th>';
+          +"</tr>";
+          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
+        }
+      }
+      
+      $('#span-total_cantidad_items').html(i);
+      $( '#table-Invoice_Proveedor' ).append(table_enlace_producto);
+
+      $( '#span-total_cliente' ).html('$ ' + fTotalCliente.toFixed(2));
+
+      $( '#span-saldo_cliente' ).html('$ ' + (fTotalCliente - (parseFloat(response.Ss_Pago_30_Cliente) + parseFloat(response.Ss_Pago_100_Cliente) + parseFloat(response.Ss_Pago_Servicio_Cliente))));
+      
+      //Date picker invoice
+      $( '.input-datepicker-today-to-more' ).datepicker({
+        autoclose : true,
+        startDate : new Date(fYear, fToday.getMonth(), fDay),
+        todayHighlight  : true,
+        dateFormat: 'dd/mm/yyyy',
+        format: 'dd/mm/yyyy',
+      });
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+	    
+  	  $( '#modal-message' ).modal('show');
+	    $( '.modal-message' ).addClass( 'modal-danger' );
+	    $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+	    setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+	    
+	    //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function recepcionCarga(ID){
+  $( '.div-Listar' ).hide();
+  
+  $( '#form-pedido' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '.div-Compuesto' ).hide();
+  $( '.div-Producto_Recepcion_Carga' ).hide();
+	$( '#table-Producto_Enlace tbody' ).empty();
+	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
+
+  $( '.div-Producto_Recepcion_Carga' ).show();
+	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
+  $( '#table-Producto_Recepcion_Carga' ).show();
+
+  //$('#span-id_pedido').html('Nro. ' + ID);
+
+  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+      var detalle = response;
+      response = response[0];
+
+      $('#span-id_pedido').html(response.sCorrelativoCotizacion);
+      
+      $( '.div-AgregarEditar' ).show();
+            
+      $( '[name="EID_Pedido_Cabecera"]' ).val(response.ID_Pedido_Cabecera);
+      $( '[name="EID_Entidad"]' ).val(response.ID_Entidad);
+      $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
+      $( '[name="EID_Organizacion"]' ).val(response.ID_Organizacion);
+
+      $( '[name="No_Contacto"]' ).val(response.No_Contacto);
+      $( '[name="Txt_Email_Contacto"]' ).val(response.Txt_Email_Contacto);
+      $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
+      $( '[name="No_Entidad"]' ).val(response.No_Entidad);
+      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
+      
+      //$( '#btn-excel_order_tracking' ).data('id_pedido', response.ID_Pedido_Cabecera);
+      $( '#btn-excel_order_tracking' ).attr('data-id_pedido', response.ID_Pedido_Cabecera); // sets 
+
+      $('#btn-descargar_pago_30').hide();
+      $('#span-pago_30').html('');
+      if( response.Txt_Url_Pago_30_Cliente != '' && response.Txt_Url_Pago_30_Cliente != null ){
+        $('#btn-descargar_pago_30').show();
+        $('#btn-descargar_pago_30').removeClass('d-none');
+
+        $('#span-pago_30').html('$ ' + response.Ss_Pago_30_Cliente);
+      }
+
+      $('#btn-descargar_pago_100').hide();
+      $('#span-pago_100').html('');
+      if( response.Txt_Url_Pago_100_Cliente != '' && response.Txt_Url_Pago_100_Cliente != null ){
+        $('#btn-descargar_pago_100').show();
+        $('#btn-descargar_pago_100').removeClass('d-none');
+
+        $('#span-pago_100').html('$ ' + response.Ss_Pago_100_Cliente);
+      }
+
+      $('#btn-descargar_pago_servicio').hide();
+      $('#span-pago_servicio').html('');
+      if( response.Txt_Url_Pago_Servicio_Cliente != '' && response.Txt_Url_Pago_Servicio_Cliente != null ){
+        $('#btn-descargar_pago_servicio').show();
+        $('#btn-descargar_pago_servicio').removeClass('d-none');
+
+        $('#span-pago_servicio').html('$ ' + response.Ss_Pago_Servicio_Cliente);
+      }
+
+      $('#btn-descargar_flete').hide();
+      $('#span-flete').html('');
+      if( response.Txt_Url_Pago_Otros_Flete != '' && response.Txt_Url_Pago_Otros_Flete != null ){
+        $('#btn-descargar_flete').show();
+        $('#btn-descargar_flete').removeClass('d-none');
+
+        $('#span-flete').html('$ ' + response.Ss_Pago_Otros_Flete);
+      }
+
+      $('#btn-descargar_costo_origen').hide();
+      $('#span-costo_origen').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Origen != '' && response.Txt_Url_Pago_Otros_Costo_Origen != null ){
+        $('#btn-descargar_costo_origen').show();
+        $('#btn-descargar_costo_origen').removeClass('d-none');
+
+        $('#span-costo_origen').html('$ ' + response.Ss_Pago_Otros_Costo_Origen);
+      }
+
+      $('#btn-descargar_fta').hide();
+      $('#span-fta').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Fta != '' && response.Txt_Url_Pago_Otros_Costo_Fta != null ){
+        $('#btn-descargar_fta').show();
+        $('#btn-descargar_fta').removeClass('d-none');
+
+        $('#span-fta').html('$ ' + response.Ss_Pago_Otros_Costo_Fta);
+      }
+
+      $('#btn-descargar_pago_cuadrilla').hide();
+      $('#span-cuadrilla').html('');
+      if( response.Txt_Url_Pago_Otros_Cuadrilla != '' && response.Txt_Url_Pago_Otros_Cuadrilla != null ){
+        $('#btn-descargar_pago_cuadrilla').show();
+        $('#btn-descargar_pago_cuadrilla').removeClass('d-none');
+
+        $('#span-cuadrilla').html('$ ' + response.Ss_Pago_Otros_Cuadrilla);
+      }
+
+      $('#btn-descargar_otros_costos').hide();
+      $('#span-otros_costo').html('');
+      if( response.Txt_Url_Pago_Otros_Costos != '' && response.Txt_Url_Pago_Otros_Costos != null ){
+        $('#btn-descargar_otros_costos').show();
+        $('#btn-descargar_otros_costos').removeClass('d-none');
+
+        $('#span-otros_costo').html('$ ' + response.Ss_Pago_Otros_Costos);
+      }
+
+      var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
+      if(response.Nu_Estado_Pedido == 2)
+        sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
+      else if(response.Nu_Estado_Pedido == 3)
+        sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
+      else if(response.Nu_Estado_Pedido == 4)
+        sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
+      $( '#div-estado' ).html(sNombreEstado);
+      
+      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
+      for (i = 0; i < detalle.length; i++) {
+        var cantidad_item_final_recepcion_carga = parseFloat(detalle[i]['Qt_Producto_Caja_Final_Verificada']);
+        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
+        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
+
+        fTotalCliente += (cantidad_item * (precio_china * parseFloat(response.Ss_Tipo_Cambio)));
+
+        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
+        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
+        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
+        //max-height: 350px;width: 100%; cursor:pointer
+
+        var fTotal = (cantidad_item * precio_china);
+        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
+        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
+
+        sClassColorTr = '';
+        iDiasVencimiento = 0;
+        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
+          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
+          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
+
+          var diff = fechaFin - fechaInicio;
+          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
+          if(iDiasVencimiento<5)
+            sClassColorTr = 'table-warning';
+        }
+
+        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
+
+        var nota_final = (detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] != '' && detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] != null ? detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] : '');
+
+        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
+          table_enlace_producto +=
+          "<tr class='table-active'>"
+            +"<th class='text-right'>Supplier</th>";
+            table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Contacto_Proveedor + "</th>";
+            table_enlace_producto += "<th class='text-left'>";
+              table_enlace_producto += '<textarea id="textarea-nota' + id_item + '" name="addProducto[' + id_item + '][nota]" class="form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + clearHTMLTextArea(nota_final) + '</textarea>';
+            table_enlace_producto += '</th>';
+            table_enlace_producto += "<th class='text-center'>";
+              table_enlace_producto += '<button type="button" id="btn-finalizar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-primary btn-finalizar_item_proveedor"> Finalizar </button>';
+            table_enlace_producto += '</th>';
+          +"</tr>";
+          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
+        }
+
+        table_enlace_producto +=
+        "<tr id='tr_enlace_producto" + id_item + "'>"
+          + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
+          + "<td class='text-center td-name' width='50px'>"
+            + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+            
+          cantidad_item = ((!isNaN(cantidad_item_final_recepcion_carga) && cantidad_item_final_recepcion_carga > 0 && cantidad_item_final_recepcion_carga!='') ? cantidad_item_final_recepcion_carga : cantidad_item);
+
+          table_enlace_producto += "</td>"
+          + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
+          + "<td class='text-right td-qty'>";
+          table_enlace_producto += '<input type="text" inputmode="decimal" class="form-control input-decimal" id="input-cantidad' + id_item + '" name="addProducto[' + id_item + '][cantidad]" value="' + Math.round10(cantidad_item, -2) + '">';
+          table_enlace_producto += "</td>";
+
+          table_enlace_producto += "<td class='text-center'>";
+            if(detalle[i]['Nu_Estado_Recepcion_Carga_Proveedor_Item']==0){//pendiente
+              table_enlace_producto += '<button type="button" id="btn-confirmado_item_proveedor' + id_item + '" data-estado="1" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-success btn-estado_item_proveedor btn-cargando_item_proveedor' + id_item + '"> Verificado </button>';
+              table_enlace_producto += ' <button type="button" id="btn-faltante_item_proveedor' + id_item + '" data-estado="2" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-warning btn-estado_item_proveedor btn-cargando_item_proveedor' + id_item + '"> Faltante </button>';
+            } else {
+              if(detalle[i]['Nu_Estado_Recepcion_Carga_Proveedor_Item']==1){
+                table_enlace_producto += '<span class="badge bg-success">verificado</span>';
+              } else if(detalle[i]['Nu_Estado_Recepcion_Carga_Proveedor_Item']==2) {
+                table_enlace_producto += '<span class="badge bg-warning">Faltante</span>';
+              }
+            }
+          table_enlace_producto += "</td>";
+
+          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
+        table_enlace_producto += "</tr>";
+        
+        table_enlace_producto += "</tr>";
+      }
+      
+      $('#span-total_cantidad_items').html(i);
+      $( '#table-Producto_Recepcion_Carga' ).append(table_enlace_producto);
+
+      $( '#span-total_cliente' ).html('$ ' + fTotalCliente.toFixed(2));
+
+      //PAGOS
+      //Ss_Pago_30_Cliente
+      //Ss_Pago_100_Cliente
+      //Ss_Pago_Servicio_Cliente
+
+      //OTROS
+      //Ss_Pago_Otros_Flete
+      //Ss_Pago_Otros_Costo_Origen
+      //Ss_Pago_Otros_Costo_Fta
+      //Ss_Pago_Otros_Cuadrilla
+      //Ss_Pago_Otros_Costos
+      $( '#span-saldo_cliente' ).html('$ ' + (fTotalCliente - (parseFloat(response.Ss_Pago_30_Cliente) + parseFloat(response.Ss_Pago_100_Cliente) + parseFloat(response.Ss_Pago_Servicio_Cliente))));
+      
+      //Date picker invoice
+      $( '.input-datepicker-today-to-more' ).datepicker({
+        autoclose : true,
+        startDate : new Date(fYear, fToday.getMonth(), fDay),
+        todayHighlight  : true,
+        dateFormat: 'dd/mm/yyyy',
+        format: 'dd/mm/yyyy',
+      });
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+	    
+  	  $( '#modal-message' ).modal('show');
+	    $( '.modal-message' ).addClass( 'modal-danger' );
+	    $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+	    setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+	    
+	    //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function coordinarPagosProveedor(ID){
+  $( '.div-Listar' ).hide();
+  
+  $( '#form-pedido' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '.div-Compuesto' ).show();
+	$( '#table-Producto_Enlace tbody' ).empty();
+  $( '#table-Producto_Enlace' ).show();
+
+  $( '.div-Producto_Recepcion_Carga' ).hide();
+	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
+
+  $( '.div-Invoice_Proveedor' ).hide();
+	$( '#table-Invoice_Proveedor tbody' ).empty();
+
+  //$('#span-id_pedido').html('Nro. ' + ID);
+
+  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+      var detalle = response;
+      response = response[0];
+
+      $('#span-id_pedido').html(response.sCorrelativoCotizacion);
+      
+      $( '.div-AgregarEditar' ).show();
+            
+      $( '[name="EID_Pedido_Cabecera"]' ).val(response.ID_Pedido_Cabecera);
+      $( '[name="EID_Entidad"]' ).val(response.ID_Entidad);
+      $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
+      $( '[name="EID_Organizacion"]' ).val(response.ID_Organizacion);
+
+      $( '[name="No_Contacto"]' ).val(response.No_Contacto);
+      $( '[name="Txt_Email_Contacto"]' ).val(response.Txt_Email_Contacto);
+      $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
+      $( '[name="No_Entidad"]' ).val(response.No_Entidad);
+      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
+      
+      //$( '#btn-excel_order_tracking' ).data('id_pedido', response.ID_Pedido_Cabecera);
+      $( '#btn-excel_order_tracking' ).attr('data-id_pedido', response.ID_Pedido_Cabecera); // sets 
+
+      $('#btn-descargar_pago_30').hide();
+      $('#span-pago_30').html('');
+      if( response.Txt_Url_Pago_30_Cliente != '' && response.Txt_Url_Pago_30_Cliente != null ){
+        $('#btn-descargar_pago_30').show();
+        $('#btn-descargar_pago_30').removeClass('d-none');
+
+        $('#span-pago_30').html('$ ' + response.Ss_Pago_30_Cliente);
+      }
+
+      $('#btn-descargar_pago_100').hide();
+      $('#span-pago_100').html('');
+      if( response.Txt_Url_Pago_100_Cliente != '' && response.Txt_Url_Pago_100_Cliente != null ){
+        $('#btn-descargar_pago_100').show();
+        $('#btn-descargar_pago_100').removeClass('d-none');
+
+        $('#span-pago_100').html('$ ' + response.Ss_Pago_100_Cliente);
+      }
+
+      $('#btn-descargar_pago_servicio').hide();
+      $('#span-pago_servicio').html('');
+      if( response.Txt_Url_Pago_Servicio_Cliente != '' && response.Txt_Url_Pago_Servicio_Cliente != null ){
+        $('#btn-descargar_pago_servicio').show();
+        $('#btn-descargar_pago_servicio').removeClass('d-none');
+
+        $('#span-pago_servicio').html('$ ' + response.Ss_Pago_Servicio_Cliente);
+      }
+
+      $('#btn-descargar_flete').hide();
+      $('#span-flete').html('');
+      if( response.Txt_Url_Pago_Otros_Flete != '' && response.Txt_Url_Pago_Otros_Flete != null ){
+        $('#btn-descargar_flete').show();
+        $('#btn-descargar_flete').removeClass('d-none');
+
+        $('#span-flete').html('$ ' + response.Ss_Pago_Otros_Flete);
+      }
+
+      $('#btn-descargar_costo_origen').hide();
+      $('#span-costo_origen').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Origen != '' && response.Txt_Url_Pago_Otros_Costo_Origen != null ){
+        $('#btn-descargar_costo_origen').show();
+        $('#btn-descargar_costo_origen').removeClass('d-none');
+
+        $('#span-costo_origen').html('$ ' + response.Ss_Pago_Otros_Costo_Origen);
+      }
+
+      $('#btn-descargar_fta').hide();
+      $('#span-fta').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Fta != '' && response.Txt_Url_Pago_Otros_Costo_Fta != null ){
+        $('#btn-descargar_fta').show();
+        $('#btn-descargar_fta').removeClass('d-none');
+
+        $('#span-fta').html('$ ' + response.Ss_Pago_Otros_Costo_Fta);
+      }
+
+      $('#btn-descargar_pago_cuadrilla').hide();
+      $('#span-cuadrilla').html('');
+      if( response.Txt_Url_Pago_Otros_Cuadrilla != '' && response.Txt_Url_Pago_Otros_Cuadrilla != null ){
+        $('#btn-descargar_pago_cuadrilla').show();
+        $('#btn-descargar_pago_cuadrilla').removeClass('d-none');
+
+        $('#span-cuadrilla').html('$ ' + response.Ss_Pago_Otros_Cuadrilla);
+      }
+
+      $('#btn-descargar_otros_costos').hide();
+      $('#span-otros_costo').html('');
+      if( response.Txt_Url_Pago_Otros_Costos != '' && response.Txt_Url_Pago_Otros_Costos != null ){
+        $('#btn-descargar_otros_costos').show();
+        $('#btn-descargar_otros_costos').removeClass('d-none');
+
+        $('#span-otros_costo').html('$ ' + response.Ss_Pago_Otros_Costos);
+      }
+
+      var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
+      if(response.Nu_Estado_Pedido == 2)
+        sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
+      else if(response.Nu_Estado_Pedido == 3)
+        sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
+      else if(response.Nu_Estado_Pedido == 4)
+        sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
+      $( '#div-estado' ).html(sNombreEstado);
+      
+      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
@@ -1036,6 +1855,271 @@ function verPedido(ID){
         }
 
         var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
+
+        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
+          table_enlace_producto +=
+          "<tr class='table-active'>"
+            +"<th class='text-right'>Supplier</th>";
+            table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Contacto_Proveedor + "</th>";
+            table_enlace_producto += "<th class='text-left' colspan='12'>";
+            table_enlace_producto += '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarProveedor(' + detalle[i].ID_Entidad_Proveedor + ', ' + id_item + ')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+            table_enlace_producto += "</th>";
+          +"</tr>";
+          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
+        }
+
+        table_enlace_producto +=
+        "<tr id='tr_enlace_producto" + id_item + "'>"
+          + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
+          + "<td class='text-center td-name' width='50%'>"
+            + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+            
+          table_enlace_producto += "</td>"
+          + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
+          + "<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
+          + "<td class='text-right td-price'>" + Math.round10(precio_china, -2) + "</td>"
+          +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
+          +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
+          +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
+          +"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>";
+
+          table_enlace_producto += "<td class='text-left td-supplier'>";
+            table_enlace_producto += '<div class="input-group date" style="width:100%">';
+              table_enlace_producto += '<input type="text" id="txt-fecha_entrega_proveedor'+i+'" name="addProducto[' + id_item + '][fecha_entrega_proveedor]" class="form-control input-datepicker-today-to-more required" value="' + fecha_entrega_proveedor + '">';
+            table_enlace_producto += '</div>';
+          table_enlace_producto += "</td>";
+
+          table_enlace_producto += "<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
+          +"<td class='text-left td-phone'>";
+          if(detalle[i]['Txt_Url_Imagen_Proveedor'] != '' && detalle[i]['Txt_Url_Imagen_Proveedor'] != null){
+            table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+          }
+          table_enlace_producto += "</td>";
+          
+          table_enlace_producto += "<td class='text-left td-eliminar'>";
+            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
+          table_enlace_producto += "</td>";
+
+          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
+        table_enlace_producto += "</tr>";
+        
+        table_enlace_producto += "<tr>";
+          table_enlace_producto += "<td class='text-left' colspan='12'>";
+            table_enlace_producto += '<button type="button" id="btn-cambiar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-cambiar_item_proveedor"> Cambiar producto proveedor </button>';
+          table_enlace_producto += "</td>";
+        table_enlace_producto += "</tr>";
+      }
+      
+      $('#span-total_cantidad_items').html(i);
+      $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+
+      $( '#span-total_cliente' ).html('$ ' + fTotalCliente.toFixed(2));
+
+      //PAGOS
+      //Ss_Pago_30_Cliente
+      //Ss_Pago_100_Cliente
+      //Ss_Pago_Servicio_Cliente
+
+      //OTROS
+      //Ss_Pago_Otros_Flete
+      //Ss_Pago_Otros_Costo_Origen
+      //Ss_Pago_Otros_Costo_Fta
+      //Ss_Pago_Otros_Cuadrilla
+      //Ss_Pago_Otros_Costos
+      $( '#span-saldo_cliente' ).html('$ ' + (fTotalCliente - (parseFloat(response.Ss_Pago_30_Cliente) + parseFloat(response.Ss_Pago_100_Cliente) + parseFloat(response.Ss_Pago_Servicio_Cliente))));
+      
+      //Date picker invoice
+      $( '.input-datepicker-today-to-more' ).datepicker({
+        autoclose : true,
+        startDate : new Date(fYear, fToday.getMonth(), fDay),
+        todayHighlight  : true,
+        dateFormat: 'dd/mm/yyyy',
+        format: 'dd/mm/yyyy',
+      });
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+	    
+  	  $( '#modal-message' ).modal('show');
+	    $( '.modal-message' ).addClass( 'modal-danger' );
+	    $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+	    setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+	    
+	    //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function verPedido(ID){
+  $( '.div-Listar' ).hide();
+  
+  $( '#form-pedido' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '.div-Compuesto' ).show();
+	$( '#table-Producto_Enlace tbody' ).empty();
+  $( '#table-Producto_Enlace' ).show();
+
+  $( '.div-Producto_Recepcion_Carga' ).hide();
+	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
+
+  $( '.div-Invoice_Proveedor' ).hide();
+	$( '#table-Invoice_Proveedor tbody' ).empty();
+
+  //$('#span-id_pedido').html('Nro. ' + ID);
+
+  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+      var detalle = response;
+      response = response[0];
+
+      $('#span-id_pedido').html(response.sCorrelativoCotizacion);
+      
+      $( '.div-AgregarEditar' ).show();
+            
+      $( '[name="EID_Pedido_Cabecera"]' ).val(response.ID_Pedido_Cabecera);
+      $( '[name="EID_Entidad"]' ).val(response.ID_Entidad);
+      $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
+      $( '[name="EID_Organizacion"]' ).val(response.ID_Organizacion);
+
+      $( '[name="No_Contacto"]' ).val(response.No_Contacto);
+      $( '[name="Txt_Email_Contacto"]' ).val(response.Txt_Email_Contacto);
+      $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
+      $( '[name="No_Entidad"]' ).val(response.No_Entidad);
+      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
+      
+      //$( '#btn-excel_order_tracking' ).data('id_pedido', response.ID_Pedido_Cabecera);
+      $( '#btn-excel_order_tracking' ).attr('data-id_pedido', response.ID_Pedido_Cabecera); // sets 
+
+      $('#btn-descargar_pago_30').hide();
+      $('#span-pago_30').html('');
+      if( response.Txt_Url_Pago_30_Cliente != '' && response.Txt_Url_Pago_30_Cliente != null ){
+        $('#btn-descargar_pago_30').show();
+        $('#btn-descargar_pago_30').removeClass('d-none');
+
+        $('#span-pago_30').html('$ ' + response.Ss_Pago_30_Cliente);
+      }
+
+      $('#btn-descargar_pago_100').hide();
+      $('#span-pago_100').html('');
+      if( response.Txt_Url_Pago_100_Cliente != '' && response.Txt_Url_Pago_100_Cliente != null ){
+        $('#btn-descargar_pago_100').show();
+        $('#btn-descargar_pago_100').removeClass('d-none');
+
+        $('#span-pago_100').html('$ ' + response.Ss_Pago_100_Cliente);
+      }
+
+      $('#btn-descargar_pago_servicio').hide();
+      $('#span-pago_servicio').html('');
+      if( response.Txt_Url_Pago_Servicio_Cliente != '' && response.Txt_Url_Pago_Servicio_Cliente != null ){
+        $('#btn-descargar_pago_servicio').show();
+        $('#btn-descargar_pago_servicio').removeClass('d-none');
+
+        $('#span-pago_servicio').html('$ ' + response.Ss_Pago_Servicio_Cliente);
+      }
+
+      $('#btn-descargar_flete').hide();
+      $('#span-flete').html('');
+      if( response.Txt_Url_Pago_Otros_Flete != '' && response.Txt_Url_Pago_Otros_Flete != null ){
+        $('#btn-descargar_flete').show();
+        $('#btn-descargar_flete').removeClass('d-none');
+
+        $('#span-flete').html('$ ' + response.Ss_Pago_Otros_Flete);
+      }
+
+      $('#btn-descargar_costo_origen').hide();
+      $('#span-costo_origen').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Origen != '' && response.Txt_Url_Pago_Otros_Costo_Origen != null ){
+        $('#btn-descargar_costo_origen').show();
+        $('#btn-descargar_costo_origen').removeClass('d-none');
+
+        $('#span-costo_origen').html('$ ' + response.Ss_Pago_Otros_Costo_Origen);
+      }
+
+      $('#btn-descargar_fta').hide();
+      $('#span-fta').html('');
+      if( response.Txt_Url_Pago_Otros_Costo_Fta != '' && response.Txt_Url_Pago_Otros_Costo_Fta != null ){
+        $('#btn-descargar_fta').show();
+        $('#btn-descargar_fta').removeClass('d-none');
+
+        $('#span-fta').html('$ ' + response.Ss_Pago_Otros_Costo_Fta);
+      }
+
+      $('#btn-descargar_pago_cuadrilla').hide();
+      $('#span-cuadrilla').html('');
+      if( response.Txt_Url_Pago_Otros_Cuadrilla != '' && response.Txt_Url_Pago_Otros_Cuadrilla != null ){
+        $('#btn-descargar_pago_cuadrilla').show();
+        $('#btn-descargar_pago_cuadrilla').removeClass('d-none');
+
+        $('#span-cuadrilla').html('$ ' + response.Ss_Pago_Otros_Cuadrilla);
+      }
+
+      $('#btn-descargar_otros_costos').hide();
+      $('#span-otros_costo').html('');
+      if( response.Txt_Url_Pago_Otros_Costos != '' && response.Txt_Url_Pago_Otros_Costos != null ){
+        $('#btn-descargar_otros_costos').show();
+        $('#btn-descargar_otros_costos').removeClass('d-none');
+
+        $('#span-otros_costo').html('$ ' + response.Ss_Pago_Otros_Costos);
+      }
+
+      var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
+      if(response.Nu_Estado_Pedido == 2)
+        sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
+      else if(response.Nu_Estado_Pedido == 3)
+        sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
+      else if(response.Nu_Estado_Pedido == 4)
+        sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
+      $( '#div-estado' ).html(sNombreEstado);
+      
+      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = 0;
+      for (i = 0; i < detalle.length; i++) {
+        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
+        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
+
+        fTotalCliente += (cantidad_item * (precio_china * parseFloat(response.Ss_Tipo_Cambio)));
+
+        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
+        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
+        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
+        //max-height: 350px;width: 100%; cursor:pointer
+
+        var fTotal = (cantidad_item * precio_china);
+        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
+        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
+
+        sClassColorTr = '';
+        iDiasVencimiento = 0;
+        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
+          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
+          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
+
+          var diff = fechaFin - fechaInicio;
+          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
+          if(iDiasVencimiento<5)
+            sClassColorTr = 'table-warning';
+        }
+
+        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
+
+        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
+          table_enlace_producto +=
+          "<tr>"
+            +"<th class='text-right'>Supplier </th>"
+            +"<th class='text-left' colspan='14'>" + detalle[i].No_Contacto_Proveedor + "</th>"
+          +"</tr>";
+          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
+        }
 
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
@@ -1427,9 +2511,16 @@ function subirInspeccion(ID){
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
 
+  $( '.div-Compuesto' ).show();
 	$( '#table-Producto_Enlace tbody' ).empty();
   $( '#table-Producto_Enlace' ).show();
 
+  $( '.div-Producto_Recepcion_Carga' ).hide();
+	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
+
+  $( '.div-Invoice_Proveedor' ).hide();
+	$( '#table-Invoice_Proveedor tbody' ).empty();
+  
   //$('#span-id_pedido').html('Nro. ' + ID);
 
   url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
@@ -1925,4 +3016,97 @@ function descargarPagoOtrosCostos(){
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function editarProveedor(ID_Entidad, id_item){
+  //alert(ID_Entidad);
+  $( '#form-proveedor' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $('.modal-proveedor').modal('show');
+
+  $( '[name="proveedor-ID_Entidad"]' ).val(ID_Entidad);
+  $( '[name="proveedor-ID_Pedido_Detalle_Producto_Proveedor"]' ).val(id_item);
+  
+  url = base_url + 'AgenteCompra/PedidosPagados/getPedidoProveedor/' + id_item;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+
+      $( '[name="proveedor-No_Wechat"]' ).val(response.No_Wechat);
+      $( '[name="proveedor-No_Rubro"]' ).val(response.No_Rubro);
+      $( '[name="proveedor-No_Cuenta_Bancaria"]' ).val(response.No_Cuenta_Bancaria);
+      $( '[name="proveedor-Ss_Pago_Importe_1"]' ).val(response.Ss_Pago_Importe_1);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      //$( '#modal-loader' ).modal('hide');
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function booking(id){
+  $( '#form-booking' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '[name="booking-ID_Pedido_Cabecera"]' ).val(id);
+
+  $(' .modal-booking ').modal('show');
+  $(' #form-booking ' )[0].reset();
+  
+  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+
+      $( '[name="booking-Qt_Caja_Total_Booking"]' ).val(response.Qt_Caja_Total_Booking);
+      $( '[name="booking-Qt_Cbm_Total_Booking"]' ).val(response.Qt_Cbm_Total_Booking);
+      $( '[name="booking-Qt_Peso_Total_Booking"]' ).val(response.Qt_Peso_Total_Booking);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      //$( '#modal-loader' ).modal('hide');
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function descargarInvoicePlProveedor(id){
+  url = base_url + 'AgenteCompra/PedidosPagados/descargarInvoicePlProveedor/' + id;
+  
+  var popupwin = window.open(url);
+  setTimeout(function() { popupwin.close();}, 2000);
+}
+
+function despacho(id, sCorrelativo){
+  $( '[name="despacho-id_cabecera"]' ).val(id);
+  $( '[name="despacho-correlativo"]' ).val(sCorrelativo);
+
+  $('#modal-fecha_entrega_shipper').modal('show');
+  $( '#form-fecha_entrega_shipper' )[0].reset();
 }

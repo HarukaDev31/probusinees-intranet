@@ -271,13 +271,21 @@ class PedidosGarantizadosModel extends CI_Model{
 		return array('status' => 'error', 'message' => 'Error al seleccionar proveedor');
 	}
 
-	public function cambiarEstado($ID, $Nu_Estado){
+	public function cambiarEstado($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China){
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array(
-			'Nu_Estado' => $Nu_Estado
+			'Nu_Estado' => $Nu_Estado,
+			'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China
 		);
 
 		if($Nu_Estado==5){//aprobado creo nueva fecha de emision para O.C. Aprobadas
+			//generar proceso de estado de checklist del chinito
+			$arrDataTour = array(
+				'ID_Pedido_Cabecera' => $ID,
+				'ID_Usuario_Interno_Empresa_China' => $ID_Usuario_Interno_Empresa_China
+			);
+			$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
+
 			$data = array_merge($data, array(
 				'Fe_Emision_OC_Aprobada' => dateNow('fecha')
 			));
@@ -375,7 +383,7 @@ class PedidosGarantizadosModel extends CI_Model{
 				//array_debug($row);
 				$arrSaleOrderDetailUPD[] = array(
 					'ID_Pedido_Detalle' => $row['id_item'],
-					'Qt_Producto' => $row['cantidad'],
+					'Qt_Producto' => $row['cantidad'],//agergar input de cantidad
 					'Txt_Descripcion' => nl2br($row['caracteristicas']),
 				);
 			}
@@ -437,22 +445,6 @@ class PedidosGarantizadosModel extends CI_Model{
 				}
 			}
 
-			$arrDetalle[] = array(
-                'ID_Empresa' => $data['EID_Empresa_item'],
-                'ID_Organizacion' => $data['EID_Organizacion_item'],
-				'ID_Pedido_Cabecera' => $data['EID_Pedido_Cabecera_item'],
-				'ID_Pedido_Detalle' => $data['EID_Pedido_Detalle_item'],
-				'Ss_Precio' => $row['precio'],
-				'Qt_Producto_Moq' => $row['moq'],
-				'Qt_Producto_Caja' => $row['qty_caja'],
-				'Qt_Cbm' => $row['cbm'],
-				'Nu_Dias_Delivery' => $row['delivery'],
-				'Ss_Costo_Delivery' => $row['costo_delivery'],
-				'Txt_Nota' => nl2br($row['nota']),
-				'No_Contacto_Proveedor' => $row['contacto_proveedor'],
-				'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
-			);
-
 			//insertar proveedor agente de compra
 			$query = "SELECT ID_Entidad FROM entidad WHERE ID_Empresa = 1 AND Nu_Tipo_Entidad = 1 AND ID_Tipo_Documento_Identidad = 1 AND No_Entidad = '" . limpiarCaracteresEspeciales($row['contacto_proveedor']) . "' LIMIT 1";
 			$objVerificarEntidad = $this->db->query($query)->row();
@@ -471,6 +463,7 @@ class PedidosGarantizadosModel extends CI_Model{
 				);
 	
 				if ($this->db->insert('entidad', $arrEntidad) > 0) {
+		    		$ID_Entidad_Proveedor = $this->db->insert_id();
 				} else {
 					$this->db->trans_rollback();
 					return array(
@@ -478,7 +471,26 @@ class PedidosGarantizadosModel extends CI_Model{
 						'message' => 'No registro proveedor'
 					);
 				}
+			} else {
+				$ID_Entidad_Proveedor = $objVerificarEntidad->ID_Entidad;
 			}
+
+			$arrDetalle[] = array(
+                'ID_Empresa' => $data['EID_Empresa_item'],
+                'ID_Organizacion' => $data['EID_Organizacion_item'],
+				'ID_Pedido_Cabecera' => $data['EID_Pedido_Cabecera_item'],
+				'ID_Pedido_Detalle' => $data['EID_Pedido_Detalle_item'],
+				'Ss_Precio' => $row['precio'],
+				'Qt_Producto_Moq' => $row['moq'],
+				'Qt_Producto_Caja' => $row['qty_caja'],
+				'Qt_Cbm' => $row['cbm'],
+				'Nu_Dias_Delivery' => $row['delivery'],
+				'Ss_Costo_Delivery' => $row['costo_delivery'],
+				'Txt_Nota' => nl2br($row['nota']),
+				'No_Contacto_Proveedor' => $row['contacto_proveedor'],
+				'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
+				'ID_Entidad_Proveedor' => $ID_Entidad_Proveedor
+			);
 		}
 
 		$this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor', $arrDetalle);
@@ -811,12 +823,12 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'ID_Organizacion' => $this->user->ID_Organizacion,
 			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
 			'No_Proceso' => '1. Coordinación con Proveedores <br> A. Negociación',
-			'Txt_Url_Menu' => 'AgenteCompra/PedidosGarantizados/listar',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
 			'Nu_Orden' => '1',
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '5',
-			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
 		);
 		
 		$proceso_agente_compra_pedido[]=array(
@@ -828,8 +840,73 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'Nu_Orden' => '1',
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
-			'Nu_ID_Interno' => '5',
-			'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+			'Nu_ID_Interno' => '6',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '2. Reserva de Booking',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '7',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '3. Recepción de carga',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '8',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '4. Inspección',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '9',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '5. Docs Exportación',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '10',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '6. Despacho al Shipper / Forwarder',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '11',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
 		);
 		
 		if ($this->db->insert_batch('proceso_agente_compra_pedido', $proceso_agente_compra_pedido)>0)

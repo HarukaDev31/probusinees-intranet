@@ -845,12 +845,23 @@ function verPedido(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Rechazado</span>';
       $( '#div-estado' ).html(sNombreEstado);
 
-      var table_enlace_producto = "";
+      var table_enlace_producto = "", ID_Entidad = 0;
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = detalle[i]['Qt_Producto'];
         var id_item = detalle[i]['ID_Pedido_Detalle'];
         var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>Link</a>" : "");
         var nombre_producto = ((detalle[i]['Txt_Producto'] != '' && detalle[i]['Txt_Producto'] != null) ? detalle[i]['Txt_Producto'] : '');
+
+        /*
+        if (ID_Entidad != response[i].ID_Entidad_Proveedor) {
+          table_enlace_producto +=
+          "<tr>"
+            +"<th class='text-right'>Proveedor </th>"
+            +"<th class='text-left' colspan='14'>" + response[i].No_Contacto_Proveedor + "</th>"
+          +"</tr>";
+          ID_Entidad = response[i].ID_Entidad_Proveedor;
+        }
+        */
 
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
@@ -859,7 +870,8 @@ function verPedido(ID){
             
             table_enlace_producto += "<h6 class='font-weight-bold font-medium'>" + nombre_producto + "</h6>";
 
-            if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
+            cantidad_item = ((!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!='') ? cantidad_item : 0);
+            //if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
               //table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span><br>";
               table_enlace_producto += '<div class="row mb-2">';
                 table_enlace_producto += '<div class="col col-sm-6 text-right">';
@@ -870,7 +882,7 @@ function verPedido(ID){
                   table_enlace_producto += '<input type="text" inputmode="decimal" class="form-control input-decimal" name="addProductoTable[' + id_item + '][cantidad]" value="' + Math.round10(cantidad_item, -2) + '">';
                 table_enlace_producto += '</div>';
               table_enlace_producto += '</div>';
-            }
+            //}
 
             /*
             if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
@@ -930,22 +942,39 @@ function verPedido(ID){
   })
 }
 
-function cambiarEstado(ID, Nu_Estado) {
+function cambiarEstado(ID, Nu_Estado, ID_Usuario_Interno_Empresa_China) {
+  var sNombreEstado = 'Garantizado';
+  if(Nu_Estado==3) {
+    sNombreEstado = 'Enviado';
+    /*
+    if(ID_Usuario_Interno_Empresa_China==0){
+      $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+      $('#modal-message').modal('show');
+      $('#moda-message-content').addClass( 'bg-warning' );
+      $('.modal-title-message').text('Primero asignar personal de china');
+    }
+    */
+  }
+  else if(Nu_Estado==4)
+    sNombreEstado = 'Rechazado';
+  else if(Nu_Estado==5) {
+    sNombreEstado = 'Aprobado';
+    
+    if(ID_Usuario_Interno_Empresa_China==0){
+      $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+      $('#modal-message').modal('show');
+      $('#moda-message-content').addClass( 'bg-warning' );
+      $('.modal-title-message').text('Primero asignar personal de china');
+    }
+  }
+  else if(Nu_Estado==8)
+    sNombreEstado = 'Obervado';
+
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
   $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
   $('.modal-message-delete').addClass('modal-success');
-
-  var sNombreEstado = 'Garantizado';
-  if(Nu_Estado==3)
-    sNombreEstado = 'Enviado';
-  else if(Nu_Estado==4)
-    sNombreEstado = 'Rechazado';
-  else if(Nu_Estado==5)
-    sNombreEstado = 'Aprobado';
-  else if(Nu_Estado==8)
-    sNombreEstado = 'Obervado';
 
   $('#modal-title').html('¿Deseas cambiar estado a <strong>' + sNombreEstado + '</strong>?');
 
@@ -959,7 +988,7 @@ function cambiarEstado(ID, Nu_Estado) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstado/' + ID + '/' + Nu_Estado;
+    url = base_url + 'AgenteCompra/PedidosGarantizados/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + ID_Usuario_Interno_Empresa_China;
     $.ajax({
       url: url,
       type: "GET",
