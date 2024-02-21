@@ -72,6 +72,20 @@
   cursor: pointer;
 }
 
+.img-resize_v2 {
+  height: 70px;
+  object-fit: cover;
+  object-position: bottom;
+  cursor: pointer;
+}
+
+.img-resize_supplier {
+  height: 30px;
+  object-fit: cover;
+  object-position: bottom;
+  cursor: pointer;
+}
+
 .font-medium {
   font-size: 1rem;
 }
@@ -242,3 +256,6 @@
     font-size: 1.8rem;
   }
 }
+
+.tableFixHeadV2          { overflow: auto; height: 700px; }
+.tableFixHeadV2 thead th { position: sticky; top: 0; z-index: 1; }

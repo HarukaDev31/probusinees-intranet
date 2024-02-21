@@ -223,25 +223,27 @@
                     <div class="col-xs-12 col-sm-12 col-md-12 mt-3 <?php echo $this->user->Nu_Tipo_Privilegio_Acceso==1 ? 'd-none' : ''; ?>">
                       <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos <button type="button" id="btn-excel_order_tracking" class="btn btn-default" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(1)" data-id_pedido="">Descargar &nbsp;<i class="fa fa-file-excel text-success"></i></button></h3>
 
-                      <div class="table-responsive div-Compuesto">
+                      <div class="table-responsive div-Compuesto tableFixHeadV2">
                         <table id="table-Producto_Enlace" class="table table-bordered table-hover">
                           <thead class="thead-light">
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-left" width="50%">Product_Photo</th>
+                              <th class="text-left" width="10%">Product_Photo</th>
                               <th class="text-left">Product_Name</th>
                               <th class="text-right">Qty</th>
                               <th class="text-right">Price</th>
                               <th class="text-right">Amount</th>
-                              <th class="text-right">Deposit_#1</th>
-                              <th class="text-right">Balance</th>
-                              <th class="text-right">Deposit_#2</th>
+                              <!--<th class="text-right">Deposit_#1</th>-->
+                              <!--<th class="text-right">Balance</th>-->
+                              <!--<th class="text-right">Deposit_#2</th>-->
                               <th class="text-right">T. Producción</th>
-                              <th class="text-right">C. Delivery</th>
-                              <th class="text-right">fecha_Entrega</th>
-                              <th class="text-right">Supplier</th><!--proveedor-->
-                              <th class="text-right">Phone_Image_Supplier</th><!--celular imagen de tarjeta de presentación-->
-                              <th class="text-right"></th>
+                              <!--<th class="text-right">C. Delivery</th>--><!-- cabecera costo de delivery por proveedor no es por item-->
+                              <th class="text-center">fecha_Entrega</th>
+                              <th class="text-center">Change Supplier</th>
+                              <th class="text-center">Eliminar Item</th>
+                              <!--<th class="text-right">Supplier</th>--><!--proveedor-->
+                              <!--<th class="text-right">Phone_Image_Supplier</th>--><!--celular imagen de tarjeta de presentación-->
+                              <!--<th class="text-right"></th>-->
                             </tr>
                           </thead>
                           <tbody>
@@ -249,14 +251,15 @@
                         </table>
                       </div>
                       
-                      <div class="table-responsive div-Producto_Recepcion_Carga">
+                      <div class="table-responsive div-Producto_Recepcion_Carga tableFixHeadV2">
                         <table id="table-Producto_Recepcion_Carga" class="table table-bordered table-hover">
                           <thead class="thead-light">
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-left" width="50px">Product_Photo</th>
-                              <th class="text-left">Product_Name</th>
-                              <th class="text-right">Qty</th>
+                              <th class="text-center" width="50px">Product_Photo</th>
+                              <th class="text-center">Product_Name</th>
+                              <th class="text-center" width="150px">Qty Total</th>
+                              <th class="text-center">Nro. Cajas</th>
                               <th class="text-center">Estado</th>
                             </tr>
                           </thead>
@@ -265,7 +268,7 @@
                         </table>
                       </div>
                       
-                      <div class="table-responsive div-Invoice_Proveedor">
+                      <div class="table-responsive div-Invoice_Proveedor tableFixHeadV2">
                         <table id="table-Invoice_Proveedor" class="table table-bordered table-hover">
                           <thead class="thead-light">
                             <tr>

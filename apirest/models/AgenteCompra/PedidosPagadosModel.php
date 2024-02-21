@@ -109,7 +109,11 @@ class PedidosPagadosModel extends CI_Model{
 		ACPDPP.Qt_Producto_Caja_Final_Verificada,
 		ACPDPP.Nu_Estado_Recepcion_Carga_Proveedor_Item,
 		ACPDPP.Txt_Nota_Recepcion_Carga_Proveedor,
-		ACPDPP.Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor
+		ACPDPP.Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor,
+		ACPDPP.Fe_Pago_Importe_1,
+		ACPDPP.Ss_Pago_Importe_1,
+		ACPDPP.Fe_Pago_Importe_2,
+		ACPDPP.Ss_Pago_Importe_2
 		');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');

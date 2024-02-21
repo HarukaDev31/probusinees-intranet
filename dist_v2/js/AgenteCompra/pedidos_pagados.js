@@ -1476,6 +1476,9 @@ function recepcionCarga(ID){
 	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
   $( '#table-Producto_Recepcion_Carga' ).show();
 
+  $( '.div-Invoice_Proveedor' ).hide();
+	$( '#table-Invoice_Proveedor tbody' ).empty();
+  
   //$('#span-id_pedido').html('Nro. ' + ID);
 
   url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
@@ -1587,7 +1590,7 @@ function recepcionCarga(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
       
-      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
+      var iCounterSupplier=1, table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item_final_recepcion_carga = parseFloat(detalle[i]['Qt_Producto_Caja_Final_Verificada']);
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
@@ -1623,9 +1626,10 @@ function recepcionCarga(ID){
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
           table_enlace_producto +=
           "<tr class='table-active'>"
-            +"<th class='text-right'>Supplier</th>";
+            +"<th class='text-right'>"  + iCounterSupplier + ". Supplier</th>";
             table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Contacto_Proveedor + "</th>";
-            table_enlace_producto += "<th class='text-left'>";
+            table_enlace_producto += "<th class='text-left' colspan='2'>";
+              table_enlace_producto += "Observaciones<br>";
               table_enlace_producto += '<textarea id="textarea-nota' + id_item + '" name="addProducto[' + id_item + '][nota]" class="form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' + clearHTMLTextArea(nota_final) + '</textarea>';
             table_enlace_producto += '</th>';
             table_enlace_producto += "<th class='text-center'>";
@@ -1633,6 +1637,7 @@ function recepcionCarga(ID){
             table_enlace_producto += '</th>';
           +"</tr>";
           ID_Entidad = detalle[i].ID_Entidad_Proveedor;
+          ++iCounterSupplier;
         }
 
         table_enlace_producto +=
@@ -1645,17 +1650,21 @@ function recepcionCarga(ID){
 
           table_enlace_producto += "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
-          + "<td class='text-right td-qty'>";
+          + "<td class='text-right td-qty'  width='150px'>";
           table_enlace_producto += '<input type="text" inputmode="decimal" class="form-control input-decimal" id="input-cantidad' + id_item + '" name="addProducto[' + id_item + '][cantidad]" value="' + Math.round10(cantidad_item, -2) + '">';
+          table_enlace_producto += "</td>";
+
+          table_enlace_producto += "<td>";
+          table_enlace_producto += '1';
           table_enlace_producto += "</td>";
 
           table_enlace_producto += "<td class='text-center'>";
             if(detalle[i]['Nu_Estado_Recepcion_Carga_Proveedor_Item']==0){//pendiente
-              table_enlace_producto += '<button type="button" id="btn-confirmado_item_proveedor' + id_item + '" data-estado="1" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-success btn-estado_item_proveedor btn-cargando_item_proveedor' + id_item + '"> Verificado </button>';
+              table_enlace_producto += '<button type="button" id="btn-confirmado_item_proveedor' + id_item + '" data-estado="1" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-success btn-estado_item_proveedor btn-cargando_item_proveedor' + id_item + '"> Confirmado </button>';
               table_enlace_producto += ' <button type="button" id="btn-faltante_item_proveedor' + id_item + '" data-estado="2" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-warning btn-estado_item_proveedor btn-cargando_item_proveedor' + id_item + '"> Faltante </button>';
             } else {
               if(detalle[i]['Nu_Estado_Recepcion_Carga_Proveedor_Item']==1){
-                table_enlace_producto += '<span class="badge bg-success">verificado</span>';
+                table_enlace_producto += '<span class="badge bg-success">Confirmado</span>';
               } else if(detalle[i]['Nu_Estado_Recepcion_Carga_Proveedor_Item']==2) {
                 table_enlace_producto += '<span class="badge bg-warning">Faltante</span>';
               }
@@ -1838,7 +1847,7 @@ function coordinarPagosProveedor(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
       
-      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
+      var iCounterSupplier = 1, table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
@@ -1871,31 +1880,42 @@ function coordinarPagosProveedor(ID){
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
           table_enlace_producto +=
           "<tr class='table-active'>"
-            +"<th class='text-right'>Supplier</th>";
-            table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Contacto_Proveedor + "</th>";
-            table_enlace_producto += "<th class='text-left' colspan='12'>";
+            +"<th class='text-right'>" + iCounterSupplier + ". Supplier</th>";
+            table_enlace_producto += "<th class='text-left'>";
+            table_enlace_producto += detalle[i].No_Contacto_Proveedor + "&nbsp;&nbsp;&nbsp;";
+            if(detalle[i]['Txt_Url_Imagen_Proveedor'] != '' && detalle[i]['Txt_Url_Imagen_Proveedor'] != null){
+              table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize_supplier mb-2'>";
+            }
+            table_enlace_producto += "</th>";
+            table_enlace_producto += "<th class='text-left'>";
             table_enlace_producto += '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarProveedor(' + detalle[i].ID_Entidad_Proveedor + ', ' + id_item + ')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+            table_enlace_producto += "</th>";
+            table_enlace_producto += "<th class='text-left' colspan='10'>";
+            table_enlace_producto += 'Costo delivery: ' + detalle[i]['Ss_Costo_Delivery'];
             table_enlace_producto += "</th>";
           +"</tr>";
           ID_Entidad = detalle[i].ID_Entidad_Proveedor;
+          ++iCounterSupplier;
         }
 
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td class='text-center td-name' width='50%'>"
-            + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+          + "<td class='text-center td-name' width='10%'>"
+            + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize_v2 mb-2'>";
             
           table_enlace_producto += "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
           + "<td class='text-right td-price'>" + Math.round10(precio_china, -2) + "</td>"
           +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
-          +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
-          +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
-          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
+          //+"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
+          //+"<td class='text-right td-pay1'>" + Math.round10(detalle[i]['Ss_Pago_Importe_1'], -2) + "</td>"
+          //+"<td class='text-right td-pay1'>" + Math.round10(detalle[i]['Ss_Pago_Importe_2'], -2) + "</td>"
+          //+"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
+          //+"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
           +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-          +"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>";
+          //+"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>";
 
           table_enlace_producto += "<td class='text-left td-supplier'>";
             table_enlace_producto += '<div class="input-group date" style="width:100%">';
@@ -1903,12 +1923,18 @@ function coordinarPagosProveedor(ID){
             table_enlace_producto += '</div>';
           table_enlace_producto += "</td>";
 
-          table_enlace_producto += "<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
-          +"<td class='text-left td-phone'>";
+          table_enlace_producto += "<td class='text-left'>";
+            table_enlace_producto += '<button type="button" id="btn-cambiar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-primary btn-block btn-cambiar_item_proveedor"> change </button>';
+          table_enlace_producto += "</td>";
+
+          //table_enlace_producto += "<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
+          /*
+          table_enlace_producto += "<td class='text-left td-phone'>";
           if(detalle[i]['Txt_Url_Imagen_Proveedor'] != '' && detalle[i]['Txt_Url_Imagen_Proveedor'] != null){
-            table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
+            table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize_v2 mb-2'>";
           }
           table_enlace_producto += "</td>";
+          */
           
           table_enlace_producto += "<td class='text-left td-eliminar'>";
             table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
@@ -1917,11 +1943,13 @@ function coordinarPagosProveedor(ID){
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
         table_enlace_producto += "</tr>";
         
+        /*
         table_enlace_producto += "<tr>";
           table_enlace_producto += "<td class='text-left' colspan='12'>";
-            table_enlace_producto += '<button type="button" id="btn-cambiar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-cambiar_item_proveedor"> Cambiar producto proveedor </button>';
+            table_enlace_producto += '<button type="button" id="btn-cambiar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-cambiar_item_proveedor"> Cambiar proveedor </button>';
           table_enlace_producto += "</td>";
         table_enlace_producto += "</tr>";
+        */
       }
       
       $('#span-total_cantidad_items').html(i);

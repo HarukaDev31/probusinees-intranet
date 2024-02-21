@@ -56,7 +56,7 @@
 
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url("dist_v2/css/adminlte.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=8.6.0'; ?>">
+  <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/style_v2.css?ver=14.6.0'; ?>">
 
   <meta name="theme-color" content="#FF6700">
   <meta name="msapplication-navbutton-color" content="#FF6700"/>

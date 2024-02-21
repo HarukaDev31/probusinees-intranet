@@ -1172,6 +1172,9 @@ color: white !important;
 .tableFixHead          { overflow: auto; height: 700px; }
 .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
 
+.tableFixHeadV2          { overflow: auto; height: 350px; }
+.tableFixHeadV2 thead th { position: sticky; top: 0; z-index: 1; }
+
 .li-favorito.active{
   background-color: #DE063A !important;
   border-color: #000000 !important;
