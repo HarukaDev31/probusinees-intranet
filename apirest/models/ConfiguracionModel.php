@@ -666,7 +666,13 @@ Nu_Orden_Slider;";
 		//->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
 		//->where_in($this->table . '.Nu_Estado', array(5,6,7,9));//pagados / oc
 
-		$where_id_usuario = ($this->user->Nu_Tipo_Privilegio_Acceso==1 ? " ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario : " ACPC.ID_Usuario_Interno_China = " . $this->user->ID_Usuario);
+		//$where_id_usuario = ($this->user->Nu_Tipo_Privilegio_Acceso==1 ? " ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario : " ACPC.ID_Usuario_Interno_China = " . $this->user->ID_Usuario . " OR ACPC.ID_Usuario_Interno_Jefe_China = " . $this->user->ID_Usuario);
+
+		$where_id_usuario = " ACPC.ID_Usuario_Interno_Empresa = " . $this->user->ID_Usuario;
+		if($this->user->Nu_Tipo_Privilegio_Acceso==2)//personal china
+			$where_id_usuario = " ACPC.ID_Usuario_Interno_China = " . $this->user->ID_Usuario;
+		else if($this->user->Nu_Tipo_Privilegio_Acceso==5)//jefe china
+			$where_id_usuario = " ACPC.ID_Usuario_Interno_Jefe_China = " . $this->user->ID_Usuario;
 
 		$query = "SELECT
 ACPC.ID_Pedido_Cabecera,

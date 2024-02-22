@@ -10,7 +10,8 @@
         </div>
 
         <?php
-        //echo $this->user->ID_Usuario;
+        //echo $this->user->ID_Usuario . "<br>";
+        //echo $this->user->Nu_Tipo_Privilegio_Acceso;
         //array_debug($arrResponsePedidoXUsuario);
 
         if($arrResponsePedidoXUsuario['status']=='success'){ ?>

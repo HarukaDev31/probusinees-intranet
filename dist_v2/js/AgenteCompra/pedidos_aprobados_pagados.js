@@ -15,174 +15,6 @@ if (fMonth < 10) {
 }
 
 $(function () {
-  
-	$(document).on('click', '#btn-guardar_supervisar_llenado_contenedor', function (e) {
-    e.preventDefault();
-
-    $( '#btn-guardar_supervisar_llenado_contenedor' ).text('');
-    $( '#btn-guardar_supervisar_llenado_contenedor' ).attr('disabled', true);
-    $( '#btn-guardar_supervisar_llenado_contenedor' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-
-    url = base_url + 'AgenteCompra/PedidosPagados/supervisarContenedor';
-      $.ajax({
-      type		  : 'POST',
-      dataType	: 'JSON',
-      url		    : url,
-      data		  : $('#form-supervisar_llenado_contenedor').serialize(),
-      success : function( response ){
-          //$( '#modal-loader' ).modal('hide');
-          
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          $('#modal-message').modal('show');
-          
-          if (response.status == 'success'){
-            $('.modal-supervisar_llenado_contenedor').modal('hide');
-              
-            $('#moda-message-content').addClass( 'bg-' + response.status);
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
-            reload_table_Entidad();
-          } else {
-            $('#moda-message-content').addClass( 'bg-danger' );
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
-          }
-          
-          $( '#btn-guardar_supervisar_llenado_contenedor' ).text('');
-          $( '#btn-guardar_supervisar_llenado_contenedor' ).append( 'Guardar' );
-          $( '#btn-guardar_supervisar_llenado_contenedor' ).attr('disabled', false);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          //$( '#modal-loader' ).modal('hide');
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          
-          $( '#modal-message' ).modal('show');
-          $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-          
-          //Message for developer
-          console.log(jqXHR.responseText);
-          
-          $( '#btn-guardar_supervisar_llenado_contenedor' ).text('');
-          $( '#btn-guardar_supervisar_llenado_contenedor' ).append( 'Guardar' );
-          $( '#btn-guardar_supervisar_llenado_contenedor' ).attr('disabled', false);
-      }
-    });
-  });
-
-	$(document).on('click', '#btn-save_booking_consolidado', function (e) {
-    e.preventDefault();
-
-    $( '#btn-save_booking_consolidado' ).text('');
-    $( '#btn-save_booking_consolidado' ).attr('disabled', true);
-    $( '#btn-save_booking_consolidado' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-
-    //$( '#modal-loader' ).modal('show');
-
-    url = base_url + 'AgenteCompra/PedidosPagados/reservaBookingConsolidado';
-      $.ajax({
-      type		  : 'POST',
-      dataType	: 'JSON',
-      url		    : url,
-      data		  : $('#form-booking_consolidado').serialize(),
-      success : function( response ){
-          //$( '#modal-loader' ).modal('hide');
-          
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          $('#modal-message').modal('show');
-          
-          if (response.status == 'success'){
-            $('.modal-booking_consolidado').modal('hide');
-              
-            $('#moda-message-content').addClass( 'bg-' + response.status);
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
-          } else {
-            $('#moda-message-content').addClass( 'bg-danger' );
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
-          }
-          
-          $( '#btn-save_booking_consolidado' ).text('');
-          $( '#btn-save_booking_consolidado' ).append( 'Guardar' );
-          $( '#btn-save_booking_consolidado' ).attr('disabled', false);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          //$( '#modal-loader' ).modal('hide');
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          
-          $( '#modal-message' ).modal('show');
-          $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-          
-          //Message for developer
-          console.log(jqXHR.responseText);
-          
-          $( '#btn-save_booking_consolidado' ).text('');
-          $( '#btn-save_booking_consolidado' ).append( 'Guardar' );
-          $( '#btn-save_booking_consolidado' ).attr('disabled', false);
-      }
-    });
-  });
-
-	$(document).on('click', '#btn-save_booking_inspeccion', function (e) {
-    e.preventDefault();
-
-    $( '#btn-save_booking_inspeccion' ).text('');
-    $( '#btn-save_booking_inspeccion' ).attr('disabled', true);
-    $( '#btn-save_booking_inspeccion' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-
-    //$( '#modal-loader' ).modal('show');
-
-    url = base_url + 'AgenteCompra/PedidosPagados/bookingInspeccion';
-      $.ajax({
-      type		  : 'POST',
-      dataType	: 'JSON',
-      url		    : url,
-      data		  : $('#form-booking_inspeccion').serialize(),
-      success : function( response ){
-          //$( '#modal-loader' ).modal('hide');
-          
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          $('#modal-message').modal('show');
-          
-          if (response.status == 'success'){
-            $('.modal-booking_inspeccion').modal('hide');
-              
-            $('#moda-message-content').addClass( 'bg-' + response.status);
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
-          } else {
-            $('#moda-message-content').addClass( 'bg-danger' );
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
-          }
-          
-          $( '#btn-save_booking_inspeccion' ).text('');
-          $( '#btn-save_booking_inspeccion' ).append( 'Guardar' );
-          $( '#btn-save_booking_inspeccion' ).attr('disabled', false);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          //$( '#modal-loader' ).modal('hide');
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          
-          $( '#modal-message' ).modal('show');
-          $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-          
-          //Message for developer
-          console.log(jqXHR.responseText);
-          
-          $( '#btn-save_booking_inspeccion' ).text('');
-          $( '#btn-save_booking_inspeccion' ).append( 'Guardar' );
-          $( '#btn-save_booking_inspeccion' ).attr('disabled', false);
-      }
-    });
-  });
-
   $(document).on('click', '#btn-guardar_personal_china', function (e) {
     e.preventDefault();
     if ( $( '#cbo-guardar_personal_china-ID_Usuario' ).val() == 0){
@@ -247,7 +79,7 @@ $(function () {
     $( '#btn-guardar_fecha_entrega_shipper' ).attr('disabled', true);
     $( '#btn-guardar_fecha_entrega_shipper' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/despacho';
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/despacho';
       $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -304,7 +136,7 @@ $(function () {
 
     //$( '#modal-loader' ).modal('show');
 
-    url = base_url + 'AgenteCompra/PedidosPagados/crudProveedor';
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/crudProveedor';
       $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -361,7 +193,7 @@ $(function () {
 
     //$( '#modal-loader' ).modal('show');
 
-    url = base_url + 'AgenteCompra/PedidosPagados/reservaBooking';
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/reservaBooking';
       $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -427,7 +259,7 @@ $(function () {
         'precio_comision_trading' : $( '#txt-modal-precio_comision_trading' ).val()
       }
 
-      url = base_url + 'AgenteCompra/PedidosPagados/agregarComisionTrading';
+      url = base_url + 'AgenteCompra/PedidosAprobadosPagados/agregarComisionTrading';
       $.ajax({
         type		  : 'POST',
         dataType	: 'JSON',
@@ -537,7 +369,7 @@ $(function () {
     }
   });
 
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_list';
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/ajax_list';
   table_Entidad = $( '#table-Pedidos' ).DataTable({
     dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
     "<'row'<'col-sm-12'tr>>" +
@@ -725,7 +557,7 @@ $(function () {
   
 	$( '#a-download_image' ).click(function(){
     id = $(this).data('id_item');
-    url = base_url + 'AgenteCompra/PedidosPagados/downloadImage/' + id;
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/downloadImage/' + id;
     
     var popupwin = window.open(url);
     setTimeout(function() { popupwin.close();}, 2000);
@@ -808,7 +640,7 @@ $(function () {
       $( '#btn-save-delete' ).attr('disabled', true);
       $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-      url = base_url + 'AgenteCompra/PedidosPagados/elminarItemProveedor/' + id + '/' + correlativo + '/' + name_item;
+      url = base_url + 'AgenteCompra/PedidosAprobadosPagados/elminarItemProveedor/' + id + '/' + correlativo + '/' + name_item;
       $.ajax({
         url : url,
         type: "GET",
@@ -851,7 +683,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-agregar_inspeccion")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addInspeccionProveedor',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addInspeccionProveedor',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -875,7 +707,6 @@ $(function () {
     $('.help-block').empty();
     $('.form-group').removeClass('has-error');
 
-    /*
     const amount_proveedor = parseFloat($('#amount_proveedor').val())
 
     if( isNaN(amount_proveedor) || amount_proveedor<=0.00 || amount_proveedor<=0) {
@@ -885,10 +716,9 @@ $(function () {
       $('#voucher_proveedor').closest('.form-group').find('.help-block').html('Empty image');
       $('#voucher_proveedor').closest('.form-group').removeClass('has-success').addClass('has-error');
     } else {
-    */
       var postData = new FormData($("#form-agregar_pago_proveedor")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addPagoProveedor',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addPagoProveedor',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -898,13 +728,12 @@ $(function () {
       .done(function(response) {
         if(response.status == 'success') {
           $('#modal-agregar_pago').modal('hide');
-          //verPedido($('#proveedor-id_cabecera').val());
-          pagarProveedores($('#proveedor-id_cabecera').val(), $('#proveedor-tipo_pago').val());
+          verPedido($('#proveedor-id_cabecera').val());
         } else {
           alert(response.message);
         }
       });
-    //}
+    }
   });
   
   $("#form-documento_entrega").on('submit',function(e){
@@ -916,13 +745,10 @@ $(function () {
     if(document.getElementById('image_documento').files.length == 0) {
       $('#image_documento').closest('.form-group').find('.help-block').html('Empty file');
       $('#image_documento').closest('.form-group').removeClass('has-success').addClass('has-error');
-    } else if(document.getElementById('image_documento_detalle').files.length == 0) {
-      $('#image_documento_detalle').closest('.form-group').find('.help-block').html('Empty file');
-      $('#image_documento_detalle').closest('.form-group').removeClass('has-success').addClass('has-error');
     } else {
       var postData = new FormData($("#form-documento_entrega")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addFileProveedor',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addFileProveedor',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -961,7 +787,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-pago_cliente_30")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addPagoCliente30',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addPagoCliente30',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1002,7 +828,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-pago_cliente_100")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addPagoCliente100',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addPagoCliente100',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1043,7 +869,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-pago_cliente_servicio")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addPagoClienteServicio',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addPagoClienteServicio',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1084,7 +910,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-pago_flete")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addPagoFlete',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addPagoFlete',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1125,7 +951,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-costos_origen")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addPagoCostosOrigen',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addPagoCostosOrigen',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1166,7 +992,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-pago_fta")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addPagoFta',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addPagoFta',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1207,7 +1033,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-otros_cuadrilla")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addOtrosCuadrilla',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addOtrosCuadrilla',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1248,7 +1074,7 @@ $(function () {
     } else {
       var postData = new FormData($("#form-otros_costos")[0]);
       $.ajax({
-        url: base_url + 'AgenteCompra/PedidosPagados/addOtrosCostos',
+        url: base_url + 'AgenteCompra/PedidosAprobadosPagados/addOtrosCostos',
         type: "POST",
         dataType: "JSON",
         data: postData,
@@ -1291,7 +1117,7 @@ $(function () {
     $( '.btn-cargando_item_proveedor' + id ).attr('disabled', true);
     $( '.btn-cargando_item_proveedor' + id ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/actualizarRecepcionCargaItemProveedor';
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/actualizarRecepcionCargaItemProveedor';
     $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -1350,7 +1176,7 @@ $(function () {
     $( '#btn-finalizar_item_proveedor' + id ).attr('disabled', true);
     $( '#btn-finalizar_item_proveedor' + id ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/actualizarRecepcionCargaProveedor';
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/actualizarRecepcionCargaProveedor';
     $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -1409,7 +1235,7 @@ $(function () {
     $( '#btn-image_documento' + id ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
     var postData = new FormData($("#form-invoice_pl_proveedor" + id)[0]);
-    url = base_url + 'AgenteCompra/PedidosPagados/subirInvoicePlProveedor';
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/subirInvoicePlProveedor';
     $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -1489,13 +1315,10 @@ function invoiceProveedor(ID){
   $( '.div-Invoice_Proveedor' ).show();
 	$( '#table-Invoice_Proveedor tbody' ).empty();
   $( '#table-Invoice_Proveedor' ).show();
-  
-  $( '.div-Pago_Proveedor' ).hide();
-	$( '#table-Pago_Proveedor tbody' ).empty();
 
   //$('#span-id_pedido').html('Nro. ' + ID);
 
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -1644,7 +1467,7 @@ function invoiceProveedor(ID){
               if(detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor != '' && detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor != null) {
                 table_enlace_producto += '<button class="btn btn-link" alt="Descargar Invoice y PL" title="Descargar Invoice y PL" href="javascript:void(0)" onclick="descargarInvoicePlProveedor(' + id_item + ')">Descargar</button>';
               } else {
-                table_enlace_producto += '<form action="' + base_url + 'AgenteCompra/PedidosPagados/listar" id="form-invoice_pl_proveedor' + id_item + '" method="post" accept-charset="utf-8">';
+                table_enlace_producto += '<form action="' + base_url + 'AgenteCompra/PedidosAprobadosPagados/listar" id="form-invoice_pl_proveedor' + id_item + '" method="post" accept-charset="utf-8">';
                   table_enlace_producto += '<input type="hidden" id="documento-id" name="documento-id" value="' + id_item + '" class="form-control"></input>';
                   table_enlace_producto += '<input class="form-control" id="image_documento' + id_item + '" name="image_documento" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>';
                 table_enlace_producto += '</form>';
@@ -1713,12 +1536,9 @@ function recepcionCarga(ID){
   $( '.div-Invoice_Proveedor' ).hide();
 	$( '#table-Invoice_Proveedor tbody' ).empty();
   
-  $( '.div-Pago_Proveedor' ).hide();
-	$( '#table-Pago_Proveedor tbody' ).empty();
-
   //$('#span-id_pedido').html('Nro. ' + ID);
 
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -1972,13 +1792,10 @@ function coordinarPagosProveedor(ID){
 
   $( '.div-Invoice_Proveedor' ).hide();
 	$( '#table-Invoice_Proveedor tbody' ).empty();
-  
-  $( '.div-Pago_Proveedor' ).hide();
-	$( '#table-Pago_Proveedor tbody' ).empty();
 
   //$('#span-id_pedido').html('Nro. ' + ID);
 
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -2127,10 +1944,10 @@ function coordinarPagosProveedor(ID){
               table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize_supplier mb-2'>";
             }
             table_enlace_producto += "</th>";
-            table_enlace_producto += "<th class='text-left' colspan='3'>";
-            table_enlace_producto += '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarProveedor(' + detalle[i].ID_Entidad_Proveedor + ', ' + id_item + ')">agregar datos &nbsp;<i class="far fa-edit" aria-hidden="true"></i></button>';
+            table_enlace_producto += "<th class='text-left'>";
+            table_enlace_producto += 'agregar datos <button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarProveedor(' + detalle[i].ID_Entidad_Proveedor + ', ' + id_item + ')"><i class="far fa-edit" aria-hidden="true"></i></button>';
             table_enlace_producto += "</th>";
-            table_enlace_producto += "<th class='text-left' colspan='7'>";
+            table_enlace_producto += "<th class='text-left' colspan='10'>";
             table_enlace_producto += 'Costo delivery: ' + detalle[i]['Ss_Costo_Delivery'];
             table_enlace_producto += "</th>";
           +"</tr>";
@@ -2250,13 +2067,10 @@ function verPedido(ID){
 
   $( '.div-Invoice_Proveedor' ).hide();
 	$( '#table-Invoice_Proveedor tbody' ).empty();
-  
-  $( '.div-Pago_Proveedor' ).hide();
-	$( '#table-Pago_Proveedor tbody' ).empty();
 
   //$('#span-id_pedido').html('Nro. ' + ID);
 
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -2525,7 +2339,7 @@ function cambiarEstado(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
     $.ajax({
       url: url,
       type: "GET",
@@ -2633,7 +2447,7 @@ function form_pedido(){
     $( '#btn-save' ).attr('disabled', true);
     $( '#btn-save' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
     
-    url = base_url + 'AgenteCompra/PedidosPagados/crudPedidoGrupal';
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/crudPedidoGrupal';
     $.ajax({
       type		  : 'POST',
       dataType	: 'JSON',
@@ -2719,7 +2533,7 @@ function generarExcelOrderTracking(ID){
 
 function _generarExcelOrderTracking($modal_delete, ID){
   $modal_delete.modal('hide');
-  url = base_url + 'AgenteCompra/PedidosPagados/generarExcelOrderTracking/' + ID;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/generarExcelOrderTracking/' + ID;
   window.open(url,'_blank');
 }
 
@@ -2756,7 +2570,7 @@ function cambiarEstadoChina(ID, Nu_Estado, iIdCorrelativo, sCorrelativo) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/cambiarEstadoChina/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/cambiarEstadoChina/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
     $.ajax({
       url: url,
       type: "GET",
@@ -2804,12 +2618,9 @@ function subirInspeccion(ID){
   $( '.div-Invoice_Proveedor' ).hide();
 	$( '#table-Invoice_Proveedor tbody' ).empty();
   
-  $( '.div-Pago_Proveedor' ).hide();
-	$( '#table-Pago_Proveedor tbody' ).empty();
-  
   //$('#span-id_pedido').html('Nro. ' + ID);
 
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/ajax_edit/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -2843,7 +2654,7 @@ function subirInspeccion(ID){
         sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
       $( '#div-estado' ).html(sNombreEstado);
 
-      var table_enlace_producto = "", iDiasVencimiento=0, sClassColorTr = '', iCounterSupplier = 1, ID_Entidad = '';
+      var table_enlace_producto = "", iDiasVencimiento=0, sClassColorTr = '';
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
@@ -2870,17 +2681,6 @@ function subirInspeccion(ID){
 
         var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
 
-        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
-          table_enlace_producto +=
-          "<tr class='table-active'>"
-            +"<th class='text-right'>" + iCounterSupplier + ". Supplier</th>";
-            table_enlace_producto += "<th class='text-left' colspan='8'>";
-            table_enlace_producto += detalle[i].No_Contacto_Proveedor;
-          +"</tr>";
-          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
-          ++iCounterSupplier;
-        }
-
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "' class='" + sClassColorTr + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
@@ -2892,11 +2692,11 @@ function subirInspeccion(ID){
           +"<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
           +"<td class='text-right td-price'>" + Math.round10(precio_china, -2) + "</td>"
           +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
-          //+"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
-          //+"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
-          //+"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
+          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
           +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-          //+"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>";
+          +"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>";
           
           table_enlace_producto += "<td class='text-left td-supplier'>";
             table_enlace_producto += '<div class="input-group date" style="width:100%">';
@@ -2904,19 +2704,16 @@ function subirInspeccion(ID){
             table_enlace_producto += '</div>';
           table_enlace_producto += "</td>";
 
-          table_enlace_producto += "<td class='text-left td-supplier'></td>";
-          //table_enlace_producto += "<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
-          /*
-          table_enlace_producto += "<td class='text-left td-phone'>";
+          table_enlace_producto += "<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
+          +"<td class='text-left td-phone'>";
           if(detalle[i]['Txt_Url_Imagen_Proveedor'] != '' && detalle[i]['Txt_Url_Imagen_Proveedor'] != null){
             table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
           }
-          */
           table_enlace_producto += "</td>";
 
           
           table_enlace_producto += "<td class='text-left td-eliminar'>";
-            //table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
+            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
           table_enlace_producto += "</td>";
 
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
@@ -2965,7 +2762,7 @@ function subirInspeccion(ID){
 function verInspeccion(ID){
 	$( '#div-img_inspeccion_item' ).html('');
 
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit_inspeccion/' + ID;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/ajax_edit_inspeccion/' + ID;
   $.ajax({
     url : url,
     type: "GET",
@@ -3008,14 +2805,7 @@ function documentoEntregado(id, sCorrelativo){
 }
 
 function descargarDocumentoEntregado(id){
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarDocumentoEntregado/' + id;
-  
-  var popupwin = window.open(url);
-  setTimeout(function() { popupwin.close();}, 2000);
-}
-
-function descargarDocumentoDetalle(id){
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarDocumentoDetalle/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarDocumentoEntregado/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3030,7 +2820,7 @@ function subirPago30(){
 
 function descargarPago30(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPago30/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPago30/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3045,7 +2835,7 @@ function subirPago100(){
 
 function descargarPago100(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPago100/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPago100/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3082,7 +2872,7 @@ function cambiarTipoServicio(ID, Nu_Tipo_Servicio, ID_Usuario_Interno_Empresa_Ch
       $( '#btn-save-delete' ).attr('disabled', true);
       $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-      url = base_url + 'AgenteCompra/PedidosPagados/cambiarTipoServicio/' + ID + '/' + Nu_Tipo_Servicio + '/' + ID_Usuario_Interno_Empresa_China;
+      url = base_url + 'AgenteCompra/PedidosAprobadosPagados/cambiarTipoServicio/' + ID + '/' + Nu_Tipo_Servicio + '/' + ID_Usuario_Interno_Empresa_China;
       $.ajax({
         url: url,
         type: "GET",
@@ -3131,7 +2921,7 @@ function subirPagoServicio(){
 
 function descargarPagoServicio(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoServicio/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPagoServicio/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3164,7 +2954,7 @@ function cambiarIncoterms(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/cambiarIncoterms/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/cambiarIncoterms/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
     $.ajax({
       url: url,
       type: "GET",
@@ -3217,7 +3007,7 @@ function cambiarTransporte(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/cambiarTransporte/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
+    url = base_url + 'AgenteCompra/PedidosAprobadosPagados/cambiarTransporte/' + ID + '/' + Nu_Estado + '/' + sCorrelativo;
     $.ajax({
       url: url,
       type: "GET",
@@ -3269,7 +3059,7 @@ function subirPagoFlete(){
 
 function descargarPagoFlete(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoFlete/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPagoFlete/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3284,7 +3074,7 @@ function subirPagoCostoOrigen(){
 
 function descargarPagoCostosOrigen(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoCostosOrigen/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPagoCostosOrigen/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3299,7 +3089,7 @@ function subirPagoFTA(){
 
 function descargarPagoFTA(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoFTA/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPagoFTA/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3314,7 +3104,7 @@ function subirPagoCuadrilla(){
 
 function descargarPagoCuadrilla(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoCuadrilla/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPagoCuadrilla/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3329,7 +3119,7 @@ function subirPagoOtrosCostos(){
 
 function descargarPagoOtrosCostos(){
   var id = $('#txt-EID_Pedido_Cabecera').val();
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarPagoOtrosCostos/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarPagoOtrosCostos/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3347,7 +3137,7 @@ function editarProveedor(ID_Entidad, id_item){
   $( '[name="proveedor-ID_Entidad"]' ).val(ID_Entidad);
   $( '[name="proveedor-ID_Pedido_Detalle_Producto_Proveedor"]' ).val(id_item);
   
-  url = base_url + 'AgenteCompra/PedidosPagados/getPedidoProveedor/' + id_item;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/getPedidoProveedor/' + id_item;
   $.ajax({
     url : url,
     type: "GET",
@@ -3386,7 +3176,7 @@ function booking(id){
   $(' .modal-booking ').modal('show');
   $(' #form-booking ' )[0].reset();
   
-  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/getBooking/' + id;
   $.ajax({
     url : url,
     type: "GET",
@@ -3414,7 +3204,7 @@ function booking(id){
 }
 
 function descargarInvoicePlProveedor(id){
-  url = base_url + 'AgenteCompra/PedidosPagados/descargarInvoicePlProveedor/' + id;
+  url = base_url + 'AgenteCompra/PedidosAprobadosPagados/descargarInvoicePlProveedor/' + id;
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
@@ -3507,474 +3297,4 @@ function removerAsignarPedido(ID, id_usuario) {
       }
     });
   });
-}
-
-function completarVerificacionOC(ID, Nu_Tipo_Servicio, ID_Usuario_Interno_Empresa_China) {
-  var $modal_delete = $('#modal-message-delete');
-  $modal_delete.modal('show');
-
-  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
-  $('.modal-message-delete').addClass('modal-success');
-
-  $('#modal-title').html('¿Deseas <strong>completar</strong> tarea?');
-
-  $('#btn-cancel-delete').off('click').click(function () {
-    $modal_delete.modal('hide');
-  });
-
-  $('#btn-save-delete').off('click').click(function () {
-    $( '#btn-save-delete' ).text('');
-    $( '#btn-save-delete' ).attr('disabled', true);
-    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-
-    url = base_url + 'AgenteCompra/PedidosPagados/completarVerificacionOC/' + ID + '/' + Nu_Tipo_Servicio + '/' + ID_Usuario_Interno_Empresa_China;
-    $.ajax({
-      url: url,
-      type: "GET",
-      dataType: "JSON",
-      success: function (response) {
-        $modal_delete.modal('hide');
-
-        $( '#btn-save-delete' ).text('');
-        $( '#btn-save-delete' ).append( 'Aceptar' );
-        $( '#btn-save-delete' ).attr('disabled', false);
-
-        $('.modal-message').removeClass('modal-danger modal-warning modal-success');
-        $('#modal-message').modal('show');
-
-        if (response.status == 'success') {
-          $('.modal-message').addClass(response.style_modal);
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
-          reload_table_Entidad();
-        } else {
-          $('.modal-message').addClass(response.style_modal);
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 1500);
-        }
-      }
-    });
-  });
-}
-
-function pagarProveedores(ID, tipo_pago){
-  $( '.div-Listar' ).hide();
-  
-  $( '#form-pedido' )[0].reset();
-  $( '.form-group' ).removeClass('has-error');
-  $( '.form-group' ).removeClass('has-success');
-  $( '.help-block' ).empty();
-
-  $( '.div-Pago_Proveedor' ).show();
-	$( '#table-Pago_Proveedor tbody' ).empty();
-  $( '#table-Pago_Proveedor' ).show();
-  
-  $( '.div-Compuesto' ).hide();
-	$( '#table-Producto_Enlace tbody' ).empty();
-
-  $( '.div-Producto_Recepcion_Carga' ).hide();
-	$( '#table-Producto_Recepcion_Carga tbody' ).empty();
-
-  $( '.div-Invoice_Proveedor' ).hide();
-	$( '#table-Invoice_Proveedor tbody' ).empty();
-
-  //$('#span-id_pedido').html('Nro. ' + ID);
-
-  url = base_url + 'AgenteCompra/PedidosPagados/ajax_edit/' + ID;
-  $.ajax({
-    url : url,
-    type: "GET",
-    dataType: "JSON",
-    success: function(response){
-      console.log(response);
-      var detalle = response;
-      response = response[0];
-
-      $('#span-id_pedido').html(response.sCorrelativoCotizacion);
-      
-      $( '.div-AgregarEditar' ).show();
-            
-      $( '[name="EID_Pedido_Cabecera"]' ).val(response.ID_Pedido_Cabecera);
-      $( '[name="EID_Entidad"]' ).val(response.ID_Entidad);
-      $( '[name="EID_Empresa"]' ).val(response.ID_Empresa);
-      $( '[name="EID_Organizacion"]' ).val(response.ID_Organizacion);
-
-      $( '[name="No_Contacto"]' ).val(response.No_Contacto);
-      $( '[name="Txt_Email_Contacto"]' ).val(response.Txt_Email_Contacto);
-      $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
-      $( '[name="No_Entidad"]' ).val(response.No_Entidad);
-      $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
-      
-      //$( '#btn-excel_order_tracking' ).data('id_pedido', response.ID_Pedido_Cabecera);
-      $( '#btn-excel_order_tracking' ).attr('data-id_pedido', response.ID_Pedido_Cabecera); // sets 
-
-      $('#btn-descargar_pago_30').hide();
-      $('#span-pago_30').html('');
-      if( response.Txt_Url_Pago_30_Cliente != '' && response.Txt_Url_Pago_30_Cliente != null ){
-        $('#btn-descargar_pago_30').show();
-        $('#btn-descargar_pago_30').removeClass('d-none');
-
-        $('#span-pago_30').html('$ ' + response.Ss_Pago_30_Cliente);
-      }
-
-      $('#btn-descargar_pago_100').hide();
-      $('#span-pago_100').html('');
-      if( response.Txt_Url_Pago_100_Cliente != '' && response.Txt_Url_Pago_100_Cliente != null ){
-        $('#btn-descargar_pago_100').show();
-        $('#btn-descargar_pago_100').removeClass('d-none');
-
-        $('#span-pago_100').html('$ ' + response.Ss_Pago_100_Cliente);
-      }
-
-      $('#btn-descargar_pago_servicio').hide();
-      $('#span-pago_servicio').html('');
-      if( response.Txt_Url_Pago_Servicio_Cliente != '' && response.Txt_Url_Pago_Servicio_Cliente != null ){
-        $('#btn-descargar_pago_servicio').show();
-        $('#btn-descargar_pago_servicio').removeClass('d-none');
-
-        $('#span-pago_servicio').html('$ ' + response.Ss_Pago_Servicio_Cliente);
-      }
-
-      $('#btn-descargar_flete').hide();
-      $('#span-flete').html('');
-      if( response.Txt_Url_Pago_Otros_Flete != '' && response.Txt_Url_Pago_Otros_Flete != null ){
-        $('#btn-descargar_flete').show();
-        $('#btn-descargar_flete').removeClass('d-none');
-
-        $('#span-flete').html('$ ' + response.Ss_Pago_Otros_Flete);
-      }
-
-      $('#btn-descargar_costo_origen').hide();
-      $('#span-costo_origen').html('');
-      if( response.Txt_Url_Pago_Otros_Costo_Origen != '' && response.Txt_Url_Pago_Otros_Costo_Origen != null ){
-        $('#btn-descargar_costo_origen').show();
-        $('#btn-descargar_costo_origen').removeClass('d-none');
-
-        $('#span-costo_origen').html('$ ' + response.Ss_Pago_Otros_Costo_Origen);
-      }
-
-      $('#btn-descargar_fta').hide();
-      $('#span-fta').html('');
-      if( response.Txt_Url_Pago_Otros_Costo_Fta != '' && response.Txt_Url_Pago_Otros_Costo_Fta != null ){
-        $('#btn-descargar_fta').show();
-        $('#btn-descargar_fta').removeClass('d-none');
-
-        $('#span-fta').html('$ ' + response.Ss_Pago_Otros_Costo_Fta);
-      }
-
-      $('#btn-descargar_pago_cuadrilla').hide();
-      $('#span-cuadrilla').html('');
-      if( response.Txt_Url_Pago_Otros_Cuadrilla != '' && response.Txt_Url_Pago_Otros_Cuadrilla != null ){
-        $('#btn-descargar_pago_cuadrilla').show();
-        $('#btn-descargar_pago_cuadrilla').removeClass('d-none');
-
-        $('#span-cuadrilla').html('$ ' + response.Ss_Pago_Otros_Cuadrilla);
-      }
-
-      $('#btn-descargar_otros_costos').hide();
-      $('#span-otros_costo').html('');
-      if( response.Txt_Url_Pago_Otros_Costos != '' && response.Txt_Url_Pago_Otros_Costos != null ){
-        $('#btn-descargar_otros_costos').show();
-        $('#btn-descargar_otros_costos').removeClass('d-none');
-
-        $('#span-otros_costo').html('$ ' + response.Ss_Pago_Otros_Costos);
-      }
-
-      var sNombreEstado = '<span class="badge badge-pill badge-secondary">Pendiente</span>';
-      if(response.Nu_Estado_Pedido == 2)
-        sNombreEstado = '<span class="badge badge-pill badge-primary">Confirmado</span>';
-      else if(response.Nu_Estado_Pedido == 3)
-        sNombreEstado = '<span class="badge badge-pill badge-success">Entregado</span>';
-      else if(response.Nu_Estado_Pedido == 4)
-        sNombreEstado = '<span class="badge badge-pill badge-danger">Confirmado</span>';
-      $( '#div-estado' ).html(sNombreEstado);
-      
-      var iCounterSupplier=1, table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
-      for (i = 0; i < detalle.length; i++) {
-        var cantidad_item_final_recepcion_carga = parseFloat(detalle[i]['Qt_Producto_Caja_Final_Verificada']);
-        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
-        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
-        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
-
-        fTotalCliente += (cantidad_item * (precio_china * parseFloat(response.Ss_Tipo_Cambio)));
-
-        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
-        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
-        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
-        //max-height: 350px;width: 100%; cursor:pointer
-
-        var fTotal = (cantidad_item * precio_china);
-        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
-        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
-
-        sClassColorTr = '';
-        iDiasVencimiento = 0;
-        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
-          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
-          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
-
-          var diff = fechaFin - fechaInicio;
-          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
-          if(iDiasVencimiento<5)
-            sClassColorTr = 'table-warning';
-        }
-
-        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
-
-        var nota_final = (detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] != '' && detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] != null ? detalle[i]['Txt_Nota_Recepcion_Carga_Proveedor'] : '');
-
-        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
-          table_enlace_producto +="<tr>";
-            table_enlace_producto += "<th class='text-left'>" + iCounterSupplier + ". " + detalle[i].No_Contacto_Proveedor + "</th>";
-            table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Cuenta_Bancaria + "</th>";
-            
-            if(tipo_pago==1) {
-              table_enlace_producto += "<th class='text-left'>" + detalle[i].Ss_Pago_Importe_1 + "</th>";
-            } else if(tipo_pago==2) {
-              table_enlace_producto += "<th class='text-left'>" + detalle[i].Ss_Pago_Importe_2 + "</th>";
-            }
-            
-            if(tipo_pago==1) {
-              table_enlace_producto +=
-              "<td class='text-left'>"
-                if( voucher_1 == '' || voucher_1 == null ){
-                  table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
-                } else {
-                  table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + detalle[i].Ss_Pago_Importe_1 +  ' (Deposit_#1)</button>';
-                }
-              table_enlace_producto +=
-              "</td>";
-            } else if (tipo_pago==2){
-              table_enlace_producto +=
-              "<td class='text-left'>"
-                if( voucher_2 == '' || voucher_2 == null ){
-                  table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
-                } else {
-                  table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + detalle[i].Ss_Pago_Importe_2 + ' (Deposit_#2)</button>';
-                }
-              table_enlace_producto +=
-              "</td>";
-            }
-          +"</tr>";
-          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
-          ++iCounterSupplier;
-        }
-      }
-
-      /*
-      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = 0;
-      for (i = 0; i < detalle.length; i++) {
-        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
-        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
-
-        fTotalCliente += (cantidad_item * (precio_china * parseFloat(response.Ss_Tipo_Cambio)));
-
-        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
-        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
-        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
-        //max-height: 350px;width: 100%; cursor:pointer
-
-        var fTotal = (cantidad_item * precio_china);
-        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
-        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
-
-        sClassColorTr = '';
-        iDiasVencimiento = 0;
-        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
-          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
-          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
-
-          var diff = fechaFin - fechaInicio;
-          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
-          if(iDiasVencimiento<5)
-            sClassColorTr = 'table-warning';
-        }
-
-        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
-
-        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
-          table_enlace_producto +=
-          "<tr>"
-            +"<th class='text-right'>Supplier </th>"
-            +"<th class='text-left' colspan='14'>" + detalle[i].No_Contacto_Proveedor + "</th>"
-          +"</tr>";
-          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
-        }
-
-        table_enlace_producto +=
-        "<tr id='tr_enlace_producto" + id_item + "'>"
-          + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td class='text-center td-name' width='50%'>"
-            + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
-            
-          table_enlace_producto += "</td>"
-          + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
-          + "<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
-          + "<td class='text-right td-price'>" + Math.round10(precio_china, -2) + "</td>"
-          +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
-          +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
-          +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
-          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
-          +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-          +"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>";
-
-          table_enlace_producto += "<td class='text-left td-supplier'>";
-            table_enlace_producto += '<div class="input-group date" style="width:100%">';
-              table_enlace_producto += '<input type="text" id="txt-fecha_entrega_proveedor'+i+'" name="addProducto[' + id_item + '][fecha_entrega_proveedor]" class="form-control input-datepicker-today-to-more required" value="' + fecha_entrega_proveedor + '">';
-            table_enlace_producto += '</div>';
-          table_enlace_producto += "</td>";
-
-          table_enlace_producto += "<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
-          +"<td class='text-left td-phone'>";
-          if(detalle[i]['Txt_Url_Imagen_Proveedor'] != '' && detalle[i]['Txt_Url_Imagen_Proveedor'] != null){
-            table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
-          }
-          table_enlace_producto += "</td>";
-          
-          table_enlace_producto += "<td class='text-left td-eliminar'>";
-            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
-          table_enlace_producto += "</td>";
-
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
-        table_enlace_producto += "</tr>";
-        
-        table_enlace_producto +=
-        "<tr><td class='text-left' colspan='14'>"
-          if( voucher_1 == '' || voucher_1 == null ){
-            table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
-          } else {
-            table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_1_Proveedor +  ' (Deposit_#1)</button>';
-            if( voucher_2 == '' || voucher_2 == null ){
-              table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
-            } else {
-              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_2_Proveedor + ' (Deposit_#2)</button>';
-            }
-          }
-        table_enlace_producto +=
-        "</td></tr>";
-      }
-      */
-      
-      $('#span-total_cantidad_items').html(i);
-      $( '#table-Pago_Proveedor' ).append(table_enlace_producto);
-
-      $( '#span-total_cliente' ).html('$ ' + fTotalCliente.toFixed(2));
-
-      //PAGOS
-      //Ss_Pago_30_Cliente
-      //Ss_Pago_100_Cliente
-      //Ss_Pago_Servicio_Cliente
-
-      //OTROS
-      //Ss_Pago_Otros_Flete
-      //Ss_Pago_Otros_Costo_Origen
-      //Ss_Pago_Otros_Costo_Fta
-      //Ss_Pago_Otros_Cuadrilla
-      //Ss_Pago_Otros_Costos
-      $( '#span-saldo_cliente' ).html('$ ' + (fTotalCliente - (parseFloat(response.Ss_Pago_30_Cliente) + parseFloat(response.Ss_Pago_100_Cliente) + parseFloat(response.Ss_Pago_Servicio_Cliente))));
-      
-      //Date picker invoice
-      $( '.input-datepicker-today-to-more' ).datepicker({
-        autoclose : true,
-        startDate : new Date(fYear, fToday.getMonth(), fDay),
-        todayHighlight  : true,
-        dateFormat: 'dd/mm/yyyy',
-        format: 'dd/mm/yyyy',
-      });
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-	    $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-	    
-  	  $( '#modal-message' ).modal('show');
-	    $( '.modal-message' ).addClass( 'modal-danger' );
-	    $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-	    setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-	    
-	    //Message for developer
-      console.log(jqXHR.responseText);
-    }
-  })
-}
-
-function bookingConsolidado(id){
-  $( '#form-booking_consolidado' )[0].reset();
-  $( '.form-group' ).removeClass('has-error');
-  $( '.form-group' ).removeClass('has-success');
-  $( '.help-block' ).empty();
-
-  $( '[name="booking_consolidado-ID_Pedido_Cabecera"]' ).val(id);
-
-  $(' .modal-booking_consolidado ').modal('show');
-  $(' #form-booking_consolidado ' )[0].reset();
-  
-  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
-  $.ajax({
-    url : url,
-    type: "GET",
-    dataType: "JSON",
-    success: function(response){
-      console.log(response);
-      $( '[name="booking_consolidado-No_Numero_Consolidado"]' ).val(response.No_Numero_Consolidado);
-      $( '#booking_consolidado-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      //$( '#modal-loader' ).modal('hide');
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        
-        $( '#modal-message' ).modal('show');
-        $( '.modal-message' ).addClass( 'modal-danger' );
-        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-        
-        //Message for developer
-      console.log(jqXHR.responseText);
-    }
-  })
-}
-
-function bookingInspeccion(id){
-  $( '#form-booking_inspeccion' )[0].reset();
-  $( '.form-group' ).removeClass('has-error');
-  $( '.form-group' ).removeClass('has-success');
-  $( '.help-block' ).empty();
-
-  $( '[name="booking_inspeccion-ID_Pedido_Cabecera"]' ).val(id);
-
-  $(' .modal-booking_inspeccion ').modal('show');
-  $(' #form-booking_inspeccion ' )[0].reset();
-  
-  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
-  $.ajax({
-    url : url,
-    type: "GET",
-    dataType: "JSON",
-    success: function(response){
-      console.log(response);
-      $( '[name="booking_inspeccion-No_Observacion_Inspeccion"]' ).val(response.No_Observacion_Inspeccion);
-
-      $( '#booking_inspeccion-Qt_Caja_Total_Booking' ).html(response.Qt_Caja_Total_Booking);
-      $( '#booking_inspeccion-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
-      $( '#booking_inspeccion-Qt_Peso_Total_Booking' ).html(response.Qt_Peso_Total_Booking);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      //$( '#modal-loader' ).modal('hide');
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        
-        $( '#modal-message' ).modal('show');
-        $( '.modal-message' ).addClass( 'modal-danger' );
-        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-        
-        //Message for developer
-      console.log(jqXHR.responseText);
-    }
-  })
-}
-
-function supervisarContenedor(id, sCorrelativo){
-  $( '[name="supervisar_llenado_contenedor-id_cabecera"]' ).val(id);
-  $( '[name="supervisar_llenado_contenedor-correlativo"]' ).val(sCorrelativo);
-
-  $('#modal-supervisar_llenado_contenedor').modal('show');
-  $( '#form-supervisar_llenado_contenedor' )[0].reset();
 }

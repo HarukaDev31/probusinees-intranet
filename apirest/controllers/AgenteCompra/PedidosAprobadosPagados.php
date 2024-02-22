@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class PedidosPagados extends CI_Controller {
+class PedidosAprobadosPagados extends CI_Controller {
 	
 	private $upload_path = '../assets/images/clientes/';
 	private $file_path = '../assets/images/logos/';
@@ -12,7 +12,7 @@ class PedidosPagados extends CI_Controller {
     	parent::__construct();	
 		$this->load->library('session');
 		$this->load->database('LAE_SYSTEMS');
-		$this->load->model('AgenteCompra/PedidosPagadosModel');
+		$this->load->model('AgenteCompra/PedidosAprobadosPagadosModel');
 		$this->load->model('HelperImportacionModel');
 		$this->load->model('NotificacionModel');
 		$this->load->model('MenuModel');
@@ -26,25 +26,26 @@ class PedidosPagados extends CI_Controller {
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
 			$this->load->view('header_v2');
-			$this->load->view('AgenteCompra/PedidosPagadosView', array(
+			$this->load->view('AgenteCompra/PedidosAprobadosPagadosView', array(
 				'sCorrelativoCotizacion' => $sCorrelativoCotizacion,
 				'ID_Pedido_Cabecera' => $ID_Pedido_Cabecera
 			));
-			$this->load->view('footer_v2', array("js_pedidos_pagados" => true));
+			$this->load->view('footer_v2', array("js_pedidos_aprobados_pagados" => true));
 		}
 	}
 
 	public function ajax_list(){
-		$arrData = $this->PedidosPagadosModel->get_datatables();
+		$arrData = $this->PedidosAprobadosPagadosModel->get_datatables();
         $data = array();
         foreach ($arrData as $row) {
 			$rows = array();
 
 			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
-            //$rows[] = $row->No_Pais;
+            $rows[] = $row->No_Pais;
             $rows[] = $sCorrelativoCotizacion;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
+            //$rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 
 			//asignar personal de china desde perú
 			$btn_asignar_personal_china = '';
@@ -55,26 +56,7 @@ class PedidosPagados extends CI_Controller {
 					$btn_asignar_personal_china .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Interno_Empresa_China . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
 				}
 			}
-
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5){
-				$rows[] = $btn_asignar_personal_china;
-			} else if($this->user->Nu_Tipo_Privilegio_Acceso==5){
-				$rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
-
-				$sNombreExportador = '';
-				if ($row->Nu_Tipo_Exportador==1)
-					$sNombreExportador = 'ProBusiness Yiwu';
-				else if ($row->Nu_Tipo_Exportador==2)
-					$sNombreExportador = 'Criss Factory';
-					
-				//verificar si completo o no
-				$btn_completar_verificacion_oc = '';
-				$arrResponsePaso1 = $this->PedidosPagadosModel->verificarTarea(11, $row->ID_Pedido_Cabecera);
-				if(is_object($arrResponsePaso1) && $arrResponsePaso1->Nu_Estado_Proceso==0)
-					$btn_completar_verificacion_oc = '<br><button class="btn btn-xs btn-primary" alt="Completado" title="Completado" href="javascript:void(0)"  onclick="completarVerificacionOC(\'' . $row->ID_Pedido_Cabecera . '\')">Verificar</button>';
-
-				$rows[] = $sNombreExportador . $btn_completar_verificacion_oc;
-			}
+			$rows[] = $btn_asignar_personal_china;
 
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerTipoServicioArray($row->Nu_Tipo_Servicio);
 			$dropdown_estado = '<div class="dropdown">';
@@ -87,13 +69,13 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=1){//no tiene acceso a cambiar status de Perú
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 			
-			$btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">Comisión</button>';
+			$btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">(+) Comisión</button>';
 			if($row->Ss_Comision_Interna_Trading>0)
-				$btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
+				$btn_comision_trading = '$ ' . $row->Ss_Comision_Interna_Trading;
 				
             $rows[] = $dropdown_estado . $btn_comision_trading;
 
@@ -110,7 +92,7 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=1){//no tiene acceso a cambiar status de Perú
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 
@@ -127,7 +109,7 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=1){//no tiene acceso a cambiar status de Perú
+			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 
@@ -153,8 +135,7 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5)
-            	$rows[] = $dropdown_estado;
+            $rows[] = $dropdown_estado;
 			
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($row->Nu_Estado_China);
 			$dropdown_estado = '<div class="dropdown">';
@@ -171,73 +152,44 @@ class PedidosPagados extends CI_Controller {
 			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de China
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
+            $rows[] = $dropdown_estado;//china
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5)
-            	$rows[] = $dropdown_estado;//china
+			//Negociar con proveedores
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Negociar con proveedor" title="Negociar con proveedor" href="javascript:void(0)"  onclick="coordinarPagosProveedor(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-handshake fa-2x" aria-hidden="true"></i></button>';
+
+			//Booking
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="booking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
+
+			//Recepcion de carga
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Recepcion de carga" title="Recepcion de carga" href="javascript:void(0)"  onclick="recepcionCarga(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+
+			//Pagos
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
+
+			//inspeccion
+			$btn_inspeccion = '';
+			if($row->Nu_Estado_China==5 || $row->Nu_Estado_China==6)
+				$btn_inspeccion = '<button class="btn btn-xs btn-link" alt="Subir inspección" title="Subir inspección" href="javascript:void(0)"  onclick="subirInspeccion(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
+			$rows[] = $btn_inspeccion;
+
+			//Invoice proveedor
+			$rows[] = '<button class="btn btn-xs btn-link" alt="Invoice proveedor" title="Invoice proveedor" href="javascript:void(0)"  onclick="invoiceProveedor(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel fa-2x" aria-hidden="true"></i></button>';
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5) {
-				//Negociar con proveedores
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Negociar con proveedor" title="Negociar con proveedor" href="javascript:void(0)"  onclick="coordinarPagosProveedor(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-handshake fa-2x" aria-hidden="true"></i></button>';
-
-				//Booking
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="booking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
-
-				//Recepcion de carga
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Recepcion de carga" title="Recepcion de carga" href="javascript:void(0)"  onclick="recepcionCarga(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-			}
-
-			if($this->user->Nu_Tipo_Privilegio_Acceso==5) {
-				//Pagos
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 1)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
-				//$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
-				
-				//Reserva de Booking
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingConsolidado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
-				
-				//Inspección
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Inspeccion" title="Inspeccion" href="javascript:void(0)"  onclick="bookingInspeccion(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
-				
-				//Pagos 2
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 2)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
-			}
+			//Despacho
+			$btn_despacho = '<button class="btn btn-xs btn-link" alt="Despacho" title="Despacho" href="javascript:void(0)"  onclick="despacho(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5) {
-				//inspeccion
-				$btn_inspeccion = '';
-				if($row->Nu_Estado_China==5 || $row->Nu_Estado_China==6)
-					$btn_inspeccion = '<button class="btn btn-xs btn-link" alt="Subir inspección" title="Subir inspección" href="javascript:void(0)"  onclick="subirInspeccion(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
-				$rows[] = $btn_inspeccion;
+			$rows[] = $btn_despacho . '<br>' . (!empty($row->Fe_Entrega_Shipper_Forwarder) ? ToDateBD($row->Fe_Entrega_Shipper_Forwarder) : '');
 
-				//Invoice proveedor
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Invoice proveedor" title="Invoice proveedor" href="javascript:void(0)"  onclick="invoiceProveedor(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel fa-2x" aria-hidden="true"></i></button>';
-				
-				//Despacho
-				$btn_despacho = '<button class="btn btn-xs btn-link" alt="Despacho" title="Despacho" href="javascript:void(0)"  onclick="despacho(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
+			//entregado
+			$btn_entregado = '';
+			if($row->Nu_Estado_China==6)
+				$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
 
-				$rows[] = $btn_despacho . '<br>' . (!empty($row->Fe_Entrega_Shipper_Forwarder) ? ToDateBD($row->Fe_Entrega_Shipper_Forwarder) : '');
+			if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
+				$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="descargarDocumentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
 			}
 
-			if($this->user->Nu_Tipo_Privilegio_Acceso==5) {
-				//entregado
-				$btn_entregado = '';
-				if($row->Nu_Estado_China==6)
-					$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
-
-				if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
-					$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarDocumentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
-				}
-				
-				if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
-					$btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarDocumentoDetalle(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
-				}
-
-				$rows[] = $btn_entregado;
-				
-				//Supervisar llenado de contenedor
-				$btn_supervisar = '<button class="btn btn-xs btn-link" alt="Supervisar" title="Supervisar" href="javascript:void(0)"  onclick="supervisarContenedor(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
-				
-				$rows[] = $btn_supervisar;
-			}
+			$rows[] = $btn_entregado;
 
             $data[] = $rows;
         }
@@ -248,7 +200,7 @@ class PedidosPagados extends CI_Controller {
     }
 
 	public function ajax_edit($ID){
-		$arrReponse = $this->PedidosPagadosModel->get_by_id($this->security->xss_clean($ID));
+		$arrReponse = $this->PedidosAprobadosPagadosModel->get_by_id($this->security->xss_clean($ID));
 		$sCorrelativoCotizacion = '';
 		foreach ($arrReponse as $row) {
 			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
@@ -259,14 +211,14 @@ class PedidosPagados extends CI_Controller {
 
 	public function cambiarEstado($ID, $Nu_Estado, $sCorrelativo){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
 	}
 
 	public function crudPedidoGrupal(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 		$data = array(
 		);
-		echo json_encode($this->PedidosPagadosModel->actualizarPedido(
+		echo json_encode($this->PedidosAprobadosPagadosModel->actualizarPedido(
 				array(
 					'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
 				),
@@ -280,12 +232,12 @@ class PedidosPagados extends CI_Controller {
 		//array_debug($this->input->post());
 		//array_debug($_FILES);
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addPagoProveedor($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addPagoProveedor($this->input->post(), $_FILES));
 	}
 
 	public function downloadImage($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->getDownloadImage($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->getDownloadImage($this->security->xss_clean($id));
 		//array_debug($objPedido);
 		
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
@@ -311,7 +263,7 @@ class PedidosPagados extends CI_Controller {
 
 	//generar cotización PDF para pedido de cliente	
 	public function generarExcelOrderTracking($ID){
-        $data = $this->PedidosPagadosModel->get_by_id($this->security->xss_clean($ID));
+        $data = $this->PedidosAprobadosPagadosModel->get_by_id($this->security->xss_clean($ID));
 		//array_debug($data);
 
 		if( !empty($data) ){
@@ -768,56 +720,30 @@ class PedidosPagados extends CI_Controller {
 
 	public function cambiarEstadoChina($ID, $Nu_Estado, $sCorrelativo){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->cambiarEstadoChina($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->cambiarEstadoChina($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
 	}
 
 	public function addInspeccionProveedor(){
 		//array_debug($this->input->post());
 		//array_debug($_FILES);
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addInspeccionProveedor($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addInspeccionProveedor($this->input->post(), $_FILES));
 	}
     	
 	public function ajax_edit_inspeccion($ID){
-        echo json_encode($this->PedidosPagadosModel->get_by_id_inspeccion($this->security->xss_clean($ID)));
+        echo json_encode($this->PedidosAprobadosPagadosModel->get_by_id_inspeccion($this->security->xss_clean($ID)));
     }
 
 	public function addFileProveedor(){
 		//array_debug($this->input->post());
 		//array_debug($_FILES);
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    		echo json_encode($this->PedidosPagadosModel->addFileProveedor($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addFileProveedor($this->input->post(), $_FILES));
 	}
     	
 	public function descargarDocumentoEntregado($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarDocumentoEntregado($this->security->xss_clean($id));
-		//array_debug($objPedido);
-		
-		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
-		$objPedido->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $objPedido->Txt_Url_Imagen_Producto);
-
-		//$file="assets/img/arturo.jpeg";
-		if(!file_exists($objPedido->Txt_Url_Imagen_Producto)){
-			die('file not found');
-		} else {
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename='.basename($objPedido->Txt_Url_Imagen_Producto));
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-			header('Pragma: public');
-			ob_clean();
-			flush();
-			readfile($objPedido->Txt_Url_Imagen_Producto);
-			exit;
-		}
-    }
-    	
-	public function descargarDocumentoDetalle($id){
-		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarDocumentoDetalle($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarDocumentoEntregado($this->security->xss_clean($id));
 		//array_debug($objPedido);
 		
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
@@ -845,12 +771,12 @@ class PedidosPagados extends CI_Controller {
 		//array_debug($this->input->post());
 		//array_debug($_FILES);
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addPagoCliente30($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addPagoCliente30($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPago30($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPago30($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPago30($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -886,12 +812,12 @@ class PedidosPagados extends CI_Controller {
 		//array_debug($this->input->post());
 		//array_debug($_FILES);
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addPagoCliente100($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addPagoCliente100($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPago100($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPago100($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPago100($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -925,17 +851,17 @@ class PedidosPagados extends CI_Controller {
 
 	public function cambiarTipoServicio($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->cambiarTipoServicio($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($ID_Usuario_Interno_Empresa_China)));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->cambiarTipoServicio($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($ID_Usuario_Interno_Empresa_China)));
 	}
 
 	public function addPagoClienteServicio(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addPagoClienteServicio($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addPagoClienteServicio($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPagoServicio($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPagoServicio($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPagoServicio($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -969,17 +895,17 @@ class PedidosPagados extends CI_Controller {
     	
 	public function elminarItemProveedor($id, $correlativo, $name_item){
 		//echo "hola";
-		echo json_encode($this->PedidosPagadosModel->elminarItemProveedor($this->security->xss_clean($id), $this->security->xss_clean($correlativo), $this->security->xss_clean($name_item)));
+		echo json_encode($this->PedidosAprobadosPagadosModel->elminarItemProveedor($this->security->xss_clean($id), $this->security->xss_clean($correlativo), $this->security->xss_clean($name_item)));
 	}
 
 	public function cambiarIncoterms($ID, $Nu_Estado, $sCorrelativo){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->cambiarIncoterms($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->cambiarIncoterms($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
 	}
 
 	public function cambiarTransporte($ID, $Nu_Estado, $sCorrelativo){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->cambiarTransporte($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->cambiarTransporte($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativo)));
 	}
 
 	public function agregarComisionTrading(){
@@ -989,19 +915,19 @@ class PedidosPagados extends CI_Controller {
 		$data = array(
 			'Ss_Comision_Interna_Trading' => $arrData['precio_comision_trading']
 		);
-		$response = $this->PedidosPagadosModel->agregarComisionTrading(array('ID_Pedido_Cabecera' => $arrData['id_pedido_cabecera']), $data);
+		$response = $this->PedidosAprobadosPagadosModel->agregarComisionTrading(array('ID_Pedido_Cabecera' => $arrData['id_pedido_cabecera']), $data);
 		echo json_encode($response);
 		exit();
 	}
 
 	public function addPagoFlete(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addPagoFlete($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addPagoFlete($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPagoFlete($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPagoFlete($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPagoFlete($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -1035,12 +961,12 @@ class PedidosPagados extends CI_Controller {
 
 	public function addPagoCostosOrigen(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addPagoCostosOrigen($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addPagoCostosOrigen($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPagoCostosOrigen($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPagoCostosOrigen($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPagoCostosOrigen($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -1074,12 +1000,12 @@ class PedidosPagados extends CI_Controller {
 
 	public function addPagoFta(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addPagoFta($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addPagoFta($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPagoFTA($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPagoFTA($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPagoFTA($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -1113,12 +1039,12 @@ class PedidosPagados extends CI_Controller {
 
 	public function addOtrosCuadrilla(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addOtrosCuadrilla($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addOtrosCuadrilla($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPagoCuadrilla($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPagoCuadrilla($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPagoCuadrilla($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -1152,12 +1078,12 @@ class PedidosPagados extends CI_Controller {
 
 	public function addOtrosCostos(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->addOtrosCostos($this->input->post(), $_FILES));
+    	echo json_encode($this->PedidosAprobadosPagadosModel->addOtrosCostos($this->input->post(), $_FILES));
 	}
     	
 	public function descargarPagoOtrosCostos($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarPagoOtrosCostos($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarPagoOtrosCostos($this->security->xss_clean($id));
 		if(is_object($objPedido)){
 			if(!empty($objPedido->Txt_Url_Imagen_Producto)) {
 				//array_debug($objPedido);
@@ -1198,7 +1124,7 @@ class PedidosPagados extends CI_Controller {
 				'No_Cuenta_Bancaria' => $this->input->post('proveedor-No_Cuenta_Bancaria'),
 				'Ss_Pago_Importe_1' => $this->input->post('proveedor-Ss_Pago_Importe_1'),
 			);
-			echo json_encode($this->PedidosPagadosModel->actualizarProveedor(
+			echo json_encode($this->PedidosAprobadosPagadosModel->actualizarProveedor(
 					array('ID_Entidad' => $this->input->post('proveedor-ID_Entidad')),
 					$data,
 					array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('proveedor-ID_Pedido_Detalle_Producto_Proveedor'))
@@ -1211,7 +1137,7 @@ class PedidosPagados extends CI_Controller {
 	
 	public function getPedidoProveedor($ID){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-        echo json_encode($this->PedidosPagadosModel->getPedidoProveedor($this->security->xss_clean($ID)));
+        echo json_encode($this->PedidosAprobadosPagadosModel->getPedidoProveedor($this->security->xss_clean($ID)));
 	}
 
 	public function reservaBooking(){
@@ -1222,7 +1148,7 @@ class PedidosPagados extends CI_Controller {
 				'Qt_Cbm_Total_Booking' => $this->input->post('booking-Qt_Cbm_Total_Booking'),
 				'Qt_Peso_Total_Booking' => $this->input->post('booking-Qt_Peso_Total_Booking')
 			);
-			echo json_encode($this->PedidosPagadosModel->reservaBooking(array('ID_Pedido_Cabecera' => $this->input->post('booking-ID_Pedido_Cabecera')), $data));
+			echo json_encode($this->PedidosAprobadosPagadosModel->reservaBooking(array('ID_Pedido_Cabecera' => $this->input->post('booking-ID_Pedido_Cabecera')), $data));
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
@@ -1230,7 +1156,7 @@ class PedidosPagados extends CI_Controller {
 	
 	public function getBooking($ID){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-        echo json_encode($this->PedidosPagadosModel->getBooking($this->security->xss_clean($ID)));
+        echo json_encode($this->PedidosAprobadosPagadosModel->getBooking($this->security->xss_clean($ID)));
 	}
 
 	public function actualizarRecepcionCargaItemProveedor(){
@@ -1240,7 +1166,7 @@ class PedidosPagados extends CI_Controller {
 				'Qt_Producto_Caja_Final_Verificada' => $this->input->post('cantidad'),
 				'Nu_Estado_Recepcion_Carga_Proveedor_Item' => $this->input->post('estado')
 			);
-			echo json_encode($this->PedidosPagadosModel->actualizarRecepcionCargaItemProveedor(array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('id')), $data));
+			echo json_encode($this->PedidosAprobadosPagadosModel->actualizarRecepcionCargaItemProveedor(array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('id')), $data));
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
@@ -1252,7 +1178,7 @@ class PedidosPagados extends CI_Controller {
 			$data = array(
 				'Txt_Nota_Recepcion_Carga_Proveedor' => $this->input->post('nota')
 			);
-			echo json_encode($this->PedidosPagadosModel->actualizarRecepcionCargaProveedor(array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('id')), $data));
+			echo json_encode($this->PedidosAprobadosPagadosModel->actualizarRecepcionCargaProveedor(array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('id')), $data));
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
@@ -1262,7 +1188,7 @@ class PedidosPagados extends CI_Controller {
 		if(isset($this->session->userdata['usuario'])) {
 			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 			
-			echo json_encode($this->PedidosPagadosModel->subirInvoicePlProveedor($this->input->post(), $_FILES));
+			echo json_encode($this->PedidosAprobadosPagadosModel->subirInvoicePlProveedor($this->input->post(), $_FILES));
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
@@ -1270,7 +1196,7 @@ class PedidosPagados extends CI_Controller {
     	
 	public function descargarInvoicePlProveedor($id){
 		//echo "hola";
-		$objPedido = $this->PedidosPagadosModel->descargarInvoicePlProveedor($this->security->xss_clean($id));
+		$objPedido = $this->PedidosAprobadosPagadosModel->descargarInvoicePlProveedor($this->security->xss_clean($id));
 		//array_debug($objPedido);
 		
 		$objPedido->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $objPedido->Txt_Url_Imagen_Producto);
@@ -1300,7 +1226,7 @@ class PedidosPagados extends CI_Controller {
 			$data = array(
 				'Fe_Entrega_Shipper_Forwarder' => ToDate($this->input->post('despacho-Fe_Entrega_Shipper_Forwarder'))
 			);
-			echo json_encode($this->PedidosPagadosModel->despacho(array('ID_Pedido_Cabecera' => $this->input->post('despacho-id_cabecera')), $data));
+			echo json_encode($this->PedidosAprobadosPagadosModel->despacho(array('ID_Pedido_Cabecera' => $this->input->post('despacho-id_cabecera')), $data));
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
@@ -1308,54 +1234,12 @@ class PedidosPagados extends CI_Controller {
 
 	public function asignarUsuarioPedidoChina(){
 		//array_debug($this->input->post());
-		echo json_encode($this->PedidosPagadosModel->asignarUsuarioPedidoChina($this->input->post()));
+		echo json_encode($this->PedidosAprobadosPagadosModel->asignarUsuarioPedidoChina($this->input->post()));
 		exit();
 	}
 
 	public function removerAsignarPedido($ID, $id_usuario){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->removerAsignarPedido($this->security->xss_clean($ID), $this->security->xss_clean($id_usuario)));
-	}
-
-	public function completarVerificacionOC($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China){
-		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->completarVerificacionOC($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($ID_Usuario_Interno_Empresa_China)));
-	}
-
-	public function reservaBookingConsolidado(){
-		if(isset($this->session->userdata['usuario'])) {
-			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-			$data = array(
-				'No_Numero_Consolidado' => $this->input->post('booking_consolidado-No_Numero_Consolidado')
-			);
-			echo json_encode($this->PedidosPagadosModel->reservaBooking(array('ID_Pedido_Cabecera' => $this->input->post('booking_consolidado-ID_Pedido_Cabecera')), $data));
-		} else {
-			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
-		}
-	}
-
-	public function bookingInspeccion(){
-		if(isset($this->session->userdata['usuario'])) {
-			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-			$data = array(
-				'No_Observacion_Inspeccion' => $this->input->post('booking_inspeccion-No_Observacion_Inspeccion')
-			);
-			echo json_encode($this->PedidosPagadosModel->bookingInspeccion(array('ID_Pedido_Cabecera' => $this->input->post('booking_inspeccion-ID_Pedido_Cabecera')), $data));
-		} else {
-			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
-		}
-	}
-
-	public function supervisarContenedor(){
-		if(isset($this->session->userdata['usuario'])) {
-			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-			$data = array(
-				'Fe_Llenado_Contenedor' => ToDate($this->input->post('supervisar_llenado_contenedor-Fe_Llenado_Contenedor')),
-				'Txt_Llenado_Contenedor' => $this->input->post('supervisar_llenado_contenedor-Txt_Llenado_Contenedor')
-			);
-			echo json_encode($this->PedidosPagadosModel->supervisarContenedor(array('ID_Pedido_Cabecera' => $this->input->post('supervisar_llenado_contenedor-id_cabecera')), $data));
-		} else {
-			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
-		}
+    	echo json_encode($this->PedidosAprobadosPagadosModel->removerAsignarPedido($this->security->xss_clean($ID), $this->security->xss_clean($id_usuario)));
 	}
 }

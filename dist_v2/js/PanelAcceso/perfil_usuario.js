@@ -201,6 +201,7 @@ function agregarPerfilUsuario(){
   
   $( '#cbo-privilegio' ).html( '<option value="1">Personal Probusiness</option>' );
   $( '#cbo-privilegio' ).append( '<option value="2">Personal China</option>' );
+  $( '#cbo-privilegio' ).append( '<option value="5">Jefe China</option>' );
   $( '#cbo-privilegio' ).append( '<option value="3">Proveedor Externo</option>' );
   $( '#cbo-privilegio' ).append( '<option value="4">Cliente</option>' );
 }
@@ -280,6 +281,11 @@ function verPerfilUsuario(ID_Grupo){
       if (response.Nu_Tipo_Privilegio_Acceso == '2')
         selected = 'selected="selected"';
       $('#cbo-privilegio').append('<option value="2" ' + selected + '>Personal China</option>');
+
+      selected = '';
+      if (response.Nu_Tipo_Privilegio_Acceso == '5')
+        selected = 'selected="selected"';
+      $('#cbo-privilegio').append('<option value="5" ' + selected + '>Jefe China</option>');
 
       selected = '';
       if (response.Nu_Tipo_Privilegio_Acceso == '3')

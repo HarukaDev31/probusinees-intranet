@@ -1,5 +1,5 @@
 <?php
-class PedidosPagadosModel extends CI_Model{
+class PedidosAprobadosPagadosModel extends CI_Model{
 	var $table = 'agente_compra_pedido_cabecera';
 	var $table_agente_compra_pedido_detalle = 'agente_compra_pedido_detalle';
 	var $table_agente_compra_pedido_detalle_producto_proveedor = 'agente_compra_pedido_detalle_producto_proveedor';
@@ -41,6 +41,7 @@ class PedidosPagadosModel extends CI_Model{
 		->where_in($this->table . '.Nu_Estado', array(5,6,7,9));
         
 		//$this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
+		$this->db->where($this->table . ".Nu_Estado_Pago_Proveedor=", 0);
 		$this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
         
 		if(!empty($this->input->post('ID_Pedido_Cabecera'))){
@@ -115,8 +116,7 @@ class PedidosPagadosModel extends CI_Model{
 		ACPDPP.Fe_Pago_Importe_1,
 		ACPDPP.Ss_Pago_Importe_1,
 		ACPDPP.Fe_Pago_Importe_2,
-		ACPDPP.Ss_Pago_Importe_2,
-		ACPDPP.No_Cuenta_Bancaria
+		ACPDPP.Ss_Pago_Importe_2
 		');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
@@ -334,7 +334,6 @@ class PedidosPagadosModel extends CI_Model{
 	public function addFileProveedor($arrPost, $data_files){
 		if (isset($data_files['image_documento']['name'])) {
 			$this->db->trans_begin();
-
 			$path = "assets/images/documento_entrega_cotizacion/";
 
 			$config['upload_path'] = $path;
@@ -360,42 +359,10 @@ class PedidosPagadosModel extends CI_Model{
 				$this->db->update($this->table, $data, $where);
 			}
 			
-			$path = "assets/images/documento_entrega_cotizacion/";
-
-			$config['upload_path'] = $path;
-			$config['allowed_types'] = 'xlsx|csv|xls|pdf|doc|docx';
-			$config['max_size'] = 3072;//1024 KB = 10 MB
-			$config['encrypt_name'] = TRUE;
-			$config['max_filename'] = '255';
-
-			$this->load->library('upload', $config);
-
-			if (!$this->upload->do_upload('image_documento_detalle')){
-				$this->db->trans_rollback();
-				return array(
-					'status' => 'error',
-					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
-				);
-			} else {
-				$arrUploadFile = $this->upload->data();
-				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
-
-				$where = array('ID_Pedido_Cabecera' => $arrPost['documento-id_cabecera']);
-				$data = array( 'Txt_Url_Archivo_Invoice_Detail' => $Txt_Url_Imagen_Producto );//1=SI
-				$this->db->update($this->table, $data, $where);
-			}
-			
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 				return array('status' => 'error', 'message' => 'Error al insertar');
 			} else {
-				$where_progreso = array(
-					'ID_Pedido_Cabecera' => $arrPost['documento-id_cabecera'],
-					'Nu_ID_Interno' => 16
-				);
-				$data_progreso = array('Nu_Estado_Proceso' => 1);
-				$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
-
 				//$this->db->trans_rollback();
 				$notificacion = $this->NotificacionModel->procesarNotificacion(
 					$this->user->No_Usuario,
@@ -414,11 +381,6 @@ class PedidosPagadosModel extends CI_Model{
 	
 	public function descargarDocumentoEntregado($id){
 		$query = "SELECT Txt_Url_Archivo_Documento_Entrega AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
-		return $this->db->query($query)->row();
-	}
-	
-	public function descargarDocumentoDetalle($id){
-		$query = "SELECT Txt_Url_Archivo_Invoice_Detail AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
 
@@ -613,17 +575,9 @@ class PedidosPagadosModel extends CI_Model{
 
 	public function cambiarTipoServicio($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China){
         $where = array('ID_Pedido_Cabecera' => $ID);
-		
-		$Nu_Tipo_Exportador = 0;
-		if ($Nu_Estado==2)
-			$Nu_Tipo_Exportador = 1;
-		else if ($Nu_Estado==1)
-			$Nu_Tipo_Exportador = 2;
-
         $data = array(
 			'Nu_Tipo_Servicio' => $Nu_Estado,
-			'ID_Usuario_Interno_Jefe_China' => $ID_Usuario_Interno_Empresa_China,
-			'Nu_Tipo_Exportador' => $Nu_Tipo_Exportador,
+			'ID_Usuario_Interno_Jefe_China' => $ID_Usuario_Interno_Empresa_China
 		);
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			$arrParams = array('ID_Pedido_Cabecera' => $ID);
@@ -1015,23 +969,13 @@ class PedidosPagadosModel extends CI_Model{
 	}
 
     public function reservaBooking($where, $data){
-		if(isset($data['No_Numero_Consolidado']) && !empty($data['No_Numero_Consolidado'])){
-			//marcar progreso 1. Verificar datos de exportación
-			$where_progreso = array(
-				'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-				'Nu_ID_Interno' => 13
-			);
-			$data_progreso = array('Nu_Estado_Proceso' => 1);
-			$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
-		}
-
 		if ( $this->db->update($this->table, $data, $where) > 0 )
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
 		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
 	
 	public function getBooking($ID){
-		$query = "SELECT Qt_Caja_Total_Booking, Qt_Cbm_Total_Booking, Qt_Peso_Total_Booking, No_Numero_Consolidado, No_Observacion_Inspeccion FROM agente_compra_pedido_cabecera WHERE ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
+		$query = "SELECT Qt_Caja_Total_Booking, Qt_Cbm_Total_Booking, Qt_Peso_Total_Booking FROM agente_compra_pedido_cabecera WHERE ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
 
@@ -1221,48 +1165,4 @@ class PedidosPagadosModel extends CI_Model{
 			return array('status' => 'success', 'message' => 'Registro guardado');
 		return array('status' => 'error', 'message' => 'Error al guardar');
 	}
-
-	public function completarVerificacionOC($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China){
-		//marcar progreso 1. Verificar datos de exportación
-		$where_progreso = array(
-			'ID_Pedido_Cabecera' => $ID,
-			'Nu_ID_Interno' => 11
-		);
-		$data_progreso = array('Nu_Estado_Proceso' => 1);
-		if ( $this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
-			return array('status' => 'success', 'message' => 'Actualizado');
-		}
-		return array('status' => 'error', 'message' => 'Error al completar tarea');
-	}
-	
-	public function verificarTarea($Nu_ID_Interno, $id){
-		$query = "SELECT Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera = " . $id . " AND Nu_ID_Interno=" . $Nu_ID_Interno . " LIMIT 1";
-		return $this->db->query($query)->row();
-	}
-
-    public function bookingInspeccion($where, $data){
-		$where_progreso = array(
-			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-			'Nu_ID_Interno' => 14
-		);
-		$data_progreso = array('Nu_Estado_Proceso' => 1);
-		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
-
-		if ( $this->db->update($this->table, $data, $where) > 0 )
-			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
-		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
-    }
-
-    public function supervisarContenedor($where, $data){
-		$where_progreso = array(
-			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-			'Nu_ID_Interno' => 17
-		);
-		$data_progreso = array('Nu_Estado_Proceso' => 1);
-		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
-
-		if ( $this->db->update($this->table, $data, $where) > 0 )
-			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
-		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
-    }
 }

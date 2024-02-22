@@ -46,42 +46,26 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
                     <tr>
-                      <!--<th>País</th>-->
+                      <th>País</th>
                       <th>Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
+                      <!--<th>Empresa</th>-->
+                      <!--<th class="no-sort">Excel</th>-->
                       <th>Personal</th>
-                      <?php } ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
-                      <th>Empresa</th>
-                      <th>Exportador</th>
-                      <?php } ?>
                       <th>Servicio</th>
                       <th>Incoterms</th>
                       <th>Envío</th>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
                       <th>Perú</th>
                       <th>China</th>
                       <th class="no-sort">Negociación</th>
                       <th class="no-sort">Booking</th>
                       <th class="no-sort">Recep. Carga</th>
-                      <?php } ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
                       <th class="no-sort">Pay</th>
-                      <th class="no-sort">Booking</th>
-                      <th class="no-sort">Insp.</th>
-                      <th class="no-sort">Pay 2</th>
-                      <?php } ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
                       <th class="no-sort">Insp.</th>
                       <th class="no-sort">Invoice P.</th>
                       <th class="no-sort">Despacho</th>
-                      <?php } ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
                       <th class="no-sort">Invoice</th>
-                      <th class="no-sort">Supervisar</th>
-                      <?php } ?>
                     </tr>
                   </thead>
                 </table>
@@ -107,7 +91,7 @@
 
                     <?php
                     $sClassOcultar = '';
-                    if($this->user->Nu_Tipo_Privilegio_Acceso==2 || $this->user->Nu_Tipo_Privilegio_Acceso==5)
+                    if($this->user->Nu_Tipo_Privilegio_Acceso==2)
                       $sClassOcultar = 'd-none';
                     ?>
                     <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
@@ -299,22 +283,6 @@
                           </tbody>
                         </table>
                       </div>
-                      
-                      <div class="table-responsive div-Pago_Proveedor tableFixHeadV2">
-                        <table id="table-Pago_Proveedor" class="table table-bordered table-hover">
-                          <thead class="thead-light">
-                            <tr>
-                              <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-center">Supplier</th>
-                              <th class="text-center">Cuenta Bancaria</th>
-                              <th class="text-center">Importe</th>
-                              <th class="text-center">voucher</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
                     </div>
                   </div><!-- ./table -->
 
@@ -379,7 +347,7 @@
           <input type="hidden" id="proveedor-tipo_pago" name="proveedor-tipo_pago" class="form-control">
           <input type="hidden" id="proveedor-correlativo" name="proveedor-correlativo" class="form-control">
 
-          <div class="col-12 col-sm-6 text-center d-none">
+          <div class="col-12 col-sm-6 text-center">
             <label>Amount</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" id="amount_proveedor" name="amount_proveedor" class="form-control input-decimal required" placeholder="" maxlength="16" autocomplete="off">
@@ -387,8 +355,7 @@
             </div>
           </div>
 
-          <!--<div class="col-12 col-sm-6 position-relative text-center ps-4 pe-3 pe-sm-0">-->
-          <div class="col-12 col-sm-12">
+          <div class="col-12 col-sm-6 position-relative text-center ps-4 pe-3 pe-sm-0">
             <div class="col-sm-12">
               <label>Voucher</label>
               <div class="form-group">
@@ -479,17 +446,9 @@
           <input type="hidden" id="documento-id_cabecera" name="documento-id_cabecera" class="form-control">
           <input type="hidden" id="documento-correlativo" name="documento-correlativo" class="form-control">
           <div class="col-sm-12">
-            <label>Invoice and PL</label>
+            <label>Documento</label>
             <div class="form-group">
               <input class="form-control" id="image_documento" name="image_documento" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-          
-          <div class="col-sm-12">
-            <label>Invoice Detail</label>
-            <div class="form-group">
-              <input class="form-control" id="image_documento_detalle" name="image_documento_detalle" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1338,137 +1297,3 @@
 </div>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>
-
-<!-- Modal booking_consolidado -->
-<div class="modal fade modal-booking_consolidado" id="modal-default">
-  <?php $attributes = array('id' => 'form-booking_consolidado'); echo form_open('', $attributes); ?>
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="text-center">Reserva de Booking</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <input type="hidden" name="booking_consolidado-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
-
-          <div class="col-12 col-lg-4">
-            <label># Consolidado</label>
-            <div class="form-group">
-              <input type="text" name="booking_consolidado-No_Numero_Consolidado" class="form-control" placeholder="Ingresar" maxlength="50" autocomplete="off">
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-          
-          <div class="col-12 col-lg-4">
-            <label>CBM Total</label>
-            <div class="form-group">
-              <label id="booking_consolidado-Qt_Cbm_Total_Booking">CBM Total</label>
-              <!--<input type="text" name="booking_consolidado-Qt_Cbm_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">-->
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer justify-content-between">
-        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
-        <button type="button" id="btn-save_booking_consolidado" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-  <?php echo form_close(); ?>
-</div><!-- /. Modal booking_consolidado -->
-
-<!-- Modal inspeccion -->
-<div class="modal fade modal-booking_inspeccion" id="modal-default">
-  <?php $attributes = array('id' => 'form-booking_inspeccion'); echo form_open('', $attributes); ?>
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="text-center">Reserva de Booking</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <input type="hidden" name="booking_inspeccion-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
-          <div class="col-12 col-lg-4">
-            <label>Cajas Total</label>
-            <div class="form-group">
-              <label id="booking_inspeccion-Qt_Caja_Total_Booking"></label>
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-
-          <div class="col-12 col-lg-4">
-            <label>CBM Total</label>
-            <div class="form-group">
-              <label id="booking_inspeccion-Qt_Cbm_Total_Booking"></label>
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-          
-          <div class="col-12 col-lg-4">
-            <label>Peso Total</label>
-            <div class="form-group">
-              <label id="booking_inspeccion-Qt_Peso_Total_Booking"></label>
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-
-          <div class="col-12 col-lg-12">
-            <label>Observación</label>
-            <div class="form-group">
-              <input type="text" name="booking_inspeccion-No_Observacion_Inspeccion" class="form-control" placeholder="Opcional" maxlength="255" autocomplete="off">
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-      <div class="modal-footer justify-content-between">
-        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
-        <button type="button" id="btn-save_booking_inspeccion" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-  <?php echo form_close(); ?>
-</div><!-- /. Modal booking_inspeccion -->
-
-<!-- modal supervisar_llenado_contenedor -->
-<div class="modal fade modal-supervisar_llenado_contenedor" id="modal-supervisar_llenado_contenedor">
-  <?php $attributes = array('id' => 'form-supervisar_llenado_contenedor'); echo form_open('', $attributes); ?>
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-body" id="modal-body-supervisar_llenado_contenedor">
-        <div class="row">
-          <input type="hidden" id="supervisar_llenado_contenedor-id_cabecera" name="supervisar_llenado_contenedor-id_cabecera" class="form-control">
-          <input type="hidden" id="supervisar_llenado_contenedor-correlativo" name="supervisar_llenado_contenedor-correlativo" class="form-control">
-
-          <div class="col-12 col-lg-12">
-            <label>F. Entrega</label>
-            <div class="form-group">
-              <input type="text" name="supervisar_llenado_contenedor-Fe_Llenado_Contenedor" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-
-          <div class="col-12 col-lg-12">
-            <label>Observación</label>
-            <div class="form-group">
-              <input type="text" name="supervisar_llenado_contenedor-Txt_Llenado_Contenedor" class="form-control" placeholder="Opcional" maxlength="255" autocomplete="off">
-              <span class="help-block text-danger" id="error"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
-        <button type="submit" id="btn-guardar_supervisar_llenado_contenedor" class="col btn btn-success btn-lg btn-block">Guardar</button>
-      </div>
-    </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
-  <?php echo form_close(); ?>
-</div>
-<!-- /.modal agregar supervisar_llenado_contenedor -->
