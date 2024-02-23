@@ -172,7 +172,7 @@
           <div class="col-6 col-lg-4">
             <label>RUC</label>
             <div class="form-group">
-              <input type="text" id="txt-Nu_Documento_Identidad" name="Nu_Documento_Identidad" class="form-control input-Mayuscula input-codigo_barra" placeholder="Ingresar" maxlength="8" autocomplete="off">
+              <input type="text" id="txt-Nu_Documento_Identidad" name="Nu_Documento_Identidad" class="form-control input-Mayuscula input-codigo_barra" placeholder="Ingresar" maxlength="11" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>

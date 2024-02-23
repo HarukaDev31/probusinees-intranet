@@ -1060,7 +1060,13 @@ Ss_Pago_Otros_Costo_Fta_China_Dolar,
 Ss_Pago_Otros_Cuadrilla_China_Yuan,
 Ss_Pago_Otros_Cuadrilla_China_Dolar,
 Ss_Pago_Otros_Costos_China_Yuan,
-Ss_Pago_Otros_Costos_China_Dolar
+Ss_Pago_Otros_Costos_China_Dolar,
+Txt_Url_Archivo_Exportacion_Docs_Shipper,
+Txt_Url_Archivo_Exportacion_Commercial_Invoice,
+Txt_Url_Archivo_Exportacion_Packing_List,
+Txt_Url_Archivo_Exportacion_Bl,
+Txt_Url_Archivo_Exportacion_Fta,
+Nu_Tipo_Incoterms
 FROM
 agente_compra_pedido_cabecera
 WHERE
@@ -1497,6 +1503,184 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		$where_progreso = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
 			'Nu_ID_Interno' => 23
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+
+	public function docsExportacion($arrPost, $data_files){
+		$path = "assets/downloads/docs_exportacion/";
+
+		$config['upload_path'] = $path;
+		$config['allowed_types'] = 'xlsx|csv|xls|pdf|doc|docx';
+		$config['max_size'] = 3072;//1024 KB = 10 MB
+		$config['encrypt_name'] = TRUE;
+		$config['max_filename'] = '255';
+
+		if (isset($data_files['docs_exportacion-Txt_Url_Archivo_Exportacion_Commercial_Invoice']['name'])) {
+			$this->db->trans_begin();
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('docs_exportacion-Txt_Url_Archivo_Exportacion_Commercial_Invoice')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo archivo ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFileCI = $this->upload->data();
+				$Txt_Url_Archivo_Exportacion_Commercial_Invoice = base_url($path . $arrUploadFileCI['file_name']);
+
+				if (isset($data_files['docs_exportacion-Txt_Url_Archivo_Exportacion_Packing_List']['name'])) {
+					if (!$this->upload->do_upload('docs_exportacion-Txt_Url_Archivo_Exportacion_Packing_List')){
+						$this->db->trans_rollback();
+						return array(
+							'status' => 'error',
+							'message' => 'No se cargo archivo PL' . strip_tags($this->upload->display_errors()),
+						);
+					} else {
+						$arrUploadFilePL = $this->upload->data();
+						$Txt_Url_Archivo_Exportacion_Packing_List = base_url($path . $arrUploadFilePL['file_name']);
+		
+						if (isset($data_files['docs_exportacion-Txt_Url_Archivo_Exportacion_Fta']['name'])) {
+							if (!$this->upload->do_upload('docs_exportacion-Txt_Url_Archivo_Exportacion_Fta')){
+								$this->db->trans_rollback();
+								return array(
+									'status' => 'error',
+									'message' => 'No se cargo archivo FTA ' . strip_tags($this->upload->display_errors()),
+								);
+							} else {
+								$arrUploadFileFTA = $this->upload->data();
+								$Txt_Url_Archivo_Exportacion_Fta = base_url($path . $arrUploadFileFTA['file_name']);
+
+								$Txt_Url_Archivo_Exportacion_Docs_Shipper = '';
+								if (isset($data_files['docs_exportacion-Txt_Url_Archivo_Exportacion_Docs_Shipper']['name'])) {
+									if (!$this->upload->do_upload('docs_exportacion-Txt_Url_Archivo_Exportacion_Docs_Shipper')){
+										$this->db->trans_rollback();
+										return array(
+											'status' => 'error',
+											'message' => 'No se cargo archivo Shipper ' . strip_tags($this->upload->display_errors()),
+										);
+									} else {
+										$arrUploadFileShipper = $this->upload->data();
+										$Txt_Url_Archivo_Exportacion_Docs_Shipper = base_url($path . $arrUploadFileShipper['file_name']);
+									}
+								}
+								
+								$Txt_Url_Archivo_Exportacion_Bl = '';
+								if (isset($data_files['docs_exportacion-Txt_Url_Archivo_Exportacion_Bl']['name'])) {
+									if (!$this->upload->do_upload('docs_exportacion-Txt_Url_Archivo_Exportacion_Bl')){
+										$this->db->trans_rollback();
+										return array(
+											'status' => 'error',
+											'message' => 'No se cargo archivo BL ' . strip_tags($this->upload->display_errors()),
+										);
+									} else {
+										$arrUploadFileBL = $this->upload->data();
+										$Txt_Url_Archivo_Exportacion_Bl = base_url($path . $arrUploadFileBL['file_name']);
+									}
+								}
+
+								$where = array('ID_Pedido_Cabecera' => $arrPost['docs_exportacion-ID_Pedido_Cabecera']);
+								$data = array(
+									'Txt_Url_Archivo_Exportacion_Docs_Shipper' => $Txt_Url_Archivo_Exportacion_Docs_Shipper,
+									'Txt_Url_Archivo_Exportacion_Commercial_Invoice' => $Txt_Url_Archivo_Exportacion_Commercial_Invoice,
+									'Txt_Url_Archivo_Exportacion_Packing_List' => $Txt_Url_Archivo_Exportacion_Packing_List,
+									'Txt_Url_Archivo_Exportacion_Bl' => $Txt_Url_Archivo_Exportacion_Bl,
+									'Txt_Url_Archivo_Exportacion_Fta' => $Txt_Url_Archivo_Exportacion_Fta,
+								);//1=SI
+								$this->db->update($this->table, $data, $where);	
+							}
+						} else {
+							return array('status' => 'error', 'message' => 'No existe archivo FTA');
+						}
+					}
+				} else {
+					return array('status' => 'error', 'message' => 'No existe archivo PL');
+				}
+			}
+			
+			//marcar progreso 1. Verificar datos de exportación
+			$where_progreso = array(
+				'ID_Pedido_Cabecera' => $arrPost['docs_exportacion-ID_Pedido_Cabecera'],
+				'Nu_ID_Interno' => 24
+			);
+			$data_progreso = array('Nu_Estado_Proceso' => 1);
+			$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+
+    public function despachoShipper($where, $data){
+		//marcar progreso 1. Verificar datos de exportación
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 25
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+	
+	public function getBookingEntidad($ID){
+		$query = "SELECT
+CLI.ID_Entidad,
+CLI.No_Entidad,
+CLI.Nu_Documento_Identidad,
+CLI.Txt_Direccion_Entidad,
+ACPC.Nu_Tipo_Exportador,
+S.No_Shipper,
+ACPC.Qt_Caja_Total_Booking,
+ACPC.Qt_Cbm_Total_Booking,
+ACPC.Qt_Peso_Total_Booking,
+ACPC.Nu_Tipo_Transporte_Maritimo,
+ACPC.Txt_Descripcion_BL_China
+FROM
+agente_compra_pedido_cabecera AS ACPC
+JOIN entidad AS CLI ON(ACPC.ID_Entidad = CLI.ID_Entidad)
+JOIN shipper AS S ON(ACPC.ID_Shipper = S.ID_Shipper)
+WHERE
+ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+
+    public function revisionBL($where, $data){
+		//marcar progreso 1. Verificar datos de exportación
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 26
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+
+    public function entregaDocsCliente($where, $data){
+		//marcar progreso 1. Verificar datos de exportación
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 27
 		);
 		$data_progreso = array('Nu_Estado_Proceso' => 1);
 		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);

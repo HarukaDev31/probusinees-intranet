@@ -1666,3 +1666,269 @@
   </div><!-- /.modal-dialog -->
   <?php echo form_close(); ?>
 </div><!-- /. Modal costos_origen_china -->
+
+
+<!-- modal docs_exportacion -->
+<div class="modal fade modal-docs_exportacion" id="modal-docs_exportacion">
+  <?php $attributes = array('id' => 'form-docs_exportacion'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-docs_exportacion">
+        <div class="row">
+          <input type="hidden" id="docs_exportacion-ID_Pedido_Cabecera" name="docs_exportacion-ID_Pedido_Cabecera" class="form-control">
+          <input type="hidden" id="docs_exportacion-iIdTareaPedido" name="docs_exportacion-iIdTareaPedido" class="form-control">
+
+          <div class="col-sm-12 div-docs_shipper">
+            <label>Docs Shipper</label>
+            <div class="form-group">
+              <input class="form-control" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Docs_Shipper" name="docs_exportacion-Txt_Url_Archivo_Exportacion_Docs_Shipper" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <a class="btn btn-link" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Docs_Shipper-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-sm-12">
+            <label>Commercial Invoice</label>
+            <div class="form-group">
+              <input class="form-control" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Commercial_Invoice" name="docs_exportacion-Txt_Url_Archivo_Exportacion_Commercial_Invoice" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <a class="btn btn-link" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Commercial_Invoice-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-sm-12">
+            <label>Packing List</label>
+            <div class="form-group">
+              <input class="form-control" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Packing_List" name="docs_exportacion-Txt_Url_Archivo_Exportacion_Packing_List" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <a class="btn btn-link" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Packing_List-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-sm-12 div-bl">
+            <label>BL</label>
+            <div class="form-group">
+              <input class="form-control" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Bl" name="docs_exportacion-Txt_Url_Archivo_Exportacion_Bl" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <a class="btn btn-link" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Bl-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-sm-12">
+            <label>FTA</label>
+            <div class="form-group">
+              <input class="form-control" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Fta" name="docs_exportacion-Txt_Url_Archivo_Exportacion_Fta" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <a class="btn btn-link" id="docs_exportacion-Txt_Url_Archivo_Exportacion_Fta-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_docs_exportacion" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar docs_exportacion -->
+
+<!-- modal despacho_shipper -->
+<div class="modal fade modal-despacho_shipper" id="modal-despacho_shipper">
+  <?php $attributes = array('id' => 'form-despacho_shipper'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center">Despacho al Shipper / Forwarder</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body" id="modal-body-despacho_shipper">
+        <div class="row">
+          <input type="hidden" id="despacho_shipper-ID_Pedido_Cabecera" name="despacho_shipper-ID_Pedido_Cabecera" class="form-control">
+
+          <div class="col-12 col-lg-12">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+              <label class="form-check-label" for="inlineCheckbox1">Entrega de Carga</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+              <label class="form-check-label" for="inlineCheckbox2">Entrega de Documentos</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_despacho_shipper" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar despacho_shipper -->
+
+<!-- Modal cliente -->
+<div class="modal fade modal-cliente_modal" id="modal-default">
+  <?php $attributes = array('id' => 'form-cliente_modal'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center"><strong>Revisión de BL</strong></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" id="cliente_modal-ID_Pedido_Cabecera" name="cliente_modal-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+          <input type="hidden" id="cliente_modal-iIdTareaPedido" name="cliente_modal-iIdTareaPedido" class="form-control" autocomplete="off">
+          <input type="hidden" id="cliente_modal-ID_Entidad" name="cliente_modal-ID_Entidad" class="form-control" autocomplete="off">
+          <input type="hidden" id="cliente_modal-ENo_Entidad" name="cliente_modal-ENo_Entidad" class="form-control" autocomplete="off">
+
+          <div class="col-6 col-lg-4">
+            <label>Empresa</label>
+            <div class="form-group">
+              <input type="text" name="cliente_modal-No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-2">
+            <label>RUC</label>
+            <div class="form-group">
+              <input type="text" name="cliente_modal-Nu_Documento_Identidad" class="form-control input-Mayuscula input-codigo_barra" placeholder="Ingresar" maxlength="11" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-6">
+            <label>Dirección</label>
+            <div class="form-group">
+              <input type="text" name="cliente_modal-Txt_Direccion_Entidad" class="form-control" placeholder="Ingresar" maxlength="100" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-6">
+            <label>Exportador</label>
+            <div class="form-group">
+              <span id="cliente_modal-exportador"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-6">
+            <label>Shipper</label>
+            <div class="form-group">
+              <span id="cliente_modal-shipper"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-3">
+            <label>Cajas Total</label>
+            <div class="form-group">
+              <span id="cliente_modal-Qt_Caja_Total_Booking"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-3">
+            <label>CBM Total</label>
+            <div class="form-group">
+              <span id="cliente_modal-Qt_Cbm_Total_Booking"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-3">
+            <label>Peso Total</label>
+            <div class="form-group">
+              <span id="cliente_modal-Qt_Peso_Total_Booking"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-3">
+            <label>Tipo de Envío</label>
+            <div class="form-group">
+              <span id="cliente_modal-Nu_Tipo_Transporte_Maritimo"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-12">
+            <label>Descripción BL</label>
+            <div class="form-group">
+              <textarea class="form-control" rows="5" placeholder="Obligatorio" name="cliente_modal-Txt_Descripcion_BL_China"></textarea>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_cliente_modal" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal cliente_modal -->
+
+<!-- modal entrega_docs_cliente -->
+<div class="modal fade modal-entrega_docs_cliente" id="modal-entrega_docs_cliente">
+  <?php $attributes = array('id' => 'form-entrega_docs_cliente'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center"><strong>Despacho al Shipper / Forwarder</strong></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body" id="modal-body-entrega_docs_cliente">
+        <div class="row">
+          <input type="hidden" id="entrega_docs_cliente-ID_Pedido_Cabecera" name="entrega_docs_cliente-ID_Pedido_Cabecera" class="form-control">
+          <input type="hidden" id="entrega_docs_cliente-Nu_Tipo_Incoterms" name="entrega_docs_cliente-Nu_Tipo_Incoterms" class="form-control">
+
+          <div class="col-12 col-lg-12">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox1" value="option1">
+              <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox1">Commercial Invoice</label>
+            </div>
+
+            <div class="form-check form-check-inline div-bl-entrega_docs"><!-- SOLO SI ES CIF O DDP-->
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox2" value="option2">
+              <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox2">BL</label>
+            </div>
+            
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox3" value="option3">
+              <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox3">FTA Detalle</label>
+            </div>
+            
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox4" value="option4">
+              <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox4">Packing List</label>
+            </div>
+            
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox5" value="option5">
+              <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox5">FTA</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_entrega_docs_cliente" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar despacho_shipper -->

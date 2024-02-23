@@ -217,6 +217,10 @@ class PedidosPagados extends CI_Controller {
 				
 				$btn_reserva_booking = '';
 				$btn_costos_origen = '';
+				$btn_docs_exportacion = '';
+				$btn_despacho_shipper = '';
+				$btn_revision_bl = '';
+				$btn_entrega_docs_cliente = '';
 				if($row->Nu_Tipo_Servicio==1) {
 					$btn_reserva_booking = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingTrading(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
 					
@@ -226,9 +230,37 @@ class PedidosPagados extends CI_Controller {
 						$iIdTareaPedido = 23;
 					}
 					$btn_costos_origen = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Costos Origen" title="Costos Origen" href="javascript:void(0)"  onclick="costosOrigenTradingChina(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
+					
+					//Docs Exportacion
+					$iIdTareaPedido = 0;//ninguno
+					if ($row->Nu_Tipo_Servicio==1){//trading
+						$iIdTareaPedido = 24;
+					}
+					$btn_docs_exportacion = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Docs Exportacion" title="Docs Exportacion" href="javascript:void(0)"  onclick="docsExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-file fa-2x" aria-hidden="true"></i></button>';
+					
+					//Despacho al Shipper
+					$iIdTareaPedido = 0;//ninguno
+					if ($row->Nu_Tipo_Servicio==1){//trading
+						$iIdTareaPedido = 25;
+					}
+					$btn_despacho_shipper = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Despacho al Shipper" title="Despacho al Shipper" href="javascript:void(0)"  onclick="despachoShipper(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-check fa-2x" aria-hidden="true"></i></button>';
+					
+					//Despacho al Shipper
+					$iIdTareaPedido = 0;//ninguno
+					if ($row->Nu_Tipo_Servicio==1){//trading
+						$iIdTareaPedido = 26;
+					}
+					$btn_revision_bl = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="revisionBL(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-warehouse fa-2x" aria-hidden="true"></i></button>';
+					
+					//Despacho al Shipper
+					$iIdTareaPedido = 0;//ninguno
+					if ($row->Nu_Tipo_Servicio==1){//trading
+						$iIdTareaPedido = 26;
+					}
+					$btn_entrega_docs_cliente = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Entrega de Docs Cliente" title="Entrega de Docs Cliente" href="javascript:void(0)"  onclick="entregaDocsCliente(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-user fa-2x" aria-hidden="true"></i></button>';
 				}
 
-				$rows[] = $btn_inpseccion . $btn_reserva_booking . $btn_costos_origen;
+				$rows[] = $btn_inpseccion . $btn_reserva_booking . $btn_costos_origen . $btn_docs_exportacion . $btn_despacho_shipper . $btn_revision_bl . $btn_entrega_docs_cliente;
 				
 				//Pagos 2
 				$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 2)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
@@ -1440,5 +1472,49 @@ class PedidosPagados extends CI_Controller {
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
+	}
+
+	public function docsExportacion(){
+		//array_debug($this->input->post());
+		//array_debug($_FILES);
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    		echo json_encode($this->PedidosPagadosModel->docsExportacion($this->input->post(), $_FILES));
+	}
+
+	public function despachoShipper(){
+		//array_debug($this->input->post());
+		//array_debug($_FILES);
+		$data = array(
+			'Nu_Verificar_Despacho_Shipper_Forwarder' => 1
+		);
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    		echo json_encode($this->PedidosPagadosModel->despachoShipper(array('ID_Pedido_Cabecera' => $this->input->post('despacho_shipper-ID_Pedido_Cabecera')), $data));
+	}
+	
+	public function getBookingEntidad($ID){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+        echo json_encode($this->PedidosPagadosModel->getBookingEntidad($this->security->xss_clean($ID)));
+	}
+
+	public function revisionBL(){
+		if(isset($this->session->userdata['usuario'])) {
+			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+			$data = array(
+				'Txt_Descripcion_BL_China' => $this->input->post('cliente_modal-Txt_Descripcion_BL_China')
+			);
+			echo json_encode($this->PedidosPagadosModel->revisionBL(array('ID_Pedido_Cabecera' => $this->input->post('cliente_modal-ID_Pedido_Cabecera')), $data));
+		} else {
+			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
+		}
+	}
+
+	public function entregaDocsCliente(){
+		//array_debug($this->input->post());
+		//array_debug($_FILES);
+		$data = array(
+			'Nu_Verificar_Entrega_Docs_Cliente' => 1
+		);
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    		echo json_encode($this->PedidosPagadosModel->entregaDocsCliente(array('ID_Pedido_Cabecera' => $this->input->post('entrega_docs_cliente-ID_Pedido_Cabecera')), $data));
 	}
 }
