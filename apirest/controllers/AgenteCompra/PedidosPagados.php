@@ -25,7 +25,7 @@ class PedidosPagados extends CI_Controller {
 	public function listar($sCorrelativoCotizacion = '', $ID_Pedido_Cabecera = ''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
+			$this->load->view('header_v2', array("js_pedidos_pagados" => true));
 			$this->load->view('AgenteCompra/PedidosPagadosView', array(
 				'sCorrelativoCotizacion' => $sCorrelativoCotizacion,
 				'ID_Pedido_Cabecera' => $ID_Pedido_Cabecera
@@ -62,16 +62,24 @@ class PedidosPagados extends CI_Controller {
 				$rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 
 				$sNombreExportador = '';
-				if ($row->Nu_Tipo_Exportador==1)
+				if ($row->Nu_Tipo_Exportador==1){
 					$sNombreExportador = 'ProBusiness Yiwu';
-				else if ($row->Nu_Tipo_Exportador==2)
+				} else if ($row->Nu_Tipo_Exportador==2) {
 					$sNombreExportador = 'Criss Factory';
+				}
+				
+				$iIdTareaPedido = 0;//ninguno
+				if ($row->Nu_Tipo_Servicio==1){//trading
+					$iIdTareaPedido = 18;
+				} else if ($row->Nu_Tipo_Servicio==2) {//consolida trading
+					$iIdTareaPedido = 11;
+				}
 					
 				//verificar si completo o no
 				$btn_completar_verificacion_oc = '';
-				$arrResponsePaso1 = $this->PedidosPagadosModel->verificarTarea(11, $row->ID_Pedido_Cabecera);
+				$arrResponsePaso1 = $this->PedidosPagadosModel->verificarTarea($iIdTareaPedido, $row->ID_Pedido_Cabecera);
 				if(is_object($arrResponsePaso1) && $arrResponsePaso1->Nu_Estado_Proceso==0)
-					$btn_completar_verificacion_oc = '<br><button class="btn btn-xs btn-primary" alt="Completado" title="Completado" href="javascript:void(0)"  onclick="completarVerificacionOC(\'' . $row->ID_Pedido_Cabecera . '\')">Verificar</button>';
+					$btn_completar_verificacion_oc = '<br><button class="btn btn-primary" alt="Completado" title="Completado" href="javascript:void(0)"  onclick="completarVerificacionOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')">Verificar</button>';
 
 				$rows[] = $sNombreExportador . $btn_completar_verificacion_oc;
 			}
@@ -192,10 +200,35 @@ class PedidosPagados extends CI_Controller {
 				//$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
 				
 				//Reserva de Booking
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingConsolidado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
+				$iIdTareaPedido = 0;//ninguno
+				if ($row->Nu_Tipo_Servicio==1){//trading
+					$iIdTareaPedido = 20;
+				} else if ($row->Nu_Tipo_Servicio==2) {//consolida trading
+					$iIdTareaPedido = 14;
+				}
+
+				$btn_reserva_booking = '<button class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingConsolidado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
+				if($row->Nu_Tipo_Servicio==1)
+					$btn_reserva_booking = '';
+				$rows[] = $btn_reserva_booking;
 				
 				//Inspección
-				$rows[] = '<button class="btn btn-xs btn-link" alt="Inspeccion" title="Inspeccion" href="javascript:void(0)"  onclick="bookingInspeccion(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
+				$btn_inpseccion = '<button class="btn btn-xs btn-link" alt="Inspeccion" title="Inspeccion" href="javascript:void(0)"  onclick="bookingInspeccion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\', \'' . $row->ID_Usuario_Interno_China . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
+				
+				$btn_reserva_booking = '';
+				$btn_costos_origen = '';
+				if($row->Nu_Tipo_Servicio==1) {
+					$btn_reserva_booking = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingTrading(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
+					
+					//Costos de Origen
+					$iIdTareaPedido = 0;//ninguno
+					if ($row->Nu_Tipo_Servicio==1){//trading
+						$iIdTareaPedido = 23;
+					}
+					$btn_costos_origen = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Costos Origen" title="Costos Origen" href="javascript:void(0)"  onclick="costosOrigenTradingChina(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
+				}
+
+				$rows[] = $btn_inpseccion . $btn_reserva_booking . $btn_costos_origen;
 				
 				//Pagos 2
 				$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 2)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
@@ -1317,9 +1350,9 @@ class PedidosPagados extends CI_Controller {
     	echo json_encode($this->PedidosPagadosModel->removerAsignarPedido($this->security->xss_clean($ID), $this->security->xss_clean($id_usuario)));
 	}
 
-	public function completarVerificacionOC($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China){
+	public function completarVerificacionOC($ID, $iIdTareaPedido){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosPagadosModel->completarVerificacionOC($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($ID_Usuario_Interno_Empresa_China)));
+    	echo json_encode($this->PedidosPagadosModel->completarVerificacionOC($this->security->xss_clean($ID), $this->security->xss_clean($iIdTareaPedido)));
 	}
 
 	public function reservaBookingConsolidado(){
@@ -1338,9 +1371,22 @@ class PedidosPagados extends CI_Controller {
 		if(isset($this->session->userdata['usuario'])) {
 			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 			$data = array(
+				'Qt_Caja_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Caja_Total_Booking'),
+				'Qt_Cbm_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Cbm_Total_Booking'),
+				'Qt_Peso_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Peso_Total_Booking'),
 				'No_Observacion_Inspeccion' => $this->input->post('booking_inspeccion-No_Observacion_Inspeccion')
 			);
-			echo json_encode($this->PedidosPagadosModel->bookingInspeccion(array('ID_Pedido_Cabecera' => $this->input->post('booking_inspeccion-ID_Pedido_Cabecera')), $data));
+			$data_notificacion = array(
+				'ID_Usuario_Interno_China' => $this->input->post('booking_inspeccion-ID_Usuario_Interno_China-Actual'),
+				'Qt_Caja_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Caja_Total_Booking-Actual'),
+				'Qt_Cbm_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Cbm_Total_Booking-Actual'),
+				'Qt_Peso_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Peso_Total_Booking-Actual'),
+				'sCorrelativoCotizacion' => $this->input->post('booking_inspeccion-sCorrelativoCotizacion-Actual')
+			);
+			echo json_encode($this->PedidosPagadosModel->bookingInspeccion(array(
+				'ID_Pedido_Cabecera' => $this->input->post('booking_inspeccion-ID_Pedido_Cabecera'),
+				'Nu_ID_Interno' => $this->input->post('booking_inspeccion-Nu_ID_Interno')
+			), $data, $data_notificacion));
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
@@ -1354,6 +1400,43 @@ class PedidosPagados extends CI_Controller {
 				'Txt_Llenado_Contenedor' => $this->input->post('supervisar_llenado_contenedor-Txt_Llenado_Contenedor')
 			);
 			echo json_encode($this->PedidosPagadosModel->supervisarContenedor(array('ID_Pedido_Cabecera' => $this->input->post('supervisar_llenado_contenedor-id_cabecera')), $data));
+		} else {
+			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
+		}
+	}
+
+	public function reservaBookingTrading(){
+		if(isset($this->session->userdata['usuario'])) {
+			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+			$data = array(
+				'ID_Shipper' => $this->input->post('reserva_booking_trading-ID_Shipper'),
+				'No_Tipo_Contenedor' => $this->input->post('reserva_booking_trading-No_Tipo_Contenedor'),
+				'No_Naviera' => $this->input->post('reserva_booking_trading-No_Naviera'),
+				'No_Dias_Transito' => $this->input->post('reserva_booking_trading-No_Dias_Transito'),
+				'No_Dias_Libres' => $this->input->post('reserva_booking_trading-No_Dias_Libres')
+			);
+			echo json_encode($this->PedidosPagadosModel->reservaBookingTrading(array('ID_Pedido_Cabecera' => $this->input->post('reserva_booking_trading-ID_Pedido_Cabecera')), $data));
+		} else {
+			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
+		}
+	}
+
+	public function costosOrigenTradingChina(){
+		if(isset($this->session->userdata['usuario'])) {
+			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+			$data = array(
+				'Ss_Pago_Otros_Flete_China_Yuan' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan'),
+				'Ss_Pago_Otros_Flete_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Flete_China_Dolar'),
+				'Ss_Pago_Otros_Costo_Origen_China_Yuan' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan'),
+				'Ss_Pago_Otros_Costo_Origen_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Dolar'),
+				'Ss_Pago_Otros_Costo_Fta_China_Yuan' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan'),
+				'Ss_Pago_Otros_Costo_Fta_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Dolar'),
+				'Ss_Pago_Otros_Cuadrilla_China_Yuan' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan'),
+				'Ss_Pago_Otros_Cuadrilla_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar'),
+				'Ss_Pago_Otros_Costos_China_Yuan' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan'),
+				'Ss_Pago_Otros_Costos_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar')
+			);
+			echo json_encode($this->PedidosPagadosModel->costosOrigenTradingChina(array('ID_Pedido_Cabecera' => $this->input->post('costos_origen_china-ID_Pedido_Cabecera')), $data));
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}

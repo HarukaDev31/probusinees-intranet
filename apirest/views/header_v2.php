@@ -49,6 +49,14 @@
     <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
   <?php endif; ?>
     
+  <?php if (isset($js_pedidos_pagados) && $js_pedidos_pagados==true) : ?>
+    <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
+  <?php endif; ?>
+    
+  <?php if (isset($js_pedidos_aprobados_pagados) && $js_pedidos_aprobados_pagados==true) : ?>
+    <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
+  <?php endif; ?>
+    
   <?php if (isset($js_pedidos_cargaconsolidada) && $js_pedidos_cargaconsolidada==true) : ?>
     <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">

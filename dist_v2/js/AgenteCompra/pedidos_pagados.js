@@ -15,6 +15,119 @@ if (fMonth < 10) {
 }
 
 $(function () {
+  $('.select2').select2();
+
+	$(document).on('click', '#btn-save_costos_origen_china', function (e) {
+    e.preventDefault();
+
+    $( '#btn-save_costos_origen_china' ).text('');
+    $( '#btn-save_costos_origen_china' ).attr('disabled', true);
+    $( '#btn-save_costos_origen_china' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    //$( '#modal-loader' ).modal('show');
+
+    url = base_url + 'AgenteCompra/PedidosPagados/costosOrigenTradingChina';
+      $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : $('#form-costos_origen_china').serialize(),
+      success : function( response ){
+          //$( '#modal-loader' ).modal('hide');
+          
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $('.modal-costos_origen_china').modal('hide');
+              
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
+          }
+          
+          $( '#btn-save_costos_origen_china' ).text('');
+          $( '#btn-save_costos_origen_china' ).append( 'Guardar' );
+          $( '#btn-save_costos_origen_china' ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          //$( '#modal-loader' ).modal('hide');
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          
+          $( '#modal-message' ).modal('show');
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-save_costos_origen_china' ).text('');
+          $( '#btn-save_costos_origen_china' ).append( 'Guardar' );
+          $( '#btn-save_costos_origen_china' ).attr('disabled', false);
+      }
+    });
+  });
+
+	$(document).on('click', '#btn-save_reserva_booking_trading', function (e) {
+    e.preventDefault();
+
+    $( '#btn-save_reserva_booking_trading' ).text('');
+    $( '#btn-save_reserva_booking_trading' ).attr('disabled', true);
+    $( '#btn-save_reserva_booking_trading' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    //$( '#modal-loader' ).modal('show');
+
+    url = base_url + 'AgenteCompra/PedidosPagados/reservaBookingTrading';
+      $.ajax({
+      type		  : 'POST',
+      dataType	: 'JSON',
+      url		    : url,
+      data		  : $('#form-reserva_booking_trading').serialize(),
+      success : function( response ){
+          //$( '#modal-loader' ).modal('hide');
+          
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $('.modal-reserva_booking_trading').modal('hide');
+              
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
+          }
+          
+          $( '#btn-save_reserva_booking_trading' ).text('');
+          $( '#btn-save_reserva_booking_trading' ).append( 'Guardar' );
+          $( '#btn-save_reserva_booking_trading' ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          //$( '#modal-loader' ).modal('hide');
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          
+          $( '#modal-message' ).modal('show');
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-save_reserva_booking_trading' ).text('');
+          $( '#btn-save_reserva_booking_trading' ).append( 'Guardar' );
+          $( '#btn-save_reserva_booking_trading' ).attr('disabled', false);
+      }
+    });
+  });
   
 	$(document).on('click', '#btn-guardar_supervisar_llenado_contenedor', function (e) {
     e.preventDefault();
@@ -3509,7 +3622,7 @@ function removerAsignarPedido(ID, id_usuario) {
   });
 }
 
-function completarVerificacionOC(ID, Nu_Tipo_Servicio, ID_Usuario_Interno_Empresa_China) {
+function completarVerificacionOC(ID, iIdTareaPedido) {
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
@@ -3527,7 +3640,7 @@ function completarVerificacionOC(ID, Nu_Tipo_Servicio, ID_Usuario_Interno_Empres
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
-    url = base_url + 'AgenteCompra/PedidosPagados/completarVerificacionOC/' + ID + '/' + Nu_Tipo_Servicio + '/' + ID_Usuario_Interno_Empresa_China;
+    url = base_url + 'AgenteCompra/PedidosPagados/completarVerificacionOC/' + ID + '/' + iIdTareaPedido;
     $.ajax({
       url: url,
       type: "GET",
@@ -3932,13 +4045,16 @@ function bookingConsolidado(id){
   })
 }
 
-function bookingInspeccion(id){
+function bookingInspeccion(id, iIdTareaPedido, ID_Usuario_Interno_China, sCorrelativoCotizacion){
   $( '#form-booking_inspeccion' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
 
   $( '[name="booking_inspeccion-ID_Pedido_Cabecera"]' ).val(id);
+  $( '[name="booking_inspeccion-Nu_ID_Interno"]' ).val(iIdTareaPedido);
+  $( '[name="booking_inspeccion-ID_Usuario_Interno_China"]' ).val(ID_Usuario_Interno_China);
+  $( '[name="booking_inspeccion-sCorrelativoCotizacion"]' ).val(sCorrelativoCotizacion);
 
   $(' .modal-booking_inspeccion ').modal('show');
   $(' #form-booking_inspeccion ' )[0].reset();
@@ -3950,11 +4066,20 @@ function bookingInspeccion(id){
     dataType: "JSON",
     success: function(response){
       console.log(response);
+
+      $( '[name="booking_inspeccion-Qt_Caja_Total_Booking-Actual"]' ).val(response.Qt_Caja_Total_Booking);
+      $( '[name="booking_inspeccion-Qt_Cbm_Total_Booking-Actual"]' ).val(response.Qt_Cbm_Total_Booking);
+      $( '[name="booking_inspeccion-Qt_Peso_Total_Booking-Actual"]' ).val(response.Qt_Peso_Total_Booking);
+
+      $( '[name="booking_inspeccion-Qt_Caja_Total_Booking"]' ).val(response.Qt_Caja_Total_Booking);
+      $( '[name="booking_inspeccion-Qt_Cbm_Total_Booking"]' ).val(response.Qt_Cbm_Total_Booking);
+      $( '[name="booking_inspeccion-Qt_Peso_Total_Booking"]' ).val(response.Qt_Peso_Total_Booking);
+      
       $( '[name="booking_inspeccion-No_Observacion_Inspeccion"]' ).val(response.No_Observacion_Inspeccion);
 
-      $( '#booking_inspeccion-Qt_Caja_Total_Booking' ).html(response.Qt_Caja_Total_Booking);
-      $( '#booking_inspeccion-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
-      $( '#booking_inspeccion-Qt_Peso_Total_Booking' ).html(response.Qt_Peso_Total_Booking);
+      //$( '#booking_inspeccion-Qt_Caja_Total_Booking' ).html(response.Qt_Caja_Total_Booking);
+      //$( '#booking_inspeccion-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
+      //$( '#booking_inspeccion-Qt_Peso_Total_Booking' ).html(response.Qt_Peso_Total_Booking);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       //$( '#modal-loader' ).modal('hide');
@@ -3977,4 +4102,128 @@ function supervisarContenedor(id, sCorrelativo){
 
   $('#modal-supervisar_llenado_contenedor').modal('show');
   $( '#form-supervisar_llenado_contenedor' )[0].reset();
+}
+
+function bookingTrading(id){
+  $( '#form-reserva_booking_trading' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '[name="reserva_booking_trading-ID_Pedido_Cabecera"]' ).val(id);
+
+  $(' .modal-reserva_booking_trading ').modal('show');
+  $(' #form-reserva_booking_trading ' )[0].reset();
+  
+  var selected = '';
+
+  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+
+      var sNombreTransporteMaritimo = 'FCL';
+      $('.div-tipo_contenedor').hide();
+      if(response.Nu_Tipo_Transporte_Maritimo==2){
+        sNombreTransporteMaritimo = 'LCL';
+        $('.div-tipo_contenedor').show();
+      }
+
+      $( '#reserva_booking_trading-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
+      $( '#reserva_booking_trading-Nu_Tipo_Transporte_Maritimo' ).html(sNombreTransporteMaritimo);
+
+      $('#cbo-shipper').html('<option value="0" selected="selected">Buscando...</option>');
+      url = base_url + 'HelperImportacionController/getShipper';
+      $.post(url, {}, function (responseShipper) {
+        console.log(responseShipper);
+        if (responseShipper.status == 'success') {
+          $('#cbo-shipper').html('<option value="0" selected="selected">- Seleccionar -</option>');
+          var l = responseShipper.result.length;
+          for (var x = 0; x < l; x++) {
+            selected = '';
+            if(response.ID_Shipper == responseShipper.result[x].ID)
+              selected = 'selected="selected"';
+            $('#cbo-shipper').append('<option value="' + responseShipper.result[x].ID + '" ' + selected + '>' + responseShipper.result[x].Nombre + '</option>');
+          }
+        } else {
+          $('#cbo-shipper').html('<option value="0" selected="selected">Sin registro</option>');
+          if (responseShipper.sMessageSQL !== undefined) {
+            console.log(responseShipper.sMessageSQL);
+          }
+          console.log(responseShipper.message);
+        }
+      }, 'JSON');
+
+      $( '[name="reserva_booking_trading-No_Tipo_Contenedor"]' ).val(response.No_Tipo_Contenedor);
+      $( '[name="reserva_booking_trading-No_Naviera"]' ).val(response.No_Naviera);
+      $( '[name="reserva_booking_trading-No_Dias_Transito"]' ).val(response.No_Dias_Transito);
+      $( '[name="reserva_booking_trading-No_Dias_Libres"]' ).val(response.No_Dias_Libres);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      //$( '#modal-loader' ).modal('hide');
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function costosOrigenTradingChina(id, iIdTareaPedido){
+  $( '#form-costos_origen_china' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $( '[name="costos_origen_china-ID_Pedido_Cabecera"]' ).val(id);
+
+  $(' .modal-costos_origen_china ').modal('show');
+  $(' #form-costos_origen_china ' )[0].reset();
+  
+  var selected = '';
+
+  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan"]' ).val(response.Ss_Pago_Otros_Flete_China_Yuan);
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Flete_China_Dolar"]' ).val(response.Ss_Pago_Otros_Flete_China_Dolar);
+
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Origen_China_Yuan);
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costo_Origen_China_Dolar);
+
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Fta_China_Yuan);
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costo_Fta_China_Dolar);
+
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan"]' ).val(response.Ss_Pago_Otros_Cuadrilla_China_Yuan);
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar"]' ).val(response.Ss_Pago_Otros_Cuadrilla_China_Dolar);
+
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costos_China_Yuan);
+      $( '[name="costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costos_China_Dolar);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      //$( '#modal-loader' ).modal('hide');
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
 }

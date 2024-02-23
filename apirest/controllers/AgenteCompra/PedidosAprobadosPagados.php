@@ -25,7 +25,7 @@ class PedidosAprobadosPagados extends CI_Controller {
 	public function listar($sCorrelativoCotizacion = '', $ID_Pedido_Cabecera = ''){
 		if(!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
 		if(isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2');
+			$this->load->view('header_v2', array("js_pedidos_aprobados_pagados" => true));
 			$this->load->view('AgenteCompra/PedidosAprobadosPagadosView', array(
 				'sCorrelativoCotizacion' => $sCorrelativoCotizacion,
 				'ID_Pedido_Cabecera' => $ID_Pedido_Cabecera

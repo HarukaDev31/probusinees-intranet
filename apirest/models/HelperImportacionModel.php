@@ -205,5 +205,30 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 		else
 			return array('No_Estado' => 'LCL','No_Class_Estado' => 'success');
 	}
+
+	public function getShipper(){
+		$query = "SELECT ID_Shipper AS ID, No_Shipper AS Nombre FROM shipper WHERE ID_Empresa = " . $this->user->ID_Empresa . " AND Nu_Estado=1";//2=china
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
+	}
 }
 ?>

@@ -1391,10 +1391,18 @@
       <div class="modal-body">
         <div class="row">
           <input type="hidden" name="booking_inspeccion-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+          <input type="hidden" name="booking_inspeccion-Nu_ID_Interno" class="form-control" autocomplete="off">
+          <input type="hidden" name="booking_inspeccion-ID_Usuario_Interno_China" class="form-control" autocomplete="off">
+          <input type="hidden" name="booking_inspeccion-sCorrelativoCotizacion" class="form-control" autocomplete="off">
+          <input type="hidden" name="booking_inspeccion-Qt_Caja_Total_Booking-Actual" class="form-control" autocomplete="off">
+          <input type="hidden" name="booking_inspeccion-Qt_Cbm_Total_Booking-Actual" class="form-control" autocomplete="off">
+          <input type="hidden" name="booking_inspeccion-Qt_Peso_Total_Booking-Actual" class="form-control" autocomplete="off">
+
           <div class="col-12 col-lg-4">
             <label>Cajas Total</label>
             <div class="form-group">
-              <label id="booking_inspeccion-Qt_Caja_Total_Booking"></label>
+              <!--<label id="booking_inspeccion-Qt_Caja_Total_Booking"></label>-->
+              <input type="text" name="booking_inspeccion-Qt_Caja_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1402,7 +1410,8 @@
           <div class="col-12 col-lg-4">
             <label>CBM Total</label>
             <div class="form-group">
-              <label id="booking_inspeccion-Qt_Cbm_Total_Booking"></label>
+              <!--<label id="booking_inspeccion-Qt_Cbm_Total_Booking"></label>-->
+              <input type="text" name="booking_inspeccion-Qt_Cbm_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1410,7 +1419,8 @@
           <div class="col-12 col-lg-4">
             <label>Peso Total</label>
             <div class="form-group">
-              <label id="booking_inspeccion-Qt_Peso_Total_Booking"></label>
+              <!--<label id="booking_inspeccion-Qt_Peso_Total_Booking"></label>-->
+              <input type="text" name="booking_inspeccion-Qt_Peso_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1472,3 +1482,187 @@
   <?php echo form_close(); ?>
 </div>
 <!-- /.modal agregar supervisar_llenado_contenedor -->
+
+<!-- Modal reserva_booking_trading -->
+<div class="modal fade modal-reserva_booking_trading" id="modal-default">
+  <?php $attributes = array('id' => 'form-reserva_booking_trading'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center">Reserva de Booking</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="reserva_booking_trading-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+
+          <div class="col-12 col-lg-4">
+            <label>CBM Total</label>
+            <div class="form-group">
+              <label id="reserva_booking_trading-Qt_Cbm_Total_Booking"></label>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4">
+            <label>Tipo de Envío</label>
+            <div class="form-group">
+              <label id="reserva_booking_trading-Nu_Tipo_Transporte_Maritimo"></label>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <label>Shipper</label>
+            <div class="form-group">
+              <select id="cbo-shipper" name="reserva_booking_trading-ID_Shipper" class="form-control select2" style="width: 100%;">
+                <option selected="selected" value="0"></option>
+              </select>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6 div-tipo_contenedor">
+            <label>Tipo Contenedor</label>
+            <div class="form-group">
+              <input type="text" name="reserva_booking_trading-No_Tipo_Contenedor" class="form-control" placeholder="Opcional" maxlength="255" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <label>Naviera</label>
+            <div class="form-group">
+              <input type="text" name="reserva_booking_trading-No_Naviera" class="form-control" placeholder="Opcional" maxlength="255" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <label>C. Días de tránsito</label>
+            <div class="form-group">
+              <input type="text" name="reserva_booking_trading-No_Dias_Transito" class="form-control input-number" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4">
+            <label>D. Días Libres</label>
+            <div class="form-group">
+              <input type="text" name="reserva_booking_trading-No_Dias_Libres" class="form-control input-number" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_reserva_booking_trading" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal reserva_booking_trading -->
+
+<!-- Modal costos_origen_china -->
+<div class="modal fade modal-costos_origen_china" id="modal-default">
+  <?php $attributes = array('id' => 'form-costos_origen_china'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center">Reserva de Booking</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="costos_origen_china-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+          
+          <div class="col-6 col-lg-6">
+            <label>Flete Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Flete Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Flete_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Costos de Origen Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Costos de Origen Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Costos de FTA Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Costos de FTA Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Cuadrilla Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Cuadrilla Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Otros Costos Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Otros Costos Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_costos_origen_china" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal costos_origen_china -->

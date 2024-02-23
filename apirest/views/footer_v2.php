@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.2.10'; ?>
+<?php $iControlVersionDashboard = '1.2.14'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -128,8 +128,9 @@
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
 
-
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 
 <!-- datepicker -->
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
@@ -143,8 +144,9 @@
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
 
-
 <script src="<?php echo base_url() . 'assets/js/jquery.auto-complete.js?ver=1.0'; ?>"></script>
+
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 
 <!-- datepicker -->
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">

@@ -615,9 +615,9 @@ class PedidosPagadosModel extends CI_Model{
         $where = array('ID_Pedido_Cabecera' => $ID);
 		
 		$Nu_Tipo_Exportador = 0;
-		if ($Nu_Estado==2)
+		if ($Nu_Estado==2)//Consolidado tranding
 			$Nu_Tipo_Exportador = 1;
-		else if ($Nu_Estado==1)
+		else if ($Nu_Estado==1)//tranding
 			$Nu_Tipo_Exportador = 2;
 
         $data = array(
@@ -630,11 +630,19 @@ class PedidosPagadosModel extends CI_Model{
 			$this->actualizarProgresoPedido($arrParams);
 
 			//crear completar pasos de configuracion jefe
-			$arrDataTour = array(
-				'ID_Pedido_Cabecera' => $ID,
-				'ID_Usuario_Interno_Empresa_China' => $ID_Usuario_Interno_Empresa_China
-			);
-			$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
+			if($Nu_Estado==2){//Consolidado tranding
+				$arrDataTour = array(
+					'ID_Pedido_Cabecera' => $ID,
+					'ID_Usuario_Interno_Empresa_China' => $ID_Usuario_Interno_Empresa_China
+				);
+				$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
+			} else if($Nu_Estado==1){//trading
+				$arrDataTour = array(
+					'ID_Pedido_Cabecera' => $ID,
+					'ID_Usuario_Interno_Empresa_China' => $ID_Usuario_Interno_Empresa_China
+				);
+				$arrTour = $this->generarEstadoProcesoAgenteCompraTrading($arrDataTour);
+			}
 
 			return array('status' => 'success', 'message' => 'Actualizado');
 		}
@@ -1031,7 +1039,32 @@ class PedidosPagadosModel extends CI_Model{
     }
 	
 	public function getBooking($ID){
-		$query = "SELECT Qt_Caja_Total_Booking, Qt_Cbm_Total_Booking, Qt_Peso_Total_Booking, No_Numero_Consolidado, No_Observacion_Inspeccion FROM agente_compra_pedido_cabecera WHERE ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
+		$query = "SELECT
+Qt_Caja_Total_Booking,
+Qt_Cbm_Total_Booking,
+Qt_Peso_Total_Booking,
+No_Numero_Consolidado,
+No_Observacion_Inspeccion,
+Nu_Tipo_Transporte_Maritimo,
+ID_Shipper,
+No_Tipo_Contenedor,
+No_Naviera,
+No_Dias_Transito,
+No_Dias_Libres,
+Ss_Pago_Otros_Flete_China_Yuan,
+Ss_Pago_Otros_Flete_China_Dolar,
+Ss_Pago_Otros_Costo_Origen_China_Yuan,
+Ss_Pago_Otros_Costo_Origen_China_Dolar,
+Ss_Pago_Otros_Costo_Fta_China_Yuan,
+Ss_Pago_Otros_Costo_Fta_China_Dolar,
+Ss_Pago_Otros_Cuadrilla_China_Yuan,
+Ss_Pago_Otros_Cuadrilla_China_Dolar,
+Ss_Pago_Otros_Costos_China_Yuan,
+Ss_Pago_Otros_Costos_China_Dolar
+FROM
+agente_compra_pedido_cabecera
+WHERE
+ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
 
@@ -1222,11 +1255,11 @@ class PedidosPagadosModel extends CI_Model{
 		return array('status' => 'error', 'message' => 'Error al guardar');
 	}
 
-	public function completarVerificacionOC($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China){
+	public function completarVerificacionOC($ID, $iIdTareaPedido){
 		//marcar progreso 1. Verificar datos de exportación
 		$where_progreso = array(
 			'ID_Pedido_Cabecera' => $ID,
-			'Nu_ID_Interno' => 11
+			'Nu_ID_Interno' => $iIdTareaPedido
 		);
 		$data_progreso = array('Nu_Estado_Proceso' => 1);
 		if ( $this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
@@ -1240,10 +1273,216 @@ class PedidosPagadosModel extends CI_Model{
 		return $this->db->query($query)->row();
 	}
 
-    public function bookingInspeccion($where, $data){
+    public function bookingInspeccion($where, $data, $data_notificacion){
 		$where_progreso = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-			'Nu_ID_Interno' => 14
+			'Nu_ID_Interno' => $where['Nu_ID_Interno']
+		);
+		//var_dump($where_progreso);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
+		unset($where['Nu_ID_Interno']);
+		if ( $this->db->update($this->table, $data, $where) > 0 ) {
+			if(
+				($data['Qt_Caja_Total_Booking'] != $data_notificacion['Qt_Caja_Total_Booking'])
+				|| ($data['Qt_Cbm_Total_Booking'] != $data_notificacion['Qt_Cbm_Total_Booking'])
+				|| ($data['Qt_Peso_Total_Booking'] != $data_notificacion['Qt_Peso_Total_Booking'])
+			){
+				$sValoresCambiados = '';
+				if($data['Qt_Caja_Total_Booking'] != $data_notificacion['Qt_Caja_Total_Booking']){
+					$sValoresCambiados .= 'Se cambio Cajas Total de ' . $data_notificacion['Qt_Caja_Total_Booking'] . ' por ' . $data['Qt_Caja_Total_Booking'];
+				}
+				
+				if($data['Qt_Cbm_Total_Booking'] != $data_notificacion['Qt_Cbm_Total_Booking']){
+					$sValoresCambiados .= 'Se cambio Cajas Total de ' . $data_notificacion['Qt_Cbm_Total_Booking'] . ' por ' . $data['Qt_Cbm_Total_Booking'];
+				}
+				
+				if($data['Qt_Peso_Total_Booking'] != $data_notificacion['Qt_Peso_Total_Booking']){
+					$sValoresCambiados .= 'Se cambio Cajas Total de ' . $data_notificacion['Qt_Peso_Total_Booking'] . ' por ' . $data['Qt_Peso_Total_Booking'];
+				}
+
+				if(!empty($sValoresCambiados)){
+					$notificacion = $this->NotificacionModel->procesarNotificacion(
+						$this->user->No_Usuario,
+						'Pedidos Pagados',
+						'Cotización ' . $data_notificacion['sCorrelativoCotizacion'] . ' se modifico Reserva de Booking. <br>' . $sValoresCambiados,
+						''
+					);
+				}
+			}
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		}
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+
+    public function supervisarContenedor($where, $data){
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 17
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+	
+	public function generarEstadoProcesoAgenteCompraTrading($arrDataTour){
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '1. Verificar datos de exportación',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '18',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '2. Pago a Proveedor (Inicial)',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '19',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+				
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '3. Inspección',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '20',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '4. Pago a Proveedor (Final)',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '21',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '5. Reserva de Booking',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '22',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '6. Costos de Origen',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '23',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '7. Docs Exportación',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '24',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '8. Despacho al Shipper / Forwarder',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '25',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '9. Revisión de BL',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '26',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '10. Entrega de Docs - Cliente',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '27',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		$proceso_agente_compra_pedido[]=array(
+			'ID_Empresa' => $this->user->ID_Empresa,
+			'ID_Organizacion' => $this->user->ID_Organizacion,
+			'ID_Pedido_Cabecera' => $arrDataTour['ID_Pedido_Cabecera'],
+			'No_Proceso' => '11. Pagos Logísticos',
+			'Txt_Url_Menu' => 'AgenteCompra/PedidosPagados/listar',
+			'Nu_Orden' => '1',
+			'Nu_Estado_Proceso' => '0',
+			'Nu_Estado_Visualizacion' => '1',
+			'Nu_ID_Interno' => '28',
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+		);
+		
+		if ($this->db->insert_batch('proceso_agente_compra_pedido', $proceso_agente_compra_pedido)>0)
+			return array('status' => 'success', 'message' => 'Registro guardado');
+		return array('status' => 'error', 'message' => 'Error al guardar');
+	}
+
+    public function reservaBookingTrading($where, $data){
+		//marcar progreso 1. Verificar datos de exportación
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 22
 		);
 		$data_progreso = array('Nu_Estado_Proceso' => 1);
 		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
@@ -1253,10 +1492,11 @@ class PedidosPagadosModel extends CI_Model{
 		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
 
-    public function supervisarContenedor($where, $data){
+    public function costosOrigenTradingChina($where, $data){
+		//marcar progreso 1. Verificar datos de exportación
 		$where_progreso = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-			'Nu_ID_Interno' => 17
+			'Nu_ID_Interno' => 23
 		);
 		$data_progreso = array('Nu_Estado_Proceso' => 1);
 		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
