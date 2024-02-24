@@ -137,8 +137,8 @@ class PedidosPagadosModel extends CI_Model{
 		if ($this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where) > 0) {
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
-				'Pedidos Pagados',
-				'Cotización ' . $correlativo . ' se eliminó producto ' . $name_item,
+				'O.C.',
+				$correlativo . ' se eliminó producto ' . $name_item,
 				''
 			);
 
@@ -163,8 +163,8 @@ class PedidosPagadosModel extends CI_Model{
 			//registrar evento de notificacion
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
-				'Pedidos Pagados',
-				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
+				'O.C.',
+				$sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
 				''
 			);
 
@@ -181,8 +181,8 @@ class PedidosPagadosModel extends CI_Model{
 			//registrar evento de notificacion
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
-				'Pedidos Pagados',
-				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
+				'O.C.',
+				$sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
 				''
 			);
 			return array('status' => 'success', 'message' => 'Actualizado', 'notificacion' => $notificacion);
@@ -248,8 +248,8 @@ class PedidosPagadosModel extends CI_Model{
 			//registrar evento de notificacion
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
-				'Pedidos Pagados',
-				'Cotización ' . $arrPost['proveedor-correlativo'] . ' se agrego pago a proveedor',
+				'O.C.',
+				$arrPost['proveedor-correlativo'] . ' se agrego pago a proveedor',
 				''
 			);
 
@@ -318,8 +318,8 @@ class PedidosPagadosModel extends CI_Model{
 				
 				$notificacion = $this->NotificacionModel->procesarNotificacion(
 					$this->user->No_Usuario,
-					'Pedidos Pagados',
-					'Cotización ' . $arrPost['proveedor-correlativo'] . ' se subió fotos de productos de inspección',
+					'O.C.',
+					$arrPost['proveedor-correlativo'] . ' se subió fotos de productos de inspección',
 					''
 				);
 
@@ -399,8 +399,8 @@ class PedidosPagadosModel extends CI_Model{
 				//$this->db->trans_rollback();
 				$notificacion = $this->NotificacionModel->procesarNotificacion(
 					$this->user->No_Usuario,
-					'Pedidos Pagados',
-					'Cotización ' . $arrPost['documento-correlativo'] . ' invoice se guardo documento',
+					'O.C.',
+					$arrPost['documento-correlativo'] . ' invoice se guardo documento',
 					''
 				);
 
@@ -1318,8 +1318,8 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 				if(!empty($sValoresCambiados)){
 					$notificacion = $this->NotificacionModel->procesarNotificacion(
 						$this->user->No_Usuario,
-						'Pedidos Pagados',
-						'Cotización ' . $data_notificacion['sCorrelativoCotizacion'] . ' se modifico Reserva de Booking. <br>' . $sValoresCambiados,
+						'O.C.',
+						$data_notificacion['sCorrelativoCotizacion'] . ' se modifico Reserva de Booking. <br>' . $sValoresCambiados,
 						''
 					);
 				}

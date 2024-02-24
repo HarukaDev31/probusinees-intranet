@@ -138,7 +138,7 @@ class PedidosAprobadosPagadosModel extends CI_Model{
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
 				'Pedidos Pagados',
-				'Cotización ' . $correlativo . ' se eliminó producto ' . $name_item,
+				'O.C. ' . $correlativo . ' se eliminó producto ' . $name_item,
 				''
 			);
 
@@ -163,8 +163,8 @@ class PedidosAprobadosPagadosModel extends CI_Model{
 			//registrar evento de notificacion
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
-				'Pedidos Pagados',
-				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
+				'O.C.',
+				$sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
 				''
 			);
 
@@ -181,8 +181,8 @@ class PedidosAprobadosPagadosModel extends CI_Model{
 			//registrar evento de notificacion
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
-				'Pedidos Pagados',
-				'Cotización ' . $sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
+				'O.C.',
+				$sCorrelativo . ' cambio estado a ' . $arrEstadoRegistro['No_Estado'],
 				''
 			);
 			return array('status' => 'success', 'message' => 'Actualizado', 'notificacion' => $notificacion);
@@ -248,8 +248,8 @@ class PedidosAprobadosPagadosModel extends CI_Model{
 			//registrar evento de notificacion
 			$notificacion = $this->NotificacionModel->procesarNotificacion(
 				$this->user->No_Usuario,
-				'Pedidos Pagados',
-				'Cotización ' . $arrPost['proveedor-correlativo'] . ' se agrego pago a proveedor',
+				'O.C.',
+				$arrPost['proveedor-correlativo'] . ' se agrego pago a proveedor',
 				''
 			);
 
@@ -318,8 +318,8 @@ class PedidosAprobadosPagadosModel extends CI_Model{
 				
 				$notificacion = $this->NotificacionModel->procesarNotificacion(
 					$this->user->No_Usuario,
-					'Pedidos Pagados',
-					'Cotización ' . $arrPost['proveedor-correlativo'] . ' se subió fotos de productos de inspección',
+					'O.C.',
+					$arrPost['proveedor-correlativo'] . ' se subió fotos de productos de inspección',
 					''
 				);
 
@@ -366,8 +366,8 @@ class PedidosAprobadosPagadosModel extends CI_Model{
 				//$this->db->trans_rollback();
 				$notificacion = $this->NotificacionModel->procesarNotificacion(
 					$this->user->No_Usuario,
-					'Pedidos Pagados',
-					'Cotización ' . $arrPost['documento-correlativo'] . ' invoice se guardo documento',
+					'O.C.',
+					$arrPost['documento-correlativo'] . ' invoice se guardo documento',
 					''
 				);
 

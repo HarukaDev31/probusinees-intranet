@@ -1385,7 +1385,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center">Reserva de Booking</h4>
+        <h4 class="text-center">Inspección</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
@@ -1570,7 +1570,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center">Reserva de Booking</h4>
+        <h4 class="text-center"><strong>Costos de Origen</strong></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
@@ -1578,7 +1578,7 @@
           <input type="hidden" name="costos_origen_china-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
           
           <div class="col-6 col-lg-6">
-            <label>Flete Yuan</label>
+            <label>Flete ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1586,7 +1586,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Flete Dolar</label>
+            <label>Flete $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Flete_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1594,7 +1594,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Costos de Origen Yuan</label>
+            <label>Costos de Origen ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1602,7 +1602,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Costos de Origen Dolar</label>
+            <label>Costos de Origen $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1610,7 +1610,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Costos de FTA Yuan</label>
+            <label>Costos de FTA ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1618,7 +1618,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Costos de FTA Dolar</label>
+            <label>Costos de FTA $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1626,7 +1626,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Cuadrilla Yuan</label>
+            <label>Cuadrilla ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1634,7 +1634,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Cuadrilla Dolar</label>
+            <label>Cuadrilla $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1642,7 +1642,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Otros Costos Yuan</label>
+            <label>Otros Costos ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1650,7 +1650,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Otros Costos Dolar</label>
+            <label>Otros Costos $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1789,6 +1789,10 @@
           <input type="hidden" id="cliente_modal-ID_Entidad" name="cliente_modal-ID_Entidad" class="form-control" autocomplete="off">
           <input type="hidden" id="cliente_modal-ENo_Entidad" name="cliente_modal-ENo_Entidad" class="form-control" autocomplete="off">
 
+          <div class="col-6 col-lg-12">
+            <label style="font-size: 1.3rem;">Consignatario</label>
+          </div>
+
           <div class="col-6 col-lg-4">
             <label>Empresa</label>
             <div class="form-group">
@@ -1813,20 +1817,36 @@
             </div>
           </div>
           
-          <div class="col-12 col-lg-6">
-            <label>Exportador</label>
+          <div class="col-6 col-lg-12">
+            <label style="font-size: 1.3rem;">Exportador</label>
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <label>Razón Social</label>
             <div class="form-group">
               <span id="cliente_modal-exportador"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
+
+          <div class="col-12 col-lg-4">
+            <label>Dirección</label>
+            <div class="form-group">
+              <span id="cliente_modal-exportador_direccion"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
           
-          <div class="col-12 col-lg-6">
+          <div class="col-12 col-lg-4">
             <label>Shipper</label>
             <div class="form-group">
               <span id="cliente_modal-shipper"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
+          </div>
+          
+          <div class="col-6 col-lg-12">
+            <label style="font-size: 1.3rem;">Datos de Carga</label>
           </div>
           
           <div class="col-12 col-lg-3">
@@ -1951,7 +1971,7 @@
           </div>
 
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
-            <label>Flete Yuan</label>
+            <label>Flete ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1959,7 +1979,7 @@
           </div>
           
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
-            <label>Flete Dolar</label>
+            <label>Flete $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1967,7 +1987,7 @@
           </div>
 
           <div class="col-6 col-lg-4 div-pagos_logisticos-cif_ddp">
-            <label>Flete</label>
+            <label>Voucher</label>
             <div class="form-group">
               <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Flete_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Flete_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
               <span class="help-block text-danger" id="error"></span>
@@ -1983,7 +2003,7 @@
           </div>
           
           <div class="col-6 col-lg-3">
-            <label>Costos de Origen Yuan</label>
+            <label>Costos de Origen ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1991,7 +2011,7 @@
           </div>
           
           <div class="col-6 col-lg-3">
-            <label>Costos de Origen Dolar</label>
+            <label>Costos de Origen $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1999,7 +2019,7 @@
           </div>
 
           <div class="col-6 col-lg-4">
-            <label>Costos de Origen</label>
+            <label>Voucher</label>
             <div class="form-group">
               <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
               <span class="help-block text-danger" id="error"></span>
@@ -2015,7 +2035,7 @@
           </div>
                     
           <div class="col-6 col-lg-3">
-            <label>Costos de FTA Yuan</label>
+            <label>Costos de FTA ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -2023,7 +2043,7 @@
           </div>
           
           <div class="col-6 col-lg-3">
-            <label>Costos de FTA Dolar</label>
+            <label>Costos de FTA $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -2031,7 +2051,7 @@
           </div>
 
           <div class="col-6 col-lg-4">
-            <label>FTA</label>
+            <label>Voucher</label>
             <div class="form-group">
               <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
               <span class="help-block text-danger" id="error"></span>
@@ -2048,18 +2068,18 @@
           
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>SubTotal Yuan: <label id="pagos_logisticos-subtotal-yuan"></label></h6></strong>
+              <strong><h6>SubTotal ¥: <label id="pagos_logisticos-subtotal-yuan"></label></h6></strong>
             </div>
           </div>
 
           <div class="col-6 col-lg-9 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>SubTotal Dolar: <label id="pagos_logisticos-subtotal-dolar"></label></h6></strong>
+              <strong><h6>SubTotal $: <label id="pagos_logisticos-subtotal-dolar"></label></h6></strong>
             </div>
           </div>
 
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
-            <label>Cuadrilla Yuan</label>
+            <label>Cuadrilla ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -2067,7 +2087,7 @@
           </div>
           
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
-            <label>Cuadrilla Dolar</label>
+            <label>Cuadrilla $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -2075,7 +2095,7 @@
           </div>
 
           <div class="col-6 col-lg-4 div-pagos_logisticos-cif_ddp">
-            <label>Cuadrilla</label>
+            <label>Voucher</label>
             <div class="form-group">
               <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
               <span class="help-block text-danger" id="error"></span>
@@ -2091,7 +2111,7 @@
           </div>
           
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
-            <label>Otros Costos Yuan</label>
+            <label>Otros Costos ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -2099,7 +2119,7 @@
           </div>
           
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
-            <label>Otros Costos Dolar</label>
+            <label>Otros Costos $</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -2107,7 +2127,7 @@
           </div>
 
           <div class="col-6 col-lg-4 div-pagos_logisticos-cif_ddp">
-            <label>Otros Costos</label>
+            <label>Voucher</label>
             <div class="form-group">
               <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Costos_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Costos_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
               <span class="help-block text-danger" id="error"></span>
@@ -2124,13 +2144,13 @@
           
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>Total Yuan: <label id="pagos_logisticos-total-yuan"></label></h6></strong>
+              <strong><h6>Total ¥: <label id="pagos_logisticos-total-yuan"></label></h6></strong>
             </div>
           </div>
 
           <div class="col-6 col-lg-9 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>Total Dolar: <label id="pagos_logisticos-total-dolar"></label></h6></strong>
+              <strong><h6>Total $: <label id="pagos_logisticos-total-dolar"></label></h6></strong>
             </div>
           </div>
         </div>

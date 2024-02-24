@@ -223,7 +223,7 @@ class PedidosPagados extends CI_Controller {
 				$btn_entrega_docs_cliente = '';
 				$btn_pagos_logisticos = '';
 				if($row->Nu_Tipo_Servicio==1) {
-					$btn_reserva_booking = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingTrading(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
+					$btn_reserva_booking = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingTrading(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-ship fa-2x" aria-hidden="true"></i></button>';
 					
 					//Costos de Origen
 					$iIdTareaPedido = 0;//ninguno
@@ -1421,7 +1421,7 @@ class PedidosPagados extends CI_Controller {
 				'Qt_Caja_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Caja_Total_Booking-Actual'),
 				'Qt_Cbm_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Cbm_Total_Booking-Actual'),
 				'Qt_Peso_Total_Booking' => $this->input->post('booking_inspeccion-Qt_Peso_Total_Booking-Actual'),
-				'sCorrelativoCotizacion' => $this->input->post('booking_inspeccion-sCorrelativoCotizacion-Actual')
+				'sCorrelativoCotizacion' => $this->input->post('booking_inspeccion-sCorrelativoCotizacion')
 			);
 			echo json_encode($this->PedidosPagadosModel->bookingInspeccion(array(
 				'ID_Pedido_Cabecera' => $this->input->post('booking_inspeccion-ID_Pedido_Cabecera'),
