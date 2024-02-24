@@ -1974,7 +1974,7 @@
             </div>
           </div>
 
-          <div class="col-6 col-lg-2">
+          <div class="col-6 col-lg-2 div-pagos_logisticos-cif_ddp">
             <label></label>
             <div class="form-group">
               <a class="btn btn-link" id="pagos_logisticos-Txt_Url_Pago_Otros_Flete_China-a" href="#" role="button">Descargar</a>
@@ -2058,7 +2058,7 @@
             </div>
           </div>
 
-          <div class="col-6 col-lg-3">
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
             <label>Cuadrilla Yuan</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
@@ -2066,7 +2066,7 @@
             </div>
           </div>
           
-          <div class="col-6 col-lg-3">
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
             <label>Cuadrilla Dolar</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">

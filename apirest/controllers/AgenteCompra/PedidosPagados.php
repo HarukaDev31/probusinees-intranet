@@ -63,9 +63,9 @@ class PedidosPagados extends CI_Controller {
 
 				$sNombreExportador = '';
 				if ($row->Nu_Tipo_Exportador==1){
-					$sNombreExportador = 'ProBusiness Yiwu';
+					$sNombreExportador = 'INTERNATIONAL PRO TRADING CO., LIMITED';
 				} else if ($row->Nu_Tipo_Exportador==2) {
-					$sNombreExportador = 'Criss Factory';
+					$sNombreExportador = 'CHRIS FACTORY LIMITED';
 				}
 				
 				$iIdTareaPedido = 0;//ninguno
