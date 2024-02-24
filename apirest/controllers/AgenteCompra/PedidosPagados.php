@@ -221,6 +221,7 @@ class PedidosPagados extends CI_Controller {
 				$btn_despacho_shipper = '';
 				$btn_revision_bl = '';
 				$btn_entrega_docs_cliente = '';
+				$btn_pagos_logisticos = '';
 				if($row->Nu_Tipo_Servicio==1) {
 					$btn_reserva_booking = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingTrading(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
 					
@@ -255,12 +256,19 @@ class PedidosPagados extends CI_Controller {
 					//Despacho al Shipper
 					$iIdTareaPedido = 0;//ninguno
 					if ($row->Nu_Tipo_Servicio==1){//trading
-						$iIdTareaPedido = 26;
+						$iIdTareaPedido = 27;
 					}
 					$btn_entrega_docs_cliente = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Entrega de Docs Cliente" title="Entrega de Docs Cliente" href="javascript:void(0)"  onclick="entregaDocsCliente(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-user fa-2x" aria-hidden="true"></i></button>';
+					
+					//Despacho al Shipper
+					$iIdTareaPedido = 0;//ninguno
+					if ($row->Nu_Tipo_Servicio==1){//trading
+						$iIdTareaPedido = 28;
+					}
+					$btn_pagos_logisticos = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Pagos Logísticos" title="Pagos Logísticos" href="javascript:void(0)"  onclick="pagosLogisticos(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
 				}
 
-				$rows[] = $btn_inpseccion . $btn_reserva_booking . $btn_costos_origen . $btn_docs_exportacion . $btn_despacho_shipper . $btn_revision_bl . $btn_entrega_docs_cliente;
+				$rows[] = $btn_inpseccion . $btn_reserva_booking . $btn_costos_origen . $btn_docs_exportacion . $btn_despacho_shipper . $btn_revision_bl . $btn_entrega_docs_cliente . $btn_pagos_logisticos;
 				
 				//Pagos 2
 				$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 2)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
@@ -1516,5 +1524,12 @@ class PedidosPagados extends CI_Controller {
 		);
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     		echo json_encode($this->PedidosPagadosModel->entregaDocsCliente(array('ID_Pedido_Cabecera' => $this->input->post('entrega_docs_cliente-ID_Pedido_Cabecera')), $data));
+	}
+
+	public function pagosLogisticos(){
+		//array_debug($this->input->post());
+		//array_debug($_FILES);
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+			echo json_encode($this->PedidosPagadosModel->pagosLogisticos($this->input->post(), $_FILES));
 	}
 }

@@ -17,6 +17,64 @@ if (fMonth < 10) {
 $(function () {
   $('.select2').select2();
 
+	$(document).on('click', '#btn-save_pagos_logisticos', function (e) {
+    e.preventDefault();
+
+    $( '#btn-save_pagos_logisticos' ).text('');
+    $( '#btn-save_pagos_logisticos' ).attr('disabled', true);
+    $( '#btn-save_pagos_logisticos' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    //$( '#modal-loader' ).modal('show');
+
+    var postData = new FormData($("#form-pagos_logisticos")[0]);
+    $.ajax({
+      url: base_url + 'AgenteCompra/PedidosPagados/pagosLogisticos',
+      type: "POST",
+      dataType: "JSON",
+      data: postData,
+      processData: false,
+      contentType: false,
+      success : function( response ){
+          //$( '#modal-loader' ).modal('hide');
+          
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          $('#modal-message').modal('show');
+          
+          if (response.status == 'success'){
+            $('.modal-pagos_logisticos').modal('hide');
+              
+            $('#moda-message-content').addClass( 'bg-' + response.status);
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+          } else {
+            $('#moda-message-content').addClass( 'bg-danger' );
+            $('.modal-title-message').text(response.message);
+            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
+          }
+          
+          $( '#btn-save_pagos_logisticos' ).text('');
+          $( '#btn-save_pagos_logisticos' ).append( 'Guardar' );
+          $( '#btn-save_pagos_logisticos' ).attr('disabled', false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          //$( '#modal-loader' ).modal('hide');
+          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+          
+          $( '#modal-message' ).modal('show');
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text('Problemas');
+          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+          
+          //Message for developer
+          console.log(jqXHR.responseText);
+          
+          $( '#btn-save_pagos_logisticos' ).text('');
+          $( '#btn-save_pagos_logisticos' ).append( 'Guardar' );
+          $( '#btn-save_pagos_logisticos' ).attr('disabled', false);
+      }
+    });
+  });
+
 	$(document).on('click', '#btn-guardar_entrega_docs_cliente', function (e) {
     e.preventDefault();
 
@@ -247,7 +305,7 @@ $(function () {
         
         $( '#modal-message' ).modal('show');
         $('#moda-message-content').addClass( 'bg-danger' );
-        $('.modal-title-message').text(response.message);
+        $('.modal-title-message').text('Problemas');
         setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
         
         //Message for developer
@@ -303,7 +361,7 @@ $(function () {
           
           $( '#modal-message' ).modal('show');
           $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
+          $('.modal-title-message').text('Problemas');
           setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
           
           //Message for developer
@@ -359,7 +417,7 @@ $(function () {
           
           $( '#modal-message' ).modal('show');
           $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
+          $('.modal-title-message').text('Problemas');
           setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
           
           //Message for developer
@@ -414,7 +472,7 @@ $(function () {
           
           $( '#modal-message' ).modal('show');
           $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
+          $('.modal-title-message').text('Problemas');
           setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
           
           //Message for developer
@@ -470,7 +528,7 @@ $(function () {
           
           $( '#modal-message' ).modal('show');
           $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
+          $('.modal-title-message').text('Problemas');
           setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
           
           //Message for developer
@@ -526,7 +584,7 @@ $(function () {
           
           $( '#modal-message' ).modal('show');
           $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
+          $('.modal-title-message').text('Problemas');
           setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
           
           //Message for developer
@@ -4636,6 +4694,115 @@ function entregaDocsCliente(id, iIdTareaPedido){
       if(response.Nu_Tipo_Incoterms == 3 || response.Nu_Tipo_Incoterms == 4){
         $('.div-bl-entrega_docs').show();
       }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      //$( '#modal-loader' ).modal('hide');
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
+}
+
+function pagosLogisticos(id, iIdTareaPedido){
+  $( '#form-pagos_logisticos' )[0].reset();
+  $( '.form-group' ).removeClass('has-error');
+  $( '.form-group' ).removeClass('has-success');
+  $( '.help-block' ).empty();
+
+  $(' .modal-pagos_logisticos ').modal('show');
+
+  $( '[name="pagos_logisticos-ID_Pedido_Cabecera"]' ).val(id);
+  
+  var selected = '', url_dowloand = '';
+
+  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+
+      $( '#pagos_logisticos-shipper' ).html(response.No_Shipper);
+      
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Yuan"]').prop('disabled', true);
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Dolar"]').prop('disabled', true);
+
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Yuan"]').prop('disabled', true);
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Dolar"]').prop('disabled', true);
+
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Yuan"]').prop('disabled', true);
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Dolar"]').prop('disabled', true);
+      
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Yuan"]').prop('disabled', true);
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Dolar"]').prop('disabled', true);
+      
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Yuan"]').prop('disabled', true);
+      $('[name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Dolar"]').prop('disabled', true);
+
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Yuan"]' ).val(response.Ss_Pago_Otros_Flete_China_Yuan);
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Dolar"]' ).val(response.Ss_Pago_Otros_Flete_China_Dolar);
+
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Origen_China_Yuan);
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costo_Origen_China_Dolar);
+
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Fta_China_Yuan);
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costo_Fta_China_Dolar);
+
+      var SubTotalYuan = ( parseFloat(response.Ss_Pago_Otros_Flete_China_Yuan) + parseFloat(response.Ss_Pago_Otros_Costo_Origen_China_Yuan) + parseFloat(response.Ss_Pago_Otros_Costo_Fta_China_Yuan) );
+      var SubTotalDolar = ( parseFloat(response.Ss_Pago_Otros_Flete_China_Dolar) + parseFloat(response.Ss_Pago_Otros_Costo_Origen_China_Dolar) + parseFloat(response.Ss_Pago_Otros_Costo_Fta_China_Dolar) );
+
+      $( '#pagos_logisticos-subtotal-yuan' ).html(SubTotalYuan);
+      $( '#pagos_logisticos-subtotal-dolar' ).html(SubTotalDolar);
+
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Yuan"]' ).val(response.Ss_Pago_Otros_Cuadrilla_China_Yuan);
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Dolar"]' ).val(response.Ss_Pago_Otros_Cuadrilla_China_Dolar);
+
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costos_China_Yuan);
+      $( '[name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costos_China_Dolar);
+
+      var TotalYuan = ( parseFloat(response.Ss_Pago_Otros_Cuadrilla_China_Yuan) + parseFloat(response.Ss_Pago_Otros_Costos_China_Yuan) );
+      var TotalDolar = ( parseFloat(response.Ss_Pago_Otros_Cuadrilla_China_Dolar) + parseFloat(response.Ss_Pago_Otros_Costos_China_Dolar) );
+
+      $( '#pagos_logisticos-total-yuan' ).html(SubTotalYuan + TotalYuan);
+      $( '#pagos_logisticos-total-dolar' ).html(SubTotalDolar + TotalDolar);
+
+      $('.div-pagos_logisticos-cif_ddp').hide();
+      if(response.Nu_Tipo_Incoterms == 3 || response.Nu_Tipo_Incoterms == 4){
+        $('.div-pagos_logisticos-cif_ddp').show();
+      }
+
+      url_dowloand = response.Txt_Url_Pago_Otros_Flete_China;
+      url_dowloand = url_dowloand.replace('https://','../../');
+      url_dowloand = url_dowloand.replace('assets','public_html/assets');
+      $("#pagos_logisticos-Txt_Url_Pago_Otros_Flete_China-a").attr("href", url_dowloand);
+      
+      url_dowloand = response.Txt_Url_Pago_Otros_Costo_Origen_China;
+      url_dowloand = url_dowloand.replace('https://','../../');
+      url_dowloand = url_dowloand.replace('assets','public_html/assets');
+      $("#pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China-a").attr("href", url_dowloand);
+      
+      url_dowloand = response.Txt_Url_Pago_Otros_Costo_Fta_China;
+      url_dowloand = url_dowloand.replace('https://','../../');
+      url_dowloand = url_dowloand.replace('assets','public_html/assets');
+      $("#pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China-a").attr("href", url_dowloand);
+      
+      url_dowloand = response.Txt_Url_Pago_Otros_Cuadrilla_China;
+      url_dowloand = url_dowloand.replace('https://','../../');
+      url_dowloand = url_dowloand.replace('assets','public_html/assets');
+      $("#pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China-a").attr("href", url_dowloand);
+      
+      url_dowloand = response.Txt_Url_Pago_Otros_Costos_China;
+      url_dowloand = url_dowloand.replace('https://','../../');
+      url_dowloand = url_dowloand.replace('assets','public_html/assets');
+      $("#pagos_logisticos-Txt_Url_Pago_Otros_Costos_China-a").attr("href", url_dowloand);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       //$( '#modal-loader' ).modal('hide');

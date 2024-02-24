@@ -1932,3 +1932,214 @@
   <?php echo form_close(); ?>
 </div>
 <!-- /.modal agregar despacho_shipper -->
+
+<!-- Modal pagos_logisticos -->
+<div class="modal fade modal-pagos_logisticos" id="modal-default">
+  <?php $attributes = array('id' => 'form-pagos_logisticos'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center"><strong>Pagos Logísticos</strong></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="pagos_logisticos-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+          
+          <div class="col-12 col-lg-12">
+            <span>Shipper: <label id="pagos_logisticos-shipper"></label></span>
+          </div>
+
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
+            <label>Flete Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
+            <label>Flete Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Flete_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4 div-pagos_logisticos-cif_ddp">
+            <label>Flete</label>
+            <div class="form-group">
+              <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Flete_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Flete_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-2">
+            <label></label>
+            <div class="form-group">
+              <a class="btn btn-link" id="pagos_logisticos-Txt_Url_Pago_Otros_Flete_China-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3">
+            <label>Costos de Origen Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3">
+            <label>Costos de Origen Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Origen_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4">
+            <label>Costos de Origen</label>
+            <div class="form-group">
+              <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-2">
+            <label></label>
+            <div class="form-group">
+              <a class="btn btn-link" id="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+                    
+          <div class="col-6 col-lg-3">
+            <label>Costos de FTA Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3">
+            <label>Costos de FTA Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costo_Fta_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4">
+            <label>FTA</label>
+            <div class="form-group">
+              <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-2">
+            <label></label>
+            <div class="form-group">
+              <a class="btn btn-link" id="pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
+            <div class="form-group">
+              <strong><h6>SubTotal Yuan: <label id="pagos_logisticos-subtotal-yuan"></label></h6></strong>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-9 div-pagos_logisticos-cif_ddp">
+            <div class="form-group">
+              <strong><h6>SubTotal Dolar: <label id="pagos_logisticos-subtotal-dolar"></label></h6></strong>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-3">
+            <label>Cuadrilla Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3">
+            <label>Cuadrilla Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Cuadrilla_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4 div-pagos_logisticos-cif_ddp">
+            <label>Cuadrilla</label>
+            <div class="form-group">
+              <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-2 div-pagos_logisticos-cif_ddp">
+            <label></label>
+            <div class="form-group">
+              <a class="btn btn-link" id="pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
+            <label>Otros Costos Yuan</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
+            <label>Otros Costos Dolar</label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" name="pagos_logisticos-Ss_Pago_Otros_Costos_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4 div-pagos_logisticos-cif_ddp">
+            <label>Otros Costos</label>
+            <div class="form-group">
+              <input class="form-control" id="pagos_logisticos-Txt_Url_Pago_Otros_Costos_China" name="pagos_logisticos-Txt_Url_Pago_Otros_Costos_China" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-2 div-pagos_logisticos-cif_ddp">
+            <label></label>
+            <div class="form-group">
+              <a class="btn btn-link" id="pagos_logisticos-Txt_Url_Pago_Otros_Costos_China-a" href="#" role="button">Descargar</a>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
+            <div class="form-group">
+              <strong><h6>Total Yuan: <label id="pagos_logisticos-total-yuan"></label></h6></strong>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-9 div-pagos_logisticos-cif_ddp">
+            <div class="form-group">
+              <strong><h6>Total Dolar: <label id="pagos_logisticos-total-dolar"></label></h6></strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_pagos_logisticos" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal pagos_logisticos -->

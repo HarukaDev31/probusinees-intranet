@@ -1040,35 +1040,42 @@ class PedidosPagadosModel extends CI_Model{
 	
 	public function getBooking($ID){
 		$query = "SELECT
-Qt_Caja_Total_Booking,
-Qt_Cbm_Total_Booking,
-Qt_Peso_Total_Booking,
-No_Numero_Consolidado,
-No_Observacion_Inspeccion,
-Nu_Tipo_Transporte_Maritimo,
-ID_Shipper,
-No_Tipo_Contenedor,
-No_Naviera,
-No_Dias_Transito,
-No_Dias_Libres,
-Ss_Pago_Otros_Flete_China_Yuan,
-Ss_Pago_Otros_Flete_China_Dolar,
-Ss_Pago_Otros_Costo_Origen_China_Yuan,
-Ss_Pago_Otros_Costo_Origen_China_Dolar,
-Ss_Pago_Otros_Costo_Fta_China_Yuan,
-Ss_Pago_Otros_Costo_Fta_China_Dolar,
-Ss_Pago_Otros_Cuadrilla_China_Yuan,
-Ss_Pago_Otros_Cuadrilla_China_Dolar,
-Ss_Pago_Otros_Costos_China_Yuan,
-Ss_Pago_Otros_Costos_China_Dolar,
-Txt_Url_Archivo_Exportacion_Docs_Shipper,
-Txt_Url_Archivo_Exportacion_Commercial_Invoice,
-Txt_Url_Archivo_Exportacion_Packing_List,
-Txt_Url_Archivo_Exportacion_Bl,
-Txt_Url_Archivo_Exportacion_Fta,
-Nu_Tipo_Incoterms
+ACPC.Qt_Caja_Total_Booking,
+ACPC.Qt_Cbm_Total_Booking,
+ACPC.Qt_Peso_Total_Booking,
+ACPC.No_Numero_Consolidado,
+ACPC.No_Observacion_Inspeccion,
+ACPC.Nu_Tipo_Transporte_Maritimo,
+ACPC.ID_Shipper,
+ACPC.No_Tipo_Contenedor,
+ACPC.No_Naviera,
+ACPC.No_Dias_Transito,
+ACPC.No_Dias_Libres,
+ACPC.Ss_Pago_Otros_Flete_China_Yuan,
+ACPC.Ss_Pago_Otros_Flete_China_Dolar,
+ACPC.Ss_Pago_Otros_Costo_Origen_China_Yuan,
+ACPC.Ss_Pago_Otros_Costo_Origen_China_Dolar,
+ACPC.Ss_Pago_Otros_Costo_Fta_China_Yuan,
+ACPC.Ss_Pago_Otros_Costo_Fta_China_Dolar,
+ACPC.Ss_Pago_Otros_Cuadrilla_China_Yuan,
+ACPC.Ss_Pago_Otros_Cuadrilla_China_Dolar,
+ACPC.Ss_Pago_Otros_Costos_China_Yuan,
+ACPC.Ss_Pago_Otros_Costos_China_Dolar,
+ACPC.Txt_Url_Archivo_Exportacion_Docs_Shipper,
+ACPC.Txt_Url_Archivo_Exportacion_Commercial_Invoice,
+ACPC.Txt_Url_Archivo_Exportacion_Packing_List,
+ACPC.Txt_Url_Archivo_Exportacion_Bl,
+ACPC.Txt_Url_Archivo_Exportacion_Fta,
+ACPC.Nu_Tipo_Incoterms,
+ACPC.Txt_Url_Pago_Otros_Flete_China,
+ACPC.Txt_Url_Pago_Otros_Costo_Origen_China,
+ACPC.Txt_Url_Pago_Otros_Costo_Fta_China,
+ACPC.Txt_Url_Pago_Otros_Cuadrilla_China,
+ACPC.Txt_Url_Pago_Otros_Costos_China,
+S.No_Shipper
 FROM
-agente_compra_pedido_cabecera
+agente_compra_pedido_cabecera AS ACPC
+LEFT JOIN shipper AS S ON(ACPC.ID_Shipper = S.ID_Shipper)
 WHERE
 ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		return $this->db->query($query)->row();
@@ -1689,4 +1696,118 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
 		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
+
+	public function pagosLogisticos($arrPost, $data_files){
+		$path = "assets/downloads/pagos_logisticos/";
+
+		$config['upload_path'] = $path;
+		$config['allowed_types'] = 'xlsx|csv|xls|pdf|doc|docx';
+		$config['max_size'] = 3072;//1024 KB = 10 MB
+		$config['encrypt_name'] = TRUE;
+		$config['max_filename'] = '255';
+
+		if (isset($data_files['pagos_logisticos-Txt_Url_Pago_Otros_Flete_China']['name'])) {
+			$this->db->trans_begin();
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('pagos_logisticos-Txt_Url_Pago_Otros_Flete_China')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo archivo ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFileCI = $this->upload->data();
+				$Txt_Url_Pago_Otros_Flete_China = base_url($path . $arrUploadFileCI['file_name']);
+
+				if (isset($data_files['pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China']['name'])) {
+					if (!$this->upload->do_upload('pagos_logisticos-Txt_Url_Pago_Otros_Costo_Origen_China')){
+						$this->db->trans_rollback();
+						return array(
+							'status' => 'error',
+							'message' => 'No se cargo archivo PL' . strip_tags($this->upload->display_errors()),
+						);
+					} else {
+						$arrUploadFilePL = $this->upload->data();
+						$Txt_Url_Pago_Otros_Costo_Origen_China = base_url($path . $arrUploadFilePL['file_name']);
+		
+						if (isset($data_files['pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China']['name'])) {
+							if (!$this->upload->do_upload('pagos_logisticos-Txt_Url_Pago_Otros_Costo_Fta_China')){
+								$this->db->trans_rollback();
+								return array(
+									'status' => 'error',
+									'message' => 'No se cargo archivo FTA ' . strip_tags($this->upload->display_errors()),
+								);
+							} else {
+								$arrUploadFileFTA = $this->upload->data();
+								$Txt_Url_Pago_Otros_Costo_Fta_China = base_url($path . $arrUploadFileFTA['file_name']);
+
+								$Txt_Url_Pago_Otros_Cuadrilla_China = '';
+								if (isset($data_files['pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China']['name'])) {
+									if (!$this->upload->do_upload('pagos_logisticos-Txt_Url_Pago_Otros_Cuadrilla_China')){
+										$this->db->trans_rollback();
+										return array(
+											'status' => 'error',
+											'message' => 'No se cargo archivo Shipper ' . strip_tags($this->upload->display_errors()),
+										);
+									} else {
+										$arrUploadFileShipper = $this->upload->data();
+										$Txt_Url_Pago_Otros_Cuadrilla_China = base_url($path . $arrUploadFileShipper['file_name']);
+									}
+								}
+								
+								$Txt_Url_Pago_Otros_Costos_China = '';
+								if (isset($data_files['pagos_logisticos-Txt_Url_Pago_Otros_Costos_China']['name'])) {
+									if (!$this->upload->do_upload('pagos_logisticos-Txt_Url_Pago_Otros_Costos_China')){
+										$this->db->trans_rollback();
+										return array(
+											'status' => 'error',
+											'message' => 'No se cargo archivo BL ' . strip_tags($this->upload->display_errors()),
+										);
+									} else {
+										$arrUploadFileBL = $this->upload->data();
+										$Txt_Url_Pago_Otros_Costos_China = base_url($path . $arrUploadFileBL['file_name']);
+									}
+								}
+
+								$where = array('ID_Pedido_Cabecera' => $arrPost['pagos_logisticos-ID_Pedido_Cabecera']);
+								$data = array(
+									'Txt_Url_Pago_Otros_Flete_China' => $Txt_Url_Pago_Otros_Flete_China,
+									'Txt_Url_Pago_Otros_Costo_Origen_China' => $Txt_Url_Pago_Otros_Costo_Origen_China,
+									'Txt_Url_Pago_Otros_Costo_Fta_China' => $Txt_Url_Pago_Otros_Costo_Fta_China,
+									'Txt_Url_Pago_Otros_Cuadrilla_China' => $Txt_Url_Pago_Otros_Cuadrilla_China,
+									'Txt_Url_Pago_Otros_Costos_China' => $Txt_Url_Pago_Otros_Costos_China,
+								);//1=SI
+								$this->db->update($this->table, $data, $where);	
+							}
+						} else {
+							return array('status' => 'error', 'message' => 'No existe archivo FTA');
+						}
+					}
+				} else {
+					return array('status' => 'error', 'message' => 'No existe archivo PL');
+				}
+			}
+			
+			//marcar progreso 1. Verificar datos de exportación
+			$where_progreso = array(
+				'ID_Pedido_Cabecera' => $arrPost['pagos_logisticos-ID_Pedido_Cabecera'],
+				'Nu_ID_Interno' => 28
+			);
+			$data_progreso = array('Nu_Estado_Proceso' => 1);
+			$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
 }
