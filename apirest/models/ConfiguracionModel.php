@@ -685,7 +685,10 @@ CLI.No_Entidad,
 CLI.Nu_Documento_Identidad,
 CLI.No_Contacto,
 CLI.Nu_Celular_Contacto,
-CLI.Txt_Email_Contacto
+CLI.Txt_Email_Contacto,
+ACPC.ID_Usuario_Interno_Empresa,
+ACPC.ID_Usuario_Interno_China,
+ACPC.ID_Usuario_Interno_Jefe_China
 FROM
 agente_compra_pedido_cabecera AS ACPC
 JOIN agente_compra_correlativo AS CORRE ON(CORRE.ID_Agente_Compra_Correlativo = ACPC.ID_Agente_Compra_Correlativo)
@@ -719,7 +722,8 @@ WHERE " . $where_id_usuario . " ORDER BY ACPC.Fe_Registro_Hora_Cotizacion ASC";/
 		$query = "SELECT
 PACP.No_Proceso,
 PACP.Nu_Estado_Proceso,
-PACP.Txt_Url_Menu
+PACP.Txt_Url_Menu,
+PACP.Nu_ID_Interno
 FROM
 proceso_agente_compra_pedido AS PACP
 WHERE

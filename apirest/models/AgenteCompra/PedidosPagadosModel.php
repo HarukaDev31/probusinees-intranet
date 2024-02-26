@@ -1072,7 +1072,8 @@ ACPC.Txt_Url_Pago_Otros_Costo_Origen_China,
 ACPC.Txt_Url_Pago_Otros_Costo_Fta_China,
 ACPC.Txt_Url_Pago_Otros_Cuadrilla_China,
 ACPC.Txt_Url_Pago_Otros_Costos_China,
-S.No_Shipper
+S.No_Shipper,
+ACPC.No_Concepto_Pago_Cuadrilla
 FROM
 agente_compra_pedido_cabecera AS ACPC
 LEFT JOIN shipper AS S ON(ACPC.ID_Shipper = S.ID_Shipper)
@@ -1276,7 +1277,7 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		);
 		$data_progreso = array('Nu_Estado_Proceso' => 1);
 		if ( $this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
-			return array('status' => 'success', 'message' => 'Actualizado');
+			return array('status' => 'success', 'message' => 'Paso 1 verificado');
 		}
 		return array('status' => 'error', 'message' => 'Error al completar tarea');
 	}
@@ -1659,7 +1660,8 @@ ACPC.Qt_Caja_Total_Booking,
 ACPC.Qt_Cbm_Total_Booking,
 ACPC.Qt_Peso_Total_Booking,
 ACPC.Nu_Tipo_Transporte_Maritimo,
-ACPC.Txt_Descripcion_BL_China
+ACPC.Txt_Descripcion_BL_China,
+ACPC.Nu_Tipo_Incoterms
 FROM
 agente_compra_pedido_cabecera AS ACPC
 JOIN entidad AS CLI ON(ACPC.ID_Entidad = CLI.ID_Entidad)
@@ -1669,17 +1671,21 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
 
-    public function revisionBL($where, $data){
-		//marcar progreso 1. Verificar datos de exportación
-		$where_progreso = array(
-			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
-			'Nu_ID_Interno' => 26
-		);
-		$data_progreso = array('Nu_Estado_Proceso' => 1);
-		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+    public function revisionBL($where, $data, $where_cliente, $data_cliente){
+		if ( $this->db->update($this->table, $data, $where) > 0 ){
+			//marcar progreso 1. Verificar datos de exportación
+			$where_progreso = array(
+				'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+				'Nu_ID_Interno' => 26
+			);
+			$data_progreso = array('Nu_Estado_Proceso' => 1);
+			$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
 
-		if ( $this->db->update($this->table, $data, $where) > 0 )
+			//modificar cliente
+		    $this->db->update('entidad', $data_cliente, $where_cliente);
+
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		}
 		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
 

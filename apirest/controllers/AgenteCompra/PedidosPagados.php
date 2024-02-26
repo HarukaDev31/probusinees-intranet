@@ -1474,7 +1474,8 @@ class PedidosPagados extends CI_Controller {
 				'Ss_Pago_Otros_Cuadrilla_China_Yuan' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan'),
 				'Ss_Pago_Otros_Cuadrilla_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar'),
 				'Ss_Pago_Otros_Costos_China_Yuan' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan'),
-				'Ss_Pago_Otros_Costos_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar')
+				'Ss_Pago_Otros_Costos_China_Dolar' => $this->input->post('costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar'),
+				'No_Concepto_Pago_Cuadrilla' => $this->input->post('costos_origen_china-No_Concepto_Pago_Cuadrilla')
 			);
 			echo json_encode($this->PedidosPagadosModel->costosOrigenTradingChina(array('ID_Pedido_Cabecera' => $this->input->post('costos_origen_china-ID_Pedido_Cabecera')), $data));
 		} else {
@@ -1508,9 +1509,21 @@ class PedidosPagados extends CI_Controller {
 		if(isset($this->session->userdata['usuario'])) {
 			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 			$data = array(
-				'Txt_Descripcion_BL_China' => $this->input->post('cliente_modal-Txt_Descripcion_BL_China')
+				'Txt_Descripcion_BL_China' => $this->input->post('revision_bl-Txt_Descripcion_BL_China')
 			);
-			echo json_encode($this->PedidosPagadosModel->revisionBL(array('ID_Pedido_Cabecera' => $this->input->post('cliente_modal-ID_Pedido_Cabecera')), $data));
+			
+			$data_cliente = array(
+				'No_Entidad' => $this->input->post('revision_bl-No_Entidad'),
+				'Nu_Documento_Identidad' => $this->input->post('revision_bl-Nu_Documento_Identidad'),
+				'Txt_Direccion_Entidad' => $this->input->post('revision_bl-Txt_Direccion_Entidad'),
+			);
+			echo json_encode($this->PedidosPagadosModel->revisionBL(
+					array('ID_Pedido_Cabecera' => $this->input->post('revision_bl-ID_Pedido_Cabecera')),
+					$data,
+					array('ID_Entidad' => $this->input->post('revision_bl-ID_Entidad')),
+					$data_cliente
+				)
+			);
 		} else {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}

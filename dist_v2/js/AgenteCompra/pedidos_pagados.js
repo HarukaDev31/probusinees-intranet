@@ -143,12 +143,12 @@ $(function () {
     }
   });
 
-	$(document).on('click', '#btn-save_cliente_modal', function (e) {
+	$(document).on('click', '#btn-save_revision_bl', function (e) {
     e.preventDefault();
     
-    $( '#btn-save_cliente_modal' ).text('');
-    $( '#btn-save_cliente_modal' ).attr('disabled', true);
-    $( '#btn-save_cliente_modal' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+    $( '#btn-save_revision_bl' ).text('');
+    $( '#btn-save_revision_bl' ).attr('disabled', true);
+    $( '#btn-save_revision_bl' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
 
     //$( '#modal-loader' ).modal('show');
 
@@ -157,7 +157,7 @@ $(function () {
       type		  : 'POST',
       dataType	: 'JSON',
       url		    : url,
-      data		  : $('#form-cliente_modal').serialize(),
+      data		  : $('#form-revision_bl').serialize(),
       success : function( response ){
           //$( '#modal-loader' ).modal('hide');
           
@@ -165,7 +165,7 @@ $(function () {
           $('#modal-message').modal('show');
           
           if (response.status == 'success'){
-            $('.modal-cliente_modal').modal('hide');
+            $('.modal-revision_bl').modal('hide');
               
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
@@ -176,9 +176,9 @@ $(function () {
             setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
           }
           
-          $( '#btn-save_cliente_modal' ).text('');
-          $( '#btn-save_cliente_modal' ).append( 'Guardar' );
-          $( '#btn-save_cliente_modal' ).attr('disabled', false);
+          $( '#btn-save_revision_bl' ).text('');
+          $( '#btn-save_revision_bl' ).append( 'Guardar' );
+          $( '#btn-save_revision_bl' ).attr('disabled', false);
       },
       error: function (jqXHR, textStatus, errorThrown) {
           //$( '#modal-loader' ).modal('hide');
@@ -192,9 +192,9 @@ $(function () {
           //Message for developer
           console.log(jqXHR.responseText);
           
-          $( '#btn-save_cliente_modal' ).text('');
-          $( '#btn-save_cliente_modal' ).append( 'Guardar' );
-          $( '#btn-save_cliente_modal' ).attr('disabled', false);
+          $( '#btn-save_revision_bl' ).text('');
+          $( '#btn-save_revision_bl' ).append( 'Guardar' );
+          $( '#btn-save_revision_bl' ).attr('disabled', false);
       }
     });
   });
@@ -4513,6 +4513,8 @@ function costosOrigenTradingChina(id, iIdTareaPedido){
 
       $( '[name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costos_China_Yuan);
       $( '[name="costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costos_China_Dolar);
+
+      $( '[name="costos_origen_china-No_Concepto_Pago_Cuadrilla"]' ).val(response.No_Concepto_Pago_Cuadrilla);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       //$( '#modal-loader' ).modal('hide');
@@ -4611,15 +4613,15 @@ function despachoShipper(id, iIdTareaPedido){
 }
 
 function revisionBL(id, iIdTareaPedido){
-  $( '#form-cliente_modal' )[0].reset();
+  $( '#form-revision_bl' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
   $( '.form-group' ).removeClass('has-success');
   $( '.help-block' ).empty();
 
-  $( '[name="cliente_modal-ID_Pedido_Cabecera"]' ).val(id);
-  $( '[name="cliente_modal-iIdTareaPedido"]' ).val(iIdTareaPedido);
+  $( '[name="revision_bl-ID_Pedido_Cabecera"]' ).val(id);
+  $( '[name="revision_bl-iIdTareaPedido"]' ).val(iIdTareaPedido);
 
-  $(' .modal-cliente_modal ').modal('show');
+  $(' .modal-revision_bl ').modal('show');
   
   var selected = '';
 
@@ -4631,32 +4633,32 @@ function revisionBL(id, iIdTareaPedido){
     success: function(response){
       console.log(response);
 
-      $( '[name="cliente_modal-ID_Entidad"]' ).val(response.ID_Entidad);
-      $( '[name="cliente_modal-ENo_Entidad"]' ).val(response.No_Entidad);
+      $( '[name="revision_bl-ID_Entidad"]' ).val(response.ID_Entidad);
+      $( '[name="revision_bl-ENo_Entidad"]' ).val(response.No_Entidad);
 
-      $( '[name="cliente_modal-No_Entidad"]' ).val(response.No_Entidad);
-      $( '[name="cliente_modal-Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
-      $( '[name="cliente_modal-Txt_Direccion_Entidad"]' ).val(response.Txt_Direccion_Entidad);
+      $( '[name="revision_bl-No_Entidad"]' ).val(response.No_Entidad);
+      $( '[name="revision_bl-Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
+      $( '[name="revision_bl-Txt_Direccion_Entidad"]' ).val(response.Txt_Direccion_Entidad);
       
       var sNombreExportador = 'ProBusiness Yiwu';
       if(response.Nu_Tipo_Exportador==2){
         sNombreExportador = 'Criss Factory';
       }
 
-      $( '#cliente_modal-exportador' ).html(sNombreExportador);
-      $( '#cliente_modal-shipper' ).html(response.No_Shipper);
+      $( '#revision_bl-exportador' ).html(sNombreExportador);
+      $( '#revision_bl-shipper' ).html(response.No_Shipper);
 
-      $( '#cliente_modal-Qt_Caja_Total_Booking' ).html(response.Qt_Caja_Total_Booking);
-      $( '#cliente_modal-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
-      $( '#cliente_modal-Qt_Peso_Total_Booking' ).html(response.Qt_Peso_Total_Booking);
+      $( '#revision_bl-Qt_Caja_Total_Booking' ).html(response.Qt_Caja_Total_Booking);
+      $( '#revision_bl-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
+      $( '#revision_bl-Qt_Peso_Total_Booking' ).html(response.Qt_Peso_Total_Booking);
       
       var sNombreTransporteMaritimo = 'FCL';
       if(response.Nu_Tipo_Transporte_Maritimo==2){
         sNombreTransporteMaritimo = 'LCL';
       }
-      $( '#cliente_modal-Nu_Tipo_Transporte_Maritimo' ).html(sNombreTransporteMaritimo);
+      $( '#revision_bl-Nu_Tipo_Transporte_Maritimo' ).html(sNombreTransporteMaritimo);
 
-      $( '[name="cliente_modal-Txt_Descripcion_BL_China"]' ).val(response.Txt_Descripcion_BL_China);
+      $( '[name="revision_bl-Txt_Descripcion_BL_China"]' ).val(response.Txt_Descripcion_BL_China);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       //$( '#modal-loader' ).modal('hide');

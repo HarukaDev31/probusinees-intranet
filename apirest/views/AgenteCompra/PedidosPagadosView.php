@@ -430,7 +430,7 @@
           <input type="hidden" id="proveedor-correlativo" name="proveedor-correlativo" class="form-control">
 
           <div class="col-sm-12">
-            <label>Inspección</label>
+            <label><strong>Inspección</strong></label>
             <div class="form-group">
               <input class="form-control" id="image_inspeccion" name="image_inspeccion[]" type="file" accept="image/*" multiple></input>
               <span class="help-block text-danger" id="error"></span>
@@ -916,7 +916,7 @@
           <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
             <label>Nombre Gasto <span class="label-advertencia text-danger"> *</span></label>
             <div class="form-group">
-              <input type="text" inputmode="numeric" id="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" name="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" class="form-control" value="" maxlength="50" placeholder="" autocomplete="off">
+              <input type="text" inputmode="text" id="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" name="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" class="form-control" value="" maxlength="50" placeholder="" autocomplete="off">
               <span class="help-block" id="error"></span>
             </div>
           </div>
@@ -1385,7 +1385,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center">Inspección</h4>
+        <h4 class="text-center"><strong>Inspección</strong></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
@@ -1489,7 +1489,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center">Reserva de Booking</h4>
+        <h4 class="text-center"><strong>Reserva de Booking</strong></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
@@ -1626,7 +1626,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Cuadrilla ¥</label>
+            <label><input type="text" inputmode="text" id="costos_origen_china-No_Concepto_Pago_Cuadrilla" name="costos_origen_china-No_Concepto_Pago_Cuadrilla" class="form-control" value="Cuadrilla" maxlength="50" placeholder="" autocomplete="off"> ¥</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1634,7 +1634,7 @@
           </div>
           
           <div class="col-6 col-lg-6">
-            <label>Cuadrilla $</label>
+            <label>$</label>
             <div class="form-group">
               <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
@@ -1666,7 +1666,6 @@
   </div><!-- /.modal-dialog -->
   <?php echo form_close(); ?>
 </div><!-- /. Modal costos_origen_china -->
-
 
 <!-- modal docs_exportacion -->
 <div class="modal fade modal-docs_exportacion" id="modal-docs_exportacion">
@@ -1742,7 +1741,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center">Despacho al Shipper / Forwarder</h4>
+        <h4 class="text-center"><strong>Despacho al Shipper / Forwarder</strong></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body" id="modal-body-despacho_shipper">
@@ -1774,8 +1773,8 @@
 <!-- /.modal agregar despacho_shipper -->
 
 <!-- Modal cliente -->
-<div class="modal fade modal-cliente_modal" id="modal-default">
-  <?php $attributes = array('id' => 'form-cliente_modal'); echo form_open('', $attributes); ?>
+<div class="modal fade modal-revision_bl" id="modal-default">
+  <?php $attributes = array('id' => 'form-revision_bl'); echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -1784,10 +1783,10 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <input type="hidden" id="cliente_modal-ID_Pedido_Cabecera" name="cliente_modal-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
-          <input type="hidden" id="cliente_modal-iIdTareaPedido" name="cliente_modal-iIdTareaPedido" class="form-control" autocomplete="off">
-          <input type="hidden" id="cliente_modal-ID_Entidad" name="cliente_modal-ID_Entidad" class="form-control" autocomplete="off">
-          <input type="hidden" id="cliente_modal-ENo_Entidad" name="cliente_modal-ENo_Entidad" class="form-control" autocomplete="off">
+          <input type="hidden" id="revision_bl-ID_Pedido_Cabecera" name="revision_bl-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+          <input type="hidden" id="revision_bl-iIdTareaPedido" name="revision_bl-iIdTareaPedido" class="form-control" autocomplete="off">
+          <input type="hidden" id="revision_bl-ID_Entidad" name="revision_bl-ID_Entidad" class="form-control" autocomplete="off">
+          <input type="hidden" id="revision_bl-ENo_Entidad" name="revision_bl-ENo_Entidad" class="form-control" autocomplete="off">
 
           <div class="col-6 col-lg-12">
             <label style="font-size: 1.3rem;">Consignatario</label>
@@ -1796,7 +1795,7 @@
           <div class="col-6 col-lg-4">
             <label>Empresa</label>
             <div class="form-group">
-              <input type="text" name="cliente_modal-No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+              <input type="text" name="revision_bl-No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1804,7 +1803,7 @@
           <div class="col-6 col-lg-2">
             <label>RUC</label>
             <div class="form-group">
-              <input type="text" name="cliente_modal-Nu_Documento_Identidad" class="form-control input-Mayuscula input-codigo_barra" placeholder="Ingresar" maxlength="11" autocomplete="off">
+              <input type="text" name="revision_bl-Nu_Documento_Identidad" class="form-control input-Mayuscula input-codigo_barra" placeholder="Ingresar" maxlength="11" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1812,7 +1811,7 @@
           <div class="col-6 col-lg-6">
             <label>Dirección</label>
             <div class="form-group">
-              <input type="text" name="cliente_modal-Txt_Direccion_Entidad" class="form-control" placeholder="Ingresar" maxlength="100" autocomplete="off">
+              <input type="text" name="revision_bl-Txt_Direccion_Entidad" class="form-control" placeholder="Ingresar" maxlength="100" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1824,7 +1823,7 @@
           <div class="col-12 col-lg-4">
             <label>Razón Social</label>
             <div class="form-group">
-              <span id="cliente_modal-exportador"></span>
+              <span id="revision_bl-exportador"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1832,7 +1831,7 @@
           <div class="col-12 col-lg-4">
             <label>Dirección</label>
             <div class="form-group">
-              <span id="cliente_modal-exportador_direccion"></span>
+              <span id="revision_bl-exportador_direccion"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1840,7 +1839,7 @@
           <div class="col-12 col-lg-4">
             <label>Shipper</label>
             <div class="form-group">
-              <span id="cliente_modal-shipper"></span>
+              <span id="revision_bl-shipper"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1852,7 +1851,7 @@
           <div class="col-12 col-lg-3">
             <label>Cajas Total</label>
             <div class="form-group">
-              <span id="cliente_modal-Qt_Caja_Total_Booking"></span>
+              <span id="revision_bl-Qt_Caja_Total_Booking"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1860,7 +1859,7 @@
           <div class="col-12 col-lg-3">
             <label>CBM Total</label>
             <div class="form-group">
-              <span id="cliente_modal-Qt_Cbm_Total_Booking"></span>
+              <span id="revision_bl-Qt_Cbm_Total_Booking"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1868,7 +1867,7 @@
           <div class="col-12 col-lg-3">
             <label>Peso Total</label>
             <div class="form-group">
-              <span id="cliente_modal-Qt_Peso_Total_Booking"></span>
+              <span id="revision_bl-Qt_Peso_Total_Booking"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1876,7 +1875,7 @@
           <div class="col-12 col-lg-3">
             <label>Tipo de Envío</label>
             <div class="form-group">
-              <span id="cliente_modal-Nu_Tipo_Transporte_Maritimo"></span>
+              <span id="revision_bl-Nu_Tipo_Transporte_Maritimo"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1884,7 +1883,7 @@
           <div class="col-12 col-lg-12">
             <label>Descripción BL</label>
             <div class="form-group">
-              <textarea class="form-control" rows="5" placeholder="Obligatorio" name="cliente_modal-Txt_Descripcion_BL_China"></textarea>
+              <textarea class="form-control" rows="5" placeholder="Obligatorio" name="revision_bl-Txt_Descripcion_BL_China"></textarea>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1892,12 +1891,12 @@
       </div>
       <div class="modal-footer justify-content-between">
         <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
-        <button type="button" id="btn-save_cliente_modal" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+        <button type="button" id="btn-save_revision_bl" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
   <?php echo form_close(); ?>
-</div><!-- /. Modal cliente_modal -->
+</div><!-- /. Modal revision_bl -->
 
 <!-- modal entrega_docs_cliente -->
 <div class="modal fade modal-entrega_docs_cliente" id="modal-entrega_docs_cliente">
@@ -1905,7 +1904,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center"><strong>Despacho al Shipper / Forwarder</strong></h4>
+        <h4 class="text-center"><strong>Entrega de Docs - Cliente</strong></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body" id="modal-body-entrega_docs_cliente">
