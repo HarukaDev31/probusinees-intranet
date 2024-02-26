@@ -77,9 +77,9 @@ class PedidosPagados extends CI_Controller {
 					
 				//verificar si completo o no
 				$btn_completar_verificacion_oc = '';
-				$arrResponsePaso1 = $this->PedidosPagadosModel->verificarTarea($iIdTareaPedido, $row->ID_Pedido_Cabecera);
-				if(is_object($arrResponsePaso1) && $arrResponsePaso1->Nu_Estado_Proceso==0)
-					$btn_completar_verificacion_oc = '<br><button class="btn btn-primary" alt="Completado" title="Completado" href="javascript:void(0)"  onclick="completarVerificacionOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')">Verificar</button>';
+				//$arrResponsePaso1 = $this->PedidosPagadosModel->verificarTarea($iIdTareaPedido, $row->ID_Pedido_Cabecera);
+				//if(is_object($arrResponsePaso1) && $arrResponsePaso1->Nu_Estado_Proceso==0)
+					//$btn_completar_verificacion_oc = '<br><button class="btn btn-primary" alt="Completado" title="Completado" href="javascript:void(0)"  onclick="completarVerificacionOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')">Verificar</button>';
 
 				$rows[] = $sNombreExportador . $btn_completar_verificacion_oc;
 			}
@@ -122,7 +122,7 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 
-            $rows[] = $dropdown_estado;
+            $rows[] = $dropdown_estado;//incoterms
 
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerTransporteMaritimo($row->Nu_Tipo_Transporte_Maritimo);
 			$dropdown_estado = '<div class="dropdown">';
@@ -139,7 +139,18 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 
-            $rows[] = $dropdown_estado;
+            $rows[] = $dropdown_estado;//envio
+			
+			//jalar en que tarea se quedo
+			$span_estado_proceso = '<span class="badge bg-secondary">No ejecuto tarea</span>';
+			$arrResponseTarea = $this->PedidosPagadosModel->listadoTareaPorPedido($row->ID_Pedido_Cabecera);
+			if(is_object($arrResponseTarea)){
+				//$arrResponseStatusTarea = $this->PedidosPagadosModel->verificarTarea($row->ID_Pedido_Cabecera,$arrResponseTarea->ID_Proceso);
+				//$span_status_tarea = ($arrResponseStatusTarea->Nu_Estado_Proceso == 1 ? 'success' : 'danger');
+				$span_status_tarea = 'danger';
+				$span_estado_proceso = '<span class="badge bg-' . $span_status_tarea . '">' . $arrResponseTarea->No_Proceso . '</span>';
+			}
+            $rows[] = $span_estado_proceso;//status
 
 			//EXCEL cliente de pedido
 			//$rows[] = '<button class="btn btn-xs btn-link" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';

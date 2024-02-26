@@ -1282,17 +1282,29 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		return array('status' => 'error', 'message' => 'Error al completar tarea');
 	}
 	
-	public function verificarTarea($Nu_ID_Interno, $id){
-		$query = "SELECT Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera = " . $id . " AND Nu_ID_Interno=" . $Nu_ID_Interno . " LIMIT 1";
+	public function listadoTareaPorPedido($id){
+		$query = "SELECT ID_Proceso, No_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera = " . $id . " AND Nu_Estado_Proceso=0 ORDER BY Nu_ID_Interno ASC LIMIT 1";
+		return $this->db->query($query)->row();
+	}
+	
+	public function verificarTarea($id, $id_tarea){
+		$query = "SELECT Nu_Estado_Proceso FROM proceso_agente_compra_pedido WHERE ID_Pedido_Cabecera = " . $id . " AND ID_Proceso=" . $id_tarea . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
 
     public function bookingInspeccion($where, $data, $data_notificacion){
+		//por mientras
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 19
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
 		$where_progreso = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
 			'Nu_ID_Interno' => $where['Nu_ID_Interno']
 		);
-		//var_dump($where_progreso);
 		$data_progreso = array('Nu_Estado_Proceso' => 1);
 		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
 
@@ -1325,7 +1337,7 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 					);
 				}
 			}
-			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Completado');
 		}
 		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
@@ -1493,6 +1505,14 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 	}
 
     public function reservaBookingTrading($where, $data){
+		//por mientras
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 21
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
 		//marcar progreso 1. Verificar datos de exportación
 		$where_progreso = array(
 			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
@@ -1502,7 +1522,7 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
 
 		if ( $this->db->update($this->table, $data, $where) > 0 )
-			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Completado');
 		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
 

@@ -184,7 +184,7 @@
                                     $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Entrega de Docs Cliente" title="Entrega de Docs Cliente" href="javascript:void(0)"  onclick="entregaDocsCliente(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-user fa-2x" aria-hidden="true"></i></button>';
                                   }
                                   
-                                  if ($row_menu->Nu_ID_Interno==28){//paso 10 - trading
+                                  if ($row_menu->Nu_ID_Interno==28){//paso 11 - trading
                                     $iIdTareaPedido = 28;
                                     $a_href = 'alt="Pagos Logísticos" title="Pagos Logísticos" href="javascript:void(0)"  onclick="pagosLogisticos(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
                                     $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Pagos Logísticos" title="Pagos Logísticos" href="javascript:void(0)"  onclick="pagosLogisticos(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';

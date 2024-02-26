@@ -60,6 +60,7 @@
                       <th>Servicio</th>
                       <th>Incoterms</th>
                       <th>Envío</th>
+                      <th>Status</th>
                       <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
                       <th>Perú</th>
                       <th>China</th>
