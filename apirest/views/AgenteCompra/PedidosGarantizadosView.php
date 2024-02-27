@@ -280,8 +280,8 @@
                             <th class="text-left" width="">__Moq__</th>
                             <th class="text-left" width="">qty_caja</th>
                             <th class="text-left" width="">__cbm__</th>
-                            <th class="text-left" width="">T. Producción</th>
-                            <th class="text-left" width="">C. Delivery</th>
+                            <th class="text-left" width="">Delivery</th>
+                            <th class="text-left" width="">Shipping Cost</th>
                             <th class="text-left" width="">Observaciones</th>
                             <th class="text-left" width="">Proveedor_nombre</th>
                             <th class="text-left" width="">Proveedor___Foto__</th>

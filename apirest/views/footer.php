@@ -9,7 +9,7 @@
   <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
-<?php $iControlVersionDashboard = '2.65.0'; ?>
+<?php $iControlVersionDashboard = '2.67.0'; ?>
 <!-- jQuery 3 -->
 <script src="<?php echo base_url() . 'bower_components/jquery/dist/jquery.min.js'; ?>"></script>
 <!-- jQuery UI 1.11.4 -->
@@ -87,6 +87,11 @@ var base_url = '<?php echo base_url(); ?>';
 <?php if (isset($js_moneda) && $js_moneda==true) : ?>
 <script src="<?php echo base_url() . 'dist/js/Configuracion/moneda.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
+
+<?php if (isset($js_tasa_cambio_v2) && $js_tasa_cambio_v2==true) : ?>
+<script src="<?php echo base_url() . 'dist/js/Configuracion/tasa_cambio.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 <?php if (isset($js_medio_pago) && $js_medio_pago==true) : ?>
 <script src="<?php echo base_url() . 'dist/js/Configuracion/medio_pago.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>

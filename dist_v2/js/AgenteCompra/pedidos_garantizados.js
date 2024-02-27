@@ -790,7 +790,7 @@ function reload_table_Entidad(){
   table_Entidad.ajax.reload(null,false);
 }
 
-function verPedido(ID){  
+function verPedido(ID){
   $( '.div-Listar' ).hide();
   
   $( '#form-pedido' )[0].reset();
@@ -832,7 +832,15 @@ function verPedido(ID){
       $( '[name="Nu_Celular_Contacto"]' ).val(response.Nu_Celular_Contacto);
       $( '[name="No_Entidad"]' ).val(response.No_Entidad);
       $( '[name="Nu_Documento_Identidad"]' ).val(response.Nu_Documento_Identidad);
-      $( '[name="Ss_Tipo_Cambio"]' ).val(response.Ss_Tipo_Cambio);
+
+      var yuan_venta = response.Ss_Tipo_Cambio;
+      //console.log(parseFloat(response.yuan_venta));
+      //console.log(parseFloat(response.Ss_Tipo_Cambio));
+      if(parseFloat(response.yuan_venta)>0 && parseFloat(response.Ss_Tipo_Cambio)==0){
+        yuan_venta=response.yuan_venta;
+      }
+
+      $( '[name="Ss_Tipo_Cambio"]' ).val(yuan_venta);
 
       $( '[name="Txt_Observaciones_Garantizado"]' ).val(response.Txt_Observaciones_Garantizado);
 
@@ -1294,7 +1302,7 @@ function addItems(){
 
         div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
           div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-          div_items += '<span class="fw-bold">Precio<span class="label-advertencia text-danger"> *</span></span>';
+          div_items += '<span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span></span>';
           div_items += '</h6>';
           div_items += '<div class="form-group">';
             div_items += '<input type="text" id="modal-precio' + iCounterItems + '" data-correlativo="' + iCounterItems + '" inputmode="decimal" name="addProducto[' + iCounterItems + '][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />';
@@ -1334,14 +1342,14 @@ function addItems(){
 
       div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-      div_items += '<span class="fw-bold">T. Producción</span>';
+      div_items += '<span class="fw-bold">Delivery</span>';
       div_items += '</h6>';
       div_items += '<input type="text" inputmode="numeric" id="modal-delivery' + iCounterItems + '" name="addProducto[' + iCounterItems + '][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
       div_items += '</div>';
 
       div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-      div_items += '<span class="fw-bold">C. Delivery</span>';
+      div_items += '<span class="fw-bold">Shipping Cost</span>';
       div_items += '</h6>';
       div_items += '<input type="text" inputmode="decimal" id="modal-costo_delivery' + iCounterItems + '" name="addProducto[' + iCounterItems + '][costo_delivery]" class="arrProducto form-control input-decimal" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
       div_items += '</div>';

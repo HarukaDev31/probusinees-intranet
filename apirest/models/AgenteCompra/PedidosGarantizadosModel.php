@@ -59,7 +59,9 @@ class PedidosGarantizadosModel extends CI_Model{
     }
     
     public function get_by_id($ID){
-        $this->db->select('CORRE.Fe_Month, Nu_Estado_China, ' . $this->table . '.*,
+        $this->db->select('CORRE.Fe_Month, Nu_Estado_China,
+		(SELECT Ss_Venta_Oficial FROM tasa_cambio WHERE ID_Empresa=1 AND Fe_Ingreso="' . dateNow('fecha') . '") AS yuan_venta,
+		' . $this->table . '.*,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,

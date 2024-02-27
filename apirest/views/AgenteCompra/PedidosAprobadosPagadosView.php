@@ -1191,7 +1191,7 @@
                       </div>
                     </div>
                     <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">
-                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Precio<span class="label-advertencia text-danger"> *</span></span></h6>
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span></span></h6>
                       <div class="form-group">
                         <input type="text" id="modal-precio1" data-correlativo="1" inputmode="decimal" name="addProducto[1][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
@@ -1219,11 +1219,11 @@
                       </div>
                     </div>
                     <div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">
-                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">T. Producción</span></h6>
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Delivery</span></h6>
                       <input type="text" inputmode="numeric" id="modal-delivery1" name="addProducto[1][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off">
                     </div>
                     <div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">
-                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">C. Delivery</span></h6>
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Shipping Cost</span></h6>
                       <input type="text" inputmode="decimal" id="modal-costo_delivery1" name="addProducto[1][costo_delivery]" class="arrProducto form-control input-decimal" placeholder="" minlength="1" maxlength="90" autocomplete="off">
                     </div>
                     <div class="col-sm-12 mb-1">

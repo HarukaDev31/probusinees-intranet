@@ -99,9 +99,12 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 			
-			$btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">Comisión</button>';
-			if($row->Ss_Comision_Interna_Trading>0)
-				$btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
+			$btn_comision_trading = '';
+			if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
+				$btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">Comisión</button>';
+				if($row->Ss_Comision_Interna_Trading>0)
+					$btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
+			}
 				
             $rows[] = $dropdown_estado . $btn_comision_trading;
 
