@@ -11,7 +11,8 @@ class InicioController extends CI_Controller {
 		$this->load->database('LAE_SYSTEMS');
 		$this->load->model('ConfiguracionModel');
 		$this->load->model('LoginModel');
-		$this->load->model('HelperModel');
+		//$this->load->model('HelperModel');
+		$this->load->model('HelperImportacionModel');
 
 		if(!isset($this->session->userdata['usuario'])) {
 			exit();	
@@ -20,11 +21,15 @@ class InicioController extends CI_Controller {
 
 	public function index(){
 		if(isset($this->session->userdata['usuario'])) {
+			//captar las ordenes que están sin asignar
+			$arrResponsePedidoSinAsignar = $this->ConfiguracionModel->obtenerPedidosSinAsignar();
+
 			//captar las ordenes que solo le pertence a ese usuario
 			$arrResponsePedidoXUsuario = $this->ConfiguracionModel->obtenerPedidosXUsuario();
 			$this->load->view('header_v2', array("js_inicio" => true));
 			$this->load->view('Inicio/InicioView',array(
-				'arrResponsePedidoXUsuario' => $arrResponsePedidoXUsuario
+				'arrResponsePedidoXUsuario' => $arrResponsePedidoXUsuario,
+				'arrResponsePedidoSinAsignar' => $arrResponsePedidoSinAsignar
 			));
 			$this->load->view('footer_v2', array("js_inicio" => true));
 		} else {

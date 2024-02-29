@@ -12,8 +12,37 @@
         <?php
         //echo $this->user->ID_Usuario . "<br>";
         //echo $this->user->Nu_Tipo_Privilegio_Acceso;
-        //array_debug($arrResponsePedidoXUsuario);
+        //array_debug($arrResponsePedidoSinAsignar);
 
+        if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
+          if($arrResponsePedidoSinAsignar['status']=='success'){ ?>
+            <?php
+            $iCantidadCotizacion = 0;
+            $iCantidadOCSinAsignar = 0;
+            //->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
+            //->where_in($this->table . '.Nu_Estado', array(5,6,7,9));//pagados / oc
+            foreach ($arrResponsePedidoSinAsignar['result'] as $row) {
+              $iCantidadCotizacion += ($row->Nu_Estado_Pedido == 1 ? 1 : 0);
+              $iCantidadOCSinAsignar += ($row->Nu_Estado_Pedido == 3 && $row->ID_Usuario_Interno_China == 0 ? 1 : 0);
+            ?>
+            <?php } ?>
+            <div class="col-lg-3 col-6">
+              <div class="small-box bg-warning">
+                <div class="inner">
+                  <h3><?php echo $iCantidadCotizacion; ?></h3>
+                  <p>Cotizaciones Pendientes</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-bag"></i>
+                </div>
+              </div>
+            </div>
+          <?php 
+          }
+        }
+        ?>
+
+        <?php
         if($arrResponsePedidoXUsuario['status']=='success'){ ?>
           <?php
           $iCantidadGaranizado = 0;
@@ -26,10 +55,10 @@
           ?>
           <?php } ?>
           <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
+            <div class="small-box bg-primary">
               <div class="inner">
                 <h3><?php echo $iCantidadGaranizado; ?></h3>
-                <p>Pedidos Garantizados</p>
+                <p>Cotizaciones Garantizadas</p>
               </div>
               <div class="icon">
                 <i class="ion ion-bag"></i>
@@ -37,11 +66,25 @@
             </div>
           </div>
           
+          <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3><?php echo $iCantidadGaranizado; ?></h3>
+                <p>Garantizadas sin Asignar China</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-bag"></i>
+              </div>
+            </div>
+          </div>
+          <?php } ?>
+          
           <div class="col-lg-3 col-6">
             <div class="small-box bg-success">
               <div class="inner">
                 <h3><?php echo $iCantidadPagado; ?></h3>
-                <p>O/C Aprobadas</p>
+                <p>Ordenes de Compra</p>
               </div>
               <div class="icon">
                 <i class="ion ion-stats-bars"></i>
@@ -56,7 +99,11 @@
 
             <div class="card card-dark">
               <div class="card-header text-center border-0 pb-2 pt-2">
-                <h4 class="mb-0">Cotizaciones Garantizadas / O.C. Aprobadas</h4>
+                <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
+                  <h4 class="mb-0">Cotizaciones Garantizadas / Ordenes de Compra</h4>
+                <?php } else { ?>
+                  <h4 class="mb-0">Ordenes de Compra</h4>
+                <?php } ?>
               </div>
               
               <div class="card-body">
@@ -88,9 +135,26 @@
                               <div class="col-2 col-sm-2">
                                 <label><?php echo $sCorrelativoCotizacion; ?></label>
                               </div>
-                              <div class="col-8 col-sm-8">
+                              <div class="col-6 col-sm-6">
                                 <!--<span>Cliente: <?php echo $row->No_Contacto; ?> / <label class="d-none d-sm-block">Empresa: <?php echo $row->No_Entidad; ?></label></span>-->
                                 <div>Cliente: <?php echo $row->No_Contacto; ?> / Empresa: <?php echo $row->No_Entidad; ?> <?php echo $btn_editar_cliente; ?></div>
+                              </div>
+                              <div class="col-2 col-sm-2 text-left">
+			                          <?php
+                                if(!empty($row->Nu_Tipo_Servicio)) {
+                                  $arrEstadoRegistro = $this->HelperImportacionModel->obtenerTipoServicioArray($row->Nu_Tipo_Servicio); ?>
+                                  <span class="badge bg-dark"><?php echo $arrEstadoRegistro['No_Estado']; ?></span>
+                                <?php } ?>
+			                          <?php
+                                if(!empty($row->Nu_Tipo_Incoterms)) {
+			                            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerIncoterms($row->Nu_Tipo_Incoterms); ?>
+                                  <span class="badge bg-dark"><?php echo $arrEstadoRegistro['No_Estado']; ?></span>
+                                <?php } ?>
+			                          <?php
+                                if(!empty($row->Nu_Tipo_Transporte_Maritimo)) {
+			                            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerTransporteMaritimo($row->Nu_Tipo_Transporte_Maritimo); ?>
+                                  <span class="badge bg-dark"><?php echo $arrEstadoRegistro['No_Estado']; ?></span>
+                                <?php } ?>
                               </div>
                               <div class="col-2 col-sm-2 text-right">
                                 <span class="badge bg-primary"><?php echo $iProgreso; ?> / <?php echo $iCantidadPasos; ?></span>
@@ -124,6 +188,45 @@
                                 foreach ($arrResponseVerificarProcesoDetalle['result'] as $row_menu) {
                                   $a_href = '';
                                   $btn_tarea = '';
+                                  
+                                  //ASESOR COMERCIAL
+                                  if ($row_menu->Nu_ID_Interno==1){//paso 1 - cotizacion garantizada
+                                    $iIdTareaPedido = 1;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-handshake" aria-hidden="true"></i>';
+                                  }
+                                  
+                                  if ($row_menu->Nu_ID_Interno==2){//paso 1 - selección de proveedores
+                                    $iIdTareaPedido = 2;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-check" aria-hidden="true"></i>';
+                                  }
+                                  
+                                  if ($row_menu->Nu_ID_Interno==3){//paso 1 - Orden Compra Aprobadas
+                                    $iIdTareaPedido = 3;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-list" aria-hidden="true"></i>';
+                                  }
+                                  
+                                  if ($row_menu->Nu_ID_Interno==4){//paso 1 - Orden Compra Aprobadas
+                                    $iIdTareaPedido = 4;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-money-bill-alt" aria-hidden="true"></i>';
+                                  }
+
+                                  //JEFE DE CHINA
+                                  if ($row_menu->Nu_ID_Interno==11){//paso 1 - verificar datos de exportación
+                                    $iIdTareaPedido = 11;
+                                    $a_href = 'alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="verificarDatosExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
+                                    $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="verificarDatosExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-check" aria-hidden="true"></i></button>';
+                                  }
+
+                                  if ($row_menu->Nu_ID_Interno==12){//paso 1 - verificar datos de exportación
+                                    $iIdTareaPedido = 12;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-money-bill-alt" aria-hidden="true"></i>';
+                                  }
+
                                   if ($row_menu->Nu_ID_Interno==18){//paso 1 - trading
                                     $iIdTareaPedido = 18;
                                     $a_href = 'alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="verificarDatosExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
@@ -194,7 +297,7 @@
                                     <i class="fa fa-check-circle check-gestion <?php echo ($row_menu->Nu_Estado_Proceso == 1 ? 'active' : ''); ?>"></i>
                                     <div>
                                       <label>
-                                        <?php echo $row_menu->No_Proceso . ' ' . $btn_tarea; ?>
+                                        <?php echo $row_menu->No_Proceso . ' &nbsp;' . $btn_tarea; ?>
                                       </label>
                                     </div>
                                   </a>
@@ -290,8 +393,40 @@
           <input type="hidden" id="cliente_modal_paso1-ID_Entidad" name="cliente_modal_paso1-ID_Entidad" class="form-control" autocomplete="off">
           <input type="hidden" id="cliente_modal_paso1-ENo_Entidad" name="cliente_modal_paso1-ENo_Entidad" class="form-control" autocomplete="off">
           
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-6 div-cliente_modal_paso1-trading">
             <label>Razón Social</label>
+            <div class="form-group">
+              <span id="cliente_modal_paso1-No_Entidad"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-6 div-cliente_modal_paso1-trading">
+            <label>RUC</label>
+            <div class="form-group">
+              <span id="cliente_modal_paso1-Nu_Documento_Identidad"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-6 div-cliente_modal_paso1-consolidatrading">
+            <label>Cliente</label>
+            <div class="form-group">
+              <span id="cliente_modal_paso1-No_Contacto"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-6 div-cliente_modal_paso1-consolidatrading">
+            <label>DNI</label>
+            <div class="form-group">
+              <span id="cliente_modal_paso1-Nu_Documento_Identidad_Externo"></span>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <label>Exportador</label>
             <div class="form-group">
               <span id="cliente_modal_paso1-exportador"></span>
               <span class="help-block text-danger" id="error"></span>
@@ -301,7 +436,7 @@
           <div class="col-12 col-lg-3">
             <label>Incoterms</label>
             <div class="form-group">
-              <span id="cliente_modal_paso1-Nu_Tipo_Incoterms"></span>
+              <span class="badge bg-success" id="cliente_modal_paso1-Nu_Tipo_Incoterms"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -309,7 +444,7 @@
           <div class="col-12 col-lg-3">
             <label>Tipo de Envío</label>
             <div class="form-group">
-              <span id="cliente_modal_paso1-Nu_Tipo_Transporte_Maritimo"></span>
+              <span class="badge bg-success" id="cliente_modal_paso1-Nu_Tipo_Transporte_Maritimo"></span>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -392,7 +527,7 @@
 <!-- Modal reserva_booking_trading -->
 <div class="modal fade modal-reserva_booking_trading" id="modal-default">
   <?php $attributes = array('id' => 'form-reserva_booking_trading'); echo form_open('', $attributes); ?>
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="text-center"><strong>Reserva de Booking</strong></h4>
@@ -402,7 +537,7 @@
         <div class="row">
           <input type="hidden" name="reserva_booking_trading-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
 
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-3">
             <label>CBM Total</label>
             <div class="form-group">
               <label id="reserva_booking_trading-Qt_Cbm_Total_Booking"></label>
@@ -410,15 +545,23 @@
             </div>
           </div>
           
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-2">
             <label>Tipo de Envío</label>
             <div class="form-group">
-              <label id="reserva_booking_trading-Nu_Tipo_Transporte_Maritimo"></label>
+              <label class="badge bg-success" id="reserva_booking_trading-Nu_Tipo_Transporte_Maritimo"></label>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-2">
+            <label>Inconterms</label>
+            <div class="form-group">
+              <label class="badge bg-success" id="reserva_booking_trading-Nu_Tipo_Incoterms"></label>
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
 
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-5">
             <label>Shipper</label>
             <div class="form-group">
               <select id="cbo-shipper" name="reserva_booking_trading-ID_Shipper" class="form-control select2" style="width: 100%;">
@@ -820,27 +963,27 @@
 
           <div class="col-12 col-lg-12">
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox1" value="option1">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox1" name="entrega_docs_cliente-Nu_Commercial_Invoice" value="option1">
               <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox1">Commercial Invoice</label>
             </div>
 
             <div class="form-check form-check-inline div-bl-entrega_docs"><!-- SOLO SI ES CIF O DDP-->
-              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox2" value="option2">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox2" name="entrega_docs_cliente-Nu_Packing_List" value="option2">
               <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox2">BL</label>
             </div>
             
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox3" value="option3">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox3" name="entrega_docs_cliente-Nu_BL" value="option3">
               <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox3">FTA Detalle</label>
             </div>
             
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox4" value="option4">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox4" name="entrega_docs_cliente-Nu_FTA" value="option4">
               <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox4">Packing List</label>
             </div>
             
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox5" value="option5">
+              <input class="form-check-input" type="checkbox" id="entrega_docs_cliente-inlineCheckbox5" name="entrega_docs_cliente-Nu_FTA_Detalle" value="option5">
               <label class="form-check-label" for="entrega_docs_cliente-inlineCheckbox5">FTA</label>
             </div>
           </div>

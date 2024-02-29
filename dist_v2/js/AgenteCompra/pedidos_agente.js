@@ -385,8 +385,8 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido) {
     $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
     $('#modal-message').modal('show');
 
-    $('#moda-message-content').addClass( 'bg-danger' );
-    $('.modal-title-message').text('Primero asignar pedido a cliente');
+    $('#moda-message-content').addClass( 'bg-warning' );
+    $('.modal-title-message').html('Primero agregar pedido a cliente');
 
     setTimeout(function () { $('#modal-message').modal('hide'); }, 3100);
     return 0;
@@ -647,7 +647,7 @@ function asignarPedido(ID) {
   $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
   $('.modal-message-delete').addClass('modal-success');
 
-  $('#modal-title').text('¿Deseas asignar Nro. Pedido ' + ID + ' ?');
+  $('#modal-title').html('¿Deseas agregar al cliente <strong>Nro. Pedido ' + ID + '</strong>?');
 
   $('#btn-save-delete').off('click').click(function () {
     

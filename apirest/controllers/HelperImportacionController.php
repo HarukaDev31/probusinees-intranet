@@ -30,6 +30,11 @@ class HelperImportacionController extends CI_Controller {
         echo json_encode($this->HelperImportacionModel->getUsuarioChina());
 	}
 	
+	public function getUsuarioJefeChina(){
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+        echo json_encode($this->HelperImportacionModel->getUsuarioJefeChina());
+	}
+	
 	public function getShipper(){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
         echo json_encode($this->HelperImportacionModel->getShipper());

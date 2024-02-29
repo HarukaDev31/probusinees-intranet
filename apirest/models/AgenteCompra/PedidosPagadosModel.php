@@ -31,12 +31,14 @@ class PedidosPagadosModel extends CI_Model{
 	public function _get_datatables_query(){
         $this->db->select('CORRE.Fe_Month, Nu_Estado_China,' . $this->table . '.*, P.No_Pais, 
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, USRCHINA.No_Usuario')
+		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, USRCHINA.No_Usuario, USRJEFECHINA.No_Usuario AS No_Usuario_Jefe')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
-    	->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
+    	//->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
+		->join($this->table_usuario_intero . ' AS USRJEFECHINA', 'USRJEFECHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Jefe_China', 'left')
+		->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where_in($this->table . '.Nu_Estado', array(5,6,7,9));
         
@@ -116,13 +118,15 @@ class PedidosPagadosModel extends CI_Model{
 		ACPDPP.Ss_Pago_Importe_1,
 		ACPDPP.Fe_Pago_Importe_2,
 		ACPDPP.Ss_Pago_Importe_2,
-		ACPDPP.No_Cuenta_Bancaria
+		ACPDPP.No_Cuenta_Bancaria,
+		PROVE.No_Contacto AS No_Vendedor_Proveedor
 		');
         $this->db->from($this->table);
     	$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
     	$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');		
     	$this->db->join($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP', 'ACPDPP.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera AND IGPD.ID_Pedido_Detalle=ACPDPP.ID_Pedido_Detalle', 'join');
     	$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
+		$this->db->join($this->table_cliente . ' AS PROVE', 'PROVE.ID_Entidad = ACPDPP.ID_Entidad_Proveedor', 'join');
         $this->db->where($this->table . '.ID_Pedido_Cabecera',$ID);
 		$this->db->where('ACPDPP.Nu_Selecciono_Proveedor',1);
 		$this->db->where('ACPDPP.Nu_Visualizacion_Item',1);
@@ -1004,12 +1008,9 @@ class PedidosPagadosModel extends CI_Model{
 		return $this->db->query($query)->row();
 	}
 
-    public function actualizarProveedor($where_entidad, $data, $where_detalle_item){
+    public function actualizarProveedor($where_entidad, $data, $where_detalle_item, $data_entidad){
 		if ( $this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, $data, $where_detalle_item) > 0 ) {
-			$data = array(
-				'No_Wechat' => $data['No_Wechat']
-			);
-			if ( $this->db->update('entidad', $data, $where_entidad) > 0 )
+			if ( $this->db->update('entidad', $data_entidad, $where_entidad) > 0 )
 				return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
 			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
 		} else {
@@ -1018,7 +1019,21 @@ class PedidosPagadosModel extends CI_Model{
     }
 	
 	public function getPedidoProveedor($ID){
-		$query = "SELECT No_Wechat, No_Rubro, No_Cuenta_Bancaria, Ss_Pago_Importe_1 FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle_Producto_Proveedor = " . $ID . " LIMIT 1";
+		$query = "SELECT
+ACPDPP.No_Wechat,
+ACPDPP.No_Rubro,
+ACPDPP.No_Cuenta_Bancaria,
+ACPDPP.Ss_Pago_Importe_1,
+PROVE.No_Contacto AS No_Vendedor_Proveedor,
+PROVE.No_Titular_Cuenta_Bancaria,
+PROVE.Txt_Url_Imagen_Proveedor_Pay_Qr,
+PROVE.Nu_Tipo_Pay_Proveedor_China,
+PROVE.No_Banco_China
+FROM
+agente_compra_pedido_detalle_producto_proveedor AS ACPDPP
+JOIN entidad AS PROVE ON(PROVE.ID_Entidad = ACPDPP.ID_Entidad_Proveedor)
+WHERE
+ACPDPP.ID_Pedido_Detalle_Producto_Proveedor = " . $ID . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
 
@@ -1073,7 +1088,12 @@ ACPC.Txt_Url_Pago_Otros_Costo_Fta_China,
 ACPC.Txt_Url_Pago_Otros_Cuadrilla_China,
 ACPC.Txt_Url_Pago_Otros_Costos_China,
 S.No_Shipper,
-ACPC.No_Concepto_Pago_Cuadrilla
+ACPC.No_Concepto_Pago_Cuadrilla,
+ACPC.Nu_Commercial_Invoice,
+ACPC.Nu_Packing_List,
+ACPC.Nu_BL,
+ACPC.Nu_FTA,
+ACPC.Nu_FTA_Detalle
 FROM
 agente_compra_pedido_cabecera AS ACPC
 LEFT JOIN shipper AS S ON(ACPC.ID_Shipper = S.ID_Shipper)
@@ -1147,7 +1167,8 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 
 	public function asignarUsuarioPedidoChina($arrPost){
         $where = array('ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera']);
-        $data = array( 'ID_Usuario_Interno_Empresa_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
+        //$data = array( 'ID_Usuario_Interno_Empresa_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
+		$data = array( 'ID_Usuario_Interno_Jefe_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			$where_progreso = array(
 				'ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera'],
@@ -1155,7 +1176,7 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 			);
 			$data_progreso = array('Nu_Estado_Proceso' => 1);
 			if ($this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
-				return array('status' => 'success', 'message' => 'Actualizado');
+				return array('status' => 'success', 'message' => 'Se asigno cotización a Jefe');
 			} else {
 				return array('status' => 'error', 'message' => 'Error al actualizar y agregar progreso compra');
 			}
@@ -1165,7 +1186,7 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 
 	public function removerAsignarPedido($ID, $id_usuario){
 		$where = array('ID_Pedido_Cabecera' => $ID);
-		$data = array( 'ID_Usuario_Interno_Empresa_China' => 0 );
+		$data = array( 'ID_Usuario_Interno_Empresa_China' => 0, 'ID_Usuario_Interno_Jefe_China' => 0 );
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			return array('status' => 'success', 'message' => 'Se quitó asignación');
 		}
@@ -1674,6 +1695,8 @@ CLI.ID_Entidad,
 CLI.No_Entidad,
 CLI.Nu_Documento_Identidad,
 CLI.Txt_Direccion_Entidad,
+CLI.No_Contacto,
+CLI.Nu_Documento_Identidad_Externo,
 ACPC.Nu_Tipo_Exportador,
 S.No_Shipper,
 ACPC.Qt_Caja_Total_Booking,
@@ -1681,11 +1704,12 @@ ACPC.Qt_Cbm_Total_Booking,
 ACPC.Qt_Peso_Total_Booking,
 ACPC.Nu_Tipo_Transporte_Maritimo,
 ACPC.Txt_Descripcion_BL_China,
-ACPC.Nu_Tipo_Incoterms
+ACPC.Nu_Tipo_Incoterms,
+ACPC.Nu_Tipo_Servicio
 FROM
 agente_compra_pedido_cabecera AS ACPC
 JOIN entidad AS CLI ON(ACPC.ID_Entidad = CLI.ID_Entidad)
-JOIN shipper AS S ON(ACPC.ID_Shipper = S.ID_Shipper)
+LEFT JOIN shipper AS S ON(ACPC.ID_Shipper = S.ID_Shipper)
 WHERE
 ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		return $this->db->query($query)->row();

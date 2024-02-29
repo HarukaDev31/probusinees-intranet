@@ -51,7 +51,7 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <th class="no-sort">Cotización</th>
+                      <th class="no-sort">Excel</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                       <th class="no-sort">Ver</th>
                       <?php endif; ?>

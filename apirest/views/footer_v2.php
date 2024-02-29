@@ -1,4 +1,4 @@
-<?php $iControlVersionDashboard = '1.2.35'; ?>
+<?php $iControlVersionDashboard = '1.2.42'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -50,6 +50,7 @@
 <!-- JS INTERNO DE EMPRESA -->
 <!-- Inicio -->
 <?php if (isset($js_inicio) && $js_inicio==true) : ?>
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/inicio.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 

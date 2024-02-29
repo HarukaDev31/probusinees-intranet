@@ -1,4 +1,5 @@
 $(function () {
+  $('.select2').select2();
 
   /*
   $("#example1").DataTable({
@@ -46,9 +47,7 @@ $(function () {
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
             
-            setTimeout(function(){
-              window.location.href = base_url + 'InicioController';
-            }, 2100);
+            location.reload();
           } else {
             $('#moda-message-content').addClass( 'bg-danger' );
             $('.modal-title-message').text(response.message);
@@ -85,7 +84,7 @@ $(function () {
     $( '#btn-save_cliente_modal_paso1' ).attr('disabled', true);
     $( '#btn-save_cliente_modal_paso1' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
     
-    url = base_url + 'AgenteCompra/PedidosPagados/completarVerificacionOC/' + $( '#cliente_modal_paso1-ID_Pedido_Cabecera' ).val() + '/' + 18;
+    url = base_url + 'AgenteCompra/PedidosPagados/completarVerificacionOC/' + $( '#cliente_modal_paso1-ID_Pedido_Cabecera' ).val() + '/' + $( '#cliente_modal_paso1-iIdTareaPedido' ).val();
     $.ajax({
     url: url,
     type: "GET",
@@ -102,6 +101,8 @@ $(function () {
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+
+          location.reload();
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -158,6 +159,8 @@ $(function () {
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+            
+            location.reload();
           } else {
             $('#moda-message-content').addClass( 'bg-danger' );
             $('.modal-title-message').text(response.message);
@@ -214,6 +217,8 @@ $(function () {
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+            
+            location.reload();
           } else {
             $('#moda-message-content').addClass( 'bg-danger' );
             $('.modal-title-message').text(response.message);
@@ -270,6 +275,8 @@ $(function () {
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+            
+            location.reload();
           } else {
             $('#moda-message-content').addClass( 'bg-danger' );
             $('.modal-title-message').text(response.message);
@@ -328,6 +335,8 @@ $(function () {
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+          
+          location.reload();
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -389,6 +398,8 @@ $(function () {
               $('#moda-message-content').addClass( 'bg-' + response.status);
               $('.modal-title-message').text(response.message);
               setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+              
+              location.reload();
             } else {
               $('#moda-message-content').addClass( 'bg-danger' );
               $('.modal-title-message').text(response.message);
@@ -446,6 +457,8 @@ $(function () {
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+            
+            location.reload();
           } else {
             $('#moda-message-content').addClass( 'bg-danger' );
             $('.modal-title-message').text(response.message);
@@ -478,6 +491,7 @@ $(function () {
 	$(document).on('click', '#btn-guardar_entrega_docs_cliente', function (e) {
     e.preventDefault();
 
+    /*
     if( !$('#entrega_docs_cliente-inlineCheckbox1').prop('checked') ) {
       alert('Debes seleccionar Commercial Invoice');
     } else if (($( '[name="entrega_docs_cliente-Nu_Tipo_Incoterms"]' ).val() ==3 || $( '[name="entrega_docs_cliente-Nu_Tipo_Incoterms"]' ).val() ==4) && !$('#entrega_docs_cliente-inlineCheckbox2').prop('checked') ) {
@@ -489,6 +503,7 @@ $(function () {
     } else if (!$('#entrega_docs_cliente-inlineCheckbox5').prop('checked') ) {
       alert('Debes seleccionar FTA');
     } else {
+    */
       $( '#btn-guardar_entrega_docs_cliente' ).text('');
       $( '#btn-guardar_entrega_docs_cliente' ).attr('disabled', true);
       $( '#btn-guardar_entrega_docs_cliente' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
@@ -513,6 +528,8 @@ $(function () {
               $('#moda-message-content').addClass( 'bg-' + response.status);
               $('.modal-title-message').text(response.message);
               setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+              
+              location.reload();
             } else {
               $('#moda-message-content').addClass( 'bg-danger' );
               $('.modal-title-message').text(response.message);
@@ -540,7 +557,7 @@ $(function () {
             $( '#btn-guardar_entrega_docs_cliente' ).attr('disabled', false);
         }
       });
-    }
+    //}
   });
   
 	$(document).on('click', '#btn-save_pagos_logisticos', function (e) {
@@ -572,6 +589,8 @@ $(function () {
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
+            
+            location.reload();
           } else {
             $('#moda-message-content').addClass( 'bg-danger' );
             $('.modal-title-message').text(response.message);
@@ -669,9 +688,23 @@ function verificarDatosExportacion(id, iIdTareaPedido){
     success: function(response){
       console.log(response);
       
-      var sNombreExportador = 'ProBusiness Yiwu';
+      $('.div-cliente_modal_paso1-trading').hide();
+      $('.div-cliente_modal_paso1-consolidatrading').hide();
+      if(response.Nu_Tipo_Servicio==1){//1=trading
+        $('.div-cliente_modal_paso1-trading').show();
+      } else if(response.Nu_Tipo_Servicio==1){//1=trading
+        $('.div-cliente_modal_paso1-consolidatrading').show();
+      }
+
+      $( '#cliente_modal_paso1-No_Entidad' ).html(response.No_Entidad);
+      $( '#cliente_modal_paso1-Nu_Documento_Identidad' ).html(response.Nu_Documento_Identidad);
+
+      $( '#cliente_modal_paso1-No_Contacto' ).html(response.No_Contacto);
+      $( '#cliente_modal_paso1-Nu_Documento_Identidad_Externo' ).html(response.Nu_Documento_Identidad_Externo);
+
+      var sNombreExportador = 'INTERNATIONAL PRO TRADING CO., LIMITED';
       if(response.Nu_Tipo_Exportador==2){
-        sNombreExportador = 'Criss Factory';
+        sNombreExportador = 'CHRIS FACTORY LIMITED';
       }
 
       $( '#cliente_modal_paso1-exportador' ).html(sNombreExportador);
@@ -786,6 +819,16 @@ function bookingTrading(id){
 
       $( '#reserva_booking_trading-Qt_Cbm_Total_Booking' ).html(response.Qt_Cbm_Total_Booking);
       $( '#reserva_booking_trading-Nu_Tipo_Transporte_Maritimo' ).html(sNombreTransporteMaritimo);
+
+      var sNombreIncoterms = 'EXW';
+      if(response.Nu_Tipo_Incoterms==2){
+        sNombreIncoterms = 'FOB';
+      } else if(response.Nu_Tipo_Incoterms==3){
+        sNombreIncoterms = 'CIF';
+      } else if(response.Nu_Tipo_Incoterms==4){
+        sNombreIncoterms = 'DDP';
+      }
+      $( '#reserva_booking_trading-Nu_Tipo_Incoterms' ).html(sNombreIncoterms);
 
       $('#cbo-shipper').html('<option value="0" selected="selected">Buscando...</option>');
       url = base_url + 'HelperImportacionController/getShipper';
@@ -992,7 +1035,7 @@ function revisionBL(id, iIdTareaPedido){
       
       var sNombreExportador = 'ProBusiness Yiwu';
       if(response.Nu_Tipo_Exportador==2){
-        sNombreExportador = 'Criss Factory';
+        sNombreExportador = 'CHRIS FACTORY LIMITED';
       }
 
       $( '#revision_bl-exportador' ).html(sNombreExportador);
@@ -1044,6 +1087,32 @@ function entregaDocsCliente(id, iIdTareaPedido){
     success: function(response){
       console.log(response);
       
+      $('#entrega_docs_cliente-inlineCheckbox1').prop('checked', false);
+      $('#entrega_docs_cliente-inlineCheckbox2').prop('checked', false);
+      $('#entrega_docs_cliente-inlineCheckbox3').prop('checked', false);
+      $('#entrega_docs_cliente-inlineCheckbox4').prop('checked', false);
+      $('#entrega_docs_cliente-inlineCheckbox5').prop('checked', false);
+
+      if(response.Nu_Commercial_Invoice==1){
+        $('#entrega_docs_cliente-inlineCheckbox1').prop('checked', true);
+      }
+      
+      if(response.Nu_Packing_List==1){
+        $('#entrega_docs_cliente-inlineCheckbox2').prop('checked', true);
+      }
+      
+      if(response.Nu_BL==1){
+        $('#entrega_docs_cliente-inlineCheckbox3').prop('checked', true);
+      }
+      
+      if(response.Nu_FTA==1){
+        $('#entrega_docs_cliente-inlineCheckbox4').prop('checked', true);
+      }
+      
+      if(response.Nu_FTA_Detalle==1){
+        $('#entrega_docs_cliente-inlineCheckbox5').prop('checked', true);
+      }
+
       $( '[name="entrega_docs_cliente-Nu_Tipo_Incoterms"]' ).val(response.Nu_Tipo_Incoterms);
 
       $('.div-bl-entrega_docs').hide();

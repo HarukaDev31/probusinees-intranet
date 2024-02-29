@@ -51,14 +51,20 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
                       <th class="no-sort">Garantía</th>
+                      <?php } ?>
                       <th>Perú</th>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
                       <th class="no-sort">Personal</th>
+                      <?php } ?>
                       <th>China</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
                       <th class="no-sort">Excel</th>
+                      <?php } ?>
                       <th class="no-sort">Importación Integral</th>
                     </tr>
                   </thead>

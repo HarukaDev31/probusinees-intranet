@@ -36,7 +36,8 @@ class PedidosGarantizadosModel extends CI_Model{
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
-    	->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
+		->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
+    	//->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where_in($this->table . '.Nu_Estado', array(2,3,4,8));
         
@@ -284,7 +285,8 @@ class PedidosGarantizadosModel extends CI_Model{
 			//generar proceso de estado de checklist del chinito
 			$arrDataTour = array(
 				'ID_Pedido_Cabecera' => $ID,
-				'ID_Usuario_Interno_Empresa_China' => $ID_Usuario_Interno_Empresa_China
+				'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China,
+				//'ID_Usuario_Interno_Empresa_China' => $ID_Usuario_Interno_Empresa_China
 			);
 			$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
 
@@ -778,22 +780,19 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 
 	public function asignarUsuarioPedidoChina($arrPost){
         $where = array('ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera']);
-        $data = array( 'ID_Usuario_Interno_Empresa_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
+		$data = array( 'ID_Usuario_Interno_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
+        //$data = array( 'ID_Usuario_Interno_Empresa_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			//agregar tour para chinito
-			/*
-			$arrDataTour = array(
-				'ID_Pedido_Cabecera' => $ID
-			);
-			$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
-*/
+			//pendiente
+
 			$where_progreso = array(
 				'ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera'],
 				'Nu_ID_Interno' => 1
 			);
 			$data_progreso = array('Nu_Estado_Proceso' => 1);
 			if ($this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso) > 0) {
-				return array('status' => 'success', 'message' => 'Actualizado');
+				return array('status' => 'success', 'message' => 'Completado');
 			} else {
 				return array('status' => 'error', 'message' => 'Error al actualizar y agregar progreso compra');
 			}
@@ -803,7 +802,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 
 	public function removerAsignarPedido($ID, $id_usuario){
 		$where = array('ID_Pedido_Cabecera' => $ID);
-		$data = array( 'ID_Usuario_Interno_Empresa_China' => 0 );
+		$data = array( 'ID_Usuario_Interno_Empresa_China' => 0, 'ID_Usuario_Interno_China' => 0 );
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			return array('status' => 'success', 'message' => 'Se quitó asignación');
 		}
@@ -820,6 +819,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 	}
 	
 	public function generarEstadoProcesoAgenteCompra($arrDataTour){
+		//var_dump($arrDataTour);
 		$proceso_agente_compra_pedido[]=array(
 			'ID_Empresa' => $this->user->ID_Empresa,
 			'ID_Organizacion' => $this->user->ID_Organizacion,
@@ -830,7 +830,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '5',
-			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_China'],
 		);
 		
 		$proceso_agente_compra_pedido[]=array(
@@ -843,7 +843,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '6',
-			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_China'],
 		);
 		
 		$proceso_agente_compra_pedido[]=array(
@@ -856,7 +856,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '7',
-			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_China'],
 		);
 		
 		$proceso_agente_compra_pedido[]=array(
@@ -869,7 +869,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '8',
-			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_China'],
 		);
 		
 		$proceso_agente_compra_pedido[]=array(
@@ -882,7 +882,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '9',
-			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_China'],
 		);
 		
 		$proceso_agente_compra_pedido[]=array(
@@ -895,7 +895,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 			'Nu_Estado_Proceso' => '0',
 			'Nu_Estado_Visualizacion' => '1',
 			'Nu_ID_Interno' => '10',
-			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_Empresa_China'],
+			'ID_Usuario_Interno_Empresa' => $arrDataTour['ID_Usuario_Interno_China'],
 		);
 		
 		if ($this->db->insert_batch('proceso_agente_compra_pedido', $proceso_agente_compra_pedido)>0)

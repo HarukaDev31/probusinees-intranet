@@ -114,8 +114,8 @@ MNU.Nu_Orden;";
 			|| $sNombreGrupo == 'SOCIOS'
 			|| $sNombreGrupo == 'FUNDADOR'
 			|| $sNombreGrupo == 'FUNDADORES'
-			|| $sNombreGrupo == 'China'
-			|| $sNombreGrupo == 'CHINA'
+			//|| $sNombreGrupo == 'CHINA'
+			|| $sNombreGrupo == 'ASESORA COMERCIAL'
 		) {
 			$menu_acceso = array(
 				'ID_Empresa'		=> $arrPost['ID_Empresa'],

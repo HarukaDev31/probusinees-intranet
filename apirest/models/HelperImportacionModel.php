@@ -181,6 +181,38 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 			'message' => 'No se encontro registro',
 		);
 	}
+
+	public function getUsuarioJefeChina(){
+		$query = "SELECT
+USR.ID_Usuario AS ID,
+USR.No_Usuario AS Nombre
+FROM
+usuario AS USR
+JOIN grupo_usuario AS GRPUSR ON(USR.ID_Usuario = GRPUSR.ID_Usuario)
+JOIN grupo AS GRP ON(GRP.ID_Grupo = GRPUSR.ID_Grupo)
+WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegio_Acceso=5 AND USR.Nu_Estado=1";//5=Jefes de china
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+		);
+	}
 	
 	//Nu_Tipo_Incoterms
 	function obtenerIncoterms($iEstado){

@@ -17,6 +17,13 @@ if (fMonth < 10) {
 $(function () {
   $('.select2').select2();
 
+  $( '#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China' ).change(function(){
+    $('.div-banco_china').hide();
+    if ( $(this).val() == 1 ) {//DNI
+      $('.div-banco_china').show();
+    }
+  })
+
 	$(document).on('click', '#btn-save_pagos_logisticos', function (e) {
     e.preventDefault();
 
@@ -607,7 +614,7 @@ $(function () {
       $( '#btn-guardar_personal_china' ).attr('disabled', true);
       $( '#btn-guardar_personal_china' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
-      url = base_url + 'AgenteCompra/PedidosGarantizados/asignarUsuarioPedidoChina';
+      url = base_url + 'AgenteCompra/PedidosPagados/asignarUsuarioPedidoChina';
       $.ajax({
         type		  : 'POST',
         dataType	: 'JSON',
@@ -3771,10 +3778,36 @@ function editarProveedor(ID_Entidad, id_item){
     success: function(response){
       console.log(response);
 
-      $( '[name="proveedor-No_Wechat"]' ).val(response.No_Wechat);
+      $( '[name="proveedor-No_Contacto"]' ).val(response.No_Vendedor_Proveedor);
+      $( '[name="proveedor-No_Titular_Cuenta_Bancaria"]' ).val(response.No_Titular_Cuenta_Bancaria);
+
       $( '[name="proveedor-No_Rubro"]' ).val(response.No_Rubro);
-      $( '[name="proveedor-No_Cuenta_Bancaria"]' ).val(response.No_Cuenta_Bancaria);
+
       $( '[name="proveedor-Ss_Pago_Importe_1"]' ).val(response.Ss_Pago_Importe_1);
+      
+      $('#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China').html('<option value="0">Seleccionar</option>');
+
+      var selected = '';
+      $('.div-banco_china').hide();
+      if (response.Nu_Tipo_Pay_Proveedor_China == '1') {
+        selected = 'selected="selected"';
+        $('.div-banco_china').show();
+      }
+      $('#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China').append('<option value="1" ' + selected + '>Cuenta Bancaria</option>');
+
+      selected = '';
+      if (response.Nu_Tipo_Pay_Proveedor_China == '2')
+        selected = 'selected="selected"';
+      $('#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China').append('<option value="2" ' + selected + '>AliPay</option>');
+
+      selected = '';
+      if (response.Nu_Tipo_Pay_Proveedor_China == '3')
+        selected = 'selected="selected"';
+      $('#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China').append('<option value="3" ' + selected + '>WeChat</option>');
+
+      $( '[name="proveedor-No_Cuenta_Bancaria"]' ).val(response.No_Cuenta_Bancaria);
+
+      $( '[name="proveedor-No_Banco_China"]' ).val(response.No_Banco_China);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       //$( '#modal-loader' ).modal('hide');
@@ -3861,7 +3894,8 @@ function asignarPedido(ID_Pedido_Cabecera,Nu_Estado){
     $('.modal-guardar_personal_china').modal('show');
 
     $('#cbo-guardar_personal_china-ID_Usuario').html('<option value="0" selected="selected">Buscando...</option>');
-    url = base_url + 'HelperImportacionController/getUsuarioChina';
+    //url = base_url + 'HelperImportacionController/getUsuarioChina';
+    url = base_url + 'HelperImportacionController/getUsuarioJefeChina';
     $.post(url, {}, function (response) {
       console.log(response);
       if (response.status == 'success') {
@@ -3896,7 +3930,7 @@ function removerAsignarPedido(ID, id_usuario) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
-    url = base_url + 'AgenteCompra/PedidosGarantizados/removerAsignarPedido/' + ID + '/' + id_usuario;
+    url = base_url + 'AgenteCompra/PedidosPagados/removerAsignarPedido/' + ID + '/' + id_usuario;
     $.ajax({
       url: url,
       type: "GET",

@@ -49,9 +49,12 @@
                       <!--<th>País</th>-->
                       <th>Pedido</th>
                       <th>Fecha</th>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
                       <th>Cliente</th>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
+                      <?php } ?>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
                       <th>Personal</th>
+                      <th>Jefe</th>
                       <?php } ?>
                       <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
                       <th>Empresa</th>
@@ -60,29 +63,34 @@
                       <th>Servicio</th>
                       <th>Incoterms</th>
                       <th>Envío</th>
-                      <th>Status</th>
                       <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
                       <th>Pagos</th><!--peru-->
+                      <?php } ?>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==1) { ?>
+                      <th>Voucher</th>
+                      <?php } ?>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) { ?>
                       <th>China</th>
                       <th class="no-sort">Negociación</th>
                       <th class="no-sort">Booking</th>
                       <th class="no-sort">Recep. Carga</th>
                       <?php } ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) { ?>
                       <th class="no-sort">Pay</th>
-                      <th class="no-sort">Booking</th>
-                      <th class="no-sort">Insp.</th>
+                      <!--<th class="no-sort">Booking</th>-->
+                      <!--<th class="no-sort">Insp.</th>-->
                       <th class="no-sort">Pay 2</th>
                       <?php } ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) { ?>
                       <th class="no-sort">Insp.</th>
-                      <th class="no-sort">Invoice P.</th>
-                      <th class="no-sort">Despacho</th>
+                      <!--<th class="no-sort">Invoice P.</th>-->
+                      <!--<th class="no-sort">Despacho</th>-->
                       <?php } ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
-                      <th class="no-sort">Invoice</th>
-                      <th class="no-sort">Supervisar</th>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) { ?>
+                      <!--<th class="no-sort">Invoice</th>-->
+                      <!--<th class="no-sort">Supervisar</th>-->
                       <?php } ?>
+                      <th>Status</th>
                     </tr>
                   </thead>
                 </table>
@@ -1086,9 +1094,10 @@
           <input type="hidden" name="proveedor-ID_Pedido_Detalle_Producto_Proveedor" class="form-control" autocomplete="off">
 
           <div class="col-6 col-lg-8">
-            <label>Wechat</label>
+            <label>Vendedor</label>
             <div class="form-group">
-              <input type="text" name="proveedor-No_Wechat" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+              <input type="text" name="proveedor-No_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+              <!--<input type="text" name="proveedor-No_Wechat" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">-->
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1102,9 +1111,10 @@
           </div>
 
           <div class="col-6 col-lg-8">
-            <label>Cuenta Bancaria</label>
+            <label>Titular</label>
             <div class="form-group">
-              <input type="text" name="proveedor-No_Cuenta_Bancaria" placeholder="Ingresar" class="form-control" maxlength="100" autocomplete="off">
+              <input type="text" name="proveedor-No_Titular_Cuenta_Bancaria" placeholder="Ingresar" class="form-control" maxlength="100" autocomplete="off">
+              <!--<input type="text" name="proveedor-No_Cuenta_Bancaria" placeholder="Ingresar" class="form-control" maxlength="100" autocomplete="off">-->
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -1113,6 +1123,38 @@
             <label>Importe 1</label>
             <div class="form-group">
               <input type="text" name="proveedor-Ss_Pago_Importe_1" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-lg-6">
+            <label>Payment</label>
+            <div class="form-group">
+              <select id="cbo-proveedor-Nu_Tipo_Pay_Proveedor_China" name="proveedor-Nu_Tipo_Pay_Proveedor_China" class="form-control" style="width: 100%;"></select>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-6">
+            <label>Cuenta / ID</label>
+            <div class="form-group">
+              <input type="text" name="proveedor-No_Cuenta_Bancaria" placeholder="Ingresar" class="form-control" maxlength="100" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-12">
+            <label>QR</label>
+            <div class="form-group">
+              <input class="form-control" id="proveedor-foto_proveedor_pay_qr" name="proveedor-foto_proveedor_pay_qr" type="file" accept="image/*">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-12 div-banco_china">
+            <label>Banco</label>
+            <div class="form-group">
+              <input type="text" name="proveedor-No_Banco_China" placeholder="Ingresar" class="form-control" maxlength="100" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>

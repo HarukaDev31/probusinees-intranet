@@ -662,6 +662,41 @@ Nu_Orden_Slider;";
 		);
 	}
 	
+	public function obtenerPedidosSinAsignar(){
+		//->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
+		//->where_in($this->table . '.Nu_Estado', array(5,6,7,9));//pagados / oc
+
+		$query = "SELECT
+ACPC.ID_Pedido_Cabecera,
+ACPC.ID_Usuario_Interno_China,
+ACPC.Nu_Estado AS Nu_Estado_Pedido
+FROM
+agente_compra_pedido_cabecera AS ACPC
+JOIN entidad AS CLI ON(CLI.ID_Entidad = ACPC.ID_Entidad)";
+		if ( !$this->db->simple_query($query) ){
+			$error = $this->db->error();
+			return array(
+				'status' => 'danger',
+				'message' => 'Problemas al obtener datos',
+				'sCodeSQL' => $error['code'],
+				'sMessageSQL' => $error['message'],
+			);
+		}
+		$arrResponseSQL = $this->db->query($query);
+		if ( $arrResponseSQL->num_rows() > 0 ){
+			return array(
+				'status' => 'success',
+				'result' => $arrResponseSQL->result(),
+			);
+		}
+		
+		return array(
+			'status' => 'warning',
+			'message' => 'No se encontro registro',
+			'query' => $query,
+		);
+	}
+	
 	public function obtenerPedidosXUsuario(){
 		//->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
 		//->where_in($this->table . '.Nu_Estado', array(5,6,7,9));//pagados / oc
@@ -688,7 +723,10 @@ CLI.Nu_Celular_Contacto,
 CLI.Txt_Email_Contacto,
 ACPC.ID_Usuario_Interno_Empresa,
 ACPC.ID_Usuario_Interno_China,
-ACPC.ID_Usuario_Interno_Jefe_China
+ACPC.ID_Usuario_Interno_Jefe_China,
+ACPC.Nu_Tipo_Servicio,
+ACPC.Nu_Tipo_Incoterms,
+ACPC.Nu_Tipo_Transporte_Maritimo
 FROM
 agente_compra_pedido_cabecera AS ACPC
 JOIN agente_compra_correlativo AS CORRE ON(CORRE.ID_Agente_Compra_Correlativo = ACPC.ID_Agente_Compra_Correlativo)

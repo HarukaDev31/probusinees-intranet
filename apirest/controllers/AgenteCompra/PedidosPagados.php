@@ -44,19 +44,23 @@ class PedidosPagados extends CI_Controller {
             //$rows[] = $row->No_Pais;
             $rows[] = $sCorrelativoCotizacion;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
-            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
 
+			if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
+            	$rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
+			}
+			
 			//asignar personal de china desde perú
 			$btn_asignar_personal_china = '';
 			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
 				$btn_asignar_personal_china = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->Nu_Estado . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
-				if(!empty($row->ID_Usuario_Interno_Empresa_China)){
-					$btn_asignar_personal_china = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
-					$btn_asignar_personal_china .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Interno_Empresa_China . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+				if(!empty($row->ID_Usuario_Interno_Jefe_China)){
+					$btn_asignar_personal_china = '<span class="badge bg-secondary">' . $row->No_Usuario_Jefe . '</span>';
+					$btn_asignar_personal_china .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Interno_Jefe_China . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
 				}
 			}
 
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5){
+			if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=2){
+				$rows[] = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
 				$rows[] = $btn_asignar_personal_china;
 			} else if($this->user->Nu_Tipo_Privilegio_Acceso==5){
 				$rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
@@ -90,8 +94,8 @@ class PedidosPagados extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Trading" title="Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Usuario_Interno_Empresa_China . '\');">Trading</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="C. Trading" title="C. Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Usuario_Interno_Empresa_China . '\');">C. Trading</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Trading" title="Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Usuario_Interno_Jefe_China . '\');">Trading</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="C. Trading" title="C. Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Usuario_Interno_Jefe_China . '\');">C. Trading</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
 			
@@ -144,17 +148,6 @@ class PedidosPagados extends CI_Controller {
 
             $rows[] = $dropdown_estado;//envio
 			
-			//jalar en que tarea se quedo
-			$span_estado_proceso = '<span class="badge bg-secondary">No ejecuto tarea</span>';
-			$arrResponseTarea = $this->PedidosPagadosModel->listadoTareaPorPedido($row->ID_Pedido_Cabecera);
-			if(is_object($arrResponseTarea)){
-				//$arrResponseStatusTarea = $this->PedidosPagadosModel->verificarTarea($row->ID_Pedido_Cabecera,$arrResponseTarea->ID_Proceso);
-				//$span_status_tarea = ($arrResponseStatusTarea->Nu_Estado_Proceso == 1 ? 'success' : 'danger');
-				$span_status_tarea = 'danger';
-				$span_estado_proceso = '<span class="badge bg-' . $span_status_tarea . '">' . $arrResponseTarea->No_Proceso . '</span>';
-			}
-            $rows[] = $span_estado_proceso;//status
-
 			//EXCEL cliente de pedido
 			//$rows[] = '<button class="btn btn-xs btn-link" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
 
@@ -177,7 +170,11 @@ class PedidosPagados extends CI_Controller {
 
 			if($this->user->Nu_Tipo_Privilegio_Acceso!=5)
             	$rows[] = $dropdown_estado;
-			
+
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1){
+				$rows[] = '<button class="btn btn-xs btn-link" alt="Recepcion de carga" title="Recepcion de carga" href="javascript:void(0)"  onclick="recepcionCarga(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+			}
+
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($row->Nu_Estado_China);
 			$dropdown_estado = '<div class="dropdown">';
 				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
@@ -194,10 +191,10 @@ class PedidosPagados extends CI_Controller {
 				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			}
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5)
+			if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1)
             	$rows[] = $dropdown_estado;//china
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5) {
+			if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) {
 				//Negociar con proveedores
 				$rows[] = '<button class="btn btn-xs btn-link" alt="Negociar con proveedor" title="Negociar con proveedor" href="javascript:void(0)"  onclick="coordinarPagosProveedor(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-handshake fa-2x" aria-hidden="true"></i></button>';
 
@@ -208,12 +205,13 @@ class PedidosPagados extends CI_Controller {
 				$rows[] = '<button class="btn btn-xs btn-link" alt="Recepcion de carga" title="Recepcion de carga" href="javascript:void(0)"  onclick="recepcionCarga(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 			}
 
-			if($this->user->Nu_Tipo_Privilegio_Acceso==5) {
+			if($this->user->Nu_Tipo_Privilegio_Acceso==5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) {
 				//Pagos
 				$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 1)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
 				//$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
 				
 				//Reserva de Booking
+				/*
 				$iIdTareaPedido = 0;//ninguno
 				if ($row->Nu_Tipo_Servicio==1){//trading
 					$iIdTareaPedido = 20;
@@ -228,7 +226,9 @@ class PedidosPagados extends CI_Controller {
 				
 				//Inspección
 				$btn_inpseccion = '<button class="btn btn-xs btn-link" alt="Inspeccion" title="Inspeccion" href="javascript:void(0)"  onclick="bookingInspeccion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\', \'' . $row->ID_Usuario_Interno_China . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
+				*/
 				
+				/*
 				$btn_reserva_booking = '';
 				$btn_costos_origen = '';
 				$btn_docs_exportacion = '';
@@ -283,12 +283,13 @@ class PedidosPagados extends CI_Controller {
 				}
 
 				$rows[] = $btn_inpseccion . $btn_reserva_booking . $btn_costos_origen . $btn_docs_exportacion . $btn_despacho_shipper . $btn_revision_bl . $btn_entrega_docs_cliente . $btn_pagos_logisticos;
-				
+				*/
+
 				//Pagos 2
 				$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 2)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
 			}
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=5) {
+			if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) {
 				//inspeccion
 				$btn_inspeccion = '';
 				if($row->Nu_Estado_China==5 || $row->Nu_Estado_China==6)
@@ -304,8 +305,9 @@ class PedidosPagados extends CI_Controller {
 				$rows[] = $btn_despacho . '<br>' . (!empty($row->Fe_Entrega_Shipper_Forwarder) ? ToDateBD($row->Fe_Entrega_Shipper_Forwarder) : '');
 			}
 
-			if($this->user->Nu_Tipo_Privilegio_Acceso==5) {
+			if($this->user->Nu_Tipo_Privilegio_Acceso==5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) {
 				//entregado
+				/*
 				$btn_entregado = '';
 				if($row->Nu_Estado_China==6)
 					$btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
@@ -324,7 +326,19 @@ class PedidosPagados extends CI_Controller {
 				$btn_supervisar = '<button class="btn btn-xs btn-link" alt="Supervisar" title="Supervisar" href="javascript:void(0)"  onclick="supervisarContenedor(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
 				
 				$rows[] = $btn_supervisar;
+				*/
 			}
+
+			//jalar en que tarea se quedo
+			$span_estado_proceso = '<span class="badge bg-secondary">No ejecuto tarea</span>';
+			$arrResponseTarea = $this->PedidosPagadosModel->listadoTareaPorPedido($row->ID_Pedido_Cabecera);
+			if(is_object($arrResponseTarea)){
+				//$arrResponseStatusTarea = $this->PedidosPagadosModel->verificarTarea($row->ID_Pedido_Cabecera,$arrResponseTarea->ID_Proceso);
+				//$span_status_tarea = ($arrResponseStatusTarea->Nu_Estado_Proceso == 1 ? 'success' : 'danger');
+				$span_status_tarea = 'danger';
+				$span_estado_proceso = '<span class="badge bg-' . $span_status_tarea . '">' . $arrResponseTarea->No_Proceso . '</span>';
+			}
+            $rows[] = $span_estado_proceso;//status
 
             $data[] = $rows;
         }
@@ -1279,16 +1293,32 @@ class PedidosPagados extends CI_Controller {
 	public function crudProveedor(){
 		if(isset($this->session->userdata['usuario'])) {
 			if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+			/*
 			$data = array(
-				'No_Wechat' => $this->input->post('proveedor-No_Wechat'),
+				'No_Contacto' => $this->input->post('proveedor-No_Contacto'),
+				'No_Titular_Cuenta_Bancaria' => $this->input->post('proveedor-No_Titular_Cuenta_Bancaria'),
+				//'No_Wechat' => $this->input->post('proveedor-No_Wechat'),
 				'No_Rubro' => $this->input->post('proveedor-No_Rubro'),
-				'No_Cuenta_Bancaria' => $this->input->post('proveedor-No_Cuenta_Bancaria'),
+				//'No_Cuenta_Bancaria' => $this->input->post('proveedor-No_Cuenta_Bancaria'),
 				'Ss_Pago_Importe_1' => $this->input->post('proveedor-Ss_Pago_Importe_1'),
+			);
+			*/
+			$data = array(
+				'No_Rubro' => $this->input->post('proveedor-No_Rubro'),
+				'Ss_Pago_Importe_1' => $this->input->post('proveedor-Ss_Pago_Importe_1'),
+				'No_Cuenta_Bancaria' => $this->input->post('proveedor-No_Cuenta_Bancaria'),
+			);
+			$data_entidad = array(
+				'No_Contacto' => $this->input->post('proveedor-No_Contacto'),
+				'No_Titular_Cuenta_Bancaria' => $this->input->post('proveedor-No_Titular_Cuenta_Bancaria'),
+				'Nu_Tipo_Pay_Proveedor_China' => $this->input->post('proveedor-Nu_Tipo_Pay_Proveedor_China'),
+				'No_Banco_China' => $this->input->post('proveedor-No_Banco_China')
 			);
 			echo json_encode($this->PedidosPagadosModel->actualizarProveedor(
 					array('ID_Entidad' => $this->input->post('proveedor-ID_Entidad')),
 					$data,
-					array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('proveedor-ID_Pedido_Detalle_Producto_Proveedor'))
+					array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('proveedor-ID_Pedido_Detalle_Producto_Proveedor')),
+					$data_entidad
 				)
 			);
 		} else {
@@ -1549,6 +1579,36 @@ class PedidosPagados extends CI_Controller {
 		$data = array(
 			'Nu_Verificar_Entrega_Docs_Cliente' => 1
 		);
+		if(isset($_POST['entrega_docs_cliente-Nu_Commercial_Invoice']) && $this->input->post('entrega_docs_cliente-Nu_Commercial_Invoice')=='option1'){
+			$data = array_merge($data, array(
+					'Nu_Commercial_Invoice' => 1
+				)
+			);
+		}
+		if(isset($_POST['entrega_docs_cliente-Nu_Packing_List']) && $this->input->post('entrega_docs_cliente-Nu_Packing_List')=='option2'){
+			$data = array_merge($data, array(
+					'Nu_Packing_List' => 1
+				)
+			);
+		}
+		if(isset($_POST['entrega_docs_cliente-Nu_BL']) && $this->input->post('entrega_docs_cliente-Nu_BL')=='option3'){
+			$data = array_merge($data, array(
+					'Nu_BL' => 1
+				)
+			);
+		}
+		if(isset($_POST['entrega_docs_cliente-Nu_FTA']) && $this->input->post('entrega_docs_cliente-Nu_FTA')=='option4'){
+			$data = array_merge($data, array(
+					'Nu_FTA' => 1
+				)
+			);
+		}
+		if(isset($_POST['entrega_docs_cliente-Nu_FTA_Detalle']) && $this->input->post('entrega_docs_cliente-Nu_FTA_Detalle')=='option5'){
+			$data = array_merge($data, array(
+					'Nu_FTA_Detalle' => 1
+				)
+			);
+		}
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     		echo json_encode($this->PedidosPagadosModel->entregaDocsCliente(array('ID_Pedido_Cabecera' => $this->input->post('entrega_docs_cliente-ID_Pedido_Cabecera')), $data));
 	}
