@@ -2509,6 +2509,7 @@ function coordinarPagosProveedor(ID){
       $( '#div-estado' ).html(sNombreEstado);
       
       var iCounterSupplier = 1, table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
+      $('#btn-save_proveedor').show();
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
         var precio_china = parseFloat(detalle[i]['Ss_Precio']);
@@ -4140,6 +4141,7 @@ function pagarProveedores(ID, tipo_pago){
       $( '#div-estado' ).html(sNombreEstado);
       
       var iCounterSupplier=1, table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = '';
+      $('#btn-save_proveedor').hide();
       for (i = 0; i < detalle.length; i++) {
         var cantidad_item_final_recepcion_carga = parseFloat(detalle[i]['Qt_Producto_Caja_Final_Verificada']);
         var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
@@ -4175,8 +4177,12 @@ function pagarProveedores(ID, tipo_pago){
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
           table_enlace_producto +="<tr>";
-            table_enlace_producto += "<th class='text-left'>" + iCounterSupplier + ". " + detalle[i].No_Contacto_Proveedor + "</th>";
-            table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Cuenta_Bancaria + "</th>";
+            //table_enlace_producto += "<th class='text-left'>" + iCounterSupplier + ". " + detalle[i].No_Contacto_Proveedor + "</th>";
+            table_enlace_producto += "<th class='text-left'>";
+            table_enlace_producto += iCounterSupplier + ". " + detalle[i].No_Contacto_Proveedor;
+            table_enlace_producto += '<button type="button" class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="editarProveedor(' + detalle[i].ID_Entidad_Proveedor + ', ' + id_item + ')">&nbsp;<i class="far fa-edit" aria-hidden="true"></i></button>';
+            table_enlace_producto += "</th>";
+            //table_enlace_producto += "<th class='text-left'>" + detalle[i].No_Cuenta_Bancaria + "</th>";
             
             if(tipo_pago==1) {
               table_enlace_producto += "<th class='text-left'>" + detalle[i].Ss_Pago_Importe_1 + "</th>";

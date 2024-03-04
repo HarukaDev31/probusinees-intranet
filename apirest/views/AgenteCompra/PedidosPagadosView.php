@@ -315,7 +315,7 @@
                             <tr>
                               <th style='display:none;' class="text-left">ID</th>
                               <th class="text-center">Supplier</th>
-                              <th class="text-center">Cuenta Bancaria</th>
+                              <!--<th class="text-center">Cuenta Bancaria</th>-->
                               <th class="text-center">Importe</th>
                               <th class="text-center">voucher</th>
                             </tr>
@@ -1085,7 +1085,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center">Proveedor</h4>
+        <h4 class="text-center"><strong>Proveedor</strong></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">

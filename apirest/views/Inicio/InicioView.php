@@ -214,6 +214,13 @@
                                     $btn_tarea = '<i class="fas fa-money-bill-alt" aria-hidden="true"></i>';
                                   }
 
+                                  //EMPLEADO DE CHINA
+                                  if ($row_menu->Nu_ID_Interno==9){//paso 1 - verificar datos de exportación
+                                    $iIdTareaPedido = 9;
+                                    $a_href = 'alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="documentoProveedorExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
+                                    $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="documentoProveedorExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-file" aria-hidden="true"></i></button>';
+                                  }
+
                                   //JEFE DE CHINA
                                   if ($row_menu->Nu_ID_Interno==11){//paso 1 - verificar datos de exportación
                                     $iIdTareaPedido = 11;
@@ -797,6 +804,27 @@
         <div class="row">
           <input type="hidden" id="despacho_shipper-ID_Pedido_Cabecera" name="despacho_shipper-ID_Pedido_Cabecera" class="form-control">
 
+          <div class="col-6 col-lg-12">
+            <label style="font-size: 1.3rem;">Datos de Shipper</label>
+          </div>
+
+          <div class="col-12 col-lg-12">
+            <div class="row">
+              <div class="col-12 col-lg-4">
+                <label>Empresa: &nbsp;</label><span id="despacho_shipper-span-empresa"></span>
+              </div>
+              <div class="col-12 col-lg-4">
+                <label>Coordinador(a): &nbsp;</label><span id="despacho_shipper-span-coordinador"></span>
+              </div>
+              <div class="col-12 col-lg-4">
+                <label>Wechat: &nbsp;</label><span id="despacho_shipper-span-wechat"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-12">
+            <label style="font-size: 1.3rem;">Verificar</label>
+          </div>
           <div class="col-12 col-lg-12">
             <div class="form-check form-check-inline">
               <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
@@ -1211,3 +1239,38 @@
   </div><!-- /.modal-dialog -->
   <?php echo form_close(); ?>
 </div><!-- /. Modal pagos_logisticos -->
+
+
+<!-- modal documento -->
+<div class="modal fade modal-documento_proveedor_exportacion" id="modal-documento_proveedor_exportacion">
+  <?php $attributes = array('id' => 'form-documento_proveedor_exportacion'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center"><strong>Docs Exportación</strong></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body" id="modal-body-documento_proveedor_exportacion">
+        <div class="row">
+          <input type="hidden" id="documento_proveedor_exportacion-id_cabecera" name="documento_proveedor_exportacion-id_cabecera" class="form-control">
+          <input type="hidden" id="documento_proveedor_exportacion-correlativo" name="documento_proveedor_exportacion-correlativo" class="form-control">
+          <div class="col-sm-12">
+            <label>Invoice and PL</label>
+            <div class="form-group">
+              <input class="form-control" id="documento_proveedor_exportacion-Txt_Url_Imagen_Proveedor_Doc_Exportacion" name="documento_proveedor_exportacion-Txt_Url_Imagen_Proveedor_Doc_Exportacion" type="file" accept="application/msword, application/vnd.ms-excel, application/pdf, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_documento_proveedor_exportacion" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar documento_proveedor_exportacion -->

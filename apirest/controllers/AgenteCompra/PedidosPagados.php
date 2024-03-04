@@ -1619,4 +1619,11 @@ class PedidosPagados extends CI_Controller {
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
 			echo json_encode($this->PedidosPagadosModel->pagosLogisticos($this->input->post(), $_FILES));
 	}
+
+	public function addFileProveedorDocumentoExportacion(){
+		//array_debug($this->input->post());
+		//array_debug($_FILES);
+		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
+    		echo json_encode($this->PedidosPagadosModel->addFileProveedorDocumentoExportacion($this->input->post(), $_FILES));
+	}
 }

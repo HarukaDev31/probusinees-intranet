@@ -619,6 +619,46 @@ $(function () {
       }
     });
   });
+  
+  $("#form-documento_proveedor_exportacion").on('submit',function(e){
+    e.preventDefault();
+
+    $('.help-block').empty();
+    $('.form-group').removeClass('has-error');
+
+    if(document.getElementById('documento_proveedor_exportacion-Txt_Url_Imagen_Proveedor_Doc_Exportacion').files.length == 0) {
+      $('#documento_proveedor_exportacion-Txt_Url_Imagen_Proveedor_Doc_Exportacion').closest('.form-group').find('.help-block').html('Empty file');
+      $('#documento_proveedor_exportacion-Txt_Url_Imagen_Proveedor_Doc_Exportacion').closest('.form-group').removeClass('has-success').addClass('has-error');
+    }else {
+      var postData = new FormData($("#form-documento_proveedor_exportacion")[0]);
+      $.ajax({
+        url: base_url + 'AgenteCompra/PedidosPagados/addFileProveedorDocumentoExportacion',
+        type: "POST",
+        dataType: "JSON",
+        data: postData,
+        processData: false,
+        contentType: false
+      })
+      .done(function(response) {
+        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+        $('#modal-message').modal('show');
+
+        if(response.status == 'success') {
+          $('#modal-documento_proveedor_exportacion').modal('hide');
+
+          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
+          
+          location.reload();
+        } else {
+          $('#moda-message-content').addClass( 'bg-danger' );
+          $('.modal-title-message').text(response.message);
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        }
+      });
+    }
+  });
 });
 
 function editarCliente(ID_Entidad){
@@ -1003,6 +1043,30 @@ function despachoShipper(id, iIdTareaPedido){
 
   $(' .modal-despacho_shipper ').modal('show');
   $(' #form-despacho_shipper ' )[0].reset();
+  
+  url = base_url + 'AgenteCompra/PedidosPagados/getBookingEntidad/' + id;
+  $.ajax({
+    url : url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response){
+      console.log(response);
+      $( '#despacho_shipper-span-empresa' ).html(response.No_Shipper);
+      $( '#despacho_shipper-span-coordinador' ).html(response.No_Coordinador);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      //$( '#modal-loader' ).modal('hide');
+        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
+        
+        $( '#modal-message' ).modal('show');
+        $( '.modal-message' ).addClass( 'modal-danger' );
+        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
+        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
+        
+        //Message for developer
+      console.log(jqXHR.responseText);
+    }
+  })
 }
 
 function revisionBL(id, iIdTareaPedido){
@@ -1242,4 +1306,12 @@ function pagosLogisticos(id, iIdTareaPedido){
       console.log(jqXHR.responseText);
     }
   })
+}
+
+function documentoProveedorExportacion(id, sCorrelativo){
+  $( '[name="documento_proveedor_exportacion-id_cabecera"]' ).val(id);
+  $( '[name="documento_proveedor_exportacion-correlativo"]' ).val(sCorrelativo);
+
+  $('#modal-documento_proveedor_exportacion').modal('show');
+  $( '#form-documento_proveedor_exportacion' )[0].reset();
 }

@@ -1088,6 +1088,7 @@ ACPC.Txt_Url_Pago_Otros_Costo_Fta_China,
 ACPC.Txt_Url_Pago_Otros_Cuadrilla_China,
 ACPC.Txt_Url_Pago_Otros_Costos_China,
 S.No_Shipper,
+S.No_Coordinador,
 ACPC.No_Concepto_Pago_Cuadrilla,
 ACPC.Nu_Commercial_Invoice,
 ACPC.Nu_Packing_List,
@@ -1853,6 +1854,62 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 				return array('status' => 'error', 'message' => 'Error al insertar');
 			} else {
 				//$this->db->trans_rollback();
+				$this->db->trans_commit();
+				return array('status' => 'success', 'message' => 'Documento guardado');
+			}
+		} else {
+			return array('status' => 'error', 'message' => 'No existe archivo');
+		}
+	}
+
+	public function addFileProveedorDocumentoExportacion($arrPost, $data_files){
+		if (isset($data_files['documento_proveedor_exportacion-Txt_Url_Imagen_Proveedor_Doc_Exportacion']['name'])) {
+			$this->db->trans_begin();
+
+			$path = "assets/images/documento_proveedor_exportacion/";
+
+			$config['upload_path'] = $path;
+			$config['allowed_types'] = 'xlsx|csv|xls|pdf|doc|docx';
+			$config['max_size'] = 3072;//1024 KB = 10 MB
+			$config['encrypt_name'] = TRUE;
+			$config['max_filename'] = '255';
+
+			$this->load->library('upload', $config);
+
+			if (!$this->upload->do_upload('documento_proveedor_exportacion-Txt_Url_Imagen_Proveedor_Doc_Exportacion')){
+				$this->db->trans_rollback();
+				return array(
+					'status' => 'error',
+					'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
+				);
+			} else {
+				$arrUploadFile = $this->upload->data();
+				$Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
+
+				$where = array('ID_Pedido_Cabecera' => $arrPost['documento_proveedor_exportacion-id_cabecera']);
+				$data = array( 'Txt_Url_Imagen_Proveedor_Doc_Exportacion' => $Txt_Url_Imagen_Producto );//1=SI
+				$this->db->update($this->table, $data, $where);
+			}
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				return array('status' => 'error', 'message' => 'Error al insertar');
+			} else {
+				$where_progreso = array(
+					'ID_Pedido_Cabecera' => $arrPost['documento_proveedor_exportacion-id_cabecera'],
+					'Nu_ID_Interno' => 9
+				);
+				$data_progreso = array('Nu_Estado_Proceso' => 1);
+				$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
+				//$this->db->trans_rollback();
+				$notificacion = $this->NotificacionModel->procesarNotificacion(
+					$this->user->No_Usuario,
+					'O.C.',
+					$arrPost['documento-correlativo'] . ' invoice se guardo documento',
+					''
+				);
+
 				$this->db->trans_commit();
 				return array('status' => 'success', 'message' => 'Documento guardado');
 			}
