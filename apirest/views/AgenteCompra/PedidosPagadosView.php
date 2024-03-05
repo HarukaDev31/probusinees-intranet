@@ -63,6 +63,9 @@
                       <th>Servicio</th>
                       <th>Incoterms</th>
                       <th>Envío</th>
+                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso==1) { ?>
+                      <th>O.C.</th><!--peru-->
+                      <?php } ?>
                       <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5) { ?>
                       <th>Pagos</th><!--peru-->
                       <?php } ?>

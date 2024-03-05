@@ -481,7 +481,7 @@ class PedidosGarantizados extends CI_Controller {
 
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'FECHA: ');
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $data[0]->Fe_Emision_Cotizacion);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, ToDateBD($data[0]->Fe_Emision_Cotizacion));
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
 			
 			$fila=13;
@@ -1314,7 +1314,7 @@ class PedidosGarantizados extends CI_Controller {
 
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'FECHA: ');
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $data[0]->Fe_Emision_Cotizacion);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, ToDateBD($data[0]->Fe_Emision_Cotizacion));
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
 			
 			$fila=13;

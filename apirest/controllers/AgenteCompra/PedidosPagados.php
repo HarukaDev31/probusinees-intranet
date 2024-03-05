@@ -148,6 +148,12 @@ class PedidosPagados extends CI_Controller {
 
             $rows[] = $dropdown_estado;//envio
 			
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//no tiene acceso a cambiar status de Perú
+				$excel_agente_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+				$excel_consolida_trading = '<button class="btn" alt="Orden Compra C. Trading" title="Orden Compra C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+				$rows[] = $excel_agente_compra . '<br>' . $excel_consolida_trading;
+			}
+			
 			//EXCEL cliente de pedido
 			//$rows[] = '<button class="btn btn-xs btn-link" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
 
@@ -1625,5 +1631,1661 @@ class PedidosPagados extends CI_Controller {
 		//array_debug($_FILES);
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     		echo json_encode($this->PedidosPagadosModel->addFileProveedorDocumentoExportacion($this->input->post(), $_FILES));
+	}
+
+	//generar cotización PDF para pedido de cliente	
+	public function generarAgenteCompra($ID){
+        $data = $this->PedidosPagadosModel->get_by_id_excel($this->security->xss_clean($ID));
+		//array_debug($data);
+
+		$this->load->library('Excel');
+		$objPHPExcel = new PHPExcel();
+			
+		$hoja_activa = 0;
+		$fila=1;
+		$fileNameExcel = "OC_Trading_sin_data.xls";
+		
+		$hoja_activa = 0;
+			
+		//Title
+		$BStyle_top = array(
+		'borders' => array(
+			'top' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_left = array(
+		'borders' => array(
+			'left' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_right = array(
+		'borders' => array(
+			'right' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_bottom = array(
+		'borders' => array(
+			'bottom' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_background_title = array(
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => '000000')
+			),
+			'font'  => array(
+				'bold'  => true,
+				'color' => array('rgb' => 'FFFFFF'),
+				'size'  => 18
+			)
+		);
+		
+		$BStyle_background_sub_tittle = array(
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => '000000')
+			),
+			'font'  => array(
+				'bold'  => true,
+				'color' => array('rgb' => 'FFFFFF'),
+				'size'  => 13
+			)
+		);
+		
+		$BStyle_background_name_label = array(
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => 'faddd0')
+			),
+			'font'  => array(
+				'bold'  => true,
+				'color' => array('rgb' => '000000'),
+				'size'  => 12
+			)
+		);
+		
+		$style_align_center = array(
+		'alignment' => array(
+			'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+		)
+		);
+		
+		$style_align_right = array(
+		'alignment' => array(
+			'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+		)
+		);
+		
+		$style_align_left = array(
+		'alignment' => array(
+			'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+		)
+		);
+		
+		$styleArrayAllborder = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => '000000')
+				)
+			)
+		);
+
+		$BStyle_tittle_cursive = array(
+			'font'  => array(
+				'color' => array('rgb' => '000000'),
+				'size'  => 11,
+				'italic'  => true,
+			)
+		);
+
+		//SET ALL BORDER NONE
+		$styleArray = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => 'FFFFFF')
+				)
+			)
+		);
+		$objPHPExcel->getDefaultStyle()->applyFromArray($styleArray);
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth("8");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth("8");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth("35");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth("25");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth("25");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth("15");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth("20");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth("20");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth("20");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth("15");//NRO
+		
+		$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth("10");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth("15");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth("15");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth("15");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth("5");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setWidth("20");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('R')->setWidth("15");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('S')->setWidth("8");//NRO
+
+		//Title
+		$fila=1;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		
+		$fila=2;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		
+		$fila=3;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$fila=4;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$fila=5;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$fila=6;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(60);
+
+		$objDrawing = new PHPExcel_Worksheet_Drawing();
+		
+		$objDrawing->setPath('assets/img/logos/logo_probusiness.png');
+		$objDrawing->setWidthAndHeight(400,500);
+		$objDrawing->setResizeProportional(true);
+		$objDrawing->setCoordinates('D' . $fila);
+		$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+
+		//DERECHA
+		$objPHPExcel->getActiveSheet()
+		->getStyle('L' . $fila)
+		->applyFromArray(
+			array(
+				'font'  => array(
+					'bold'  => true,
+					'color' => array('rgb' => '000000'),
+					'size'  => 54
+				)
+			)
+		);
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)
+		->setCellValue('L' . $fila, 'ORDEN DE COMPRA');
+
+		$fila=7;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		
+		$fila=8;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$objPHPExcel->getActiveSheet()->getStyle('D'.$fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'Ofic China');
+		$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_left);
+		
+		$objPHPExcel->getActiveSheet()->getStyle('G'.$fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'Ofic China');
+		$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_left);
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($BStyle_right);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila. ':N' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+		$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':N' . $fila)->applyFromArray($style_align_center);
+		$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':N' . $fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':N' . $fila);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('L'.$fila, 'N° ORDEN');
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila. ':Q' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+		$objPHPExcel->getActiveSheet()->getStyle('O' . $fila . ':Q' . $fila)->applyFromArray($style_align_center);
+		$objPHPExcel->getActiveSheet()->getStyle('O' . $fila . ':Q' . $fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('O' . $fila . ':Q' . $fila);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, 'FECHA');
+
+		$fila=9;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'Jr. Alberto Bartón 527');
+		$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_left);
+		
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'Shuangchuang Building, No. 1133');
+		$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_left);
+		
+		// /. Title
+
+		if( !empty($data) ){
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3))  . str_pad($data[0]->Nu_Correlativo,3,"0",STR_PAD_LEFT);
+	  			
+			$objPHPExcel->getActiveSheet()->setTitle($sCorrelativoCotizacion);
+			$fileNameExcel = "3.2_O.C C.TRADING APROBADA_" . $sCorrelativoCotizacion . ".xls";
+
+			$fila=9;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila . ':Q' . $fila)->applyFromArray($BStyle_bottom);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('L'.$fila, $sCorrelativoCotizacion);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':N' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':N' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, ToDateBD($data[0]->Fe_Emision_Cotizacion));
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('O' . $fila . ':Q' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila . ':Q' . $fila)->applyFromArray($style_align_center);
+				
+			$fila=10;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'Santa Catalina - La Victoria');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_left);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'Chouzhou North Road, Yiwu City');
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_left);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(15);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(15);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila. ':E' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':E' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':E' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'CLIENTE');
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(30);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':E' . $fila)->applyFromArray($BStyle_top);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'NAME: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->No_Contacto);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':H' . $fila)->applyFromArray($BStyle_top);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila . ':Q' . $fila)->applyFromArray($BStyle_top);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'RAZON SOCIAL: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $data[0]->No_Entidad);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'DNI: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->Nu_Documento_Identidad_Externo);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'RUC: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $data[0]->Nu_Documento_Identidad);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'WHATSAPP: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->Nu_Celular_Contacto);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'N° PROFORMA: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $sCorrelativoCotizacion);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'CORREO: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->Txt_Email_Contacto);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':E' . $fila)->applyFromArray($BStyle_bottom);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':H' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'SERVICIO: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, 'TRADING');
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila . ':Q' . $fila)->applyFromArray($BStyle_bottom);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':R' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(50);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila. ':O' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'N');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('E'.$fila, 'FOTO DEL PRODUCTO');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, 'NOMBRE COMERCIAL');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'CARACTERISTICAS');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('H'.$fila, 'CANTIDAD TOTAL');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('I'.$fila, 'PRECIO UNITARIO ' . "\n" . ' EXW (RMB)');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('J'.$fila, 'PRECIO UNITARIO ' . "\n" . ' EXW (USD)');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'COSTO TOTAL');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('L'.$fila, 'PCS /' . "\n" . ' CAJA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, 'TOTAL CAJAS');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('N'.$fila, 'CBM /' . "\n" . ' CAJA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, 'CBM ' . "\n" . ' TOTAL');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila. ':R' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('Q' . $fila . ':R' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('Q'.$fila, 'TIEMPO PRODUCCIÓN');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('Q' . $fila . ':R' . $fila);
+			
+			$fila++;
+			$iCounter=1;
+			$fCostoTotalYuanesGeneral = 0;
+			$fCostoTotalGeneral = 0;
+			$fCbmTotal = 0;
+			$fCbmTotalGeneral = 0;
+			$fTotalCajasGeneral = 0;
+            foreach($data as $row) {
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+				$objPHPExcel->getActiveSheet()->getStyle('Q' . $fila . ':R' . $fila)->applyFromArray($style_align_center);
+				
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('E' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('G' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('J' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('M' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($styleArrayAllborder);
+				
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('Q' . $fila . ':R' . $fila);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('R' . $fila)->applyFromArray($styleArrayAllborder);
+
+				$html_data = array("&nbsp;");
+				$row->Txt_Descripcion =str_replace($html_data," ",$row->Txt_Descripcion);
+		
+				$html_data = array("<br>", "<p>", "<br/>");
+				$row->Txt_Descripcion =str_replace($html_data,"\n",$row->Txt_Descripcion);
+		
+				$row->Txt_Descripcion =strip_tags($row->Txt_Descripcion);
+
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)
+				->setCellValue('D' . $fila, $iCounter);
+
+				if( !empty($row->Txt_Url_Imagen_Producto) ){
+					$objDrawing = new PHPExcel_Worksheet_Drawing();
+
+					//cloud
+					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
+					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
+					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
+						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
+						$objDrawing->setWidthAndHeight(148,500);
+						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
+						$objDrawing->setResizeProportional(true);
+
+						$objDrawing->setCoordinates('E' . $fila);
+						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+					}
+				} else {
+					$objPHPExcel->setActiveSheetIndex($hoja_activa)
+					->setCellValue('E' . $fila, '');
+				}
+
+				$fPrecioYuanes = $row->Ss_Precio;
+				$fPrecioDolares = ($row->Ss_Precio * $row->Ss_Tipo_Cambio);
+				$fTotalCajas = ($row->Qt_Producto_Caja_Final / $row->Qt_Producto_Caja);//TOTAL CAJAS
+				$fCostoTotal = ($fPrecioDolares * $row->Qt_Producto_Caja_Final);
+				$fCostoTotalYuanes = ($fPrecioYuanes * $row->Qt_Producto_Caja_Final);
+				$fCbmTotal = ($fTotalCajas * $row->Qt_Cbm);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)
+				->setCellValue('F' . $fila, $row->Txt_Producto)
+				->setCellValue('G' . $fila, $row->Txt_Descripcion)
+				->setCellValue('H' . $fila, $row->Qt_Producto_Caja_Final)
+				->setCellValue('I' . $fila, $row->Ss_Precio)//precio yuanes
+				->setCellValue('J' . $fila, $fPrecioDolares)
+				->setCellValue('K' . $fila, $fCostoTotal)
+				->setCellValue('L' . $fila, $row->Qt_Producto_Caja)
+				->setCellValue('M' . $fila, $fTotalCajas)
+				->setCellValue('N' . $fila, $row->Qt_Cbm)
+				->setCellValue('O' . $fila, $fCbmTotal)
+				;
+
+				$fCostoTotalGeneral += $fCostoTotal;//precio en dolares
+				$fCostoTotalYuanesGeneral += $fCostoTotalYuanes;//precio en dolares
+				$fCbmTotalGeneral += $fCbmTotal;
+				$fTotalCajasGeneral += $fTotalCajas;
+
+				$iCounter++;
+				$fila++;
+			}
+			
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(30);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'TOTAL')
+            ->setCellValue('K' . $fila, numberFormat($fCostoTotalGeneral, 2, '.', ','))
+            ->setCellValue('M' . $fila, numberFormat($fTotalCajasGeneral, 2, '.', ','))
+			->setCellValue('O' . $fila, numberFormat($fCbmTotalGeneral, 2, '.', ','));
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':J' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->getFont()->setBold(true);
+
+			//SUMAR I y M
+			$objPHPExcel->getActiveSheet()
+			->getStyle('D' . $fila . ':' . 'K' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FF500B')
+					),
+					'font'  => array(
+						'color' => array('rgb' => 'FFFFFF'),
+					),
+				)
+			);
+			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('M' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FF500B')
+					),
+					'font'  => array(
+						'color' => array('rgb' => 'FFFFFF'),
+					),
+				)
+			);
+			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('O' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FF500B')
+					),
+					'font'  => array(
+						'color' => array('rgb' => 'FFFFFF'),
+					),
+				)
+			);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, 'USD');
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+
+			//DIBUJAR SELLO
+			$objDrawing = new PHPExcel_Worksheet_Drawing();
+					
+			$objDrawing->setName('Sello ProBusiness China');
+			$sSelloEmpresa = 'assets/img/sello_probusiness_china.png';
+			if ( file_exists($sSelloEmpresa) ) {
+				$objDrawing->setPath($sSelloEmpresa);
+				$objDrawing->setWidthAndHeight(170,600);
+				$objDrawing->setResizeProportional(true);
+
+				$sello_fila = $fila;
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('Q'.($sello_fila+1).':R'.($sello_fila+8));
+				$objDrawing->setCoordinates('Q' . ($sello_fila+1));
+				$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+			}
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'TOTAL DE LA COMPRA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'COMISION BROKER');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':G' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('G' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'SUB TOTAL');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral + 500);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('G' . $fila, $fCostoTotalGeneral + 500);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'CUENTA BANCARIA CHINA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':O' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(30);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, '** Beneficiary Bank: ZHEJIANG CHOUZHOU ');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('I' . $fila, '** Beneficiary Name:   CHRIS FACTORY LIMITED ');
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->getFont()->setBold(true);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'COMMERCIAL BANK');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('I' . $fila, '- Beneficiary Account: NRA15602002010590009448');
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->getFont()->setBold(true);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, ' - SWIFT BIC: CZCBCN2X');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('I' . $fila, ' - Company Address: Room 2107 21/F CC Wu Building');
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->getFont()->setBold(true);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, ' - City: YIWU');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('I' . $fila, ' 302-308  Henessy Road, Wanchai, Hong Kong');
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->getFont()->setBold(true);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, ' - Province: ZHEJIANG');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('I' . $fila, ' Henessy Road, Wanchai, Hong Kong');
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila)->getFont()->setBold(true);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, '  - Country: CHINA');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, ' - Bank Address: No. 1401 North Chouzhou Road ');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, ' Yiwu Zhejiang China');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila . ':S' . $fila)->applyFromArray($BStyle_bottom);
+			//FIN DE GENERAR EXCEL
+		} else {
+			$fila=3;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)
+			->setCellValue('A' . $fila, 'No hay registro');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('A' . $fila . ':O' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('A' . $fila)->applyFromArray($style_align_center);
+		}
+		
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment; filename="' . $fileNameExcel . '"');
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$objWriter->save('php://output');
+	}
+	
+	//generar cotización PDF para pedido de cliente	
+	public function generarConsolidaTrading($ID){
+        $data = $this->PedidosPagadosModel->get_by_id_excel($this->security->xss_clean($ID));
+		//array_debug($data);
+
+		$this->load->library('Excel');
+		$objPHPExcel = new PHPExcel();
+			
+		$hoja_activa = 0;
+		$fila=1;
+		$fileNameExcel = "OC_C.Trading_sin_data.xls";
+		
+		$hoja_activa = 0;
+			
+		//Title
+		$BStyle_top = array(
+		'borders' => array(
+			'top' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_left = array(
+		'borders' => array(
+			'left' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_right = array(
+		'borders' => array(
+			'right' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_bottom = array(
+		'borders' => array(
+			'bottom' => array(
+				'style' => PHPExcel_Style_Border::BORDER_THIN,
+				'color' => array('rgb' => '000000')
+			)
+		)
+		);
+		
+		$BStyle_background_title = array(
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => '000000')
+			),
+			'font'  => array(
+				'bold'  => true,
+				'color' => array('rgb' => 'FFFFFF'),
+				'size'  => 18
+			)
+		);
+		
+		$BStyle_background_sub_tittle = array(
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => '000000')
+			),
+			'font'  => array(
+				'bold'  => true,
+				'color' => array('rgb' => 'FFFFFF'),
+				'size'  => 13
+			)
+		);
+		
+		$BStyle_background_name_label = array(
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => 'faddd0')
+			),
+			'font'  => array(
+				'bold'  => true,
+				'color' => array('rgb' => '000000'),
+				'size'  => 12
+			)
+		);
+		
+		$style_align_center = array(
+		'alignment' => array(
+			'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+		)
+		);
+		
+		$style_align_right = array(
+		'alignment' => array(
+			'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+		)
+		);
+		
+		$style_align_left = array(
+		'alignment' => array(
+			'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+		)
+		);
+		
+		$styleArrayAllborder = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => '000000')
+				)
+			)
+		);
+
+		$BStyle_tittle_cursive = array(
+			'font'  => array(
+				'color' => array('rgb' => '000000'),
+				'size'  => 11,
+				'italic'  => true,
+			)
+		);
+
+		//SET ALL BORDER NONE
+		$styleArray = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => 'FFFFFF')
+				)
+			)
+		);
+		$objPHPExcel->getDefaultStyle()->applyFromArray($styleArray);
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth("8");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth("8");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth("35");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth("25");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth("25");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth("15");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth("20");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth("20");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth("20");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth("15");//NRO
+		
+		$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth("10");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth("15");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth("15");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth("15");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth("5");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setWidth("20");//NRO
+		$objPHPExcel->getActiveSheet()->getColumnDimension('R')->setWidth("15");//NRO
+
+		$objPHPExcel->getActiveSheet()->getColumnDimension('S')->setWidth("8");//NRO
+
+		//Title
+		$fila=1;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		
+		$fila=2;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		
+		$fila=3;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$fila=4;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$fila=5;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$fila=6;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(60);
+
+		$objDrawing = new PHPExcel_Worksheet_Drawing();
+		
+		$objDrawing->setPath('assets/img/logos/logo_probusiness.png');
+		$objDrawing->setWidthAndHeight(400,500);
+		$objDrawing->setResizeProportional(true);
+		$objDrawing->setCoordinates('D' . $fila);
+		$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+
+		//DERECHA
+		$objPHPExcel->getActiveSheet()
+		->getStyle('L' . $fila)
+		->applyFromArray(
+			array(
+				'font'  => array(
+					'bold'  => true,
+					'color' => array('rgb' => '000000'),
+					'size'  => 54
+				)
+			)
+		);
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)
+		->setCellValue('L' . $fila, 'ORDEN DE COMPRA');
+
+		$fila=7;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+		
+		$fila=8;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$objPHPExcel->getActiveSheet()->getStyle('D'.$fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'Ofic China');
+		$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_left);
+		
+		$objPHPExcel->getActiveSheet()->getStyle('G'.$fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'Ofic China');
+		$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_left);
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($BStyle_right);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila. ':N' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+		$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':N' . $fila)->applyFromArray($style_align_center);
+		$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':N' . $fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':N' . $fila);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('L'.$fila, 'N° ORDEN');
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila. ':Q' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+		$objPHPExcel->getActiveSheet()->getStyle('O' . $fila . ':Q' . $fila)->applyFromArray($style_align_center);
+		$objPHPExcel->getActiveSheet()->getStyle('O' . $fila . ':Q' . $fila)->getFont()->setBold(true);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('O' . $fila . ':Q' . $fila);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, 'FECHA');
+
+		$fila=9;
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'Jr. Alberto Bartón 527');
+		$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_left);
+		
+		$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'Shuangchuang Building, No. 1133');
+		$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_left);
+		
+		// /. Title
+
+		if( !empty($data) ){
+			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($data[0]->Fe_Month), 0 , 3))  . str_pad($data[0]->Nu_Correlativo,3,"0",STR_PAD_LEFT);
+	  			
+			$objPHPExcel->getActiveSheet()->setTitle($sCorrelativoCotizacion);
+			$fileNameExcel = "3.1_O.C TRADING APROBADA_" . $sCorrelativoCotizacion . ".xls";
+
+			$fila=9;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila . ':Q' . $fila)->applyFromArray($BStyle_bottom);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('L'.$fila, $sCorrelativoCotizacion);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':N' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':N' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, ToDateBD($data[0]->Fe_Emision_Cotizacion));
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('O' . $fila . ':Q' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila . ':Q' . $fila)->applyFromArray($style_align_center);
+				
+			$fila=10;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'Santa Catalina - La Victoria');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_left);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'Chouzhou North Road, Yiwu City');
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_left);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(15);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(15);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila. ':E' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':E' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':E' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'CLIENTE');
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(30);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+				
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':E' . $fila)->applyFromArray($BStyle_top);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'NAME: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->No_Contacto);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':H' . $fila)->applyFromArray($BStyle_top);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila . ':Q' . $fila)->applyFromArray($BStyle_top);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'RAZON SOCIAL: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $data[0]->No_Entidad);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'DNI: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->Nu_Documento_Identidad_Externo);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_left);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'RUC: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $data[0]->Nu_Documento_Identidad);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'WHATSAPP: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->Nu_Celular_Contacto);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_left);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'N° PROFORMA: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, $sCorrelativoCotizacion);
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'CORREO: ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, $data[0]->Txt_Email_Contacto);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('F' . $fila . ':H' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':E' . $fila)->applyFromArray($BStyle_bottom);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':H' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('K' . $fila . ':L' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'SERVICIO: ');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':Q' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, 'TRADING');
+			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila . ':Q' . $fila)->applyFromArray($BStyle_bottom);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':R' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(50);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila. ':O' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'N');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('E'.$fila, 'FOTO DEL PRODUCTO');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, 'NOMBRE COMERCIAL');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'CARACTERISTICAS');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('H'.$fila, 'CANTIDAD TOTAL');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('I'.$fila, 'PRECIO UNITARIO ' . "\n" . ' EXW (RMB)');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('J'.$fila, 'PRECIO UNITARIO ' . "\n" . ' EXW (USD)');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'COSTO TOTAL');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('L'.$fila, 'PCS /' . "\n" . ' CAJA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, 'TOTAL CAJAS');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('N'.$fila, 'CBM /' . "\n" . ' CAJA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, 'CBM ' . "\n" . ' TOTAL');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila. ':R' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('Q' . $fila . ':R' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('Q'.$fila, 'TIEMPO PRODUCCIÓN');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('Q' . $fila . ':R' . $fila);
+			
+			$fila++;
+			$iCounter=1;
+			$fCostoTotalYuanesGeneral = 0;
+			$fCostoTotalGeneral = 0;
+			$fCbmTotal = 0;
+			$fCbmTotalGeneral = 0;
+			$fTotalCajasGeneral = 0;
+            foreach($data as $row) {
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+				$objPHPExcel->getActiveSheet()->getStyle('Q' . $fila . ':R' . $fila)->applyFromArray($style_align_center);
+				
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('E' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('G' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('H' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('J' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('M' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($styleArrayAllborder);
+				
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('Q' . $fila . ':R' . $fila);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('R' . $fila)->applyFromArray($styleArrayAllborder);
+
+				$html_data = array("&nbsp;");
+				$row->Txt_Descripcion =str_replace($html_data," ",$row->Txt_Descripcion);
+		
+				$html_data = array("<br>", "<p>", "<br/>");
+				$row->Txt_Descripcion =str_replace($html_data,"\n",$row->Txt_Descripcion);
+		
+				$row->Txt_Descripcion =strip_tags($row->Txt_Descripcion);
+
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)
+				->setCellValue('D' . $fila, $iCounter);
+
+				if( !empty($row->Txt_Url_Imagen_Producto) ){
+					$objDrawing = new PHPExcel_Worksheet_Drawing();
+
+					//cloud
+					$row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
+					$row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
+					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
+						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
+						$objDrawing->setWidthAndHeight(148,500);
+						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
+						$objDrawing->setResizeProportional(true);
+
+						$objDrawing->setCoordinates('E' . $fila);
+						$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+					}
+				} else {
+					$objPHPExcel->setActiveSheetIndex($hoja_activa)
+					->setCellValue('E' . $fila, '');
+				}
+
+				$fPrecioYuanes = $row->Ss_Precio;
+				$fPrecioDolares = ($row->Ss_Precio * $row->Ss_Tipo_Cambio);
+				$fTotalCajas = ($row->Qt_Producto_Caja_Final / $row->Qt_Producto_Caja);//TOTAL CAJAS
+				$fCostoTotal = ($fPrecioDolares * $row->Qt_Producto_Caja_Final);
+				$fCostoTotalYuanes = ($fPrecioYuanes * $row->Qt_Producto_Caja_Final);
+				$fCbmTotal = ($fTotalCajas * $row->Qt_Cbm);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)
+				->setCellValue('F' . $fila, $row->Txt_Producto)
+				->setCellValue('G' . $fila, $row->Txt_Descripcion)
+				->setCellValue('H' . $fila, $row->Qt_Producto_Caja_Final)
+				->setCellValue('I' . $fila, $row->Ss_Precio)//precio yuanes
+				->setCellValue('J' . $fila, $fPrecioDolares)
+				->setCellValue('K' . $fila, $fCostoTotal)
+				->setCellValue('L' . $fila, $row->Qt_Producto_Caja)
+				->setCellValue('M' . $fila, $fTotalCajas)
+				->setCellValue('N' . $fila, $row->Qt_Cbm)
+				->setCellValue('O' . $fila, $fCbmTotal)
+				;
+
+				$fCostoTotalGeneral += $fCostoTotal;//precio en dolares
+				$fCostoTotalYuanesGeneral += $fCostoTotalYuanes;//precio en dolares
+				$fCbmTotalGeneral += $fCbmTotal;
+				$fTotalCajasGeneral += $fTotalCajas;
+
+				$iCounter++;
+				$fila++;
+			}
+			
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(30);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'TOTAL')
+            ->setCellValue('K' . $fila, numberFormat($fCostoTotalGeneral, 2, '.', ','))
+            ->setCellValue('M' . $fila, numberFormat($fTotalCajasGeneral, 2, '.', ','))
+			->setCellValue('O' . $fila, numberFormat($fCbmTotalGeneral, 2, '.', ','));
+
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':J' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':O' . $fila)->getFont()->setBold(true);
+
+			//SUMAR I y M
+			$objPHPExcel->getActiveSheet()
+			->getStyle('D' . $fila . ':' . 'K' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FF500B')
+					),
+					'font'  => array(
+						'color' => array('rgb' => 'FFFFFF'),
+					),
+				)
+			);
+			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('M' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FF500B')
+					),
+					'font'  => array(
+						'color' => array('rgb' => 'FFFFFF'),
+					),
+				)
+			);
+			
+			$objPHPExcel->getActiveSheet()
+			->getStyle('O' . $fila)
+			->applyFromArray(
+				array(
+					'fill' => array(
+						'type' => PHPExcel_Style_Fill::FILL_SOLID,
+						'color' => array('rgb' => 'FF500B')
+					),
+					'font'  => array(
+						'color' => array('rgb' => 'FFFFFF'),
+					),
+				)
+			);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, 'USD');
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+
+			//DIBUJAR SELLO
+			$objDrawing = new PHPExcel_Worksheet_Drawing();
+					
+			$objDrawing->setName('Sello ProBusiness China');
+			$sSelloEmpresa = 'assets/img/sello_probusiness_china.png';
+			if ( file_exists($sSelloEmpresa) ) {
+				$objDrawing->setPath($sSelloEmpresa);
+				$objDrawing->setWidthAndHeight(170,600);
+				$objDrawing->setResizeProportional(true);
+
+				$sello_fila = $fila;
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('Q'.($sello_fila+1).':R'.($sello_fila+8));
+				$objDrawing->setCoordinates('Q' . ($sello_fila+1));
+				$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+			}
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'TOTAL DE LA COMPRA');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'COMISION BROKER');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':G' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('G' . $fila)->applyFromArray($BStyle_background_name_label);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'SUB TOTAL');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral + 500);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('G' . $fila, $fCostoTotalGeneral + 500);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, 'CUENTAS BANCARIAS PERÚ');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':I' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':I' . $fila)->applyFromArray($styleArrayAllborder);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(25);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, ' - CUENTA: CORRIENTE EN DÓLARES');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':F' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':F' . $fila)->applyFromArray($style_align_center);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('G' . $fila, ' - TITULAR: GRUPO PROBUSINESS SAC');
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('G' . $fila . ':I' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila . ':I' . $fila)->applyFromArray($style_align_center);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila. ':F' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':F' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':F' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':F' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, 'BCP');
+			
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('G' . $fila. ':I' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila . ':I' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila . ':I' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('G' . $fila . ':I' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'INTERBANK');
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('D' . $fila, ' - NRO.CUENTA EN DOLARES: 191-9840556-1-63');
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':F' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':F' . $fila)->applyFromArray($style_align_center);
+			
+            $objPHPExcel->setActiveSheetIndex($hoja_activa)
+            ->setCellValue('G' . $fila, ' - NRO.CUENTA EN DOLARES: 200-3001727696');
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('G' . $fila . ':I' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila . ':I' . $fila)->applyFromArray($style_align_center);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('D' . $fila . ':I' . $fila)->applyFromArray($BStyle_bottom);
+			
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+
+			$fila++;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila . ':Q' . $fila)->applyFromArray($BStyle_bottom);
+			//FIN DE GENERAR EXCEL
+		} else {
+			$fila=3;
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)
+			->setCellValue('A' . $fila, 'No hay registro');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('A' . $fila . ':O' . $fila);
+			$objPHPExcel->getActiveSheet()->getStyle('A' . $fila)->applyFromArray($style_align_center);
+		}
+		
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment; filename="' . $fileNameExcel . '"');
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$objWriter->save('php://output');
 	}
 }
