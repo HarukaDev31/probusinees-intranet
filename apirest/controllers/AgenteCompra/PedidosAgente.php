@@ -471,6 +471,7 @@ class PedidosAgente extends CI_Controller {
 			// /. Title
 
 			$fila=17;
+			$iCounter=1;
             foreach($data as $row) {
 				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':G' . $fila)->applyFromArray($style_align_center);
 				$objPHPExcel->getActiveSheet()->getStyle('I' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
@@ -529,13 +530,13 @@ class PedidosAgente extends CI_Controller {
 				->setCellValue('F' . $fila, $row->Qt_Producto)
 				;
 				
-				$objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getAlignment()->setWrapText(true);
+				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->getAlignment()->setWrapText(true);
 
-				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->getNumberFormat()->setFormatCode('#,##0.00');
+				$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->getNumberFormat()->setFormatCode('#,##0.00');
 
 				if( !empty($row->Txt_Url_Link_Pagina_Producto) ){
 					$objPHPExcel->setActiveSheetIndex($hoja_activa)
-					->setCellValue('F' . $fila, 'Link');
+					->setCellValue('G' . $fila, 'Link');
 
 					$objPHPExcel->getActiveSheet()->getCell('F' . $fila)
 					->getHyperlink()
@@ -548,7 +549,7 @@ class PedidosAgente extends CI_Controller {
 						'underline' => 'single'
 						]
 					];
-					$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($link_style_array);
+					$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($link_style_array);
 				}
 
 				$iCounter++;
@@ -937,12 +938,6 @@ class PedidosAgente extends CI_Controller {
 				$iCounter++;
 				$fila++;
 			} // /. foreach data
-
-			header('Content-type: application/vnd.ms-excel');
-			header('Content-Disposition: attachment; filename="' . $fileNameExcel . '"');
-
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-			$objWriter->save('php://output');
 			//FIN DE GENERAR EXCEL
 		} else {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)
@@ -950,6 +945,12 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('A' . $fila . ':O' . $fila);
 			$objPHPExcel->getActiveSheet()->getStyle('A' . $fila)->applyFromArray($style_align_center);
 		}
+		
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment; filename="' . $fileNameExcel . '"');
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$objWriter->save('php://output');
 	}
 
 	public function downloadImage($id){

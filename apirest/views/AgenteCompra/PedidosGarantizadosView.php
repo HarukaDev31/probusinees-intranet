@@ -63,7 +63,7 @@
                         <th class="no-sort">Ver</th>
                       <?php endif; ?>
                       <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
-                      <th class="no-sort">Excel</th>
+                      <th class="no-sort">Proforma</th>
                       <?php } ?>
                       <th class="no-sort">Importación Integral</th>
                     </tr>
