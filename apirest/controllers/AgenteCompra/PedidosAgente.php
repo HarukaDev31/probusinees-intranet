@@ -327,8 +327,8 @@ class PedidosAgente extends CI_Controller {
 			);
 			$objPHPExcel->getDefaultStyle()->applyFromArray($styleArray);
 
-			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth("20");//NRO
-			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth("23");//NRO
+			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth("25");//NRO
+			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth("30");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth("30");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth("10");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth("12");//NRO
