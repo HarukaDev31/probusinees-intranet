@@ -26,6 +26,7 @@
               $iCantidadOCSinAsignar += ($row->Nu_Estado_Pedido == 3 && $row->ID_Usuario_Interno_China == 0 ? 1 : 0);
             ?>
             <?php } ?>
+            <?php if($this->user->Nu_Tipo_Privilegio_Acceso==1) { ?>
             <div class="col-lg-3 col-6">
               <div class="small-box bg-warning">
                 <div class="inner">
@@ -37,6 +38,7 @@
                 </div>
               </div>
             </div>
+            <?php } ?>
           <?php 
           }
         }
@@ -626,17 +628,21 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="text-center"><strong>Costos de Origen</strong></h4>
+        <h4 class="text-center">
+          <strong>Costos de Origen</strong>
+          &nbsp;&nbsp;<span style="font-size: 1rem;">T.C.: <span class="badge bg-success" id="costos_origen_china-tipo_cambio"></span></span>
+        </h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
         <div class="row">
           <input type="hidden" name="costos_origen_china-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+          <input type="hidden" name="costos_origen_china-Ss_Tipo_Cambio" class="form-control" autocomplete="off">
           
           <div class="col-6 col-lg-6">
             <label>Flete ¥</label>
             <div class="form-group">
-              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan" class="form-control input-decimal conversion-yuan_dolar" data-conversion_dolar='costos_origen_china-Ss_Pago_Otros_Flete_China_Dolar' placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -652,7 +658,7 @@
           <div class="col-6 col-lg-6">
             <label>Costos de Origen ¥</label>
             <div class="form-group">
-              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan" class="form-control input-decimal conversion-yuan_dolar" data-conversion_dolar='costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Dolar' placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -668,7 +674,7 @@
           <div class="col-6 col-lg-6">
             <label>Costos de FTA ¥</label>
             <div class="form-group">
-              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan" class="form-control input-decimal conversion-yuan_dolar" data-conversion_dolar='costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Dolar' placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -684,7 +690,7 @@
           <div class="col-6 col-lg-6">
             <label><input type="text" inputmode="text" id="costos_origen_china-No_Concepto_Pago_Cuadrilla" name="costos_origen_china-No_Concepto_Pago_Cuadrilla" class="form-control" value="Cuadrilla" maxlength="50" placeholder="" autocomplete="off"></label>
             <div class="form-group">
-              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan" class="form-control input-decimal conversion-yuan_dolar" data-conversion_dolar='costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar' placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>
@@ -700,7 +706,7 @@
           <div class="col-6 col-lg-6">
             <label>Otros Costos ¥</label>
             <div class="form-group">
-              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <input type="text" inputmode="decimal" name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan" class="form-control input-decimal conversion-yuan_dolar" data-conversion_dolar='costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar' placeholder="Ingresar" maxlength="20" autocomplete="off">
               <span class="help-block text-danger" id="error"></span>
             </div>
           </div>

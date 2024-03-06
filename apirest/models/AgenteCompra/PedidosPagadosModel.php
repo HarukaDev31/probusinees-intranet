@@ -1094,7 +1094,8 @@ ACPC.Nu_Commercial_Invoice,
 ACPC.Nu_Packing_List,
 ACPC.Nu_BL,
 ACPC.Nu_FTA,
-ACPC.Nu_FTA_Detalle
+ACPC.Nu_FTA_Detalle,
+(SELECT Ss_Venta_Oficial FROM tasa_cambio WHERE ID_Empresa=1 AND Fe_Ingreso='" . dateNow('fecha') . "' LIMIT 1) AS yuan_venta
 FROM
 agente_compra_pedido_cabecera AS ACPC
 LEFT JOIN shipper AS S ON(ACPC.ID_Shipper = S.ID_Shipper)

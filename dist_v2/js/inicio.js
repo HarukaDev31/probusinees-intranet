@@ -18,6 +18,19 @@ $(function () {
   });
   */
  
+	$(".conversion-yuan_dolar").keyup(function (e) {
+		e.preventDefault();
+
+    var tipo_cambio = parseFloat($( '[name="costos_origen_china-Ss_Tipo_Cambio"]' ).val());
+    var yuan = parseFloat($(this).val());
+
+    console.log('tipo cambio > ' + tipo_cambio);
+    console.log('yuan > ' + yuan);
+    console.log( ' > ' + $( this ).data('conversion_dolar'));
+
+    $('[name="' + $( this ).data('conversion_dolar') + '"]').val( (yuan / tipo_cambio).toFixed(2) );
+	});
+  
 	$(document).on('click', '#btn-save_cliente', function (e) {
     e.preventDefault();
 
@@ -932,22 +945,37 @@ function costosOrigenTradingChina(id, iIdTareaPedido){
     success: function(response){
       console.log(response);
 
-      $( '[name="costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan"]' ).val(response.Ss_Pago_Otros_Flete_China_Yuan);
+      $( '#costos_origen_china-tipo_cambio' ).html(response.yuan_venta);
+      $( '[name="costos_origen_china-Ss_Tipo_Cambio"]' ).val(response.yuan_venta);
+
+      if(parseFloat(response.Ss_Pago_Otros_Flete_China_Yuan)>0){
+        $( '[name="costos_origen_china-Ss_Pago_Otros_Flete_China_Yuan"]' ).val(response.Ss_Pago_Otros_Flete_China_Yuan);
+      }
       $( '[name="costos_origen_china-Ss_Pago_Otros_Flete_China_Dolar"]' ).val(response.Ss_Pago_Otros_Flete_China_Dolar);
 
-      $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Origen_China_Yuan);
+      if(parseFloat(response.Ss_Pago_Otros_Costo_Origen_China_Yuan)>0){
+        $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Origen_China_Yuan);
+      }
       $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Origen_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costo_Origen_China_Dolar);
 
-      $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Fta_China_Yuan);
+      if(parseFloat(response.Ss_Pago_Otros_Costo_Fta_China_Yuan)>0){
+        $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costo_Fta_China_Yuan);
+      }
       $( '[name="costos_origen_china-Ss_Pago_Otros_Costo_Fta_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costo_Fta_China_Dolar);
 
-      $( '[name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan"]' ).val(response.Ss_Pago_Otros_Cuadrilla_China_Yuan);
+      if(parseFloat(response.Ss_Pago_Otros_Cuadrilla_China_Yuan)>0){
+        $( '[name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Yuan"]' ).val(response.Ss_Pago_Otros_Cuadrilla_China_Yuan);
+      }
       $( '[name="costos_origen_china-Ss_Pago_Otros_Cuadrilla_China_Dolar"]' ).val(response.Ss_Pago_Otros_Cuadrilla_China_Dolar);
 
-      $( '[name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costos_China_Yuan);
+      if(parseFloat(response.Ss_Pago_Otros_Costos_China_Yuan)>0){
+        $( '[name="costos_origen_china-Ss_Pago_Otros_Costos_China_Yuan"]' ).val(response.Ss_Pago_Otros_Costos_China_Yuan);
+      }
       $( '[name="costos_origen_china-Ss_Pago_Otros_Costos_China_Dolar"]' ).val(response.Ss_Pago_Otros_Costos_China_Dolar);
 
-      $( '[name="costos_origen_china-No_Concepto_Pago_Cuadrilla"]' ).val(response.No_Concepto_Pago_Cuadrilla);
+      if(response.No_Concepto_Pago_Cuadrilla!='' && response.No_Concepto_Pago_Cuadrilla!=null){
+        $( '[name="costos_origen_china-No_Concepto_Pago_Cuadrilla"]' ).val(response.No_Concepto_Pago_Cuadrilla);
+      }
     },
     error: function (jqXHR, textStatus, errorThrown) {
       //$( '#modal-loader' ).modal('hide');
