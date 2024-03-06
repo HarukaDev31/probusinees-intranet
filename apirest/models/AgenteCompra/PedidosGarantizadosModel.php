@@ -88,6 +88,7 @@ class PedidosGarantizadosModel extends CI_Model{
 		IGPD.Txt_Url_Imagen_Producto,
 		IGPD.Txt_Producto,
 		IGPD.Txt_Descripcion,
+		IGPD.Qt_Producto,
 		ACPDPP.Qt_Producto_Caja_Final,
 		ACPDPP.Ss_Precio,
 		ACPDPP.Qt_Producto_Caja,

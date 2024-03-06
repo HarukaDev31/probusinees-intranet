@@ -380,7 +380,8 @@ function verPedido(ID){
   })
 }
 
-function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido) {
+function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido, ID_Entidad_Cliente) {
+  /*
   if(Nu_Estado==2 && id_usuario_pedido==0){
     $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
     $('#modal-message').modal('show');
@@ -391,6 +392,7 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido) {
     setTimeout(function () { $('#modal-message').modal('hide'); }, 3100);
     return 0;
   }
+  */
 
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
@@ -414,7 +416,7 @@ function cambiarEstado(ID, Nu_Estado, id_correlativo, id_usuario_pedido) {
     $( '#btn-save-delete' ).attr('disabled', true);
     $( '#btn-save-delete' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
 
-    url = base_url + 'AgenteCompra/PedidosAgente/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + id_correlativo;
+    url = base_url + 'AgenteCompra/PedidosAgente/cambiarEstado/' + ID + '/' + Nu_Estado + '/' + id_correlativo + '/' + ID_Entidad_Cliente;
     $.ajax({
       url: url,
       type: "GET",

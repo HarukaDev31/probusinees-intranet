@@ -17,6 +17,7 @@ class PedidosAgenteModel extends CI_Model{
 	var $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
 	var $table_pais = 'pais';
 	var $table_usuario_intero = 'usuario';
+	var $table_grupo_usuario = 'grupo_usuario';
 	
     var $order = array('Fe_Registro' => 'desc');
 		
@@ -27,7 +28,7 @@ class PedidosAgenteModel extends CI_Model{
 	public function _get_datatables_query(){
         $this->db->select($this->table . '.*, P.No_Pais,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Entidad')//, USRINTERNO.No_Usuario
+		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Entidad, CLI.ID_Entidad AS ID_Entidad_Cliente')//, USRINTERNO.No_Usuario
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
@@ -70,7 +71,7 @@ class PedidosAgenteModel extends CI_Model{
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
-		TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido, CONFI.Txt_Cuentas_Bancarias');
+		TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido, CONFI.Txt_Cuentas_Bancarias, CLI.ID_Entidad AS ID_Entidad_Cliente');
         $this->db->from($this->table);
 		$this->db->join($this->table_empresa . ' AS EMP', 'EMP.ID_Empresa = ' . $this->table . '.ID_Empresa', 'join');
 		$this->db->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join');
@@ -87,39 +88,73 @@ class PedidosAgenteModel extends CI_Model{
         return $query->result();
     }
 
-	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){		
+	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo, $ID_Entidad_Cliente){
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array( 'Nu_Estado' => $Nu_Estado );
 		if ($this->db->update($this->table, $data, $where) > 0) {
 			if($Nu_Estado==2 && $id_correlativo==0){
-				//si es Nu_Estado=2 Garantizado crear correlativo de mes y año si no existe y asignar al pedido
-				$arrCorrelativo = $this->generarCorrelativo();
-				if($arrCorrelativo['status']=='success'){
-					$ID_Agente_Compra_Correlativo = $arrCorrelativo['result']['id_correlativo'];
-					$Nu_Correlativo = $arrCorrelativo['result']['numero_correlativo'];
+				//asignar cotizacion a usuario de tipo cliente para que luego en su plataforma las pueda revisar
+				$query = "SELECT No_Contacto, Txt_Email_Contacto, Nu_Celular_Contacto FROM entidad WHERE ID_Entidad = " . $ID_Entidad_Cliente . " LIMIT 1";
+				$objEntidadCliente = $this->db->query($query)->row();
+				if(is_object($objEntidadCliente)){
+					//validacion de email
+					$sEmail = trim($objEntidadCliente->Txt_Email_Contacto);
+					$sEmail = filter_var($sEmail, FILTER_SANITIZE_EMAIL);// Remove all illegal characters from email
+					$regex = '/^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$/';// regular expression for email check
+					if ( $sEmail != 'root' && !filter_var($sEmail, FILTER_VALIDATE_EMAIL) && !preg_match($regex, $sEmail) ) {
+						return array('status' => 'error', 'message' => 'Debes ingresar un email válido');
+					}
 
-					//insertar estado proceso agente compra
-					$arrDataTour = array(
-						'ID_Pedido_Cabecera' => $ID
+					$data_cliente_usuario = array(
+						'ID_Empresa' 			=> 1,
+						'ID_Organizacion' 		=> 1,
+						'ID_Grupo'				=> 1204,//1204 Grupo cliente localhost - 1205 grupo cliente
+						'No_Usuario'			=> $sEmail,
+						'No_Nombres_Apellidos'	=> $objEntidadCliente->No_Contacto,
+						'No_Password'			=> $this->encryption->encrypt($sEmail),
+						'Nu_Celular'			=> $objEntidadCliente->Nu_Celular_Contacto,
+						'Txt_Email'				=> $sEmail,
+						'No_IP'					=> $this->input->ip_address(),
+						'Nu_Estado'				=> 1,
 					);
-					$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
+					
+					$arrUsuarioCliente = $this->crearUsuarioCliente($data_cliente_usuario);
+					if($arrUsuarioCliente['status']=='success'){
+						//si es Nu_Estado=2 Garantizado crear correlativo de mes y año si no existe y asignar al pedido
+						$arrCorrelativo = $this->generarCorrelativo();
+						if($arrCorrelativo['status']=='success'){
+							$ID_Agente_Compra_Correlativo = $arrCorrelativo['result']['id_correlativo'];
+							$Nu_Correlativo = $arrCorrelativo['result']['numero_correlativo'];
 
-					//actualizar tabla para agregar correlativo
-					$data = array(
-						'ID_Agente_Compra_Correlativo' => $ID_Agente_Compra_Correlativo,
-						'Nu_Correlativo' => $Nu_Correlativo,
-						'Fe_Emision_Cotizacion' => dateNow('fecha'),
-						'Fe_Registro_Hora_Cotizacion' => dateNow('fecha_hora'),
-						'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario
-					);
+							//insertar estado proceso agente compra
+							$arrDataTour = array(
+								'ID_Pedido_Cabecera' => $ID
+							);
+							$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
 
-					if ($this->db->update($this->table, $data, $where) > 0) {
-						return array('status' => 'success', 'message' => 'Correlativo generado');
+							//actualizar tabla para agregar correlativo
+							$data = array(
+								'ID_Agente_Compra_Correlativo' => $ID_Agente_Compra_Correlativo,
+								'Nu_Correlativo' => $Nu_Correlativo,
+								'Fe_Emision_Cotizacion' => dateNow('fecha'),
+								'Fe_Registro_Hora_Cotizacion' => dateNow('fecha_hora'),
+								'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
+								'ID_Usuario_Pedido' => $arrUsuarioCliente['ID_Usuario'] //para cliente
+							);
+
+							if ($this->db->update($this->table, $data, $where) > 0) {
+								return array('status' => 'success', 'message' => 'Correlativo generado');
+							} else {
+								return array('status' => 'error', 'message' => 'Error al asignar correlativo');
+							}
+						} else {
+							return $arrCorrelativo;
+						}
 					} else {
-						return array('status' => 'error', 'message' => 'Error al asignar correlativo');
+						return $arrUsuarioCliente;
 					}
 				} else {
-					return $arrCorrelativo;
+					return array('status' => 'error', 'message' => 'No existe cliente');
 				}
 			} else {
 				return array('status' => 'success', 'message' => 'Actualizado');
@@ -366,4 +401,40 @@ Nu_Correlativo
 			return array('status' => 'success', 'message' => 'Registro guardado');
 		return array('status' => 'error', 'message' => 'Error al guardar');
 	}
+
+    public function crearUsuarioCliente($data){
+		/*
+		if($this->db->query("SELECT COUNT(*) AS existe FROM usuario WHERE ID_Organizacion=" . $data['ID_Organizacion'] . " AND No_Usuario='" . $data['No_Usuario'] . "' LIMIT 1")->row()->existe > 0){
+			return array('status' => 'warning', 'style_modal' => 'modal-warning', 'message' => 'El usuario ya existe');
+		} else {
+		*/
+		$query = "SELECT ID_Usuario FROM usuario WHERE ID_Organizacion=" . $data['ID_Organizacion'] . " AND No_Usuario='" . $data['No_Usuario'] . "' LIMIT 1";
+		$objUsuario = $this->db->query($query)->row();
+		if(!is_object($objUsuario)){
+			if($data['No_Usuario']=='root'){//1=root
+				return array('status' => 'error', 'style_modal' => 'modal-warning', 'message' => 'No puedes crear un usuario con nombre > "root"');
+			}
+
+			if ( ($this->db->insert($this->table_usuario_intero, $data) > 0) ){
+			    unset($data['No_Usuario']);
+			    unset($data['No_Nombres_Apellidos']);
+				unset($data['No_Password']);
+				if( isset($data['Nu_Celular']) )
+			    	unset($data['Nu_Celular']);
+			    unset($data['Txt_Email']);
+			    unset($data['Txt_Token_Activacion']);
+			    unset($data['No_IP']);
+			    unset($data['Nu_Estado']);
+			    $data['ID_Usuario'] = $this->db->insert_id();
+			    if ($this->db->insert($this->table_grupo_usuario, $data) > 0){
+				    return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado', 'ID_Usuario' => $data['ID_Usuario']);
+			    }
+			} else {
+				return array('status' => 'error', 'style_modal' => 'modal-warning', 'message' => 'No se creo usuario para cliente');
+			}
+		} else {
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado', 'ID_Usuario' => $objUsuario->ID_Usuario);
+		}
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
+    }
 }

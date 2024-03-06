@@ -55,7 +55,7 @@
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
                       <th class="no-sort">Ver</th>
                       <?php endif; ?>
-                      <th class="no-sort">Cliente</th>
+                      <!--<th class="no-sort">Cliente</th>-->
                       <th>Estado</th>
                     </tr>
                   </thead>

@@ -11,6 +11,7 @@ class PedidosAgente extends CI_Controller {
 	function __construct(){
     	parent::__construct();	
 		$this->load->library('session');
+		$this->load->library('encryption');
 		$this->load->database('LAE_SYSTEMS');
 		$this->load->model('AgenteCompra/PedidosAgenteModel');
 		$this->load->model('HelperImportacionModel');
@@ -50,6 +51,7 @@ class PedidosAgente extends CI_Controller {
 				$btn_ver = '';
 			$rows[] = $btn_ver;
 
+			/*
 			$btn_asignar_usuario = '';
 			if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
 				$btn_asignar_usuario = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
@@ -59,6 +61,7 @@ class PedidosAgente extends CI_Controller {
 				}
 			}
 			$rows[] = $btn_asignar_usuario;
+			*/
 			
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($row->Nu_Estado);
 			$dropdown_estado = '<div class="dropdown">';
@@ -66,8 +69,8 @@ class PedidosAgente extends CI_Controller {
 					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
 				$dropdown_estado .= '<span class="caret"></span></button>';
 				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',1,0);">Pendiente</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Garantizado" title="Garantizado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $row->ID_Usuario_Pedido . '\');">Garantizado</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',1,0,\'' . $row->ID_Entidad_Cliente . '\');">Pendiente</a></li>';
+					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Garantizado" title="Garantizado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $row->ID_Usuario_Pedido . '\',\'' . $row->ID_Entidad_Cliente . '\');">Garantizado</a></li>';
 				$dropdown_estado .= '</ul>';
 			$dropdown_estado .= '</div>';
             $rows[] = $dropdown_estado;
@@ -87,9 +90,9 @@ class PedidosAgente extends CI_Controller {
         echo json_encode($this->PedidosAgenteModel->get_by_id($this->security->xss_clean($ID)));
     }
 
-	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo){
+	public function cambiarEstado($ID, $Nu_Estado, $id_correlativo, $ID_Entidad_Cliente){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
-    	echo json_encode($this->PedidosAgenteModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($id_correlativo)));
+    	echo json_encode($this->PedidosAgenteModel->cambiarEstado($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($id_correlativo), $this->security->xss_clean($ID_Entidad_Cliente)));
 	}
 
 	public function crudPedidoGrupal(){
@@ -327,6 +330,7 @@ class PedidosAgente extends CI_Controller {
 			);
 			$objPHPExcel->getDefaultStyle()->applyFromArray($styleArray);
 
+			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth("5");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth("25");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth("30");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth("30");//NRO
