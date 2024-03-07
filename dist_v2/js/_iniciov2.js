@@ -1,129 +1,23 @@
 $(function () {
-  $('.select2').select2(); 
+  $('.select2').select2();
+
+  /*
+  $("#example1").DataTable({
+    "responsive": true, "lengthChange": false, "autoWidth": false,
+    "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+  }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+  $('#example2').DataTable({
+    "paging": true,
+    "lengthChange": false,
+    "searching": false,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": true,
+  });
+  */ 
   
-  //Date picker invoice
-  $( '.input-report' ).datepicker({
-    autoclose : true,
-    startDate : new Date('2023', '10', '01'),
-    todayHighlight  : true,
-    dateFormat: 'dd/mm/yyyy',
-    format: 'dd/mm/yyyy',
-  });
-
-	$(document).on('click', '#btn-save_booking', function (e) {
-    e.preventDefault();
-
-    $( '#btn-save_booking' ).text('');
-    $( '#btn-save_booking' ).attr('disabled', true);
-    $( '#btn-save_booking' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-
-    //$( '#modal-loader' ).modal('show');
-
-    url = base_url + 'AgenteCompra/PedidosPagados/reservaBooking';
-      $.ajax({
-      type		  : 'POST',
-      dataType	: 'JSON',
-      url		    : url,
-      data		  : $('#form-booking').serialize(),
-      success : function( response ){
-          //$( '#modal-loader' ).modal('hide');
-          
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          $('#modal-message').modal('show');
-          
-          if (response.status == 'success'){
-            $('.modal-booking').modal('hide');
-              
-            $('#moda-message-content').addClass( 'bg-' + response.status);
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
-            
-            location.reload();
-          } else {
-            $('#moda-message-content').addClass( 'bg-danger' );
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
-          }
-          
-          $( '#btn-save_booking' ).text('');
-          $( '#btn-save_booking' ).append( 'Guardar' );
-          $( '#btn-save_booking' ).attr('disabled', false);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          //$( '#modal-loader' ).modal('hide');
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          
-          $( '#modal-message' ).modal('show');
-          $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-          
-          //Message for developer
-          console.log(jqXHR.responseText);
-          
-          $( '#btn-save_booking' ).text('');
-          $( '#btn-save_booking' ).append( 'Guardar' );
-          $( '#btn-save_booking' ).attr('disabled', false);
-      }
-    });
-  });
-
-	$(document).on('click', '#btn-guardar_fecha_entrega_shipper', function (e) {
-    e.preventDefault();
-
-    $( '#btn-guardar_fecha_entrega_shipper' ).text('');
-    $( '#btn-guardar_fecha_entrega_shipper' ).attr('disabled', true);
-    $( '#btn-guardar_fecha_entrega_shipper' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
-
-    url = base_url + 'AgenteCompra/PedidosPagados/despacho';
-      $.ajax({
-      type		  : 'POST',
-      dataType	: 'JSON',
-      url		    : url,
-      data		  : $('#form-fecha_entrega_shipper').serialize(),
-      success : function( response ){
-          //$( '#modal-loader' ).modal('hide');
-          
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          $('#modal-message').modal('show');
-          
-          if (response.status == 'success'){
-            $('.modal-fecha_entrega_shipper').modal('hide');
-              
-            $('#moda-message-content').addClass( 'bg-' + response.status);
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 2100);
-            
-            location.reload();
-          } else {
-            $('#moda-message-content').addClass( 'bg-danger' );
-            $('.modal-title-message').text(response.message);
-            setTimeout(function() {$('#modal-message').modal('hide');}, 3200);
-          }
-          
-          $( '#btn-guardar_fecha_entrega_shipper' ).text('');
-          $( '#btn-guardar_fecha_entrega_shipper' ).append( 'Guardar' );
-          $( '#btn-guardar_fecha_entrega_shipper' ).attr('disabled', false);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          //$( '#modal-loader' ).modal('hide');
-          $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-          
-          $( '#modal-message' ).modal('show');
-          $('#moda-message-content').addClass( 'bg-danger' );
-          $('.modal-title-message').text(response.message);
-          setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-          
-          //Message for developer
-          console.log(jqXHR.responseText);
-          
-          $( '#btn-guardar_fecha_entrega_shipper' ).text('');
-          $( '#btn-guardar_fecha_entrega_shipper' ).append( 'Guardar' );
-          $( '#btn-guardar_fecha_entrega_shipper' ).attr('disabled', false);
-      }
-    });
-  });
-
   $("#form-pago_cliente_30").on('submit',function(e){
     e.preventDefault();
 
@@ -150,11 +44,12 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-pago_cliente_30').modal('hide');
 
+          verPedido($('#pago_cliente_30-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           
-          location.reload();
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -190,12 +85,12 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-pago_cliente_100').modal('hide');
 
+          verPedido($('#pago_cliente_100-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           
-          location.reload();
-
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -231,12 +126,12 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-pago_cliente_servicio').modal('hide');
 
+          verPedido($('#pago_cliente_servicio-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           
-          location.reload();
-
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -272,11 +167,12 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-pago_flete').modal('hide');
 
+          verPedido($('#pago_flete-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           
-          location.reload();
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -312,12 +208,12 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-costos_origen').modal('hide');
 
+          verPedido($('#costos_origen-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
-
-          location.reload();
-
+          
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -352,13 +248,13 @@ $(function () {
 
         if(response.status == 'success') {
           $('#modal-pago_fta').modal('hide');
-          
+
+          verPedido($('#pago_fta-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           
-          location.reload();
-
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -394,11 +290,12 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-otros_cuadrilla').modal('hide');
 
+          verPedido($('#otros_cuadrilla-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
           
-          location.reload();
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -434,12 +331,12 @@ $(function () {
         if(response.status == 'success') {
           $('#modal-otros_costos').modal('hide');
 
+          verPedido($('#otros_costos-id_cabecera').val());
+
           $('#moda-message-content').addClass( 'bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 1100);
-
-          location.reload();
-
+          
         } else {
           $('#moda-message-content').addClass( 'bg-danger' );
           $('.modal-title-message').text(response.message);
@@ -2035,50 +1932,4 @@ function descargarPagoOtrosCostos(){
   
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
-}
-
-function despacho(id, sCorrelativo){
-  $( '[name="despacho-id_cabecera"]' ).val(id);
-  $( '[name="despacho-correlativo"]' ).val(sCorrelativo);
-
-  $('#modal-fecha_entrega_shipper').modal('show');
-  $( '#form-fecha_entrega_shipper' )[0].reset();
-}
-
-function booking(id){
-  $( '#form-booking' )[0].reset();
-  $( '.form-group' ).removeClass('has-error');
-  $( '.form-group' ).removeClass('has-success');
-  $( '.help-block' ).empty();
-
-  $( '[name="booking-ID_Pedido_Cabecera"]' ).val(id);
-
-  $(' .modal-booking ').modal('show');
-  $(' #form-booking ' )[0].reset();
-  
-  url = base_url + 'AgenteCompra/PedidosPagados/getBooking/' + id;
-  $.ajax({
-    url : url,
-    type: "GET",
-    dataType: "JSON",
-    success: function(response){
-      console.log(response);
-
-      $( '[name="booking-Qt_Caja_Total_Booking"]' ).val(response.Qt_Caja_Total_Booking);
-      $( '[name="booking-Qt_Cbm_Total_Booking"]' ).val(response.Qt_Cbm_Total_Booking);
-      $( '[name="booking-Qt_Peso_Total_Booking"]' ).val(response.Qt_Peso_Total_Booking);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      //$( '#modal-loader' ).modal('hide');
-        $( '.modal-message' ).removeClass('modal-danger modal-warning modal-success');
-        
-        $( '#modal-message' ).modal('show');
-        $( '.modal-message' ).addClass( 'modal-danger' );
-        $( '.modal-title-message' ).text( textStatus + ' [' + jqXHR.status + ']: ' + errorThrown );
-        setTimeout(function() {$('#modal-message').modal('hide');}, 1700);
-        
-        //Message for developer
-      console.log(jqXHR.responseText);
-    }
-  })
 }

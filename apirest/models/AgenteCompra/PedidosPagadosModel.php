@@ -31,7 +31,7 @@ class PedidosPagadosModel extends CI_Model{
 	public function _get_datatables_query(){
         $this->db->select('CORRE.Fe_Month, Nu_Estado_China,' . $this->table . '.*, P.No_Pais, 
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, USRCHINA.No_Usuario, USRJEFECHINA.No_Usuario AS No_Usuario_Jefe')
+		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, USRCHINA.No_Nombres_Apellidos AS No_Usuario, USRJEFECHINA.No_Nombres_Apellidos AS No_Usuario_Jefe')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
@@ -1037,7 +1037,7 @@ ACPDPP.ID_Pedido_Detalle_Producto_Proveedor = " . $ID . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
 
-    public function reservaBooking($where, $data){
+    public function reservaBookingConsolidado($where, $data){
 		if(isset($data['No_Numero_Consolidado']) && !empty($data['No_Numero_Consolidado'])){
 			//marcar progreso 1. Verificar datos de exportación
 			$where_progreso = array(
@@ -1047,6 +1047,20 @@ ACPDPP.ID_Pedido_Detalle_Producto_Proveedor = " . $ID . " LIMIT 1";
 			$data_progreso = array('Nu_Estado_Proceso' => 1);
 			$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
 		}
+
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
+    }
+
+    public function reservaBooking($where, $data){
+		//marcar progreso 1. Verificar datos de exportación
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 6
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
 
 		if ( $this->db->update($this->table, $data, $where) > 0 )
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
@@ -1089,6 +1103,7 @@ ACPC.Txt_Url_Pago_Otros_Cuadrilla_China,
 ACPC.Txt_Url_Pago_Otros_Costos_China,
 S.No_Shipper,
 S.No_Coordinador,
+ACPC.Nu_Tipo_Servicio,
 ACPC.No_Concepto_Pago_Cuadrilla,
 ACPC.Nu_Commercial_Invoice,
 ACPC.Nu_Packing_List,
@@ -1162,8 +1177,15 @@ ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 	}
 
     public function despacho($where, $data){
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 10
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
 		if ( $this->db->update($this->table, $data, $where) > 0 )
-			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro modificado');
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Completado');
 		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
 
@@ -1945,5 +1967,18 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		$this->db->where('ACPDPP.Nu_Selecciono_Proveedor',1);
         $query = $this->db->get();
         return $query->result();
+    }
+
+    public function reservaPedido($where, $data){
+		$where_progreso = array(
+			'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
+			'Nu_ID_Interno' => 3
+		);
+		$data_progreso = array('Nu_Estado_Proceso' => 1);
+		$this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+
+		if ( $this->db->update($this->table, $data, $where) > 0 )
+			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Completado');
+		return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
     }
 }

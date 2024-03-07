@@ -31,7 +31,7 @@ class PedidosGarantizadosModel extends CI_Model{
         $this->db->select($this->table . '.*, P.No_Pais, 
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
-		CORRE.Fe_Month, USRCHINA.No_Usuario')
+		CORRE.Fe_Month, USRCHINA.No_Nombres_Apellidos AS No_Usuario')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')

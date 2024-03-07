@@ -54,7 +54,7 @@
                       <?php } ?>
                       <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
                       <th>Personal</th>
-                      <th>Jefe</th>
+                      <!--<th>Jefe</th>--><!-- asignar automatico al jefe limit 1 usuario -->
                       <?php } ?>
                       <?php if($this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
                       <th>Empresa</th>

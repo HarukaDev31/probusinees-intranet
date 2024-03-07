@@ -56,37 +56,73 @@
             $iCantidadPagado += (($row->Nu_Estado_Pedido == 5 || $row->Nu_Estado_Pedido == 6 || $row->Nu_Estado_Pedido == 7 || $row->Nu_Estado_Pedido == 9) ? 1 : 0);
           ?>
           <?php } ?>
-          <div class="col-lg-3 col-6">
-            <div class="small-box bg-primary">
-              <div class="inner">
-                <h3><?php echo $iCantidadGaranizado; ?></h3>
-                <p>Cotizaciones Garantizadas</p>
-              </div>
-              <div class="icon">
-                <i class="ion ion-bag"></i>
-              </div>
-            </div>
+          <div class="col-lg-12 col-12">
+            <h1 class="mb-3">Cotizaciones Garantizadas</h1>
           </div>
           
           <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
-          <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-              <div class="inner">
-                <h3><?php echo $iCantidadGaranizado; ?></h3>
-                <p>Garantizadas sin Asignar China</p>
-              </div>
-              <div class="icon">
-                <i class="ion ion-bag"></i>
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-warning"><i class="far fa-envelope"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Por Asignar</span>
+                <span class="info-box-number"><?php echo $iCantidadGaranizado; ?></span>
               </div>
             </div>
           </div>
           <?php } ?>
+
+          <div class="col-md-3 col-sm-6 col-12"><!-- para el chino solo los que están asignados a él--> <!-- al tamara y jefe total-->
+            <div class="info-box">
+              <span class="info-box-icon bg-danger"><i class="far fa-envelope"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Pendientes</span>
+                <span class="info-box-number"><?php echo $iCantidadGaranizado; ?></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-primary"><i class="far fa-envelope"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">En Proceso</span>
+                <span class="info-box-number"><?php echo $iCantidadGaranizado; ?></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-success"><i class="far fa-envelope"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Cotizado</span>
+                <span class="info-box-number"><?php echo $iCantidadGaranizado; ?></span>
+              </div>
+            </div>
+          </div>
           
+          <div class="col-lg-12 col-12">
+            <h1 class="mb-3">Orden de Compra</h1><!-- para el chino solo los que están asignados a él--> <!-- al jefe total-->
+          </div>
+
           <div class="col-lg-3 col-6">
             <div class="small-box bg-success">
               <div class="inner">
                 <h3><?php echo $iCantidadPagado; ?></h3>
-                <p>Ordenes de Compra</p>
+                <p>Trading</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-primary">
+              <div class="inner">
+                <h3><?php echo $iCantidadPagado; ?></h3>
+                <p>C. Trading</Table></p>
               </div>
               <div class="icon">
                 <i class="ion ion-stats-bars"></i>
@@ -206,14 +242,47 @@
                                   
                                   if ($row_menu->Nu_ID_Interno==3){//paso 1 - Orden Compra Aprobadas
                                     $iIdTareaPedido = 3;
+                                    /*
                                     $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
                                     $btn_tarea = '<i class="fas fa-list" aria-hidden="true"></i>';
+                                    */
+                                    $a_href = 'alt="Orden de Compra Pedido" title="Orden de Compra Pedido" href="javascript:void(0)"  onclick="reservarPedidoOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
+                                    $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Orden de Compra Pedido" title="Orden de Compra Pedido" href="javascript:void(0)"  onclick="reservarPedidoOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-list" aria-hidden="true"></i></button>';
                                   }
                                   
                                   if ($row_menu->Nu_ID_Interno==4){//paso 1 - Orden Compra Aprobadas
                                     $iIdTareaPedido = 4;
+                                    /*
                                     $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
                                     $btn_tarea = '<i class="fas fa-money-bill-alt" aria-hidden="true"></i>';
+                                    */
+                                    $a_href = 'alt="Orden de Compra Pedido" title="Orden de Compra Pedido" href="javascript:void(0)"  onclick="pagoClienteOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
+                                    $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Orden de Compra Pedido" title="Orden de Compra Pedido" href="javascript:void(0)"  onclick="pagoClienteOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-money-bill-alt" aria-hidden="true"></i></button>';
+                                  }
+                                  
+                                  if ($row_menu->Nu_ID_Interno==5){//paso 1 - selección de proveedores
+                                    $iIdTareaPedido = 5;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-handshake" aria-hidden="true"></i>';
+                                  }
+
+                                  //EMPLEADO DE CHINA
+                                  if ($row_menu->Nu_ID_Interno==6){//paso 1 - verificar datos de exportación
+                                    $iIdTareaPedido = 6;
+                                    $a_href = 'alt="Booking" title="Booking" href="javascript:void(0)"  onclick="booking(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
+                                    $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="booking(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-box" aria-hidden="true"></i></button>';
+                                  }
+                                  
+                                  if ($row_menu->Nu_ID_Interno==7){//paso 1 - selección de proveedores
+                                    $iIdTareaPedido = 7;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-vote-yea" aria-hidden="true"></i>';
+                                  }
+                                  
+                                  if ($row_menu->Nu_ID_Interno==8){//paso 1 - selección de proveedores
+                                    $iIdTareaPedido = 8;
+                                    $a_href = 'href="' . $row_menu->Txt_Url_Menu . '/' . $sCorrelativoCotizacion . '/' . $row->ID_Pedido_Cabecera . '"';
+                                    $btn_tarea = '<i class="fas fa-search" aria-hidden="true"></i>';
                                   }
 
                                   //EMPLEADO DE CHINA
@@ -221,6 +290,13 @@
                                     $iIdTareaPedido = 9;
                                     $a_href = 'alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="documentoProveedorExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
                                     $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="documentoProveedorExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-file" aria-hidden="true"></i></button>';
+                                  }
+
+                                  //EMPLEADO DE CHINA
+                                  if ($row_menu->Nu_ID_Interno==10){//paso 1 - verificar datos de exportación
+                                    $iIdTareaPedido = 10;
+                                    $a_href = 'alt="Despacho" title="Despacho" href="javascript:void(0)"  onclick="despacho(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"';
+                                    $btn_tarea = '<button type="button" class="btn btn-xs btn-link" alt="Despacho" title="Despacho" href="javascript:void(0)"  onclick="despacho(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-truck" aria-hidden="true"></i></button>';
                                   }
 
                                   //JEFE DE CHINA
@@ -1280,3 +1356,722 @@
   <?php echo form_close(); ?>
 </div>
 <!-- /.modal agregar documento_proveedor_exportacion -->
+
+<!-- Modal oc_reservar_pedido -->
+<div class="modal fade modal-oc_reservar_pedido" id="modal-default">
+  <?php $attributes = array('id' => 'form-oc_reservar_pedido'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center"><strong>Selección de Servicio</strong></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="oc_reservar_pedido-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+
+          <div class="col-4 col-lg-4">
+            <label>Servicio</label>
+            <div class="form-group">
+              <select id="oc_reservar_pedido-Nu_Tipo_Servicio" name="oc_reservar_pedido-Nu_Tipo_Servicio" class="form-control" style="width: 100%;"></select>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-4 col-lg-4">
+            <label>Inconterms</label>
+            <div class="form-group">
+              <select id="oc_reservar_pedido-Nu_Tipo_Incoterms" name="oc_reservar_pedido-Nu_Tipo_Incoterms" class="form-control" style="width: 100%;"></select>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-4 col-lg-4">
+            <label>Envío</label>
+            <div class="form-group">
+              <select id="oc_reservar_pedido-Nu_Tipo_Transporte_Maritimo" name="oc_reservar_pedido-Nu_Tipo_Transporte_Maritimo" class="form-control" style="width: 100%;"></select>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_oc_reservar_pedido" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal oc_reservar_pedido -->
+
+<!-- Modal oc_reservar_pedido -->
+<div class="modal fade modal-pago_cliente_oc" id="modal-default">
+  <?php $attributes = array('id' => 'form-pago_cliente_oc'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center"><strong>Pagos de Cliente y Otros</strong></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="pago_cliente_oc-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+
+          <div class="col-6 col-sm-12 col-md-6 text-left">
+            <label>Pagos</label>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">Pagar 30%</button>
+              <button type="button" id="btn-descargar_pago_30" class="btn btn-primary d-none" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()"><span id="span-pago_30"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+              
+              <button type="button" class="btn btn-primary" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">Pagar 70%</button>
+              <button type="button" id="btn-descargar_pago_100" class="btn btn-primary d-none" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()"><span id="span-pago_100"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+              
+              <button type="button" class="btn btn-primary" alt="Subir pago servicio" title="Subir pago servicio" onclick="subirPagoServicio()">Pagar servicio</button>
+              <button type="button" id="btn-descargar_pago_servicio" class="btn btn-primary d-none" alt="Descargar pago servicio" title="Descargar pago servicio" onclick="descargarPagoServicio()"><span id="span-pago_servicio"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          
+          <div class="col-6 col-sm-12 col-md-6 text-left">
+            <label>Otros Pagos</label>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary" alt="Subir Flete" title="Subir Flete" onclick="subirPagoFlete()">Pagar Flete</button>
+              <button type="button" id="btn-descargar_flete" class="btn btn-primary d-none" alt="Descargar Flete" title="Descargar Flete" onclick="descargarPagoFlete()"><span id="span-flete"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+              
+              <button type="button" class="btn btn-primary" alt="Subir Costo Origen" title="Subir Costo Origen" onclick="subirPagoCostoOrigen()">Costo Origen</button>
+              <button type="button" id="btn-descargar_costo_origen" class="btn btn-primary d-none" alt="Descargar Costo Origen" title="Descargar Costo Origen" onclick="descargarPagoCostosOrigen()"><span id="span-costo_origen"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+              
+              <button type="button" class="btn btn-primary" alt="Subir Costo FTA" title="Subir Costo FTA" onclick="subirPagoFTA()">Costo FTA</button>
+              <button type="button" id="btn-descargar_fta" class="btn btn-primary d-none" alt="Descargar Costo FTA" title="Descargar Costo FTA" onclick="descargarPagoFTA()"><span id="span-fta"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+              
+              <button type="button" class="btn btn-primary" alt="Subir Costo Gastos" title="Subir Costo Gastos" onclick="subirPagoCuadrilla()">Gastos</button>
+              <button type="button" id="btn-descargar_pago_cuadrilla" class="btn btn-primary d-none" alt="Descargar Costo Gastos" title="Descargar Costo Gastos" onclick="descargarPagoCuadrilla()"><span id="span-cuadrilla"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+              
+              <button type="button" class="btn btn-primary" alt="Subir Otros Costos" title="Subir Otros Costo" onclick="subirPagoOtrosCostos()">Otros Costo</button>
+              <button type="button" id="btn-descargar_otros_costos" class="btn btn-primary d-none" alt="Descargar Otros Costo" title="Descargar Otros Costo" onclick="descargarPagoOtrosCostos()"><span id="span-otros_costo"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_pago_cliente_oc" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal pago_cliente_oc -->
+
+
+<!-- modal pago 30% cliente -->
+<div class="modal fade modal-pago_cliente_30" id="modal-pago_cliente_30">
+  <?php $attributes = array('id' => 'form-pago_cliente_30'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_cliente_30">
+        <div class="row">
+          <input type="hidden" id="pago_cliente_30-id_cabecera" name="pago_cliente_30-id_cabecera" class="form-control">
+
+          <div class="col-12 col-sm-12">
+            <label>Voucher pago 30%</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_cliente_30" name="pago_cliente_30" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">Empresa <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="ID_Pais_30_Cliente" id="cbo-ID_Pais_30_Cliente" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="modal-Fe_Pago_30_Cliente" name="Fe_Pago_30_Cliente" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="modal-Ss_Pago_30_Cliente" name="Ss_Pago_30_Cliente" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="modal-Nu_Operacion_Pago_30_Cliente" name="Nu_Operacion_Pago_30_Cliente" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_pago_cliente_30" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago 30% cliente -->
+
+<!-- modal pago 100% cliente -->
+<div class="modal fade modal-pago_cliente_100" id="modal-pago_cliente_100">
+  <?php $attributes = array('id' => 'form-pago_cliente_100'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_cliente_100">
+        <div class="row">
+          <input type="hidden" id="pago_cliente_100-id_cabecera" name="pago_cliente_100-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher pago 70%</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_cliente_100" name="pago_cliente_100" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="ID_Pais_100_Cliente" id="cbo-ID_Pais_100_Cliente" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="modal-Fe_Pago_100_Cliente" name="Fe_Pago_100_Cliente" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="modal-Ss_Pago_100_Cliente" name="Ss_Pago_100_Cliente" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="modal-Nu_Operacion_Pago_100_Cliente" name="Nu_Operacion_Pago_100_Cliente" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-pago_cliente_100" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago 100% cliente -->
+
+<!-- modal pago servicio cliente -->
+<div class="modal fade modal-pago_cliente_servicio" id="modal-pago_cliente_servicio">
+  <?php $attributes = array('id' => 'form-pago_cliente_servicio'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_cliente_servicio">
+        <div class="row">
+          <input type="hidden" id="pago_cliente_servicio-id_cabecera" name="pago_cliente_servicio-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher pago servicio</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_cliente_servicio" name="pago_cliente_servicio" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="ID_Pais_Servicio_Cliente" id="cbo-ID_Pais_Servicio_Cliente" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="modal-Fe_Pago_Servicio_Cliente" name="Fe_Pago_Servicio_Cliente" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="modal-Ss_Pago_Servicio_Cliente" name="Ss_Pago_Servicio_Cliente" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="modal-Nu_Operacion_Pago_Servicio_Cliente" name="Nu_Operacion_Pago_Servicio_Cliente" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-pago_cliente_servicio" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago servicio cliente -->
+
+
+<!-- modal pago flete -->
+<div class="modal fade modal-pago_flete" id="modal-pago_flete">
+  <?php $attributes = array('id' => 'form-pago_flete'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_flete">
+        <div class="row">
+          <input type="hidden" id="pago_flete-id_cabecera" name="pago_flete-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_flete" name="pago_flete" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="pago_flete-ID_Pais_Otros_Flete" id="pago_flete-ID_Pais_Otros_Flete" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="pago_flete-Fe_Pago" name="pago_flete-Fe_Pago" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="pago_flete-Ss_Pago_Otros_Flete" name="pago_flete-Ss_Pago_Otros_Flete" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Opcional <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="pago_flete-Nu_Operacion_Pago_Otros_Flete" name="pago_flete-Nu_Operacion_Pago_Otros_Flete" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-pago_flete" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago flete -->
+
+<!-- modal pago costos_origen -->
+<div class="modal fade modal-costos_origen" id="modal-costos_origen">
+  <?php $attributes = array('id' => 'form-costos_origen'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-costos_origen">
+        <div class="row">
+          <input type="hidden" id="costos_origen-id_cabecera" name="costos_origen-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher</label>
+            <div class="form-group">
+              <input class="form-control" id="costos_origen" name="costos_origen" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="costos_origen-ID_Pais_Otros_Costo_Origen" id="costos_origen-ID_Pais_Otros_Costo_Origen" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="costos_origen-Fe_Pago_Otros_Costo_Origen" name="costos_origen-Fe_Pago_Otros_Costo_Origen" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="costos_origen-Ss_Pago_Otros_Costo_Origen" name="costos_origen-Ss_Pago_Otros_Costo_Origen" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="costos_origen-Nu_Operacion_Pago_Otros_Costo_Origen" name="costos_origen-Nu_Operacion_Pago_Otros_Costo_Origen" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-costos_origen" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago costos_origen -->
+
+<!-- modal pago pago_fta -->
+<div class="modal fade modal-pago_fta" id="modal-pago_fta">
+  <?php $attributes = array('id' => 'form-pago_fta'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-pago_fta">
+        <div class="row">
+          <input type="hidden" id="pago_fta-id_cabecera" name="pago_fta-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher</label>
+            <div class="form-group">
+              <input class="form-control" id="pago_fta" name="pago_fta" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="pago_fta-ID_Pais_Otros_Costo_Fta" id="pago_fta-ID_Pais_Otros_Costo_Fta" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="pago_fta-Fe_Pago_Otros_Costo_Fta" name="pago_fta-Fe_Pago_Otros_Costo_Fta" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="pago_fta-Ss_Pago_Otros_Costo_Fta" name="pago_fta-Ss_Pago_Otros_Costo_Fta" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="pago_fta-Nu_Operacion_Pago_Otros_Costo_Fta" name="pago_fta-Nu_Operacion_Pago_Otros_Costo_Fta" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-pago_fta" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago pago_fta -->
+
+<!-- modal pago otros_cuadrilla -->
+<div class="modal fade modal-otros_cuadrilla" id="modal-otros_cuadrilla">
+  <?php $attributes = array('id' => 'form-otros_cuadrilla'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-otros_cuadrilla">
+        <div class="row">
+          <input type="hidden" id="otros_cuadrilla-id_cabecera" name="otros_cuadrilla-id_cabecera" class="form-control">
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Nombre Gasto <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="text" id="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" name="otros_cuadrilla-No_Concepto_Pago_Cuadrilla" class="form-control" value="" maxlength="50" placeholder="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-sm-12">
+            <label>Voucher</label>
+            <div class="form-group">
+              <input class="form-control" id="otros_cuadrilla" name="otros_cuadrilla" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="otros_cuadrilla-ID_Pais_Otros_Cuadrilla" id="otros_cuadrilla-ID_Pais_Otros_Cuadrilla" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="otros_cuadrilla-Fe_Pago_Otros_Cuadrilla" name="otros_cuadrilla-Fe_Pago_Otros_Cuadrilla" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="otros_cuadrilla-Ss_Pago_Otros_Cuadrilla" name="otros_cuadrilla-Ss_Pago_Otros_Cuadrilla" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="otros_cuadrilla-Nu_Operacion_Pago_Otros_Cuadrilla" name="otros_cuadrilla-Nu_Operacion_Pago_Otros_Cuadrilla" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-otros_cuadrilla" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago otros_cuadrilla -->
+
+<!-- modal pago pago_fta -->
+<div class="modal fade modal-otros_costos" id="modal-otros_costos">
+  <?php $attributes = array('id' => 'form-otros_costos'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-otros_costos">
+        <div class="row">
+          <input type="hidden" id="otros_costos-id_cabecera" name="otros_costos-id_cabecera" class="form-control">
+
+          <div class="col-sm-12">
+            <label>Voucher</label>
+            <div class="form-group">
+              <input class="form-control" id="otros_costos" name="otros_costos" type="file" accept="image/*"></input>
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label class="fw-bold mb-2">País <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <select name="otros_costos-ID_Pais_Otros_Costos" id="otros_costos-ID_Pais_Otros_Costos" class="form-control">
+                <option value="0" selected="selected">- Seleccionar -</option>
+                <option value="1">Perú</option>
+                <option value="55">China</option>
+              </select>
+            </div>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>F. Pago <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" id="otros_costos-Fe_Pago_Otros_Costos" name="otros_costos-Fe_Pago_Otros_Costos" class="form-control input-datepicker-pay required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3">
+            <label>Importe <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="decimal" class="form-control input-decimal" id="otros_costos-Ss_Pago_Otros_Costos" name="otros_costos-Ss_Pago_Otros_Costos" value="" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-3 div-modal_datos_tarjeta_credito">
+            <label>Nro. Operación <span class="label-advertencia text-danger"> *</span></label>
+            <div class="form-group">
+              <input type="text" inputmode="numeric" id="otros_costos-Nu_Operacion_Pago_Otros_Costos" name="otros_costos-Nu_Operacion_Pago_Otros_Costos" class="form-control input-number" value="" maxlength="10" placeholder="No. Operación" autocomplete="off">
+              <span class="help-block" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-otros_costos" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- modal pago otros_costos -->
+
+<!-- modal fecha_entrega_shipper -->
+<div class="modal fade modal-fecha_entrega_shipper" id="modal-fecha_entrega_shipper">
+  <?php $attributes = array('id' => 'form-fecha_entrega_shipper'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-fecha_entrega_shipper">
+        <div class="row">
+          <input type="hidden" id="despacho-id_cabecera" name="despacho-id_cabecera" class="form-control">
+          <input type="hidden" id="despacho-correlativo" name="despacho-correlativo" class="form-control">
+          <div class="col-sm-12">
+            <label>F. Entrega</label>
+            <div class="form-group">
+              <input type="text" name="despacho-Fe_Entrega_Shipper_Forwarder" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="submit" id="btn-guardar_fecha_entrega_shipper" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div>
+<!-- /.modal agregar fecha_entrega_shipper -->
+
+<!-- Modal booking -->
+<div class="modal fade modal-booking" id="modal-default">
+  <?php $attributes = array('id' => 'form-booking'); echo form_open('', $attributes); ?>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="text-center"><strong>Reserva de Booking</strong></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input type="hidden" name="booking-ID_Pedido_Cabecera" class="form-control" autocomplete="off">
+
+          <div class="col-12 col-lg-4">
+            <label>Cajas Total</label>
+            <div class="form-group">
+              <input type="text" name="booking-Qt_Caja_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4">
+            <label>CBM Total</label>
+            <div class="form-group">
+              <input type="text" name="booking-Qt_Cbm_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4">
+            <label>Peso Total</label>
+            <div class="form-group">
+              <input type="text" name="booking-Qt_Peso_Total_Booking" class="form-control input-decimal" placeholder="Ingresar" maxlength="20" autocomplete="off">
+              <span class="help-block text-danger" id="error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-save_booking" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <?php echo form_close(); ?>
+</div><!-- /. Modal booking -->

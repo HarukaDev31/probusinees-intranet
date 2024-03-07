@@ -1322,7 +1322,7 @@ function addItems(){
                 
       div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
       div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-      div_items += '<span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>';
+      div_items += '<span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>';//qty_caja_actual
       div_items += '</h6>';
       div_items += '<div class="form-group">';
       div_items += '<input type="text" id="modal-qty_caja' + iCounterItems + '" data-correlativo="' + iCounterItems + '" inputmode="decimal" name="addProducto[' + iCounterItems + '][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />';
@@ -1534,7 +1534,7 @@ function getItemProveedor(id_detalle){
               
               table_enlace_producto += '<div class="row">';
                 table_enlace_producto += '<div class="col-1 col-sm-1 mt-3">';
-                  table_enlace_producto += '<label>qty_caja</label>';
+                  table_enlace_producto += '<label>qty_total</label>';//qty_caja_actual
                   table_enlace_producto += '<input type="text" id="modal-cantidad' + i + '" data-correlativo="' + i + '" inputmode="numeric" name="addProducto[' + i + '][cantidad]" class="arrProducto form-control required cantidad input-numeric" placeholder="Cantidad" value="' + cantidad_html + '" autocomplete="off" />';
                 table_enlace_producto += '</div>';
                 table_enlace_producto += '<div class="text-left col-11 col-sm-11 mt-3">';

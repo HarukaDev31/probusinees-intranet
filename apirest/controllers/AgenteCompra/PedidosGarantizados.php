@@ -41,8 +41,8 @@ class PedidosGarantizados extends CI_Controller {
             $rows[] = $row->No_Pais;
             $rows[] = $sCorrelativoCotizacion;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
-            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
-            $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
+            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;//quitar para el chino
+            $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;//quitar para el chino
 			
 			//pago garantizado
 			if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
@@ -118,6 +118,7 @@ class PedidosGarantizados extends CI_Controller {
 				$excel_agente_compra = '<button class="btn" alt="Proforma Trading" title="Proforma Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
 				$excel_consolida_trading = '<button class="btn" alt="Proforma C. Trading" title="Proforma C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
 				$rows[] = $excel_agente_compra . '<br>' . $excel_consolida_trading;
+				$rows[] = '<span class="badge bg-danger">7 días</span><br>T.C. $ ' . round($row->Ss_Tipo_Cambio, 2);
 			}
 
 			//estado peru
@@ -591,7 +592,7 @@ class PedidosGarantizados extends CI_Controller {
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 						$objDrawing->setWidthAndHeight(148,500);
-						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
+						//$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
 						$objDrawing->setResizeProportional(true);
 
 						$objDrawing->setCoordinates('E' . $fila);
@@ -623,8 +624,11 @@ class PedidosGarantizados extends CI_Controller {
 				->setCellValue('M' . $fila, $fTotalCajas)
 				->setCellValue('N' . $fila, $row->Qt_Cbm)
 				->setCellValue('O' . $fila, $fCbmTotal)
-				->setCellValue('Q' . $fila, $row->Nu_Dias_Delivery)
+				->setCellValue('Q' . $fila, $row->Nu_Dias_Delivery . ' DIAS')
 				;
+
+				//$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(80);
+				$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->getAlignment()->setWrapText(true);
 
 				$fCostoTotalGeneral += $fCostoTotal;//precio en dolares
 				$fCostoTotalYuanesGeneral += $fCostoTotalYuanes;//precio en dolares
@@ -705,8 +709,10 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, 'USD');
+            ->setCellValue('F' . $fila, 'USD')
+			->setCellValue('G' . $fila, 'RMB');
 			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_center);
 			
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila. ':R' . $fila)->applyFromArray($BStyle_background_sub_tittle);
 			$objPHPExcel->getActiveSheet()->getStyle('K' . $fila . ':R' . $fila)->applyFromArray($style_align_center);
@@ -718,12 +724,15 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
 
+			$fCostoTotalGeneralRMB = round($fCostoTotalGeneral * $data[0]->Ss_Tipo_Cambio, 2);
 			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
             ->setCellValue('D' . $fila, 'TOTAL DE LA COMPRA');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, $fCostoTotalGeneral);
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral)
+			->setCellValue('G' . $fila, $fCostoTotalGeneralRMB)
+			;
 
 			//DERECHA
 			$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($styleArrayAllborder);
@@ -737,7 +746,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($styleArrayAllborder);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':M' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('L' . $fila, 1111);
+            ->setCellValue('L' . $fila, round($fCostoTotalGeneral * 0.3, 2));
 			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':M' . $fila)->applyFromArray($style_align_right);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('M' . $fila)->applyFromArray($BStyle_background_name_label);
@@ -754,10 +763,17 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($style_align_center);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':M' . $fila);
 			
+			//FORUMAL DE COMISIOJN DE CONSOLIDA TRADING 5%
+			$fComisionTotal = 500;
+			$fTotalComisionGeneral = ($fCostoTotalGeneral * 0.05);
+			if( $fTotalComisionGeneral > 500 ){//=SI((F26*0.05)>250,F26*0.05,250)
+				$fComisionTotal = $fTotalComisionGeneral;
+			}
+
 			$objPHPExcel->getActiveSheet()->getStyle('P' . $fila)->applyFromArray($styleArrayAllborder);
 			$objPHPExcel->getActiveSheet()->getStyle('Q' . $fila)->applyFromArray($styleArrayAllborder);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('P' . $fila, 3333);
+            ->setCellValue('P' . $fila, $fComisionTotal);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->getActiveSheet()->getStyle('P' . $fila . ':Q' . $fila)->applyFromArray($style_align_right);
@@ -771,19 +787,14 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('S' . $fila)->applyFromArray($BStyle_right);
 
-			//FORUMAL DE COMISIOJN DE CONSOLIDA TRADING 5%
-			$fComisionTotal = 500;
-			$fTotalComisionGeneral = ($fCostoTotalGeneral * 0.05);
-			if( $fTotalComisionGeneral > 500 ){//=SI((F26*0.05)>250,F26*0.05,250)
-				$fComisionTotal = $fTotalComisionGeneral;
-			}
-
+			$fComisionTotalRMB = round($fComisionTotal * $data[0]->Ss_Tipo_Cambio, 2);
 			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
             ->setCellValue('D' . $fila, 'COMISION BROKER');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, $fComisionTotal);
+            ->setCellValue('F' . $fila, $fComisionTotal)
+			->setCellValue('G' . $fila, $fComisionTotalRMB);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':G' . $fila)->applyFromArray($BStyle_bottom);
 			
 			//DERECHA
@@ -798,7 +809,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($styleArrayAllborder);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':M' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('L' . $fila, 2222);
+            ->setCellValue('L' . $fila, round($fCostoTotalGeneral * 0.7, 2));
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':M' . $fila)->applyFromArray($style_align_right);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
@@ -819,7 +830,7 @@ class PedidosGarantizados extends CI_Controller {
             ->setCellValue('P' . $fila, 'SERV. INTEGRAL IMPORT.');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_background_name_label);
-			$objPHPExcel->getActiveSheet()->getStyle('P' . $fila . ':Q' . $fila)->applyFromArray($style_align_right);
+			$objPHPExcel->getActiveSheet()->getStyle('P' . $fila . ':Q' . $fila)->applyFromArray($style_align_center);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('P' . $fila . ':Q' . $fila);
 
 			$objPHPExcel->getActiveSheet()
@@ -860,10 +871,8 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
 
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, $fCostoTotalGeneral + $fComisionTotal);
-
-            $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('G' . $fila, 0);
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral + $fComisionTotal)
+			->setCellValue('G' . $fila, $fCostoTotalGeneralRMB + $fComisionTotalRMB);
 
 			$fila++;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
@@ -1224,7 +1233,7 @@ class PedidosGarantizados extends CI_Controller {
 		$objDrawing->setPath('assets/img/logos/logo_probusiness.png');
 		$objDrawing->setWidthAndHeight(340,500);
 		$objDrawing->setResizeProportional(true);
-		$objDrawing->setCoordinates('J' . $fila);
+		$objDrawing->setCoordinates('H' . $fila);
 		$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 
 		$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('C' . $fila . ':Q' . $fila);
@@ -1428,7 +1437,7 @@ class PedidosGarantizados extends CI_Controller {
 					if ( file_exists($row->Txt_Url_Imagen_Producto) ) {
 						$objDrawing->setPath($row->Txt_Url_Imagen_Producto);
 						$objDrawing->setWidthAndHeight(148,500);
-						$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
+						//$objPHPExcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(120);
 						$objDrawing->setResizeProportional(true);
 
 						$objDrawing->setCoordinates('E' . $fila);
@@ -1460,8 +1469,10 @@ class PedidosGarantizados extends CI_Controller {
 				->setCellValue('M' . $fila, $fTotalCajas)
 				->setCellValue('N' . $fila, $row->Qt_Cbm)
 				->setCellValue('O' . $fila, $fCbmTotal)
-				->setCellValue('P' . $fila, $row->Nu_Dias_Delivery)
+				->setCellValue('P' . $fila, $row->Nu_Dias_Delivery . ' DIAS')
 				;
+
+				$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->getAlignment()->setWrapText(true);
 
 				$fCostoTotalGeneral += $fCostoTotal;//precio en dolares
 				$fCostoTotalYuanesGeneral += $fCostoTotalYuanes;//precio en dolares
@@ -1542,8 +1553,11 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, 'USD');
+            ->setCellValue('F' . $fila, 'USD')
+			->setCellValue('G' . $fila, 'RMB')
+			;
 			$objPHPExcel->getActiveSheet()->getStyle('F' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->applyFromArray($style_align_center);
 			
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('K' . $fila. ':M' . $fila)->applyFromArray($BStyle_background_sub_tittle);
 			$objPHPExcel->getActiveSheet()->getStyle('K' . $fila . ':M' . $fila)->applyFromArray($style_align_center);
@@ -1555,12 +1569,22 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
 
+			$fCostoTotalGeneralRMB = round($fCostoTotalGeneral * $data[0]->Ss_Tipo_Cambio, 2);
 			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
             ->setCellValue('D' . $fila, 'TOTAL DE LA COMPRA');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, $fCostoTotalGeneral);
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral)
+            ->setCellValue('G' . $fila, $fCostoTotalGeneralRMB);
+
+			//FORUMAL DE COMISIOJN DE CONSOLIDA TRADING 5%
+			$fComisionTotal = 250;
+			$fTotalComisionGeneral = ($fCostoTotalGeneral * 0.05);
+			if( $fTotalComisionGeneral > 250 ){//=SI((F26*0.05)>250,F26*0.05,250)
+				$fComisionTotal = $fTotalComisionGeneral;
+			}
+			$fComisionTotalRMB = round($fComisionTotal * $data[0]->Ss_Tipo_Cambio, 2);
 
 			//DERECHA
 			$objPHPExcel->getActiveSheet()->getStyle('K' . $fila)->applyFromArray($styleArrayAllborder);
@@ -1574,7 +1598,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($styleArrayAllborder);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':M' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('L' . $fila, 1111);
+            ->setCellValue('L' . $fila, $fCostoTotalGeneral + $fComisionTotal);
 			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':M' . $fila)->applyFromArray($style_align_right);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('M' . $fila)->applyFromArray($BStyle_background_name_label);
@@ -1588,19 +1612,13 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('Q' . $fila)->applyFromArray($BStyle_right);
 
-			//FORUMAL DE COMISIOJN DE CONSOLIDA TRADING 5%
-			$fComisionTotal = 250;
-			$fTotalComisionGeneral = ($fCostoTotalGeneral * 0.05);
-			if( $fTotalComisionGeneral > 250 ){//=SI((F26*0.05)>250,F26*0.05,250)
-				$fComisionTotal = $fTotalComisionGeneral;
-			}
-
 			$objPHPExcel->getActiveSheet()->getStyle('D' . $fila . ':G' . $fila)->getFont()->setBold(true);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
             ->setCellValue('D' . $fila, 'COMISION BROKER');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, $fComisionTotal);
+            ->setCellValue('F' . $fila, $fComisionTotal)
+			->setCellValue('G' . $fila, $fComisionTotalRMB);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('F' . $fila . ':G' . $fila)->applyFromArray($BStyle_bottom);
 
 			//DERECHA
@@ -1615,9 +1633,9 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($styleArrayAllborder);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('L' . $fila . ':M' . $fila);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('L' . $fila, 2222);
+            ->setCellValue('L' . $fila, 'CONSOLIDADO');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('L' . $fila)->applyFromArray($BStyle_background_name_label);
-			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':M' . $fila)->applyFromArray($style_align_right);
+			$objPHPExcel->getActiveSheet()->getStyle('L' . $fila . ':M' . $fila)->applyFromArray($style_align_center);
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
             ->setCellValue('N' . $fila, 'SERV LOGISTICO+ IMPUESTOS');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('N' . $fila . ':O' . $fila);
@@ -1642,10 +1660,8 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('D' . $fila . ':E' . $fila);
 
             $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('F' . $fila, $fCostoTotalGeneral + $fComisionTotal);
-
-            $objPHPExcel->setActiveSheetIndex($hoja_activa)
-            ->setCellValue('G' . $fila, 0);
+            ->setCellValue('F' . $fila, $fCostoTotalGeneral + $fComisionTotal)
+			->setCellValue('G' . $fila, $fCostoTotalGeneralRMB + $fComisionTotalRMB);
 
 			$fila++;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_left);
