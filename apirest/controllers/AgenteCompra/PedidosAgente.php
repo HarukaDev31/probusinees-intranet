@@ -344,6 +344,7 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth("12");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth("12");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth("12");//NRO
+			$objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth("12");//NRO
 
 			//Title
 			$fila=2;
@@ -355,51 +356,51 @@ class PedidosAgente extends CI_Controller {
 			$objDrawing->setCoordinates('F' . $fila);
 			$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B' . $fila . ':O' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B' . $fila . ':P' . $fila);
 			
 			//border
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila . ':O' . $fila)->applyFromArray($BStyle_top);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila . ':P' . $fila)->applyFromArray($BStyle_top);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 
 
 			$fila=3;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->getActiveSheet()->getStyle('B'.$fila)->getFont()->setBold(true);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'Ofic Perú');
 			
-			$objPHPExcel->getActiveSheet()->getStyle('O'.$fila)->getFont()->setBold(true);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, 'Ofic China');
-			$objPHPExcel->getActiveSheet()->getStyle('O' . $fila)->applyFromArray($style_align_right);
+			$objPHPExcel->getActiveSheet()->getStyle('P'.$fila)->getFont()->setBold(true);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('P'.$fila, 'Ofic China');
+			$objPHPExcel->getActiveSheet()->getStyle('P' . $fila)->applyFromArray($style_align_right);
 			
 			$fila=4;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'Jr. Alberto Bartón 527');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, 'Shuangchuang Building, No. 1133');
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':O' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':P' . $fila);
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_tittle_cursive);
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_tittle_cursive);
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_right);
 			
 			$fila=5;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'Santa Catalina - La Victoria');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, 'Chouzhou North Road, Yiwu City');
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_tittle_cursive);
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($BStyle_tittle_cursive);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':O' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('M' . $fila . ':P' . $fila);
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $fila)->applyFromArray($style_align_right);
 
 			$fila=6;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 
 			$fila=7;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			
 			$fila=8;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_background_title);
@@ -409,11 +410,11 @@ class PedidosAgente extends CI_Controller {
 
 			$fila=9;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			
 			$fila=10;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('C'.$fila, 'NAME: ');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, $data[0]->No_Contacto);
@@ -425,7 +426,7 @@ class PedidosAgente extends CI_Controller {
 			
 			$fila=11;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('C'.$fila, 'WHATSAPP: ');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('d' . $fila)->applyFromArray($style_align_left);
@@ -438,7 +439,7 @@ class PedidosAgente extends CI_Controller {
 			
 			$fila=12;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($BStyle_background_name_label);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('C'.$fila, 'MAIL: ');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('D'.$fila, $data[0]->Txt_Email_Contacto);
@@ -450,8 +451,8 @@ class PedidosAgente extends CI_Controller {
 			
 			$fila=13;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_left);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($BStyle_right);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila . ':O' . $fila)->applyFromArray($BStyle_bottom);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($BStyle_right);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila . ':P' . $fila)->applyFromArray($BStyle_bottom);
 			
 			$fila=16;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila. ':G' . $fila)->applyFromArray($BStyle_background_sub_tittle);
@@ -463,22 +464,23 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('F'.$fila, 'QTY');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('G'.$fila, 'LINK');
 			
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila. ':O' . $fila)->applyFromArray($BStyle_background_sub_tittle);
-			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('I' . $fila. ':P' . $fila)->applyFromArray($BStyle_background_sub_tittle);
+			$objPHPExcel->getActiveSheet()->getStyle('I' . $fila . ':P' . $fila)->applyFromArray($style_align_center);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('I'.$fila, 'MOQ');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('J'.$fila, 'PRICE RMB');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('K'.$fila, 'PRICE USD');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('L'.$fila, 'QTY/BOX');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('M'.$fila, 'TOTAL BOX');
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('N'.$fila, 'CBM/BOX');
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, 'DELIVERY');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('O'.$fila, 'SHIPPIND COST');
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('P'.$fila, 'DELIVERY');
 			// /. Title
 
 			$fila=17;
 			$iCounter=1;
             foreach($data as $row) {
 				$objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':G' . $fila)->applyFromArray($style_align_center);
-				$objPHPExcel->getActiveSheet()->getStyle('I' . $fila . ':O' . $fila)->applyFromArray($style_align_center);
+				$objPHPExcel->getActiveSheet()->getStyle('I' . $fila . ':P' . $fila)->applyFromArray($style_align_center);
 				
 				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($styleArrayAllborder);
 				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('C' . $fila)->applyFromArray($styleArrayAllborder);
@@ -494,6 +496,7 @@ class PedidosAgente extends CI_Controller {
 				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('M' . $fila)->applyFromArray($styleArrayAllborder);
 				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($styleArrayAllborder);
 				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($styleArrayAllborder);
+				$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($styleArrayAllborder);
 
 				$html_data = array("&nbsp;");
 				$row->Txt_Descripcion =str_replace($html_data," ",$row->Txt_Descripcion);
