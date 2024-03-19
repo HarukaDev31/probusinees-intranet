@@ -343,7 +343,7 @@ class PedidosAgente extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth("12");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth("12");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth("12");//NRO
-			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth("12");//NRO
+			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth("17");//NRO
 			$objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth("12");//NRO
 
 			//Title
@@ -405,7 +405,7 @@ class PedidosAgente extends CI_Controller {
 			$fila=8;
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('B' . $fila)->applyFromArray($BStyle_background_title);
 			$objPHPExcel->setActiveSheetIndex($hoja_activa)->setCellValue('B'.$fila, 'REQUEST FOR QUOTATION ' . $ID);
-			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B' . $fila . ':O' . $fila);
+			$objPHPExcel->setActiveSheetIndex($hoja_activa)->mergeCells('B' . $fila . ':P' . $fila);
 			$objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($style_align_center);
 
 			$fila=9;
