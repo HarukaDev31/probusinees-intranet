@@ -61,7 +61,6 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
                     <tr>
-                      <th>País</th>
                       <th>Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
@@ -71,6 +70,16 @@
                       <th>Moodle</th>
                       <th>Ref. Pago</th>
                       <th>Compartir</th>
+                      <th>Celular</th>
+                      <th>T.D.I</th>
+                      <th>Nro. Doc. Ident.</th>
+                      <th>Nombres y Apellidos</th>
+                      <th>Edad</th>
+                      <th>Sexo</th>
+                      <th>País</th>
+                      <th>Departamento</th>
+                      <th>Provincia</th>
+                      <th>Distrito</th>
                     </tr>
                   </thead>
                 </table>

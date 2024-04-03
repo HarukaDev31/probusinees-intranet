@@ -21,13 +21,16 @@ class PedidosCursoModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, TDI.No_Tipo_Documento_Identidad_Breve, P.No_Pais, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password')
+        $this->db->select($this->table . '.*, No_Distrito, No_Provincia, No_Departamento, TDI.No_Tipo_Documento_Identidad_Breve, P.No_Pais, CLI.Nu_Tipo_Sexo, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
     	->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join')
     	->join($this->table_moneda . ' AS M', 'M.ID_Moneda = ' . $this->table . '.ID_Moneda', 'join')
     	->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'join')
+		->join($this->table_distrito, $this->table_distrito . '.ID_Distrito = CLI.ID_Distrito', 'left')
+    	->join($this->table_provincia, $this->table_provincia . '.ID_Provincia = CLI.ID_Provincia', 'left')
+    	->join($this->table_departamento, $this->table_departamento . '.ID_Departamento = CLI.ID_Departamento', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
 
 		if(!empty($this->input->post('estado_pago')))

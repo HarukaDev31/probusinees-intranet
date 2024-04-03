@@ -37,7 +37,6 @@ class PedidosCurso extends CI_Controller {
         foreach ($arrData as $row) {
 			$rows = array();
 
-            $rows[] = $row->No_Pais;
             $rows[] = $row->ID_Pedido_Curso;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
 			
@@ -71,6 +70,24 @@ class PedidosCurso extends CI_Controller {
 			if($row->Nu_Estado==4)
 				$btn_compartir ='';
 			$rows[] = $btn_compartir;
+
+			$rows[] = $row->Nu_Celular_Entidad;//celular
+			$rows[] = $row->No_Tipo_Documento_Identidad_Breve;//tdi
+			$rows[] = $row->Nu_Documento_Identidad;//nro
+			$rows[] = $row->No_Entidad;//nombres y apellidos
+			$rows[] = $row->Nu_Edad;//edad
+
+			$sNombreSexo = 'Hombre';
+			if($row->Nu_Tipo_Sexo==2)
+				$sNombreSexo = 'Mujer';
+			else if($row->Nu_Tipo_Sexo==3)
+				$sNombreSexo = 'Otros';
+			$rows[] = $sNombreSexo;//sexo
+
+            $rows[] = $row->No_Pais;
+			$rows[] = $row->No_Departamento;//depa
+			$rows[] = $row->No_Provincia;//pro
+			$rows[] = $row->No_Distrito;//dis
 
             $data[] = $rows;
         }
