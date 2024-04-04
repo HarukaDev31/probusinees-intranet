@@ -21,7 +21,7 @@ class PedidosCursoModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, No_Distrito, No_Provincia, No_Departamento, TDI.No_Tipo_Documento_Identidad_Breve, P.No_Pais, CLI.Nu_Tipo_Sexo, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password')
+        $this->db->select($this->table . '.*, CLI.Fe_Nacimiento, CLI.Nu_Como_Entero_Empresa, CLI.No_Otros_Como_Entero_Empresa, No_Distrito, No_Provincia, No_Departamento, TDI.No_Tipo_Documento_Identidad_Breve, P.No_Pais, CLI.Nu_Tipo_Sexo, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')

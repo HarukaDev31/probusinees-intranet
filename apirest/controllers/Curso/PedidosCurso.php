@@ -75,7 +75,7 @@ class PedidosCurso extends CI_Controller {
 			$rows[] = $row->No_Tipo_Documento_Identidad_Breve;//tdi
 			$rows[] = $row->Nu_Documento_Identidad;//nro
 			$rows[] = $row->No_Entidad;//nombres y apellidos
-			$rows[] = $row->Nu_Edad;//edad
+			$rows[] = (!empty($row->Fe_Nacimiento) ? ToDateBD($row->Fe_Nacimiento) : '');
 
 			$sNombreSexo = 'Hombre';
 			if($row->Nu_Tipo_Sexo==2)
@@ -83,6 +83,25 @@ class PedidosCurso extends CI_Controller {
 			else if($row->Nu_Tipo_Sexo==3)
 				$sNombreSexo = 'Otros';
 			$rows[] = $sNombreSexo;//sexo
+			
+			//1=Tiktok, 2=Facebook, 3=Instagram, 4=Youtube, 5=Familiares/Amigos, 6=LinkedIn, 7=Google, 8=Otros
+			$sNombreRedSocial = 'Tiktok';
+			if($row->Nu_Como_Entero_Empresa==2)
+				$sNombreRedSocial = 'Facebook';
+			else if($row->Nu_Como_Entero_Empresa==3)
+				$sNombreRedSocial = 'Instagram';
+			else if($row->Nu_Como_Entero_Empresa==4)
+				$sNombreRedSocial = 'Youtube';
+			else if($row->Nu_Como_Entero_Empresa==5)
+				$sNombreRedSocial = 'Familiares/Amigos';
+			else if($row->Nu_Como_Entero_Empresa==6)
+				$sNombreRedSocial = 'LinkedIn';
+			else if($row->Nu_Como_Entero_Empresa==7)
+				$sNombreRedSocial = 'Google';
+			else if($row->Nu_Como_Entero_Empresa==8)
+				$sNombreRedSocial = 'Otros: ';
+
+            $rows[] = $sNombreRedSocial . (!empty($row->No_Otros_Como_Entero_Empresa) && $row->No_Otros_Como_Entero_Empresa != '1' ? $row->No_Otros_Como_Entero_Empresa : '');
 
             $rows[] = $row->No_Pais;
 			$rows[] = $row->No_Departamento;//depa

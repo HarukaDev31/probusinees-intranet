@@ -74,8 +74,9 @@
                       <th>T.D.I</th>
                       <th>Nro. Doc. Ident.</th>
                       <th>Nombres y Apellidos</th>
-                      <th>Edad</th>
+                      <th>F. Nacimiento</th>
                       <th>Sexo</th>
+                      <th>Red Social</th>
                       <th>País</th>
                       <th>Departamento</th>
                       <th>Provincia</th>
