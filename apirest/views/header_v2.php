@@ -211,8 +211,11 @@
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-header">Menú</li>
             <?php
+
             foreach($this->menu as $arrMenuPadre):
               $menu_padre = explode('/', $this->router->directory);
+              var_dump($menu_padre);
+
               $menu_padre = $menu_padre[0];
               $No_Class_Li_Padre = "nav-item";
               $No_Class_A_Padre_Active = "";

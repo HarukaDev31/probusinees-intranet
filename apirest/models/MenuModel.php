@@ -17,52 +17,52 @@ class MenuModel extends CI_Model{
 			$this->order_by_nu_agregar = "ORDER BY Nu_Agregar DESC";
 		}
 		$sql = "SELECT DISTINCT
-MNU.*,
-(SELECT COUNT(*) FROM menu WHERE ID_Padre=MNU.ID_Menu AND Nu_Activo=0) AS Nu_Cantidad_Menu_Padre
-FROM
-menu AS MNU
-JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
-JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
-WHERE
-MNU.ID_Padre=0
-AND MNU.Nu_Activo=0
-" . $this->where_id_grupo . "
-ORDER BY
-MNU.ID_Padre ASC,
-MNU.Nu_Orden;";
+				MNU.*,
+				(SELECT COUNT(*) FROM menu WHERE ID_Padre=MNU.ID_Menu AND Nu_Activo=0) AS Nu_Cantidad_Menu_Padre
+				FROM
+				menu AS MNU
+				JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
+				JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
+				WHERE
+				MNU.ID_Padre=0
+				AND MNU.Nu_Activo=0
+				" . $this->where_id_grupo . "
+				ORDER BY
+				MNU.ID_Padre ASC,
+				MNU.Nu_Orden;";
 		$arrMenuPadre = $this->db->query($sql)->result();
 		
 		foreach($arrMenuPadre as $rowPadre){
 			$sql = "SELECT DISTINCT
-MNU.*,
-(SELECT COUNT(*) FROM menu WHERE ID_Padre=MNU.ID_Menu AND Nu_Activo=0) AS Nu_Cantidad_Menu_Hijos
-FROM
-menu AS MNU
-JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
-JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
-WHERE
-MNU.ID_Padre=" . $rowPadre->ID_Menu . "
-AND MNU.Nu_Activo=0
-" . $this->where_id_grupo . "
-ORDER BY
-MNU.Nu_Orden;";
+					MNU.*,
+					(SELECT COUNT(*) FROM menu WHERE ID_Padre=MNU.ID_Menu AND Nu_Activo=0) AS Nu_Cantidad_Menu_Hijos
+					FROM
+					menu AS MNU
+					JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
+					JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
+					WHERE
+					MNU.ID_Padre=" . $rowPadre->ID_Menu . "
+					AND MNU.Nu_Activo=0
+					" . $this->where_id_grupo . "
+					ORDER BY
+					MNU.Nu_Orden;";
 			$rowPadre->{'Hijos'} = $this->db->query($sql)->result();
 		
 			foreach($rowPadre->Hijos as $rowSubHijos){
 				if ( $rowSubHijos->Nu_Cantidad_Menu_Hijos > 0 ) {
 					$sql = "SELECT DISTINCT
-MNU.*
-FROM
-menu AS MNU
-JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
-JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
-WHERE
-MNU.ID_Padre=" . $rowSubHijos->ID_Menu . "
-AND MNU.Nu_Activo=0
-" . $this->where_id_grupo . "
-ORDER BY
-MNU.Nu_Orden;";
-					$rowSubHijos->{'SubHijos'} = $this->db->query($sql)->result();
+							MNU.*
+							FROM
+							menu AS MNU
+							JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
+							JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
+							WHERE
+							MNU.ID_Padre=" . $rowSubHijos->ID_Menu . "
+							AND MNU.Nu_Activo=0
+							" . $this->where_id_grupo . "
+							ORDER BY
+							MNU.Nu_Orden;";
+							$rowSubHijos->{'SubHijos'} = $this->db->query($sql)->result();
 				}
 			}
 		}

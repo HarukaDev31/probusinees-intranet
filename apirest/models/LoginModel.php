@@ -42,29 +42,29 @@ class LoginModel extends CI_Model{
 								$iCantidadAcessoUsuario = 1;
 
 								$sql = "SELECT
-USR.*,
-GRP.ID_Organizacion,
-GRP.No_Grupo,
-GRP.No_Grupo_Descripcion,
-GRP.Nu_Tipo_Privilegio_Acceso,
-GRP.Nu_Notificacion,
-GRPUSR.ID_Grupo_Usuario,
-T.No_Dominio_Tienda_Virtual,
-T.No_Subdominio_Tienda_Virtual,
-T.Nu_Estado as TiendaEstado,
-P.ID_Pais,
-P.No_Pais,
-MONE.*
-FROM
-usuario AS USR
-JOIN empresa AS EMP ON(EMP.ID_Empresa = USR.ID_Empresa)
-JOIN pais AS P ON(P.ID_Pais = EMP.ID_Pais)
-JOIN moneda AS MONE ON(EMP.ID_Empresa = MONE.ID_Empresa)
-JOIN grupo_usuario AS GRPUSR ON(USR.ID_Usuario = GRPUSR.ID_Usuario)
-JOIN grupo AS GRP ON(GRP.ID_Grupo = GRPUSR.ID_Grupo)
-LEFT JOIN subdominio_tienda_virtual T ON T.ID_Empresa=USR.ID_Empresa
-WHERE
-USR.No_Usuario = '" . $No_Usuario . "' AND USR.Nu_Estado=1 ORDER BY Fe_Creacion ASC LIMIT 1;";
+										USR.*,
+										GRP.ID_Organizacion,
+										GRP.No_Grupo,
+										GRP.No_Grupo_Descripcion,
+										GRP.Nu_Tipo_Privilegio_Acceso,
+										GRP.Nu_Notificacion,
+										GRPUSR.ID_Grupo_Usuario,
+										T.No_Dominio_Tienda_Virtual,
+										T.No_Subdominio_Tienda_Virtual,
+										T.Nu_Estado as TiendaEstado,
+										P.ID_Pais,
+										P.No_Pais,
+										MONE.*
+										FROM
+										usuario AS USR
+										JOIN empresa AS EMP ON(EMP.ID_Empresa = USR.ID_Empresa)
+										JOIN pais AS P ON(P.ID_Pais = EMP.ID_Pais)
+										JOIN moneda AS MONE ON(EMP.ID_Empresa = MONE.ID_Empresa)
+										JOIN grupo_usuario AS GRPUSR ON(USR.ID_Usuario = GRPUSR.ID_Usuario)
+										JOIN grupo AS GRP ON(GRP.ID_Grupo = GRPUSR.ID_Grupo)
+										LEFT JOIN subdominio_tienda_virtual T ON T.ID_Empresa=USR.ID_Empresa
+										WHERE
+										USR.No_Usuario = '" . $No_Usuario . "' AND USR.Nu_Estado=1 ORDER BY Fe_Creacion ASC LIMIT 1;";
 								$u = $this->db->query($sql)->row();
 								
 								// Protegemos la contraseña
@@ -90,35 +90,35 @@ USR.No_Usuario = '" . $No_Usuario . "' AND USR.Nu_Estado=1 ORDER BY Fe_Creacion 
 								);
 							} else {
 								$sql = "SELECT
-USR.*,
-GRP.ID_Organizacion,
-GRP.No_Grupo,
-GRP.No_Grupo_Descripcion,
-GRP.Nu_Tipo_Privilegio_Acceso,
-GRP.Nu_Notificacion,
-GRPUSR.ID_Grupo_Usuario,
-T.No_Dominio_Tienda_Virtual,
-T.No_Subdominio_Tienda_Virtual,
-T.Nu_Estado as TiendaEstado,
-P.ID_Pais,
-P.No_Pais,
-MONE.*
-FROM
-usuario AS USR
-JOIN empresa AS EMP ON(EMP.ID_Empresa = USR.ID_Empresa)
-JOIN pais AS P ON(P.ID_Pais = EMP.ID_Pais)
-JOIN moneda AS MONE ON(EMP.ID_Empresa = MONE.ID_Empresa)
-JOIN grupo_usuario AS GRPUSR ON(USR.ID_Usuario = GRPUSR.ID_Usuario)
-JOIN grupo AS GRP ON(GRP.ID_Grupo = GRPUSR.ID_Grupo)
-JOIN organizacion AS ORG ON(ORG.ID_Organizacion = USR.ID_Organizacion)
-LEFT JOIN subdominio_tienda_virtual T ON T.ID_Empresa=USR.ID_Empresa
-WHERE
-USR.No_Usuario = '" . $No_Usuario . "'
-AND GRP.ID_Empresa = " . $ID_Empresa . "
-AND GRP.ID_Organizacion = " . $ID_Organizacion . "
-AND ORG.Nu_Estado = 1
-AND USR.Nu_Estado=1 ORDER BY Fe_Creacion ASC
-LIMIT 1;";
+										USR.*,
+										GRP.ID_Organizacion,
+										GRP.No_Grupo,
+										GRP.No_Grupo_Descripcion,
+										GRP.Nu_Tipo_Privilegio_Acceso,
+										GRP.Nu_Notificacion,
+										GRPUSR.ID_Grupo_Usuario,
+										T.No_Dominio_Tienda_Virtual,
+										T.No_Subdominio_Tienda_Virtual,
+										T.Nu_Estado as TiendaEstado,
+										P.ID_Pais,
+										P.No_Pais,
+										MONE.*
+										FROM
+										usuario AS USR
+										JOIN empresa AS EMP ON(EMP.ID_Empresa = USR.ID_Empresa)
+										JOIN pais AS P ON(P.ID_Pais = EMP.ID_Pais)
+										JOIN moneda AS MONE ON(EMP.ID_Empresa = MONE.ID_Empresa)
+										JOIN grupo_usuario AS GRPUSR ON(USR.ID_Usuario = GRPUSR.ID_Usuario)
+										JOIN grupo AS GRP ON(GRP.ID_Grupo = GRPUSR.ID_Grupo)
+										JOIN organizacion AS ORG ON(ORG.ID_Organizacion = USR.ID_Organizacion)
+										LEFT JOIN subdominio_tienda_virtual T ON T.ID_Empresa=USR.ID_Empresa
+										WHERE
+										USR.No_Usuario = '" . $No_Usuario . "'
+										AND GRP.ID_Empresa = " . $ID_Empresa . "
+										AND GRP.ID_Organizacion = " . $ID_Organizacion . "
+										AND ORG.Nu_Estado = 1
+										AND USR.Nu_Estado=1 ORDER BY Fe_Creacion ASC
+										LIMIT 1;";
 								$u = $this->db->query($sql)->row();
 								if ( is_object($u) ) {
 									// Protegemos la contraseña
