@@ -133,7 +133,6 @@ function agregarCliente(){
 
 function verCliente(ID){  
   $( '.div-Listar' ).hide();
-  
   $( '#form-Cliente' )[0].reset();
   $( '.form-group' ).removeClass('has-error');
   $( '.form-group' ).removeClass('has-success');
@@ -145,7 +144,6 @@ function verCliente(ID){
     type: "GET",
     dataType: "JSON",
     success: function(response){
-      console.log(response);
       $( '.div-AgregarEditar' ).show();
             
       $( '[name="EID_Carga_Consolidada"]' ).val(response.ID_Carga_Consolidada);

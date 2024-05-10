@@ -220,6 +220,13 @@
 <?php if (isset($js_consolidado) && $js_consolidado==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/consolidado.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
+<?php if (isset($js_ccotizaciones) && $js_ccotizaciones==true) {
+} ?>
+
+  
+<?php if (isset($js_ccotizaciones) && $js_ccotizaciones==true) : ?>
+<script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/ccotizaciones.js'?>"></script>
+<?php endif; ?>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-dialog-loader">

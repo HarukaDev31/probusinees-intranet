@@ -252,11 +252,14 @@ class CI_Loader {
 		// Is the model in a sub-folder? If so, parse out the filename and path.
 		if (($last_slash = strrpos($model, '/')) !== FALSE)
 		{
+			
+
 			// The path is in front of the last slash
 			$path = substr($model, 0, ++$last_slash);
 
 			// And the model name behind it
 			$model = substr($model, $last_slash);
+			
 		}
 
 		if (empty($name))

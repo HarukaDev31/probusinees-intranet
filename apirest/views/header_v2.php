@@ -214,9 +214,7 @@
 
             foreach($this->menu as $arrMenuPadre):
               $menu_padre = explode('/', $this->router->directory);
-              var_dump($menu_padre);
-
-              $menu_padre = $menu_padre[0];
+              $menu_pdre = $menu_padre[0];
               $No_Class_Li_Padre = "nav-item";
               $No_Class_A_Padre_Active = "";
               if ($menu_padre != $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
@@ -243,6 +241,7 @@
                 <ul class="nav nav-treeview">
                   <?php
                   foreach($arrMenuPadre->Hijos as $arrHijos):
+                  
                     $No_Class_Li = "nav-item";
                     if ($this->router->directory != $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
                       $No_Class_Li = "nav-item";
@@ -261,7 +260,8 @@
                       <?php if($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
                       <ul class="nav nav-treeview">
                         <?php foreach($arrHijos->SubHijos as $arrSubHijos): ?>
-                        <li class="<?php echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>">
+                        <li class="<?php 
+                          echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>">
                           <a class="nav-link 2 <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
                             <i class="<?php echo $arrSubHijos->Txt_Css_Icons; ?>"></i>
                             <p>&nbsp;<?php echo $arrSubHijos->No_Menu; ?></p>

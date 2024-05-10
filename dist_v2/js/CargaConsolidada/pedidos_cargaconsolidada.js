@@ -7,7 +7,6 @@ let search_global_autocomplete = caractes_no_validos_global_autocomplete.split('
 let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 //28 caracteres
 // FIN AUTOCOMPLETE
-
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 
 $(function () {
