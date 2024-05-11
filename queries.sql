@@ -98,3 +98,12 @@ ID_Tipo_Tributo int not null auto_increment,
 Nombre varchar(255) not null,
 primary key(ID_Tipo_Tributo)
 )
+
+insert into tipo_carga_consolidada_cotizaciones_tributo(Nombre)
+values
+("Ad Valorem"),
+("IGV"),
+("IPM").
+("PERCEPCION"),
+("VALORACION").
+("ANTIDUMPING");	

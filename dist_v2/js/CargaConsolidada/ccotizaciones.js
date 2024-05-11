@@ -78,4 +78,18 @@ $(function(){
 function verCotizacion(ID){
     $( '.div-Listar' ).hide();
     $( '.div-AgregarEditar' ).show();
-}
+
+    url = base_url + 'CargaConsolidada/CCotizaciones/ajax_edit_body/' + ID;
+    $.ajax({
+      url : url,
+      type: "GET",
+      dataType: "JSON",
+      success: function(response){
+        console.log(response);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+      }
+    })
+  }
+

@@ -34,5 +34,11 @@ class CCotizaciones extends CI_Controller{
         );
         echo json_encode($output);  
     }
+    public function ajax_edit_header($ID){
+        echo json_encode($this->CCotizacionesModel->get_cotization_header($this->security->xss_clean($ID)));
+    }
+    public function ajax_edit_body($ID){
+        echo json_encode($this->CCotizacionesModel->get_cotization_body($this->security->xss_clean($ID)));
+    }
 }
 ?>
