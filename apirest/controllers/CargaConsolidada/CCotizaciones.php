@@ -1,4 +1,7 @@
 <?php
+
+use Mpdf\Http\Request;
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 class CCotizaciones extends CI_Controller{
     function __construct()
@@ -39,6 +42,17 @@ class CCotizaciones extends CI_Controller{
     }
     public function ajax_edit_body($ID){
         echo json_encode($this->CCotizacionesModel->get_cotization_body($this->security->xss_clean($ID)));
+    }
+    public function guardarTributos(){
+        $postData = file_get_contents('php://input');
+        $tributos = json_decode($postData, true);
+        echo json_encode($this->CCotizacionesModel->guardarTributos($tributos));
+        
+    }
+    public function guardarCotizacion(){
+        $postData = file_get_contents('php://input');
+        $cotizacion = json_decode($postData, true);
+        echo json_encode($this->CCotizacionesModel->guardarCotizacion($cotizacion));
     }
 }
 ?>

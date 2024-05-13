@@ -71,7 +71,6 @@
                 $attributes = array('id' => 'form-pedido');
                 echo form_open('', $attributes);
                 ?>
-                  <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control required">
                   <div class="row div-CotizacionHeader">
                     <div class="col-12 col-md-9">
                         <div class="row">
@@ -102,62 +101,12 @@
 
                     </div>
                   </div>
-                  <div class="row div-CotizacionBody">
-                      <div class="col-12">
-                        <div class="row"><div class="col-12 col-sm-3 col-md-6 col-lg-8"><label>Proveedor 1</label></div>
-                          <div class="col-12 col-sm-9 col-md-6 col-lg-4">
-                            <div class="row d-flex">
-                              <div class="form-group">
-                                  <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                                  <span class="help-block text-danger" id="error"></span>
-                              </div>
-                              <div class="form-group">
-                                  <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                                  <span class="help-block text-danger" id="error"></span>
-                              </div >
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-12">
-                        <div class="row">
-                          <div class="col-12 col-md-6"><label>Producto 1</label></div>
-                          <div class="col-12 col-md-3"><label>Informacion de Productos</label></div>
-                          <div class="col-12 col-md-3"><label>Tributos</label></div>
-                        </div>
-                          <div class="row">
-                            <div class="col-12 col-md-6">
-                              <label>Img</label>
-                              <div class="form-group">
-                                    <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                                    <span class="help-block text-danger" id="error"></span>
-                              </div>
-                            </div>
-                            <div class="col-12 col-md-3">
-                              <div class="form-group">
-                                    <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                                    <span class="help-block text-danger" id="error"></span>
-                              </div>
-                              <div class="form-group">
-                                    <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                                    <span class="help-block text-danger" id="error"></span>
-                              </div>
-                              <div class="form-group">
-                                    <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                                    <span class="help-block text-danger" id="error"></span>
-                              </div>
-                              <div class="form-group">
-                                    <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                                    <span class="help-block text-danger" id="error"></span>
-                              </div>
-                            </div>
-                            <div class="col-12 col-md-3">
-                            <button type="button" class="btn btn-primary">Ver Tributo</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
+                  <div class="row div-CotizacionBody" id="div-CotizacionBody">
                 <?php echo form_close(); ?>
+              </div>
+              <div id="div-footer">
+                <button type="button" class="btn btn-success" onclick="guardaryCambiarEstado()">Marcar Como Cotizado</button>
+                <button type="button" class="btn btn-primary" onclick="guardarCotizacion()">Guardar </button>
               </div>
             </div>
           </div>
@@ -168,50 +117,81 @@
     <!-- /.container-fluid -->
   </section>
   <!-- /.content -->
-</div>
-<!-- /.content-wrapper -->
-
-<!-- modal ver imagen del item -->
-<div class="modal fade modal-enviar_mensaje" id="modal-enviar_mensaje">
-  <?php $attributes = array('id' => 'form-enviar_mensaje');
-echo form_open('', $attributes);?>
-  <div class="modal-dialog">
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-body" id="modal-body-enviar_mensaje">
-        <input type="hidden" id="enviar_mensaje-id_pedido_cabecera" name="enviar_mensaje-id_pedido_cabecera" class="form-control" autocomplete="off">
-        <input type="hidden" id="enviar_mensaje-id_entidad" name="enviar_mensaje-id_entidad" class="form-control" autocomplete="off">
-
-        <div class="col-12 text-left">
-          <label>Mensaje</label>
-          <div class="form-group">
-            <textarea class="form-control required" rows="3" name="enviar_mensaje-No_Seguimiento" placeholder="Escribir..."></textarea>
-            <span class="help-block text-danger" id="error"></span>
-          </div>
-        </div>
-
-        <div class="col-12 text-left">
-          <label>Ajuste</label>
-          <div class="form-group">
-            <input type="text" id="enviar_mensaje-Ss_Total" inputmode="decimal" name="enviar_mensaje-Ss_Total" placeholder="Obligatorio" class="form-control required input-decimal" maxlength="20" autocomplete="off">
-            <span class="help-block text-danger" id="error"></span>
-          </div>
-        </div>
-
-        <div class="col-12 text-left">
-          <label>Observaciones</label>
-          <div class="form-group">
-            <textarea class="form-control required" rows="3" name="enviar_mensaje-Txt_Nota" placeholder="Opcional"></textarea>
-          </div>
-        </div>
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Tributos del Producto {
+        Nombre del producto} del Proveedor {Nombre del proveedor}
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-      <div class="modal-footer justify-content-between">
-        <button type="button" class="col btn btn-danger btn-lg btn-block" data-dismiss="modal">Salir</button>
-        <button type="submit" id="btn-enviar_mensaje" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" id="ad-valorem-label">AD VALOREM (%)</label>
+              </div>
+              <input type="text" value="0" id="ad-valorem"class="form-control" placeholder="Ad-Valorem" aria-label="ad-valorem" aria-describedby="ad-valorem-label">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" id="igv-label">IGV %</label>
+              </div>
+              <input type="text" value="16" id="igv"class="form-control" placeholder="IGV" aria-label="igv" aria-describedby="igv-label">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" id="ipm-label">IPM %</label>
+              </div>
+              <input type="text" value="2" id="ipm"class="form-control" placeholder="ipm" aria-label="ipm" aria-describedby="ipm-label">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="Percepcion">PERCEPCION %</label>
+            </div>
+            <select class="custom-select" id="percepcion">
+              <option value="0">0</option>
+              <option value="3.5" selected>3.5</option>
+              <option value="5">5</option>
+            </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" id="valoracion-label">VALORACION</label>
+              </div>
+              <input type="text"  value="0"   id="valoracion" class="form-control" placeholder="valoracion" aria-label="valoracion" aria-describedby="valoracion-label">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" id="antidumping-label">ANTIDUMPING</label>
+              </div>
+              <input type="text" value="0" id="antidumping"class="form-control" placeholder="antidumping" aria-label="antidumping" aria-describedby="antidumping-label">
+            </div>
+          </div>
+          <!--Percepcion select-->
+          
+          
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="guardarTributos()" class="btn btn-primary">Guardar</button>
       </div>
     </div>
-    <!-- /.modal-content -->
   </div>
-  <!-- /.modal-dialog -->
-  <?php echo form_close(); ?>
 </div>
-<!-- /.modal imagen del item -->
+</div>
+
