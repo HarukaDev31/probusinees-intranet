@@ -417,3 +417,341 @@ values
 (2,2,3.1,4,275),
 (2,2,4.1,999999,250)
 ;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `intranetprobusiness`.`get_cotization_tributos_v2`(IN p_id_cotizacion int)
+begin
+	
+	-- valor flete y valor destino
+	set @flete=0.6;
+	set @destino=0.4;
+    -- Obtener la suma de FOB y FOB valorado
+    SELECT
+        SUM(Cantidad * Valor_unitario) AS sum_fob,
+        SUM(Cantidad * (SELECT get_tribute_value(ID_Producto, 5))) AS sum_fob_valorado
+    INTO
+        @sum_fob,
+        @sum_fob_valorado
+    FROM
+        carga_consolidada_cotizaciones_detalles_producto
+    WHERE
+        ID_Cotizacion = p_id_cotizacion;
+
+    -- Obtener la suma de CBM total y Peso total
+    SELECT
+        SUM(CBM_Total) AS cbm_total,
+        SUM(Peso_Total) AS peso_total
+    INTO
+        @cbm_total,
+        @peso_total
+    FROM
+        carga_consolidada_cotizaciones_detalles_proovedor
+    WHERE
+        ID_Cotizacion = p_id_cotizacion;
+
+    -- Calcular el seguro total
+    SET @seguro_total = CASE
+    WHEN (IF(@sum_fob_valorado = 0, @sum_fob, @sum_fob_valorado) + (SELECT get_cbm_total(@cbm_total, 1) * @flete)) > 5000 THEN 100
+    ELSE 50
+END;
+    -- Calcular el CIF total
+    SET @cif_total = @seguro_total + @sum_fob + (SELECT get_cbm_total(@cbm_total, 1) * @flete);
+
+    -- Calcular el CIF valorado total
+    SET @cif_valorado_total = CASE
+        WHEN @sum_fob_valorado = 0 THEN 0
+        ELSE @seguro_total + @sum_fob_valorado + (SELECT get_cbm_total(@cbm_total, 1) * @flete)
+    END;
+
+    SELECT
+        cccdp.Cantidad,
+        cccdp.Valor_unitario,
+        (SELECT get_tribute_value(cccdp.ID_Producto, 5)) AS valoracion,
+        cccdp.Cantidad * cccdp.Valor_unitario AS fob,
+        cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5)) AS fob_valorado,
+        @sum_fob AS sum_fob,
+        @sum_fob_valorado AS sum_fob_valorado,
+        ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) AS distribucion,
+        @cbm_total AS cbm_total,
+        @peso_total AS peso_total,
+        ROUND((SELECT get_cbm_total(@cbm_total, 1)) * @flete * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2), 2) AS flete,
+        @sum_fob + (SELECT get_cbm_total(@cbm_total, 1) * @flete) AS cfr_total,
+        ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) AS cfr,
+        CASE
+            WHEN @sum_fob_valorado <> 0 THEN
+                ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                    ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+            ELSE 0
+        END AS cfr_valorado,
+        
+        CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @sum_fob_valorado + (SELECT get_cbm_total(@cbm_total, 1) * @flete)
+        END AS cfr_valorado_total,
+        @seguro_total AS seguro_total,
+        @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) AS seguro,
+        @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+        ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) AS valor_cif,
+        CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+                CASE
+                    WHEN @sum_fob_valorado <> 0 THEN
+                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                        ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+                    ELSE 0
+                END
+        END AS valor_cif_valorado,
+        @cif_total AS cif_total,
+        @cif_valorado_total AS cif_valorado_total,
+        (SELECT get_tribute_value(cccdp.ID_Producto, 1)) AS ad_valorem,
+        (SELECT get_tribute_value(cccdp.ID_Producto, 2)) AS igv,
+        (SELECT get_tribute_value(cccdp.ID_Producto, 3)) AS ipm,
+        (SELECT get_tribute_value(cccdp.ID_Producto, 4)) AS percepcion,
+        (SELECT get_tribute_value(cccdp.ID_Producto, 6)) AS antidumping,
+       ROUND((
+    CASE
+        WHEN @sum_fob_valorado <> 0 THEN
+            (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            1,
+             CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+                CASE
+                    WHEN @sum_fob_valorado <> 0 THEN
+                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                        ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+                    ELSE 0
+                END
+        	END )
+            )
+        ELSE
+            (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            1,
+             @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) + ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete 
+             * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) 
+				)
+            )
+    END
+), 2) AS advalorem,
+ROUND((
+    CASE
+        WHEN @sum_fob_valorado <> 0 THEN
+            (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            2,
+             CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+                CASE
+                    WHEN @sum_fob_valorado <> 0 THEN
+                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                        ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+                    ELSE 0
+                END
+        	END )
+            )
+        ELSE
+            (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            2,
+             @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) + ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete 
+             * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) 
+				)
+            )
+    END
+), 2) AS igv,
+ROUND((
+    CASE
+        WHEN @sum_fob_valorado  <> 0 THEN
+            (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            3,
+             CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+                CASE
+                    WHEN @sum_fob_valorado <> 0 THEN
+                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                        ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+                    ELSE 0
+                END
+        	END )
+            )
+        ELSE
+             (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            3,
+             @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) + ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete 
+             * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) 
+				)
+            )
+    END
+), 2) AS ipm,
+ROUND((
+    CASE
+        WHEN @sum_fob_valorado <> 0 THEN
+            (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            4,
+             CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+                CASE
+                    WHEN @sum_fob_valorado <> 0 THEN
+                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                        ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+                    ELSE 0
+                END
+        	END )
+            )
+        ELSE
+             (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            4,
+             @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) + ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete 
+             * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) 
+				
+            ))
+end ),2) as percepcion,
+ROUND((SELECT get_cbm_total(@cbm_total, 1)) * @destino * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2), 2) as costo_de_envio,
+ROUND((
+    CASE
+        WHEN @sum_fob_valorado <> 0 THEN
+            (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            -1,
+             CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+                CASE
+                    WHEN @sum_fob_valorado <> 0 THEN
+                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                        ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+                    ELSE 0
+                END
+        	END )
+            )+ CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) +
+                CASE
+                    WHEN @sum_fob_valorado <> 0 THEN
+                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+                        ((SELECT get_cbm_total(@cbm_total, 1) * @flete) *
+                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+                    ELSE 0
+                END
+        	END 
+        ELSE
+             (select get_taxes_calc(
+            cccdp.ID_Producto,
+            cccdp.ID_Cotizacion,
+            -1,
+             @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) + ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete 
+             * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) 
+				
+            ))+@seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) + ROUND(((SELECT get_cbm_total(@cbm_total, 1)) * @flete 
+             * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) 
+	end ),2)+ROUND((SELECT get_cbm_total(@cbm_total, 1)) * @destino * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2), 2) as costo_total,
+    (SELECT get_tribute_value(cccdp.ID_Producto, 6)) as antidumping
+from
+    
+        carga_consolidada_cotizaciones_detalles_producto cccdp
+    WHERE
+        cccdp.ID_Cotizacion = p_id_cotizacion;
+END
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `intranetprobusiness`.`get_cbm_total`( cbm decimal(10,2),tipo_cliente int) RETURNS decimal(10,2)
+begin
+	declare precio decimal(10,2)  default 0;
+	declare v_tarifa decimal(10,2) default 0;
+	select tarifa  into v_tarifa from carga_consolidada_cbm_tarifas  ccbt
+	where (cbm >= ccbt.limite_inf and cbm<=ccbt.limite_sup
+	and ccbt.id_tipo_cliente=tipo_cliente) limit 1;
+	
+	return v_tarifa;
+END
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `intranetprobusiness`.`get_cbm_total`( cbm decimal(10,2),tipo_cliente int) RETURNS decimal(10,2)
+begin
+	declare precio decimal(10,2)  default 0;
+	declare v_tarifa decimal(10,2) default 0;
+	select tarifa  into v_tarifa from carga_consolidada_cbm_tarifas  ccbt
+	where (cbm >= ccbt.limite_inf and cbm<=ccbt.limite_sup
+	and ccbt.id_tipo_cliente=tipo_cliente) limit 1;
+	
+	return v_tarifa;
+END
+CREATE FUNCTION intranetprobusiness.get_taxes_calc(
+    p_producto_id INT,
+    p_cotizacion_id INT,
+    p_tributo_id INT,
+    v_valor_cif decimal(10,2)
+)
+RETURNS DECIMAL(10, 2)
+BEGIN
+    DECLARE v_distribucion DECIMAL(10, 2);
+    DECLARE v_ad_honorem DECIMAL(10, 2);
+    DECLARE v_igv DECIMAL(10, 2);
+    DECLARE v_ipm DECIMAL(10, 2);
+    DECLARE v_percepcion DECIMAL(10, 2);
+    DECLARE v_valor_tributo DECIMAL(10, 2);
+
+
+    -- Obtener los valores de los tributos
+    SELECT 
+        get_tribute_value(p_producto_id, 1),
+        get_tribute_value(p_producto_id, 2),
+        get_tribute_value(p_producto_id, 3),
+        get_tribute_value(p_producto_id, 4)
+    INTO 
+        v_ad_honorem,
+        v_igv,
+        v_ipm,
+        v_percepcion;
+
+    -- Calcular el valor del CIF
+
+    -- Calcular el valor del tributo según el tipo de tributo
+    CASE p_tributo_id
+        WHEN 1 THEN
+            SET v_valor_tributo = v_valor_cif * v_ad_honorem / 100;
+        WHEN 2 THEN
+            SET v_valor_tributo = (v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_igv / 100;
+        WHEN 3 THEN
+            SET v_valor_tributo = (v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_ipm / 100;
+        WHEN 4 THEN
+            SET v_valor_tributo = (v_valor_cif + (v_valor_cif * v_ad_honorem / 100)
+                + ((v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_igv / 100)
+                + ((v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_ipm / 100))
+                * v_percepcion / 100;
+        WHEN -1 THEN
+            SET v_valor_tributo = (v_valor_cif * v_ad_honorem / 100) +
+             ((v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_igv / 100)+
+              ((v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_ipm / 100)+
+              ((v_valor_cif + (v_valor_cif * v_ad_honorem / 100)
+                + ((v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_igv / 100)
+                + ((v_valor_cif + (v_valor_cif * v_ad_honorem / 100)) * v_ipm / 100))
+                * v_percepcion / 100);
+        ELSE
+            SET v_valor_tributo = 0;
+    END CASE;
+
+    RETURN v_valor_tributo;
+END
