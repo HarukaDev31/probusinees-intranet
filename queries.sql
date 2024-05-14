@@ -342,3 +342,78 @@ begin
 	
 	return v_tarifa;
 END
+SELECT 
+    cccdprov.ID_Proveedor,
+    cccdprov.CBM_Total,
+    cccdprov.Peso_Total,
+    (
+        SELECT 
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'ID_Producto', cccdpro.ID_Producto,
+                    'URL_Link', cccdpro.URL_Link,
+                    'Nombre_Comercial', cccdpro.Nombre_Comercial,
+                    'Uso', cccdpro.Uso,
+                    'Cantidad', cccdpro.Cantidad,
+                    'Valor_unitario', IFNULL(cccdpro.Valor_unitario, 0),
+                    'Tributos', (
+                        select json_arrayagg(
+                        	json_object(
+                        	"Tipo_Tributo",tccct.Nombre,
+                        	"Key",tccct.table_key,
+                        	"Value",cccdt.value,
+                        	) 
+                        )  from carga_consolidada_cotizaciones_detalles_tributo cccdt 
+                        join tipo_carga_consolidada_cotizaciones_tributo tccct  on tccct.ID_Tipo_Tributo=cccdt.ID_Tipo_Tributo
+                        where cccdt.ID_Producto=cccdpro.ID_Producto
+                        
+                    )
+                )
+            )
+        FROM 
+            carga_consolidada_cotizaciones_detalles_producto cccdpro
+        WHERE 
+            cccdpro.ID_Cotizacion = cccdprov.ID_Cotizacion
+            AND cccdpro.ID_Proveedor = cccdprov.ID_Proveedor
+    ) AS productos
+FROM  
+    carga_consolidada_cotizaciones_detalles_proovedor cccdprov
+WHERE 
+    cccdprov.ID_Cotizacion = 33;
+   
+select Cantidad,Valor_unitario  from carga_consolidada_cotizaciones_detalles_producto cccdp
+where ID_Cotizacion =33;
+
+    
+create table carga_consolidada_cbm_tarifas(
+id_tarifa int  not null auto_increment,
+id_tipo_tarifa int not null,
+id_tipo_cliente int not null,
+limite_inf decimal(10,2) not null,
+limite_sup decimal(10,2) not null,
+currency  varchar(50) not null default "USD",
+tarifa decimal(10,2) not null,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+updated_at DATETIME ,
+primary key(id_tarifa)
+);
+select tarifa from carga_consolidada_cbm_tarifas  ccbt
+	where (1 >= ccbt.limite_inf and 1<=ccbt.limite_sup
+	and ccbt.id_tipo_cliente=1) limit 1
+
+table carga_consolidada_cbm_tarifas add column type_tarifa int not null default 1
+insert into carga_consolidada_cbm_tarifas(id_tipo_tarifa,id_tipo_cliente,limite_inf,limite_sup,tarifa)
+values
+(1,1,0.1,0.5,250),
+(1,1,0.6,1,350),
+(2,1,1.1,2,350),
+(2,1,2.1,3.0,325),
+(2,1,3.1,4,300),
+(2,1,4.1,999999,280),
+(1,2,0.1,0.5,250),
+(1,2,0.6,1,325),
+(2,2,1.1,2,325),
+(2,2,2.1,3.0,300),
+(2,2,3.1,4,275),
+(2,2,4.1,999999,250)
+;

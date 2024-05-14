@@ -6,7 +6,8 @@
         "php": ">=5.4.0",
         "lyracom/rest-php-sdk": "4.0.*",
         "mpdf/mpdf": "^8.1",
-        "geoip/geoip": "^1.17"
+        "geoip/geoip": "^1.17",
+        "phpoffice/phpspreadsheet": "^1.5"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

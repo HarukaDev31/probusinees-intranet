@@ -29,6 +29,7 @@ class CCotizaciones extends CI_Controller{
             $rows[] = $row->Empresa;
             $rows[] = $row->Cotizacion;
             $rows[] = $row->ID_Tipo_Cliente;
+            $rows[] = '<button class="btn btn-xs btn-link" alt="Descargar" title="Modificar" href="javascript:void(0)" onclick="descargarReporte(\'' . $row->ID_Cotizacion . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(\'' . $row->ID_Cotizacion . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }

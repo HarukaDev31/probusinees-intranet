@@ -60,6 +60,7 @@
                       <th>Empresa</th>
                       <th>Cotizacion</th>
                       <th>Tipo de Cliente</th>
+                      <th>Descargar</th>
                       <th>Ver</th>
                     </tr>
                   </thead>
