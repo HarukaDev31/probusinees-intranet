@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-require_once APPPATH . 'third_party/PHPExcel.php';
 
 class Excel extends CI_Controller {
     public function __construct()
@@ -8,8 +7,9 @@ class Excel extends CI_Controller {
      parent::__construct();
     }
     function index()
- {
-  
- }
+    {
+        
+    
+    }
    
 }

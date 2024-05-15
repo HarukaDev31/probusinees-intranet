@@ -254,36 +254,24 @@ const guardarCotizacion=()=>{
       }
     })
 }
-const  descargarReporte=(ID_Cotizacion)=> {
+const descargarReporte=(ID_Cotizacion)=> {
     $.ajax({
-        url:base_url + 'Excel/Excel/index',
+        url:base_url + 'CargaConsolidada/CCotizaciones/descargarExcel',
         type: 'POST',
         xhrFields: {
             responseType: 'blob'
         },
         data: JSON.stringify({ID_Cotizacion:ID_Cotizacion}),
         success: function(response) {
-            var disposition = jqXHR.getResponseHeader('Content-Disposition');
-            var filename = disposition.split('=')[1];
-
-            if (typeof window.navigator.msSaveBlob !== 'undefined') {
-                // Para Internet Explorer
-                window.navigator.msSaveBlob(new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), filename);
-            } else {
-                // Para otros navegadores
-                var a = document.createElement('a');
-                var url = window.URL.createObjectURL(new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(function() {
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                }, 0);
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
+            var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'example.xlsx';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            },
+        error: function(errorThrown) {
             console.error('Error al descargar el archivo Excel: ' + errorThrown);
         }
     });

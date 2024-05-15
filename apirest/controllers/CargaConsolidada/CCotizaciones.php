@@ -55,5 +55,27 @@ class CCotizaciones extends CI_Controller{
         $cotizacion = json_decode($postData, true);
         echo json_encode($this->CCotizacionesModel->guardarCotizacion($cotizacion));
     }
+    public function descargarExcel(){
+        $postData = file_get_contents('php://input');
+        $cotizacion = json_decode($postData, true);
+        $this->load->library('PHPExcel');
+
+            // Create a new PHPExcel object
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel= $this->CCotizacionesModel->fillExcelData($cotizacion,$objPHPExcel);
+       
+
+        // // Add some data to the sheet
+       
+
+        // Set the content type header to indicate that this is an Excel file
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="example.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        exit(); // 
+    }
 }
 ?>
