@@ -78,10 +78,27 @@ $(function(){
 function verCotizacion(ID){
     $( '.div-Listar' ).hide();
     $( '.div-AgregarEditar' ).show();
-
-    url = base_url + 'CargaConsolidada/CCotizaciones/ajax_edit_body/' + ID;
+    urlCabecera = base_url + 'CargaConsolidada/CCotizaciones/ajax_edit_header/' + ID;
     $.ajax({
-      url : url,
+        url : urlCabecera,
+        type: "GET",
+        dataType: "JSON",
+        success: function(response){
+            //response have names,cbm_total, peso_total y empresa
+            $('#Nombre').val(response[0].Nombre);
+            $('#CBM_Total').val(response[0].CBM_Total);
+            $('#Peso_Total').val(response[0].Peso_Total);
+            $('#Empresa').val(response[0].Empresa);
+            $('#ID_Cotizacion').val(ID);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+        }
+    })
+
+    urlBody = base_url + 'CargaConsolidada/CCotizaciones/ajax_edit_body/' + ID;
+    $.ajax({
+      url : urlBody,
       type: "GET",
       dataType: "JSON",
       success: function(response){
@@ -100,7 +117,13 @@ function verCotizacion(ID){
                 $(`#Uso-${i}-${product}`).val(productosJSON[key].Uso);
                 $(`#Cantidad-${i}-${product}`).val(productosJSON[key].Cantidad);
                 $(`#Valor_Unitario-${i}-${product}`).val(productosJSON[key].Valor_unitario);
+                
+                //add attributes data to button
+                const button=$(`#button-tributo-${i}-${product}`);
+                button.attr('data-nombre',productosJSON[key].Nombre_Comercial);
+                button.attr('data-proveedorIndex',i);
                 product++;
+
 
             }   
           
@@ -111,62 +134,96 @@ function verCotizacion(ID){
       }
     })
   }
+function getProvTemplate(index,ID_Proveedor=null){
+    template=
+    `<div class="col-12"> 
+        <div class="row">
+            <div class="col-12 col-sm-3 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+                <div class="row">
+                    <div class="col-12 col-md-5 d-flex flex-column justify-content-center">
+                    <h4>Proveedor ${index+1}</h4>
+                    </div>
+                    <div class="col-12 col-md-7">
+                    <button type="button" class="btn btn-danger w-100" >Eliminar</button>
+                    <button type="button" class="btn btn-danger w-100 mt-1" >Agregar Producto</button>
 
-function getProvTemplate(index,ID_Proveedor){
-    template=`<div class="col-12"> 
-    <div class="row"><div class="col-12 col-sm-3 col-md-6 col-lg-8"><label>Proveedor ${index+1}</label></div>
-    <div class="col-12 col-sm-9 col-md-6 col-lg-4">
-      <div class="row d-flex proveedor">
-        <input class="proveedorID" value="${ID_Proveedor}" type="hidden" >
-        <div class="form-group ">
-            <input id="CBM_Total-${index}"disabled="true" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-            <span class="help-block text-danger" id="error"></span>
+                    </div>
+                        
+                </div>
             </div>
-            <div class="form-group">
-                <input disabled="true"
-                id="Peso_Total-${index}"
-                type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                <span class="help-block text-danger" id="error"></span>
+            <div class="col-12 col-sm-9 col-md-8 col-lg-8">
+                <div class="row d-flex proveedor flex-row">
+                    <input class="proveedorID" value="${ID_Proveedor?ID_Proveedor:-1}" type="hidden" >
+                    <div class="col-12 col-md-6">
+                        <div class="form-group ">
+                        <label>CBM Total</label>
+                        <input id="CBM_Total-${index}"  type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                    </div>
+                </div>
+            
+                <div class="col-12 col-md-6">
+                    <div class="form-group">
+                        <label>Peso Total</label>
+                        <input  id="Peso_Total-${index}" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <span class="help-block text-danger" id="error"></span>
+                    </div>   
+                </div>
             </div>
         </div>
-    </div>
-    </div>
+        </div>
+        <div class="row rounded-5 mb-2 border border-secondary">
+            <div class="col-12 col-md-6 d-flex justify-content-center">
+                <Label>Producto</Label>
+            </div>
+            <div class="col-12 col-md-4 d-flex justify-content-center">
+                <Label>Informacion del Producto</Label>
+            </div>
+            <div class="col-12 col-md-2 d-flex justify-content-center">
+                <Label>Tributos</Label>
+            </div>
+        </div>
     </div>`
     return template;
 }
 function getProductoTemplate(proveedor,index,productoID){
     
     template=`<div class="col-12">
-    <div class="row producto-${proveedor}">
+        <div class="row producto-${proveedor} ">
         <input class="productID" value="${productoID}" type="hidden" >
 
-            <div class="col-12 col-md-6">
-            <label>Img</label>
+            <div class="col-12 col-md-6 ">
+            <Label>Img</Label>
             <div class="form-group">
-                    <input id="URL_Link-${proveedor}-${index}" class="URL_Link" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                    <input id="URL_Link-${proveedor}-${index}"  class="form-control required URL_Link" placeholder="Ingresar" maxlength="100" autocomplete="off">
                     <span class="help-block text-danger" id="error"></span>
             </div>
+            <button type="button" class="btn btn-primary w-100" style="height:50px;">Quitar</button>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-4">
         <div class="form-group">
-                <input id="Nombre_Comercial-${proveedor}-${index}" class="Nombre_Comercial" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                <label>Nombre Comercial</label>
+                <input id="Nombre_Comercial-${proveedor}-${index}"  type="text"  class="form-control required Nombre_Comercial" placeholder="Ingresar" maxlength="100" autocomplete="off">
                 <span class="help-block text-danger" id="error"></span>
         </div>
         <div class="form-group">
-                <input id="Uso-${proveedor}-${index}" class="Uso" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                <label>Uso</label>
+                <input id="Uso-${proveedor}-${index}"  type="text"  class="form-control required Uso" placeholder="Ingresar" maxlength="100" autocomplete="off">
                 <span class="help-block text-danger" id="error"></span>
         </div>
         <div class="form-group">
-                <input id="Cantidad-${proveedor}-${index}" class="Cantidad" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                <label>Cantidad</label>
+                <input id="Cantidad-${proveedor}-${index}"  type="text"  class="form-control required Cantidad" placeholder="Ingresar" maxlength="100" autocomplete="off">
                 <span class="help-block text-danger" id="error"></span>
         </div>
         <div class="form-group">
-                <input id="Valor_Unitario-${proveedor}-${index}" class="Valor_Unitario" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                <label>Valor Unitario</label>
+                <input id="Valor_Unitario-${proveedor}-${index}" type="text"  class="form-control required Valor_Unitario" placeholder="Ingresar" maxlength="100" autocomplete="off">
                 <span class="help-block text-danger" id="error"></span>
         </div>
         </div>
-        <div class="col-12 col-md-3">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-productid="${productoID}">Ver Tributo</button>
+        <div class="col-12 col-md-2 d-flex justify-content-center align-items-center">
+        <button id="button-tributo-${proveedor}-${index}" type="button" class="btn btn-primary w-100" style="height:50px;" data-toggle="modal" data-target="#exampleModal" data-productid="${productoID}">Ver</button>
         </div>
     </div>
     </div>`
@@ -174,7 +231,11 @@ function getProductoTemplate(proveedor,index,productoID){
 
 }
 var productoID=null;
+var newProveedores=[
+
+]
 const guardarTributos=()=>{
+    
     const tributos ={
         "ID_Producto":productoID,
         'ad-valorem':$('#ad-valorem').val(),
@@ -193,7 +254,7 @@ const guardarTributos=()=>{
       traditional: true,
       data: JSON.stringify(tributos),
       success: function(response){
-        
+        $('#exampleModal').modal('hide');
         
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -202,8 +263,41 @@ const guardarTributos=()=>{
     })
 }
 $('#exampleModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    productoID= button.data('productid') // Extract info from data-* attributes   
+    var button = $(event.relatedTarget)
+     // Button that triggered the modal
+    productoID= button.data('productid')
+    nombre=button.data('nombre')
+    proveedorIndex=button.data('proveedorindex')+1
+    $('#exampleModalLabel').text('Tributos del producto '+nombre+' del Proveedor '+proveedorIndex);
+
+    if(productoID==null){
+        $('#ad-valorem').val('0');
+        $('#igv').val('16');
+        $('#ipm').val('2');
+        $('#percepcion').val('3.50');
+        $('#valoracion').val('0');
+        $('#antidumping').val('0');
+        return;
+    }
+    url = base_url + 'CargaConsolidada/CCotizaciones/ajax_edit_tributos/'+productoID;
+    
+    $.ajax({
+        url : url,
+        type: "GET",
+        dataType: "JSON",
+        data: {ID_Producto:productoID},
+        success: function(response){
+            $('#ad-valorem').val(response["ad-valorem"]);
+            $('#igv').val(response.igv);
+            $('#ipm').val(response.ipm);
+            $('#percepcion').val(response.percepcion);
+            $('#valoracion').val(response.valoracion);
+            $('#antidumping').val(response.antidumping);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+        }
+        })
 })
 const guardarCotizacion=()=>{
     const cotizacion=[
@@ -237,6 +331,9 @@ const guardarCotizacion=()=>{
             });
         }
     }
+    //add preloader
+
+
     url = base_url + 'CargaConsolidada/CCotizaciones/guardarCotizacion';
     $.ajax({
       url : url,
@@ -246,11 +343,15 @@ const guardarCotizacion=()=>{
       traditional: true,
       data: JSON.stringify(cotizacion),
       success: function(response){
-        
-        
+        //remove preloader
+        $('.preloader').remove();
+        $( '.div-Listar' ).show();
+        $( '.div-CotizacionBody' ).html('');
+        $( '.div-AgregarEditar' ).hide();
+        table_Entidad.ajax.reload();
       },
       error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
+            $('.preloader').remove();
       }
     })
 }
@@ -275,4 +376,19 @@ const descargarReporte=(ID_Cotizacion)=> {
             console.error('Error al descargar el archivo Excel: ' + errorThrown);
         }
     });
+}
+const agregarProveedor=()=>{
+    const index = $('.proveedor').length;
+    $('#div-CotizacionBody').append(getProvTemplate(index));
+    //add initial product
+    $('#div-CotizacionBody').append(getProductoTemplate(index,0));
+    const button=$(`#button-tributo-${index}-${0}`);
+    button.attr('data-nombre',"nuevo");
+    button.attr('data-proveedorIndex',index);
+    button.attr('data-productid',null);
+    newProveedores.push({
+        
+    });
+    //set disabled
+
 }

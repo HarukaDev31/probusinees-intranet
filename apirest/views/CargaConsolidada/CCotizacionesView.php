@@ -78,11 +78,11 @@
                         <div class="col-12 col-md-7">
                         <label>Cliente </label>
                           <div class="form-group">
-                            <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                            <input id="Nombre" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
                           <div class="form-group">
-                            <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                            <input  id="CBM_Total" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
                         </div>
@@ -90,23 +90,33 @@
                         <div class="col-12 col-md-5">
                         <label>Empresa </label>
                           <div class="form-group">
-                            <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                            <input id="Empresa" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
                           <div class="form-group">
-                            <input disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                            <input id="Peso_Total" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
                         </div>
                         </div>
 
                     </div>
+                    <div class="col-12 col-md-3 d-flex flex-column d-flex align-items-center justify-content-center">
+                      <label>Estado</label>
+                      <div class="form-group ">
+                      <button type="button" class="btn btn-primary" onclick="agregarProveedor()">Agregar Proveedor </button>
+                      </div>  
+                    <div class="form-group ">
+                    <button type="button" class="btn btn-primary" onclick="cambiarTipodeCliente()">Tipo de Cliente </button>
+                      </div>
+                    </div>
                   </div>
-                  <div class="row div-CotizacionBody" id="div-CotizacionBody">
+                  <div class="row div-CotizacionBody" id="div-CotizacionBody">                    
+                  </div>
                 <?php echo form_close(); ?>
               </div>
               <div id="div-footer">
-                <button type="button" class="btn btn-success" onclick="guardaryCambiarEstado()">Marcar Como Cotizado</button>
+                <!-- <button type="button" class="btn btn-success" onclick="guardaryCambiarEstado()">Marcar Como Cotizado</button> -->
                 <button type="button" class="btn btn-primary" onclick="guardarCotizacion()">Guardar </button>
               </div>
             </div>
@@ -161,9 +171,9 @@
               <label class="input-group-text" for="Percepcion">PERCEPCION %</label>
             </div>
             <select class="custom-select" id="percepcion">
-              <option value="0">0</option>
-              <option value="3.5" selected>3.5</option>
-              <option value="5">5</option>
+              <option value="0.00">0</option>
+              <option value="3.50" selected>3.5</option>
+              <option value="5.00">5</option>
             </select>
             </div>
           </div>

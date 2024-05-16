@@ -29,7 +29,7 @@ class CCotizaciones extends CI_Controller{
             $rows[] = $row->Empresa;
             $rows[] = $row->Cotizacion;
             $rows[] = $row->ID_Tipo_Cliente;
-            $rows[] = '<button class="btn btn-xs btn-link" alt="Descargar" title="Modificar" href="javascript:void(0)" onclick="descargarReporte(\'' . $row->ID_Cotizacion . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
+            $rows[] = '<button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(\'' . $row->ID_Cotizacion . '\')"><i class=" far fa-edit fa-2x" aria-hidden="true"></i></button>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(\'' . $row->ID_Cotizacion . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
             $data[] = $rows;
         }
@@ -43,6 +43,9 @@ class CCotizaciones extends CI_Controller{
     }
     public function ajax_edit_body($ID){
         echo json_encode($this->CCotizacionesModel->get_cotization_body($this->security->xss_clean($ID)));
+    }
+    public function ajax_edit_tributos($ID){
+        echo json_encode($this->CCotizacionesModel->get_cotization_tributos($this->security->xss_clean($ID)));
     }
     public function guardarTributos(){
         $postData = file_get_contents('php://input');
@@ -59,10 +62,13 @@ class CCotizaciones extends CI_Controller{
         $postData = file_get_contents('php://input');
         $cotizacion = json_decode($postData, true);
         $this->load->library('PHPExcel');
+      
 
             // Create a new PHPExcel object
-        $objPHPExcel = new PHPExcel();
-        $objPHPExcel= $this->CCotizacionesModel->fillExcelData($cotizacion,$objPHPExcel);
+            $templatePath = 'assets/downloads/Boleta_Template.xlsx';
+            $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
+      
+            $objPHPExcel= $this->CCotizacionesModel->fillExcelData($cotizacion,$objPHPExcel);
        
 
         // // Add some data to the sheet
