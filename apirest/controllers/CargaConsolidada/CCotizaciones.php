@@ -23,7 +23,7 @@ class CCotizaciones extends CI_Controller{
         $data = array();
         foreach($arrData as $row){
             $rows = array();
-            $rows[] = $row->ID_Cotizacion;
+            $rows[] = $row->CotizacionCode;
             $rows[] = ToDateBD($row->Fe_Creacion);
             $rows[] = $row->N_Cliente;
             $rows[] = $row->Empresa;

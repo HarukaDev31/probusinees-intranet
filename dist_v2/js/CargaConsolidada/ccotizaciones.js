@@ -132,6 +132,9 @@ function verCotizacion(ID) {
           $(`#Valor_Unitario-${i}-${product}`).val(
             productosJSON[key].Valor_unitario
           );
+          $(`#img-${i}-${product}`).html(
+            `<img src="${productosJSON[key].Url_Image}" class="img-fluid" alt="Responsive image">`
+          )
 
           //add attributes data to button
           const button = $(`#button-tributo-${i}-${product}`);
@@ -208,7 +211,7 @@ function getProductoTemplate(proveedor, index, productoID) {
         <input class="productID" value="${productoID}" type="hidden" >
 
             <div class="col-12 col-md-6 ">
-            <Label>Img</Label>
+            <Label id="img-${proveedor}-${index}"></Label>
             <div class="form-group">
                     <input id="URL_Link-${proveedor}-${index}"  class="form-control required URL_Link" placeholder="Ingresar" maxlength="100" autocomplete="off">
                     <span class="help-block text-danger" id="error"></span>

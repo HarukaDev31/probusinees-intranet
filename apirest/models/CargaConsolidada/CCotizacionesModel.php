@@ -48,10 +48,11 @@ class CCotizacionesModel extends CI_Model
         cccdprov.Peso_Total,
         (
             SELECT
-                JSON_ARRAYAGG(
+                JSON_ARRAY(
                     JSON_OBJECT(
                         'ID_Producto', cccdpro.ID_Producto,
                         'URL_Link', cccdpro.URL_Link,
+                        'Url_Image', cccdpro.Url_Image,
                         'Nombre_Comercial', cccdpro.Nombre_Comercial,
                         'Uso', cccdpro.Uso,
                         'Cantidad', cccdpro.Cantidad,
@@ -236,7 +237,7 @@ class CCotizacionesModel extends CI_Model
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
-        $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
+        $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion .",".intval("1").")");
         $query = json_decode(json_encode($query->result()), true);
         $this->db->close();
         $this->db->initialize();
@@ -277,6 +278,7 @@ class CCotizacionesModel extends CI_Model
             $InitialColumn++;
 
         }
+        
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', $query[0]["Peso_Total"]);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $query[0]["Total_CBM"]);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '10', $query[0]["Total_Cantidad"]);
@@ -303,6 +305,7 @@ class CCotizacionesModel extends CI_Model
         $sumIPM = 0;
         $sumPercepcion = 0;
         $sumTotal = 0;
+
         foreach ($query as $row) {
             $sum = 0;
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', $row["antidumping"]);
@@ -321,6 +324,7 @@ class CCotizacionesModel extends CI_Model
             $InitialColumn++;
 
         }
+
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $sumAdValorem);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', $sumAdValorem);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', $sumIGV);
@@ -392,6 +396,7 @@ class CCotizacionesModel extends CI_Model
         f as query["Cantidad"] g as query["Valor_Unitario"] i as query["costo_total"]/ $query["Cantidad"]
         j as  query["costo_total"] k as query["Valor_Unitario"]*3.7
          */
+        
         for ($index = 0; $index < count($query); $index++) {
             $row = 36 + $index;
             $objPHPExcel->getActiveSheet()->setCellValue('B' . $row, $index + 1);
@@ -402,18 +407,19 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->getActiveSheet()->setCellValue('J' . $row, $query[$index]["costo_total"]);
             $objPHPExcel->getActiveSheet()->setCellValue('K' . $row, $query[$index]["Valor_Unitario"] * 3.7);
         };
+
         $cotizationDetails = $this->db->select('*')
             ->from($this->table_cotizacion_detalles)
             ->where('ID_Cotizacion', $ID_Cotizacion)
             ->get()
             ->result_array();
 
-        $objPHPExcel->getActiveSheet()->setCellValue('C8', $cotizationDetails[0]['nombres']);
-        $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['apellidos']);
-        $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['dni']);
-        $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['telefono']);
-        $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["Peso_Total"]);
-        $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["Total_CBM"]);
+            $objPHPExcel->getActiveSheet()->setCellValue('C8', $cotizationDetails[0]['Nombres']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['Apellidos']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['DNI']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['Telefono']);
+            $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["Peso_Total"]);
+            $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["CBM_Total"]);
         return $objPHPExcel;
     }
     public function get_cotization_tributos($ID_Producto)
