@@ -128,19 +128,94 @@ class CCotizacionesModel extends CI_Model
                 $ID_Proveedor = $cot['ID_Proveedor'];
                 $CBM_Total = $cot['CBM_Total'];
                 $Peso_Total = $cot['Peso_Total'];
-                $this->db->where('ID_Proveedor', $ID_Proveedor);
-                $this->db->update($this->table_proveedor, array("CBM_Total" => $CBM_Total, "Peso_Total" => $Peso_Total));
-                foreach ($cot['productos'] as $producto) {
-                    $ID_Producto = $producto['ID_Producto'];
-                    $URL_Link = $producto['URL_Link'];
-                    $Nombre_Comercial = $producto['Nombre_Comercial'];
-                    $Uso = $producto['Uso'];
-                    $Cantidad = $producto['Cantidad'];
-                    $Valor_Unitario = $producto['Valor_Unitario'];
-                    $this->db->where('ID_Producto', $ID_Producto);
-                    $this->db->update($this->table_producto, array("URL_Link" => $URL_Link, "Nombre_Comercial" => $Nombre_Comercial, "Uso" => $Uso, "Cantidad" => $Cantidad, "Valor_Unitario" => $Valor_Unitario));
+                if (intval($ID_Proveedor) === -1) {
+                    $this->db->insert($this->table_proveedor, array("CBM_Total" => $CBM_Total, "Peso_Total" => $Peso_Total, "ID_Cotizacion" => $cot['ID_Cotizacion']));
+                    $ID_Proveedor = $this->db->insert_id();
+                    foreach ($cot['productos'] as $producto) {
+                        //if product dont have key tributos continue
+                        if (!array_key_exists('tributos', $producto)) {
+                            continue;
+                        }
+                        $URL_Link = $producto['URL_Link'];
+                        $Nombre_Comercial = $producto['Nombre_Comercial'];
+                        $Uso = $producto['Uso'];
+                        $Cantidad = $producto['Cantidad'];
+                        $Valor_Unitario = $producto['Valor_Unitario'];
+                        $this->db->insert($this->table_producto, array("URL_Link" => $URL_Link, "Nombre_Comercial" => $Nombre_Comercial, "Uso" => $Uso, "Cantidad" => $Cantidad, "Valor_Unitario" => $Valor_Unitario, "ID_Proveedor" => $ID_Proveedor, "ID_Cotizacion" => $cot['ID_Cotizacion']));
+                        $ID_Producto = $this->db->insert_id();
+                        //foreach key in producto['tributos'] call function to get type product id with key and insert into table tributo
+                        foreach ($producto['tributos'] as $key => $value) {
+                            //if producto not have tributos continue
+                            
+                            $ID_Tipo_Tributo = $this->getTypeTributoId($key);
+                            $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto,"ID_Proveedor"=>$ID_Proveedor,"ID_Cotizacion"=>$cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
+                        }
+                        
+                    }
+                    //foreach newproducts where key created_for_new is false  insert 
+                    foreach ($cot['newProductos'] as $producto) {
+                        if($producto['created_for_new'] === false){
+                            $URL_Link = $producto['URL_Link'];
+                            $Nombre_Comercial = $producto['Nombre_Comercial'];
+                            $Uso = $producto['Uso'];
+                            $Cantidad = $producto['Cantidad'];
+                            $Valor_Unitario = $producto['Valor_Unitario'];
+                            $this->db->insert($this->table_producto, array("URL_Link" => $URL_Link, "Nombre_Comercial" => $Nombre_Comercial, "Uso" => $Uso, "Cantidad" => $Cantidad, "Valor_Unitario" => $Valor_Unitario, "ID_Proveedor" => $ID_Proveedor, "ID_Cotizacion" => $cot['ID_Cotizacion']));
+                            $ID_Producto = $this->db->insert_id();
+                            foreach ($producto['tributos'] as $key => $value) {
+                                $ID_Tipo_Tributo = $this->getTypeTributoId($key);
+                                $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto,"ID_Proveedor"=>$ID_Proveedor,"ID_Cotizacion"=>$cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
+                            }
+                        }
+                    }
+                } else {
+                    $this->db->where('ID_Proveedor', $ID_Proveedor);
+                    $this->db->update($this->table_proveedor, array("CBM_Total" => $CBM_Total, "Peso_Total" => $Peso_Total));
+                    foreach ($cot['productos'] as $producto) {
+                        $ID_Producto = $producto['ID_Producto'];
+                        $URL_Link = $producto['URL_Link'];
+                        $Nombre_Comercial = $producto['Nombre_Comercial'];
+                        $Uso = $producto['Uso'];
+                        $Cantidad = $producto['Cantidad'];
+                        $Valor_Unitario = $producto['Valor_Unitario'];
+                        $this->db->where('ID_Producto', $ID_Producto);
+                        $this->db->update($this->table_producto, array("URL_Link" => $URL_Link, "Nombre_Comercial" => $Nombre_Comercial, "Uso" => $Uso, "Cantidad" => $Cantidad, "Valor_Unitario" => $Valor_Unitario));
+                    }
+                    if(count($cot['newProductos'])>0){
+                        for($i=0;$i<=count($cot['newProductos']);$i++){
+
+                            
+                            $URL_Link = $cot['newProductos'][$i]['URL_Link'];
+                            $Nombre_Comercial = $cot['newProductos'][$i]['Nombre_Comercial'];
+                            $Uso = $cot['newProductos'][$i]['Uso'];
+                            $Cantidad = $cot['newProductos'][$i]['Cantidad'];
+                            $Valor_Unitario = $cot['newProductos'][$i]['Valor_Unitario'];
+                            $this->db->insert($this->table_producto, array("URL_Link" => $URL_Link, "Nombre_Comercial" => $Nombre_Comercial, "Uso" => $Uso, "Cantidad" => $Cantidad, "Valor_Unitario" => $Valor_Unitario, "ID_Proveedor" => $ID_Proveedor, "ID_Cotizacion" => $cot['ID_Cotizacion']));
+                            $ID_Producto = $this->db->insert_id();
+                            foreach ($cot['newProductos'][$i]['tributos'] as $key => $value) {
+                                $ID_Tipo_Tributo = $this->getTypeTributoId($key);
+                                $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto,"ID_Proveedor"=>$ID_Proveedor,"ID_Cotizacion"=>$cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
+                            }
+                        }
+                        
+        
+                    }
                 }
             }
+            if(count($cotizacion[0]['deletedProveedores'])>0){
+                for($i=0;$i<count($cotizacion[0]['deletedProveedores']);$i++){
+                    $this->db->where('ID_Proveedor', $cotizacion[0]['deletedProveedores'][$i]);
+                    $this->db->delete($this->table_tributo);
+                    $this->db->where('ID_Proveedor', $cotizacion[0]['deletedProveedores'][$i]);
+                    $this->db->delete($this->table_producto);
+
+                    $this->db->where('ID_Proveedor', $cotizacion[0]['deletedProveedores'][$i]);
+                    $this->db->delete($this->table_proveedor);
+                }
+                
+
+            }
+            
             return array("success" => true);
 
         } catch (Exception $e) {
@@ -148,43 +223,29 @@ class CCotizacionesModel extends CI_Model
         }
 
     }
+    public function getTypeTributoId($table_key)
+    {
+        $this->db->select('ID_Tipo_Tributo');
+        $this->db->from($this->table_tipo_tributo);
+        $this->db->where('table_key', $table_key);
+        $query = $this->db->get();
+        $result = $query->row();
+        return $result->ID_Tipo_Tributo;
+    }
+
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
         $query = json_decode(json_encode($query->result()), true);
-        //LIBERATE QUERY
         $this->db->close();
         $this->db->initialize();
-        //do select to cotization details by id_cotization FROM table_cotizacion_detalles
-
-        //Sheet tributos
-        //set from b1 to b3 text calculo de tributos
-        //create a new sheet
         $newSheet = $objPHPExcel->createSheet();
         //set title
         $newSheet->setTitle('3');
 
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B3:E3');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B3', 'Calculo de Tributos');
-
-        //set headers for the excel b6 to b21
-        /**
-         * peso
-         * total cbm
-         * valor unitario
-         * valoracion
-         * cantidad
-         * valor fob
-         * valor fob valoracion
-         * distribucion %
-         * flete
-         * valor cfr
-         * cfr valorizado
-         * seguro
-         * valor cif
-         * cif valorizado
-         */
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B6', 'Peso');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B7', 'Total CBM');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B8', 'Valor Unitario');
@@ -357,7 +418,7 @@ class CCotizacionesModel extends CI_Model
     }
     public function get_cotization_tributos($ID_Producto)
     {
-     
+
         //select value from table tributo and table_key from table_tipo_tributo
         $this->db->select('ccct.value, cctt.table_key');
         $this->db->from($this->table_tributo . ' as ccct');
