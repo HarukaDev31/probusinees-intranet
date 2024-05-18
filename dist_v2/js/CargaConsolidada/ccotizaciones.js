@@ -1,5 +1,6 @@
 var url;
 $(function () {
+  $("#button-save").hide();
   url = base_url + "CargaConsolidada/CCotizaciones/ajax_list";
   table_Entidad = $("#table-CCotizaciones").DataTable({
     dom:
@@ -84,6 +85,7 @@ function verCotizacion(ID) {
   CotizacionID = ID;
   $(".div-Listar").hide();
   $(".div-AgregarEditar").show();
+  $("#button-save").show();
   urlCabecera =
     base_url + "CargaConsolidada/CCotizaciones/ajax_edit_header/" + ID;
   $.ajax({
@@ -592,6 +594,7 @@ const guardarCotizacion = () => {
       newProveedores = [];
       deletedProveedores = [];
       deletedProductos = [];
+      $("#button-save").hide();
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $(".preloader").remove();
@@ -601,6 +604,8 @@ const guardarCotizacion = () => {
       newProveedores = [];
       deletedProveedores = [];
       deletedProductos = [];
+      $("#button-save").hide();
+
     },
   });
 };
@@ -687,3 +692,20 @@ const agregarProveedor = () => {
   });
   //set disabled
 };
+const updateTipoCliente = (select,ID_Cotizacion) => {
+  const tipoCliente = $(select).val();
+  url = base_url + "CargaConsolidada/CCotizaciones/updateTipoCliente";
+  $.ajax({
+    url: url,
+    type: "post",
+    dataType: "JSON",
+    contentType: "application/json; charset=utf-8",
+    data:JSON.stringify({ID_Cotizacion:ID_Cotizacion,Tipo_Cliente:tipoCliente}),
+    success: function (response) {
+      console.log(response);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR);
+    },
+  });
+}

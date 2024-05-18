@@ -54,11 +54,11 @@
                 <table id="table-CCotizaciones" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
                     <tr>
-                      <th>Pedido</th>
+                      <th>N° Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <th>Cotizacion</th>
+                      <th>Total</th>
                       <th>Tipo de Cliente</th>
                       <th>Descargar</th>
                       <th>Ver</th>
@@ -117,7 +117,7 @@
               </div>
               <div id="div-footer">
                 <!-- <button type="button" class="btn btn-success" onclick="guardaryCambiarEstado()">Marcar Como Cotizado</button> -->
-                <button type="button" class="btn btn-primary" onclick="guardarCotizacion()">Guardar </button>
+                <button id="button-save"  type="button" class="btn btn-primary"  onclick="guardarCotizacion()">Guardar </button>
               </div>
             </div>
           </div>
@@ -204,5 +204,6 @@
     </div>
   </div>
 </div>
+
 </div>
 

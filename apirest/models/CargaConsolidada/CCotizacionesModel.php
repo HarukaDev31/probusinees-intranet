@@ -10,6 +10,7 @@ class CCotizacionesModel extends CI_Model
     public $table_tributo = "carga_consolidada_cotizaciones_detalles_tributo";
     public $table_tipo_tributo = "tipo_carga_consolidada_cotizaciones_tributo";
     public $table_cotizacion_detalles = "carga_consolidada_cotizaciones_detalle";
+    public $table_tipo_cliente = "carga_consolidada_tipo_cliente";
     public $get_excel_data = "get_cotization_tributos_v2";
     public function __construct()
     {
@@ -17,11 +18,17 @@ class CCotizacionesModel extends CI_Model
     }
     public function _get_datatables_query()
     {
-        $this->db->select('*');
+        $this->db->select('*,  (SELECT CONCAT("[", GROUP_CONCAT(
+                JSON_OBJECT(
+                    "value", cctc2.ID_Tipo_Cliente,
+                    "label", cctc2.Nombre
+                )
+            ), "]")
+FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $this->db->from($this->table);
-        // Aquí puedes agregar cualquier condición o filtro que necesites
-        // Ejemplo: $this->db->where('estado', 'activo');
+        $this->db->join($this->table_tipo_cliente, 'carga_consolidada_cotizaciones_cabecera.ID_Tipo_Cliente = carga_consolidada_tipo_cliente.ID_Tipo_Cliente', 'join');
     }
+
     public function get_datatables()
     {
         $this->_get_datatables_query();
@@ -42,39 +49,38 @@ class CCotizacionesModel extends CI_Model
     public function get_cotization_body($ID_Cotizacion)
     {
 
-        $this->db->select("
-        cccdprov.ID_Proveedor,
+        $this->db->select("cccdprov.ID_Proveedor,
         cccdprov.CBM_Total,
         cccdprov.Peso_Total,
         (
-            SELECT
-                JSON_ARRAY(
-                    JSON_OBJECT(
-                        'ID_Producto', cccdpro.ID_Producto,
-                        'URL_Link', cccdpro.URL_Link,
-                        'Url_Image', cccdpro.Url_Image,
-                        'Nombre_Comercial', cccdpro.Nombre_Comercial,
-                        'Uso', cccdpro.Uso,
-                        'Cantidad', cccdpro.Cantidad,
-                        'Valor_unitario', IFNULL(cccdpro.Valor_unitario, 0),
-                        'Tributos_Pendientes', (
-                            SELECT
-                                COUNT(*)
-                            FROM
-                                carga_consolidada_cotizaciones_detalles_tributo cccdt
-                            WHERE
-                                cccdt.ID_Producto = cccdpro.ID_Producto
-                                AND cccdt.Status = 'Pending'
-                        )
+            SELECT CONCAT('[', GROUP_CONCAT(
+                JSON_OBJECT(
+                    'ID_Producto', cccdpro.ID_Producto,
+                    'URL_Link', cccdpro.URL_Link,
+                    'Url_Image', cccdpro.Url_Image,
+                    'Nombre_Comercial', cccdpro.Nombre_Comercial,
+                    'Uso', cccdpro.Uso,
+                    'Cantidad', cccdpro.Cantidad,
+                    'Valor_unitario', IFNULL(cccdpro.Valor_unitario, 0),
+                    'Tributos_Pendientes', (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            carga_consolidada_cotizaciones_detalles_tributo cccdt
+                        WHERE
+                            cccdt.ID_Producto = cccdpro.ID_Producto
+                            AND cccdt.ID_Proveedor = cccdpro.ID_Proveedor
+                            AND cccdt.ID_Cotizacion = cccdpro.ID_Cotizacion
+                            AND cccdt.Status = 'Pending'
                     )
                 )
+            SEPARATOR ','), ']')
             FROM
                 carga_consolidada_cotizaciones_detalles_producto cccdpro
             WHERE
                 cccdpro.ID_Cotizacion = cccdprov.ID_Cotizacion
                 AND cccdpro.ID_Proveedor = cccdprov.ID_Proveedor
-        ) AS productos
-    ");
+        ) AS productos");
         $this->db->from($this->table_proveedor . ' as cccdprov');
         // $this->db->join($this->table_producto.' as cccdp2',
         // 'cccdp2.ID_Cotizacion = cccdp.ID_Cotizacion ','join');
@@ -125,10 +131,16 @@ class CCotizacionesModel extends CI_Model
     {
         //[{"ID_Proveedor":"9","CBM_Total":"150.00","Peso_Total":"1500.00","productos":[{"ID_Producto":"6","URL_Link":"https:\/\/music.youtube.com\/watch?v=zul8B399nzA&list=RDAMVMxQEV9lYHlNY","Nombre_Comercial":"Zapatos","Uso":"para los pies","Cantidad":"10000","Valor_Unitario":"0"},{"ID_Producto":"7","URL_Link":"31313","Nombre_Comercial":"1131","Uso":"313","Cantidad":"131","Valor_Unitario":"0"}]}]
         try {
+            $sum_CBM = 0;
+            $sum_Peso = 0;
             foreach ($cotizacion as $cot) {
                 $ID_Proveedor = $cot['ID_Proveedor'];
+
                 $CBM_Total = $cot['CBM_Total'];
                 $Peso_Total = $cot['Peso_Total'];
+                $sum_CBM += $CBM_Total;
+                $sum_Peso += $Peso_Total;
+
                 if (intval($ID_Proveedor) === -1) {
                     $this->db->insert($this->table_proveedor, array("CBM_Total" => $CBM_Total, "Peso_Total" => $Peso_Total, "ID_Cotizacion" => $cot['ID_Cotizacion']));
                     $ID_Proveedor = $this->db->insert_id();
@@ -147,15 +159,15 @@ class CCotizacionesModel extends CI_Model
                         //foreach key in producto['tributos'] call function to get type product id with key and insert into table tributo
                         foreach ($producto['tributos'] as $key => $value) {
                             //if producto not have tributos continue
-                            
+
                             $ID_Tipo_Tributo = $this->getTypeTributoId($key);
-                            $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto,"ID_Proveedor"=>$ID_Proveedor,"ID_Cotizacion"=>$cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
+                            $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto, "ID_Proveedor" => $ID_Proveedor, "ID_Cotizacion" => $cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
                         }
-                        
+
                     }
-                    //foreach newproducts where key created_for_new is false  insert 
+                    //foreach newproducts where key created_for_new is false  insert
                     foreach ($cot['newProductos'] as $producto) {
-                        if($producto['created_for_new'] === false){
+                        if ($producto['created_for_new'] === false) {
                             $URL_Link = $producto['URL_Link'];
                             $Nombre_Comercial = $producto['Nombre_Comercial'];
                             $Uso = $producto['Uso'];
@@ -165,7 +177,7 @@ class CCotizacionesModel extends CI_Model
                             $ID_Producto = $this->db->insert_id();
                             foreach ($producto['tributos'] as $key => $value) {
                                 $ID_Tipo_Tributo = $this->getTypeTributoId($key);
-                                $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto,"ID_Proveedor"=>$ID_Proveedor,"ID_Cotizacion"=>$cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
+                                $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto, "ID_Proveedor" => $ID_Proveedor, "ID_Cotizacion" => $cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
                             }
                         }
                     }
@@ -182,10 +194,9 @@ class CCotizacionesModel extends CI_Model
                         $this->db->where('ID_Producto', $ID_Producto);
                         $this->db->update($this->table_producto, array("URL_Link" => $URL_Link, "Nombre_Comercial" => $Nombre_Comercial, "Uso" => $Uso, "Cantidad" => $Cantidad, "Valor_Unitario" => $Valor_Unitario));
                     }
-                    if(count($cot['newProductos'])>0){
-                        for($i=0;$i<=count($cot['newProductos']);$i++){
+                    if (count($cot['newProductos']) > 0) {
+                        for ($i = 0; $i <= count($cot['newProductos']); $i++) {
 
-                            
                             $URL_Link = $cot['newProductos'][$i]['URL_Link'];
                             $Nombre_Comercial = $cot['newProductos'][$i]['Nombre_Comercial'];
                             $Uso = $cot['newProductos'][$i]['Uso'];
@@ -195,16 +206,15 @@ class CCotizacionesModel extends CI_Model
                             $ID_Producto = $this->db->insert_id();
                             foreach ($cot['newProductos'][$i]['tributos'] as $key => $value) {
                                 $ID_Tipo_Tributo = $this->getTypeTributoId($key);
-                                $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto,"ID_Proveedor"=>$ID_Proveedor,"ID_Cotizacion"=>$cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
+                                $this->db->insert($this->table_tributo, array("ID_Producto" => $ID_Producto, "ID_Proveedor" => $ID_Proveedor, "ID_Cotizacion" => $cot['ID_Cotizacion'], "ID_Tipo_Tributo" => intval($ID_Tipo_Tributo), "value" => $value, "Status" => "Pending"));
                             }
                         }
-                        
-        
+
                     }
                 }
             }
-            if(count($cotizacion[0]['deletedProveedores'])>0){
-                for($i=0;$i<count($cotizacion[0]['deletedProveedores']);$i++){
+            if (count($cotizacion[0]['deletedProveedores']) > 0) {
+                for ($i = 0; $i < count($cotizacion[0]['deletedProveedores']); $i++) {
                     $this->db->where('ID_Proveedor', $cotizacion[0]['deletedProveedores'][$i]);
                     $this->db->delete($this->table_tributo);
                     $this->db->where('ID_Proveedor', $cotizacion[0]['deletedProveedores'][$i]);
@@ -213,10 +223,11 @@ class CCotizacionesModel extends CI_Model
                     $this->db->where('ID_Proveedor', $cotizacion[0]['deletedProveedores'][$i]);
                     $this->db->delete($this->table_proveedor);
                 }
-                
 
             }
-            
+            $this->db->close();
+            $this->db->initialize();
+            $this->db->update($this->table_cotizacion_detalles, array("CBM_Total" => $sum_CBM, "Peso_Total" => $sum_Peso), array("ID_Cotizacion" => $cotizacion[0]['ID_Cotizacion']));
             return array("success" => true);
 
         } catch (Exception $e) {
@@ -237,7 +248,8 @@ class CCotizacionesModel extends CI_Model
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
-        $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion .",".intval("1").")");
+
+        $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
         $query = json_decode(json_encode($query->result()), true);
         $this->db->close();
         $this->db->initialize();
@@ -245,29 +257,79 @@ class CCotizacionesModel extends CI_Model
         //set title
         $newSheet->setTitle('3');
 
-        $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B3:E3');
+        $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B3:G3');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B3', 'Calculo de Tributos');
+        $style = $objPHPExcel->getActiveSheet()->getStyle('B3');
+        $grayColor = 'F8F9F9';
+        $blueColor = '1F618D';
+        $yellowColor = 'FFFF33';
+        $borders = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                ),
+            ),
+        );
+       //set auto size for columns 
+      
+        // Establecer el color de fondo gris
+        $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $style->getFill()->getStartColor()->setARGB($grayColor);
+
+        //ALL BORDERS
+        $objPHPExcel->getActiveSheet()->getStyle('B3:G3')->applyFromArray($borders);
+        //center text
+        $objPHPExcel->getActiveSheet()->getStyle('B3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B5', 'Nombres');
+        //set fill blue color
+        $objPHPExcel->getActiveSheet()->getStyle('B5')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('B5')->getFill()->getStartColor()->setARGB($blueColor);
+        //all borders
+        $objPHPExcel->getActiveSheet()->getStyle('B5')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        //apply border to all cells
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B6', 'Peso');
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B7', 'Total CBM');
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B7', "Valor CBM");
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B8', 'Valor Unitario');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B9', 'Valoracion');
+        //apply yellow color
+        $objPHPExcel->getActiveSheet()->getStyle('B9')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('B9')->getFill()->getStartColor()->setARGB($yellowColor);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B10', 'Cantidad');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B11', 'Valor FOB');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B12', 'Valor FOB Valoracion');
+        $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->getStartColor()->setARGB($yellowColor);
+        
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B13', 'Distribucion %');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B14', 'Flete');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B15', 'Valor CFR');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B16', 'CFR Valorizado');
+        $objPHPExcel->getActiveSheet()->getStyle('B16')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('B16')->getFill()->getStartColor()->setARGB($yellowColor);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B17', 'Seguro');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B18', 'Valor CIF');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B19', 'CIF Valorizado');
+        $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->getStartColor()->setARGB($yellowColor);
 
         //foreach row in sp result set the values in the excel
+
         $InitialColumn = 'C';
+        $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
+
         foreach ($query as $row) {
-            $rowExcel = 6;
+            $rowExcel = 5;
 
             foreach ($row as $key => $value) {
+                if ($rowExcel == 5) {
+                    $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->getStartColor()->setARGB($blueColor);
+                }
+                if ($rowExcel == 12 || $rowExcel == 16 || $rowExcel == 19||$rowExcel==9) {
+                    $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->getStartColor()->setARGB($yellowColor);
+                }
                 if ($rowExcel > 19) {
                     break;
                 }
@@ -275,10 +337,22 @@ class CCotizacionesModel extends CI_Model
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . $rowExcel, $value);
                 $rowExcel++;
             }
+            //set auto size for columns
             $InitialColumn++;
+            $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
+
 
         }
-        
+        $objPHPExcel->getActiveSheet()->getStyle('B5:'.$InitialColumn.'19')->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B28:'.$InitialColumn.'32')->applyFromArray($borders);
+
+        $objPHPExcel->getActiveSheet()->getStyle('B40:'.$InitialColumn.'40')->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B43:'.$InitialColumn.'47')->applyFromArray($borders);
+
+        $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->getStartColor()->setARGB($blueColor);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '5', "Total");
+
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', $query[0]["Peso_Total"]);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $query[0]["Total_CBM"]);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '10', $query[0]["Total_Cantidad"]);
@@ -290,7 +364,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', $query[0]["seguro_total"]);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', $query[0]["cif_total"]);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '19', $query[0]["cif_valorado_total"]);
-
+        //
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B23:E23');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B23', 'Tributos Aplicables');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B26', 'ANTIDUMPING');
@@ -308,14 +382,14 @@ class CCotizacionesModel extends CI_Model
 
         foreach ($query as $row) {
             $sum = 0;
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', $row["antidumping"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $row["ad_valorem"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', $row["ad_valorem_value"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', $row["igv_value"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', $row["ipm_value"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', $row["percepcion_value"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', "$".$row["antidumping"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $row["ad_valorem"]."%");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', "$".$row["ad_valorem_value"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$".$row["igv_value"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$".$row["ipm_value"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$".$row["percepcion_value"]);
             $sum = $row["ad_valorem_value"] + $row["igv_value"] + $row["ipm_value"] + $row["percepcion_value"];
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', $sum);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', "$".$sum);
             $sumAdValorem += $row["ad_valorem_value"];
             $sumIGV += $row["igv_value"];
             $sumIPM += $row["ipm_value"];
@@ -325,12 +399,12 @@ class CCotizacionesModel extends CI_Model
 
         }
 
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $sumAdValorem);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', $sumAdValorem);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', $sumIGV);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', $sumIPM);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', $sumPercepcion);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', $sumTotal);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', "$".$sumAdValorem);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', "$".$sumAdValorem);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$".$sumIGV);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$".$sumIPM);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$".$sumPercepcion);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', "$".$sumTotal);
 
         //Costos Destinos
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B37:E37');
@@ -396,7 +470,7 @@ class CCotizacionesModel extends CI_Model
         f as query["Cantidad"] g as query["Valor_Unitario"] i as query["costo_total"]/ $query["Cantidad"]
         j as  query["costo_total"] k as query["Valor_Unitario"]*3.7
          */
-        
+
         for ($index = 0; $index < count($query); $index++) {
             $row = 36 + $index;
             $objPHPExcel->getActiveSheet()->setCellValue('B' . $row, $index + 1);
@@ -414,12 +488,12 @@ class CCotizacionesModel extends CI_Model
             ->get()
             ->result_array();
 
-            $objPHPExcel->getActiveSheet()->setCellValue('C8', $cotizationDetails[0]['Nombres']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['Apellidos']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['DNI']);
-            $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['Telefono']);
-            $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["Peso_Total"]);
-            $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["CBM_Total"]);
+        $objPHPExcel->getActiveSheet()->setCellValue('C8', $cotizationDetails[0]['Nombres']);
+        $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['Apellidos']);
+        $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['DNI']);
+        $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['Telefono']);
+        $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["Peso_Total"]);
+        $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["CBM_Total"]);
         return $objPHPExcel;
     }
     public function get_cotization_tributos($ID_Producto)
@@ -438,5 +512,14 @@ class CCotizacionesModel extends CI_Model
         }
         return $asoArray;
         //return as asociative array
+    }
+    public function updateTipoCliente($data)
+    {
+        $ID_Cotizacion = $data['ID_Cotizacion'];
+        $ID_TipoCliente = $data['Tipo_Cliente'];
+        $this->db->where('ID_Cotizacion', $ID_Cotizacion);
+        $this->db->update($this->table, array("ID_Tipo_Cliente" => $ID_TipoCliente));
+
+        return array("success" => true);
     }
 }

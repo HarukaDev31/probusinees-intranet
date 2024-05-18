@@ -1596,12 +1596,14 @@ foreign key(ID_Cotizacion) references carga_consolidada_cotizaciones_cabecera(ID
 )
 
 -- final get_cotization_tributos_v2
-	CREATE PROCEDURE probussiness.get_cotization_tributos_v2( IN p_id_cotizacion int ,in v_t_cliente int)
-	begin
-		
+CREATE DEFINER=`root`@`localhost` PROCEDURE `probussiness`.`get_cotization_tributos_v2`( IN p_id_cotizacion int )
+begin
+		declare v_t_cliente int default 1;
+
 		-- valor flete y valor destino
 		set @flete=0.6;
 		set @destino=0.4;
+		select ID_Tipo_Cliente into v_t_cliente from carga_consolidada_cotizaciones_cabecera cccc where cccc.ID_Cotizacion=p_id_cotizacion;
 	    -- Obtener la suma de FOB y FOB valorado
 	    SELECT
 	        SUM(Cantidad * Valor_unitario) AS sum_fob,
@@ -1643,6 +1645,7 @@ foreign key(ID_Cotizacion) references carga_consolidada_cotizaciones_cabecera(ID
 	    END;
 	
 	    select
+	    	cccdp.Nombre_Comercial,
 	    	0 Peso,
 	    	(SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente)) Total_CBM,
 	    	cccdp.Valor_Unitario,
@@ -1655,9 +1658,9 @@ foreign key(ID_Cotizacion) references carga_consolidada_cotizaciones_cabecera(ID
 	        ROUND(((SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente) * @flete*ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) )+(cccdp.Cantidad*cccdp.Valor_Unitario) ),2) Valor_CFR,
 	        CASE
 	            WHEN @sum_fob_valorado <> 0 THEN
-	                ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
+	                (((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
 	                ((SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente) * @flete) *
-	                    ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+	               ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)))
 	            ELSE 0
 	        END AS Valor_CFR_Valorizado,
 	        @seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) AS Seguro,
@@ -1670,7 +1673,7 @@ foreign key(ID_Cotizacion) references carga_consolidada_cotizaciones_cabecera(ID
 	                    WHEN @sum_fob_valorado <> 0 THEN
 	                        ((SELECT get_tribute_value(cccdp.ID_Producto, 5)) * cccdp.Cantidad) +
 	                        ((SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente) * @flete) *
-	                            ROUND((cccdp.Cantidad * (SELECT get_tribute_value(cccdp.ID_Producto, 5))) / NULLIF(@sum_fob_valorado, 0), 2))
+	                            ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2))
 	                    ELSE 0
 	                END
 	        END as Valor_CIF_Valorado,
@@ -1856,10 +1859,9 @@ foreign key(ID_Cotizacion) references carga_consolidada_cotizaciones_cabecera(ID
 	            ))+@seguro_total * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2) + ROUND(((SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente)) * @flete 
 	             * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2)) + (cccdp.Cantidad * cccdp.Valor_unitario), 2) 
 		end ),2)+ROUND((SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente)) * @destino * ROUND((cccdp.Cantidad * cccdp.Valor_unitario) / @sum_fob, 2), 2) as costo_total,
-		(select Peso_total from carga_consolidada_cotizaciones_detalles_proovedor where ID_Cotizacion=p_id_cotizacion) as Peso_Total,
+		(select Peso_total from carga_consolidada_cotizaciones_detalles_proovedor where ID_Cotizacion=p_id_cotizacion and cccdp.ID_Proveedor=ID_Proveedor) as Peso_Total,
 		@total_cantidad as Total_Cantidad,
-		ROUND((SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente))) Servicio,
-		cccdp.Nombre_Comercial
+		ROUND((SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente))) Servicio
 	from
 	        carga_consolidada_cotizaciones_detalles_producto cccdp
 	    WHERE
