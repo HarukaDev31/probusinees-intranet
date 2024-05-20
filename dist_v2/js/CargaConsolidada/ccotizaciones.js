@@ -1,4 +1,5 @@
 var url;
+const { jsPDF } = window.jspdf;
 $(function () {
   $("#button-save").hide();
   url = base_url + "CargaConsolidada/CCotizaciones/ajax_list";
@@ -99,6 +100,7 @@ function verCotizacion(ID) {
       $("#Peso_Total").val(response[0].Peso_Total);
       $("#Empresa").val(response[0].Empresa);
       $("#ID_Cotizacion").val(ID);
+      
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log(jqXHR);
@@ -122,6 +124,9 @@ function verCotizacion(ID) {
 
         for (const key in productosJSON) {
           var productoID = productosJSON[key].ID_Producto;
+          //if tributos_pendiente int value is >0 then set the tributos button to red
+          
+
           $(".proveedor-" + i + "-productos").append(
             getProductoTemplate(i, product, productoID)
           );
@@ -136,8 +141,17 @@ function verCotizacion(ID) {
           );
           $(`#img-${i}-${product}`).html(
             `<img src="${productosJSON[key].Url_Image}" class="img-fluid" alt="Responsive image">`
-          )
+          );
+          const tributos_pendiente = productosJSON[key].Tributos_Pendientes;
+          console.log(tributos_pendiente);
+          if (tributos_pendiente > 0) {
+            console.log("Tributos Pendientes", tributos_pendiente,i,product);
+            const button = $(`#button-tributo-${i}-${product}`);
+           //ad circle to button with the number of tributos pendientes
+            button.html(`<span>Ver<span class="badge badge-danger"> ${tributos_pendiente}</span></span>`);
 
+
+          }
           //add attributes data to button
           const button = $(`#button-tributo-${i}-${product}`);
           button.attr("data-nombre", productosJSON[key].Nombre_Comercial);
@@ -218,9 +232,9 @@ function getProductoTemplate(proveedor, index, productoID) {
                     <input id="URL_Link-${proveedor}-${index}"  class="form-control required URL_Link" placeholder="Ingresar" maxlength="100" autocomplete="off">
                     <span class="help-block text-danger" id="error"></span>
             </div>
-            <button type="button" class="btn btn-primary w-100" style="height:50px;" onclick="borrarProducto(${proveedor},${index},${
+            <button type="button" class="btn btn-danger w-100" style="height:50px;" onclick="borrarProducto(${proveedor},${index},${
     productoID ? productoID : -1
-            })">Quitar</button>
+  })">Quitar</button>
         </div>
         <div class="col-12 col-md-4">
         <div class="form-group">
@@ -268,22 +282,24 @@ const borrarProveedor = (ID_Proveedor, index) => {
     $(`.proveedor-${index}`).remove();
   }
 };
-const borrarProducto = (provedorIndex, index,ID_Producto) => {
-    const productos=$(`.producto-${provedorIndex}.proveedor-${provedorIndex}`);
-    //if products is only one alert to the user and tell him to delete the provider
-    if (productos.length == 1) {
-        alert("No se puede eliminar el unico producto de un proveedor, elimine el proveedor");
-        return;
-    }
-    const producto=productos[index];
-    if (ID_Producto == null) {
-        newProductos.splice(index, 1);
-        producto.remove();
-    } else {
-        deletedProductos.push(ID_Producto);
-        producto.remove();
-    }
-    console.log(deletedProductos);
+const borrarProducto = (provedorIndex, index, ID_Producto) => {
+  const productos = $(`.producto-${provedorIndex}.proveedor-${provedorIndex}`);
+  //if products is only one alert to the user and tell him to delete the provider
+  if (productos.length == 1) {
+    alert(
+      "No se puede eliminar el unico producto de un proveedor, elimine el proveedor"
+    );
+    return;
+  }
+  const producto = productos[index];
+  if (ID_Producto == null) {
+    newProductos.splice(index, 1);
+    producto.remove();
+  } else {
+    deletedProductos.push(ID_Producto);
+    producto.remove();
+  }
+  console.log(deletedProductos);
 };
 const agregarProducto = (ID_Proveedor, index) => {
   //productIndex if length of divs with both class producto-index and proveedor-index
@@ -458,12 +474,12 @@ $("#exampleModal").on("show.bs.modal", function (event) {
     dataType: "JSON",
     data: { ID_Producto: productoID },
     success: function (response) {
-      $("#ad-valorem").val(response["ad-valorem"]);
-      $("#igv").val(response.igv);
-      $("#ipm").val(response.ipm);
-      $("#percepcion").val(response.percepcion);
-      $("#valoracion").val(response.valoracion);
-      $("#antidumping").val(response.antidumping);
+      $("#ad-valorem").val(response["ad-valorem"]??0);
+      $("#igv").val(response.igv??16);
+      $("#ipm").val(response.ipm??2);
+      $("#percepcion").val(response.percepcion??"3.50");
+      $("#valoracion").val(response.valoracion??0);
+      $("#antidumping").val(response.antidumping??0);
       newProveedor = null;
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -483,6 +499,7 @@ const guardarCotizacion = () => {
     var Peso_Total = $(proveedores[i])
       .find("#Peso_Total-" + i)
       .val();
+      console.log(deletedProductos,deletedProveedores)
     cotizacion.push({
       ID_Proveedor: $(proveedores[i]).find(".proveedorID").val(),
       ID_Cotizacion: CotizacionID,
@@ -491,6 +508,7 @@ const guardarCotizacion = () => {
       productos: [],
       deletedProveedores: deletedProveedores,
       newProductos: [],
+      deletedProductos: deletedProductos,
     });
 
     const productosHTML = $(`.producto-${i}`);
@@ -514,7 +532,6 @@ const guardarCotizacion = () => {
         Cantidad: Cantidad,
         Valor_Unitario: Valor_Unitario,
         created_for_new: false,
-
       });
     }
   }
@@ -605,7 +622,6 @@ const guardarCotizacion = () => {
       deletedProveedores = [];
       deletedProductos = [];
       $("#button-save").hide();
-
     },
   });
 };
@@ -632,6 +648,82 @@ const descargarReporte = (ID_Cotizacion) => {
       console.error("Error al descargar el archivo Excel: " + errorThrown);
     },
   });
+};
+const descargarBoletaPDF = (ID_Cotizacion) => {
+  $.ajax({
+    url: base_url + "CargaConsolidada/CCotizaciones/descargarBoleta",
+    type: "POST",
+    xhrFields: {
+      responseType: "blob",
+    },
+    data: JSON.stringify({ ID_Cotizacion: ID_Cotizacion }),
+    success: function (response) {
+      var blob = new Blob([response], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      //return excel file converted to pdf
+      convertirExcelAPDF(blob);
+    },
+    error: function (errorThrown) {
+      console.error("Error al descargar el archivo Excel: " + errorThrown);
+    },
+  });
+};
+const convertirExcelAPDF = (excelBlob) => {
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const data = new Uint8Array(event.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    console.log(workbook);
+    // Convertir el libro de trabajo (workbook) a PDF
+    const pdfBlob = workbook2pdf(workbook);
+    // Descargar el archivo PDF
+ 
+  };
+  reader.readAsArrayBuffer(excelBlob);
+};
+
+const workbook2pdf = (workbook) => {
+  const pdf = new jsPDF();
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const html = XLSX.utils.sheet_to_html(worksheet);
+
+  // Crear un contenedor temporal para el HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  document.body.appendChild(tempDiv);
+
+  html2canvas(tempDiv, {
+    scale: 0.5
+  }).then((canvas) => {
+    const imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 10, 10, canvas.width / 4, canvas.height / 4);
+    const pdfBlob = pdf.output('blob');
+
+    // Eliminar el contenedor temporal
+    document.body.removeChild(tempDiv);
+
+    // Aquí puedes hacer lo que necesites con el pdfBlob, por ejemplo, descargarlo
+    const url = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'exported.pdf';
+    a.click();
+
+    URL.revokeObjectURL(url);
+  });
+};
+
+const descargarPDF = (pdfBlob) => {
+  console.log(pdfBlob);
+  const url = window.URL.createObjectURL(pdfBlob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "boleta.pdf";
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
 };
 const agregarProveedor = () => {
   const index = $(".proveedor").length;
@@ -692,7 +784,7 @@ const agregarProveedor = () => {
   });
   //set disabled
 };
-const updateTipoCliente = (select,ID_Cotizacion) => {
+const updateTipoCliente = (select, ID_Cotizacion) => {
   const tipoCliente = $(select).val();
   url = base_url + "CargaConsolidada/CCotizaciones/updateTipoCliente";
   $.ajax({
@@ -700,7 +792,10 @@ const updateTipoCliente = (select,ID_Cotizacion) => {
     type: "post",
     dataType: "JSON",
     contentType: "application/json; charset=utf-8",
-    data:JSON.stringify({ID_Cotizacion:ID_Cotizacion,Tipo_Cliente:tipoCliente}),
+    data: JSON.stringify({
+      ID_Cotizacion: ID_Cotizacion,
+      Tipo_Cliente: tipoCliente,
+    }),
     success: function (response) {
       console.log(response);
     },
@@ -708,4 +803,4 @@ const updateTipoCliente = (select,ID_Cotizacion) => {
       console.log(jqXHR);
     },
   });
-}
+};

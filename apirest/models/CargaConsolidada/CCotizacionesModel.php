@@ -1,6 +1,5 @@
 <?php
 require_once APPPATH . 'third_party/PHPExcel.php';
-
 class CCotizacionesModel extends CI_Model
 {
     public $table_carga_consolidada = 'carga_consolidada';
@@ -225,6 +224,14 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
                 }
 
             }
+            if(count($cotizacion[0]['deletedProductos'])>0){
+                for($i=0;$i<count($cotizacion[0]['deletedProductos']);$i++){
+                    $this->db->where('ID_Producto', $cotizacion[0]['deletedProductos'][$i]);
+                    $this->db->delete($this->table_tributo);
+                    $this->db->where('ID_Producto', $cotizacion[0]['deletedProductos'][$i]);
+                    $this->db->delete($this->table_producto);
+                }
+            }
             $this->db->close();
             $this->db->initialize();
             $this->db->update($this->table_cotizacion_detalles, array("CBM_Total" => $sum_CBM, "Peso_Total" => $sum_Peso), array("ID_Cotizacion" => $cotizacion[0]['ID_Cotizacion']));
@@ -263,6 +270,7 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $grayColor = 'F8F9F9';
         $blueColor = '1F618D';
         $yellowColor = 'FFFF33';
+        $greenColor="009999";
         $borders = array(
             'borders' => array(
                 'allborders' => array(
@@ -270,8 +278,8 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
                 ),
             ),
         );
-       //set auto size for columns 
-      
+        //set auto size for columns
+
         // Establecer el color de fondo gris
         $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
         $style->getFill()->getStartColor()->setARGB($grayColor);
@@ -300,7 +308,7 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B12', 'Valor FOB Valoracion');
         $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
         $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->getStartColor()->setARGB($yellowColor);
-        
+
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B13', 'Distribucion %');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B14', 'Flete');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B15', 'Valor CFR');
@@ -314,9 +322,9 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->getStartColor()->setARGB($yellowColor);
 
         //foreach row in sp result set the values in the excel
+        $objPHPExcel->getActiveSheet()->getColumnDimension("B")->setAutoSize(true);
 
         $InitialColumn = 'C';
-        $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
 
         foreach ($query as $row) {
             $rowExcel = 5;
@@ -326,7 +334,7 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
                     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->getStartColor()->setARGB($blueColor);
                 }
-                if ($rowExcel == 12 || $rowExcel == 16 || $rowExcel == 19||$rowExcel==9) {
+                if ($rowExcel == 12 || $rowExcel == 16 || $rowExcel == 19 || $rowExcel == 9) {
                     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . $rowExcel)->getFill()->getStartColor()->setARGB($yellowColor);
                 }
@@ -337,17 +345,17 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . $rowExcel, $value);
                 $rowExcel++;
             }
-            //set auto size for columns
-            $InitialColumn++;
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
 
+            //set auto size for columns
+            $InitialColumn++;
 
         }
-        $objPHPExcel->getActiveSheet()->getStyle('B5:'.$InitialColumn.'19')->applyFromArray($borders);
-        $objPHPExcel->getActiveSheet()->getStyle('B28:'.$InitialColumn.'32')->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B5:' . $InitialColumn . '19')->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B28:' . $InitialColumn . '32')->applyFromArray($borders);
 
-        $objPHPExcel->getActiveSheet()->getStyle('B40:'.$InitialColumn.'40')->applyFromArray($borders);
-        $objPHPExcel->getActiveSheet()->getStyle('B43:'.$InitialColumn.'47')->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B40:' . $InitialColumn . '40')->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B43:' . $InitialColumn . '47')->applyFromArray($borders);
 
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->getStartColor()->setARGB($blueColor);
@@ -367,6 +375,24 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         //
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B23:E23');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B23', 'Tributos Aplicables');
+        $style = $objPHPExcel->getActiveSheet()->getStyle('B23');
+        $borders = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                ),
+            ),
+        );
+        //set auto size for columns
+
+        // Establecer el color de fondo gris
+        $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $style->getFill()->getStartColor()->setARGB($grayColor);
+
+        //ALL BORDERScc
+        $objPHPExcel->getActiveSheet()->getStyle('B23:E23')->applyFromArray($borders);
+        //center text
+        $objPHPExcel->getActiveSheet()->getStyle('B23')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B26', 'ANTIDUMPING');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B28', 'AD VALOREM');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B29', 'IGV');
@@ -379,45 +405,224 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $sumIPM = 0;
         $sumPercepcion = 0;
         $sumTotal = 0;
+        $sumAntidumping = 0;
 
         foreach ($query as $row) {
             $sum = 0;
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', "$".$row["antidumping"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $row["ad_valorem"]."%");
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', "$".$row["ad_valorem_value"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$".$row["igv_value"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$".$row["ipm_value"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$".$row["percepcion_value"]);
+            $sheet = $objPHPExcel->getActiveSheet();
+
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', "$" . $row["antidumping"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $row["ad_valorem"] . "%");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', "$" . $row["ad_valorem_value"]);
+            $cell = $sheet->getCell($InitialColumn . '28');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
+
+            
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$" . $row["igv_value"]);
+            $cell = $sheet->getCell($InitialColumn . '29');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$" . $row["ipm_value"]);
+            $cell = $sheet->getCell($InitialColumn . '30');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$" . $row["percepcion_value"]);
+            $cell = $sheet->getCell($InitialColumn . '31');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
             $sum = $row["ad_valorem_value"] + $row["igv_value"] + $row["ipm_value"] + $row["percepcion_value"];
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', "$".$sum);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', "$" . $sum);
             $sumAdValorem += $row["ad_valorem_value"];
             $sumIGV += $row["igv_value"];
             $sumIPM += $row["ipm_value"];
             $sumPercepcion += $row["percepcion_value"];
+            $sumAntidumping += $row["antidumping"];
             $sumTotal += $sum;
+            $cell = $sheet->getCell($InitialColumn . '32');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
             $InitialColumn++;
 
         }
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', "$" . $sumAntidumping);
+        $cell = $sheet->getCell($InitialColumn . '26');
+        // Verificar si el valor es numérico
+        if (!is_null($cell)) {
+            $cellValue = $cell->getValue();
 
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', "$".$sumAdValorem);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', "$".$sumAdValorem);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$".$sumIGV);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$".$sumIPM);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$".$sumPercepcion);
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', "$".$sumTotal);
+            // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+            if (strpos($cellValue, '$') !== false) {
+                $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                $cell->setValue($numericValue);
+                //convert to currency format with dollar symbol
+                $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            }
+        }
+
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', "$" . $sumAdValorem);
+        $cell = $sheet->getCell($InitialColumn . '27');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', "$" . $sumAdValorem);
+        $cell = $sheet->getCell($InitialColumn . '28');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$" . $sumIGV);
+        $cell = $sheet->getCell($InitialColumn . '29');
+            // Verificar si el valor es numérico
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                }
+            }
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$" . $sumIPM);
+        $cell = $sheet->getCell($InitialColumn . '30');
+
+        if (!is_null($cell)) {
+            $cellValue = $cell->getValue();
+
+            // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+            if (strpos($cellValue, '$') !== false) {
+                $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                $cell->setValue($numericValue);
+                //convert to currency format with dollar symbol
+                $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            }
+        }
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$" . $sumPercepcion);
+        $cell = $sheet->getCell($InitialColumn . '31');
+
+        if (!is_null($cell)) {
+            $cellValue = $cell->getValue();
+
+            // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+            if (strpos($cellValue, '$') !== false) {
+                $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                $cell->setValue($numericValue);
+                //convert to currency format with dollar symbol
+                $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            }
+        }
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', "$" . $sumTotal);
 
         //Costos Destinos
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B37:E37');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B37', 'Costos Destinos');
+        $style = $objPHPExcel->getActiveSheet()->getStyle('B37');
+        $borders = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                ),
+            ),
+        );
+        //set auto size for columns
+
+        // Establecer el color de fondo gris
+        $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $style->getFill()->getStartColor()->setARGB($grayColor);
+
+        //ALL BORDERS
+        $objPHPExcel->getActiveSheet()->getStyle('B37:E37')->applyFromArray($borders);
+        //center text
+        $objPHPExcel->getActiveSheet()->getStyle('B37')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B40', 'ITEM');
         $InitialColumn = 'C';
         $sumCostoDestino = 0;
         foreach ($query as $row) {
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', $row["costo_de_envio"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', "$" . $row["costo_de_envio"]);
             $sumCostoDestino += $row["costo_de_envio"];
             $InitialColumn++;
         }
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', $sumCostoDestino);
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', "$" . $sumCostoDestino);
         $InitialColumn = 'C';
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B41:E41');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B43', 'ITEM');
@@ -428,14 +633,37 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $sumCostoTotal = 0;
         foreach ($query as $row) {
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '43', $row["Nombre_Comercial"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '44', $row["costo_total"]);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '44', "$" . $row["Total_Cantidad"]);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '45', $row["Cantidad"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '46', $row["costo_total"] / $row["Cantidad"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '47', $row["Valor_Unitario"] * 3.7);
-            $sumCostoTotal += $row["costo_total"];
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '46', "$" . round($row["Total_Cantidad"] / $row["Cantidad"], 2));
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '47', 'S/.' . round(($row["Total_Cantidad"] / $row["Cantidad"]) * 3.7, 2));
+            $sumCostoTotal += $row["Total_Cantidad"];
             $InitialColumn++;
         }
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '44', $sumCostoTotal);
+        $ColumndIndex = PHPExcel_Cell::stringFromColumnIndex(count($query) + 1);
+        $initialIndex="C";
+
+       //set j20 = max column from rangue c27  to initialcolumn27
+       //convert c27 to column index 27 from string %number to number with percentage format
+        for ($i = 0; $i < count($query); $i++) {
+            $cell = $objPHPExcel->getActiveSheet()->getCell($initialIndex . '27');
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+    
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '%') !== false) {
+                    $numericValue = floatval(str_replace(['%', ','], '', $cellValue))/100;
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $cell->getStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                }
+            }
+            $initialIndex++;
+        }
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('J20', "=MAX('3'!C27:" .$ColumndIndex . "27)");
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '43', "Total");
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '44', "$" . $sumCostoTotal);
 
         $columnaIndex = PHPExcel_Cell::stringFromColumnIndex(count($query) + 2);
 
@@ -455,6 +683,7 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $objPHPExcel->getActiveSheet()->setCellValue('K22', "='3'!" . $columnaIndex . "30");
         //k25 =columnaIndex 31
         $objPHPExcel->getActiveSheet()->setCellValue('K25', "='3'!" . $columnaIndex . "31");
+        
         //k30 =$query[0]["Flete"]/$query[0]["Distribucion"]
         $objPHPExcel->getActiveSheet()->setCellValue('K30', $query[0]["Servicio"]);
 
@@ -477,25 +706,93 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
             $objPHPExcel->getActiveSheet()->setCellValue('C' . $row, $query[$index]["Nombre_Comercial"]);
             $objPHPExcel->getActiveSheet()->setCellValue('F' . $row, $query[$index]["Cantidad"]);
             $objPHPExcel->getActiveSheet()->setCellValue('G' . $row, $query[$index]["Valor_Unitario"]);
-            $objPHPExcel->getActiveSheet()->setCellValue('I' . $row, $query[$index]["costo_total"] / $query[$index]["Cantidad"]);
-            $objPHPExcel->getActiveSheet()->setCellValue('J' . $row, $query[$index]["costo_total"]);
-            $objPHPExcel->getActiveSheet()->setCellValue('K' . $row, $query[$index]["Valor_Unitario"] * 3.7);
+            $objPHPExcel->getActiveSheet()->setCellValue('I' . $row, round($query[$index]["Total_Cantidad"] / $query[$index]["Cantidad"], 2));
+            $objPHPExcel->getActiveSheet()->setCellValue('J' . $row, round($query[$index]["Total_Cantidad"]));
+            $objPHPExcel->getActiveSheet()->setCellValue('K' . $row, "S/.".round($query[$index]["Total_Cantidad"] / $query[$index]["Cantidad"], 2) * 3.7);
+            //combine cells from C$ROW to e$row
+            $objPHPExcel->getActiveSheet()->mergeCells('C' . $row . ':E' . $row);
+            $objPHPExcel->getActiveSheet()->mergeCells('G' . $row . ':H' . $row);
+            $objPHPExcel->getActiveSheet()->mergeCells('K' . $row . ':L' . $row);
+            $style = $objPHPExcel->getActiveSheet()->getStyle('K'.$row);
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($greenColor);
+            //set letter color to white
+            $style->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
+            //center text
+            $style->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            //set normal weight
+            
         };
+        //set borders  from b36 to k$row 
+        $objPHPExcel->getActiveSheet()->getStyle('B36:K' . $row)->applyFromArray($borders);
+        //set bold false from b36 to k$row
+        
 
         $cotizationDetails = $this->db->select('*')
             ->from($this->table_cotizacion_detalles)
             ->where('ID_Cotizacion', $ID_Cotizacion)
             ->get()
             ->result_array();
+        //set antidumping
+        $antiDumping = 0;
+        foreach ($query as $row) {
+            $antiDumping += $row["antidumping"];
+        }
+        $sheet = $objPHPExcel->getActiveSheet();
 
+
+// Definir la celda y la fila que se va a evaluar
+        $cellToCheck = 'I22';
+        $rowToCheck = 23;
+
+// Obtener el valor de la celda
+        $cellValue = $sheet->getCell($cellToCheck)->getValue();
+
+        // Verificar si se cumple la condición
+        if ($antiDumping != 0) {
+            // Insertar una nueva fila en la posición 22
+            $sheet->insertNewRowBefore($rowToCheck, 1);
+
+            // Opcional: Puedes rellenar la nueva fila con datos si es necesario
+            $newRowIndex = $rowToCheck;
+            $sheet->setCellValue('B' . $newRowIndex, "ANTIDUMPING");
+            $sheet->setCellValue('K' . $newRowIndex, "$".$antiDumping); // Ajusta según tus necesidades
+            $cell = $sheet->getCell("K" . $rowToCheck);
+
+            if (!is_null($cell)) {
+                $cellValue = $cell->getValue();
+
+                // Si el valor contiene el símbolo de dólar, limpiarlo y convertirlo a número
+                if (strpos($cellValue, '$') !== false) {
+                    $numericValue = floatval(str_replace(['$', ','], '', $cellValue));
+                    $cell->setValue($numericValue);
+                    //convert to currency format with dollar symbol
+                    $cell->setValueExplicit($numericValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $objPHPExcel->getActiveSheet()->setCellValue('K24', "=SUMA(K20:K23)");
+
+                }
+            }
+                //K24= =SUMA(K20:K23)
+            // Añade más celdas si es necesario 
+
+        } else {
+        }
+
+        // Set the values of the cells in the Excel sheet payroll
         $objPHPExcel->getActiveSheet()->setCellValue('C8', $cotizationDetails[0]['Nombres']);
         $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['Apellidos']);
         $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['DNI']);
         $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['Telefono']);
         $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["Peso_Total"]);
         $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["CBM_Total"]);
+        //remove F11 CELL VALIDATION
+        
+        $objPHPExcel->getActiveSheet()->setCellValue('F11', $query[0]["tipo_ciente"]);
+        //remove page 2
+        $objPHPExcel->removeSheetByIndex(1);
         return $objPHPExcel;
     }
+
     public function get_cotization_tributos($ID_Producto)
     {
 

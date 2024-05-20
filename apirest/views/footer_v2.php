@@ -18,6 +18,9 @@
 <!-- jQuery -->
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
 <!-- Bootstrap 4 -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script src="<?php echo base_url("plugins_v2/bootstrap/js/bootstrap.bundle.min.js"); ?>"></script>
 <!-- DataTables  & Plugins -->
 <script src="<?php echo base_url("plugins_v2/datatables/jquery.dataTables.min.js"); ?>"></script>
@@ -214,14 +217,13 @@
 
 <script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 
+
 <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/pedidos_cargaconsolidada.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <?php if (isset($js_consolidado) && $js_consolidado==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/consolidado.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
-<?php if (isset($js_ccotizaciones) && $js_ccotizaciones==true) {
-} ?>
 
   
 <?php if (isset($js_ccotizaciones) && $js_ccotizaciones==true) : ?>

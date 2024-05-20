@@ -58,7 +58,6 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <th>Total</th>
                       <th>Tipo de Cliente</th>
                       <th>Descargar</th>
                       <th>Ver</th>
