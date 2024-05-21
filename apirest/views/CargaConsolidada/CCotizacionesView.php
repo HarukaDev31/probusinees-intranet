@@ -61,6 +61,7 @@
                       <th>Tipo de Cliente</th>
                       <th>Descargar</th>
                       <th>Ver</th>
+                      <th>Estado</th>
                     </tr>
                   </thead>
                 </table>
@@ -106,7 +107,11 @@
                       <button type="button" class="btn btn-primary" onclick="agregarProveedor()">Agregar Proveedor </button>
                       </div>  
                     <div class="form-group ">
-                    <button type="button" class="btn btn-primary" onclick="cambiarTipodeCliente()">Tipo de Cliente </button>
+                      <!--select with nuevo antiguo options with value 1 or 2-->
+                      <select class="form-control" id="selectEstadoBody" name="selectEstado" onchange="updateTipoCliente(this)">
+                        <option value="1">Nuevo</option>
+                        <option value="2">Antiguo</option>
+                      </select>
                       </div>
                     </div>
                   </div>

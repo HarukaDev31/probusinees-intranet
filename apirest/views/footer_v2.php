@@ -229,7 +229,9 @@
 <?php if (isset($js_ccotizaciones) && $js_ccotizaciones==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/ccotizaciones.js'?>"></script>
 <?php endif; ?>
-
+<?php if (isset($js_tarifas_cotizaciones) && $js_tarifas_cotizaciones==true) : ?>
+<script src="<?php echo base_url() . 'dist/js/Configuracion/tarifas_cotizaciones.js'?>"></script>
+<?php endif; ?>
 <div id="modal-loader" class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-dialog-loader">
     <div class="modal-content modal-content-loader-change">

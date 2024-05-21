@@ -23,7 +23,10 @@ class CCotizacionesModel extends CI_Model
                     "label", cctc2.Nombre
                 )
             ), "]")
-FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
+FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types,
+        (SELECT COUNT(*)
+        FROM carga_consolidada_cotizaciones_detalles_tributo AS ccdt
+        WHERE ccdt.ID_Cotizacion = carga_consolidada_cotizaciones_cabecera.ID_Cotizacion) as Tributos_Pendientes') ;
         $this->db->from($this->table);
         $this->db->join($this->table_tipo_cliente, 'carga_consolidada_cotizaciones_cabecera.ID_Tipo_Cliente = carga_consolidada_tipo_cliente.ID_Tipo_Cliente', 'join');
     }
@@ -51,6 +54,8 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $this->db->select("cccdprov.ID_Proveedor,
         cccdprov.CBM_Total,
         cccdprov.Peso_Total,
+        (select ID_Tipo_Cliente from carga_consolidada_cotizaciones_cabecera where ID_Cotizacion = cccdprov.ID_Cotizacion) as ID_Tipo_Cliente,
+
         (
             SELECT CONCAT('[', GROUP_CONCAT(
                 JSON_OBJECT(
@@ -235,6 +240,16 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
             $this->db->close();
             $this->db->initialize();
             $this->db->update($this->table_cotizacion_detalles, array("CBM_Total" => $sum_CBM, "Peso_Total" => $sum_Peso), array("ID_Cotizacion" => $cotizacion[0]['ID_Cotizacion']));
+            //COUNT ALL TRIBUTES WITH STATUS PENDING FROM THIS COTIZATION AND IF COUNT IS 0 UPDATE Cotizacion_Status_ID TO 2
+            $this->db->select('COUNT(*) as count');
+            $this->db->from($this->table_tributo);
+            $this->db->where('ID_Cotizacion', $cotizacion[0]['ID_Cotizacion']);
+            $this->db->where('Status', 'Pending');
+            $query = $this->db->get();
+            $result = $query->row();
+            if ($result->count == 0) {
+                $this->db->update($this->table, array("Cotizacion_Status_ID" => 2), array("ID_Cotizacion" => $cotizacion[0]['ID_Cotizacion']));
+            }
             return array("success" => true);
 
         } catch (Exception $e) {
@@ -257,7 +272,10 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
 
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
+        
+        
         $query = json_decode(json_encode($query->result()), true);
+
         $this->db->close();
         $this->db->initialize();
         $newSheet = $objPHPExcel->createSheet();
@@ -777,7 +795,7 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
 
         } else {
         }
-
+        
         // Set the values of the cells in the Excel sheet payroll
         $objPHPExcel->getActiveSheet()->setCellValue('C8', $cotizationDetails[0]['Nombres']);
         $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['Apellidos']);
@@ -815,7 +833,16 @@ FROM carga_consolidada_tipo_cliente AS cctc2) AS Client_Types');
         $ID_Cotizacion = $data['ID_Cotizacion'];
         $ID_TipoCliente = $data['Tipo_Cliente'];
         $this->db->where('ID_Cotizacion', $ID_Cotizacion);
-        $this->db->update($this->table, array("ID_Tipo_Cliente" => $ID_TipoCliente));
+        $this->db->update($this->table, array("ID_Tipo_Cliente" => intval($ID_TipoCliente)));
+
+        return array("success" => true);
+    }
+    public function updateEstadoCotizacion($data)
+    {
+        $ID_Cotizacion = $data['ID_Cotizacion'];
+        $Estado = $data['Estado'];
+        $this->db->where('ID_Cotizacion', $ID_Cotizacion);
+        $this->db->update($this->table, array("Cotizacion_Status_ID" => $Estado));
 
         return array("success" => true);
     }

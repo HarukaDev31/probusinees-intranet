@@ -58,12 +58,17 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [],
+    order: [
+      [0, "asc"],
+
+    ],
     ajax: {
       url: url,
       type: "POST",
       dataType: "json",
-      data: function (data) {},
+      data: function (data) {
+        console.log(data);
+      },
     },
     columnDefs: [
       {
@@ -113,12 +118,16 @@ function verCotizacion(ID) {
     type: "GET",
     dataType: "JSON",
     success: function (response) {
+      const estado=$("#selectEstadoBody")
+      const estadoCliente=response[0].ID_Tipo_Cliente;
+      estado.val(estadoCliente);
       for (var i = 0; i < response.length; i++) {
         $("#div-CotizacionBody").append(
           getProvTemplate(i, response[i].ID_Proveedor)
         );
         $("#CBM_Total-" + i).val(response[i].CBM_Total);
         $("#Peso_Total-" + i).val(response[i].Peso_Total);
+        
         productosJSON = JSON.parse(response[i].productos);
         product = 0;
 
@@ -168,20 +177,21 @@ function verCotizacion(ID) {
 function getProvTemplate(index, ID_Proveedor = null) {
   template = `<div class="col-12 proveedor-${index}" > 
         <div class="row">
-            <div class="col-12 col-sm-3 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+            <div class="col-12 col-sm-3 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
                 <div class="row">
                     <div class="col-12 col-md-5 d-flex flex-column justify-content-center">
-                    <h4>Proveedor ${index + 1}</h4>
+                    <h4 class="font-weight-bold">PROVEEDOR ${index + 1}</h4>
                     </div>
-                    <div class="col-12 col-md-7">
-                    <button type="button" class="btn btn-danger w-100" onclick="borrarProveedor(${ID_Proveedor},${index})">Eliminar</button>
-                    <button type="button" class="btn btn-danger mt-2 w-100" onclick="agregarProducto(${ID_Proveedor},${index})">Agregar Producto</button>
-
+                    <div class="col-12 col-md-7 d-flex align-items-center w-100 justify-content-center">
+                    <div class="form-group d-flex flex-row align-items-center align-items-center w-100">
+                    <button type="button" class="btn btn-danger w-75 mx-1" onclick="borrarProveedor(${ID_Proveedor},${index})">Eliminar</button>
+                    <button type="button" class="btn btn-danger w-75 mx-1" onclick="agregarProducto(${ID_Proveedor},${index})">Agregar Producto</button>
+                    </div>
                     </div>
                         
                 </div>
             </div>
-            <div class="col-12 col-sm-9 col-md-8 col-lg-8">
+            <div class="col-12 col-sm-9 col-md-4 col-lg-4">
                 <div class="row d-flex proveedor flex-row">
                     <input class="proveedorID" value="${
                       ID_Proveedor ? ID_Proveedor : -1
@@ -217,7 +227,8 @@ function getProvTemplate(index, ID_Proveedor = null) {
                 </div>
             </div>
         </div>
-    </div>`;
+    </div>
+    <div style="height: 1px; width:100%;background-color: #000000;" class="my-4"></div>`;
   return template;
 }
 function getProductoTemplate(proveedor, index, productoID) {
@@ -793,7 +804,7 @@ const updateTipoCliente = (select, ID_Cotizacion) => {
     dataType: "JSON",
     contentType: "application/json; charset=utf-8",
     data: JSON.stringify({
-      ID_Cotizacion: ID_Cotizacion,
+      ID_Cotizacion: ID_Cotizacion??CotizacionID,
       Tipo_Cliente: tipoCliente,
     }),
     success: function (response) {
@@ -804,3 +815,23 @@ const updateTipoCliente = (select, ID_Cotizacion) => {
     },
   });
 };
+const updateEstadoCotizacion = (select, ID_Cotizacion) => {
+  const estado = $(select).val();
+  url = base_url + "CargaConsolidada/CCotizaciones/updateEstadoCotizacion";
+  $.ajax({
+    url: url,
+    type: "post",
+    dataType: "JSON",
+    contentType: "application/json; charset=utf-8",
+    data: JSON.stringify({
+      ID_Cotizacion: ID_Cotizacion,
+      Estado: estado,
+    }),
+    success: function (response) {
+      console.log(response);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR);
+    },
+  });
+}
