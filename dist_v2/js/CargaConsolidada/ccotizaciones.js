@@ -120,14 +120,21 @@ function verCotizacion(ID) {
     success: function (response) {
       const estado=$("#selectEstadoBody")
       const estadoCliente=response[0].ID_Tipo_Cliente;
-      estado.val(estadoCliente);
+      estado.val(response[0]);
       for (var i = 0; i < response.length; i++) {
         $("#div-CotizacionBody").append(
           getProvTemplate(i, response[i].ID_Proveedor)
         );
         $("#CBM_Total-" + i).val(response[i].CBM_Total);
         $("#Peso_Total-" + i).val(response[i].Peso_Total);
-        
+       //ADD CLICK LISTENER TO BUTTONS 
+       console.log("Proforma",response[i])
+        $(`#Proforma-${i}`).click(function(){
+          downloadFile(response[i].URL_Proforma);
+        }); 
+        $(`#Packing-${i}`).click(function(){
+          downloadFile(response[i].URL_Packing);
+        });
         productosJSON = JSON.parse(response[i].productos);
         product = 0;
 
@@ -174,10 +181,24 @@ function verCotizacion(ID) {
     },
   });
 }
+const downloadFile=(url)=>{
+
+    // Crea un enlace temporal
+    var enlaceDescarga = document.createElement("a");
+    enlaceDescarga.href = url;
+    enlaceDescarga.setAttribute("download", ""); // Indica al navegador que descargue el archivo
+
+    // Simula un clic en el enlace para iniciar la descarga
+    document.body.appendChild(enlaceDescarga);
+    enlaceDescarga.click();
+
+    // Elimina el enlace temporal
+    document.body.removeChild(enlaceDescarga);
+}
 function getProvTemplate(index, ID_Proveedor = null) {
   template = `<div class="col-12 proveedor-${index}" > 
         <div class="row">
-            <div class="col-12 col-sm-3 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
+            <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
                 <div class="row">
                     <div class="col-12 col-md-5 d-flex flex-column justify-content-center">
                     <h4 class="font-weight-bold">PROVEEDOR ${index + 1}</h4>
@@ -191,12 +212,12 @@ function getProvTemplate(index, ID_Proveedor = null) {
                         
                 </div>
             </div>
-            <div class="col-12 col-sm-9 col-md-4 col-lg-4">
+            <div class="col-12 col-md-6">
                 <div class="row d-flex proveedor flex-row">
                     <input class="proveedorID" value="${
                       ID_Proveedor ? ID_Proveedor : -1
                     }" type="hidden" >
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-2">
                         <div class="form-group ">
                         <label>CBM Total</label>
                         <input id="CBM_Total-${index}"  type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
@@ -204,13 +225,27 @@ function getProvTemplate(index, ID_Proveedor = null) {
                     </div>
                 </div>
             
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-2">
                     <div class="form-group">
                         <label>Peso Total</label>
                         <input  id="Peso_Total-${index}" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                     </div>   
                 </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-group">
+                        <label>Proforma</label>
+                        <div class="btn btn-primary" id="Proforma-${index}">Descargar Proforma</div>
+                        
+                    </div>   
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-group">
+                        <label>Packing </label>
+                        <div class="btn btn-primary" id="Proforma-${index}">Descargar Packing</div>
+                    </div>   
+                </div>
+
             </div>
         </div>
         </div>
