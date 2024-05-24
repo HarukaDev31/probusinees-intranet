@@ -116,7 +116,7 @@ function verCotizacion(ID) {
     success: function (response) {
       const estado = $("#selectEstadoBody");
       const estadoCliente = response[0].ID_Tipo_Cliente;
-
+      estado.val(estadoCliente);
       for (var i = 0; i < response.length; i++) {
         $("#div-CotizacionBody").append(
           getProvTemplate(i, response[i].ID_Proveedor)

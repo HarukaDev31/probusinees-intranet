@@ -119,6 +119,7 @@ echo form_open('', $attributes);
                       <select class="form-control" id="selectEstadoBody" name="selectEstado" onchange="updateTipoCliente(this)">
                         <option value="1">Nuevo</option>
                         <option value="2">Antiguo</option>
+                        <option value="3">Socio</option>
                       </select>
                       </div>
                     </div>

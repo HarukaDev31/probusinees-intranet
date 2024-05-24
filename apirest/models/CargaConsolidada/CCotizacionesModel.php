@@ -470,9 +470,8 @@ class CCotizacionesModel extends CI_Model
         $DestinoCell=$TarifasStartColumn3 . $initialRow;
         //set currency format with dollar symbol
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn3 . $initialRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-        $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . '17:' . $TarifasStartColumn4 . "18")->applyFromArray($borders);
-        $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . '20:' . $TarifasStartColumn4 . $initialRow)->applyFromArray($borders);
-
+        $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow-1).":" . $TarifasStartColumn4 . $initialRow)->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow-4).":" . $TarifasStartColumn4 . ($initialRow-3))->applyFromArray($borders);
         $InitialColumn = 'C';
         foreach ($query as $row) {
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn.'5', $row["Nombre_Comercial"]);
@@ -495,11 +494,9 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn.'11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn.'12')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
-
             //set auto size for columns
             $InitialColumn++;
             $totalRows++;
-
         }
 
         $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
@@ -931,9 +928,6 @@ class CCotizacionesModel extends CI_Model
             $style->getFill()->getStartColor()->setARGB($yellowColor);
             // Ajusta según tus necesidades
             $objPHPExcel->getActiveSheet()->setCellValue('K24', "=SUM(K20:K23)");
-
-            //K24= =SUMA(K20:K23)
-            // Añade más celdas si es necesario
 
         } else {
         }
