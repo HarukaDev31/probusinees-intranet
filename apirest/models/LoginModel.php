@@ -27,7 +27,7 @@ class LoginModel extends CI_Model{
 				if ($this->db->query("SELECT ORG.Nu_Estado FROM empresa AS EMP JOIN organizacion AS ORG ON(EMP.ID_Empresa = ORG.ID_Empresa) WHERE EMP.ID_Empresa = " . $u->ID_Empresa . " AND ORG.ID_Organizacion = " . $u->ID_Organizacion . " LIMIT 1")->row()->Nu_Estado == 1) {
 					$UNo_Password = $this->encryption->decrypt($u->No_Password);//Verificar contraseña
 					//$UNo_Password == $No_Password
-					if( 1==1 ){
+					if( $UNo_Password == $No_Password){
 						if($u->Nu_Estado == 1){// 1 = Activo
 							$ID_Empresa = trim($data['ID_Empresa']);
 							$ID_Empresa = strip_tags($ID_Empresa);

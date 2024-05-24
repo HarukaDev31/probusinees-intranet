@@ -47,7 +47,6 @@ class InicioController extends CI_Controller {
 		$data["sUsuario"] = $this->user->No_Usuario;
 		$data["sVersionCliente"] = $this->empresa->No_Version_Sistema;
 		$data["sVersionNueva"] = NUEVA_VERSION_SISTEMA;
-
 		$this->email->from('noreply@laesystems.com', $this->empresa->No_Empresa);//de
 		$this->email->to('soporte@laesystems.com');//para
 		$this->email->subject('Actualización de versión ' . $this->empresa->No_Version_Sistema . ' a ' . NUEVA_VERSION_SISTEMA);
@@ -231,3 +230,4 @@ class InicioController extends CI_Controller {
 		}
 	}
 }
+	

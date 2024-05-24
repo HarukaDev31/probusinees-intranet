@@ -50,6 +50,7 @@ class CCotizaciones extends CI_Controller
             $rows[] = $row->CotizacionCode;
             $rows[] = ToDateBD($row->Fe_Creacion);
             $rows[] = $row->N_Cliente;
+            $rows[] = $row->Telefono;
             $rows[] = $row->Empresa;
             $rows[] = $select;
             $rows[] = '<div>

@@ -57,6 +57,7 @@
                       <th>N° Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
+                      <th>Telefono</th>
                       <th>Empresa</th>
                       <th>Tipo de Cliente</th>
                       <th>Descargar</th>
@@ -69,19 +70,22 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-                $attributes = array('id' => 'form-pedido');
-                echo form_open('', $attributes);
-                ?>
+$attributes = array('id' => 'form-pedido');
+echo form_open('', $attributes);
+?>
                   <div class="row div-CotizacionHeader">
                     <div class="col-12 col-md-9">
                         <div class="row">
                         <div class="col-12 col-md-7">
                         <label>Cliente </label>
                           <div class="form-group">
+                            <label>Nombre</label>
                             <input id="Nombre" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
                           <div class="form-group">
+                          <label>CBM Total</label>
+
                             <input  id="CBM_Total" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
@@ -90,10 +94,14 @@
                         <div class="col-12 col-md-5">
                         <label>Empresa </label>
                           <div class="form-group">
+                          <label>Nombre de Empresa</label>
+
                             <input id="Empresa" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
                           <div class="form-group">
+                          <label>Peso Total</label>
+
                             <input id="Peso_Total" disabled="true" type="text" name="No_Carga_Consolidada" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                             <span class="help-block text-danger" id="error"></span>
                           </div>
@@ -105,7 +113,7 @@
                       <label>Estado</label>
                       <div class="form-group ">
                       <button type="button" class="btn btn-primary" onclick="agregarProveedor()">Agregar Proveedor </button>
-                      </div>  
+                      </div>
                     <div class="form-group ">
                       <!--select with nuevo antiguo options with value 1 or 2-->
                       <select class="form-control" id="selectEstadoBody" name="selectEstado" onchange="updateTipoCliente(this)">
@@ -115,7 +123,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="row div-CotizacionBody" id="div-CotizacionBody">                    
+                  <div class="row div-CotizacionBody" id="div-CotizacionBody">
                   </div>
                 <?php echo form_close(); ?>
               </div>
@@ -150,7 +158,7 @@
               <div class="input-group-prepend">
                 <label class="input-group-text" id="ad-valorem-label">AD VALOREM (%)</label>
               </div>
-              <input type="text" value="0" id="ad-valorem"class="form-control" placeholder="Ad-Valorem" aria-label="ad-valorem" aria-describedby="ad-valorem-label">
+              <input type="number" value="0" id="ad-valorem"class="form-control" placeholder="Ad-Valorem" aria-label="ad-valorem" aria-describedby="ad-valorem-label">
             </div>
           </div>
           <div class="form-group">
@@ -158,7 +166,7 @@
               <div class="input-group-prepend">
                 <label class="input-group-text" id="igv-label">IGV %</label>
               </div>
-              <input type="text" value="16" id="igv"class="form-control" placeholder="IGV" aria-label="igv" aria-describedby="igv-label">
+              <input type="number" value="16" id="igv"class="form-control" placeholder="IGV" aria-label="igv" aria-describedby="igv-label">
             </div>
           </div>
           <div class="form-group">
@@ -166,7 +174,7 @@
               <div class="input-group-prepend">
                 <label class="input-group-text" id="ipm-label">IPM %</label>
               </div>
-              <input type="text" value="2" id="ipm"class="form-control" placeholder="ipm" aria-label="ipm" aria-describedby="ipm-label">
+              <input type="number" value="2" id="ipm"class="form-control" placeholder="ipm" aria-label="ipm" aria-describedby="ipm-label">
             </div>
           </div>
           <div class="form-group">
@@ -186,7 +194,7 @@
               <div class="input-group-prepend">
                 <label class="input-group-text" id="valoracion-label">VALORACION</label>
               </div>
-              <input type="text"  value="0"   id="valoracion" class="form-control" placeholder="valoracion" aria-label="valoracion" aria-describedby="valoracion-label">
+              <input type="number"  value="0"   id="valoracion" class="form-control" placeholder="valoracion" aria-label="valoracion" aria-describedby="valoracion-label">
             </div>
           </div>
           <div class="form-group">
@@ -194,12 +202,12 @@
               <div class="input-group-prepend">
                 <label class="input-group-text" id="antidumping-label">ANTIDUMPING</label>
               </div>
-              <input type="text" value="0" id="antidumping"class="form-control" placeholder="antidumping" aria-label="antidumping" aria-describedby="antidumping-label">
+              <input type="number" value="0" id="antidumping"class="form-control" placeholder="antidumping" aria-label="antidumping" aria-describedby="antidumping-label">
             </div>
           </div>
           <!--Percepcion select-->
-          
-          
+
+
         </form>
       </div>
       <div class="modal-footer">

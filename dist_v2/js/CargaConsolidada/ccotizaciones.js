@@ -58,10 +58,7 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [
-      [0, "asc"],
-
-    ],
+    order: [[0, "desc"]],
     ajax: {
       url: url,
       type: "POST",
@@ -105,7 +102,6 @@ function verCotizacion(ID) {
       $("#Peso_Total").val(response[0].Peso_Total);
       $("#Empresa").val(response[0].Empresa);
       $("#ID_Cotizacion").val(ID);
-      
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log(jqXHR);
@@ -118,35 +114,49 @@ function verCotizacion(ID) {
     type: "GET",
     dataType: "JSON",
     success: function (response) {
-      const estado=$("#selectEstadoBody")
-      const estadoCliente=response[0].ID_Tipo_Cliente;
-      estado.val(response[0]);
+      const estado = $("#selectEstadoBody");
+      const estadoCliente = response[0].ID_Tipo_Cliente;
+
       for (var i = 0; i < response.length; i++) {
         $("#div-CotizacionBody").append(
           getProvTemplate(i, response[i].ID_Proveedor)
         );
         $("#CBM_Total-" + i).val(response[i].CBM_Total);
         $("#Peso_Total-" + i).val(response[i].Peso_Total);
-       //ADD CLICK LISTENER TO BUTTONS 
-       console.log("Proforma",response[i])
-        $(`#Proforma-${i}`).click(function(){
-          downloadFile(response[i].URL_Proforma);
-        }); 
-        $(`#Packing-${i}`).click(function(){
-          downloadFile(response[i].URL_Packing);
-        });
+        //ADD CLICK LISTENER TO BUTTONS
+        $(`#Archivos-${i}`).attr(
+          "onclick",
+          `downloadFile('${response[i].URL_Proforma}','${response[i].URL_Packing}')`
+        );
+        // $(`#Proforma-${i}`).attr("onclick",`downloadFile('${response[i].URL_Proforma}')`);
+        // $(`#Packing-${i}`).attr("onclick",`downloadFile('${response[i].URL_Packing}')`);
         productosJSON = JSON.parse(response[i].productos);
         product = 0;
 
         for (const key in productosJSON) {
           var productoID = productosJSON[key].ID_Producto;
           //if tributos_pendiente int value is >0 then set the tributos button to red
-          
 
           $(".proveedor-" + i + "-productos").append(
             getProductoTemplate(i, product, productoID)
           );
           $(`#URL_Link-${i}-${product}`).val(productosJSON[key].URL_Link);
+          //add URL_redirect click listener to redirect to the URL and onhover change the cursor to pointer and svg color to blue
+          if (productosJSON[key].URL_Link != "") {
+            $(`#URL_redirect-${i}-${product}`).attr(
+              "onclick",
+              `window.open('${productosJSON[key].URL_Link}')`
+            );
+            $(`#URL_redirect-${i}-${product}`).hover(
+              function () {
+                $(this).css("cursor", "pointer");
+                $(this).css("fill", "blue");
+              },
+              function () {
+                $(this).css("fill", "black");
+              }
+            );
+          }
           $(`#Nombre_Comercial-${i}-${product}`).val(
             productosJSON[key].Nombre_Comercial
           );
@@ -161,12 +171,13 @@ function verCotizacion(ID) {
           const tributos_pendiente = productosJSON[key].Tributos_Pendientes;
           console.log(tributos_pendiente);
           if (tributos_pendiente > 0) {
-            console.log("Tributos Pendientes", tributos_pendiente,i,product);
+            console.log("Tributos Pendientes", tributos_pendiente, i, product);
             const button = $(`#button-tributo-${i}-${product}`);
-           //ad circle to button with the number of tributos pendientes
-            button.html(`<span>Ver<span class="badge badge-danger"> ${tributos_pendiente}</span></span>`);
-
-
+            //ad circle to button with the number of tributos pendientes
+            button.html(`<span>Revisar</span>`);
+            //remove btn-primary class add btn-outline-secondary
+            button.removeClass("btn-outline-secondary");
+            button.addClass("btn-primary");
           }
           //add attributes data to button
           const button = $(`#button-tributo-${i}-${product}`);
@@ -181,20 +192,30 @@ function verCotizacion(ID) {
     },
   });
 }
-const downloadFile=(url)=>{
+const downloadFile = (urlProforma, urlPacking) => {
+  // Función para crear y activar un enlace de descarga
+  const createAndClickDownloadLink = (url) => {
+    // Crea un enlace de descarga
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  try {
+    // Genera nombres de archivo para las descargas
 
-    // Crea un enlace temporal
-    var enlaceDescarga = document.createElement("a");
-    enlaceDescarga.href = url;
-    enlaceDescarga.setAttribute("download", ""); // Indica al navegador que descargue el archivo
+    // Crea y activa enlaces de descarga
+    createAndClickDownloadLink(urlProforma);
+    createAndClickDownloadLink("sx");
+  } catch (error) {
+    console.error("Error downloading files:", error);
+  }
+};
 
-    // Simula un clic en el enlace para iniciar la descarga
-    document.body.appendChild(enlaceDescarga);
-    enlaceDescarga.click();
+// Llamada a la función con las URLs de ejemplo
 
-    // Elimina el enlace temporal
-    document.body.removeChild(enlaceDescarga);
-}
 function getProvTemplate(index, ID_Proveedor = null) {
   template = `<div class="col-12 proveedor-${index}" > 
         <div class="row">
@@ -205,8 +226,8 @@ function getProvTemplate(index, ID_Proveedor = null) {
                     </div>
                     <div class="col-12 col-md-7 d-flex align-items-center w-100 justify-content-center">
                     <div class="form-group d-flex flex-row align-items-center align-items-center w-100">
-                    <button type="button" class="btn btn-danger w-75 mx-1" onclick="borrarProveedor(${ID_Proveedor},${index})">Eliminar</button>
-                    <button type="button" class="btn btn-danger w-75 mx-1" onclick="agregarProducto(${ID_Proveedor},${index})">Agregar Producto</button>
+                    <button type="button" class="btn btn-outline-danger w-75 mx-1" onclick="borrarProveedor(${ID_Proveedor},${index})">Eliminar</button>
+                    <button type="button" class="btn btn btn-outline-danger w-75 mx-1" onclick="agregarProducto(${ID_Proveedor},${index})">Agregar Producto</button>
                     </div>
                     </div>
                         
@@ -217,34 +238,29 @@ function getProvTemplate(index, ID_Proveedor = null) {
                     <input class="proveedorID" value="${
                       ID_Proveedor ? ID_Proveedor : -1
                     }" type="hidden" >
-                    <div class="col-12 col-md-2">
+                    <div class="col-12 col-md-3">
                         <div class="form-group ">
                         <label>CBM Total</label>
-                        <input id="CBM_Total-${index}"  type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <input id="CBM_Total-${index}"  type="number"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                     </div>
                 </div>
             
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-3">
                     <div class="form-group">
                         <label>Peso Total</label>
                         <input  id="Peso_Total-${index}" type="text"  class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                     </div>   
                 </div>
-                <div class="col-12 col-md-4">
-                    <div class="form-group">
-                        <label>Proforma</label>
-                        <div class="btn btn-primary" id="Proforma-${index}">Descargar Proforma</div>
+                <div class="col-12 col-md-6">
+                    <div class="form-group d-flex flex-column ">
+                        <label>Archivos</label>
+                        <div class="btn btn-primary" id="Archivos-${index}">Descargar </div>
                         
                     </div>   
                 </div>
-                <div class="col-12 col-md-4">
-                    <div class="form-group">
-                        <label>Packing </label>
-                        <div class="btn btn-primary" id="Proforma-${index}">Descargar Packing</div>
-                    </div>   
-                </div>
+               
 
             </div>
         </div>
@@ -274,11 +290,14 @@ function getProductoTemplate(proveedor, index, productoID) {
 
             <div class="col-12 col-md-6 ">
             <Label id="img-${proveedor}-${index}"></Label>
-            <div class="form-group">
-                    <input id="URL_Link-${proveedor}-${index}"  class="form-control required URL_Link" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                    <span class="help-block text-danger" id="error"></span>
+            <div class="form-group d-flex flex-row align-items-center">
+                    <input id="URL_Link-${proveedor}-${index}"   class="form-control required URL_Link mr-1" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                    <svg id="URL_redirect-${proveedor}-${index}"xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
+                    <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
+                  </svg>                    <span class="help-block text-danger" id="error"></span>
             </div>
-            <button type="button" class="btn btn-danger w-100" style="height:50px;" onclick="borrarProducto(${proveedor},${index},${
+            <button type="button" class="btn btn-outline-danger w-100" style="height:50px;" onclick="borrarProducto(${proveedor},${index},${
     productoID ? productoID : -1
   })">Quitar</button>
         </div>
@@ -295,17 +314,17 @@ function getProductoTemplate(proveedor, index, productoID) {
         </div>
         <div class="form-group">
                 <label>Cantidad</label>
-                <input id="Cantidad-${proveedor}-${index}"  type="text"  class="form-control required Cantidad" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                <input id="Cantidad-${proveedor}-${index}"  type="number"  class="form-control required Cantidad" placeholder="Ingresar" maxlength="100" autocomplete="off">
                 <span class="help-block text-danger" id="error"></span>
         </div>
         <div class="form-group">
                 <label>Valor Unitario</label>
-                <input id="Valor_Unitario-${proveedor}-${index}" type="text"  class="form-control required Valor_Unitario" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                <input id="Valor_Unitario-${proveedor}-${index}" type="number"  class="form-control required Valor_Unitario" placeholder="Ingresar" maxlength="100" autocomplete="off">
                 <span class="help-block text-danger" id="error"></span>
         </div>
         </div>
         <div class="col-12 col-md-2 d-flex justify-content-center align-items-center">
-        <button id="button-tributo-${proveedor}-${index}" type="button" class="btn btn-primary w-100" style="height:50px;" data-toggle="modal" data-target="#exampleModal" data-productid="${productoID}">Ver</button>
+        <button id="button-tributo-${proveedor}-${index}" type="button" class="btn btn-outline-secondary w-100" style="height:50px;" data-toggle="modal" data-target="#exampleModal" data-productid="${productoID}">Ver</button>
         </div>
     </div>
     </div>`;
@@ -520,12 +539,12 @@ $("#exampleModal").on("show.bs.modal", function (event) {
     dataType: "JSON",
     data: { ID_Producto: productoID },
     success: function (response) {
-      $("#ad-valorem").val(response["ad-valorem"]??0);
-      $("#igv").val(response.igv??16);
-      $("#ipm").val(response.ipm??2);
-      $("#percepcion").val(response.percepcion??"3.50");
-      $("#valoracion").val(response.valoracion??0);
-      $("#antidumping").val(response.antidumping??0);
+      $("#ad-valorem").val(response["ad-valorem"] ?? 0);
+      $("#igv").val(response.igv ?? 16);
+      $("#ipm").val(response.ipm ?? 2);
+      $("#percepcion").val(response.percepcion ?? "3.50");
+      $("#valoracion").val(response.valoracion ?? 0);
+      $("#antidumping").val(response.antidumping ?? 0);
       newProveedor = null;
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -545,7 +564,7 @@ const guardarCotizacion = () => {
     var Peso_Total = $(proveedores[i])
       .find("#Peso_Total-" + i)
       .val();
-      console.log(deletedProductos,deletedProveedores)
+    console.log(deletedProductos, deletedProveedores);
     cotizacion.push({
       ID_Proveedor: $(proveedores[i]).find(".proveedorID").val(),
       ID_Cotizacion: CotizacionID,
@@ -589,7 +608,6 @@ const guardarCotizacion = () => {
         `#URL_Link-${newProductos[i].Prooveedor_Index}-${newProductos[i].ID_Producto_temp}`
       )
       .val();
-    console.log(URL_Link);
     var Nombre_Comercial = $(producto)
       .find(
         `#Nombre_Comercial-${newProductos[i].Prooveedor_Index}-${newProductos[i].ID_Producto_temp}`
@@ -724,7 +742,6 @@ const convertirExcelAPDF = (excelBlob) => {
     // Convertir el libro de trabajo (workbook) a PDF
     const pdfBlob = workbook2pdf(workbook);
     // Descargar el archivo PDF
- 
   };
   reader.readAsArrayBuffer(excelBlob);
 };
@@ -736,25 +753,25 @@ const workbook2pdf = (workbook) => {
   const html = XLSX.utils.sheet_to_html(worksheet);
 
   // Crear un contenedor temporal para el HTML
-  const tempDiv = document.createElement('div');
+  const tempDiv = document.createElement("div");
   tempDiv.innerHTML = html;
   document.body.appendChild(tempDiv);
 
   html2canvas(tempDiv, {
-    scale: 0.5
+    scale: 0.5,
   }).then((canvas) => {
-    const imgData = canvas.toDataURL('image/png');
-    pdf.addImage(imgData, 'PNG', 10, 10, canvas.width / 4, canvas.height / 4);
-    const pdfBlob = pdf.output('blob');
+    const imgData = canvas.toDataURL("image/png");
+    pdf.addImage(imgData, "PNG", 10, 10, canvas.width / 4, canvas.height / 4);
+    const pdfBlob = pdf.output("blob");
 
     // Eliminar el contenedor temporal
     document.body.removeChild(tempDiv);
 
     // Aquí puedes hacer lo que necesites con el pdfBlob, por ejemplo, descargarlo
     const url = URL.createObjectURL(pdfBlob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'exported.pdf';
+    a.download = "exported.pdf";
     a.click();
 
     URL.revokeObjectURL(url);
@@ -839,7 +856,7 @@ const updateTipoCliente = (select, ID_Cotizacion) => {
     dataType: "JSON",
     contentType: "application/json; charset=utf-8",
     data: JSON.stringify({
-      ID_Cotizacion: ID_Cotizacion??CotizacionID,
+      ID_Cotizacion: ID_Cotizacion ?? CotizacionID,
       Tipo_Cliente: tipoCliente,
     }),
     success: function (response) {
@@ -869,4 +886,4 @@ const updateEstadoCotizacion = (select, ID_Cotizacion) => {
       console.log(jqXHR);
     },
   });
-}
+};
