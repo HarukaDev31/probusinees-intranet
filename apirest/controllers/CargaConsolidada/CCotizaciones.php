@@ -54,7 +54,7 @@ class CCotizaciones extends CI_Controller
             $rows[] = $row->Empresa;
             $rows[] = $select;
             $rows[] = '<div>
-            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(\'' . $row->ID_Cotizacion . '\')"><i class="fa fa-file-excel color_icon_excel fa-2x" aria-hidden="true"></i></button>
+            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ','.$row->CotizacionCode.')"><i class="fas fa-file-excel fa-2x" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
             </div>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(\'' . $row->ID_Cotizacion . '\')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
             //select with options pendiente,cotizado,confirmado
@@ -63,7 +63,7 @@ class CCotizaciones extends CI_Controller
             <option value="2" ' . ($row->Cotizacion_Status_ID == 2 ? 'selected' : '') . '>Cotizado</option>
             <option value="3" ' . ($row->Cotizacion_Status_ID == 3 ? 'selected' : '') . '>Confirmado</option>
             </select>';
-            $rows[]=$row->ID_Tipo_Cliente;
+            $rows[] = $row->ID_Tipo_Cliente;
             $data[] = $rows;
         }
         $output = array(
@@ -102,9 +102,12 @@ class CCotizaciones extends CI_Controller
     }
     public function descargarExcel()
     {
+        ob_start();
 
         $postData = file_get_contents('php://input');
         $cotizacion = json_decode($postData, true);
+        $C_Cotizacion = $cotizacion['C_Cotizacion'];
+
         $this->load->library('PHPExcel');
 
         // Create a new PHPExcel object
@@ -117,9 +120,9 @@ class CCotizaciones extends CI_Controller
 
         // Set the content type header to indicate that this is an Excel file
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="example.xlsx"');
+        header('Content-Disposition: attachment;filename="Cotizacion' . $C_Cotizacion . '.xlsx"');
         header('Cache-Control: max-age=0');
-        
+
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         exit(); //
@@ -128,20 +131,19 @@ class CCotizaciones extends CI_Controller
 
         $postData = file_get_contents('php://input');
         $cotizacion = json_decode($postData, true);
-
+        $C_Cotizacion = $cotizacion['C_Cotizacion'];
 // Cargar el archivo de plantilla Excel
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
         $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="example.xlsx"');
+        header('Content-Disposition: attachment;filename="Cotizacion' . $C_Cotizacion . '.xlsx"');
         header('Cache-Control: max-age=0');
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         exit();
-   
-        
+
     }
 
     public function getTipoCliente()

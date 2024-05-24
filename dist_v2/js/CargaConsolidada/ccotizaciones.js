@@ -697,21 +697,26 @@ const guardarCotizacion = () => {
     },
   });
 };
-const descargarReporte = (ID_Cotizacion) => {
+const descargarReporte = (ID_Cotizacion,C_Cotizacion) => {
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/descargarExcel",
     type: "POST",
     xhrFields: {
       responseType: "blob",
     },
-    data: JSON.stringify({ ID_Cotizacion: ID_Cotizacion }),
+    data: JSON.stringify({ ID_Cotizacion: ID_Cotizacion,
+      C_Cotizacion: C_Cotizacion
+     }),
     success: function (response) {
       var blob = new Blob([response], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
       var link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
-      link.download = "example.xlsx";
+      const currentDate = new Date();
+      //format date to dd_mm_yyyy
+      const formattedDate = `${currentDate.getDate()}_${currentDate.getMonth()+1}_${currentDate.getFullYear()}`;
+      link.download = "Cotizacion_" + C_Cotizacion+"_" +formattedDate+".xlsx";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
