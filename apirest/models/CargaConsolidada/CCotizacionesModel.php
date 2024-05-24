@@ -365,6 +365,7 @@ class CCotizacionesModel extends CI_Model
             ->from($this->table_tarifas)
             ->where('id_tipo_cliente', $ID_Tipo_Cliente)
             ->where('updated_at is null')
+            ->order_by('limite_inf', 'ASC')
             ->get()
             ->result_array();
 
@@ -550,7 +551,7 @@ class CCotizacionesModel extends CI_Model
             //set currency format with dollar symbol
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn.'17')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             //IF COBROCELL IS GREATER THAN 5000 SET THE VALUE TO $initialcolumn17  TO roundup100/ distroCell ELSE SET roundup50/distroCell
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn.'17', "=IF(".$CobroCell.">5000,ROUNDUP(100/".$distroCell.",2),ROUNDUP(50/".$distroCell.",2))");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn.'17', "=IF(".$CobroCell.">5000,ROUND(100*".$distroCell.",2),ROUND(50*".$distroCell.",2))");
             //initial18 is roundup($cfrCell+$seguroCell,2) 
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn.'18', "=ROUNDUP(".$cfrCell.'+'.$seguroCell.",2)");
             //initial19 is roundup($cfrvCell+$seguroCell,2)
@@ -636,18 +637,18 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '27')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
             //set text color red
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '27')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
-            //set initialcolumn28 = initialcolumn27*initialcolumn19
+            $AdValoremCell = $InitialColumn . '28';
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                 $InitialColumn . '28',
                 "=MAX(" . $InitialColumn . "19," . $InitialColumn . "18)*" . $InitialColumn . "27"
             );            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '28')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$" . $row["igv_value"]);
             //set initialcolumn29 = $row["igv"]*initialcolumn19
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "=" . ($row['igv'] / 100) . "*" . "MAX(" . $InitialColumn . "19," . $InitialColumn . "18)");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "=" . ($row['igv'] / 100) . "*(" . "MAX(" . $InitialColumn . "19," . $InitialColumn . "18)+".$AdValoremCell.")");
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '29')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$" . $row["ipm_value"]);
             //set initialcolumn30 = $row["ipm"]*initialcolumn19
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "=" . ($row['ipm'] / 100) . "*" . "MAX(" . $InitialColumn . "19," . $InitialColumn . "18)");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "=" . ($row['ipm'] / 100) . "*(" . "MAX(" . $InitialColumn . "19," . $InitialColumn . "18)+".$AdValoremCell.")");
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '30')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$" . $row["percepcion_value"]);
             //set initialcolumn31 = $row["percepcion"]*initialcolumn19
@@ -945,8 +946,10 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['DNI']);
         $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['Telefono']);
         $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["Peso_Total"]." Kg");
-        $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["Total_CBM"] . " m3");
-        $objPHPExcel->getActiveSheet()->setCellValue('I10', "Qnt. Proveedores");
+        $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["CBM_Total"] . " m3");
+        $objPHPExcel->getActiveSheet()->setCellValue('I10', "QTY PROVEEDORES");
+        $objPHPExcel->getActiveSheet()->setCellValue('I11', "CBM");
+
         //set number format
         $objPHPExcel->getActiveSheet()->getStyle('J9')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
         //SET COLUMN I AUTO SIZE

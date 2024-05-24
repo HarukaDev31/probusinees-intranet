@@ -211,7 +211,7 @@ echo form_open('', $attributes);
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" onclick="guardarTributos()" class="btn btn-primary">Guardar</button>
+        <button type="button" onclick="guardarTributos(this)" class="btn btn-primary">Guardar</button>
       </div>
     </div>
   </div>

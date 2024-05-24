@@ -324,7 +324,7 @@ function getProductoTemplate(proveedor, index, productoID) {
         </div>
         </div>
         <div class="col-12 col-md-2 d-flex justify-content-center align-items-center">
-        <button id="button-tributo-${proveedor}-${index}" type="button" class="btn btn-outline-secondary w-100" style="height:50px;" data-toggle="modal" data-target="#exampleModal" data-productid="${productoID}">Ver</button>
+        <button id="button-tributo-${proveedor}-${index}" type="button" class="btn btn-outline-secondary w-100" style="height:50px;" data-toggle="modal" data-target="#exampleModal" data-productid="${productoID}" data-button="button-tributo-${proveedor}-${index}">Ver</button>
         </div>
     </div>
     </div>`;
@@ -410,7 +410,7 @@ const agregarProducto = (ID_Proveedor, index) => {
   //add new product to proveedor
 };
 
-const guardarTributos = () => {
+const guardarTributos = (button) => {
   if (newProveedor != null) {
     newProveedores[newProveedor].productos[productoID].tributos = {
       "ad-valorem": $("#ad-valorem").val(),
@@ -424,7 +424,6 @@ const guardarTributos = () => {
     return;
   }
   if (newProducto != null) {
-    console.log(newProductos, newProducto);
     newProductos[newProducto].tributos = {
       "ad-valorem": $("#ad-valorem").val(),
       igv: $("#igv").val(),
@@ -445,6 +444,7 @@ const guardarTributos = () => {
     valoracion: $("#valoracion").val(),
     antidumping: $("#antidumping").val(),
   };
+  
   url = base_url + "CargaConsolidada/CCotizaciones/guardarTributos";
   $.ajax({
     url: url,
@@ -455,14 +455,20 @@ const guardarTributos = () => {
     data: JSON.stringify(tributos),
     success: function (response) {
       $("#exampleModal").modal("hide");
+      currentButton.html(`<span>Ver</span>`);
+      currentButton.removeClass("btn-primary");
+      currentButton.addClass("btn-outline-secondary");
+      currrentButton = null;
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log(jqXHR);
     },
   });
 };
+let currentButton = null;
 $("#exampleModal").on("show.bs.modal", function (event) {
   var button = $(event.relatedTarget);
+  currentButton=button;
   // Button that triggered the modal
   productoID = button.data("productid");
   const nombre = button.data("nombre");
@@ -676,6 +682,8 @@ const guardarCotizacion = () => {
       deletedProveedores = [];
       deletedProductos = [];
       $("#button-save").hide();
+      //set button revisar to ver
+      
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $(".preloader").remove();
