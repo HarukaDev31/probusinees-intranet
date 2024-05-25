@@ -427,8 +427,10 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells($TarifasStartColumn . $initialRow . ':' . $TarifasStartColumn2 . $initialRow);
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells($TarifasStartColumn3 . $initialRow . ':' . $TarifasStartColumn4 . $initialRow);
 
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow, $CBM_Total_C);
-        //center horizontal
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow, 
+        "=ROUND(MAX(IF(" . $InitialColumn . "6 <= 1000, " . $InitialColumn . "6 / 1000, " . $InitialColumn . "6), " . $CBM_Total_C . "), 2)"
+    );
+            //center horizontal
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . $initialRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         //IF TIPO TARIFA IS Estandar set the value to $tarifaCell else set the TarifaCell*CBM_Total_C
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
@@ -513,7 +515,15 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '5', "Total");
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
 
-        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', $query[0]["Peso_Total"] . " Kg");
+        $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', $query[0]["peso_total"]>1000?round($query[0]["peso_total"]/1000,2):$query[0]["peso_total"]);
+        // if $query[0]["Peso_Total"] >1000 apply tn format else apply kg format
+        // if($query[0]["peso_total"]>=1000){
+        //     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Tn"');
+        // }else{
+        //     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Kg"');
+        // }
+        $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Kg"');
+
         //set text alignment to right
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
 
@@ -910,10 +920,10 @@ class CCotizacionesModel extends CI_Model
         // Verificar si se cumple la condición
         if ($antiDumping != 0) {
             // Insertar una nueva fila en la posición 22
-            $objPHPExcel->getActiveSheet()->getStyle('K23')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-            $objPHPExcel->getActiveSheet()->getStyle('K22')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-            $objPHPExcel->getActiveSheet()->getStyle('K24')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-            $objPHPExcel->getActiveSheet()->getStyle('K25')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            // $objPHPExcel->getActiveSheet()->getStyle('K23')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            // $objPHPExcel->getActiveSheet()->getStyle('K22')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            // $objPHPExcel->getActiveSheet()->getStyle('K24')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            // $objPHPExcel->getActiveSheet()->getStyle('K25')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $sheet->insertNewRowBefore($rowToCheck, 1);
 
             // Opcional: Puedes rellenar la nueva fila con datos si es necesario
@@ -939,7 +949,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['Apellidos']);
         $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['DNI']);
         $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['Telefono']);
-        $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["Peso_Total"]." Kg");
+        $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["peso_total"]." Kg");
         $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["CBM_Total"] . " m3");
         $objPHPExcel->getActiveSheet()->setCellValue('I10', "QTY PROVEEDORES");
         $objPHPExcel->getActiveSheet()->setCellValue('I11', "CBM");
@@ -954,10 +964,7 @@ class CCotizacionesModel extends CI_Model
         //APPPLY NUMBER FORMAT TO K10
         $objPHPExcel->getActiveSheet()->getStyle('K10')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
         $objPHPExcel->getActiveSheet()->setCellValue('L10', "");
-        $objPHPExcel->getActiveSheet()->getStyle('K23')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-        $objPHPExcel->getActiveSheet()->getStyle('K22')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-        $objPHPExcel->getActiveSheet()->getStyle('K24')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-        $objPHPExcel->getActiveSheet()->getStyle('K25')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+       
 
 
 
