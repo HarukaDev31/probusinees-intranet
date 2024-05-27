@@ -428,8 +428,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells($TarifasStartColumn3 . $initialRow . ':' . $TarifasStartColumn4 . $initialRow);
 
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow, 
-        "=ROUND(MAX(IF(" . $InitialColumn . "6 <= 1000, " . $InitialColumn . "6 / 1000, " . $InitialColumn . "6), " . $CBM_Total_C . "), 2)"
-    );
+        "=ROUND(MAX(".$query[0]["peso_total"]/1000 .",".$CBM_Total_C."),2)");
             //center horizontal
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . $initialRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         //IF TIPO TARIFA IS Estandar set the value to $tarifaCell else set the TarifaCell*CBM_Total_C
@@ -474,6 +473,8 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn3 . $initialRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow-1).":" . $TarifasStartColumn4 . $initialRow)->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow-4).":" . $TarifasStartColumn4 . ($initialRow-3))->applyFromArray($borders);
+        $initialRow++;
+        //insert $TarifasStartColumn.$initialRow  kg  and $TarifasStartColumn2.$initialRow  as $query[0]["peso_total"]
         $InitialColumn = 'C';
         foreach ($query as $row) {
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn.'5', $row["Nombre_Comercial"]);
@@ -516,13 +517,14 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
 
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', $query[0]["peso_total"]>1000?round($query[0]["peso_total"]/1000,2):$query[0]["peso_total"]);
-        // if $query[0]["Peso_Total"] >1000 apply tn format else apply kg format
-        // if($query[0]["peso_total"]>=1000){
-        //     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Tn"');
-        // }else{
-        //     $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Kg"');
-        // }
-        $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Kg"');
+        // IF initial column 6>= 1000 set tn format else set kg format
+        if($query[0]["peso_total"]>1000){
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" tn"');
+        }else{
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Kg"');
+        }
+        
+        // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Kg"');
 
         //set text alignment to right
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
@@ -949,7 +951,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setCellValue('C9', $cotizationDetails[0]['Apellidos']);
         $objPHPExcel->getActiveSheet()->setCellValue('C10', $cotizationDetails[0]['DNI']);
         $objPHPExcel->getActiveSheet()->setCellValue('C11', $cotizationDetails[0]['Telefono']);
-        $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["peso_total"]." Kg");
+        $objPHPExcel->getActiveSheet()->setCellValue('J9', $query[0]["peso_total"]>=1000? $query[0]["peso_total"]/1000 . " Tn":$query[0]["peso_total"] . " Kg");
         $objPHPExcel->getActiveSheet()->setCellValue('J11', $query[0]["CBM_Total"] . " m3");
         $objPHPExcel->getActiveSheet()->setCellValue('I10', "QTY PROVEEDORES");
         $objPHPExcel->getActiveSheet()->setCellValue('I11', "CBM");
