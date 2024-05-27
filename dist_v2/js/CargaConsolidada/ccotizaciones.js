@@ -142,7 +142,7 @@ function verCotizacion(ID) {
           );
           $(`#URL_Link-${i}-${product}`).val(productosJSON[key].URL_Link);
           //add URL_redirect click listener to redirect to the URL and onhover change the cursor to pointer and svg color to blue
-          if (productosJSON[key].URL_Link != "") {
+          if (productosJSON[key].URL_Link != "" || productosJSON[key].URL_Link != null || productosJSON[key].URL_Link != "null") {
             $(`#URL_redirect-${i}-${product}`).attr(
               "onclick",
               `window.open('${productosJSON[key].URL_Link}')`
@@ -195,6 +195,21 @@ function verCotizacion(ID) {
 const downloadFile = (urlProforma, urlPacking) => {
   // Función para crear y activar un enlace de descarga
   const createAndClickDownloadLink = (url) => {
+    if (!url) {
+      console.error("No URL provided for download");
+      return;
+    }
+    if (typeof url !== "string") {
+      console.error("Invalid URL provided for download");
+      return;
+    }
+    if (url.length === 0) {
+      console.error("Empty URL provided for download");
+      return;
+    }if (url == "null") {
+      console.error("Empty URL provided for download");
+      return;
+    }
     // Crea un enlace de descarga
     const link = document.createElement("a");
     link.href = url;
