@@ -712,6 +712,50 @@ const guardarCotizacion = () => {
     },
   });
 };
+const getData=()=>{
+  $.ajax({
+    url: base_url + "CargaConsolidada/CCotizaciones/getExcelData",
+    xhrFields: {
+      responseType: "blob",
+    },
+    type: "POST",
+    success: function (response) {
+      console.log(response);
+    },
+    error: function (errorThrown) {
+      console.error("Error al descargar el archivo Excel: " + errorThrown);
+    },
+  });
+}
+getData()
+const uploadExcel = () => {
+  $.ajax({
+    url: base_url + "CargaConsolidada/CCotizaciones/uploadExcelMassive",
+    xhrFields: {
+      responseType: "blob",
+    },
+    type: "POST",
+    success: function (response) {
+      //blob as zip file
+      const blob = new Blob([response], {
+        type: "application/zip",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "plantilla_cotizaciones.zip";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+    },
+    error: function (errorThrown) {
+      console.error("Error al descargar el archivo Excel: " + errorThrown);
+    
+    },
+  });
+}
+uploadExcel();
 const descargarReporte = (ID_Cotizacion,C_Cotizacion) => {
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/descargarExcel",

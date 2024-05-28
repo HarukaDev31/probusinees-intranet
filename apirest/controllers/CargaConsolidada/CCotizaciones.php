@@ -54,7 +54,7 @@ class CCotizaciones extends CI_Controller
             $rows[] = $row->Empresa;
             $rows[] = $select;
             $rows[] = '<div>
-            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ','.$row->CotizacionCode.')"><i class="fas fa-file-excel fa-2x" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
+            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-excel fa-2x" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
             </div>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(\'' . $row->ID_Cotizacion . '\')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
             //select with options pendiente,cotizado,confirmado
@@ -99,6 +99,26 @@ class CCotizaciones extends CI_Controller
         $postData = file_get_contents('php://input');
         $cotizacion = json_decode($postData, true);
         echo json_encode($this->CCotizacionesModel->guardarCotizacion($cotizacion));
+    }
+    public function getExcelData(){
+        $data=$this->CCotizacionesModel->getMassiveExcelData();
+        echo json_encode($data);
+    }
+    public function uploadExcelMassive()
+    {
+        // Generate the ZIP file
+        $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls();
+
+        // Set headers for file download
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="Boletas.zip"');
+        header('Content-Length: ' . filesize($zipFilePath));
+
+        // Return the ZIP file for download
+        readfile($zipFilePath);
+
+        // Clean up - remove the ZIP file after download
+        unlink($zipFilePath);
     }
     public function descargarExcel()
     {
