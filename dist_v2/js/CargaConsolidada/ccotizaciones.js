@@ -144,7 +144,11 @@ function verCotizacion(ID) {
           );
           $(`#URL_Link-${i}-${product}`).val(productosJSON[key].URL_Link);
           //add URL_redirect click listener to redirect to the URL and onhover change the cursor to pointer and svg color to blue
-          if (productosJSON[key].URL_Link != "" || productosJSON[key].URL_Link != null || productosJSON[key].URL_Link != "null") {
+          if (
+            productosJSON[key].URL_Link != "" ||
+            productosJSON[key].URL_Link != null ||
+            productosJSON[key].URL_Link != "null"
+          ) {
             $(`#URL_redirect-${i}-${product}`).attr(
               "onclick",
               `window.open('${productosJSON[key].URL_Link}')`
@@ -208,7 +212,8 @@ const downloadFile = (urlProforma, urlPacking) => {
     if (url.length === 0) {
       console.error("Empty URL provided for download");
       return;
-    } if (url == "null") {
+    }
+    if (url == "null") {
       console.error("Empty URL provided for download");
       return;
     }
@@ -252,8 +257,9 @@ function getProvTemplate(index, ID_Proveedor = null) {
             </div>
             <div class="col-12 col-md-6">
                 <div class="row d-flex proveedor flex-row">
-                    <input class="proveedorID" value="${ID_Proveedor ? ID_Proveedor : -1
-    }" type="hidden" >
+                    <input class="proveedorID" value="${
+                      ID_Proveedor ? ID_Proveedor : -1
+                    }" type="hidden" >
                     <div class="col-12 col-md-3">
                         <div class="form-group ">
                         <label>CBM Total</label>
@@ -313,8 +319,9 @@ function getProductoTemplate(proveedor, index, productoID) {
                     <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
                   </svg>                    <span class="help-block text-danger" id="error"></span>
             </div>
-            <button type="button" class="btn btn-outline-danger w-100" style="height:50px;" onclick="borrarProducto(${proveedor},${index},${productoID ? productoID : -1
-    })">Quitar</button>
+            <button type="button" class="btn btn-outline-danger w-100" style="height:50px;" onclick="borrarProducto(${proveedor},${index},${
+    productoID ? productoID : -1
+  })">Quitar</button>
         </div>
         <div class="col-12 col-md-4">
         <div class="form-group">
@@ -481,7 +488,6 @@ const guardarTributos = (button) => {
   });
 };
 let currentButton = null;
-
 
 $("#exampleModal").on("show.bs.modal", function (event) {
   var button = $(event.relatedTarget);
@@ -700,7 +706,6 @@ const guardarCotizacion = () => {
       deletedProductos = [];
       $("#button-save").hide();
       //set button revisar to ver
-
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $(".preloader").remove();
@@ -715,11 +720,31 @@ const guardarCotizacion = () => {
   });
 };
 const getData = () => {
+  const fileInput = $("#file-upload-excel")[0];
+
+  // Check if a file is selected
+  if (fileInput.files.length === 0) {
+    alert("Please select a file before uploading.");
+    return;
+  }
+
+  const file = fileInput.files[0];
+
+  // Create form data
+  const formData = new FormData();
+  formData.append("file", file);
+  //send file to server
+  $("#modal-upload-excel").modal("hide");
+
+  $("#loading-spinner").show();
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/getExcelData",
     xhrFields: {
       responseType: "blob",
     },
+    contentType: false, // Prevent jQuery from setting content type
+    processData: false,
+    data: formData,
     type: "POST",
     success: function (response) {
       console.log(response);
@@ -728,7 +753,7 @@ const getData = () => {
       console.error("Error al descargar el archivo Excel: " + errorThrown);
     },
   });
-}
+};
 const uploadExcel = () => {
   const fileInput = $("#file-upload-excel")[0];
 
@@ -743,7 +768,6 @@ const uploadExcel = () => {
   // Create form data
   const formData = new FormData();
   formData.append("file", file);
-  console.log(formData);
   //send file to server
   $("#modal-upload-excel").modal("hide");
 
@@ -754,7 +778,7 @@ const uploadExcel = () => {
     xhrFields: {
       responseType: "blob",
     },
-    contentType: false,  // Prevent jQuery from setting content type
+    contentType: false, // Prevent jQuery from setting content type
     processData: false,
     data: formData,
     type: "POST",
@@ -777,12 +801,9 @@ const uploadExcel = () => {
     error: function (errorThrown) {
       console.error("Error al descargar el archivo Excel: " + errorThrown);
       $("#loading-spinner").hide();
-     
-
-
     },
   });
-}
+};
 const descargarReporte = (ID_Cotizacion, C_Cotizacion) => {
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/descargarExcel",
@@ -792,7 +813,7 @@ const descargarReporte = (ID_Cotizacion, C_Cotizacion) => {
     },
     data: JSON.stringify({
       ID_Cotizacion: ID_Cotizacion,
-      C_Cotizacion: C_Cotizacion
+      C_Cotizacion: C_Cotizacion,
     }),
     success: function (response) {
       var blob = new Blob([response], {
@@ -802,8 +823,11 @@ const descargarReporte = (ID_Cotizacion, C_Cotizacion) => {
       link.href = window.URL.createObjectURL(blob);
       const currentDate = new Date();
       //format date to dd_mm_yyyy
-      const formattedDate = `${currentDate.getDate()}_${currentDate.getMonth() + 1}_${currentDate.getFullYear()}`;
-      link.download = "Cotizacion_" + C_Cotizacion + "_" + formattedDate + ".xlsx";
+      const formattedDate = `${currentDate.getDate()}_${
+        currentDate.getMonth() + 1
+      }_${currentDate.getFullYear()}`;
+      link.download =
+        "Cotizacion_" + C_Cotizacion + "_" + formattedDate + ".xlsx";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

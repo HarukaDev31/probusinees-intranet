@@ -101,7 +101,26 @@ class CCotizaciones extends CI_Controller
         echo json_encode($this->CCotizacionesModel->guardarCotizacion($cotizacion));
     }
     public function getExcelData(){
-        $data=$this->CCotizacionesModel->getMassiveExcelData();
+        $data=null;
+        if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+            // Get the uploaded file
+            $fileTmpPath = $_FILES['file']['tmp_name'];
+            $fileName = $_FILES['file']['name'];
+            $fileSize = $_FILES['file']['size'];
+            $fileType = $_FILES['file']['type'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
+
+            // Validate file type if necessary
+            $allowedfileExtensions = array('xls', 'xlsx');
+            if (in_array($fileExtension, $allowedfileExtensions)) {
+                //convert this excel to phpoject
+                $this->load->library('PHPExcel');
+                $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
+                $data=$this->CCotizacionesModel->getMassiveExcelData($objPHPExcel);
+            }
+        }
+
         echo json_encode($data);
     }
     public function uploadExcelMassive()

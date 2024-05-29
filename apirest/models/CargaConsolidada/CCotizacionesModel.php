@@ -1011,7 +1011,7 @@ class CCotizacionesModel extends CI_Model
         $this->zip->archive($zipFilePath);
         return $zipFilePath;
     }
-   
+
     public function getFinalCotizacionExcel($objPHPExcel, $data)
     {
         $newSheet = $objPHPExcel->createSheet();
@@ -1501,7 +1501,7 @@ class CCotizacionesModel extends CI_Model
             $style->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
             //center text
             //set normal weight
-            $columnsToApply = ['B', 'C','D','E', 'F', 'G', 'H', 'I', 'J','K'];
+            $columnsToApply = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
             //apply borders from b$row to l$row
             $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray($borders);
             //for each column in columnsToApply apply style center and auto size
@@ -1512,8 +1512,8 @@ class CCotizacionesModel extends CI_Model
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');    
-            }   
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+            }
             $InitialColumn++;
             $lastRow = $row;
         };
@@ -1538,7 +1538,7 @@ class CCotizacionesModel extends CI_Model
         //set borders  from b$lastrow to l$lastrow
         $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':L' . $lastRow)->applyFromArray(array());
         //set without borders  from b36 to k$row
-        
+
         // Definir la celda y la fila que se va a evaluar
         $cellToCheck = 'I22';
         $rowToCheck = 23;
@@ -1619,7 +1619,7 @@ class CCotizacionesModel extends CI_Model
 
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Massive_Payroll.xlsx';
-        $excel =$objPHPExcel;
+        $excel = $objPHPExcel;
         $worksheet = $excel->getActiveSheet();
 
         // Obtener los rangos de celdas mergeadas
@@ -1794,9 +1794,9 @@ class CCotizacionesModel extends CI_Model
                 $startRowF = $matchesF[1];
                 $endRowF = $matchesF[2];
 
-                if ($startRowF >= $startRowA && $endRowF<= $endRowA) {
+                if ($startRowF >= $startRowA && $endRowF <= $endRowA) {
                     $rangeF = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeF);
-                    $firstCellF= $rangeF[0];
+                    $firstCellF = $rangeF[0];
                     $producto = $worksheet->getCell($firstCellF)->getValue();
                     if ($producto == null) {
                         continue;
@@ -1839,8 +1839,8 @@ class CCotizacionesModel extends CI_Model
                             $rangeI = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeI);
                             $firstCellI = $rangeI[0];
                             $valueI = $worksheet->getCell($firstCellI)->getValue();
-                            if ($valueI == null) {
-                                continue;
+                            if ($valueI == null || $valueI=="-") {
+                                $valueI = 0;
                             }
                             break;
                         }
@@ -1853,8 +1853,9 @@ class CCotizacionesModel extends CI_Model
                             $rangeJ = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeJ);
                             $firstCellJ = $rangeJ[0];
                             $valueJ = $worksheet->getCell($firstCellJ)->getValue();
-                            if ($valueJ == null) {
-                                continue;
+                            if ($valueJ == null || $valueI=="-") {
+                                $valueJ=0;
+
                             }
                             break;
                         }
@@ -1867,8 +1868,8 @@ class CCotizacionesModel extends CI_Model
                             $rangeK = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeK);
                             $firstCellK = $rangeK[0];
                             $valueK = $worksheet->getCell($firstCellK)->getValue();
-                            if ($valueK == null) {
-                                continue;
+                            if ($valueK == null || $valueI=="-") {
+                                $valueK=0;
                             }
                             break;
                         }
@@ -1881,8 +1882,8 @@ class CCotizacionesModel extends CI_Model
                             $rangeL = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeL);
                             $firstCellL = $rangeL[0];
                             $valueL = $worksheet->getCell($firstCellL)->getValue();
-                            if ($valueL == null) {
-                                continue;
+                            if ($valueL == null || $valueI=="-") {
+                                $valueL = 0.035;
                             }
                             break;
                         }
@@ -1895,8 +1896,8 @@ class CCotizacionesModel extends CI_Model
                             $rangeM = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeM);
                             $firstCellM = $rangeM[0];
                             $valueM = $worksheet->getCell($firstCellM)->getValue();
-                            if ($valueM == null) {
-                                continue;
+                            if ($valueM == null || $valueI=="-") {
+                                $valueM = 0;
                             }
                             break;
                         }
@@ -1909,25 +1910,26 @@ class CCotizacionesModel extends CI_Model
                             $rangeN = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeN);
                             $firstCellN = $rangeN[0];
                             $valueN = $worksheet->getCell($firstCellN)->getValue();
-                            if ($valueN == null) {
+                            if ($valueN == null || $valueI=="-") {
                                 continue;
                             }
                             break;
                         }
                     }
+                    if ($valueG != null && $valueH != null && $valueN != null) {
+                        $productos[] = [
+                            'nombre' => $producto,
+                            'cantidad' => $valueG,
+                            'precio_unitario' => $valueH,
+                            'antidumping' => $valueI,
+                            'valoracion' => $valueJ,
+                            'ad_valorem' => $valueK,
+                            'percepcion' => $valueL,
+                            'peso' => $valueM,
+                            'cbm' => $valueN,
+                        ];
+                    }
 
-                    // Añadir producto, cantidad, precio unitario, valoración, ad valorem, percepción, peso y CBM al array de productos
-                    $productos[] = [
-                        'nombre' => $producto,
-                        'cantidad' => $valueG,
-                        'precio_unitario' => $valueH,
-                        'antidumping' => $valueI,
-                        'valoracion' => $valueJ,
-                        'ad_valorem' => $valueK,
-                        'percepcion' => $valueL,
-                        'peso' => $valueM,
-                        'cbm' => $valueN,
-                    ];
                 }
             }
 
