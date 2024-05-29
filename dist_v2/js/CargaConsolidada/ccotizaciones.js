@@ -230,7 +230,7 @@ const downloadFile = (urlProforma, urlPacking) => {
 
     // Crea y activa enlaces de descarga
     createAndClickDownloadLink(urlProforma);
-    createAndClickDownloadLink("sx");
+    createAndClickDownloadLink(urlPacking);
   } catch (error) {
     console.error("Error downloading files:", error);
   }
