@@ -145,6 +145,29 @@
     </div>
     <!-- /.container-fluid -->
   </section>
+  <div id="loading-spinner"class="spinner-backdrop">
+  <div class="spinner">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+</div>
+<style>
+  .spinner-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+</div>
   <!-- /.content -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -227,7 +250,12 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modal-upload-excel">Subir Cotizacion Final</h5>
+        <h5 class="modal-title mr-1" id="modal-upload-excel">Subir Cotizacion Final</h5>
+          <a href="<?php echo base_url('assets/downloads/Massive_Payroll.xlsx'); ?>" class="btn btn-primary" aria-hidden="true" title="Descargar Plantilla" download>
+          <!--i with download icon and hover text-->
+          <i class="fas fa-download" "></i>
+      </a>
+
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -236,6 +264,7 @@
         <form id="form-upload-excel" enctype="multipart/form-data">
           <div class="form-group">
             <label for="file-upload-excel">Subir Archivo Excel</label>
+            <!--download template button-->
             <input type="file" class="form-control-file" id="file-upload-excel" name="file-upload-excel" accept=".xls,.xlsx">
           </div>
         </form>

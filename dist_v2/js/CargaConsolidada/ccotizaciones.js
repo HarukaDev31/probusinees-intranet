@@ -2,6 +2,8 @@ var url;
 const { jsPDF } = window.jspdf;
 $(function () {
   $("#button-save").hide();
+  $("#loading-spinner").hide();
+
   url = base_url + "CargaConsolidada/CCotizaciones/ajax_list";
   table_Entidad = $("#table-CCotizaciones").DataTable({
     dom:
@@ -743,6 +745,9 @@ const uploadExcel = () => {
   formData.append("file", file);
   console.log(formData);
   //send file to server
+  $("#modal-upload-excel").modal("hide");
+
+  $("#loading-spinner").show();
 
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/uploadExcelMassive",
@@ -766,10 +771,14 @@ const uploadExcel = () => {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-
+      $("#loading-spinner").hide();
+      //hide modal-upload-excel
     },
     error: function (errorThrown) {
       console.error("Error al descargar el archivo Excel: " + errorThrown);
+      $("#loading-spinner").hide();
+     
+
 
     },
   });

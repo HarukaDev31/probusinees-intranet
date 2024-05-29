@@ -814,9 +814,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setCellValue('K22', "='3'!" . $columnaIndex . "30");
         //k25 =columnaIndex 31
         $objPHPExcel->getActiveSheet()->setCellValue('K25', "='3'!" . $columnaIndex . "31");
-
-        //k30 =$query[0]["Flete"]/$query[0]["Distribucion"]
-        $objPHPExcel->getActiveSheet()->setCellValue('K30', $query[0]["Servicio"]);
+        $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $CobroCell);
 
         for ($row = 36; $row <= 39; $row++) {
             for ($col = 1; $col <= 12; $col++) {
@@ -994,30 +992,7 @@ class CCotizacionesModel extends CI_Model
         $this->load->library('zip');
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
-        $data = $this->getMassiveExcelData(); // Assuming this gets the data for all rows
-        // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
-        foreach ($data as $key => $value) {
-            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value);
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-            $excelFileName = 'Boleta_' . $value['cliente']['nombre'] . '.xlsx';
-            $excelFilePath = 'assets/downloads/' . $excelFileName;
-            $objWriter->save($excelFilePath);
-            $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
-            unlink($excelFilePath); // Remove the Excel file after adding it to the ZIP
-        }
-
-        // Save the ZIP file
-        $zipFileName = 'Boletas.zip';
-        $zipFilePath = 'assets/downloads/' . $zipFileName;
-        $this->zip->archive($zipFilePath);
-        return $zipFilePath;
-    }
-    {
-        $this->load->library('PHPExcel');
-        $this->load->library('zip');
-        // Create a new PHPExcel object
-        $templatePath = 'assets/downloads/Boleta_Template.xlsx';
-        $data = $this->getMassiveExcelData(); // Assuming this gets the data for all rows
+        $data = $this->getMassiveExcelData($objPHPExcel); // Assuming this gets the data for all rows
         // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
         foreach ($data as $key => $value) {
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
@@ -1036,6 +1011,7 @@ class CCotizacionesModel extends CI_Model
         $this->zip->archive($zipFilePath);
         return $zipFilePath;
     }
+   
     public function getFinalCotizacionExcel($objPHPExcel, $data)
     {
         $newSheet = $objPHPExcel->createSheet();
@@ -1526,6 +1502,8 @@ class CCotizacionesModel extends CI_Model
             //center text
             //set normal weight
             $columnsToApply = ['B', 'C','D','E', 'F', 'G', 'H', 'I', 'J','K'];
+            //apply borders from b$row to l$row
+            $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray($borders);
             //for each column in columnsToApply apply style center and auto size
             foreach ($columnsToApply as $column) {
                 //set font to calibri
@@ -1634,14 +1612,14 @@ class CCotizacionesModel extends CI_Model
         return $objPHPExcel;
     }
 
-    public function getMassiveExcelData()
+    public function getMassiveExcelData($objPHPExcel)
     {
         //PHPExcel_Cell::extractAllCellReferencesInRange($mergedRange);
         $this->load->library('PHPExcel');
 
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Massive_Payroll.xlsx';
-        $excel = PHPExcel_IOFactory::load($templatePath);
+        $excel =$objPHPExcel;
         $worksheet = $excel->getActiveSheet();
 
         // Obtener los rangos de celdas mergeadas

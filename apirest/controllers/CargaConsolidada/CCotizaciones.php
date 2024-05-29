@@ -121,7 +121,6 @@ class CCotizaciones extends CI_Controller
                 //convert this excel to phpoject
                 $this->load->library('PHPExcel');
                 $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
-
                 $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel);
 
                 // Assuming $zipFilePath is the path to the generated ZIP file
