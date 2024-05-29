@@ -106,19 +106,43 @@ class CCotizaciones extends CI_Controller
     }
     public function uploadExcelMassive()
     {
-        // Generate the ZIP file
-        $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls();
+        if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+            // Get the uploaded file
+            $fileTmpPath = $_FILES['file']['tmp_name'];
+            $fileName = $_FILES['file']['name'];
+            $fileSize = $_FILES['file']['size'];
+            $fileType = $_FILES['file']['type'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
 
-        // Set headers for file download
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="Boletas.zip"');
-        header('Content-Length: ' . filesize($zipFilePath));
+            // Validate file type if necessary
+            $allowedfileExtensions = array('xls', 'xlsx');
+            if (in_array($fileExtension, $allowedfileExtensions)) {
+                //convert this excel to phpoject
+                $this->load->library('PHPExcel');
+                $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
 
-        // Return the ZIP file for download
-        readfile($zipFilePath);
+                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel);
 
-        // Clean up - remove the ZIP file after download
-        unlink($zipFilePath);
+                // Assuming $zipFilePath is the path to the generated ZIP file
+                if (file_exists($zipFilePath)) {
+                    header('Content-Type: application/zip');
+                    header('Content-Disposition: attachment; filename="' . basename($zipFilePath) . '"');
+                    header('Content-Length: ' . filesize($zipFilePath));
+                    readfile($zipFilePath);
+                    unlink($zipFilePath);
+                    exit();
+                } else {
+                    // Handle error if file generation failed
+                    echo "Error: Unable to generate the ZIP file.";
+                }
+            } else {
+                echo "Error: Invalid file extension.";
+            }
+        } else {
+            echo "Error: " . $_FILES['file']['error'];
+        }
+    
     }
     public function descargarExcel()
     {

@@ -42,6 +42,11 @@
                   <label>&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
+                <div class="col-2 col-sm-3  ">
+                  <label>&nbsp;</label>
+                  <button type="button" id="btn-upload-excel" class="btn btn-primary btn-block btn-reporte" data-toggle="modal" data-target="#modal-upload-excel"><i class="fa fa-upload"></i> Subir Excel</button>
+                  
+                </div>
 
 
                 <!-- <div class="col-6 col-sm-2">
@@ -70,9 +75,9 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-$attributes = array('id' => 'form-pedido');
-echo form_open('', $attributes);
-?>
+              $attributes = array('id' => 'form-pedido');
+              echo form_open('', $attributes);
+              ?>
                   <div class="row div-CotizacionHeader">
                     <div class="col-12 col-md-9">
                         <div class="row">
@@ -217,6 +222,28 @@ echo form_open('', $attributes);
     </div>
   </div>
 </div>
-
+<!-- Modal  with input file and button upload-->
+<div class="modal fade" id="modal-upload-excel" tabindex="-1" role="dialog" aria-labelledby="modal-upload-excel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-upload-excel">Subir Cotizacion Final</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="form-upload-excel" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="file-upload-excel">Subir Archivo Excel</label>
+            <input type="file" class="form-control-file" id="file-upload-excel" name="file-upload-excel" accept=".xls,.xlsx">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="uploadExcel()" class="btn btn-primary">Subir</button>
+      </div>  
+    </div>
+  </div>  
 </div>
 

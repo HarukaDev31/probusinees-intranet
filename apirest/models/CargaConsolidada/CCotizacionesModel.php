@@ -988,7 +988,30 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setTitle('2');
         return $objPHPExcel;
     }
-    public function generateMassiveExcelPayrolls()
+    public function generateMassiveExcelPayrolls($objPHPExcel)
+    {
+        $this->load->library('PHPExcel');
+        $this->load->library('zip');
+        // Create a new PHPExcel object
+        $templatePath = 'assets/downloads/Boleta_Template.xlsx';
+        $data = $this->getMassiveExcelData(); // Assuming this gets the data for all rows
+        // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
+        foreach ($data as $key => $value) {
+            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value);
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $excelFileName = 'Boleta_' . $value['cliente']['nombre'] . '.xlsx';
+            $excelFilePath = 'assets/downloads/' . $excelFileName;
+            $objWriter->save($excelFilePath);
+            $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
+            unlink($excelFilePath); // Remove the Excel file after adding it to the ZIP
+        }
+
+        // Save the ZIP file
+        $zipFileName = 'Boletas.zip';
+        $zipFilePath = 'assets/downloads/' . $zipFileName;
+        $this->zip->archive($zipFilePath);
+        return $zipFilePath;
+    }
     {
         $this->load->library('PHPExcel');
         $this->load->library('zip');
@@ -1507,11 +1530,11 @@ class CCotizacionesModel extends CI_Model
             foreach ($columnsToApply as $column) {
                 //set font to calibri
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setName('Calibri');
+                //set font size to 11
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
-
-                
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');    
             }   
             $InitialColumn++;
             $lastRow = $row;
@@ -1532,11 +1555,12 @@ class CCotizacionesModel extends CI_Model
         //set bold true and set dollar format
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getFont()->setBold(true);
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-
-        //set borders  from b36 to k$row
-        $objPHPExcel->getActiveSheet()->getStyle('B36:L' . $row)->applyFromArray($borders);
-        $objPHPExcel->getActiveSheet()->getStyle('B38:L38')->applyFromArray(array());
-
+        //center text
+        $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        //set borders  from b$lastrow to l$lastrow
+        $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':L' . $lastRow)->applyFromArray(array());
+        //set without borders  from b36 to k$row
+        
         // Definir la celda y la fila que se va a evaluar
         $cellToCheck = 'I22';
         $rowToCheck = 23;
