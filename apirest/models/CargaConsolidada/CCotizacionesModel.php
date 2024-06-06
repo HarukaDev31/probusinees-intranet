@@ -299,7 +299,6 @@ return $results;
         ini_set('memory_limit', '2002M');
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
-        print_r($query->result());
         $query = json_decode(json_encode($query->result()), true);
         
 
