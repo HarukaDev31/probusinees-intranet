@@ -65,7 +65,7 @@ class CCotizacionesModel extends CI_Model
                     'Nombre_Comercial', cccdpro.Nombre_Comercial,
                     'Uso', cccdpro.Uso,
                     'URL_Link', cccdpro.URL_Link,
-                    'URL_Image', cccdpro.URL_Image,
+                    'Url_Image', cccdpro.URL_Image,
                     'Cantidad', cccdpro.Cantidad,
                     'Valor_unitario', IFNULL(cccdpro.Valor_unitario, 0),
                     'Tributos_Pendientes', (
