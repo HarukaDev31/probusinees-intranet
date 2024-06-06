@@ -53,7 +53,11 @@ class CCotizacionesModel extends CI_Model
     public function get_cotization_body($ID_Cotizacion)
     {
 
-        $this->db->select("cccdprov.ID_Proveedor,
+        $results = [];
+$limit = 100;
+$offset = 0;
+do {
+    $this->db->select("cccdprov.ID_Proveedor,
         cccdprov.CBM_Total,
         cccdprov.Peso_Total,
         cccdprov.URL_Proforma,
@@ -89,12 +93,21 @@ class CCotizacionesModel extends CI_Model
                 cccdpro.ID_Cotizacion = cccdprov.ID_Cotizacion
                 AND cccdpro.ID_Proveedor = cccdprov.ID_Proveedor
         ) AS productos");
-        $this->db->from($this->table_proveedor . ' as cccdprov');
-        // $this->db->join($this->table_producto.' as cccdp2',
-        // 'cccdp2.ID_Cotizacion = cccdp.ID_Cotizacion ','join');
-        $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
-        $query = $this->db->get();
-        return $query->result();
+    $this->db->from($this->table_proveedor . ' as cccdprov');
+    $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
+    $this->db->limit($limit, $offset);
+    $query = $this->db->get();
+    $data = $query->result();
+    
+    if (!empty($data)) {
+        $results = array_merge($results, $data);
+        $offset += $limit;
+    } else {
+        break;
+    }
+} while (true);
+
+return $results;
     }
     public function guardarTributos($tributos)
     {
