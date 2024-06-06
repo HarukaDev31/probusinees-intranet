@@ -496,6 +496,7 @@ return $results;
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow - 1) . ":" . $TarifasStartColumn4 . $initialRow)->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow - 4) . ":" . $TarifasStartColumn4 . ($initialRow - 3))->applyFromArray($borders);
         $initialRow++;
+        return $objPHPExcel;
 
         $InitialColumn = 'C';
         foreach ($query as $row) {
@@ -752,7 +753,6 @@ return $results;
         $CBMTotal = $InitialColumn . "7";
         $InitialColumn = 'C';
         $sumCostoDestino = 0;
-        return $objPHPExcel;
 
         foreach ($query as $row) {
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', "=" . $CBMTotal . "*0.4" . "*" . $InitialColumn . "13");
