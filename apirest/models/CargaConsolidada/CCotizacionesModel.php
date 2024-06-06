@@ -299,6 +299,7 @@ return $results;
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
 
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
+        return $objPHPExcel;
 
         $query = json_decode(json_encode($query->result()), true);
 
@@ -496,7 +497,6 @@ return $results;
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow - 1) . ":" . $TarifasStartColumn4 . $initialRow)->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow - 4) . ":" . $TarifasStartColumn4 . ($initialRow - 3))->applyFromArray($borders);
         $initialRow++;
-        return $objPHPExcel;
 
         $InitialColumn = 'C';
         foreach ($query as $row) {
