@@ -177,7 +177,7 @@ class CCotizaciones extends CI_Controller
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 
         $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
-
+        echo $objPHPExcel;
         // // Add some data to the sheet
 
         // Set the content type header to indicate that this is an Excel file
