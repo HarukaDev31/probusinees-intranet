@@ -52,6 +52,9 @@ class CCotizacionesModel extends CI_Model
     }
     public function get_cotization_body($ID_Cotizacion)
     {
+        //set max length of query
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '1024M');
         $results = [];
         $limit = 100;
         $offset = 0;
