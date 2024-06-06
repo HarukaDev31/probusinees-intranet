@@ -296,9 +296,11 @@ return $results;
      */
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
+        ini_set('max_execution_time', 1000);
+        ini_set('memory_limit', '512M');
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
-        return $query;
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
+
         $query = json_decode(json_encode($query->result()), true);
         
 
