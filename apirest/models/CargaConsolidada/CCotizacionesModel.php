@@ -299,7 +299,6 @@ return $results;
  
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
-        var_dump($query->result());
         return $objPHPExcel;
         $query = json_decode(json_encode($query->result()), true);
         
