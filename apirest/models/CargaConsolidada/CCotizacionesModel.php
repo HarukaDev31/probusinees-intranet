@@ -52,62 +52,63 @@ class CCotizacionesModel extends CI_Model
     }
     public function get_cotization_body($ID_Cotizacion)
     {
-
         $results = [];
-$limit = 100;
-$offset = 0;
-do {
-    $this->db->select("cccdprov.ID_Proveedor,
-        cccdprov.CBM_Total,
-        cccdprov.Peso_Total,
-        cccdprov.URL_Proforma,
-        cccdprov.URL_Packing,
-        (select ID_Tipo_Cliente from carga_consolidada_cotizaciones_cabecera where ID_Cotizacion = cccdprov.ID_Cotizacion) as ID_Tipo_Cliente,
-
-        (
-            SELECT CONCAT('[', GROUP_CONCAT(
-                JSON_OBJECT(
-                    'ID_Producto', cccdpro.ID_Producto,
-                    'URL_Link', cccdpro.URL_Link,
-                    'Url_Image', cccdpro.Url_Image,
-                    'Nombre_Comercial', cccdpro.Nombre_Comercial,
-                    'Uso', cccdpro.Uso,
-                    'Cantidad', cccdpro.Cantidad,
-                    'Valor_unitario', IFNULL(cccdpro.Valor_unitario, 0),
-                    'Tributos_Pendientes', (
-                        SELECT
-                            COUNT(*)
-                        FROM
-                            carga_consolidada_cotizaciones_detalles_tributo cccdt
-                        WHERE
-                            cccdt.ID_Producto = cccdpro.ID_Producto
-                            AND cccdt.ID_Proveedor = cccdpro.ID_Proveedor
-                            AND cccdt.ID_Cotizacion = cccdpro.ID_Cotizacion
-                            AND cccdt.Status = 'Pending'
-                    )
-                )
-            SEPARATOR ','), ']')
-            FROM
-                carga_consolidada_cotizaciones_detalles_producto cccdpro
-            WHERE
-                cccdpro.ID_Cotizacion = cccdprov.ID_Cotizacion
-                AND cccdpro.ID_Proveedor = cccdprov.ID_Proveedor
-        ) AS productos");
-    $this->db->from($this->table_proveedor . ' as cccdprov');
-    $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
-    $this->db->limit($limit, $offset);
-    $query = $this->db->get();
-    $data = $query->result();
-    
-    if (!empty($data)) {
-        $results = array_merge($results, $data);
-        $offset += $limit;
-    } else {
-        break;
-    }
-} while (true);
-
-return $results;
+        $limit = 100;
+        $offset = 0;
+        
+        do {
+            $this->db->select("cccdprov.ID_Proveedor,
+                cccdprov.CBM_Total,
+                cccdprov.Peso_Total,
+                cccdprov.URL_Proforma,
+                cccdprov.URL_Packing,
+                (select ID_Tipo_Cliente from carga_consolidada_cotizaciones_cabecera where ID_Cotizacion = cccdprov.ID_Cotizacion) as ID_Tipo_Cliente,
+                (
+                    SELECT CONCAT('[', GROUP_CONCAT(
+                        JSON_OBJECT(
+                            'ID_Producto', cccdpro.ID_Producto,
+                            'URL_Link', cccdpro.URL_Link,
+                            'Url_Image', cccdpro.Url_Image,
+                            'Nombre_Comercial', cccdpro.Nombre_Comercial,
+                            'Uso', cccdpro.Uso,
+                            'Cantidad', cccdpro.Cantidad,
+                            'Valor_unitario', IFNULL(cccdpro.Valor_unitario, 0),
+                            'Tributos_Pendientes', (
+                                SELECT
+                                    COUNT(*)
+                                FROM
+                                    carga_consolidada_cotizaciones_detalles_tributo cccdt
+                                WHERE
+                                    cccdt.ID_Producto = cccdpro.ID_Producto
+                                    AND cccdt.ID_Proveedor = cccdpro.ID_Proveedor
+                                    AND cccdt.ID_Cotizacion = cccdpro.ID_Cotizacion
+                                    AND cccdt.Status = 'Pending'
+                            )
+                        )
+                    SEPARATOR ','), ']')
+                    FROM
+                        carga_consolidada_cotizaciones_detalles_producto cccdpro
+                    WHERE
+                        cccdpro.ID_Cotizacion = cccdprov.ID_Cotizacion
+                        AND cccdpro.ID_Proveedor = cccdprov.ID_Proveedor
+                ) AS productos");
+            $this->db->from($this->table_proveedor . ' as cccdprov');
+            $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
+            $this->db->limit($limit);
+            $this->db->offset($offset); // Correctamente aplicar el offset
+            $query = $this->db->get();
+            $data = $query->result();
+            
+            if (!empty($data)) {
+                $results = array_merge($results, $data);
+                $offset += $limit;
+            } else {
+                break;
+            }
+        } while (true);
+        
+        return $results;
+        
     }
     public function guardarTributos($tributos)
     {
