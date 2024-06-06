@@ -935,6 +935,16 @@ return $results;
             $style->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
             //center text
             $style->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $columnsToApply = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+            foreach ($columnsToApply as $column) {
+                //set font to calibri
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setName('Calibri');
+                //set font size to 11
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+            }
             //set normal weight
             $InitialColumn++;
             $lastRow = $row;
