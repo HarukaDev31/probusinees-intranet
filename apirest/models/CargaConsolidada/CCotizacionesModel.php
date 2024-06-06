@@ -67,7 +67,6 @@ do {
                 JSON_OBJECT(
                     'ID_Producto', cccdpro.ID_Producto,
                    
-                    'Url_Image', cccdpro.Url_Image,
                     'Nombre_Comercial', cccdpro.Nombre_Comercial,
                     'Uso', cccdpro.Uso,
                     'Cantidad', cccdpro.Cantidad,
