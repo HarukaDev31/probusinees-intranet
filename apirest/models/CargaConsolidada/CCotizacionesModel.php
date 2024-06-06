@@ -943,9 +943,11 @@ return $results;
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+                if ($column != 'B') {
+                    $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+                }
             }
-            //set normal weight
+            //set normal weiight
             $InitialColumn++;
             $lastRow = $row;
         };
