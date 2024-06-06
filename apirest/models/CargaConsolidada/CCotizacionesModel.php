@@ -52,12 +52,12 @@ class CCotizacionesModel extends CI_Model
     }
     public function get_cotization_body($ID_Cotizacion)
     {
-$results = [];
-$limit = 100;
-$offset = 0;
+        $results = [];
+        $limit = 100;
+        $offset = 0;
 
-do {
-    $this->db->select("cccdprov.ID_Proveedor,
+        do {
+            $this->db->select("cccdprov.ID_Proveedor,
         cccdprov.CBM_Total,
         cccdprov.Peso_Total,
 
@@ -66,7 +66,7 @@ do {
             SELECT CONCAT('[', GROUP_CONCAT(
                 JSON_OBJECT(
                     'ID_Producto', cccdpro.ID_Producto,
-                   
+
                     'Nombre_Comercial', cccdpro.Nombre_Comercial,
                     'Uso', cccdpro.Uso,
                     'Cantidad', cccdpro.Cantidad,
@@ -90,22 +90,22 @@ do {
                 cccdpro.ID_Cotizacion = cccdprov.ID_Cotizacion
                 AND cccdpro.ID_Proveedor = cccdprov.ID_Proveedor
         ) AS productos");
-    $this->db->from($this->table_proveedor . ' as cccdprov');
-    $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
-    $this->db->limit($limit);
-    $this->db->offset($offset); // Correctamente aplicar el offset
-    $query = $this->db->get();
-    $data = $query->result();
-    
-    if (!empty($data)) {
-        $results = array_merge($results, $data);
-        $offset += $limit;
-    } else {
-        break;
-    }
-} while (true);
+            $this->db->from($this->table_proveedor . ' as cccdprov');
+            $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
+            $this->db->limit($limit);
+            $this->db->offset($offset); // Correctamente aplicar el offset
+            $query = $this->db->get();
+            $data = $query->result();
 
-return $results;
+            if (!empty($data)) {
+                $results = array_merge($results, $data);
+                $offset += $limit;
+            } else {
+                break;
+            }
+        } while (true);
+
+        return $results;
 
     }
     public function guardarTributos($tributos)
@@ -299,7 +299,6 @@ return $results;
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
         $query = json_decode(json_encode($query->result()), true);
-        
 
         $this->db->close();
         $this->db->initialize();
@@ -858,24 +857,24 @@ return $results;
                         'borders' => array(
                             'allborders' => array(
                                 'style' => PHPExcel_Style_Border::BORDER_NONE,
-                                'color' => array('rgb' => '000000')
+                                'color' => array('rgb' => '000000'),
                             ),
                         ),
                     )
                 );
-                $objPHPExcel->getActiveSheet()->getStyle('B39'. ':L39')->applyFromArray(
+                $objPHPExcel->getActiveSheet()->getStyle('B39' . ':L39')->applyFromArray(
                     array(
                         'borders' => array(
                             'allborders' => array(
                                 'style' => PHPExcel_Style_Border::BORDER_NONE,
-                                'color' => array('rgb' => '000000')
+                                'color' => array('rgb' => '000000'),
                             ),
                         ),
                     )
                 );
                 //set background color to white
                 $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-                if(count($query) < 3){
+                if (count($query) < 3) {
                     $style = $objPHPExcel->getActiveSheet()->getStyle('K' . $row);
                     $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
                     $style->getFill()->getStartColor()->setARGB($whiteColor);
@@ -925,7 +924,7 @@ return $results;
 
             $objPHPExcel->getActiveSheet()->mergeCells('K' . $row . ':L' . $row);
             $style = $objPHPExcel->getActiveSheet()->getStyle('K' . $row);
-            
+
             //set letter color to white
             //set background color to green
             $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
@@ -956,19 +955,17 @@ return $results;
         $lastRow++;
         //set b$latsrow values "total"
         $objPHPExcel->getActiveSheet()->setCellValue('B' . $lastRow, "TOTAL");
-        
+
         //UNMERGE C D E AND MERGE B TO E
 
-        if(count($query) < 3){
+        if (count($query) < 3) {
             $objPHPExcel->getActiveSheet()->unmergeCells('C' . $lastRow . ':E' . $lastRow);
             $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
 
-        }else{
+        } else {
             $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
 
         }
-
-
 
         //SET BORDER TO B$lastrow to e$lastrow
         $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':E' . $lastRow)->applyFromArray($borders);
@@ -1002,8 +999,7 @@ return $results;
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
-
-        $objPHPExcel->getActiveSheet()->getStyle('B36:L' . $row )->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B36:L' . $row)->applyFromArray($borders);
 
         // $objPHPExcel->getActiveSheet()->getStyle('B38:L38')->applyFromArray(array(
         //     'borders' => array(
@@ -1013,7 +1009,6 @@ return $results;
         //         ),
         //     ),
         // ));
-
 
         //set bold false from b36 to k$row
 
@@ -1082,7 +1077,7 @@ return $results;
         $objPHPExcel->getActiveSheet()->setCellValue('L10', "");
 
         $objPHPExcel->getActiveSheet()->setCellValue('F11', $query[0]["tipo_cliente"]);
-     
+
         //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
 
         //select
@@ -1620,7 +1615,9 @@ return $results;
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+                if ($column != 'B') {
+                    $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+                }
             }
             $InitialColumn++;
             $lastRow = $row;
@@ -1947,7 +1944,7 @@ return $results;
                             $rangeI = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeI);
                             $firstCellI = $rangeI[0];
                             $valueI = $worksheet->getCell($firstCellI)->getValue();
-                            if ($valueI == null || $valueI=="-") {
+                            if ($valueI == null || $valueI == "-") {
                                 $valueI = 0;
                             }
                             break;
@@ -1961,8 +1958,8 @@ return $results;
                             $rangeJ = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeJ);
                             $firstCellJ = $rangeJ[0];
                             $valueJ = $worksheet->getCell($firstCellJ)->getValue();
-                            if ($valueJ == null || $valueI=="-") {
-                                $valueJ=0;
+                            if ($valueJ == null || $valueI == "-") {
+                                $valueJ = 0;
 
                             }
                             break;
@@ -1976,8 +1973,8 @@ return $results;
                             $rangeK = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeK);
                             $firstCellK = $rangeK[0];
                             $valueK = $worksheet->getCell($firstCellK)->getValue();
-                            if ($valueK == null || $valueI=="-") {
-                                $valueK=0;
+                            if ($valueK == null || $valueI == "-") {
+                                $valueK = 0;
                             }
                             break;
                         }
@@ -1990,7 +1987,7 @@ return $results;
                             $rangeL = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeL);
                             $firstCellL = $rangeL[0];
                             $valueL = $worksheet->getCell($firstCellL)->getValue();
-                            if ($valueL == null || $valueI=="-") {
+                            if ($valueL == null || $valueI == "-") {
                                 $valueL = 0.035;
                             }
                             break;
@@ -2004,7 +2001,7 @@ return $results;
                             $rangeM = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeM);
                             $firstCellM = $rangeM[0];
                             $valueM = $worksheet->getCell($firstCellM)->getValue();
-                            if ($valueM == null || $valueI=="-") {
+                            if ($valueM == null || $valueI == "-") {
                                 $valueM = 0;
                             }
                             break;
@@ -2018,7 +2015,7 @@ return $results;
                             $rangeN = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeN);
                             $firstCellN = $rangeN[0];
                             $valueN = $worksheet->getCell($firstCellN)->getValue();
-                            if ($valueN == null || $valueI=="-") {
+                            if ($valueN == null || $valueI == "-") {
                                 continue;
                             }
                             break;
