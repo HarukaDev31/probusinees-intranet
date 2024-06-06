@@ -52,9 +52,6 @@ class CCotizacionesModel extends CI_Model
     }
     public function get_cotization_body($ID_Cotizacion)
     {
-        //set max length of query
-        ini_set('max_execution_time', 300);
-        ini_set('memory_limit', '1024M');
         $results = [];
         $limit = 100;
         $offset = 0;
@@ -69,8 +66,7 @@ class CCotizacionesModel extends CI_Model
             SELECT CONCAT('[', GROUP_CONCAT(
                 JSON_OBJECT(
                     'ID_Producto', cccdpro.ID_Producto,
-                    'URL_Link', cccdpro.URL_Link,
-                    'URL_Image', cccdpro.URL_Image,
+
                     'Nombre_Comercial', cccdpro.Nombre_Comercial,
                     'Uso', cccdpro.Uso,
                     'Cantidad', cccdpro.Cantidad,
@@ -946,7 +942,7 @@ class CCotizacionesModel extends CI_Model
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                if ($column =='K') {
+                if ($column == 'K') {
                     $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
                 }
             }
