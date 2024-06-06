@@ -313,6 +313,7 @@ return $results;
         $grayColor = 'F8F9F9';
         $blueColor = '1F618D';
         $yellowColor = 'FFFF33';
+        $whiteColor = 'FFFFFF';
         $greenColor = "009999";
         $borders = array(
             'borders' => array(
@@ -844,16 +845,45 @@ return $results;
          */
         $lastRow = 0;
         $InitialColumn = 'C';
+        //center i35
+        $objPHPExcel->getActiveSheet()->getStyle('I35')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         //if count query is lower than 3 get sustract 3- count query and set the value to $substract and for each $substract remove border from row 36 to 39
         if (count($query) < 3) {
             $substract = 3 - count($query);
             for ($i = 0; $i < $substract; $i++) {
                 $row = 36 + $i + count($query);
                 //set not borders from b$row to l$row
-                $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray(array());
+                $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray(
+                    array(
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_NONE,
+                                'color' => array('rgb' => '000000')
+                            ),
+                        ),
+                    )
+                );
+                $objPHPExcel->getActiveSheet()->getStyle('B39'. ':L39')->applyFromArray(
+                    array(
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_NONE,
+                                'color' => array('rgb' => '000000')
+                            ),
+                        ),
+                    )
+                );
+                //set background color to white
+                $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                if(count($query) < 3){
+                    $style = $objPHPExcel->getActiveSheet()->getStyle('K' . $row);
+                    $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $style->getFill()->getStartColor()->setARGB($whiteColor);
+                }
             }
             //remove borders from b36 to l39
         }
+
         for ($index = 0; $index < count($query); $index++) {
             $row = 36 + $index;
             $objPHPExcel->getActiveSheet()->setCellValue('B' . $row, $index + 1);
@@ -882,6 +912,8 @@ return $results;
             //set currency format with dollar symbol
             $objPHPExcel->getActiveSheet()->getStyle('J' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $JCellVal = $objPHPExcel->getActiveSheet()->getCell('J' . $row)->getValue();
+            //CENTER TEXT
+            $objPHPExcel->getActiveSheet()->getStyle('J' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->setCellValue('K' . $row, "='3'!" . $InitialColumn . 47);
             //set currency format with pen symbol
             //combine cells from C$ROW to e$row
@@ -891,9 +923,13 @@ return $results;
 
             $objPHPExcel->getActiveSheet()->mergeCells('K' . $row . ':L' . $row);
             $style = $objPHPExcel->getActiveSheet()->getStyle('K' . $row);
+            
+            //set letter color to white
+            //set background color to green
             $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
             $style->getFill()->getStartColor()->setARGB($greenColor);
-            //set letter color to white
+            //set bold false
+            $style->getFont()->setBold(false);
             $style->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
             //center text
             $style->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -906,23 +942,64 @@ return $results;
         $lastRow++;
         //set b$latsrow values "total"
         $objPHPExcel->getActiveSheet()->setCellValue('B' . $lastRow, "TOTAL");
+        
+        //UNMERGE C D E AND MERGE B TO E
+
+        if(count($query) < 3){
+            $objPHPExcel->getActiveSheet()->unmergeCells('C' . $lastRow . ':E' . $lastRow);
+            $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
+
+        }else{
+            $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
+
+        }
+
+
+
+        //SET BORDER TO B$lastrow to e$lastrow
+        $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':E' . $lastRow)->applyFromArray($borders);
+
+        //center text
+        $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        //VERTICAL CENTER
+        $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        //set row height
+        $objPHPExcel->getActiveSheet()->getRowDimension($lastRow)->setRowHeight(40);
         //set bold true
         $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getFont()->setBold(true);
         //set f$lastrow =sum(f37:f$lastrow-1)
         $objPHPExcel->getActiveSheet()->setCellValue('F' . $lastRow, "=SUM(F36:F" . ($lastRow - 1) . ")");
+        //apply borders
+        $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->applyFromArray($borders);
         //set bold true and set dollar format
         $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->getFont()->setBold(true);
         //center text
         $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
         //set f$lastrow =sum(j37:j$lastrow-1)
         $objPHPExcel->getActiveSheet()->setCellValue('J' . $lastRow, "=SUM(J36:J" . ($lastRow - 1) . ")");
+        //apply borders
+        $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->applyFromArray($borders);
         //set bold true and set dollar format
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getFont()->setBold(true);
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+        //center text
+        $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
-        //set borders  from b36 to k$row
-        $objPHPExcel->getActiveSheet()->getStyle('B36:L' . $row)->applyFromArray($borders);
-        $objPHPExcel->getActiveSheet()->getStyle('B38:L38')->applyFromArray(array());
+
+        $objPHPExcel->getActiveSheet()->getStyle('B36:L' . $row )->applyFromArray($borders);
+
+        // $objPHPExcel->getActiveSheet()->getStyle('B38:L38')->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_NONE,
+        //             'color' => array('rgb' => '000000')
+        //         ),
+        //     ),
+        // ));
+
 
         //set bold false from b36 to k$row
 
@@ -991,10 +1068,7 @@ return $results;
         $objPHPExcel->getActiveSheet()->setCellValue('L10', "");
 
         $objPHPExcel->getActiveSheet()->setCellValue('F11', $query[0]["tipo_cliente"]);
-        if (count($query) < 3) {
-            //remove borders from b36 to l39
-            $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
-        }
+     
         //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
 
         //select
@@ -1040,6 +1114,7 @@ return $results;
         $blueColor = '1F618D';
         $yellowColor = 'FFFF33';
         $greenColor = "009999";
+        $whiteColor = "FFFFFF";
         $borders = array(
             'borders' => array(
                 'allborders' => array(
