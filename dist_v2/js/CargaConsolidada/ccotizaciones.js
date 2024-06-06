@@ -275,13 +275,6 @@ function getProvTemplate(index, ID_Proveedor = null) {
                         <span class="help-block text-danger" id="error"></span>
                     </div>   
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="form-group d-flex flex-column ">
-                        <label>Archivos</label>
-                        <div class="btn btn-primary" id="Archivos-${index}">Descargar </div>
-                        
-                    </div>   
-                </div>
                
 
             </div>
