@@ -60,13 +60,13 @@ class CCotizacionesModel extends CI_Model
             $this->db->select("cccdprov.ID_Proveedor,
                 cccdprov.CBM_Total,
                 cccdprov.Peso_Total,
-                cccdprov.URL_Proforma,
-                cccdprov.URL_Packing,
                 (select ID_Tipo_Cliente from carga_consolidada_cotizaciones_cabecera where ID_Cotizacion = cccdprov.ID_Cotizacion) as ID_Tipo_Cliente,
                 (
                     SELECT CONCAT('[', GROUP_CONCAT(
                         JSON_OBJECT(
                             'ID_Producto', cccdpro.ID_Producto,
+                            'URL_Link', cccdpro.URL_Link,
+                            'Url_Image', cccdpro.Url_Image,
                             'Nombre_Comercial', cccdpro.Nombre_Comercial,
                             'Uso', cccdpro.Uso,
                             'Cantidad', cccdpro.Cantidad,
