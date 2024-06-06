@@ -52,12 +52,7 @@ class CCotizacionesModel extends CI_Model
     }
     public function get_cotization_body($ID_Cotizacion)
     {
-        $results = [];
-        $limit = 100;
-        $offset = 0;
-
-        do {
-            $this->db->select("cccdprov.ID_Proveedor,
+        $this->db->select("cccdprov.ID_Proveedor,
         cccdprov.CBM_Total,
         cccdprov.Peso_Total,
 
@@ -69,6 +64,8 @@ class CCotizacionesModel extends CI_Model
 
                     'Nombre_Comercial', cccdpro.Nombre_Comercial,
                     'Uso', cccdpro.Uso,
+                    'URL_Link', cccdpro.URL_Link,
+                    'URL_Image', cccdpro.URL_Image,
                     'Cantidad', cccdpro.Cantidad,
                     'Valor_unitario', IFNULL(cccdpro.Valor_unitario, 0),
                     'Tributos_Pendientes', (
@@ -90,22 +87,13 @@ class CCotizacionesModel extends CI_Model
                 cccdpro.ID_Cotizacion = cccdprov.ID_Cotizacion
                 AND cccdpro.ID_Proveedor = cccdprov.ID_Proveedor
         ) AS productos");
-            $this->db->from($this->table_proveedor . ' as cccdprov');
-            $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
-            $this->db->limit($limit);
-            $this->db->offset($offset); // Correctamente aplicar el offset
-            $query = $this->db->get();
-            $data = $query->result();
+        $this->db->from($this->table_proveedor . ' as cccdprov');
+        $this->db->where('cccdprov.ID_Cotizacion', $ID_Cotizacion);
+        // Correctamente aplicar el offset
+        $query = $this->db->get();
+        $data = $query->result();
 
-            if (!empty($data)) {
-                $results = array_merge($results, $data);
-                $offset += $limit;
-            } else {
-                break;
-            }
-        } while (true);
-
-        return $results;
+        return $data;
 
     }
     public function guardarTributos($tributos)
@@ -1615,7 +1603,7 @@ class CCotizacionesModel extends CI_Model
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                if ($column =='K') {
+                if ($column == 'K') {
                     $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
                 }
             }
