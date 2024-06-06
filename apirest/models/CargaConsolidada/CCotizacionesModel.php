@@ -919,6 +919,8 @@ return $results;
             //combine cells from C$ROW to e$row
             $objPHPExcel->getActiveSheet()->mergeCells('C' . $row . ':E' . $row);
             $objPHPExcel->getActiveSheet()->mergeCells('G' . $row . ':H' . $row);
+            //center text
+            $objPHPExcel->getActiveSheet()->getStyle('G' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             //SET CURRRENCY FORMAT WITH DOLLAR SYMBOL
 
             $objPHPExcel->getActiveSheet()->mergeCells('K' . $row . ':L' . $row);
