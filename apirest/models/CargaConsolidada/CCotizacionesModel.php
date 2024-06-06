@@ -297,11 +297,10 @@ return $results;
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
-
+        return $query;
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
-
         $query = json_decode(json_encode($query->result()), true);
-        return $objPHPExcel;
+        
 
         $this->db->close();
         $this->db->initialize();
