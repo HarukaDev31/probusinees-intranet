@@ -66,7 +66,8 @@ class CCotizacionesModel extends CI_Model
             SELECT CONCAT('[', GROUP_CONCAT(
                 JSON_OBJECT(
                     'ID_Producto', cccdpro.ID_Producto,
-
+                    'URL_Link', cccdpro.URL_Link,
+                    'URL_Image', cccdpro.URL_Image,
                     'Nombre_Comercial', cccdpro.Nombre_Comercial,
                     'Uso', cccdpro.Uso,
                     'Cantidad', cccdpro.Cantidad,
