@@ -296,7 +296,6 @@ return $results;
      */
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
-        ini_set('memory_limit', '2002M');
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
         $query = json_decode(json_encode($query->result()), true);
@@ -860,8 +859,14 @@ return $results;
             $objPHPExcel->getActiveSheet()->setCellValue('B' . $row, $index + 1);
             //SET FONT BOLD FALSE
             $objPHPExcel->getActiveSheet()->getStyle('B' . $row)->getFont()->setBold(false);
+            //center horizontal
+            $objPHPExcel->getActiveSheet()->getStyle('B' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->setCellValue('C' . $row, $query[$index]["Nombre_Comercial"]);
+            $objPHPExcel->getActiveSheet()->getStyle('C' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
             $objPHPExcel->getActiveSheet()->setCellValue('F' . $row, "='3'!" . $InitialColumn . 10);
+            $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
             $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getFont()->setBold(false);
 
             $objPHPExcel->getActiveSheet()->setCellValue('G' . $row, "='3'!" . $InitialColumn . 8);
