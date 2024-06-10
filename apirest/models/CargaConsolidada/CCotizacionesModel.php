@@ -1082,7 +1082,8 @@ class CCotizacionesModel extends CI_Model
         $this->load->library('zip');
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
-        $data = $this->getMassiveExcelData($objPHPExcel); // Assuming this gets the data for all rows
+        $data = $this->getMassiveExcelData($objPHPExcel); 
+        // Assuming this gets the data for all rows
         // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
         foreach ($data as $key => $value) {
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
@@ -1161,7 +1162,6 @@ class CCotizacionesModel extends CI_Model
         $pesoTotal = 0;
         //first iterate for tributes zone, set values and apply styles to cells
         foreach ($data['cliente']['productos'] as $producto) {
-
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '5', $producto["nombre"]);
             //APLY BACKGROUND COLOR BLUE AND LETTERS WHITE
@@ -1222,6 +1222,7 @@ class CCotizacionesModel extends CI_Model
         $initialRow = 10;
         $tarifaCell = "";
         $tipoTarifa = "";
+        $tarifaValue=0;
         //fill tarifas zone
         foreach ($tarifas as $tarifa) {
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow, $tarifa["limite_inf"]);
@@ -1229,7 +1230,10 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn3 . $initialRow, $tarifa["tarifa"]);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn4 . $initialRow, $tarifa["id_tipo_tarifa"] == 1 ? "Estandar" : "No Estandar");
             //set currency format with dollar symbol
-            if ($cbmTotal >= $tarifa["limite_inf"] && $cbmTotal <= $tarifa["limite_sup"]) {
+            $cbmTotal = round($cbmTotal,2);
+            $limiteInf=round($tarifa["limite_inf"],2);
+            $limiteSup=round($tarifa["limite_sup"],2);
+            if ( $cbmTotal >= $limiteInf && $cbmTotal <= $limiteSup) {
                 $tarifaCell = $TarifasStartColumn3 . $initialRow;
                 $tipoTarifa = $TarifasStartColumn4 . $initialRow;
             }
@@ -1328,16 +1332,22 @@ class CCotizacionesModel extends CI_Model
         $CBMTotal = $InitialColumn . "7";
         $antidumpingSum = 0;
         $InitialColumn = 'C';
+
         //second iteration  for each product and set values and apply styles
         foreach ($data['cliente']['productos'] as $producto) {
             //$INITIALCOLUMN13 =ROUND($VFOBCell/$InitialColumn.'11') TO PERCENTAGE;
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '13', "=" . $InitialColumn . '11/' . $VFOBCell);
             $distroCell = $InitialColumn . '13';
+            // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '25', $tarifaValue);
+
+            // return $objPHPExcel;
+
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '13')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
             //$initialcolumn14=round($FleteCell*$InitialColumn.'13',2)
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '14', "=ROUNDUP(" . $FleteCell . '*' . $InitialColumn . '13,2)');
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '14')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             //$initialcolumn15=roundup( $initialcolumn11+$initialcolumn14,2)
+
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '15', "=ROUNDUP(" . $InitialColumn . '11+' . $InitialColumn . '14,2)');
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '15')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $cfrCell = $InitialColumn . '15';
@@ -1417,6 +1427,7 @@ class CCotizacionesModel extends CI_Model
             $InitialColumn++;
 
         }
+
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', "=" . $CobroCell);
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '11')->getFont()->setBold(true);

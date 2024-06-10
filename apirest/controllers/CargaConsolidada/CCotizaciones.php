@@ -141,7 +141,7 @@ class CCotizaciones extends CI_Controller
                 $this->load->library('PHPExcel');
                 $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
                 $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel);
-
+                
                 // Assuming $zipFilePath is the path to the generated ZIP file
                 if (file_exists($zipFilePath)) {
                     header('Content-Type: application/zip');
