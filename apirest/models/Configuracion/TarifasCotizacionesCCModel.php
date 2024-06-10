@@ -10,7 +10,7 @@ class TarifasCotizacionesCCModel extends CI_Model{
         $this->db->select('*');
         $this->db->from($this->table.' as t');
         $this->db->join($this->table_type_clientes.' as tc','t.id_tipo_cliente=tc.ID_Tipo_Cliente','inner');
-
+        $this->db->where('t.updated_at is null');
         $query = $this->db->get();
         return $query->result();
     }
