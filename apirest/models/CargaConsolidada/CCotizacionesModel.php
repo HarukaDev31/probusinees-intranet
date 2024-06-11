@@ -1078,6 +1078,8 @@ class CCotizacionesModel extends CI_Model
     }
     public function generateMassiveExcelPayrolls($objPHPExcel)
     {
+        //init more memory
+        ini_set('memory_limit', '1024M');
         $this->load->library('PHPExcel');
         $this->load->library('zip');
         // Create a new PHPExcel object
@@ -1552,6 +1554,7 @@ class CCotizacionesModel extends CI_Model
         f as query["Cantidad"] g as query["Valor_Unitario"] i as query["costo_total"]/ $query["Cantidad"]
         j as  query["costo_total"] k as query["Valor_Unitario"]*3.7
          */
+
         $lastRow = 0;
         $InitialColumn = 'C';
         //if count query is lower than 3 get sustract 3- count query and set the value to $substract and for each $substract remove border from row 36 to 39
