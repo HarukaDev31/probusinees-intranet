@@ -1787,7 +1787,6 @@ class CCotizacionesModel extends CI_Model
                 $columnCBM[] = $mergedRange;
             }
         }
-
         // Ordenar los rangos en función del número de fila inicial para cada columna
         usort($columnClientes, function ($a, $b) {
             preg_match('/^A(\d+):A\d+$/', $a, $matchesA);
@@ -1878,9 +1877,7 @@ class CCotizacionesModel extends CI_Model
             $rangeC = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeC);
             $firstCellC = $rangeC[0];
             $valueC = $worksheet->getCell($firstCellC)->getValue();
-            if ($valueC == null) {
-                continue;
-            }
+            
             $mergedRangeD = $columnPhoneClientes[$key];
             $rangeD = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeD);
             $firstCellD = $rangeD[0];
@@ -2051,7 +2048,6 @@ class CCotizacionesModel extends CI_Model
                 ],
             ];
         }
-
         return $clients;
     }
 
