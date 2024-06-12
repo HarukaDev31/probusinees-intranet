@@ -22,7 +22,7 @@
           	  <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control" value="<?php echo $this->router->method; ?>">
 
               <div class="row mb-3 div-Listar">
-                <div class="col-2 col-md-3">
+                <div class="col-6 col-md-3">
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
                     <input type="text" id="txt-Fe_Inicio" class="form-control input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
@@ -30,7 +30,7 @@
                   </div>
                 </div>
 
-                <div class="col-2 col-sm-3">
+                <div class="col-6 col-sm-3">
                   <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
                     <input type="text" id="txt-Fe_Fin" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
@@ -38,11 +38,11 @@
                   </div>
                 </div>
 
-                <div class="col-2 col-sm-3  ">
+                <div class="col-12 col-sm-3  ">
                   <label>&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
-                <div class="col-2 col-sm-3  ">
+                <div class="col-12 col-sm-3  ">
                   <label>&nbsp;</label>
                   <button type="button" id="btn-upload-excel" class="btn btn-primary btn-block btn-reporte" data-toggle="modal" data-target="#modal-upload-excel"><i class="fa fa-upload"></i> Subir Excel</button>
 
@@ -75,9 +75,9 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-$attributes = array('id' => 'form-pedido');
-echo form_open('', $attributes);
-?>
+                  $attributes = array('id' => 'form-pedido');
+                  echo form_open('', $attributes);
+                  ?>
                   <div class="row div-CotizacionHeader">
                     <div class="col-12 col-md-9">
                         <div class="row">
@@ -267,23 +267,23 @@ echo form_open('', $attributes);
             <!--download template button-->
             <input type="file" class="form-control-file" id="file-upload-excel" name="file-upload-excel" accept=".xls,.xlsx">
           </div>
-          <div class="form-group" id="tarifas-container">
-            <div class="row" id="headers">
-              <div class="col-1">
+          <div class="form-group " id="tarifas-container">
+            <div class="row mx-auto w-100" id="headers">
+              <div class="col-3 col-lg-1">
                 <span>Rangos</span>
               </div>
-              <div class="col-3">
-                <span>Nuevo</span>
+              <div class="col-3 text-center">
+                <span >Nuevo</span>
               </div>
-              <div class="col-3">
-                <span>Antiguo</span>
+              <div class="col-3 text-center">
+                <span >Antiguo</span>
               </div>
-              <div class="col-3">
-                <span>Socio</span>
+              <div class="col-3 text-center">
+                <span >Socio</span>
               </div>
             </div>
             <div class="row" id="tarifas-1">
-              <div class="col-1">
+              <div class="col-3 col-lg-1">
                 <span>0-0.59</span>
               </div>
               <div class="col-3">
@@ -306,7 +306,7 @@ echo form_open('', $attributes);
               </div>
             </div>
             <div class="row" id="tarifas-2">
-              <div class="col-1">
+              <div class="col-3 col-lg-1">
                 <span>0.6-1.09</span>
               </div>
               <div class="col-3">
@@ -328,7 +328,7 @@ echo form_open('', $attributes);
             </div>
 
             <div class="row" id="tarifas-3">
-              <div class="col-1">
+              <div class="col-3 col-lg-1">
                 <span>1.10-2.09</span>
               </div>
               <div class="col-3">
@@ -351,7 +351,7 @@ echo form_open('', $attributes);
               </div>
             </div>
             <div class="row" id="tarifas-4">
-              <div class="col-1">
+              <div class="col-3 col-lg-1">
                 <span>2.1-3.09</span>
               </div>
               <div class="col-3">
@@ -372,7 +372,7 @@ echo form_open('', $attributes);
               </div>
             </div>
             <div class="row" id="tarifas-5">
-              <div class="col-1">
+              <div class="col-3 col-lg-1">
                 <span>3.1-4.09</span>
               </div>
               <div class="col-3">
@@ -393,7 +393,7 @@ echo form_open('', $attributes);
               </div>
             </div>
             <div class="row" id="tarifas-5">
-              <div class="col-1">
+              <div class="col-3 col-lg-1">
                 <span>+4.1</span>
               </div>
               <div class="col-3">
