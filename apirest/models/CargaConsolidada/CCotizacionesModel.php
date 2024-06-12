@@ -1192,7 +1192,7 @@ class CCotizacionesModel extends CI_Model
         }
         $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
         //get tarifas from db
-        $tipoCliente = $data['cliente']["tipo"];
+        $tipoCliente =trim($data['cliente']["tipo"]);
         //SET CURRENT SHEET TO TITLE TO $tipoCliente
         $tarifas = $this->db->select('*')
             ->from($this->table_tarifas . ' as tt')
@@ -1334,7 +1334,6 @@ class CCotizacionesModel extends CI_Model
         $CBMTotal = $InitialColumn . "7";
         $antidumpingSum = 0;
         $InitialColumn = 'C';
-        return $objPHPExcel;
 
         //second iteration  for each product and set values and apply styles
         foreach ($data['cliente']['productos'] as $producto) {
