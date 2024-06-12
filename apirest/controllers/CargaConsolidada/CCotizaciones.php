@@ -48,7 +48,7 @@ class CCotizaciones extends CI_Controller
 
             $rows = array();
             $rows[] = $row->CotizacionCode;
-           //fe_Creation to unix timestamp
+            //fe_Creation to unix timestamp
             $rows[] = strtotime($row->Fe_Creacion);
             $rows[] = ToDateBD($row->Fe_Creacion);
             $rows[] = $row->N_Cliente;
@@ -56,7 +56,9 @@ class CCotizaciones extends CI_Controller
             $rows[] = $row->Empresa;
             $rows[] = $select;
             $rows[] = '<div>
-            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-excel fa-2x" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
+            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-excel fa-2x text-success" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
+                        <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf(' . $row->ID_Cotizacion . ')"></i></button>
+
             </div>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
             //select with options pendiente,cotizado,confirmado
@@ -102,8 +104,9 @@ class CCotizaciones extends CI_Controller
         $cotizacion = json_decode($postData, true);
         echo json_encode($this->CCotizacionesModel->guardarCotizacion($cotizacion));
     }
-    public function getExcelData(){
-        $data=null;
+    public function getExcelData()
+    {
+        $data = null;
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
             // Get the uploaded file
             $fileTmpPath = $_FILES['file']['tmp_name'];
@@ -119,7 +122,7 @@ class CCotizaciones extends CI_Controller
                 //convert this excel to phpoject
                 $this->load->library('PHPExcel');
                 $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
-                $data=$this->CCotizacionesModel->getMassiveExcelData($objPHPExcel);
+                $data = $this->CCotizacionesModel->getMassiveExcelData($objPHPExcel);
             }
         }
 
@@ -128,7 +131,7 @@ class CCotizaciones extends CI_Controller
     public function uploadExcelMassive()
     {
         //get tarifas from post
-        $tarifas= $_POST['tarifas'];
+        $tarifas = $_POST['tarifas'];
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
             // Get the uploaded file
             $fileTmpPath = $_FILES['file']['tmp_name'];
@@ -144,7 +147,7 @@ class CCotizaciones extends CI_Controller
                 //convert this excel to phpoject
                 $this->load->library('PHPExcel');
                 $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
-                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel,$tarifas);
+                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel, $tarifas);
                 // Assuming $zipFilePath is the path to the generated ZIP file
                 if (file_exists($zipFilePath)) {
                     header('Content-Type: application/zip');
@@ -163,7 +166,7 @@ class CCotizaciones extends CI_Controller
         } else {
             echo "Error: " . $_FILES['file']['error'];
         }
-    
+
     }
     public function descargarExcel()
     {
@@ -191,21 +194,44 @@ class CCotizaciones extends CI_Controller
         exit(); //
     }public function descargarBoleta()
     {
+        try {
+            $postData = file_get_contents('php://input');
+            $cotizacion = json_decode($postData, true);
+            $C_Cotizacion = $cotizacion['C_Cotizacion'];
+            // Cargar el archivo de plantilla Excel
+            $templatePath = 'assets/downloads/Boleta_Template.xlsx';
+            $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
+            $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
+            //get only first sheet
+            $objPHPExcel->setActiveSheetIndex(0);
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'HTML');
+            $htmlFilePath = 'assets/downloads/temp.html';
+            $objWriter->save($htmlFilePath);    
+            $htmlContent = file_get_contents($htmlFilePath);
+            
+            $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-        $postData = file_get_contents('php://input');
-        $cotizacion = json_decode($postData, true);
-        $C_Cotizacion = $cotizacion['C_Cotizacion'];
-        // Cargar el archivo de plantilla Excel
-        $templatePath = 'assets/downloads/Boleta_Template.xlsx';
-        $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-        $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="Cotizacion' . $C_Cotizacion . '.xlsx"');
-        header('Cache-Control: max-age=0');
+            // Configurar márgenes
+            $pdf->SetMargins(0, 0, 0); // Márgenes izquierdo, superior, derecho
+            $pdf->SetHeaderMargin(0); // Margen superior del encabezado
+            $pdf->SetFooterMargin(0);
+            $pdf->SetAutoPageBreak(TRUE, 10);
 
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        $objWriter->save('php://output');
-        exit();
+
+            // Añadir una página
+            $pdf->AddPage();
+
+            // Escribir el contenido HTML en el PDF
+            $pdf->writeHTML($htmlContent, true, false, true, false, '');
+            //remove    html file
+            unlink($htmlFilePath);
+
+    
+            //devolver el pdf
+            $pdf->Output('Cotizacion' . $C_Cotizacion . '.pdf', 'I');
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
 
     }
 

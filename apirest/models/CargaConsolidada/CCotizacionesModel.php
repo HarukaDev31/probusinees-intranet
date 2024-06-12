@@ -1065,10 +1065,9 @@ class CCotizacionesModel extends CI_Model
         //SET COLUMN I AUTO SIZE
         $objPHPExcel->getActiveSheet()->getColumnDimension("I")->setAutoSize(true);
 
-        $objPHPExcel->getActiveSheet()->setCellValue('K10', $query[0]["count_proveedores"]);
-        $objPHPExcel->getActiveSheet()->setCellValue('J10', "");
+        $objPHPExcel->getActiveSheet()->setCellValue('J10', $query[0]["count_proveedores"]);
         //APPPLY NUMBER FORMAT TO K10
-        $objPHPExcel->getActiveSheet()->getStyle('K10')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
+        $objPHPExcel->getActiveSheet()->getStyle('J10')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
         $objPHPExcel->getActiveSheet()->setCellValue('L10', "");
 
         $objPHPExcel->getActiveSheet()->setCellValue('F11', $query[0]["tipo_cliente"]);

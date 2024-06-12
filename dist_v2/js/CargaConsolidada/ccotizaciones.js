@@ -1067,26 +1067,41 @@ const descargarReporte = async(ID_Cotizacion, C_Cotizacion) => {
     },
   });
 };
-const descargarBoletaPDF = (ID_Cotizacion) => {
+const descargarBoletaPDF = (ID_Cotizacion,C_Cotizacion) => {
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/descargarBoleta",
     type: "POST",
     xhrFields: {
       responseType: "blob",
     },
-    data: JSON.stringify({ ID_Cotizacion: ID_Cotizacion }),
+    data: JSON.stringify({ ID_Cotizacion: ID_Cotizacion ,
+      C_Cotizacion: C_Cotizacion
+    }),
     success: function (response) {
       var blob = new Blob([response], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        type: "application/pdf",  
       });
-      //return excel file converted to pdf
-      convertirExcelAPDF(blob);
+      var link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      const currentDate = new Date();
+      //format date to dd_mm_yyyy
+      const formattedDate = `${currentDate.getDate()}_${
+        currentDate.getMonth() + 1
+      }_${currentDate.getFullYear()}`;
+      link.download = "Boleta_" + formattedDate + ".pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      
     },
     error: function (errorThrown) {
       console.error("Error al descargar el archivo Excel: " + errorThrown);
     },
   });
 };
+// descargarBoletaPDF(62,62);
+
 const convertirExcelAPDF = (excelBlob) => {
   const reader = new FileReader();
   reader.onload = function (event) {
