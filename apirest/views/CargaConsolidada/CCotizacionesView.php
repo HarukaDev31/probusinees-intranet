@@ -137,7 +137,9 @@
               </div>
               <div id="div-footer">
                 <!-- <button type="button" class="btn btn-success" onclick="guardaryCambiarEstado()">Marcar Como Cotizado</button> -->
-                <button id="button-save"  type="button" class="btn btn-primary"  onclick="guardarCotizacion()">Guardar </button>
+                <button id="button-save"  type="button" class="btn btn-primary"  onclick="guardarYSalir()">Guardar y Salir </button>
+                <button id="button-save-excel"  type="button" class="btn btn-success"  onclick="guardarCotizacionYDescargar()">Guardar y Generar Excel </button>
+
               </div>
             </div>
           </div>

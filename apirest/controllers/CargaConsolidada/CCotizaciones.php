@@ -58,7 +58,7 @@ class CCotizaciones extends CI_Controller
             $rows[] = '<div>
             <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-excel fa-2x" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
             </div>';
-            $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(\'' . $row->ID_Cotizacion . '\')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
+            $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
             //select with options pendiente,cotizado,confirmado
             $rows[] = '<select class="form-control" id="selectEstado" name="selectEstado" onchange="updateEstadoCotizacion(this,' . $row->ID_Cotizacion . ')">
             <option value="1" ' . ($row->Cotizacion_Status_ID == 1 ? 'selected' : '') . '>Pendiente</option>
@@ -178,7 +178,6 @@ class CCotizaciones extends CI_Controller
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-
         $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
         // // Add some data to the sheet
 

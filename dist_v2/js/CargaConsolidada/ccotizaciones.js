@@ -2,8 +2,21 @@ var url;
 const { jsPDF } = window.jspdf;
 $(function () {
   $("#button-save").hide();
-  $("#loading-spinner").hide();
+  $("#button-save-excel").hide();
 
+  $("#loading-spinner").hide();
+  jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+    "date-dd-mm-yyyy-pre": function (date) {
+      var dateParts = date.split("/");
+      return (dateParts[2] + dateParts[1] + dateParts[0]) * 1;
+    },
+    "date-dd-mm-yyyy-asc": function (a, b) {
+      return a < b ? -1 : a > b ? 1 : 0;
+    },
+    "date-dd-mm-yyyy-desc": function (a, b) {
+      return a < b ? 1 : a > b ? -1 : 0;
+    },
+  });
   url = base_url + "CargaConsolidada/CCotizaciones/ajax_list";
   table_Entidad = $("#table-CCotizaciones").DataTable({
     dom:
@@ -61,7 +74,7 @@ $(function () {
       },
     },
     order: [
-      [1, "desc"],
+      [2, "desc"],
       [10, "asc"],
     ],
     ajax: {
@@ -69,7 +82,6 @@ $(function () {
       type: "POST",
       dataType: "json",
       data: function (data) {
-        console.log(data);
       },
     },
     columnDefs: [
@@ -80,6 +92,12 @@ $(function () {
       {
         targets: [1, 10], // Target the 10th (index 9) column
         visible: false, // Hide this column
+      },
+      {
+        targets: [2], // Target the 10th (index 9) column
+        visible: true, // Hide this column
+        type: 'date-dd-mm-yyyy', 
+        orderable: true
       },
       {
         className: "text-center",
@@ -93,11 +111,13 @@ $(function () {
     ],
   });
 });
-function verCotizacion(ID) {
+function verCotizacion(ID, CID) {
   CotizacionID = ID;
+  CCotizacion = CID;
   $(".div-Listar").hide();
   $(".div-AgregarEditar").show();
   $("#button-save").show();
+  $("#button-save-excel").show();
   urlCabecera =
     base_url + "CargaConsolidada/CCotizaciones/ajax_edit_header/" + ID;
   $.ajax({
@@ -356,6 +376,7 @@ var productoID = null;
 var newProveedores = [];
 var newProveedor = null;
 var CotizacionID = null;
+var CCotizacion = null;
 var newProducto = null;
 var deletedProveedores = [];
 var deletedProductos = [];
@@ -392,13 +413,6 @@ const agregarProducto = (ID_Proveedor, index) => {
   //productIndex if length of divs with both class producto-index and proveedor-index
   const productoIndex = $(`.producto-${index}.proveedor-${index}`).length;
 
-  console.log(
-    "Agregar Producto",
-    "Proveedor",
-    index,
-    "Producto",
-    productoIndex
-  );
   $(`.proveedor-${index}-productos`).append(
     getProductoTemplate(index, productoIndex, -1)
   );
@@ -627,9 +641,22 @@ $("#exampleModal").on("show.bs.modal", function (event) {
     },
   });
 });
-const guardarCotizacion = () => {
-  const cotizacion = [];
+const guardarCotizacionYDescargar =async () => {
+  await guardarCotizacion();
+  await descargarReporte(CotizacionID, CCotizacion);
+};
+const guardarYSalir = async() => {
+  await guardarCotizacion();
 
+  $(".div-Listar").show();
+  $(".div-CotizacionBody").html("");
+  $(".div-AgregarEditar").hide();
+  table_Entidad.ajax.reload();
+  $("#button-save").hide();
+  $("#button-save-excel").hide();
+};
+const guardarCotizacion = async () => {
+  const cotizacion = [];
   const proveedores = $(".proveedor");
   for (let i = 0; i < proveedores.length; i++) {
     var CBM_Total = $(proveedores[i])
@@ -739,17 +766,17 @@ const guardarCotizacion = () => {
     success: function (response) {
       //remove preloader
       $(".preloader").remove();
-      $(".div-Listar").show();
-      $(".div-CotizacionBody").html("");
-      $(".div-AgregarEditar").hide();
-      table_Entidad.ajax.reload();
+      // $(".div-Listar").show();
+      // $(".div-CotizacionBody").html("");
+      // $(".div-AgregarEditar").hide();
+      // table_Entidad.ajax.reload();
       newProveedor = null;
       newProducto = null;
       newProductos = [];
       newProveedores = [];
       deletedProveedores = [];
       deletedProductos = [];
-      $("#button-save").hide();
+      // $("#button-save").hide();
       //set button revisar to ver
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -760,7 +787,7 @@ const guardarCotizacion = () => {
       newProveedores = [];
       deletedProveedores = [];
       deletedProductos = [];
-      $("#button-save").hide();
+      // $("#button-save").hide();
     },
   });
 };
@@ -1007,7 +1034,7 @@ const uploadExcel = () => {
     },
   });
 };
-const descargarReporte = (ID_Cotizacion, C_Cotizacion) => {
+const descargarReporte = async(ID_Cotizacion, C_Cotizacion) => {
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/descargarExcel",
     type: "POST",

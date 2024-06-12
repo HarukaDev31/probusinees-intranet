@@ -285,7 +285,9 @@ class CCotizacionesModel extends CI_Model
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
+
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
+
         $query = json_decode(json_encode($query->result()), true);
 
         $this->db->close();
@@ -368,6 +370,7 @@ class CCotizacionesModel extends CI_Model
             $totalRows++;
 
         }
+
         $ID_Tipo_Cliente = $query[0]["ID_Tipo_Cliente"];
 
         $tarifas = $this->db->select('*')
@@ -416,6 +419,7 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn3 . $initialRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $initialRow++;
         }
+
         //from $TarifasStartColumn8 to $TarifasStartColumn4 15 apply all borders
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . '8:' . $TarifasStartColumn4 . ($initialRow - 1))->applyFromArray($borders);
 
@@ -581,6 +585,7 @@ class CCotizacionesModel extends CI_Model
             $totalRows++;
 
         }
+
         //g7 =cobrocELL
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', "=" . $CobroCell);
 
@@ -690,6 +695,7 @@ class CCotizacionesModel extends CI_Model
             $InitialColumn++;
 
         }
+
         //apply borders to b26 to initialColumn26
         $objPHPExcel->getActiveSheet()->getStyle('B26:' . $InitialColumn . '26')->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle('C27:' . $InitialColumn . '27')->applyFromArray($borders);
@@ -823,6 +829,7 @@ class CCotizacionesModel extends CI_Model
 
             }
         }
+
         //set column j y k autosize
         $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
