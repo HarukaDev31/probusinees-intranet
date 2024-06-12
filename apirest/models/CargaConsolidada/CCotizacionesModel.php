@@ -1334,7 +1334,7 @@ class CCotizacionesModel extends CI_Model
         $CBMTotal = $InitialColumn . "7";
         $antidumpingSum = 0;
         $InitialColumn = 'C';
-
+        return $objPHPExcel;
         //second iteration  for each product and set values and apply styles
         foreach ($data['cliente']['productos'] as $producto) {
             //$INITIALCOLUMN13 =ROUND($VFOBCell/$InitialColumn.'11') TO PERCENTAGE;
