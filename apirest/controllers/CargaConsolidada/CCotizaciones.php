@@ -125,6 +125,8 @@ class CCotizaciones extends CI_Controller
     }
     public function uploadExcelMassive()
     {
+        //get tarifas from post
+        $tarifas= $_POST['tarifas'];
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
             // Get the uploaded file
             $fileTmpPath = $_FILES['file']['tmp_name'];
@@ -140,8 +142,7 @@ class CCotizaciones extends CI_Controller
                 //convert this excel to phpoject
                 $this->load->library('PHPExcel');
                 $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
-                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel);
-
+                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel,$tarifas);
                 // Assuming $zipFilePath is the path to the generated ZIP file
                 if (file_exists($zipFilePath)) {
                     header('Content-Type: application/zip');
@@ -193,7 +194,7 @@ class CCotizaciones extends CI_Controller
         $postData = file_get_contents('php://input');
         $cotizacion = json_decode($postData, true);
         $C_Cotizacion = $cotizacion['C_Cotizacion'];
-// Cargar el archivo de plantilla Excel
+        // Cargar el archivo de plantilla Excel
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
         $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
@@ -223,5 +224,9 @@ class CCotizaciones extends CI_Controller
         $postData = file_get_contents('php://input');
         $data = json_decode($postData, true);
         echo json_encode($this->CCotizacionesModel->updateEstadoCotizacion($data));
+    }
+    public function getTarifas()
+    {
+        echo json_encode($this->CCotizacionesModel->getTarifas());
     }
 }

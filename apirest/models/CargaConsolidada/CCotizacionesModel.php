@@ -1076,7 +1076,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setTitle('2');
         return $objPHPExcel;
     }
-    public function generateMassiveExcelPayrolls($objPHPExcel)
+    public function generateMassiveExcelPayrolls($objPHPExcel,$tarifas)
     {
         //init more memory
         ini_set('memory_limit', '1024M');
@@ -1087,9 +1087,10 @@ class CCotizacionesModel extends CI_Model
         $data = $this->getMassiveExcelData($objPHPExcel); 
         // Assuming this gets the data for all rows
         // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
+      
         foreach ($data as $key => $value) {
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value);
+            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value,$tarifas);
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $excelFileName = 'Boleta_' . $value['cliente']['nombre'] . '.xlsx';
             $excelFilePath = 'assets/downloads/' . $excelFileName;
@@ -1105,7 +1106,7 @@ class CCotizacionesModel extends CI_Model
         return $zipFilePath;
     }
 
-    public function getFinalCotizacionExcel($objPHPExcel, $data)
+    public function getFinalCotizacionExcel($objPHPExcel, $data,$tarifas)
     {
         $newSheet = $objPHPExcel->createSheet();
         $newSheet->setTitle('3');
@@ -1194,16 +1195,18 @@ class CCotizacionesModel extends CI_Model
         //get tarifas from db
         $tipoCliente =trim($data['cliente']["tipo"]);
         //SET CURRENT SHEET TO TITLE TO $tipoCliente
-        $tarifas = $this->db->select('*')
-            ->from($this->table_tarifas . ' as tt')
-            ->join($this->table_tipo_cliente . ' as tc', 'tc.ID_Tipo_Cliente = tt.id_tipo_cliente', 'join')
-            ->where('UPPER(tc.Nombre)', $tipoCliente)
-            ->where('tt.updated_at IS NULL')
-            ->order_by('tt.limite_inf', 'ASC')
-            ->get()
-            ->result_array();
-        //set tarifas zone
-        $tarifas = json_decode(json_encode($tarifas), true);
+        
+        $tarifas = json_decode($tarifas, true);
+        //filter tarifas if tipoCliente is NUEVO then filter by id_tipo_cliente=1 els if tipoCliente is ANTIGUO filter by id_tipo_cliente=2 
+        $tarifas = array_filter($tarifas, function ($tarifa) use ($tipoCliente) {
+            if ($tipoCliente == "NUEVO") {
+                return $tarifa["id_tipo_cliente"] == 1;
+            } else if($tipoCliente == "ANTIGUO") {
+                return $tarifa["id_tipo_cliente"] == 2;
+            }else if($tipoCliente == "SOCIO"){
+                return $tarifa["id_tipo_cliente"] == 3;
+            }
+        });
         $TarifasStartColumn = chr(ord($InitialColumn) + 5);
         $TarifasStartColumn2 = chr(ord($InitialColumn) + 6);
         $TarifasStartColumn3 = chr(ord($InitialColumn) + 7);
@@ -2085,5 +2088,15 @@ class CCotizacionesModel extends CI_Model
         $this->db->update($this->table, array("Cotizacion_Status_ID" => $Estado));
 
         return array("success" => true);
+    }
+    public function getTarifas(){
+        $this->db->select('ID_Tarifa, ID_Tipo_Cliente,tarifa,ID_Tipo_Tarifa');
+        $this->db->from($this->table_tarifas);
+        //join with table tipo cliente        
+        $this->db->where('updated_at is null');
+        //order by ID_Tipo_Cliente id_tipo_cliente, limite_inf
+        $this->db->order_by('ID_Tipo_Cliente, limite_inf');
+        $query = $this->db->get();
+        return $query->result();
     }
 }

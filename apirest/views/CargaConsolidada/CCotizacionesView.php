@@ -45,7 +45,7 @@
                 <div class="col-2 col-sm-3  ">
                   <label>&nbsp;</label>
                   <button type="button" id="btn-upload-excel" class="btn btn-primary btn-block btn-reporte" data-toggle="modal" data-target="#modal-upload-excel"><i class="fa fa-upload"></i> Subir Excel</button>
-                  
+
                 </div>
 
 
@@ -75,9 +75,9 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-              $attributes = array('id' => 'form-pedido');
-              echo form_open('', $attributes);
-              ?>
+$attributes = array('id' => 'form-pedido');
+echo form_open('', $attributes);
+?>
                   <div class="row div-CotizacionHeader">
                     <div class="col-12 col-md-9">
                         <div class="row">
@@ -247,7 +247,7 @@
 </div>
 <!-- Modal  with input file and button upload-->
 <div class="modal fade" id="modal-upload-excel" tabindex="-1" role="dialog" aria-labelledby="modal-upload-excel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title mr-1" id="modal-upload-excel">Subir Cotizacion Final</h5>
@@ -267,12 +267,159 @@
             <!--download template button-->
             <input type="file" class="form-control-file" id="file-upload-excel" name="file-upload-excel" accept=".xls,.xlsx">
           </div>
+          <div class="form-group" id="tarifas-container">
+            <div class="row" id="headers">
+              <div class="col-1">
+                <span>Rangos</span>
+              </div>
+              <div class="col-3">
+                <span>Nuevo</span>
+              </div>
+              <div class="col-3">
+                <span>Antiguo</span>
+              </div>
+              <div class="col-3">
+                <span>Socio</span>
+              </div>
+            </div>
+            <div class="row" id="tarifas-1">
+              <div class="col-1">
+                <span>0-0.59</span>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-nuevo" id="tarifa-nuevo-1" name="nuevo-1" value="0">
+                <div class="text-danger d-none" id="error-tarifa-nuevo-1" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-antiguo" id="tarifa-antiguo-1" name="antiguo-1" value="0">
+                <div class="text-danger d-none" id="error-tarifa-antiguo-1" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-socio" id="tarifa-socio-1" name="socio-1" value="0">
+                <div class="text-danger d-none" id="error-tarifa-socio-1" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+            </div>
+            <div class="row" id="tarifas-2">
+              <div class="col-1">
+                <span>0.6-1.09</span>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-nuevo" id="tarifa-nuevo-2" name="nuevo-2" value="0">
+                <div class="text-danger d-none" id="error-tarifa-nuevo-2" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-antiguo" id="tarifa-antiguo-2" name="antiguo-2" value="0">
+                <div class="text-danger d-none" id="error-tarifa-antiguo-2" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-socio-fake-1" name="socio-1" value="0" disabled>
+
+              </div>
+            </div>
+
+            <div class="row" id="tarifas-3">
+              <div class="col-1">
+                <span>1.10-2.09</span>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-nuevo" id="tarifa-nuevo-3" name="nuevo-3" value="0">
+                <div class="text-danger d-none" id="error-tarifa-nuevo-3" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-antiguo" id="tarifa-antiguo-3" name="antiguo-3" value="0">
+                <div class="text-danger d-none" id="error-tarifa-antiguo-3" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-socio" id="tarifa-socio-2" name="socio-3" value="0" >
+                <div class="text-danger d-none" id="error-tarifa-socio-2" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+            </div>
+            <div class="row" id="tarifas-4">
+              <div class="col-1">
+                <span>2.1-3.09</span>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-nuevo" id="tarifa-nuevo-4" name="nuevo-4" value="0">
+                <div class="text-danger d-none" id="error-tarifa-nuevo-4" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-antiguo" id="tarifa-antiguo-4" name="antiguo-4" value="0">
+                <div class="text-danger d-none" id="error-tarifa-antiguo-4" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-socio-fake-2" name="socio-3" value="0" disabled>
+          
+              </div>
+            </div>
+            <div class="row" id="tarifas-5">
+              <div class="col-1">
+                <span>3.1-4.09</span>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-nuevo" id="tarifa-nuevo-5" name="nuevo-5" value="0">
+                <div class="text-danger d-none" id="error-tarifa-nuevo-5" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-antiguo" id="tarifa-antiguo-5" name="antiguo-5" value="0">
+                <div class="text-danger d-none" id="error-tarifa-antiguo-5" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-socio-fake-2"  name="socio-3" value="0" disabled>
+
+              </div>
+            </div>
+            <div class="row" id="tarifas-5">
+              <div class="col-1">
+                <span>+4.1</span>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-nuevo" id="tarifa-nuevo-6" name="nuevo-6" value="0">
+                <div class="text-danger d-none" id="error-tarifa-nuevo-6" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-antiguo" id="tarifa-antiguo-6" name="antiguo-6" value="0">
+                <div class="text-danger d-none" id="error-tarifa-antiguo-6" >
+                  Debe ser mayor a 0
+                </div>
+              </div>
+              <div class="col-3">
+                <input type="number" min="0" class="form-control tarifa-socio-fake-2"  name="socio-3" value="0" disabled>
+              
+              </div>
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" onclick="uploadExcel()" class="btn btn-primary">Subir</button>
-      </div>  
+      </div>
     </div>
-  </div>  
+  </div>
 </div>
 

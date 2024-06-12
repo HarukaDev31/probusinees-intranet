@@ -482,6 +482,51 @@ const guardarTributos = (button) => {
 };
 let currentButton = null;
 
+$("#modal-upload-excel").on("show.bs.modal", function (event) {
+  url = base_url + "CargaConsolidada/CCotizaciones/getTarifas";
+
+  $.ajax({
+    url: url,
+    type: "GET",
+    dataType: "JSON",
+    success: function (response) {
+      let indexNuevo = 1;
+      let indexAntiguo = 1;
+      let indexSocio = 1;
+      response.forEach((element) => {
+        if (element.ID_Tipo_Cliente == 1) {
+          $(`#tarifa-antiguo-${indexAntiguo}`).val(element.tarifa);
+          indexAntiguo++;
+        } else if (element.ID_Tipo_Cliente == 2) {
+          $(`#tarifa-nuevo-${indexNuevo}`).val(element.tarifa);
+          indexNuevo++;
+        } else if (element.ID_Tipo_Cliente == 3) {
+          const tarifaSocio = $(`#tarifa-socio-${indexSocio}`);
+          tarifaSocio.val(element.tarifa);
+          const tarifasSocio = $(`.tarifa-socio-fake-${indexSocio}`);
+
+          //add event listener to change the value of fake inputs
+          tarifaSocio.on("input change", (event) => {
+            tarifasSocio.each((index, element) => {
+              $(element).val($(event.target).val());
+            });
+          });
+          
+          //add event listener on change and all tarifa-socio-fake-indexSocio to change to the same value
+          if (tarifasSocio.length > 0) {
+            tarifasSocio.each((index, element) => {
+              $(element).val($(`#tarifa-socio-${indexSocio}`).val());
+            });
+          }
+          indexSocio++;
+        }
+      });
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR);
+    },
+  });
+});
 $("#exampleModal").on("show.bs.modal", function (event) {
   var button = $(event.relatedTarget);
   currentButton = button;
@@ -726,6 +771,8 @@ const getData = () => {
   // Create form data
   const formData = new FormData();
   formData.append("file", file);
+  //get tarifas
+
   //send file to server
   $("#modal-upload-excel").modal("hide");
 
@@ -761,6 +808,164 @@ const uploadExcel = () => {
   // Create form data
   const formData = new FormData();
   formData.append("file", file);
+  const tarifas = [];
+  const tarifasAntiguo = [];
+  const tarifasNuevo = [];
+  const tarifasSocio = [];
+  const tarifasAntiguoInputs = $(".tarifa-antiguo");
+  const tarifasNuevoInputs = $(".tarifa-nuevo");
+  const tarifasSocioInputs = $(".tarifa-socio");
+  let limitesAntiguo = [
+    {
+      inf: 0,
+      sup: 0.59,
+      id_tipo_tarifa: 1,
+    },
+    {
+      inf: 0.6,
+      sup: 1.09,
+      id_tipo_tarifa: 1,
+    },
+
+    {
+      inf: 1.1,
+      sup: 2.09,
+      id_tipo_tarifa: 2,
+    },
+    {
+      inf: 2.1,
+      sup: 3.09,
+      id_tipo_tarifa: 2,
+    },
+    {
+      inf: 3.1,
+      sup: 4.09,
+      id_tipo_tarifa: 2,
+    },
+    {
+      inf: 4.1,
+      sup: 999999,
+      id_tipo_tarifa: 2,
+    },
+  ];
+  let limitesNuevo = [
+    {
+      inf: 0,
+      sup: 0.59,
+      id_tipo_tarifa: 1,
+    },
+    {
+      inf: 0.6,
+      sup: 1.09,
+      id_tipo_tarifa: 1,
+    },
+
+    {
+      inf: 1.1,
+      sup: 2.09,
+      id_tipo_tarifa: 2,
+    },
+    {
+      inf: 2.1,
+      sup: 3.09,
+      id_tipo_tarifa: 2,
+    },
+    {
+      inf: 3.1,
+      sup: 4.09,
+      id_tipo_tarifa: 2,
+    },
+    {
+      inf: 4.1,
+      sup: 999999,
+      id_tipo_tarifa: 2,
+    },
+  ];
+  let limitesSocio = [
+    {
+      inf: 0,
+      sup: 1.09,
+      id_tipo_tarifa: 1,
+    },
+    {
+      inf: 1.1,
+      sup: 9999999,
+      id_tipo_tarifa: 2,
+    },
+    
+  ];
+  let hasError = false;
+  for (let i = 0; i < tarifasAntiguoInputs.length; i++) {
+    //if not a number and not more than 0
+    if (
+      isNaN($(tarifasAntiguoInputs[i]).val()) ||
+      $(tarifasAntiguoInputs[i]).val() < 0
+    ) {
+      hasError = true;
+      const inputError = $(`#error-tarifa-antiguo-${i + 1}`);
+      inputError.removeClass("d-none");
+    } else {
+      const inputError = $(`#error-tarifa-antiguo-${i + 1}`);
+      inputError.addClass("d-none");
+    }
+    if (
+      
+      isNaN($(tarifasNuevoInputs[i]).val()) ||
+      $(tarifasNuevoInputs[i]).val() < 0
+    ) {
+      hasError = true;
+      const inputError = $(`#error-tarifa-nuevo-${i + 1}`);
+      inputError.removeClass("d-none");
+    } else {
+      const inputError = $(`#error-tarifa-nuevo-${i + 1}`);
+      inputError.addClass("d-none");
+    }
+    if (
+      tarifasSocioInputs.length > i &&(
+      isNaN($(tarifasSocioInputs[i]).val()) ||
+      $(tarifasSocioInputs[i]).val() < 0)
+    ) {
+      console.log("Error");
+      hasError = true;
+      const inputError = $(`#error-tarifa-socio-${i + 1}`);
+      inputError.removeClass("d-none");
+    } else {
+      const inputError = $(`#error-tarifa-socio-${i + 1}`);
+      inputError.addClass("d-none");
+    }
+
+    tarifasAntiguo.push({
+      id_tipo_cliente: 2,
+      tarifa: $(tarifasAntiguoInputs[i]).val(),
+      limite_inf: limitesAntiguo[i].inf,
+      limite_sup: limitesAntiguo[i].sup,
+      id_tipo_tarifa: limitesAntiguo[i].id_tipo_tarifa,
+    });
+    tarifasNuevo.push({
+      id_tipo_cliente: 1,
+      tarifa: $(tarifasNuevoInputs[i]).val(),
+      limite_inf: limitesNuevo[i].inf,
+      limite_sup: limitesNuevo[i].sup,
+      id_tipo_tarifa: limitesNuevo[i].id_tipo_tarifa,
+    });
+    if(tarifasSocioInputs.length > i){
+      tarifasSocio.push({
+        id_tipo_cliente: 3,
+        tarifa: $(tarifasSocioInputs[i]).val(),
+        limite_inf: limitesSocio[i].inf,
+        limite_sup: limitesSocio[i].sup,
+        id_tipo_tarifa: limitesSocio[i].id_tipo_tarifa,
+      });
+    }
+  }
+  if (hasError) {
+    return;
+  }
+  tarifas.push(...tarifasAntiguo);
+  tarifas.push(...tarifasNuevo);
+  tarifas.push(...tarifasSocio);
+
+  formData.append("tarifas", JSON.stringify(tarifas));
   //send file to server
   $("#modal-upload-excel").modal("hide");
 
