@@ -60,6 +60,7 @@
                   <thead class="thead-light">
                     <tr>
                       <th>N° Pedido</th>
+                      <th>Fecha Unix</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Telefono</th>
@@ -68,6 +69,7 @@
                       <th>Descargar</th>
                       <th>Ver</th>
                       <th>Estado</th>
+                      <th>Estado_ID</th>
                     </tr>
                   </thead>
                 </table>

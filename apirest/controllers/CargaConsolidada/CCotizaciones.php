@@ -48,6 +48,8 @@ class CCotizaciones extends CI_Controller
 
             $rows = array();
             $rows[] = $row->CotizacionCode;
+           //fe_Creation to unix timestamp
+            $rows[] = strtotime($row->Fe_Creacion);
             $rows[] = ToDateBD($row->Fe_Creacion);
             $rows[] = $row->N_Cliente;
             $rows[] = $row->Telefono;
@@ -63,7 +65,7 @@ class CCotizaciones extends CI_Controller
             <option value="2" ' . ($row->Cotizacion_Status_ID == 2 ? 'selected' : '') . '>Cotizado</option>
             <option value="3" ' . ($row->Cotizacion_Status_ID == 3 ? 'selected' : '') . '>Confirmado</option>
             </select>';
-            $rows[] = $row->ID_Tipo_Cliente;
+            $rows[] = $row->Cotizacion_Status_ID;
             $data[] = $rows;
         }
         $output = array(

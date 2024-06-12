@@ -60,7 +60,10 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [[0, "desc"]],
+    order: [
+      [1, "desc"],
+      [10, "asc"],
+    ],
     ajax: {
       url: url,
       type: "POST",
@@ -73,6 +76,10 @@ $(function () {
       {
         targets: "no-hidden",
         orderable: false,
+      },
+      {
+        targets: [1, 10], // Target the 10th (index 9) column
+        visible: false, // Hide this column
       },
       {
         className: "text-center",
@@ -511,7 +518,7 @@ $("#modal-upload-excel").on("show.bs.modal", function (event) {
               $(element).val($(event.target).val());
             });
           });
-          
+
           //add event listener on change and all tarifa-socio-fake-indexSocio to change to the same value
           if (tarifasSocio.length > 0) {
             tarifasSocio.each((index, element) => {
@@ -892,7 +899,6 @@ const uploadExcel = () => {
       sup: 9999999,
       id_tipo_tarifa: 2,
     },
-    
   ];
   let hasError = false;
   for (let i = 0; i < tarifasAntiguoInputs.length; i++) {
@@ -909,7 +915,6 @@ const uploadExcel = () => {
       inputError.addClass("d-none");
     }
     if (
-      
       isNaN($(tarifasNuevoInputs[i]).val()) ||
       $(tarifasNuevoInputs[i]).val() < 0
     ) {
@@ -921,9 +926,9 @@ const uploadExcel = () => {
       inputError.addClass("d-none");
     }
     if (
-      tarifasSocioInputs.length > i &&(
-      isNaN($(tarifasSocioInputs[i]).val()) ||
-      $(tarifasSocioInputs[i]).val() < 0)
+      tarifasSocioInputs.length > i &&
+      (isNaN($(tarifasSocioInputs[i]).val()) ||
+        $(tarifasSocioInputs[i]).val() < 0)
     ) {
       console.log("Error");
       hasError = true;
@@ -948,7 +953,7 @@ const uploadExcel = () => {
       limite_sup: limitesNuevo[i].sup,
       id_tipo_tarifa: limitesNuevo[i].id_tipo_tarifa,
     });
-    if(tarifasSocioInputs.length > i){
+    if (tarifasSocioInputs.length > i) {
       tarifasSocio.push({
         id_tipo_cliente: 3,
         tarifa: $(tarifasSocioInputs[i]).val(),
