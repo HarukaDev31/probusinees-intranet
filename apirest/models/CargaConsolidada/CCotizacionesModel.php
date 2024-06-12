@@ -284,6 +284,7 @@ class CCotizacionesModel extends CI_Model
      */
     public function fillExcelData($ID_Cotizacion, $objPHPExcel)
     {
+        //ZZZ IMPLEMENTATION PENDING TO REFACTOR THIS FUNCTION,SO BAD CODE IMPLEMENTATION HERE ZZZ
         $ID_Cotizacion = intval($ID_Cotizacion["ID_Cotizacion"]);
 
         $query = $this->db->query("CALL " . $this->get_excel_data . "(" . $ID_Cotizacion . ")");
@@ -362,8 +363,13 @@ class CCotizacionesModel extends CI_Model
         $InitialColumn = 'C';
         $totalRows = 0;
         foreach ($query as $row) {
+            if($InitialColumn != 'C'){
+                $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
 
-            $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
+            }else{
+                //set specific width for column
+                $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setWidth(2000);
+            }
 
             //set auto size for columns
             $InitialColumn++;
@@ -1114,6 +1120,7 @@ class CCotizacionesModel extends CI_Model
 
     public function getFinalCotizacionExcel($objPHPExcel, $data,$tarifas)
     {
+        //GOD IMPLEMENTATION
         $newSheet = $objPHPExcel->createSheet();
         $newSheet->setTitle('3');
         /**Base Styles */
