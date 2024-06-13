@@ -1116,6 +1116,7 @@ class CCotizacionesModel extends CI_Model
         $zipFileName = 'Boletas.zip';
         $zipFilePath = 'assets/downloads/' . $zipFileName;
         $this->zip->archive($zipFilePath);
+        gc_collect_cycles();
         return $zipFilePath;
     }
 
