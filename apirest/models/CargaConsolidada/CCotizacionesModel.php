@@ -1093,7 +1093,6 @@ class CCotizacionesModel extends CI_Model
     public function generateMassiveExcelPayrolls($objPHPExcel, $tarifas)
     {
         //init more memory
-        ini_set('memory_limit', '1024M');
         $this->load->library('PHPExcel');
         $this->load->library('zip');
         // Create a new PHPExcel object
