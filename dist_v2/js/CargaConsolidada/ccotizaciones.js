@@ -76,6 +76,7 @@ $(function () {
     order: [
       [2, "desc"],
       [10, "asc"],
+      [0, "desc"]
     ],
     ajax: {
       url: url,
