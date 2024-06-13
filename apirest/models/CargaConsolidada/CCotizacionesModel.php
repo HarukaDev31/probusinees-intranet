@@ -1102,16 +1102,16 @@ class CCotizacionesModel extends CI_Model
         // Assuming this gets the data for all rows
         // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
 
-        foreach ($data as $key => $value) {
-            $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value, $tarifas);
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-            $excelFileName = 'Boleta_' . $value['cliente']['nombre'] . '.xlsx';
-            $excelFilePath = 'assets/downloads/' . $excelFileName;
-            $objWriter->save($excelFilePath);
-            $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
-            unlink($excelFilePath); // Remove the Excel file after adding it to the ZIP
-        }
+        // foreach ($data as $key => $value) {
+        //     $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
+        //     $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value, $tarifas);
+        //     $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        //     $excelFileName = 'Boleta_' . $value['cliente']['nombre'] . '.xlsx';
+        //     $excelFilePath = 'assets/downloads/' . $excelFileName;
+        //     $objWriter->save($excelFilePath);
+        //     $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
+        //     unlink($excelFilePath); // Remove the Excel file after adding it to the ZIP
+        // }
 
         // Save the ZIP file
         $zipFileName = 'Boletas.zip';
