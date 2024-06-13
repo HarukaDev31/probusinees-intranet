@@ -1094,7 +1094,7 @@ class CCotizacionesModel extends CI_Model
     {
         //init more memory
         $originalMemoryLimit = ini_get('memory_limit');
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '1024M');
         $this->load->library('PHPExcel');
         $this->load->library('zip');
         // Create a new PHPExcel object
