@@ -836,9 +836,11 @@ class CCotizacionesModel extends CI_Model
             }
         }
 
-        //set column j y k autosize
-        $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+        // //set column j y k autosize
+        // $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
+        // $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+        //set b column width
+
         /*foreach query as row starts in row 36 set b as index +1, c as query["Nombre_Comercial"]
         f as query["Cantidad"] g as query["Valor_Unitario"] i as query["costo_total"]/ $query["Cantidad"]
         j as  query["costo_total"] k as query["Valor_Unitario"]*3.7
@@ -1097,7 +1099,6 @@ class CCotizacionesModel extends CI_Model
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
-        // return $data;
         // Assuming this gets the data for all rows
         // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
 
@@ -1564,9 +1565,9 @@ class CCotizacionesModel extends CI_Model
 
             }
         }
-        //set column j y k autosize
-        $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+        // //set column j y k autosize
+        // $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
+        // $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
         /*foreach query as row starts in row 36 set b as index +1, c as query["Nombre_Comercial"]
         f as query["Cantidad"] g as query["Valor_Unitario"] i as query["costo_total"]/ $query["Cantidad"]
         j as  query["costo_total"] k as query["Valor_Unitario"]*3.7
@@ -1646,7 +1647,24 @@ class CCotizacionesModel extends CI_Model
             $InitialColumn++;
             $lastRow = $row;
         };
-
+        $notUsedDefaultRows = 3-$productsCount;
+        if($notUsedDefaultRows>=0){
+            for($i=0;$i<=$notUsedDefaultRows;$i++){
+                $row = 36 + $productsCount + $i;
+                $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray( array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_NONE,
+                            'color' => array('rgb' => '000000'),
+                        ),
+                    ),
+                ));
+                //set k background color to white
+                $style = $objPHPExcel->getActiveSheet()->getStyle('K' . $row);
+                $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                $style->getFill()->getStartColor()->setARGB($whiteColor);
+            }
+        }
         $lastRow++;
         //set b$latsrow values "total"
         if ($productsCount >= 7) {
@@ -1659,6 +1677,13 @@ class CCotizacionesModel extends CI_Model
             // $objPHPExcel->getActiveSheet()->mergeCells('J' . $lastRow . ':J' . $lastRow+1);
 
             //merge k to l
+        }
+        if($notUsedDefaultRows>=0){
+            //unmerge c to e 
+            $objPHPExcel->getActiveSheet()->mergeCells('C' . $lastRow . ':E' . $lastRow);
+
+            $objPHPExcel->getActiveSheet()->unmergeCells('C' . $lastRow . ':E' . $lastRow);
+            $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
         }
         $objPHPExcel->getActiveSheet()->setCellValue('B' . $lastRow, "TOTAL");
         $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getFont()->setBold(true);
@@ -1916,7 +1941,7 @@ class CCotizacionesModel extends CI_Model
             }
             // Inicializar el array de productos para este cliente
             $productos = [];
-            
+
             // Obtener los límites del rango de la columna A
             preg_match('/^A(\d+):A(\d+)$/', $mergedRangeA, $matchesA);
             $startRowA = $matchesA[1];
@@ -1964,7 +1989,7 @@ class CCotizacionesModel extends CI_Model
 
                         }
                     }
-                    $return=false;
+                    $return = false;
                     foreach ($columnAntidumping as $mergedRangeI) {
                         preg_match('/^I(\d+):I(\d+)$/', $mergedRangeI, $matchesI);
                         $startRowI = $matchesI[1];
@@ -1973,24 +1998,22 @@ class CCotizacionesModel extends CI_Model
                             $rangeI = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeI);
                             $firstCellI = $rangeI[0];
                             $valueI = $worksheet->getCell($firstCellI)->getValue();
-                            
 
                             if ($valueI == null || $valueI == "-") {
                                 $valueI = 0;
                             }
                         }
                     }
-                 
-                    
+
                     foreach ($columnValoracion as $mergedRangeJ) {
                         preg_match('/^J(\d+):J(\d+)$/', $mergedRangeJ, $matchesJ);
                         $startRowJ = $matchesJ[1];
                         $endRowJ = $matchesJ[2];
                         if ($startRowJ == $startRowF && $endRowJ == $endRowF) {
-                           
+
                             $rangeJ = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeJ);
                             $firstCellJ = $rangeJ[0];
-                            
+
                             $valueJ = $worksheet->getCell($firstCellJ)->getValue();
                             if ($valueJ == null || $valueJ == "-") {
                                 $valueJ = 0;
