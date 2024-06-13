@@ -1585,6 +1585,11 @@ class CCotizacionesModel extends CI_Model
         }
         for ($index = 0; $index < $productsCount; $index++) {
             $row = 36 + $index;
+            if($index >= 7 && $index!=$productsCount){
+                $sheet = $objPHPExcel->getActiveSheet();
+                $sheet->insertNewRowBefore($row, 1);
+
+            }
             $objPHPExcel->getActiveSheet()->setCellValue('B' . $row, $index + 1);
             //SET FONT BOLD FALSE
             $objPHPExcel->getActiveSheet()->getStyle('B' . $row)->getFont()->setBold(false);
@@ -1643,26 +1648,33 @@ class CCotizacionesModel extends CI_Model
 
         $lastRow++;
         //set b$latsrow values "total"
+        if($productsCount >= 7){
+            //unmerge b row
+            $objPHPExcel->getActiveSheet()->unmergeCells('B' . $lastRow . ':L' . $lastRow);
+            //merge b to e 
+            $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
+            //merge f to f+1 
+            // $objPHPExcel->getActiveSheet()->mergeCells('F' . $lastRow . ':F' . $lastRow+1);
+            // $objPHPExcel->getActiveSheet()->mergeCells('J' . $lastRow . ':J' . $lastRow+1);
+
+            //merge k to l
+        }
         $objPHPExcel->getActiveSheet()->setCellValue('B' . $lastRow, "TOTAL");
-        //set bold true
         $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getFont()->setBold(true);
-        //set f$lastrow =sum(f37:f$lastrow-1)
+        $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':E' . $lastRow)->applyFromArray($borders);
+        $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objPHPExcel->getActiveSheet()->setCellValue('F' . $lastRow, "=SUM(F36:F" . ($lastRow - 1) . ")");
-        //set bold true and center text
+        $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->getFont()->setBold(true);
         $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        //set f$lastrow =sum(j37:j$lastrow-1)
         $objPHPExcel->getActiveSheet()->setCellValue('J' . $lastRow, "=SUM(J36:J" . ($lastRow - 1) . ")");
-        //set bold true and set dollar format
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-        //center text
         $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        //set borders  from b$lastrow to l$lastrow
         $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':L' . $lastRow)->applyFromArray(array());
-        //set without borders  from b36 to k$row
-
-        // Definir la celda y la fila que se va a evaluar
+        //SET FONT SIZE TO 11 
+        $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':L' . $lastRow+1)->getFont()->setSize(11);
         $cellToCheck = 'I22';
         $rowToCheck = 23;
         $sheet = $objPHPExcel->getActiveSheet();
