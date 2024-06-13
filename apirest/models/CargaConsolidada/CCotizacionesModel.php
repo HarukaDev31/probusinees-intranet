@@ -1093,6 +1093,7 @@ class CCotizacionesModel extends CI_Model
     public function generateMassiveExcelPayrolls($objPHPExcel, $tarifas)
     {
         //init more memory
+        ini_set('memory_limit', '512M');
         $this->load->library('PHPExcel');
         $this->load->library('zip');
         // Create a new PHPExcel object
@@ -1116,7 +1117,6 @@ class CCotizacionesModel extends CI_Model
         $zipFileName = 'Boletas.zip';
         $zipFilePath = 'assets/downloads/' . $zipFileName;
         $this->zip->archive($zipFilePath);
-        gc_collect_cycles();
         return $zipFilePath;
     }
 
