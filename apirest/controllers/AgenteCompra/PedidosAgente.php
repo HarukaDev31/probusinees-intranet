@@ -39,7 +39,19 @@ class PedidosAgente extends CI_Controller {
             $rows[] = $row->No_Pais;
             $rows[] = $row->ID_Pedido_Cabecera;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
-            $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto . "<br>" . $row->Txt_Email_Entidad;
+			$contacto="";
+			if(!empty($row->No_Contacto)){
+				$contacto = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
+			}
+			if(!empty($row->Txt_Email_Entidad)){
+				if(!empty($row->No_Contacto)){
+					$contacto .= "<br>" . $row->Txt_Email_Entidad;
+				}
+				else{
+					$contacto = $row->Txt_Email_Entidad;
+				}
+			}	
+            $rows[] = $contacto;
 			//$rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 			
