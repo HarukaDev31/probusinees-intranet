@@ -2,7 +2,7 @@
 
 require_once APPPATH . 'third_party/PHPExcel.php';
 require_once APPPATH . 'third_party/tcpdf/tcpdf.php';
-
+require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 defined('BASEPATH') or exit('No direct script access allowed');
 class CCotizaciones extends CI_Controller
 {
@@ -55,9 +55,12 @@ class CCotizaciones extends CI_Controller
             $rows[] = $row->Telefono;
             $rows[] = $row->Empresa;
             $rows[] = $select;
+            /**
+             *                         <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf(' . $row->ID_Cotizacion . ')"></i></button>
+
+             */
             $rows[] = '<div>
             <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-excel fa-2x text-success" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
-                        <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf(' . $row->ID_Cotizacion . ')"></i></button>
 
             </div>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
@@ -132,6 +135,7 @@ class CCotizaciones extends CI_Controller
     {
         //get tarifas from post
         $tarifas = $_POST['tarifas'];
+        $expirationDate = $_POST['expiration_date'];
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
             // Get the uploaded file
             $fileTmpPath = $_FILES['file']['tmp_name'];
@@ -147,7 +151,7 @@ class CCotizaciones extends CI_Controller
                 //convert this excel to phpoject
                 $this->load->library('PHPExcel');
                 $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
-                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel, $tarifas);
+                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel, $tarifas, $expirationDate);
                 // echo json_encode($zipFilePath);
                 // return;
                 // Assuming $zipFilePath is the path to the generated ZIP file
@@ -197,44 +201,97 @@ class CCotizaciones extends CI_Controller
     }public function descargarBoleta()
     {
         try {
+            // Obtener datos del POST (si es necesario)
             $postData = file_get_contents('php://input');
             $cotizacion = json_decode($postData, true);
             $C_Cotizacion = $cotizacion['C_Cotizacion'];
-            // Cargar el archivo de plantilla Excel
+
+            // Ruta del archivo de plantilla Excel
             $templatePath = 'assets/downloads/Boleta_Template.xlsx';
+
+            // Cargar el archivo de plantilla Excel
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
+
+            // Llenar datos adicionales en la plantilla de Excel si es necesario
+            // Utilizando el modelo CCotizacionesModel o cualquier otro método necesario
             $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
-            //get only first sheet
-            $objPHPExcel->setActiveSheetIndex(0);
+
+            // Obtener solo la primera hoja (sheet) del archivo Excel
+            //get excel images
+            //get images from php excel file and save them in a folder later replace the image path in html content
+            // Crear un escritor para generar HTML a partir del archivo Excel
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'HTML');
-            $htmlFilePath = 'assets/downloads/temp.html';
-            $objWriter->save($htmlFilePath);    
+
+            // Guardar el HTML generado en un archivo temporal
+            $htmlFilePath = 'assets/downloads/Boleta_Template.html';
+            // $objWriter->save($htmlFilePath);
+
+            // Leer el contenido HTML del archivo temporal
             $htmlContent = file_get_contents($htmlFilePath);
-            
-            $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+            //REMOVE ROW0 AND 1
+            // $htmlContent = $this->eliminarElementoPorClase($htmlContent, 'tr', 'row0');
+            // $htmlContent = $this->eliminarElementoPorClase($htmlContent, 'tr', 'row1');
+            // $styles = '<style>
+            // body {
+            //    margin: 0!important;
 
-            // Configurar márgenes
-            $pdf->SetMargins(0, 0, 0); // Márgenes izquierdo, superior, derecho
-            $pdf->SetHeaderMargin(0); // Margen superior del encabezado
-            $pdf->SetFooterMargin(0);
-            $pdf->SetAutoPageBreak(TRUE, 10);
+            // }.
+            // .style16 {
+            //     width: 100px!important;
+            // }.style72{
+            //     font-size: 25px!important;
+            // }
+            //     .style73 {
+            //     font-size: 20px!important;
+            // }
+            // td{
+            // font-size: 12px!important;
+            // }tr{
+            //     font-size: 12px!important;
+            // ';
+            // $htmlContent = str_replace('<style>', $styles, $htmlContent);
+            // //save the html content in a file
+            // file_put_contents($htmlFilePath, $htmlContent);
+            //use dompdf to convert html to pdf and download it
+            $options = new Dompdf\Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $dompdf = new Dompdf\Dompdf($options);
 
+            $dompdf->loadHtml($htmlContent);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+            $dompdf->stream('Cotizacion' . $C_Cotizacion . '.pdf', array("Attachment" => 0));
+            // Eliminar el archivo temporal
 
-            // Añadir una página
-            $pdf->AddPage();
-
-            // Escribir el contenido HTML en el PDF
-            $pdf->writeHTML($htmlContent, true, false, true, false, '');
-            //remove    html file
-            unlink($htmlFilePath);
-
-    
-            //devolver el pdf
-            $pdf->Output('Cotizacion' . $C_Cotizacion . '.pdf', 'I');
         } catch (Exception $e) {
             echo $e->getMessage();
         }
 
+    }
+    public function eliminarElementoPorClase($htmlContent, $tagName, $className)
+    {
+        // Construir el patrón de búsqueda para encontrar el elemento con la clase específica
+        $pattern = '/<' . $tagName . '[^>]*\sclass=[\'"]' . $className . '[\'"][^>]*>.*?<\/' . $tagName . '>/is';
+
+        // Reemplazar el elemento encontrado con una cadena vacía para eliminarlo
+        $htmlContent = preg_replace($pattern, '', $htmlContent);
+
+        return $htmlContent;
+    }
+    public function ajustarRutasImagenes($htmlContent, $objPHPExcel)
+    {
+        // Recorrer las imágenes dentro del archivo Excel y ajustar sus rutas en el HTML
+        foreach ($objPHPExcel->getActiveSheet()->getDrawingCollection() as $drawing) {
+            if ($drawing instanceof PHPExcel_Worksheet_MemoryDrawing) {
+                // Obtener la etiqueta <img> generada por PhpSpreadsheet
+                $htmlImageTag = '<img src="' . $drawing->getIndexedFilename() . '" alt="' . $drawing->getDescription() . '">';
+
+                // Ajustar la ruta de la imagen en el HTML
+                $htmlContent = str_replace($drawing->getIndexedFilename(), $htmlImageTag, $htmlContent);
+            }
+        }
+
+        return $htmlContent;
     }
 
     public function getTipoCliente()

@@ -505,6 +505,17 @@ const guardarTributos = (button) => {
 let currentButton = null;
 
 $("#modal-upload-excel").on("show.bs.modal", function (event) {
+  //set current date + 1 week not use moment 
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const formattedDate = `${year}-${month < 10 ? "0" + month : month}-${
+    day < 10 ? "0" + day : day
+  }`;
+  $("#date-cotizacion").val(formattedDate);
+  
   url = base_url + "CargaConsolidada/CCotizaciones/getTarifas";
 
   $.ajax({
@@ -831,6 +842,13 @@ const getData = () => {
 };
 const uploadExcel = () => {
   const fileInput = $("#file-upload-excel")[0];
+  const dateInput = $("#date-cotizacion")[0];
+  const date = dateInput.value;
+  //CHECK IF DATE IS VALID 
+  if (date == "") {
+    alert("Por favor ingrese una fecha valida");
+    return;
+  }
 
   // Check if a file is selected
   if (fileInput.files.length === 0) {
@@ -999,6 +1017,7 @@ const uploadExcel = () => {
   tarifas.push(...tarifasSocio);
 
   formData.append("tarifas", JSON.stringify(tarifas));
+  formData.append("expiration_date", date);
   //send file to server
   $("#modal-upload-excel").modal("hide");
 

@@ -271,6 +271,11 @@
             <!--download template button-->
             <input type="file" class="form-control-file" id="file-upload-excel" name="file-upload-excel" accept=".xls,.xlsx">
           </div>
+          <div  class="form-group">
+            <!--date picker for date of the cotizacion-->
+            <label for="date-cotizacion">Fecha de Vencimiento</label>
+            <input type="date" class="form-control" id="date-cotizacion" name="date-cotizacion" value="">
+          </div>
           <div class="form-group " id="tarifas-container">
             <div class="row mx-auto w-100" id="headers">
               <div class="col-3 col-lg-1">
