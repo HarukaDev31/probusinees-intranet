@@ -51,39 +51,39 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
                       <th class="no-sort">Garantía</th>
-                      <?php } ?>
+                      <?php }?>
                       <th>Perú</th>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
                       <th class="no-sort">Personal</th>
-                      <?php } ?>
+                      <?php }?>
                       <th>China</th>
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1) : ?>
+                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1): ?>
                         <th class="no-sort">Ver</th>
-                      <?php endif; ?>
-                      <?php if($this->user->Nu_Tipo_Privilegio_Acceso!=2) { ?>
+                      <?php endif;?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
                       <th class="no-sort">Proforma</th>
                       <th class="no-sort">Vencimiento</th>
-                      <?php } ?>
+                      <?php }?>
                       <th class="no-sort">Importación Integral</th>
                     </tr>
                   </thead>
                 </table>
               </div>
-              
+
               <div class="box-body div-AgregarEditar">
                 <?php
-                //$attributes = array('id' => 'form-pedido');
-                $attributes = array('id' => 'form-pedido', 'enctype' => 'multipart/form-data');
-                echo form_open('', $attributes);
-                ?>
+//$attributes = array('id' => 'form-pedido');
+$attributes = array('id' => 'form-pedido', 'enctype' => 'multipart/form-data');
+echo form_open('', $attributes);
+?>
                   <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
                   <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
                   <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
                   <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
                   <input type="hidden" id="txt-ECorrelativo" name="ECorrelativo" class="form-control">
-                  
+
                   <div class="row">
                     <div class="col-12 col-sm-12 col-md-12 d-none">
                       <label>Estado</label>
@@ -115,7 +115,7 @@
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
-                    
+
                     <div class="col-6 col-sm-3 col-md-3">
                       <label>Empresa</label>
                       <div class="form-group">
@@ -131,7 +131,7 @@
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
-                    
+
                     <div class="col-12 col-sm-4 col-md-2">
                       <label>T.C.</label>
                       <div class="form-group">
@@ -139,15 +139,16 @@
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
-                    
+
                     <div class="col-12 col-sm-4 col-md-4">
-                      <label>Observaciones</label>
+                      <label>Cotizacion</label>
                       <div class="form-group">
-                        <textarea name="Txt_Observaciones_Garantizado" class="form-control" rows="1" placeholder="Opcional" style="height: 38px !important;"></textarea>
+                        <input type="file" id="file_cotizacion" name="file_cotizacion" class="form-control required" accept="application/pdf">
+                        <!-- <textarea name="Txt_Observaciones_Garantizado" class="form-control" rows="1" placeholder="Opcional" style="height: 38px !important;"></textarea> -->
                       </div>
                     </div>
                   </div>
-                    
+
                   <div class="row">
                     <div class="col-12 col-sm-8 col-md-8 d-none">
                       <label>Producto</label>
@@ -164,7 +165,7 @@
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
-                      
+
                     <div class="col-12 col-sm-2 col-md-2 d-none">
                       <label>Cantidad</label>
                       <div class="form-group">
@@ -172,14 +173,14 @@
                         <span class="help-block" id="error"></span>
                       </div>
                     </div>
-                    
+
                     <div class="col-12 col-sm-2 col-md-2 d-none">
                       <label class="hidden-xs">&nbsp;</label>
                       <div class="form-group">
                         <button type="button" id="btn-addProductosEnlaces" class="btn btn-success btn-block"> Agregar</button>
                       </div>
                     </div>
-                    
+
                     <div class="col-12 col-sm-12 col-md-12 mb-3" id="div-button-add_item">
                     </div>
 
@@ -227,16 +228,16 @@
               <!-- div agregar productos de proveedor -->
               <div class="box-body" id="div-add_item_proveedor">
                 <?php
-                $attributes = array('id' => 'form-arrItems');
-                echo form_open('', $attributes);
-                ?>
+$attributes = array('id' => 'form-arrItems');
+echo form_open('', $attributes);
+?>
                   <input type="hidden" id="txt-EID_Empresa_item" name="EID_Empresa_item" class="form-control">
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Detalle_item" name="EID_Pedido_Detalle_item" class="form-control">
                   <input type="hidden" id="txt-Item_ECorrelativo" name="Item_ECorrelativo" class="form-control">
                   <input type="hidden" id="txt-Item_Ename_producto" name="Item_Ename_producto" class="form-control">
-                                    
+
                   <div id="div-arrItems" class="div-agregar_proveedor"></div>
 
                   <div class="row div-agregar_proveedor">
@@ -263,9 +264,9 @@
               </div><!--div agregar productos de proveedor -->
               <div class="box-body" id="div-elegir_item_proveedor">
                 <?php
-                $attributes = array('id' => 'form-arrItemsProveedor');
-                echo form_open('', $attributes);
-                ?>
+$attributes = array('id' => 'form-arrItemsProveedor');
+echo form_open('', $attributes);
+?>
                   <input type="hidden" id="txt-EID_Empresa_item" name="EID_Empresa_item" class="form-control">
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
@@ -281,17 +282,17 @@
                         <thead class="thead-light">
                           <tr>
                             <th style='display:none;' class="text-left">ID</th>
-                            <th class="text-left" width="">imagen_producto</th>
-                            <th class="text-left" width="">P_Dólares</th>
-                            <th class="text-left" width="">P_Yuanes</th>
+                            <th class="text-left" width="">Imagen Producto</th>
+                            <th class="text-left" width="">Precio $</th>
+                            <th class="text-left" width="">Precio ¥</th>
                             <th class="text-left" width="">__Moq__</th>
-                            <th class="text-left" width="">qty_caja</th>
-                            <th class="text-left" width="">__cbm__</th>
+                            <th class="text-left" width="">Qtn Cajas</th>
+                            <th class="text-left" width="">CBM</th>
                             <th class="text-left" width="">Delivery</th>
                             <th class="text-left" width="">Shipping Cost</th>
                             <th class="text-left" width="">Observaciones</th>
-                            <th class="text-left" width="">Proveedor_nombre</th>
-                            <th class="text-left" width="">Proveedor___Foto__</th>
+                            <th class="text-left" width="">Nombre Proveedor</th>
+                            <th class="text-left" width="">Imagen Proveedor</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -348,7 +349,8 @@
 
 <!-- modal documento -->
 <div class="modal fade modal-documento_pago_garantizado" id="modal-documento_pago_garantizado">
-  <?php $attributes = array('id' => 'form-documento_pago_garantizado'); echo form_open('', $attributes); ?>
+  <?php $attributes = array('id' => 'form-documento_pago_garantizado');
+echo form_open('', $attributes);?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-documento_pago_garantizado">
@@ -418,18 +420,18 @@
               <!-- /.card-body -->
               <div class="card-footer">
                 <?php
-                $attributes = array('id' => 'form-chat_producto');
-                echo form_open('', $attributes);
-                ?>
+$attributes = array('id' => 'form-chat_producto');
+echo form_open('', $attributes);
+?>
                   <input type="hidden" name="chat_producto-ID_Empresa_item" id="txt-chat_producto-ID_Empresa_item" class="form-control form-control-lg">
                   <input type="hidden" name="chat_producto-ID_Organizacion_item" id="txt-chat_producto-ID_Organizacion_item" class="form-control form-control-lg">
                   <input type="hidden" name="chat_producto-ID_Pedido_Cabecera_item" id="txt-chat_producto-ID_Pedido_Cabecera_item" class="form-control form-control-lg">
                   <input type="hidden" name="chat_producto-ID_Pedido_Detalle_item" id="txt-chat_producto-ID_Pedido_Detalle_item" class="form-control form-control-lg">
-                  
+
                   <div class="form-group">
                     <div class="input-group">
                       <!--<input type="text" name="message_chat" id="message_chat" placeholder="Escribir mensaje ..." class="form-control form-control-lg">-->
-                      
+
                       <textarea name="message_chat" id="message_chat" class="form-control" rows="1" placeholder="Opcional" style="height: auto;"></textarea>
                       <span class="input-group-append">
                         <button type="button" id="btn-enviar_mensaje" class="btn btn-success btn-lg">Enviar</button>
@@ -452,8 +454,8 @@
 
 <!-- asignar pedido personal de china -->
 <?php
-  $attributes = array('id' => 'form-guardar_personal_china');
-  echo form_open('', $attributes);
+$attributes = array('id' => 'form-guardar_personal_china');
+echo form_open('', $attributes);
 ?>
 <div class="modal fade modal-guardar_personal_china" id="modal-guardar_personal_china">
   <div class="modal-dialog">
@@ -473,6 +475,23 @@
       <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
         <button type="button" id="btn-guardar_personal_china" class="col btn btn-success btn-lg btn-block">Guardar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<div class="modal fade modal-confirmation" id="modal-confirmation">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-confirmation">
+        <div class="col-xs-12">
+          <label>¿Está seguro de asignar el pedido al personal de China?</label>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-cancel-confirmation" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="btn-confirmation" class="col btn btn-success btn-lg btn-block">Guardar</button>
       </div>
     </div>
     <!-- /.modal-content -->

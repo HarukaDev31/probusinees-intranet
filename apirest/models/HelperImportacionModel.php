@@ -81,7 +81,7 @@ class HelperImportacionModel extends CI_Model{
 		if( $iEstado == 1 )
 			return array('No_Estado' => 'Pendiente','No_Class_Estado' => 'secondary');
 		else if( $iEstado == 2 )
-			return array('No_Estado' => 'Garantizado','No_Class_Estado' => 'primary');//separa con $50 o más para iniciar proceso de cotizado
+			return array('No_Estado' => 'Esperando','No_Class_Estado' => 'danger');//separa con $50 o más para iniciar proceso de cotizado
 		else if( $iEstado == 3 )
 			return array('No_Estado' => 'Enviado','No_Class_Estado' => 'warning');
 		else if( $iEstado == 4 )
@@ -96,6 +96,10 @@ class HelperImportacionModel extends CI_Model{
 			return array('No_Estado' => 'Observado','No_Class_Estado' => 'warning');
 		else if( $iEstado == 9 )
 			return array('No_Estado' => 'Pago servicio','No_Class_Estado' => 'primary');
+		else if ($iEstado==10){
+			return array('No_Estado' => 'Recibido','No_Class_Estado' => 'primary');
+
+		}
 	}
 
 	//1=Pendiente, 2=Proceso, 3=Cotizado, 4=Producción, 5=Inspección y 6=Entregado
