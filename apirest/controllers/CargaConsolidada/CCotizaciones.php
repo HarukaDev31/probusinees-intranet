@@ -196,7 +196,8 @@ class CCotizaciones extends CI_Controller
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         exit(); //
-    }public function descargarBoleta()
+    }
+    public function descargarBoleta()
     {
         try {
             // Obtener datos del POST (si es necesario)
@@ -211,114 +212,119 @@ class CCotizaciones extends CI_Controller
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
             $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
             $objPHPExcel->setActiveSheetIndex(0);
-            $data=[
-                "name"=>$objPHPExcel->getActiveSheet()->getCell('C8')->getValue(),
-                "lastname"=>$objPHPExcel->getActiveSheet()->getCell('C9')->getValue(),
-                "ID"=>$objPHPExcel->getActiveSheet()->getCell('C10')->getValue(),
-                "phone"=>$objPHPExcel->getActiveSheet()->getCell('C11')->getValue(),
-                "date"=>date('d/m/Y'),
-                "tipocliente"=>$objPHPExcel->getActiveSheet()->getCell('F11')->getValue(),
-                "peso"=>$objPHPExcel->getActiveSheet()->getCell('J9')->getCalculatedValue(),
-                "qtysuppliers"=>$objPHPExcel->getActiveSheet()->getCell('J10')->getValue(),
-                "cbm"=>$objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue(),
-                "valorcarga"=>round($objPHPExcel->getActiveSheet()->getCell('K14')->getCalculatedValue(), 2),
-                "fleteseguro"=>round($objPHPExcel->getActiveSheet()->getCell('K15')->getCalculatedValue(),2),
-                "valorcif"=>round($objPHPExcel->getActiveSheet()->getCell('K16')->getCalculatedValue(),2),
-                "advalorem"=>round($objPHPExcel->getActiveSheet()->getCell('K20')->getCalculatedValue(),2),
-                "igv"=>round($objPHPExcel->getActiveSheet()->getCell('K21')->getCalculatedValue(),2),
-                "ipm"=>round($objPHPExcel->getActiveSheet()->getCell('K22')->getCalculatedValue(),2),
-                "subtotal"=>round($objPHPExcel->getActiveSheet()->getCell('K23')->getCalculatedValue(),2),
-                "percepcion"=>round($objPHPExcel->getActiveSheet()->getCell('K25')->getCalculatedValue(),2),
-                "total"=>round($objPHPExcel->getActiveSheet()->getCell('K26')->getCalculatedValue(),2),
-                "valorcargaproveedor"=>round($objPHPExcel->getActiveSheet()->getCell('K29')->getCalculatedValue(),2),
-                "servicioimportacion"=>round($objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue(),2),
-                "impuestos"=>round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(),2),
-                "montototal"=>round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(),2),
-                
+            $antidumping = $objPHPExcel->getActiveSheet()->getCell('B23')->getValue();
+            $data = [
+                "name" => $objPHPExcel->getActiveSheet()->getCell('C8')->getValue(),
+                "lastname" => $objPHPExcel->getActiveSheet()->getCell('C9')->getValue(),
+                "ID" => $objPHPExcel->getActiveSheet()->getCell('C10')->getValue(),
+                "phone" => $objPHPExcel->getActiveSheet()->getCell('C11')->getValue(),
+                "date" => date('d/m/Y'),
+                "tipocliente" => $objPHPExcel->getActiveSheet()->getCell('F11')->getValue(),
+                "peso" => $objPHPExcel->getActiveSheet()->getCell('J9')->getCalculatedValue(),
+                "qtysuppliers" => $objPHPExcel->getActiveSheet()->getCell('J10')->getValue(),
+                "cbm" => $objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue(),
+                "valorcarga" => round($objPHPExcel->getActiveSheet()->getCell('K14')->getCalculatedValue(), 2),
+                "fleteseguro" => round($objPHPExcel->getActiveSheet()->getCell('K15')->getCalculatedValue(), 2),
+                "valorcif" => round($objPHPExcel->getActiveSheet()->getCell('K16')->getCalculatedValue(), 2),
+                "advalorem" => round($objPHPExcel->getActiveSheet()->getCell('K20')->getCalculatedValue(), 2),
+                "antidumping" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K23')->getCalculatedValue(), 2) : "",
+
+                "igv" => round($objPHPExcel->getActiveSheet()->getCell('K21')->getCalculatedValue(), 2),
+                "ipm" => round($objPHPExcel->getActiveSheet()->getCell('K22')->getCalculatedValue(), 2),
+                "subtotal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K24')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K23')->getCalculatedValue(), 2),
+                "percepcion" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K26')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K25')->getCalculatedValue(), 2),
+                "total" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K27')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K26')->getCalculatedValue(), 2),
+                "valorcargaproveedor" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K29')->getCalculatedValue(), 2),
+                "servicioimportacion" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue(), 2),
+                "impuestos" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2),
+                "montototal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K33')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2),
             ];
-           //iterate until you find the total word from c36 to more
-            $i=36;
-            $items=[];
-            while($objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue()!='TOTAL'){
-                //add item to items array 
-                $item=[
-                    "index"=>$objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue(),
-                    "name"=>$objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue(),
-                    "qty"=>$objPHPExcel->getActiveSheet()->getCell('F'.$i)->getValue(),
-                    "costounit"=>round($objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue(),2),
-                    "preciounit"=>round($objPHPExcel->getActiveSheet()->getCell('H'.$i)->getCalculatedValue(),2),
-                    "total"=>round($objPHPExcel->getActiveSheet()->getCell('I'.$i)->getCalculatedValue(),2),
-                    "preciounitpen"=>round($objPHPExcel->getActiveSheet()->getCell('J'.$i)->getCalculatedValue(),2),
+            //iterate until you find the total word from c36 to more
+            $i = 36;
+            $items = [];
+            while ($objPHPExcel->getActiveSheet()->getCell('B' . $i)->getValue() != 'TOTAL') {
+                //add item to items array
+                $item = [
+                    "index" => $objPHPExcel->getActiveSheet()->getCell('B' . $i)->getCalculatedValue(),
+                    "name" => $objPHPExcel->getActiveSheet()->getCell('C' . $i)->getCalculatedValue(),
+                    "qty" => $objPHPExcel->getActiveSheet()->getCell('F' . $i)->getCalculatedValue(),
+                    "costounit" => number_format(round($objPHPExcel->getActiveSheet()->getCell('G' . $i)->getCalculatedValue(), 2), 2, '.', ','),
+                    "preciounit" => number_format(round($objPHPExcel->getActiveSheet()->getCell('I' . $i)->getCalculatedValue(), 2), 2, '.', ','),
+                    "total" => number_format(round($objPHPExcel->getActiveSheet()->getCell('J' . $i)->getCalculatedValue(), 2), 2, '.', ','),
+                    "preciounitpen" => number_format(round($objPHPExcel->getActiveSheet()->getCell('K' . $i)->getCalculatedValue(), 2), 2, '.', ','),
                 ];
-                $items[]=$item;
+                $items[] = $item;
                 $i++;
             }
-            $data['items']=$items;
-            // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'HTML');
-
-            // Guardar el HTML generado en un archivo temporal
+            $itemsCount = count($items);
+            $data["br"] = $itemsCount - 16 < 0 ? str_repeat("<br>", 16 - $itemsCount) : "";
+            $data['items'] = $items;
+            $logoContent = file_get_contents(base_url() . 'assets/downloads/logo.png');
+            $logoData = base64_encode($logoContent);
+            $data["logo"] = 'data:image/png;base64,' . $logoData;
             $htmlFilePath = 'assets/downloads/Boleta_Template.html';
-            // $objWriter->save($htmlFilePath);
-
-            // Leer el contenido HTML del archivo temporal
             $htmlContent = file_get_contents($htmlFilePath);
+            $pagosContent = file_get_contents(base_url() . 'assets/downloads/pagos.png');
+            $pagosData = base64_encode($pagosContent);
+            $data["pagos"] = 'data:image/png;base64,' . $pagosData;
             //replace {{name}} with data['name']
             foreach ($data as $key => $value) {
                 //if value is a number parse to 2 decimals with comma as unit separator and dot as decimal separator
                 if (is_numeric($value)) {
-                    if($value==0){
+                    if ($value == 0) {
                         $value = '-';
                     }
-                    $value = number_format($value, 2, '.', ',');
+                    if ($key != "ID" && $key != "phone" && $key != "qtysuppliers") {
+                        $value = number_format($value, 2, '.', ',');
+                    }
                 }
-                if($key=="items"){
-                    $itemsHtml="";
-                    foreach($value as $item){
-                        $itemsHtml.='<tr>
-                        <td class="style16" style="width: 100px;">'.$item['index'].'</td>
-                        <td class="style16" style="width: 100px;">'.$item['name'].'</td>
-                        <td class="style16" style="width: 100px;">'.$item['qty'].'</td>
-                        <td class="style16" style="width: 100px;">'.$item['costounit'].'</td>
-                        <td class="style16" style="width: 100px;">'.$item['preciounit'].'</td>
-                        <td class="style16" style="width: 100px;">'.$item['total'].'</td>
-                        <td class="style16" style="width: 100px;">'.$item['preciounitpen'].'</td>
+                if ($key == "antidumping" && $antidumping == "ANTIDUMPING") {
+                    $antidumpingHtml = '<tr style="background:#FFFF33">
+                    <td style="border-top:none!important;border-bottom:none!important" colspan="3">ANTIDUMPING</td>
+                    <td style="border-top:none!important;border-bottom:none!important" ></td>
+                    <td style="border-top:none!important;border-bottom:none!important" >$' . number_format($data['antidumping'], 2, '.', ',') . '</td>
+                    <td style="border-top:none!important;border-bottom:none!important" >USD</td>
+                    </tr>';
+                    $htmlContent = str_replace('{{antidumping}}', $antidumpingHtml, $htmlContent);
+                    //search items with class ipm and set border none
+                    }
+                if ($key == "items") {
+                    $itemsHtml = "";
+                    $total = 0;
+                    $cantidad = 0;
+                    foreach ($value as $item) {
+                        $total += $item['total'];
+                        $cantidad += $item['qty'];
+                        $itemsHtml .= '<tr>
+                        <td colspan="1">' . $item['index'] . '</td>
+                        <td colspan="5">' . $item['name'] . '</td>
+                        <td colspan="1">' . $item['qty'] . '</td>
+                        <td colspan="2">$ ' . $item['costounit'] . '</td>
+                        <td colspan="1">$ ' . $item['preciounit'] . '</td>
+                        <td colspan="1">$ ' . $item['total'] . '</td>
+                        <td colspan="1">S/. ' . $item['preciounitpen'] . '</td>
                     </tr>';
                     }
+                    $itemsHtml .= '<tr>
+                    <td colspan="6" >TOTAL</td>
+                    <td >' . number_format($cantidad, 2, '.', ',') . '</td>
+                    <td colspan="2" style="border:none!important"></td>
+                    <td style="border:none!important"></td>
+                    <td >$ ' . number_format($total, 2, '.', ',') . '</td>
+                    <td style="border:none!important"></td>
+
+                </tr>';
                     $htmlContent = str_replace('{{' . $key . '}}', $itemsHtml, $htmlContent);
-                }else{
+                } else {
                     $htmlContent = str_replace('{{' . $key . '}}', $value, $htmlContent);
                 }
-                
-            }
-            //REMOVE ROW0 AND 1
-            // $htmlContent = $this->eliminarElementoPorClase($htmlContent, 'tr', 'row0');
-            // $htmlContent = $this->eliminarElementoPorClase($htmlContent, 'tr', 'row1');
-            // $styles = '<style>
-            // body {
-            //    margin: 0!important;
 
-            // }.
-            // .style16 {
-            //     width: 100px!important;
-            // }.style72{
-            //     font-size: 25px!important;
-            // }
-            //     .style73 {
-            //     font-size: 20px!important;
-            // }
-            // td{
-            // font-size: 12px!important;
-            // }tr{
-            //     font-size: 12px!important;
-            // ';
-            // $htmlContent = str_replace('<style>', $styles, $htmlContent);
-            // //save the html content in a file
-            // file_put_contents($htmlFilePath, $htmlContent);
-            //use dompdf to convert html to pdf and download it
+            }
             $options = new Dompdf\Options();
             $options->set('isHtml5ParserEnabled', true);
             $dompdf = new Dompdf\Dompdf($options);
 
+            // $dompdf->loadHtml('<img src="data:image/png;base64,' . $imgData . '">');
             $dompdf->loadHtml($htmlContent);
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
@@ -329,6 +335,25 @@ class CCotizaciones extends CI_Controller
             echo $e->getMessage();
         }
 
+    }
+    public function getBase64Image($path)
+    {
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        return 'data:image/' . $type . ';base64,' . base64_encode($data);
+    }
+    public function replaceClassesWithStyle($htmlContent, $classesToReplace, $style)
+    {
+        $pattern = '/(?<=\sclass=["\'])((?:\s*\w+\s*)+?)(?=(?:' . implode('|', array_map('preg_quote', $classesToReplace, array_fill(0, count($classesToReplace), '/'))) . '))/is';
+        $replacement = function ($match) use ($classesToReplace, $style) {
+            $classes = explode(' ', trim($match[0]));
+            $newClasses = array_filter($classes, function ($class) use ($classesToReplace) {
+                return !in_array($class, $classesToReplace);
+            });
+            return 'style="' . $style . '"';
+        };
+
+        return preg_replace_callback($pattern, $replacement, $htmlContent);
     }
     public function eliminarElementoPorClase($htmlContent, $tagName, $className)
     {
