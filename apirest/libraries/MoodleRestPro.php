@@ -362,7 +362,7 @@ class MoodleRestPro {
     catch ( Exception $e ) {
       return array(
         'status' => 'error',
-        'message' => "Caught exception: " .  $e->getMessage()
+        'message' => "Error de Mooddle" .  $e->getMessage()
       );
       //echo "\nCaught exception:\n" .  $e->getMessage() . "\n";
     }
