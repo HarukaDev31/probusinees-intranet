@@ -355,7 +355,6 @@ class MoodleRestPro {
     try {
       $token = '2a41772b01afcf26da875fc1ab59bf45';
       $user_data_1 = $this->make_test_user( $arrPost );
-      echo json_encode($user_data_1);
       $user_id_1 = $this->create_user( $user_data_1, $token );
       return $user_id_1;
     } 
