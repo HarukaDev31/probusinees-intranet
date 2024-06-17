@@ -55,12 +55,10 @@ class CCotizaciones extends CI_Controller
             $rows[] = $row->Telefono;
             $rows[] = $row->Empresa;
             $rows[] = $select;
-            /**
-             *                         <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf(' . $row->ID_Cotizacion . ')"></i></button>
 
-             */
             $rows[] = '<div>
             <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-excel fa-2x text-success" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
+         <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf(' . $row->ID_Cotizacion . ')"></i></button>
 
             </div>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
@@ -211,16 +209,51 @@ class CCotizaciones extends CI_Controller
 
             // Cargar el archivo de plantilla Excel
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-
-            // Llenar datos adicionales en la plantilla de Excel si es necesario
-            // Utilizando el modelo CCotizacionesModel o cualquier otro método necesario
             $objPHPExcel = $this->CCotizacionesModel->fillExcelData($cotizacion, $objPHPExcel);
-
-            // Obtener solo la primera hoja (sheet) del archivo Excel
-            //get excel images
-            //get images from php excel file and save them in a folder later replace the image path in html content
-            // Crear un escritor para generar HTML a partir del archivo Excel
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'HTML');
+            $objPHPExcel->setActiveSheetIndex(0);
+            $data=[
+                "name"=>$objPHPExcel->getActiveSheet()->getCell('C8')->getValue(),
+                "lastname"=>$objPHPExcel->getActiveSheet()->getCell('C9')->getValue(),
+                "ID"=>$objPHPExcel->getActiveSheet()->getCell('C10')->getValue(),
+                "phone"=>$objPHPExcel->getActiveSheet()->getCell('C11')->getValue(),
+                "date"=>date('d/m/Y'),
+                "tipocliente"=>$objPHPExcel->getActiveSheet()->getCell('F11')->getValue(),
+                "peso"=>$objPHPExcel->getActiveSheet()->getCell('J9')->getCalculatedValue(),
+                "qtysuppliers"=>$objPHPExcel->getActiveSheet()->getCell('J10')->getValue(),
+                "cbm"=>$objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue(),
+                "valorcarga"=>round($objPHPExcel->getActiveSheet()->getCell('K14')->getCalculatedValue(), 2),
+                "fleteseguro"=>round($objPHPExcel->getActiveSheet()->getCell('K15')->getCalculatedValue(),2),
+                "valorcif"=>round($objPHPExcel->getActiveSheet()->getCell('K16')->getCalculatedValue(),2),
+                "advalorem"=>round($objPHPExcel->getActiveSheet()->getCell('K20')->getCalculatedValue(),2),
+                "igv"=>round($objPHPExcel->getActiveSheet()->getCell('K21')->getCalculatedValue(),2),
+                "ipm"=>round($objPHPExcel->getActiveSheet()->getCell('K22')->getCalculatedValue(),2),
+                "subtotal"=>round($objPHPExcel->getActiveSheet()->getCell('K23')->getCalculatedValue(),2),
+                "percepcion"=>round($objPHPExcel->getActiveSheet()->getCell('K25')->getCalculatedValue(),2),
+                "total"=>round($objPHPExcel->getActiveSheet()->getCell('K26')->getCalculatedValue(),2),
+                "valorcargaproveedor"=>round($objPHPExcel->getActiveSheet()->getCell('K29')->getCalculatedValue(),2),
+                "servicioimportacion"=>round($objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue(),2),
+                "impuestos"=>round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(),2),
+                "montototal"=>round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(),2),
+                
+            ];
+           //iterate until you find the total word from c36 to more
+            $i=36;
+            $items=[];
+            while($objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue()!='TOTAL'){
+                //add item to items array 
+                $item=[
+                    "index"=>$objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue(),
+                    "name"=>$objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue(),
+                    "qty"=>$objPHPExcel->getActiveSheet()->getCell('F'.$i)->getValue(),
+                    "costounit"=>$objPHPExcel->getActiveSheet()->getCell('G'.$i)->getValue(),
+                    "preciounit"=>$objPHPExcel->getActiveSheet()->getCell('I'.$i)->getValue(),
+                    "total"=>$objPHPExcel->getActiveSheet()->getCell('J'.$i)->getValue(),
+                    "preciounitpen"=>$objPHPExcel->getActiveSheet()->getCell('K'.$i)->getValue(),
+                ];
+                $items[]=$item;
+            }
+            $data['items']=$items;
+            // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'HTML');
 
             // Guardar el HTML generado en un archivo temporal
             $htmlFilePath = 'assets/downloads/Boleta_Template.html';
@@ -228,6 +261,34 @@ class CCotizaciones extends CI_Controller
 
             // Leer el contenido HTML del archivo temporal
             $htmlContent = file_get_contents($htmlFilePath);
+            //replace {{name}} with data['name']
+            foreach ($data as $key => $value) {
+                //if value is a number parse to 2 decimals with comma as unit separator and dot as decimal separator
+                if (is_numeric($value)) {
+                    if($value==0){
+                        $value = '-';
+                    }
+                    $value = number_format($value, 2, '.', ',');
+                }
+                if($key=="items"){
+                    $itemsHtml="<tr><td>".$value."</td></tr>";
+                    // foreach($value as $item){
+                    //     $itemsHtml.='<tr>
+                    //     <td class="style16" style="width: 100px;">'.$item['index'].'</td>
+                    //     <td class="style16" style="width: 100px;">'.$item['name'].'</td>
+                    //     <td class="style16" style="width: 100px;">'.$item['qty'].'</td>
+                    //     <td class="style16" style="width: 100px;">'.$item['costounit'].'</td>
+                    //     <td class="style16" style="width: 100px;">'.$item['preciounit'].'</td>
+                    //     <td class="style16" style="width: 100px;">'.$item['total'].'</td>
+                    //     <td class="style16" style="width: 100px;">'.$item['preciounitpen'].'</td>
+                    // </tr>';
+                    // }
+                    $htmlContent = str_replace('{{' . $key . '}}', $itemsHtml, $htmlContent);
+                }else{
+                    $htmlContent = str_replace('{{' . $key . '}}', $value, $htmlContent);
+                }
+                
+            }
             //REMOVE ROW0 AND 1
             // $htmlContent = $this->eliminarElementoPorClase($htmlContent, 'tr', 'row0');
             // $htmlContent = $this->eliminarElementoPorClase($htmlContent, 'tr', 'row1');
