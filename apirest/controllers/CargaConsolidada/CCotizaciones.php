@@ -245,12 +245,13 @@ class CCotizaciones extends CI_Controller
                     "index"=>$objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue(),
                     "name"=>$objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue(),
                     "qty"=>$objPHPExcel->getActiveSheet()->getCell('F'.$i)->getValue(),
-                    "costounit"=>$objPHPExcel->getActiveSheet()->getCell('G'.$i)->getValue(),
-                    "preciounit"=>$objPHPExcel->getActiveSheet()->getCell('I'.$i)->getValue(),
-                    "total"=>$objPHPExcel->getActiveSheet()->getCell('J'.$i)->getValue(),
-                    "preciounitpen"=>$objPHPExcel->getActiveSheet()->getCell('K'.$i)->getValue(),
+                    "costounit"=>round($objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue(),2),
+                    "preciounit"=>round($objPHPExcel->getActiveSheet()->getCell('H'.$i)->getCalculatedValue(),2),
+                    "total"=>round($objPHPExcel->getActiveSheet()->getCell('I'.$i)->getCalculatedValue(),2),
+                    "preciounitpen"=>round($objPHPExcel->getActiveSheet()->getCell('J'.$i)->getCalculatedValue(),2),
                 ];
                 $items[]=$item;
+                $i++;
             }
             $data['items']=$items;
             // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'HTML');
@@ -271,18 +272,18 @@ class CCotizaciones extends CI_Controller
                     $value = number_format($value, 2, '.', ',');
                 }
                 if($key=="items"){
-                    $itemsHtml="<tr><td>".$value."</td></tr>";
-                    // foreach($value as $item){
-                    //     $itemsHtml.='<tr>
-                    //     <td class="style16" style="width: 100px;">'.$item['index'].'</td>
-                    //     <td class="style16" style="width: 100px;">'.$item['name'].'</td>
-                    //     <td class="style16" style="width: 100px;">'.$item['qty'].'</td>
-                    //     <td class="style16" style="width: 100px;">'.$item['costounit'].'</td>
-                    //     <td class="style16" style="width: 100px;">'.$item['preciounit'].'</td>
-                    //     <td class="style16" style="width: 100px;">'.$item['total'].'</td>
-                    //     <td class="style16" style="width: 100px;">'.$item['preciounitpen'].'</td>
-                    // </tr>';
-                    // }
+                    $itemsHtml="";
+                    foreach($value as $item){
+                        $itemsHtml.='<tr>
+                        <td class="style16" style="width: 100px;">'.$item['index'].'</td>
+                        <td class="style16" style="width: 100px;">'.$item['name'].'</td>
+                        <td class="style16" style="width: 100px;">'.$item['qty'].'</td>
+                        <td class="style16" style="width: 100px;">'.$item['costounit'].'</td>
+                        <td class="style16" style="width: 100px;">'.$item['preciounit'].'</td>
+                        <td class="style16" style="width: 100px;">'.$item['total'].'</td>
+                        <td class="style16" style="width: 100px;">'.$item['preciounitpen'].'</td>
+                    </tr>';
+                    }
                     $htmlContent = str_replace('{{' . $key . '}}', $itemsHtml, $htmlContent);
                 }else{
                     $htmlContent = str_replace('{{' . $key . '}}', $value, $htmlContent);

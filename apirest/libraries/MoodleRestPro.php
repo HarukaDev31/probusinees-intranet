@@ -3,7 +3,7 @@
 class MoodleRestPro {
   function make_test_user( $arrPost ){
     $user = new stdClass();
-    $user->username = $arrPost['username'];
+    $user->username = strtolower($arrPost['username']);
     $user->password = $arrPost['password'];
     $user->firstname = $arrPost['firstname'];
     $user->lastname = $arrPost['username'];
