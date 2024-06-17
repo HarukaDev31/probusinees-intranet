@@ -257,7 +257,7 @@ class CCotizaciones extends CI_Controller
                 $i++;
             }
             $itemsCount = count($items);
-            $data["br"] = $itemsCount - 16 < 0 ? str_repeat("<br>", 16 - $itemsCount) : "";
+            $data["br"] = $itemsCount - 18 < 0 ? str_repeat("<br>", 18 - $itemsCount) : "";
             $data['items'] = $items;
             $logoContent = file_get_contents(base_url() . 'assets/downloads/logo.png');
             $logoData = base64_encode($logoContent);
