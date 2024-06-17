@@ -7,7 +7,7 @@ class MoodleRestPro {
     $user->password = $arrPost['password'];
     $user->firstname = $arrPost['firstname'];
     $user->lastname = $arrPost['username'];
-    $user->email = $arrPost['email'];
+    $user->email = strtolower($arrPost['email']);
     $user->auth = 'manual';
     $user->lang = 'es';
     $user->calendartype = 'gregorian';
@@ -22,7 +22,7 @@ class MoodleRestPro {
     $course->categoryid = 1;
     return $course;
   }
-
+ 
   function create_user( $user, $token )
   {
     $users = array( $user );
