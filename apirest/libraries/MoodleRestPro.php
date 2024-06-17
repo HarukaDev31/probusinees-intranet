@@ -6,7 +6,7 @@ class MoodleRestPro {
     $user->username = $arrPost['username'];
     $user->password = $arrPost['password'];
     $user->firstname = $arrPost['firstname'];
-    $user->lastname = $arrPost['username'];
+    $user->lastname = "lastname";
     $user->email = $arrPost['email'];
     $user->auth = 'manual';
     $user->lang = 'es';
@@ -29,7 +29,6 @@ class MoodleRestPro {
     $params = array( 'users' => $users );
     echo json_encode(['users' => $users, 'params' => $params]);
     $response = $this->call_moodle( 'core_user_create_users', $params, $token );
-    echo json_encode($response);
 
     if ( $this->xmlresponse_is_exception( $response ) ) {
       //throw new Exception( $response );
