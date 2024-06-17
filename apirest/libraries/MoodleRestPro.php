@@ -27,8 +27,9 @@ class MoodleRestPro {
   {
     $users = array( $user );
     $params = array( 'users' => $users );
-
+    echo json_encode(['users' => $users, 'params' => $params]);
     $response = $this->call_moodle( 'core_user_create_users', $params, $token );
+    echo json_encode($response);
 
     if ( $this->xmlresponse_is_exception( $response ) ) {
       //throw new Exception( $response );
