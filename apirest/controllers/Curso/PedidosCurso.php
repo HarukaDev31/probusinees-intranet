@@ -132,7 +132,7 @@ class PedidosCurso extends CI_Controller {
 				'username' => $result->No_Usuario,
 				'password' => $this->encryption->decrypt($result->No_Password),
 				'firstname' => $result->No_Nombres_Apellidos,
-				"lastname" => "",
+				"lastname" => "lastname",
 				'email' => $result->No_Usuario,
 			);
 			echo json_encode($arrPost);
