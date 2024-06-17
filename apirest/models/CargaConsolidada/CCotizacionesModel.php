@@ -1121,7 +1121,7 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
             $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value, $tarifas, $expirationDate);
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-            $excelFileName = 'Boleta_' . $value['cliente']['nombre'] . '.xlsx';
+            $excelFileName = 'Cotizacion' . $value['cliente']['nombre'] . '.xlsx';
             $excelFilePath = 'assets/downloads/' . $excelFileName;
             $objWriter->save($excelFilePath);
             $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
