@@ -1,6 +1,9 @@
 <?php
+require_once APPPATH . 'traits/SupplierTraits.php';
 class PedidosGarantizadosModel extends CI_Model{
+	use SupplierTraits;
 	var $table = 'agente_compra_pedido_cabecera';
+	var $table_suppliers='suppliers';
 	var $table_agente_compra_pedido_detalle = 'agente_compra_pedido_detalle';
 	var $table_agente_compra_pedido_detalle_producto_proveedor = 'agente_compra_pedido_detalle_producto_proveedor';
 	var $table_agente_compra_pedido_detalle_producto_proveedor_imagen = 'agente_compra_pedido_detalle_producto_proveedor_imagen';
@@ -121,13 +124,12 @@ class PedidosGarantizadosModel extends CI_Model{
 		ACPDPP.Nu_Selecciono_Proveedor,
 		ACPDPP.Qt_Producto_Caja_Final,
 		ACPDPP.Txt_Nota_Final,
-		ACPDPPI.Txt_Url_Imagen_Producto,
 		ACPDPP.No_Contacto_Proveedor,
 		ACPDPP.Txt_Url_Imagen_Proveedor
 		');
         $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP');
 		$this->db->join($this->table . ' AS ACPC', 'ACPC.ID_Pedido_Cabecera = ACPDPP.ID_Pedido_Cabecera', 'join');
-		$this->db->join($this->table_agente_compra_pedido_detalle_producto_proveedor_imagen . ' AS ACPDPPI', 'ACPDPPI.ID_Pedido_Detalle_Producto_Proveedor = ACPDPP.ID_Pedido_Detalle_Producto_Proveedor', 'join');
+		// $this->db->join($this->table_agente_compra_pedido_detalle_producto_proveedor_imagen . ' AS ACPDPPI', 'ACPDPPI.ID_Pedido_Detalle_Producto_Proveedor = ACPDPP.ID_Pedido_Detalle_Producto_Proveedor', 'join');
         $this->db->where('ACPDPP.ID_Pedido_Detalle',$ID);
         $query = $this->db->get();
         return $query->result();
@@ -144,37 +146,38 @@ class PedidosGarantizadosModel extends CI_Model{
     public function actualizarElegirItemProductos($arrPost, $data_files){
 		$this->db->trans_begin();
 
-		//array_debug($data_files['addProveedor']);
+		try{
+			//array_debug($data_files['addProveedor']);
 
 		$path = "assets/images/contacto_proveedores/";
 		//foreach ($arrPost['addProducto'] as $row) {
 		foreach($arrPost['addProducto'] as $key => $row) {
 			$Txt_Url_Imagen_Proveedor='';
-			if(isset($data_files['addProveedor']) && !empty($data_files['addProveedor']) && !empty($data_files['addProveedor']['name'][$key])) {
-				$_FILES['img_proveedor']['name'] = $data_files['addProveedor']['name'][$key];
-				$_FILES['img_proveedor']['type'] = $data_files['addProveedor']['type'][$key];
-				$_FILES['img_proveedor']['tmp_name'] = $data_files['addProveedor']['tmp_name'][$key];
-				$_FILES['img_proveedor']['error'] = $data_files['addProveedor']['error'][$key];
-				$_FILES['img_proveedor']['size'] = $data_files['addProveedor']['size'][$key];
+			// if(isset($data_files['addProveedor']) && !empty($data_files['addProveedor']) && !empty($data_files['addProveedor']['name'][$key])) {
+			// 	$_FILES['img_proveedor']['name'] = $data_files['addProveedor']['name'][$key];
+			// 	$_FILES['img_proveedor']['type'] = $data_files['addProveedor']['type'][$key];
+			// 	$_FILES['img_proveedor']['tmp_name'] = $data_files['addProveedor']['tmp_name'][$key];
+			// 	$_FILES['img_proveedor']['error'] = $data_files['addProveedor']['error'][$key];
+			// 	$_FILES['img_proveedor']['size'] = $data_files['addProveedor']['size'][$key];
 
-				$config['upload_path'] = $path;
-				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
-				$config['max_size'] = 3072;//1024 KB = 3 MB
-				$config['encrypt_name'] = TRUE;
-				$config['max_filename'] = '255';
+			// 	$config['upload_path'] = $path;
+			// 	$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			// 	$config['max_size'] = 3072;//1024 KB = 3 MB
+			// 	$config['encrypt_name'] = TRUE;
+			// 	$config['max_filename'] = '255';
 		
-				$this->load->library('upload', $config);
-				if (!$this->upload->do_upload('img_proveedor')){
-					$this->db->trans_rollback();
-					return array(
-						'status' => 'error',
-						'message' => 'No se cargo imagen proveedor ' . strip_tags($this->upload->display_errors()),
-					);
-				} else {
-					$arrUploadFile = $this->upload->data();
-					$Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
-				}
-			}
+			// 	$this->load->library('upload', $config);
+			// 	if (!$this->upload->do_upload('img_proveedor')){
+			// 		$this->db->trans_rollback();
+			// 		return array(
+			// 			'status' => 'error',
+			// 			'message' => 'No se cargo imagen proveedor ' . strip_tags($this->upload->display_errors()),
+			// 		);
+			// 	} else {
+			// 		$arrUploadFile = $this->upload->data();
+			// 		$Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
+			// 	}
+			// }
 
 
 			$cantidad = $row['cantidad_oculta'];
@@ -197,8 +200,8 @@ class PedidosGarantizadosModel extends CI_Model{
 			if($row['moq'] < $row['moq_oculta'])
 				$moq = $row['moq_oculta'];
 				
-			$caja = $row['caja'];
-			if($row['caja'] < $row['caja_oculta'])
+			$caja = $row['qty_caja'];
+			if($row['qty_caja'] < $row['caja_oculta'])
 				$caja = $row['caja_oculta'];
 				
 			$cbm = $row['cbm'];
@@ -209,8 +212,8 @@ class PedidosGarantizadosModel extends CI_Model{
 			if($row['delivery'] < $row['delivery_oculta'])
 				$delivery = $row['delivery_oculta'];
 			
-			$costo_delivery = $row['costo_delivery'];
-			if($row['costo_delivery'] < $row['costo_delivery_oculta'])
+			$costo_delivery = $row['shipping_cost'];
+			if($row['shipping_cost'] < $row['costo_delivery_oculta'])
 				$costo_delivery = $row['costo_delivery_oculta'];
 				
 			$nota_historica = $row['nota_historica'];
@@ -220,7 +223,7 @@ class PedidosGarantizadosModel extends CI_Model{
 			$contacto_proveedor = $row['contacto_proveedor'];
 			if(empty($row['contacto_proveedor']))
 				$contacto_proveedor = $row['contacto_proveedor'];
-
+			
 			$arrActualizar[] = array(
 				'ID_Pedido_Detalle_Producto_Proveedor' => $row['id_detalle'],
 				'Qt_Producto_Caja_Final' => $cantidad,
@@ -235,6 +238,8 @@ class PedidosGarantizadosModel extends CI_Model{
 				'No_Contacto_Proveedor' => $contacto_proveedor,
 				'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
 			);
+			
+			
 		}
 		
 		$this->db->update_batch($this->table_agente_compra_pedido_detalle_producto_proveedor, $arrActualizar, 'ID_Pedido_Detalle_Producto_Proveedor');
@@ -253,6 +258,9 @@ class PedidosGarantizadosModel extends CI_Model{
 
 			$this->db->trans_commit();
 			return array('status' => 'success', 'message' => 'Datos actualizados');
+		}
+		} catch (Exception $e) {
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
 		}
     }
 
@@ -423,52 +431,53 @@ class PedidosGarantizadosModel extends CI_Model{
 		$path = "assets/images/contacto_proveedores/";
 		foreach($data['addProducto'] as $key => $row) {
 			$Txt_Url_Imagen_Proveedor='';
-			if(isset($data_files['proveedor']) && !empty($data_files['proveedor']) && !empty($data_files['proveedor']['name'][$key])) {
-				$_FILES['img_proveedor']['name'] = $data_files['proveedor']['name'][$key];
-				$_FILES['img_proveedor']['type'] = $data_files['proveedor']['type'][$key];
-				$_FILES['img_proveedor']['tmp_name'] = $data_files['proveedor']['tmp_name'][$key];
-				$_FILES['img_proveedor']['error'] = $data_files['proveedor']['error'][$key];
-				$_FILES['img_proveedor']['size'] = $data_files['proveedor']['size'][$key];
+			// if(isset($data_files['proveedor']) && !empty($data_files['proveedor']) && !empty($data_files['proveedor']['name'][$key])) {
+			// 	$_FILES['img_proveedor']['name'] = $data_files['proveedor']['name'][$key];
+			// 	$_FILES['img_proveedor']['type'] = $data_files['proveedor']['type'][$key];
+			// 	$_FILES['img_proveedor']['tmp_name'] = $data_files['proveedor']['tmp_name'][$key];
+			// 	$_FILES['img_proveedor']['error'] = $data_files['proveedor']['error'][$key];
+			// 	$_FILES['img_proveedor']['size'] = $data_files['proveedor']['size'][$key];
 
-				$config['upload_path'] = $path;
-				$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
-				$config['max_size'] = 3072;//1024 KB = 3 MB
-				$config['encrypt_name'] = TRUE;
-				$config['max_filename'] = '255';
+			// 	$config['upload_path'] = $path;
+			// 	$config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+			// 	$config['max_size'] = 3072;//1024 KB = 3 MB
+			// 	$config['encrypt_name'] = TRUE;
+			// 	$config['max_filename'] = '255';
 		
-				$this->load->library('upload', $config);
+			// 	$this->load->library('upload', $config);
 
-				if (!$this->upload->do_upload('img_proveedor')){
-					$this->db->trans_rollback();
-					return array(
-						'status' => 'error',
-						'message' => 'No se cargo imagen proveedor ' . strip_tags($this->upload->display_errors()),
-					);
-				} else {
-					$arrUploadFile = $this->upload->data();
-					$Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
-				}
-			}
+			// 	if (!$this->upload->do_upload('img_proveedor')){
+			// 		$this->db->trans_rollback();
+			// 		return array(
+			// 			'status' => 'error',
+			// 			'message' => 'No se cargo imagen proveedor ' . strip_tags($this->upload->display_errors()),
+			// 		);
+			// 	} else {
+			// 		$arrUploadFile = $this->upload->data();
+			// 		$Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
+			// 	}
+			// }
 
 			//insertar proveedor agente de compra
-			$query = "SELECT ID_Entidad FROM entidad WHERE ID_Empresa = 1 AND Nu_Tipo_Entidad = 1 AND ID_Tipo_Documento_Identidad = 1 AND No_Entidad = '" . limpiarCaracteresEspeciales($row['contacto_proveedor']) . "' LIMIT 1";
-			$objVerificarEntidad = $this->db->query($query)->row();
-			if (!is_object($objVerificarEntidad)){
-				$arrEntidad = array(
-					'ID_Empresa' => 1,
-					'ID_Organizacion' => 1,
-					'Nu_Tipo_Entidad' => 1,//1=Proveedor
-					'ID_Tipo_Documento_Identidad' => 1,
-					'Nu_Documento_Identidad' => '-',
-					'No_Entidad' => $row['contacto_proveedor'],
-					'Nu_Estado' => 1,
-					'ID_Pais' => 55,//buscar id china
-					'Nu_Agente_Compra' => 1,
-					'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor
+			// $query = "SELECT ID_Entidad FROM entidad WHERE ID_Empresa = 1 AND Nu_Tipo_Entidad = 1 AND ID_Tipo_Documento_Identidad = 1 AND No_Entidad = '" . limpiarCaracteresEspeciales($row['contacto_proveedor']) . "' LIMIT 1";
+			// $objVerificarEntidad = $this->db->query($query)->row();
+			//check if exists supplier with same phone number and get id_supplier
+			$existsSupplier=$this->db->get_where($this->table_suppliers, array('phone' => $row['celular_proveedor']))->row();
+			if (empty($existsSupplier)) {
+				/// generate code recursively until it does not exist in supplier table
+				$code = $this->generateSupplierCode($row['nombre_proveedor']);
+				while ($this->db->get_where($this->table_suppliers, array('code' => $code))->num_rows() > 0) {
+					$code = $this->generateSupplierCode($row['nombre_proveedor']);
+				}
+
+				$arrSupplier=array(
+					"name"=>$row['nombre_proveedor'],
+					"phone"=>$row['celular_proveedor'],
+					"code"=>$code,
 				);
 	
-				if ($this->db->insert('entidad', $arrEntidad) > 0) {
-		    		$ID_Entidad_Proveedor = $this->db->insert_id();
+				if ($this->db->insert('suppliers', $arrSupplier) > 0) {
+		    		$idSupplier = $this->db->insert_id();
 				} else {
 					$this->db->trans_rollback();
 					return array(
@@ -477,7 +486,7 @@ class PedidosGarantizadosModel extends CI_Model{
 					);
 				}
 			} else {
-				$ID_Entidad_Proveedor = $objVerificarEntidad->ID_Entidad;
+				$idSupplier = $existsSupplier->id_supplier;
 			}
 
 			$arrDetalle[] = array(
@@ -490,12 +499,12 @@ class PedidosGarantizadosModel extends CI_Model{
 				'Qt_Producto_Caja' => $row['qty_caja'],
 				'Qt_Cbm' => $row['cbm'],
 				'Nu_Dias_Delivery' => $row['delivery'],
-				'Ss_Costo_Delivery' => $row['costo_delivery'],
+				'Ss_Costo_Delivery' => $row['shipping_cost'],
 				'Txt_Nota' => nl2br($row['nota']),
 				'No_Contacto_Proveedor' => $row['contacto_proveedor'],
 				'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
-				'ID_Entidad_Proveedor' => $ID_Entidad_Proveedor
-			);
+				'ID_Entidad_Proveedor' => $idSupplier
+			);	
 		}
 
 		$this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor', $arrDetalle);
@@ -577,10 +586,11 @@ class PedidosGarantizadosModel extends CI_Model{
 					}
 				}
 				//array_debug($arrDetalleImagen);
-			} else {
-				$this->db->trans_rollback();
-				return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'No existe imagen');
-			}
+			} 
+			//else {
+			// 	$this->db->trans_rollback();
+			// 	return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'No existe imagen');
+			// }
 		} else {
 			$this->db->trans_rollback();
 			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
@@ -604,7 +614,6 @@ class PedidosGarantizadosModel extends CI_Model{
 			return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
 		}
     }
-	
 	public function getDownloadImage($id){
 		$query = "SELECT Txt_Url_Imagen_Producto FROM agente_compra_pedido_detalle WHERE ID_Pedido_Detalle = " . $id . " LIMIT 1";
 		return $this->db->query($query)->row();

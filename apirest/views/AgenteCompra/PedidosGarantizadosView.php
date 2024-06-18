@@ -46,7 +46,7 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
                     <tr>
-                      <th>País</th>
+                      <th>País </th>
                       <th>Cotización</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
@@ -74,10 +74,10 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-//$attributes = array('id' => 'form-pedido');
-$attributes = array('id' => 'form-pedido', 'enctype' => 'multipart/form-data');
-echo form_open('', $attributes);
-?>
+                  //$attributes = array('id' => 'form-pedido');
+                  $attributes = array('id' => 'form-pedido', 'enctype' => 'multipart/form-data');
+                  echo form_open('', $attributes);
+                  ?>
                   <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
                   <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
                   <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
@@ -264,9 +264,9 @@ echo form_open('', $attributes);
               </div><!--div agregar productos de proveedor -->
               <div class="box-body" id="div-elegir_item_proveedor">
                 <?php
-$attributes = array('id' => 'form-arrItemsProveedor');
-echo form_open('', $attributes);
-?>
+              $attributes = array('id' => 'form-arrItemsProveedor');
+              echo form_open('', $attributes);
+              ?>
                   <input type="hidden" id="txt-EID_Empresa_item" name="EID_Empresa_item" class="form-control">
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
@@ -275,11 +275,11 @@ echo form_open('', $attributes);
                   <input type="hidden" id="txt-Item_Ename_producto_Editar" name="Item_Ename_producto_Editar" class="form-control">
 
                   <div id="div-arrItemsProveedor" class="col-xs-12 col-sm-12 col-md-12">
-                    <h3>Productos</h3>
+                    <h3>Elegir Proveedor</h3>
 
                     <div class="table-responsive">
                       <table id="table-elegir_productos_proveedor" class="table table-bordered table-hover table-striped">
-                        <thead class="thead-light">
+                        <!-- <thead class="thead-light">
                           <tr>
                             <th style='display:none;' class="text-left">ID</th>
                             <th class="text-left" width="">Imagen Producto</th>
@@ -294,7 +294,7 @@ echo form_open('', $attributes);
                             <th class="text-left" width="">Nombre Proveedor</th>
                             <th class="text-left" width="">Imagen Proveedor</th>
                           </tr>
-                        </thead>
+                        </thead> -->
                         <tbody>
                         </tbody>
                       </table>
@@ -486,7 +486,7 @@ echo form_open('', $attributes);
     <div class="modal-content">
       <div class="modal-body" id="modal-body-confirmation">
         <div class="col-xs-12">
-          <label>¿Está seguro de asignar el pedido al personal de China?</label>
+          <label id="modal-message-confirmation-title">¿Está seguro de asignar el pedido al personal de China?</label>
         </div>
       </div>
       <div class="modal-footer justify-content-between">

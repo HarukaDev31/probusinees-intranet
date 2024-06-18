@@ -149,10 +149,12 @@ class PedidosGarantizados extends CI_Controller {
     	
 	public function ajax_edit($ID){
 		$arrReponse = $this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID));
+		//get user Nu_Tipo_Privilegio_Acceso 
 		$sCorrelativoCotizacion = '';
 		foreach ($arrReponse as $row) {
 			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
 			$row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
+			$row->Nu_Tipo_Privilegio_Acceso = $this->user->Nu_Tipo_Privilegio_Acceso;	
 		}
         echo json_encode($arrReponse);
         //echo json_encode($this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID)));

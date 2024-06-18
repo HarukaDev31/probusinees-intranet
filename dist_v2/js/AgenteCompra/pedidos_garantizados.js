@@ -560,70 +560,76 @@ $(function () {
 
   $(document).on("click", ".btn-seleccionar_proveedor", function (e) {
     e.preventDefault();
-
     var id_detalle = $(this).data("id_detalle");
-    var id = $(this).data("id");
-    var correlativo = $(this).data("correlativo");
-    var name_item = $(this).data("name_item");
+      var id = $(this).data("id");
+      var correlativo = $(this).data("correlativo");
+      var name_item = $(this).data("name_item");
+    $("#btn-confirmation").on("click", function () {
+      
+      $("#modal-confirmation").modal("hide");
 
-    url =
-      base_url +
-      "AgenteCompra/PedidosGarantizados/elegirItemProveedor/" +
-      id_detalle +
-      "/" +
-      id +
-      "/" +
-      1 +
-      "/" +
-      correlativo +
-      "/" +
-      encodeURIComponent(name_item);
-    $.ajax({
-      url: url,
-      type: "GET",
-      dataType: "JSON",
-      success: function (response) {
-        $("#moda-message-content").removeClass(
-          "bg-danger bg-warning bg-success"
-        );
-        $("#modal-message").modal("show");
+      url =
+        base_url +
+        "AgenteCompra/PedidosGarantizados/elegirItemProveedor/" +
+        id_detalle +
+        "/" +
+        id +
+        "/" +
+        1 +
+        "/" +
+        correlativo +
+        "/" +
+        encodeURIComponent(name_item);
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "JSON",
+        success: function (response) {
+          $("#moda-message-content").removeClass(
+            "bg-danger bg-warning bg-success"
+          );
+          $("#modal-message").modal("show");
 
-        if (response.status == "success") {
-          //alert(response.message);
-          $("#moda-message-content").addClass("bg-" + response.status);
-          $(".modal-title-message").text(response.message);
+          if (response.status == "success") {
+            //alert(response.message);
+            $("#moda-message-content").addClass("bg-" + response.status);
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 1100);
+
+            $("#table-elegir_productos_proveedor tbody").empty();
+            getItemProveedor(id_detalle);
+          } else {
+            $("#moda-message-content").addClass("bg-danger");
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 2100);
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $(".modal-message").removeClass(
+            "modal-danger modal-warning modal-success"
+          );
+
+          $("#modal-message").modal("show");
+          $(".modal-message").addClass("modal-danger");
+          $(".modal-title-message").text(
+            textStatus + " [" + jqXHR.status + "]: " + errorThrown
+          );
           setTimeout(function () {
             $("#modal-message").modal("hide");
-          }, 1100);
+          }, 1700);
 
-          $("#table-elegir_productos_proveedor tbody").empty();
-          getItemProveedor(id_detalle);
-        } else {
-          $("#moda-message-content").addClass("bg-danger");
-          $(".modal-title-message").text(response.message);
-          setTimeout(function () {
-            $("#modal-message").modal("hide");
-          }, 2100);
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $(".modal-message").removeClass(
-          "modal-danger modal-warning modal-success"
-        );
-
-        $("#modal-message").modal("show");
-        $(".modal-message").addClass("modal-danger");
-        $(".modal-title-message").text(
-          textStatus + " [" + jqXHR.status + "]: " + errorThrown
-        );
-        setTimeout(function () {
-          $("#modal-message").modal("hide");
-        }, 1700);
-
-        //Message for developer
-        console.log(jqXHR.responseText);
-      },
+          //Message for developer
+          console.log(jqXHR.responseText);
+        },
+      });
     });
+    $("#modal-confirmation").modal("show");
+    //modal-message-confirmation set title
+    $("#modal-message-confirmation-title").html("Desea seleccionar proveedor?");
   });
 
   $(document).on("click", ".btn-desmarcar_proveedor", function (e) {
@@ -836,22 +842,29 @@ $(function () {
 
     //validacion de articulos
     var sEstadoArticulos = true;
+    var firstError = null;
+
     $("#form-arrItems")
       .find(":input")
       .each(function () {
         var elemento = this;
-
+        console.log(elemento);
         if (elemento.dataset.correlativo !== undefined) {
           if (elemento.classList[0] == "arrProducto") {
             if (elemento.type == "text") {
               if (elemento.classList[2] == "required") {
                 if (
-                  (elemento.classList[3] == "precio" ||
+                  ((elemento.classList[3] == "precio" ||
                     elemento.classList[3] == "moq" ||
                     elemento.classList[3] == "qty_caja" ||
-                    elemento.classList[3] == "cbm") &&
-                  (isNaN(parseFloat($("#" + elemento.id).val())) ||
-                    parseFloat($("#" + elemento.id).val()) < 0.0)
+                    elemento.classList[3] == "cbm" ||
+                    elemento.classList[3] == "delivery" ||
+                    elemento.classList[3] == "shipping_cost" ||
+                    elemento.classList[3] == "celular_proveedor") &&
+                    (isNaN(parseFloat($("#" + elemento.id).val())) ||
+                      parseFloat($("#" + elemento.id).val()) < 0.0)) ||
+                  (elemento.classList[3] == "nombre_proveedor" &&
+                    $("#" + elemento.id).val().length == 0)
                 ) {
                   $("#" + elemento.id)
                     .closest(".form-group")
@@ -861,8 +874,10 @@ $(function () {
                     .closest(".form-group")
                     .removeClass("has-success")
                     .addClass("has-error");
-
-                  scrollToError($("html, body"), $("#" + elemento.id));
+                  if (firstError == null) {
+                    firstError = elemento.id;
+                  }
+                  // scrollToError($("html, body"), $("#" + elemento.id));
 
                   $("#" + elemento.id).focus();
                   $("#" + elemento.id).select();
@@ -872,13 +887,15 @@ $(function () {
                   }, 30);
 
                   sEstadoArticulos = false;
-                  return false;
                 }
               }
             }
           }
         }
       });
+    if (firstError != null) {
+      scrollToError($("html, body"), $("#" + firstError));
+    }
     //validacion de articulos
 
     if (sEstadoArticulos == true) {
@@ -1169,7 +1186,6 @@ function verPedido(ID) {
             ? cantidad_item
             : 0;
         //if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-        //table_enlace_producto += "<span class='mt-3'>Cantidad: </span><span class='font-weight-bold'>" + Math.round10(cantidad_item, -2) + "</span><br>";
         table_enlace_producto += '<div class="row mb-2">';
         table_enlace_producto += '<div class="col col-sm-6 text-right">';
         table_enlace_producto += "<span class='mt-3'>Cantidad</span>";
@@ -1807,190 +1823,271 @@ function _generarConsolidaTrading($modal_delete, ID) {
 }
 
 function addItems() {
-  div_items = "";
+  div_items = `
+  <div id="card"${iCounterItems}" class="card border-0 rounded shadow-sm mt-3">
+    <div class = "row" >
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-precio${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+         <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Moq<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-moq${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Qty_caja<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-qty_caja${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Cbm<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-cbm${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Shipping Cost<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-costo_delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-6">
+        <div class="row h-100">
+          <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
+            <!--Upload Icon-->
+            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen Principal</button>
+          </div>
+          <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 2</button>
+            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 3</button>
+            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 1</button>
+            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 2</button>
 
-  div_items +=
-    '<div id="card' +
-    iCounterItems +
-    '" class="card border-0 rounded shadow-sm mt-3">';
-  div_items += '<div class="row">';
-  div_items += '<div class="col-sm-12">';
-  div_items += '<div class="card-body pt-3">';
-  div_items += '<div class="row">';
-  div_items +=
-    '<div class="col-11 col-sm-11 col-md-11 col-lg-11 mb-0 mb-sm-0">';
-  div_items +=
-    '<h6 class="text-left card-title mb-2 pt-0" style="text-align: left;">';
-  div_items +=
-    '<span class="fw-bold" style="font-weight: bold;">Imagen<span class="label-advertencia text-danger"> *</span></span>';
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<input class="form-control" name="voucher[' +
-    iCounterItems +
-    '][]" type="file" accept="image/*" multiple></input>';
-  //div_items += '<input class="form-control" name="addProducto[' + iCounterItems + '][voucher][]" type="file" accept="image/*" multiple></input>';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-6">
+        <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-nombre_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+        <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-celular_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+        <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
+        <div class="form-group">
+          <textarea id="modal-notas${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
+        </div>
 
-  div_items += '<div class="col-1 col-sm-1 col-md-1 col-lg-1">';
-  div_items += '<span class="fw-bold" style="font-weight: bold;">&nbsp;</span>';
-  div_items +=
-    '<div class="d-grid gap"><button type="button" id="btn-quitar_item_' +
-    iCounterItems +
-    '" class="btn btn-outline-danger btn-quitar_item col" data-id="' +
-    iCounterItems +
-    '">X</div>';
-  div_items += "</div>";
+      </div>
+    </div>
+  </div>
+  `;
 
-  div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items +=
-    '<span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span></span>';
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<input type="text" id="modal-precio' +
-    iCounterItems +
-    '" data-correlativo="' +
-    iCounterItems +
-    '" inputmode="decimal" name="addProducto[' +
-    iCounterItems +
-    '][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items +=
+  //   '<div id="card' +
+  //   iCounterItems +
+  //   '" class="card border-0 rounded shadow-sm mt-3">';
+  // div_items += '<div class="row">';
+  // div_items += '<div class="col-sm-12">';
+  // div_items += '<div class="card-body pt-3">';
+  // div_items += '<div class="row">';
+  // div_items +=
+  //   '<div class="col-11 col-sm-11 col-md-11 col-lg-11 mb-0 mb-sm-0">';
+  // div_items +=
+  //   '<h6 class="text-left card-title mb-2 pt-0" style="text-align: left;">';
+  // div_items +=
+  //   '<span class="fw-bold" style="font-weight: bold;">Imagen<span class="label-advertencia text-danger"> *</span></span>';
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<input class="form-control" name="voucher[' +
+  //   iCounterItems +
+  //   '][]" type="file" accept="image/*" multiple></input>';
+  // //div_items += '<input class="form-control" name="addProducto[' + iCounterItems + '][voucher][]" type="file" accept="image/*" multiple></input>';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
 
-  div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items +=
-    '<span class="fw-bold">moq<span class="label-advertencia text-danger"> *</span></span>';
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<input type="text" id="modal-moq' +
-    iCounterItems +
-    '" data-correlativo="' +
-    iCounterItems +
-    '" inputmode="decimal" name="addProducto[' +
-    iCounterItems +
-    '][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items += '<div class="col-1 col-sm-1 col-md-1 col-lg-1">';
+  // div_items += '<span class="fw-bold" style="font-weight: bold;">&nbsp;</span>';
+  // div_items +=
+  //   '<div class="d-grid gap"><button type="button" id="btn-quitar_item_' +
+  //   iCounterItems +
+  //   '" class="btn btn-outline-danger btn-quitar_item col" data-id="' +
+  //   iCounterItems +
+  //   '">X</div>';
+  // div_items += "</div>";
 
-  div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items +=
-    '<span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>'; //qty_caja_actual
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<input type="text" id="modal-qty_caja' +
-    iCounterItems +
-    '" data-correlativo="' +
-    iCounterItems +
-    '" inputmode="decimal" name="addProducto[' +
-    iCounterItems +
-    '][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items +=
+  //   '<span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span></span>';
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<input type="text" id="modal-precio' +
+  //   iCounterItems +
+  //   '" data-correlativo="' +
+  //   iCounterItems +
+  //   '" inputmode="decimal" name="addProducto[' +
+  //   iCounterItems +
+  //   '][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
 
-  div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items +=
-    '<span class="fw-bold">cbm<span class="label-advertencia text-danger"> *</span></span>';
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<input type="text" id="modal-cbm' +
-    iCounterItems +
-    '" data-correlativo="' +
-    iCounterItems +
-    '" inputmode="decimal" name="addProducto[' +
-    iCounterItems +
-    '][cbm]" class="arrProducto form-control required input-decimal" cbm placeholder="" value="" autocomplete="off" />';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items +=
+  //   '<span class="fw-bold">moq<span class="label-advertencia text-danger"> *</span></span>';
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<input type="text" id="modal-moq' +
+  //   iCounterItems +
+  //   '" data-correlativo="' +
+  //   iCounterItems +
+  //   '" inputmode="decimal" name="addProducto[' +
+  //   iCounterItems +
+  //   '][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
 
-  div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items += '<span class="fw-bold">Delivery</span>';
-  div_items += "</h6>";
-  div_items +=
-    '<input type="text" inputmode="numeric" id="modal-delivery' +
-    iCounterItems +
-    '" name="addProducto[' +
-    iCounterItems +
-    '][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
-  div_items += "</div>";
+  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items +=
+  //   '<span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>'; //qty_caja_actual
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<input type="text" id="modal-qty_caja' +
+  //   iCounterItems +
+  //   '" data-correlativo="' +
+  //   iCounterItems +
+  //   '" inputmode="decimal" name="addProducto[' +
+  //   iCounterItems +
+  //   '][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
 
-  div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items += '<span class="fw-bold">Shipping Cost</span>';
-  div_items += "</h6>";
-  div_items +=
-    '<input type="text" inputmode="decimal" id="modal-costo_delivery' +
-    iCounterItems +
-    '" name="addProducto[' +
-    iCounterItems +
-    '][costo_delivery]" class="arrProducto form-control input-decimal" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
-  div_items += "</div>";
+  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items +=
+  //   '<span class="fw-bold">cbm<span class="label-advertencia text-danger"> *</span></span>';
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<input type="text" id="modal-cbm' +
+  //   iCounterItems +
+  //   '" data-correlativo="' +
+  //   iCounterItems +
+  //   '" inputmode="decimal" name="addProducto[' +
+  //   iCounterItems +
+  //   '][cbm]" class="arrProducto form-control required input-decimal" cbm placeholder="" value="" autocomplete="off" />';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
 
-  div_items += '<div class="col-sm-12 mb-1">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items += '<span class="fw-bold">Observaciones</span>';
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<textarea class="arrProducto form-control required nota" rows="1" placeholder="Opcional" id="modal-nota' +
-    iCounterItems +
-    '" name="addProducto[' +
-    iCounterItems +
-    '][nota]" style="height: 50px;"></textarea>';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items += '<span class="fw-bold">Delivery</span>';
+  // div_items += "</h6>";
+  // div_items +=
+  //   '<input type="text" inputmode="numeric" id="modal-delivery' +
+  //   iCounterItems +
+  //   '" name="addProducto[' +
+  //   iCounterItems +
+  //   '][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
+  // div_items += "</div>";
 
-  div_items += '<div class="col-12 col-sm-6 mb-1">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items += '<span class="fw-bold">Nombre Proveedor</span>';
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<input type="text" inputmode="text" id="modal-contacto_proveedor' +
-    iCounterItems +
-    '" name="addProducto[' +
-    iCounterItems +
-    '][contacto_proveedor]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off" />';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items += '<span class="fw-bold">Shipping Cost</span>';
+  // div_items += "</h6>";
+  // div_items +=
+  //   '<input type="text" inputmode="decimal" id="modal-costo_delivery' +
+  //   iCounterItems +
+  //   '" name="addProducto[' +
+  //   iCounterItems +
+  //   '][costo_delivery]" class="arrProducto form-control input-decimal" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
+  // div_items += "</div>";
 
-  div_items += '<div class="col-12 col-sm-6 mb-0">';
-  div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  div_items += '<span class="fw-bold">Foto Proveedor</span>';
-  div_items += "</h6>";
-  div_items += '<div class="form-group">';
-  div_items +=
-    '<input class="form-control" id="modal-foto_proveedor' +
-    iCounterItems +
-    '" name="proveedor[' +
-    iCounterItems +
-    ']" type="file" accept="image/*"></input>';
-  //div_items += '<input type="text" inputmode="text" id="modal-foto_proveedor' + iCounterItems + '" name="addProducto[' + iCounterItems + '][foto_proveedor]" class="arrProducto form-control input-number" placeholder="" maxlength="255" autocomplete="off" />';
-  div_items += '<span class="help-block text-danger" id="error"></span>';
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items += '<div class="col-sm-12 mb-1">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items += '<span class="fw-bold">Observaciones</span>';
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<textarea class="arrProducto form-control required nota" rows="1" placeholder="Opcional" id="modal-nota' +
+  //   iCounterItems +
+  //   '" name="addProducto[' +
+  //   iCounterItems +
+  //   '][nota]" style="height: 50px;"></textarea>';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
 
-  div_items += "</div>";
-  div_items += "</div>";
-  div_items += "</div>";
-  div_items += "</div>";
-  div_items += "</div>";
+  // div_items += '<div class="col-12 col-sm-6 mb-1">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items += '<span class="fw-bold">Nombre Proveedor</span>';
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<input type="text" inputmode="text" id="modal-contacto_proveedor' +
+  //   iCounterItems +
+  //   '" name="addProducto[' +
+  //   iCounterItems +
+  //   '][contacto_proveedor]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off" />';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
+
+  // div_items += '<div class="col-12 col-sm-6 mb-0">';
+  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
+  // div_items += '<span class="fw-bold">Foto Proveedor</span>';
+  // div_items += "</h6>";
+  // div_items += '<div class="form-group">';
+  // div_items +=
+  //   '<input class="form-control" id="modal-foto_proveedor' +
+  //   iCounterItems +
+  //   '" name="proveedor[' +
+  //   iCounterItems +
+  //   ']" type="file" accept="image/*"></input>';
+  // //div_items += '<input type="text" inputmode="text" id="modal-foto_proveedor' + iCounterItems + '" name="addProducto[' + iCounterItems + '][foto_proveedor]" class="arrProducto form-control input-number" placeholder="" maxlength="255" autocomplete="off" />';
+  // div_items += '<span class="help-block text-danger" id="error"></span>';
+  // div_items += "</div>";
+  // div_items += "</div>";
+
+  // div_items += "</div>";
+  // div_items += "</div>";
+  // div_items += "</div>";
+  // div_items += "</div>";
+  // div_items += "</div>";
 
   $("#div-arrItems").append(div_items);
 
@@ -2036,7 +2133,119 @@ function scrollToError($sMetodo, $IdElemento) {
     "slow"
   );
 }
+function getItemTemplate(i, mode, detalle) {
+  div_items = `
+    <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
+      <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
 
+      <div class = "row" >
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-precio${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Moq<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-moq${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Qty_caja<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-qty_caja${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Cbm<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-cbm${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Shipping Cost<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-costo_delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-6">
+          <div class="row h-100">
+            <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
+              <!--Upload Icon-->
+              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Imagen Principal</button>
+            </div>
+            <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Imagen 2</button>
+              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Imagen 3</button>
+              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Video 1</button>
+              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Video 2</button>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-6">
+          <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-celular_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
+          <div class="form-group">
+            <textarea id="modal-notas${i}" data-correlativo="${i}" name="addProducto[${i}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
+          </div>
+
+        </div>
+      </div>
+      `;
+  var id_detalle = detalle[i]["ID_Pedido_Detalle"];
+  var id_item = detalle[i]["ID_Pedido_Detalle_Producto_Proveedor"];
+  if (mode == "edit") {
+  } else {
+    if (detalle[i]["Nu_Selecciono_Proveedor"] == 0) {
+      div_items += `
+            <button type="button" id="btn-seleccionar_proveedor${id_item}" 
+              data-id_detalle="${id_detalle}" 
+              data-id="${id_item}" 
+              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}" 
+              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}" 
+              class="btn btn-danger btn-block btn-seleccionar_proveedor">
+              <i class="fas fa-check"></i>&nbsp; Seleccionar proveedor
+            </button>`;
+    } else {
+      div_items += `
+            <button type="button" id="btn-desmarcar_proveedor${id_item}" 
+              data-id_detalle="${id_detalle}" 
+              data-id="${id_item}" 
+              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}" 
+              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}" 
+              class="btn btn-secondary btn-block btn-desmarcar_proveedor">
+              <i class="fas fa-times"></i>&nbsp; Deseleccionar proveedor
+            </button>`;
+    }
+  }
+  div_items += `</div>`;
+  return div_items;
+}
 function getItemProveedor(id_detalle) {
   url =
     base_url +
@@ -2048,10 +2257,36 @@ function getItemProveedor(id_detalle) {
     dataType: "JSON",
     success: function (response) {
       var detalle = response;
+      const container = $("#table-elegir_productos_proveedor tbody");
+      container.empty();
 
-      $("#table-elegir_productos_proveedor tbody").empty();
+      for (i = 0; i < detalle.length; i++) {
+        let item = getItemTemplate(i, "select", detalle);
 
-      console.log(detalle);
+        container.append(item);
+        container.find(`#modal-precio${i}`).val(detalle[i]["Ss_Precio"]);
+        container.find(`#modal-moq${i}`).val(detalle[i]["Qt_Producto_Moq"]);
+        container
+          .find(`#modal-qty_caja${i}`)
+          .val(detalle[i]["Qt_Producto_Caja"]);
+        container.find(`#modal-cbm${i}`).val(detalle[i]["Qt_Cbm"]);
+        container
+          .find(`#modal-delivery${i}`)
+          .val(detalle[i]["Nu_Dias_Delivery"]);
+        container
+          .find(`#modal-costo_delivery${i}`)
+          .val(detalle[i]["Ss_Costo_Delivery"]);
+        container
+          .find(`#modal-nombre_proveedor${i}`)
+          .val(detalle[i]["No_Contacto_Proveedor"]);
+        container
+          .find(`#modal-celular_proveedor${i}`)
+          .val(detalle[i]["No_Celular_Contacto_Proveedor"]);
+        container
+          .find(`#modal-detalle${i}`)
+          .val(detalle[i]["ID_Pedido_Detalle_Producto_Proveedor"]);
+      }
+      return;
       var table_enlace_producto = "",
         id_item_tmp = 0;
       for (i = 0; i < detalle.length; i++) {
