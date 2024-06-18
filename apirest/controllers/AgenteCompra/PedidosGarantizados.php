@@ -213,7 +213,9 @@ class PedidosGarantizados extends CI_Controller {
 	public function addPedidoItemProveedor(){
 		//array_debug($this->input->post());
 		//array_debug($_FILES);
-		echo json_encode($this->PedidosGarantizadosModel->addPedidoItemProveedor($this->input->post(), $_FILES));
+		$formData = $this->input->post();
+		$fileData = $_FILES;
+		echo json_encode($this->PedidosGarantizadosModel->addPedidoItemProveedor($formData,$fileData));
 		exit();
 	}
 

@@ -1,7 +1,8 @@
 <?php
 require_once APPPATH . 'traits/SupplierTraits.php';
+require_once APPPATH . 'traits/FileTrait.php';
 class PedidosGarantizadosModel extends CI_Model{
-	use SupplierTraits;
+	use SupplierTraits, FileTrait;
 	var $table = 'agente_compra_pedido_cabecera';
 	var $table_suppliers='suppliers';
 	var $table_agente_compra_pedido_detalle = 'agente_compra_pedido_detalle';
@@ -431,6 +432,97 @@ class PedidosGarantizadosModel extends CI_Model{
 		$path = "assets/images/contacto_proveedores/";
 		foreach($data['addProducto'] as $key => $row) {
 			$Txt_Url_Imagen_Proveedor='';
+			$filesKey=[
+				"main-photo",
+				"secondary_photo",
+				"terciary_photo",
+				"primary_video",
+				"secondary_video",
+			];
+			foreach ($filesKey as $keyFile) {
+				//return this item in form data addProducto[1][main_photo]
+				return $data_files['addProducto'];
+
+				$rowFile=$data_files['addProducto'][$key][$keyFile];
+				$mainPhotoUrl='';
+				$secondaryPhotoUrl='';
+				$terciaryPhotoUrl='';
+				$primaryVideoUrl='';
+				$secondaryVideoUrl='';
+				$allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP');
+				$allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp');
+				$maxSize = 3072;//1024 KB = 3 MB
+				$validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($rowFile, $allowedExtensions, $allowedContentTypes);
+				echo 1;
+				return;
+				$validateSize = $this->validateSize($rowFile, $maxSize);
+				if (!$validateExtensionAndContentTypes) {
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . $rowFile->getClientOriginalName() . ' extension no permitida',
+					);
+				}
+				if (!$validateSize) {
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . $rowFile->getClientOriginalName() . ' tamaño no permitido',
+					);
+				}
+				//upload file to server
+				$mainPhotoUrl = $this->uploadFile($rowFile, $path);
+				//check if valid file
+				if ($mainPhotoUrl == '') {
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . $rowFile->getClientOriginalName(),
+					);
+				}
+				//check if valid file
+				$secondaryPhotoUrl = $this->uploadFile($rowFile, $path);
+				//check if valid file
+				if ($secondaryPhotoUrl == '') {
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . $rowFile->getClientOriginalName(),
+					);
+				}
+				//check if valid file
+				$terciaryPhotoUrl = $this->uploadFile($rowFile, $path);
+				//check if valid file
+				if ($terciaryPhotoUrl == '') {
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . $rowFile->getClientOriginalName(),
+					);
+				}
+				//check if valid file
+				$primaryVideoUrl = $this->uploadFile($rowFile, $path);
+				//check if valid file
+				if ($primaryVideoUrl == '') {
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . $rowFile->getClientOriginalName(),
+					);
+				}
+				//check if valid file
+				$secondaryVideoUrl = $this->uploadFile($rowFile, $path);
+				//check if valid file
+				if ($secondaryVideoUrl == '') {
+					return array(
+						'status' => 'error',
+						'message' => 'No se cargo imagen proveedor ' . $rowFile->getClientOriginalName(),
+					);
+				}
+
+				
+				
+
+			}
+				//check if valid file 
+				
+			//foreach file with key in $fileskey check type of file and size
+
+
 			// if(isset($data_files['proveedor']) && !empty($data_files['proveedor']) && !empty($data_files['proveedor']['name'][$key])) {
 			// 	$_FILES['img_proveedor']['name'] = $data_files['proveedor']['name'][$key];
 			// 	$_FILES['img_proveedor']['type'] = $data_files['proveedor']['type'][$key];
@@ -503,6 +595,11 @@ class PedidosGarantizadosModel extends CI_Model{
 				'Txt_Nota' => nl2br($row['nota']),
 				'No_Contacto_Proveedor' => $row['contacto_proveedor'],
 				'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
+				"main_photo"=>$mainPhotoUrl,
+				"secondary_photo"=>$secondaryPhotoUrl,
+				"terciary_photo"=>$terciaryPhotoUrl,
+				"primary_video"=>$primaryVideoUrl,
+				"secondary_video"=>$secondaryVideoUrl,
 				'ID_Entidad_Proveedor' => $idSupplier
 			);	
 		}

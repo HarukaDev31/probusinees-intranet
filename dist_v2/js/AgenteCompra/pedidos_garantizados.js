@@ -1874,13 +1874,13 @@ function addItems() {
         <div class="row h-100">
           <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
             <!--Upload Icon-->
-            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen Principal</button>
+            <input type="file" name="addProducto[${iCounterItems}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen Principal</input>
           </div>
           <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
-            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 2</button>
-            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 3</button>
-            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 1</button>
-            <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 2</button>
+            <input type="file" name="addProducto[${iCounterItems}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 2</input>
+            <input type="file" name="addProducto[${iCounterItems}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 3</input>
+            <input type="file" name="addProducto[${iCounterItems}][primary_video]"class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 1</input>
+            <input type="file" name="addProducto[${iCounterItems}][secondary_video]"class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 2</input>
 
           </div>
         </div>
