@@ -57,10 +57,9 @@ class CCotizaciones extends CI_Controller
             $rows[] = $select;
 
             $rows[] = '<div>
-            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-excel fa-2x text-success" aria-hidden="true" id="descargar-reporte(' . $row->ID_Cotizacion . ')"></i></button>
-         <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf(' . $row->ID_Cotizacion . ')"></i></button>
-
-            </div>';
+            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarReporte(' . $row->ID_Cotizacion . ', \'' . $row->CotizacionCode . '\')"><i class="fas fa-file-excel fa-2x text-success" aria-hidden="true" id="descargar-reporte-' . $row->ID_Cotizacion . '"></i></button>
+            <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ', \'' . $row->CotizacionCode . '\', \'' . $row->N_Cliente . '\')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf-' . $row->ID_Cotizacion . '"></i></button>
+          </div>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
             //select with options pendiente,cotizado,confirmado
             $rows[] = '<select class="form-control" id="selectEstado" name="selectEstado" onchange="updateEstadoCotizacion(this,' . $row->ID_Cotizacion . ')">
@@ -226,6 +225,7 @@ class CCotizaciones extends CI_Controller
                 "valorcarga" => round($objPHPExcel->getActiveSheet()->getCell('K14')->getCalculatedValue(), 2),
                 "fleteseguro" => round($objPHPExcel->getActiveSheet()->getCell('K15')->getCalculatedValue(), 2),
                 "valorcif" => round($objPHPExcel->getActiveSheet()->getCell('K16')->getCalculatedValue(), 2),
+                "advalorempercent" => intval($objPHPExcel->getActiveSheet()->getCell('J20')->getCalculatedValue()*100) ,
                 "advalorem" => round($objPHPExcel->getActiveSheet()->getCell('K20')->getCalculatedValue(), 2),
                 "antidumping" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K23')->getCalculatedValue(), 2) : "",
 
@@ -274,7 +274,7 @@ class CCotizaciones extends CI_Controller
                     if ($value == 0) {
                         $value = '-';
                     }
-                    if ($key != "ID" && $key != "phone" && $key != "qtysuppliers") {
+                    if ($key != "ID" && $key != "phone" && $key != "qtysuppliers" && $key != "advalorempercent") {
                         $value = number_format($value, 2, '.', ',');
                     }
                 }

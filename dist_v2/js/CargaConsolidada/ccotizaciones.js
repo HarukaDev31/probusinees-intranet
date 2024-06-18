@@ -1087,7 +1087,7 @@ const descargarReporte = async(ID_Cotizacion, C_Cotizacion) => {
     },
   });
 };
-const descargarBoletaPDF = (ID_Cotizacion,C_Cotizacion) => {
+const descargarBoletaPDF = (ID_Cotizacion,C_Cotizacion,CName) => {
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/descargarBoleta",
     type: "POST",
@@ -1108,7 +1108,7 @@ const descargarBoletaPDF = (ID_Cotizacion,C_Cotizacion) => {
       const formattedDate = `${currentDate.getDate()}_${
         currentDate.getMonth() + 1
       }_${currentDate.getFullYear()}`;
-      link.download = "Boleta_" + formattedDate + ".pdf";
+      link.download = `Cotizacion_${C_Cotizacion}_${CName}_${formattedDate}.pdf`
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
