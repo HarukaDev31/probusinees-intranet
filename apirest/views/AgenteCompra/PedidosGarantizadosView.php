@@ -142,8 +142,8 @@
 
                     <div class="col-12 col-sm-4 col-md-4">
                       <label>Cotizacion</label>
-                      <div class="form-group">
-                        <input type="file" id="file_cotizacion" name="file_cotizacion" class="form-control required" accept="application/pdf">
+                      <div class="form-group" id="container-file_cotizacion">
+                        <input type="file" id="file_cotizacion" name="file_cotizacion" class="form-control " accept="application/pdf">
                         <!-- <textarea name="Txt_Observaciones_Garantizado" class="form-control" rows="1" placeholder="Opcional" style="height: 38px !important;"></textarea> -->
                       </div>
                     </div>

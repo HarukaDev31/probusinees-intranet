@@ -19,6 +19,14 @@ var fToday = new Date(),
   fMonth = fToday.getMonth() + 1,
   fDay = fToday.getDate();
 
+//cancelar agregar productos, add onclick on btn-cancelar
+$(document).on("click", "#btn-cancelar", function (e) {
+  e.preventDefault();
+  $(".div-Listar").show();
+  $(".div-AgregarEditar").hide();
+  //remove btn-file_cotizacion
+  $("#btn-file_cotizacion").remove();
+});
 $(function () {
   $(".select2").select2();
 
@@ -561,11 +569,10 @@ $(function () {
   $(document).on("click", ".btn-seleccionar_proveedor", function (e) {
     e.preventDefault();
     var id_detalle = $(this).data("id_detalle");
-      var id = $(this).data("id");
-      var correlativo = $(this).data("correlativo");
-      var name_item = $(this).data("name_item");
+    var id = $(this).data("id");
+    var correlativo = $(this).data("correlativo");
+    var name_item = $(this).data("name_item");
     $("#btn-confirmation").on("click", function () {
-      
       $("#modal-confirmation").modal("hide");
 
       url =
@@ -1109,6 +1116,14 @@ function verPedido(ID) {
       $('[name="Nu_Celular_Contacto"]').val(response.Nu_Celular_Contacto);
       $('[name="No_Entidad"]').val(response.No_Entidad);
       $('[name="Nu_Documento_Identidad"]').val(response.Nu_Documento_Identidad);
+      if (response.file_cotizacion != "" && response.file_cotizacion != null) {
+        //remove file_cotizacion
+        $("#file_cotizacion").hide();
+        $("#container-file_cotizacion").append(`
+          <a id="btn-file_cotizacion" href="${response.file_cotizacion}" target="_blank" class="btn btn-primary" role="button">
+          <i class="fa fa-download"></i>
+          Descargar Cotizacion</a>`)
+      }
 
       var yuan_venta = response.Ss_Tipo_Cambio;
       //console.log(parseFloat(response.yuan_venta));
@@ -1663,6 +1678,7 @@ function isExistTableTemporalProducto($id) {
 
 function form_pedido() {
   if ($("#table-Producto_Enlace >tbody >tr").length == 0) {
+    
     $("#txt-ANombre")
       .closest(".form-group")
       .find(".help-block")
@@ -1678,9 +1694,8 @@ function form_pedido() {
     $("#btn-save").html(
       'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>'
     );
-
     var postData = new FormData($("#form-pedido")[0]);
-    url = base_url + "AgenteCompra/PedidosGarantizados/crudPedidoGrupal";
+      url = base_url + "AgenteCompra/PedidosGarantizados/crudPedidoGrupal";
     $.ajax({
       type: "POST",
       dataType: "JSON",
@@ -1874,13 +1889,13 @@ function addItems() {
         <div class="row h-100">
           <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
             <!--Upload Icon-->
-            <input type="file" name="addProducto[${iCounterItems}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen Principal</input>
+            <input type="file" name="file[${iCounterItems}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen Principal</input>
           </div>
           <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
-            <input type="file" name="addProducto[${iCounterItems}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 2</input>
-            <input type="file" name="addProducto[${iCounterItems}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 3</input>
-            <input type="file" name="addProducto[${iCounterItems}][primary_video]"class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 1</input>
-            <input type="file" name="addProducto[${iCounterItems}][secondary_video]"class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 2</input>
+            <input type="file" name="file[${iCounterItems}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 2</input>
+            <input type="file" name="file[${iCounterItems}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Imagen 3</input>
+            <input type="file" name="file[${iCounterItems}][primary_video]"class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 1</input>
+            <input type="file" name="file[${iCounterItems}][secondary_video]"class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}"><i class="fas fa-upload"></i> Subir Video 2</input>
 
           </div>
         </div>
@@ -2137,6 +2152,7 @@ function getItemTemplate(i, mode, detalle) {
   div_items = `
     <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+      <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
 
       <div class = "row" >
         <div class="col-6 col-md-3 col-lg-2">
@@ -2187,13 +2203,31 @@ function getItemTemplate(i, mode, detalle) {
           <div class="row h-100">
             <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
               <!--Upload Icon-->
-              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Imagen Principal</button>
+              <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
+              <label>Imagen Principal</label>
+              </br>
+              <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
+              <input type="file" name="file[${i}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+              </div>
             </div>
             <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
-              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Imagen 2</button>
-              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Imagen 3</button>
-              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Video 1</button>
-              <button type="button" class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"><i class="fas fa-upload"></i> Subir Video 2</button>
+            <div class="form-group" id="container-uploadimg2-${i}">
+            <label>Imagen 2</label>
+            <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
+            <input type="file" name="file[${i}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+            </div>
+              <div class="form-group" id="container-uploadimg3-${i}">
+              <label>Imagen 3</label>
+              <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
+              <input type="file" name="file[${i}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+              <div class="form-group" id="container-uploadvideo1-${i}">
+              <label>Video 1</label>
+              <input type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
+              <input type="file" name="file[${i}][primary_video]" class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+              <div class="form-group"  id="container-uploadvideo2-${i}">
+              <label>Video 2</label>
+              <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
+              <input type="file" name="file[${i}][secondary_video]" class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
 
             </div>
           </div>
@@ -2217,11 +2251,11 @@ function getItemTemplate(i, mode, detalle) {
         </div>
       </div>
       `;
-  var id_detalle = detalle[i]["ID_Pedido_Detalle"];
-  var id_item = detalle[i]["ID_Pedido_Detalle_Producto_Proveedor"];
+  var id_detalle = detalle[i - 1]["ID_Pedido_Detalle"];
+  var id_item = detalle[i - 1]["ID_Pedido_Detalle_Producto_Proveedor"];
   if (mode == "edit") {
   } else {
-    if (detalle[i]["Nu_Selecciono_Proveedor"] == 0) {
+    if (detalle[i - 1]["Nu_Selecciono_Proveedor"] == 0) {
       div_items += `
             <button type="button" id="btn-seleccionar_proveedor${id_item}" 
               data-id_detalle="${id_detalle}" 
@@ -2261,30 +2295,102 @@ function getItemProveedor(id_detalle) {
       container.empty();
 
       for (i = 0; i < detalle.length; i++) {
-        let item = getItemTemplate(i, "select", detalle);
+        let item = getItemTemplate(i + 1, "select", detalle);
 
         container.append(item);
-        container.find(`#modal-precio${i}`).val(detalle[i]["Ss_Precio"]);
-        container.find(`#modal-moq${i}`).val(detalle[i]["Qt_Producto_Moq"]);
+        container.find(`#modal-precio${i + 1}`).val(detalle[i]["Ss_Precio"]);
+        container.find(`#modal-moq${i + 1}`).val(detalle[i]["Qt_Producto_Moq"]);
         container
-          .find(`#modal-qty_caja${i}`)
+          .find(`#modal-qty_caja${i + 1}`)
           .val(detalle[i]["Qt_Producto_Caja"]);
-        container.find(`#modal-cbm${i}`).val(detalle[i]["Qt_Cbm"]);
+        container.find(`#modal-cbm${i + 1}`).val(detalle[i]["Qt_Cbm"]);
         container
-          .find(`#modal-delivery${i}`)
+          .find(`#modal-delivery${i + 1}`)
           .val(detalle[i]["Nu_Dias_Delivery"]);
         container
-          .find(`#modal-costo_delivery${i}`)
+          .find(`#modal-costo_delivery${i + 1}`)
           .val(detalle[i]["Ss_Costo_Delivery"]);
         container
-          .find(`#modal-nombre_proveedor${i}`)
+          .find(`#modal-nombre_proveedor${i + 1}`)
           .val(detalle[i]["No_Contacto_Proveedor"]);
         container
-          .find(`#modal-celular_proveedor${i}`)
+          .find(`#modal-celular_proveedor${i + 1}`)
           .val(detalle[i]["No_Celular_Contacto_Proveedor"]);
         container
-          .find(`#modal-detalle${i}`)
+          .find(`#modal-detalle${i + 1}`)
           .val(detalle[i]["ID_Pedido_Detalle_Producto_Proveedor"]);
+        container
+          .find(`#modal-pedido-cabecera${i + 1}`)
+          .val(detalle[i]["ID_Pedido_Cabecera"]);
+        container
+          .find(`#modal-nombre_proveedor${i + 1}`)
+          .val(detalle[i]["nombre_proveedor"]);
+        container
+          .find(`#modal-celular_proveedor${i + 1}`)
+          .val(detalle[i]["celular_proveedor"]);
+
+        container
+          .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
+          .val(detalle[i]["main_photo"]);
+        if (detalle[i]["main_photo"] != null) {
+          container
+            .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
+            .val(detalle[i]["main_photo"]);
+          container.find(`#btn-uploadprimaryimg-${i + 1}`).hide();
+          container
+            .find(`#container-uploadprimaryimg-${i + 1}`)
+            .append(
+              `<img src="${detalle[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+            );
+        }
+        if (detalle[i]["secondary_photo"] != null) {
+          container
+            .find(`#btn-uploadimg2-URL-${i + 1}`)
+            .val(detalle[i]["secondary_photo"]);
+          container.find(`#btn-uploadimg2-${i + 1}`).hide();
+          container
+            .find(`#container-uploadimg2-${i + 1}`)
+            .append(
+              `<img src="${detalle[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+            );
+        }
+        if (detalle[i]["terciary_photo"] != null) {
+          container
+            .find(`#btn-uploadimg3-URL-${i + 1}`)
+            .val(detalle[i]["terciary_photo"]);
+          container.find(`#btn-uploadimg3-${i + 1}`).hide();
+          container
+            .find(`#container-uploadimg3-${i + 1}`)
+            .append(
+              `<img src="${detalle[i]["terciary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+            );
+        }
+        if (detalle[i]["primary_video"] != null) {
+          container
+            .find(`#btn-uploadvideo1-URL-${i + 1}`)
+            .val(detalle[i]["primary_video"]);
+          container.find(`#btn-uploadvideo1-${i + 1}`).hide();
+          container
+            .find(`#container-uploadvideo1-${i + 1}`)
+            .append(
+              `<video src="${detalle[i]["primary_video"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2" controls></video>`
+            );
+        }
+        if (detalle[i]["secondary_video"] != null) {
+          container
+            .find(`#btn-uploadvideo2-URL-${i + 1}`)
+            .val(detalle[i]["secondary_video"]);
+          container.find(`#btn-uploadvideo2-${i + 1}`).hide();
+          container
+            .find(`#container-uploadvideo2-${i + 1}`)
+            .append(
+              "<video src='" +
+                detalle[i]["secondary_video"] +
+                "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
+            );
+        }
+
+        // container.find(`btn-uploadprimaryimg-${i}`).val(detalle[i]["main_photo"]);
       }
       return;
       var table_enlace_producto = "",
