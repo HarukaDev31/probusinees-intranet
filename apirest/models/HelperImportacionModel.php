@@ -1,6 +1,10 @@
 <?php
 class HelperImportacionModel extends CI_Model{
 
+	private $defaultAgenteSteps=array("ORDEN DE COMPRA","PAGOS","RECEPCION DE CARGA","INSPECCIÓN","DOCUMENTACIÓN");
+	private $defautlAgenteChinaSteps=array("ORDEN DE COMPRA","Coordinación","RECEPCION DE CARGA","INSPECCIÓN","DOCUMENTACIÓN");
+	private $defaultJefeChina=array("ORDEN DE COMPRA","PAGOS","BOOKING","INSPECCIÓN","DOCUMENTACIÓN");
+
 	public function __construct(){
 		parent::__construct();
 	}
@@ -229,7 +233,12 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 		else if( $iEstado == 3 )
 			return array('No_Estado' => 'CIF','No_Class_Estado' => 'success');
 		else if( $iEstado == 4 )
-			return array('No_Estado' => 'DDP','No_Class_Estado' => 'success');
+			return array('No_Estado' => 'DAP','No_Class_Estado' => 'success');
+		else if($iEstado==5)
+			return array('No_Estado' => 'FCA','No_Class_Estado' => 'success');
+		else if($iEstado==6)
+			return array('No_Estado' => 'CFR','No_Class_Estado' => 'success');
+		
 	}
 	
 	//Nu_Tipo_Transporte_Maritimo
@@ -265,6 +274,54 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 			'status' => 'warning',
 			'message' => 'No se encontro registro',
 		);
+	}
+	public function generateOrderSteps($privilegiesArray,$idPedido){
+		$stepAgente=[];
+		$stepAgenteChina=[];
+		$stepJefeChina=[];
+		$idPedido=intval($idPedido);
+		foreach($privilegiesArray as $key=> $privilegie){
+			$agenteIndex=1;
+			foreach($this->defaultAgenteSteps as $step){
+				if($key=="agente"){
+					$stepAgente[]=[
+						"id_pedido"=>$idPedido,
+						'id_permision_role'=>$privilegiesArray[$key],
+						'id_order'=>$agenteIndex,
+						'name'=>$step,
+						'status'=>'PENDING'
+					];
+					$agenteIndex++;
+				}
+			}
+			$agenteChinaIndex=1;
+			foreach($this->defautlAgenteChinaSteps as $step){
+				if($key=="agente_china"){
+					$stepAgenteChina[]=[
+						"id_pedido"=>$idPedido,
+						'id_permision_role'=>$privilegiesArray[$key],
+						'id_order'=>$agenteChinaIndex,
+						'name'=>$step,
+						'status'=>'PENDING'
+					];
+					$agenteChinaIndex++;
+				}
+			}
+			$jefeChinaIndex=1;
+			foreach($this->defaultJefeChina as $step){
+				if($key=="jefe_china"){
+					$stepJefeChina[]=[
+						"id_pedido"=>$idPedido,
+						'id_permision_role'=>$privilegiesArray[$key],
+						'id_order'=>$jefeChinaIndex,
+						'name'=>$step,
+						'status'=>'PENDING'
+					];
+					$jefeChinaIndex++;
+				}
+			}
+		}
+		return array_merge($stepAgente,$stepAgenteChina,$stepJefeChina);
 	}
 }
 ?>

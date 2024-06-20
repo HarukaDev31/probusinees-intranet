@@ -2940,8 +2940,11 @@ function cambiarIncoterms(ID, Nu_Estado, id_pedido_cabecera, sCorrelativo) {
   else if(Nu_Estado==3)
     sNombreEstado = 'CIF';
   else if(Nu_Estado==4)
-    sNombreEstado = 'DDP';
-
+    sNombreEstado = 'DAP';
+  else if(Nu_Estado==5)
+    sNombreEstado = 'FCA';
+  else if(Nu_Estado==6)
+    sNombreEstado = 'CFR';
   $('#modal-title').html('¿Deseas cambiar a <strong>' + sNombreEstado + '</strong>?');
 
   $('#btn-cancel-delete').off('click').click(function () {

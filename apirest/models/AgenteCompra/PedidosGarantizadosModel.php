@@ -27,6 +27,7 @@ class PedidosGarantizadosModel extends CI_Model
     public $table_usuario_intero = 'usuario';
     private $jefeChinaPrivilegio = 5;
     private $personalChinaPrivilegio = 2;
+    private $personalPeruPrivilegio=1;
     public $order = array('Fe_Registro' => 'desc');
 
     public function __construct()
@@ -391,7 +392,7 @@ class PedidosGarantizadosModel extends CI_Model
                 'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China,
                 //'ID_Usuario_Interno_Empresa_China' => $ID_Usuario_Interno_Empresa_China
             );
-            $arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
+            // $arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
 
             $data = array_merge($data, array(
                 'Fe_Emision_OC_Aprobada' => dateNow('fecha'),
@@ -402,8 +403,15 @@ class PedidosGarantizadosModel extends CI_Model
                 'ID_Pedido_Cabecera' => $ID,
                 'Nu_ID_Interno' => 2,
             );
-            $data_progreso = array('Nu_Estado_Proceso' => 1);
-            $this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
+            $permissionRoles=[
+                "agente"=>$this->personalPeruPrivilegio,
+                "agente_china"=>$this->personalChinaPrivilegio,
+                "jefe_china"=>$this->jefeChinaPrivilegio,
+            ];
+            $stepsArray=$this->generatePurchaseOrderSteps($permissionRoles,$ID);
+            $response=$this->db->insert_batch('agente_compra_order_steps', $stepsArray);
+            // $data_progreso = array('Nu_Estado_Proceso' => 1);
+            // $this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
         }
 
         if ($this->db->update($this->table, $data, $where) > 0) {
@@ -412,6 +420,10 @@ class PedidosGarantizadosModel extends CI_Model
         return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }
 
+    public function generatePurchaseOrderSteps($roles,$idPedido):array{
+        $steps=$this->HelperImportacionModel->generateOrderSteps($roles,$idPedido);
+        return $steps;
+    }
     public function cambiarEstadoChina($ID, $Nu_Estado, $sCorrelativo)
     {
         $where = array('ID_Pedido_Cabecera' => $ID);
