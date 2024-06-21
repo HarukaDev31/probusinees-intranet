@@ -10,3 +10,8 @@ CREATE TABLE agente_compra_order_steps (
     PRIMARY KEY (id),
     FOREIGN KEY (id_pedido) REFERENCES agente_compra_pedido_cabecera(ID_Pedido_Cabecera)
 );
+CREATE PROCEDURE probussiness_v3.get_agente_compra_pedido_productos(
+in p_id_producto int)
+begin
+	select * from agente_compra_pedido_detalle acpd where acpd.ID_Pedido_Cabecera=p_id_producto
+END

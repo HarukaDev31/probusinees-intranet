@@ -24,6 +24,7 @@ class PedidosPagadosModel extends CI_Model
     public $table_usuario_intero = 'usuario';
     public $table_order_steps = "agente_compra_order_steps";
     public $order = array('Fe_Registro' => 'desc');
+    public $get_productos="get_agente_compra_pedido_productos";
 
     public function __construct()
     {
@@ -2099,5 +2100,15 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             throw new Exception($e->getMessage());
         }
 
+    }public function getPedidoProductos($idPedido){
+        try{
+            
+            //call sp 
+            $query = $this->db->query("CALL get_agente_compra_pedido_productos(".$idPedido.")");
+            return $query->result();
+
+        }catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
     }
 }

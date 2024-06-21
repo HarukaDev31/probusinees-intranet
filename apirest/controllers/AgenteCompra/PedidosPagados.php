@@ -3529,4 +3529,19 @@ class PedidosPagados extends CI_Controller
         }
 
     }
+    public function getStepByRole(){
+        try{
+        $step = $this->input->post('step');
+        $priviligie = $this->user->Nu_Tipo_Privilegio_Acceso;
+        $idPedido = $this->input->post('idPedido');
+        if($step==1){
+            if($priviligie==1){
+                $data=$this->PedidosPagadosModel->getPedidoProductos($idPedido);
+                echo json_encode(array('status'=>'success','data'=>$data));
+            }
+        }
+        }catch(Exception $e){
+        echo json_encode(array('error'=>$e->getMessage()));
+        }
+    }
 }

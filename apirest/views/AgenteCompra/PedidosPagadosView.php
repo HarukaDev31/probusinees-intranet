@@ -5,7 +5,7 @@
       <div class="row mb-2">
         <div class="col-sm-8">
           <h1>
-            <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?>
+            <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <span id="section-title"><?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></span>
             &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
           </h1>
         </div>
@@ -338,12 +338,31 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                 <?php echo form_close(); ?>
               </div>
             </div>
-            <div class="card-body d-flex flex-column w-100 justify-content-center"  id="container-ver"  >
+            <div class="card-body "  id="container-ver"  >
               <h1 class="m-0 p-0">Avances</h1>
               <div class="separator-line"></div>
               <div id="steps" class="w-100 row pt-2" style="height: 400px;">
                 <div class="spinner-border text-primary" id="loading-steps" role="status">
                 </div>
+              </div>
+            </div>
+            </div>
+          <div class="card-body" id="container_orden-compra">
+            <div class="orden-compra_header row">
+              <div class="col-12 col-md-3">
+                Imagen
+              </div>
+              <div class="col-12 col-md-2">
+                Nombre
+              </div>
+              <div class="col-12 col-md-2">
+                Cantidad
+              </div>
+              <div class="col-12 col-md-3">
+                Caracteristicas
+              </div>
+              <div class="col-12 col-md-2">
+                Link
               </div>
             </div>
           </div>

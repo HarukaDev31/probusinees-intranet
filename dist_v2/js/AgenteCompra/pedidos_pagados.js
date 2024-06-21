@@ -19,11 +19,17 @@ if (fMonth < 10) {
 }
 let containerVer = null;
 let containerListar = null;
+let containerOrdenCompra=null;
+let sectionTitle=null;
+let containerRotulado=null;
+let idPedido=null;
 $(function () {
-  containerVer = $("#container-ver");
-  console.log("containerVer", containerVer);
+  containerVer = $("#container-ver"); 
   containerVer.hide();
   containerListar = $("#container-listar");
+  containerOrdenCompra=$("#container_orden-compra");
+  containerOrdenCompra.hide();
+  
   $(".select2").select2();
 
   $("#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China").change(function () {
@@ -6812,6 +6818,7 @@ function _generarConsolidaTrading($modal_delete, ID) {
 }
 //get order progress section
 const getOrderProgress = (id) => {
+  idPedido = id;
   url = base_url + "AgenteCompra/PedidosPagados/getOrderProgress";
   const steps = $("#steps");
   const loading = $("#loading-steps");
@@ -6847,7 +6854,7 @@ const getOrderProgress = (id) => {
 const stepTemplate = (step, i) => {
   const stepHTML = `
     <div class="col-12 col-lg-2">
-      <div class="step-container"  id="step-${i}>
+      <div class="step-container" onclick="openStepFunction(${i+1})"  id="step-${i}>
       <span class="step">${step.name}</span>
       <span>Image</span>
       </div>
@@ -6855,3 +6862,49 @@ const stepTemplate = (step, i) => {
   `;
   return stepHTML;
 };
+const openStepFunction=(i)=>{
+    $("#container-ver").hide();
+    containerOrdenCompra.show();
+    url=base_url+"AgenteCompra/PedidosPagados/getStepByRole";
+    //ajax post 
+    $.post(url, { idPedido: idPedido,
+      step: i },
+      function (response) {
+        const {status, data} = JSON.parse(response) ;
+        console.log(data,status);
+        if(status=="success"){
+
+          console.log(data);
+          data.forEach((producto) => {
+            console.log(producto)
+            containerOrdenCompra.append(getProductTemplate(producto));
+          });
+            
+        }
+      })
+}
+const getProductTemplate=(producto)=>{
+  const template=`
+  <div class="row">
+    <div class="col-12 col-lg-3">
+      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${producto.Txt_Producto}" class="img-fluid">
+    </div>
+    <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
+      <span>${producto.Txt_Producto}</span>
+      <div class="btn btn-primary" onclick="openRotuladoView(${producto.ID_Pedido_Detalle})">Rotulado</div>
+    </div>
+    <div class="col-12 col-lg-2">
+      <span>${producto.Qt_Producto}</span>
+    </div>
+    <div class="col-12 col-lg-3">
+          <span>${producto.Txt_Descripcion}</span>
+    </div>
+    <div class="col-12 col-lg-2">
+      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${producto.Txt_Url_Link_Pagina_Producto}</a>
+    </div>
+  </div>`
+  return template;
+}
+const openRotuladoView=(id)=>{
+
+}
