@@ -8,7 +8,10 @@ let search_global_autocomplete =
 let replace_global_autocomplete = ["", "", "", "", "", "", "", "", ""];
 //28 caracteres
 // FIN AUTOCOMPLETE
-
+let priviligesPersonalPeru = 1;
+let priviligesPersonalChina = 2;
+let priviligesJefeChina = 5;
+let currentPrivilege = null;
 var fToday = new Date(),
   fYear = fToday.getFullYear(),
   fMonth = fToday.getMonth() + 1,
@@ -19,17 +22,25 @@ if (fMonth < 10) {
 }
 let containerVer = null;
 let containerListar = null;
-let containerOrdenCompra=null;
-let sectionTitle=null;
-let containerRotulado=null;
-let idPedido=null;
+let containerOrdenCompra = null;
+let sectionTitle = null;
+let containerRotulado = null;
+let idPedido = null;
+let productoSelected = null;
+let selectedStep = null;
+let containerSteps = null;
+let containerPagos=null;
 $(function () {
-  containerVer = $("#container-ver"); 
+  sectionTitle = $("#section-title");
+  containerVer = $("#container-ver");
   containerVer.hide();
   containerListar = $("#container-listar");
-  containerOrdenCompra=$("#container_orden-compra");
+  containerOrdenCompra = $("#container_orden-compra");
   containerOrdenCompra.hide();
-  
+  containerRotulado = $("#container-rotulado");
+  containerSteps = $("#steps");
+  containerPagos=$("#container-pagos");
+  containerPagos.hide();
   $(".select2").select2();
 
   $("#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China").change(function () {
@@ -5912,7 +5923,7 @@ function pagarProveedores(ID, tipo_pago) {
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
           + "<td class='text-center td-name' width='50%'>"
             + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
-            
+
           table_enlace_producto += "</td>"
           + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
           + "<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
@@ -5936,14 +5947,14 @@ function pagarProveedores(ID, tipo_pago) {
             table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
           }
           table_enlace_producto += "</td>";
-          
+
           table_enlace_producto += "<td class='text-left td-eliminar'>";
             table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
           table_enlace_producto += "</td>";
 
           table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
         table_enlace_producto += "</tr>";
-        
+
         table_enlace_producto +=
         "<tr><td class='text-left' colspan='14'>"
           if( voucher_1 == '' || voucher_1 == null ){
@@ -6836,6 +6847,13 @@ const getOrderProgress = (id) => {
         loading.hide();
         data.forEach((step, i) => {
           steps.append(stepTemplate(step, i));
+          console.log(step);
+          if (step.status == "COMPLETED") {
+            //REMOVE step-container AND ADD step-container-completed
+            $(`#step-${i}`)
+              .removeClass("step-container")
+              .addClass("step-container-completed");
+          }
         });
         //set data to modal
       } else {
@@ -6854,7 +6872,9 @@ const getOrderProgress = (id) => {
 const stepTemplate = (step, i) => {
   const stepHTML = `
     <div class="col-12 col-lg-2">
-      <div class="step-container" onclick="openStepFunction(${i+1})"  id="step-${i}>
+      <div class="step-container" onclick="openStepFunction(${i + 1},${
+    step.id
+  })"  id="step-${i}">
       <span class="step">${step.name}</span>
       <span>Image</span>
       </div>
@@ -6862,36 +6882,129 @@ const stepTemplate = (step, i) => {
   `;
   return stepHTML;
 };
-const openStepFunction=(i)=>{
-    $("#container-ver").hide();
-    containerOrdenCompra.show();
-    url=base_url+"AgenteCompra/PedidosPagados/getStepByRole";
-    //ajax post 
-    $.post(url, { idPedido: idPedido,
-      step: i },
-      function (response) {
-        const {status, data} = JSON.parse(response) ;
-        console.log(data,status);
-        if(status=="success"){
-
-          console.log(data);
-          data.forEach((producto) => {
-            console.log(producto)
-            containerOrdenCompra.append(getProductTemplate(producto));
-          });
-            
-        }
-      })
+const openStepFunction = (i, stepId) => {
+  $("#container-ver").hide();
+  containerOrdenCompra.show();
+  selectedStep = stepId;
+  url = base_url + "AgenteCompra/PedidosPagados/getStepByRole";
+  //ajax post
+  $.post(url, { idPedido: idPedido, step: i }, function (response) {
+    if (i == 1) {
+      openOrdenCompra(response);
+    }
+    if(i==2){
+      openPagos(response);
+    }
+  });
+};
+const openPagos=(response)=>{
+  response=JSON.parse(response);
+  console.log(response,response.status);
+  containerPagos.show();
+  if(response.status=="success"){
+    const data=response.data;
+    $("#orden_total").html(data.orden_total);
+    $("#pago_cliente").html(data.pago_cliente);
+  }
 }
-const getProductTemplate=(producto)=>{
-  const template=`
-  <div class="row">
+const openOrdenCompra = (response) => {
+  const { status, data, priviligie, pedidoData } = JSON.parse(response);
+
+  if (status == "success") {
+    currentPrivilege = parseInt(priviligie);
+
+    $(".orden-compra_header_china").append(getProductsTemplateHeader());
+    data.forEach((producto) => {
+      containerOrdenCompra.append(getProductTemplate(producto));
+      if (producto.caja_master_URL) {
+        $("#btn-rotulado").removeClass("btn-primary").addClass("btn-secondary");
+      }
+    });
+    if (typeof pedidoData != "undefined") {
+      pedidoData.total_rmb = pedidoData.total_rmb ?? 0;
+      pedidoData.Ss_Tipo_Cambio = pedidoData.Ss_Tipo_Cambio ?? 0;
+      const totalUSD =
+        pedidoData.Ss_Tipo_Cambio == 0
+          ? 0
+          : pedidoData.total_rmb / pedidoData.Ss_Tipo_Cambio;
+      $("#total-rmb").val(pedidoData.total_rmb);
+      $("#tc").val(pedidoData.Ss_Tipo_Cambio);
+      $("#total-usd").val(totalUSD);
+    }
+    if (
+      [priviligesPersonalChina, priviligesJefeChina].includes(currentPrivilege)
+    ) {
+      $("#btn-rotulado").hide();
+      const buttonsData = {
+        btnSave: {
+          text: "Guardar",
+          action: `saveOrdenCompra()`,
+        },
+        btnCancel: {
+          text: "Regresar",
+          action: "hideOrdenCompra()",
+        },
+      };
+      const butttonsTemplate = getActionButtons(buttonsData);
+      containerOrdenCompra.append(butttonsTemplate);
+    }
+  }
+};
+const getProductsTemplateHeader = () => {
+  let templateHeader = ``;
+
+  if (
+    currentPrivilege == priviligesPersonalChina ||
+    currentPrivilege == priviligesJefeChina
+  ) {
+    templateHeader = `
+    <form class="row" id="pedido-form">
+      <!-- Column -->
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label>TOTAL RMB:</label>
+          <input type="number" name="total-rmb" class="form-control"  id="total-rmb">
+        </div>
+      </div>
+      <!-- Column -->
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label>T.C:</label>
+          <input type="number" name="tc" class="form-control"  id="tc">
+        </div>
+      </div>
+      <!-- Column -->
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label>TOTAL USD:</label>
+          <input type="number" name="total-usd" class="form-control"  id="total-usd" disabled>
+        </div>
+      </div>
+    </form>`;
+  }
+  return templateHeader;
+};
+
+const getProductTemplate = (producto) => {
+  const template = `
+  <div class="row producto">
     <div class="col-12 col-lg-3">
-      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${producto.Txt_Producto}" class="img-fluid">
+      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${
+    producto.Txt_Producto
+  }" class="img-fluid">
     </div>
     <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
       <span>${producto.Txt_Producto}</span>
-      <div class="btn btn-primary" onclick="openRotuladoView(${producto.ID_Pedido_Detalle})">Rotulado</div>
+      ${
+        currentPrivilege == priviligesPersonalPeru
+          ? `<div class="btn btn-primary"  id="btn-rotulado" onclick='openRotuladoView(${JSON.stringify(
+              producto
+            )})'>Rotulado</div>`
+          : `
+      <span class="btn btn-primary">ITEM CODE :${
+        producto.product_code ? producto.product_code : ""
+      }</span>`
+      }
     </div>
     <div class="col-12 col-lg-2">
       <span>${producto.Qt_Producto}</span>
@@ -6900,11 +7013,238 @@ const getProductTemplate=(producto)=>{
           <span>${producto.Txt_Descripcion}</span>
     </div>
     <div class="col-12 col-lg-2">
-      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${producto.Txt_Url_Link_Pagina_Producto}</a>
+      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${
+    producto.Txt_Url_Link_Pagina_Producto
+  }</a>
     </div>
-  </div>`
+  </div>`;
   return template;
-}
-const openRotuladoView=(id)=>{
+};
+const openRotuladoView = (producto) => {
+  sectionTitle.html("Rotulado");
+  containerOrdenCompra.hide();
+  if (!productoSelected) {
+    productoSelected = producto;
+  }
+  containerRotulado.append(getContainerRotuladoView(productoSelected));
+  const buttonsData = {
+    btnSave: {
+      text: "Guardar",
+      action: `saveRotuladoProducto(${JSON.stringify(productoSelected)})`,
+    },
+    btnCancel: {
+      text: "Cancelar",
+      action: "hideRotuladoView() ",
+    },
+  };
 
-}
+  const btnSection = $("#btns-section");
+  btnSection.append(getActionButtons(buttonsData));
+  const switchEmpaque = $("#empaque_URL_switch");
+  if (productoSelected.empaque_URL) {
+    switchEmpaque.prop("checked", true);
+    const empaqueDiv = $("#empaque_container");
+    empaqueDiv.append(`
+      <div id="empaque_input-container">
+        <input name="empaque_URL" type="hidden" value="${productoSelected.empaque_URL}">
+        <a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-link">Descargar</a>
+      </div>
+    `);
+  }
+  switchEmpaque.on("change", function () {
+    const isChecked = $(this).prop("checked");
+    const empaqueDiv = $("#empaque_container");
+
+    if (isChecked) {
+      empaqueDiv.append(`
+        <div id="empaque_input-container">
+          <input name="empaque_URL" type="hidden" value="${
+            productoSelected.empaque_URL
+          }">
+          ${
+            productoSelected.empaque_URL
+              ? `<a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-link">Descargar</a>`
+              : `<input type="file" name="empaque" class="form-control">`
+          }
+        </div>
+      `);
+    } else {
+      empaqueDiv.find("#empaque_input-container").remove();
+    }
+  });
+  const switchVim = $("#vim_motor_URL_switch");
+  if (productoSelected.vim_motor_URL) {
+    switchVim.prop("checked", true);
+    const vimDiv = $("#vim_motor_container");
+    vimDiv.append(`
+      <div id="vim_motor_input-container">
+        <input name="vim_motor_URL" type="hidden" value="${productoSelected.vim_motor_URL}">
+        <a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>
+      </div>
+    `);
+  }
+  switchVim.on("change", function () {
+    const isChecked = $(this).prop("checked");
+    const vimDiv = $("#vim_motor_container");
+
+    if (isChecked) {
+      vimDiv.append(`
+        <div id="vim_motor_input-container">
+          <input name="vim_motor_URL" type="hidden" value="${
+            productoSelected.vim_motor_URL
+          }">
+          ${
+            productoSelected.vim_motor_URL
+              ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>`
+              : `<input type="file" name="vim_motor" class="form-control">`
+          }
+        </div>
+      `);
+    } else {
+      vimDiv.find("#vim_motor_input-container").remove();
+    }
+  });
+  containerRotulado.show();
+};
+const saveRotuladoProducto = (producto) => {
+  const url = base_url + "AgenteCompra/PedidosPagados/saveRotuladoProducto";
+  //get form-rotulado
+  const form = $("#form-rotulado");
+  //get form data
+  const formData = new FormData(form[0]);
+  //append idPedido
+  formData.append("idPedido", producto.ID_Pedido_Cabecera);
+  formData.append("idProducto", producto.ID_Pedido_Detalle);
+  formData.append("stepID", selectedStep);
+  //post data
+  $.ajax({
+    url,
+    type: "POST",
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function (response) {
+      console.log(response);
+      const { status, data } = JSON.parse(response);
+      if (status == "success") {
+        hideRotuladoView();
+        productoSelected.caja_master_URL = data.message.caja_master_URL;
+        productoSelected.empaque_URL = data.message.empaque_URL;
+        productoSelected.vim_motor_URL = data.message.vim_motor_URL;
+        productoSelected.notas_rotulado = data.message.notas_rotulado;
+        if (productoSelected.caja_master_URL) {
+          $("#btn-rotulado")
+            .removeClass("btn-primary")
+            .addClass("btn-secondary");
+        }
+      } else {
+        alert(message);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};
+const getContainerRotuladoView = (producto) => {
+  console.log(producto);
+  const rotuladoTemplate = `
+    <form class="row" id="form-rotulado">
+      <div class="col-12 col-md-5">
+        <div class="form-group">
+          <label>CAJA MASTER:</label>
+          <input name="caja_master_URL" type="hidden" value="${
+            producto.caja_master_URL
+          }">
+          ${
+            producto.caja_master_URL
+              ? `<a href="${producto.caja_master_URL}" class="btn btn-link" target="_blank">Descargar</a>`
+              : '<input type="file" name="caja_master" class="form-control">'
+          }
+        </div>
+        <div class="form-group" id="empaque_container">
+          <div class="conditional-field">
+            <label>Empaque</label>
+            <label class="switch">
+              <input type="checkbox" id="empaque_URL_switch" >
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group" id="vim_motor_container">
+          <div class="conditional-field">
+            <label>VIM/MOTOR</label>
+            
+            <label class="switch">
+              <input type="checkbox" id="vim_motor_URL_switch" >
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group" id="btns-section">
+        </div>
+        
+      </div>
+      <div class="col-12 col-md-7">
+          <label>Notas</label>
+          <textarea name="notas_rotulado" class="form-control" rows="5">${
+            producto.notas_rotulado
+          }</textarea>
+      </div>
+    </form>
+  `;
+  return rotuladoTemplate;
+};
+const getActionButtons = (data) => {
+  const buttons = `
+    <div class="row buttons">
+      <div class="col-12 col-md-6">
+        <div class="btn btn-primary" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="btn btn-secondary" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+      </div>
+    </div>`;
+  return buttons;
+};
+const hideRotuladoView = () => {
+  containerRotulado.empty();
+  containerRotulado.hide();
+  containerOrdenCompra.show();
+};
+const hideOrdenCompra = () => {
+  containerOrdenCompra.hide();
+  $(".orden-compra_header_china").empty();
+  $(".producto").remove();
+  $(".buttons").remove();
+  containerVer.hide();
+  containerListar.show();
+  containerSteps.empty();
+};
+const saveOrdenCompra = () => {
+  console.log(selectedStep);
+  const url = base_url + "AgenteCompra/PedidosPagados/saveOrdenCompra";
+  const form = $("#pedido-form");
+  const formData = new FormData(form[0]);
+  formData.append("idPedido", idPedido);
+  formData.append("stepID", selectedStep);
+  $.ajax({
+    url,
+    type: "POST",
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function (response) {
+      console.log(response);
+      const { status, data } = JSON.parse(response);
+      if (status == "success") {
+        hideOrdenCompra();
+      } else {
+        alert(message);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};

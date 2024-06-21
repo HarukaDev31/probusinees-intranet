@@ -27,7 +27,8 @@ class PedidosGarantizadosModel extends CI_Model
     public $table_usuario_intero = 'usuario';
     private $jefeChinaPrivilegio = 5;
     private $personalChinaPrivilegio = 2;
-    private $personalPeruPrivilegio=1;
+    private $personalPeruPrivilegio = 1;
+    private $table_payments = "payments_agente_compra_pedido";
     public $order = array('Fe_Registro' => 'desc');
 
     public function __construct()
@@ -38,6 +39,7 @@ class PedidosGarantizadosModel extends CI_Model
     public function _get_datatables_query()
     {
         $this->db->select($this->table . '.*, P.No_Pais,
+        PAY.file_url,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
 		CORRE.Fe_Month, USRCHINA.No_Nombres_Apellidos AS No_Usuario')
@@ -46,7 +48,7 @@ class PedidosGarantizadosModel extends CI_Model
             ->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
             ->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
             ->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
-        //->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
+            ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
             ->where_in($this->table . '.Nu_Estado', array(2, 3, 4, 8));
 
@@ -63,7 +65,7 @@ class PedidosGarantizadosModel extends CI_Model
     }
 
     public function get_datatables()
-    {   
+    {
         $this->_get_datatables_query();
 
         $query = $this->db->get();
@@ -75,8 +77,8 @@ class PedidosGarantizadosModel extends CI_Model
      */
     public function get_by_id($ID)
     {
-        $acceso=$this->user->Nu_Tipo_Privilegio_Acceso;
-        
+        $acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
+
         $this->db->select('CORRE.Fe_Month, Nu_Estado_China,
 		(SELECT Ss_Venta_Oficial FROM tasa_cambio WHERE ID_Empresa=1 AND Fe_Ingreso="' . dateNow('fecha') . '" LIMIT 1) AS yuan_venta,
 		' . $this->table . '.*,
@@ -91,19 +93,19 @@ class PedidosGarantizadosModel extends CI_Model
         $this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join');
         $this->db->where($this->table . '.ID_Pedido_Cabecera', $ID);
         $query = $this->db->get();
-        $query=$query->result();
+        $query = $query->result();
         $sCorrelativoCotizacion = '';
-		foreach ($query as $row) {
-			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
-			$row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
-			$row->Nu_Tipo_Privilegio_Acceso = $this->user->Nu_Tipo_Privilegio_Acceso;	
-		}
+        foreach ($query as $row) {
+            $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0, 3)) . str_pad($row->Nu_Correlativo, 3, "0", STR_PAD_LEFT);
+            $row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
+            $row->Nu_Tipo_Privilegio_Acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
+        }
         $sCorrelativoCotizacion = $query[0]->sCorrelativoCotizacion;
-        if($acceso==$this->personalChinaPrivilegio|| $acceso==$this->jefeChinaPrivilegio){
+        if ($acceso == $this->personalChinaPrivilegio || $acceso == $this->jefeChinaPrivilegio) {
             $this->cambiarEstadoChina($ID, 2, $sCorrelativoCotizacion);
         }
         return $query;
-       
+
     }
 
     public function get_by_id_excel($ID)
@@ -188,17 +190,17 @@ class PedidosGarantizadosModel extends CI_Model
             //array_debug($data_files['addProveedor']);
             $results = [];
 
-                $filesKey = [
-                    "main_photo",
-                    "secondary_photo",
-                    "terciary_photo",
-                    "primary_video",
-                    "secondary_video",
-                ];
-                $results = $this->processFiles($data_files, null, $filesKey, $arrPost);
-                foreach ($arrPost['addProducto'] as $key => $row) {
+            $filesKey = [
+                "main_photo",
+                "secondary_photo",
+                "terciary_photo",
+                "primary_video",
+                "secondary_video",
+            ];
+            $results = $this->processFiles($data_files, null, $filesKey, $arrPost);
+            foreach ($arrPost['addProducto'] as $key => $row) {
                 $Txt_Url_Imagen_Proveedor = '';
-                
+
                 //if $results not have key path return error
                 if (!array_key_exists('paths', $results)) {
                     return array(
@@ -403,13 +405,13 @@ class PedidosGarantizadosModel extends CI_Model
                 'ID_Pedido_Cabecera' => $ID,
                 'Nu_ID_Interno' => 2,
             );
-            $permissionRoles=[
-                "agente"=>$this->personalPeruPrivilegio,
-                "agente_china"=>$this->personalChinaPrivilegio,
-                "jefe_china"=>$this->jefeChinaPrivilegio,
+            $permissionRoles = [
+                "agente" => $this->personalPeruPrivilegio,
+                "agente_china" => $this->personalChinaPrivilegio,
+                "jefe_china" => $this->jefeChinaPrivilegio,
             ];
-            $stepsArray=$this->generatePurchaseOrderSteps($permissionRoles,$ID);
-            $response=$this->db->insert_batch('agente_compra_order_steps', $stepsArray);
+            $stepsArray = $this->generatePurchaseOrderSteps($permissionRoles, $ID);
+            $response = $this->db->insert_batch('agente_compra_order_steps', $stepsArray);
             // $data_progreso = array('Nu_Estado_Proceso' => 1);
             // $this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
         }
@@ -420,8 +422,9 @@ class PedidosGarantizadosModel extends CI_Model
         return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }
 
-    public function generatePurchaseOrderSteps($roles,$idPedido):array{
-        $steps=$this->HelperImportacionModel->generateOrderSteps($roles,$idPedido);
+    public function generatePurchaseOrderSteps($roles, $idPedido): array
+    {
+        $steps = $this->HelperImportacionModel->generateOrderSteps($roles, $idPedido);
         return $steps;
     }
     public function cambiarEstadoChina($ID, $Nu_Estado, $sCorrelativo)
@@ -447,18 +450,18 @@ class PedidosGarantizadosModel extends CI_Model
     {
         $this->db->trans_begin();
         //upload $data['file-cotizacion'] in agente_compra_pedido_cabecera
-        
-        $fileCotizacion=$data['file_cotizacion'];
+
+        $fileCotizacion = $data['file_cotizacion'];
         $this->allowedExtensions = array('pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'webp');
         $this->allowedContentTypes = array('application/pdf', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/gif', 'image/webp');
-        $pedido=$where['ID_Pedido_Cabecera'];
-        
+        $pedido = $where['ID_Pedido_Cabecera'];
+
         $path = "assets/images/agentecompra/cotizaciones/" . $pedido . "/";
-        $fileCotizacionURL=$this->uploadSingleFile($fileCotizacion,$path);
-        $data['file_cotizacion']=$fileCotizacionURL;
+        $fileCotizacionURL = $this->uploadSingleFile($fileCotizacion, $path);
+        $data['file_cotizacion'] = $fileCotizacionURL;
         $this->db->update('agente_compra_pedido_cabecera',
-        ['file_cotizacion'=>$fileCotizacionURL],
-        ['ID_Pedido_Cabecera'=>$pedido]);
+            ['file_cotizacion' => $fileCotizacionURL],
+            ['ID_Pedido_Cabecera' => $pedido]);
         if (!empty($arrProducto)) {
             //localhost
             $path = "assets/images/productos/";
@@ -545,7 +548,7 @@ class PedidosGarantizadosModel extends CI_Model
     }
     /**
      * This function adds a new supplier to the product of guaranteed orders table
-     * 
+     *
      */
     public function addPedidoItemProveedor($data, $data_files)
     {
@@ -553,8 +556,8 @@ class PedidosGarantizadosModel extends CI_Model
 
         //actualizar cabecera
         $results = [];
-        $pedidoID=$data['EID_Pedido_Cabecera_item'];
-        $correlativo=$data['Item_ECorrelativo'];
+        $pedidoID = $data['EID_Pedido_Cabecera_item'];
+        $correlativo = $data['Item_ECorrelativo'];
         $path = "assets/images/agentecompra/garantizados/" . $pedidoID . "/" . $data['EID_Pedido_Detalle_item'];
         $filesKey = [
             "main_photo",
@@ -565,9 +568,9 @@ class PedidosGarantizadosModel extends CI_Model
         ];
         $results = $this->processFiles($data_files, $path, $filesKey, null);
         foreach ($data['addProducto'] as $key => $row) {
-            
+
             $Txt_Url_Imagen_Proveedor = '';
-            
+
             //if $results not have key path return error
             if (!array_key_exists('paths', $results)) {
                 return array(
@@ -624,8 +627,7 @@ class PedidosGarantizadosModel extends CI_Model
                 'ID_Entidad_Proveedor' => $idSupplier,
             );
             $this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor', $arrDetalle);
-            $id=$this->db->insert_id();
-        
+            $id = $this->db->insert_id();
 
             if ($this->db->trans_status() === false) {
                 $this->db->trans_rollback();
@@ -642,32 +644,32 @@ class PedidosGarantizadosModel extends CI_Model
                 );
             }
         }
-        $this->checkAllProductsWithSupplier($pedidoID,$correlativo);
+        $this->checkAllProductsWithSupplier($pedidoID, $correlativo);
         return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
-        
 
     }
-    public function checkAllProductsWithSupplier($idPedido,$correlativo){
+    public function checkAllProductsWithSupplier($idPedido, $correlativo)
+    {
         /*
-                 SELECT 
-            acpd.ID_Pedido_Detalle,
-            (SELECT COUNT(*) 
-            FROM agente_compra_pedido_detalle_producto_proveedor acpdp2 
-            WHERE acpdp2.ID_Pedido_Detalle = acpd.ID_Pedido_Detalle) AS product_count
-        FROM 
-            agente_compra_pedido_detalle acpd
-        LEFT JOIN 
-            agente_compra_pedido_detalle_producto_proveedor acpdp 
-            ON acpd.ID_Pedido_Detalle = acpdp.ID_Pedido_Detalle 
-        WHERE 
-            acpd.ID_Pedido_Cabecera = 222
+        SELECT
+        acpd.ID_Pedido_Detalle,
+        (SELECT COUNT(*)
+        FROM agente_compra_pedido_detalle_producto_proveedor acpdp2
+        WHERE acpdp2.ID_Pedido_Detalle = acpd.ID_Pedido_Detalle) AS product_count
+        FROM
+        agente_compra_pedido_detalle acpd
+        LEFT JOIN
+        agente_compra_pedido_detalle_producto_proveedor acpdp
+        ON acpd.ID_Pedido_Detalle = acpdp.ID_Pedido_Detalle
+        WHERE
+        acpd.ID_Pedido_Cabecera = 222
         group by 1
 
          */
         $this->db->select('
             acpd.ID_Pedido_Detalle,
-            (SELECT COUNT(*) 
-            FROM agente_compra_pedido_detalle_producto_proveedor acpdp2 
+            (SELECT COUNT(*)
+            FROM agente_compra_pedido_detalle_producto_proveedor acpdp2
             WHERE acpdp2.ID_Pedido_Detalle = acpd.ID_Pedido_Detalle) AS product_count
         ');
         $this->db->from('agente_compra_pedido_detalle acpd');
@@ -675,18 +677,18 @@ class PedidosGarantizadosModel extends CI_Model
         $this->db->where('acpd.ID_Pedido_Cabecera', $idPedido);
         $this->db->group_by('1');
         $query = $this->db->get();
-        $data=$query->result();
-        if(count($data)>0){
-            $allWithSupplier=true;
-            foreach($data as $row){
-                if($row->product_count==0){
-                    $allWithSupplier=false;
+        $data = $query->result();
+        if (count($data) > 0) {
+            $allWithSupplier = true;
+            foreach ($data as $row) {
+                if ($row->product_count == 0) {
+                    $allWithSupplier = false;
                     break;
-                }else{
-                    
+                } else {
+
                 }
             }
-            if($allWithSupplier){
+            if ($allWithSupplier) {
                 $this->cambiarEstadoChina($idPedido, 3, $correlativo);
             }
         }
@@ -745,30 +747,18 @@ Nu_Correlativo
     {
         if (isset($data_files['image_documento']['name'])) {
             $this->db->trans_begin();
-            $path = "assets/images/voucher_pagos_garantizado/";
+            $path = "assets/images/garantizados/" . $arrPost['documento_pago_garantizado-id_cabecera'] . "/pagos/";
 
-            $config['upload_path'] = $path;
-            $config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
-            $config['max_size'] = 3072; //1024 KB = 10 MB
-            $config['encrypt_name'] = true;
-            $config['max_filename'] = '255';
+       
+            $Txt_Url_Imagen_Producto = $this->uploadSingleFile($data_files['image_documento'], $path);
 
-            $this->load->library('upload', $config);
-
-            if (!$this->upload->do_upload('image_documento')) {
-                $this->db->trans_rollback();
-                return array(
-                    'status' => 'error',
-                    'message' => 'No se cargo imagen ' . strip_tags($this->upload->display_errors()),
-                );
-            } else {
-                $arrUploadFile = $this->upload->data();
-                $Txt_Url_Imagen_Producto = base_url($path . $arrUploadFile['file_name']);
-
-                $where = array('ID_Pedido_Cabecera' => $arrPost['documento_pago_garantizado-id_cabecera']);
-                $data = array('Txt_Url_Pago_Garantizado' => $Txt_Url_Imagen_Producto); //1=SI
-                $this->db->update($this->table, $data, $where);
-            }
+            // $where = array('id_pedido' => $arrPost['documento_pago_garantizado-id_cabecera']);
+            // $data = array('Txt_Url_Pago_Garantizado' => $Txt_Url_Imagen_Producto); //1=SI
+            $data = array(
+                "id_pedido" => $arrPost['documento_pago_garantizado-id_cabecera'],
+                "file_url" => $Txt_Url_Imagen_Producto,
+            );
+            $this->db->insert($this->paymentsTable, $data);
 
             if ($this->db->trans_status() === false) {
                 $this->db->trans_rollback();
@@ -793,7 +783,7 @@ Nu_Correlativo
 
     public function descargarDocumentoPagoGarantizado($id)
     {
-        $query = "SELECT Txt_Url_Pago_Garantizado AS Txt_Url_Imagen_Producto FROM " . $this->table . " WHERE ID_Pedido_Cabecera = " . $id . " LIMIT 1";
+        $query = "SELECT file_url AS Txt_Url_Imagen_Producto FROM " . $this->table_payments . " WHERE id_pedido = " . $id . " LIMIT 1";
         return $this->db->query($query)->row();
     }
 

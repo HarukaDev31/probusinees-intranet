@@ -2765,7 +2765,7 @@ function descargarDocumentoPagoGarantizado(id) {
           base_url +
           "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/" +
           id;
-        $("#a-download_image_pago_garantizado").attr("href", url);
+        $("#a-download_image_pago_garantizado").attr("href", response.url_image);
         //$("#a-download_image_pago_garantizado").attr("data-id_pago", id);
       } else {
         alert(response.message);

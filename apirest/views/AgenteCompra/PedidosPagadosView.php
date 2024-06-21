@@ -338,34 +338,93 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                 <?php echo form_close(); ?>
               </div>
             </div>
-            <div class="card-body "  id="container-ver"  >
-              <h1 class="m-0 p-0">Avances</h1>
-              <div class="separator-line"></div>
-              <div id="steps" class="w-100 row pt-2" style="height: 400px;">
-                <div class="spinner-border text-primary" id="loading-steps" role="status">
+              <div class="card-body"  id="container-ver"  >
+                <h1 class="m-0 p-0">Avances</h1>
+                <div class="separator-line"></div>
+                <div id="steps" class="w-100 row pt-2" style="height: 400px;">
+                  <div class="spinner-border text-primary" id="loading-steps" role="status">
+                  </div>
                 </div>
               </div>
+              <div class="card-body" id="container_orden-compra">
+                  <div class="orden-compra_header_china"></div>
+                  <div class="orden-compra_header row">
+                    <div class="col-12 col-md-3">
+                      Imagen
+                    </div>
+                    <div class="col-12 col-md-2">
+                      Nombre
+                    </div>
+                    <div class="col-12 col-md-2">
+                      Cantidad
+                    </div>
+                    <div class="col-12 col-md-3">
+                      Caracteristicas
+                    </div>
+                    <div class="col-12 col-md-2">
+                      Link
+                    </div>
+                  </div>
+                </div>
+              <div class="card-body" id="container-rotulado">
+              </div>
+              <form class="card-body" id="container-pagos">
+                <div class="row" id="pagos-header">
+                  <div class="col-12 col-md-3">
+                    <label>ORDEN TOTAL</label>
+                    <span class="pagos-header-input" id="orden_total">0</span>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label>PAGO CLIENTE:</label>
+                    <span class="pagos-header-input" id="pago_cliente">0</span>
+                  </div>
+                </div>
+                <div class="w-100 row" id="pagos-body">
+                  <div class="col-12 col-md-5">
+                    <div class="pago row" id="pago-garantia">
+                        <div class="col-12 col-md-8">
+                          <label>PAGO GARANTIA</label>
+                          <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL"/>
+                        </div>
+                        <div class="col-12 col-md-4">
+                        <input type="file" name="pago-garantia" id="pago-garantia" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="pago row" id="pago-1">
+                        <div class="col-12 col-md-8">
+                          <label>PAGO 1:</label>
+                          <input type="hidden" name="pago-1_URL" id="pago-1_URL"/>
+                        </div>
+                        <div class="col-12 col-md-4">
+                        <input type="file" name="pago-1" id="pago-1" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="pago row" id="pago-2">
+                        <div class="col-12 col-md-8">
+                          <label>PAGO 2:</label>
+                          <input type="hidden" name="pago-2_URL" id="pago-2_URL"/>
+                        </div>
+                        <div class="col-12 col-md-4">
+                        <input type="file" name="pago-2" id="pago-2" class="form-control"/>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-7">
+                    <div class="form-group">
+                      <label>LIQUIDACION:</label>
+                      <input type="hidden" name="liquidacion_URL" id="liquidacion_URL"/>
+                      <input type="file" name="liquidacion" id="liquidacion" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                      <label>NOTAS:</label>
+                      <textarea class="form-control" name="notas-pagos" id="notas-pagos" ></textarea>  
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
-            </div>
-          <div class="card-body" id="container_orden-compra">
-            <div class="orden-compra_header row">
-              <div class="col-12 col-md-3">
-                Imagen
-              </div>
-              <div class="col-12 col-md-2">
-                Nombre
-              </div>
-              <div class="col-12 col-md-2">
-                Cantidad
-              </div>
-              <div class="col-12 col-md-3">
-                Caracteristicas
-              </div>
-              <div class="col-12 col-md-2">
-                Link
-              </div>
-            </div>
-          </div>
+
+
         </div>
       </div>
       <!-- /.row -->
@@ -2252,7 +2311,7 @@ echo form_open('', $attributes);?>
         <button type="button" id="btn-save_pagos_logisticos" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
       </div>
     </div><!-- /.modal-content -->
-   
+
   </div><!-- /.modal-dialog -->
   <style scoped>
       .step-container{
@@ -2263,7 +2322,18 @@ echo form_open('', $attributes);?>
         align-items: center;
         padding: 4em 0;
         margin-bottom: 10px;
-      }.step-container:hover{
+      }.step-container-completed{
+        display: flex;
+        flex-direction: column;
+        border:1px solid #ccc;
+        border-radius: 1em;
+        align-items: center;
+        padding: 4em 0;
+        margin-bottom: 10px;
+        background-color: #85C1E9;
+        color:white;
+      }
+      .step-container:hover{
         background-color: #f9f9f9;
       }
       .separator-line{
@@ -2271,7 +2341,60 @@ echo form_open('', $attributes);?>
         height: 0.1em;
         background-color: black;
         margin: 1em 0;
-      }
+      }/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
       </style>
   <?php echo form_close(); ?>
 </div><!-- /. Modal pagos_logisticos -->

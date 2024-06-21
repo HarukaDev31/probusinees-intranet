@@ -39,7 +39,11 @@ trait FileTrait
         }
         return true;
     }
-
+    /*
+    * This function is used to upload a single file
+    * @param $file - The file data
+    * @param $path - The path where the file will be stored
+    */
     public function uploadSingleFile($file, $path)
     {
         $fileSize= $file['size'] / 1024; // size in K}B
@@ -48,10 +52,10 @@ trait FileTrait
         $fileName = $file['name'];
         $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($fileName, $fileType, $this->allowedExtensions, $this->allowedContentTypes);
         if (!$validateExtensionAndContentTypes) {
-            return 'Invalid extension or content type';
+            return array('error' => 'Invalid extension or content type');
         }
         if (!$this->validateSize($fileSize, $this->maxFileSize)) {
-            return 'File size exceeds limit';
+            return array('error' => 'File size exceeds limit');
         }
         try {
             $uploadedFilePath = $this->uploadFile($fileTname, $fileName, $path);

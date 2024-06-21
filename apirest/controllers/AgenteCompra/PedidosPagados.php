@@ -3,7 +3,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class PedidosPagados extends CI_Controller
 {
-
+    private $jefeChinaPrivilegio = 5;
+    private $personalChinaPrivilegio = 2;
+    private $personalPeruPrivilegio=1;
     private $upload_path = '../assets/images/clientes/';
     private $file_path = '../assets/images/logos/';
     private $logo_cliente_path = '../assets/images/logos/';
@@ -3520,28 +3522,86 @@ class PedidosPagados extends CI_Controller
 
             $dbResponse = $this->PedidosPagadosModel->getOrderProgress($idPedido, $idPrivilegio);
             //RETURN JSON RESPONSE
-			echo json_encode(array(
-				"status" => "success",
-				"data" => $dbResponse,
-			));
+            echo json_encode(array(
+                "status" => "success",
+                "data" => $dbResponse,
+            ));
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
         }
 
     }
-    public function getStepByRole(){
-        try{
-        $step = $this->input->post('step');
-        $priviligie = $this->user->Nu_Tipo_Privilegio_Acceso;
-        $idPedido = $this->input->post('idPedido');
-        if($step==1){
-            if($priviligie==1){
-                $data=$this->PedidosPagadosModel->getPedidoProductos($idPedido);
-                echo json_encode(array('status'=>'success','data'=>$data));
+    public function getStepByRole()
+    {
+        try {
+            $step = $this->input->post('step');
+            $priviligie = $this->user->Nu_Tipo_Privilegio_Acceso;
+            $idPedido = $this->input->post('idPedido');
+            if ($step == 1) {
+                //if peru personal
+                if ($priviligie == $this->personalPeruPrivilegio) {
+                    $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
+                    echo json_encode(array('status' => 'success', 'data' => $data,'priviligie'=>$priviligie));
+                    return;
+                }
+                //if china personal
+                if ($priviligie == $this->personalChinaPrivilegio||$priviligie == $this->jefeChinaPrivilegio) {
+                    $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
+                    $pedidoData=$this->PedidosPagadosModel->getPedidoData($idPedido);
+                    echo json_encode(array('status' => 'success', 'data' => $data,'pedidoData'=>$pedidoData,'priviligie'=>$priviligie));
+                    return;
+
+                }else{
+                    echo json_encode(array('status' => 'error', 'data' => [],'priviligie'=>$priviligie));
+                    return;
+
+                }   
             }
+            if($step == 2){
+                //if peru personal
+                if ($priviligie == $this->personalPeruPrivilegio) {
+                    $data = $this->PedidosPagadosModel->getPedidoPagos($idPedido);
+                    echo json_encode(array('status' => 'success', 'data' => $data['data'],
+                    'pagosData'=>$data['pagos'],'priviligie'=>$priviligie));
+                    return;
+                }
+                //if china personal
+                // if ($priviligie == $this->personalChinaPrivilegio||$priviligie == $this->jefeChinaPrivilegio) {
+                //     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
+                //     $pedidoData=$this->PedidosPagadosModel->getPedidoData($idPedido);
+                //     echo json_encode(array('status' => 'success', 'data' => $data,'pedidoData'=>$pedidoData,'priviligie'=>$priviligie));
+                //     return;
+
+                // }else{
+                //     echo json_encode(array('status' => 'error', 'data' => [],'priviligie'=>$priviligie));
+                //     return;
+
+                // }   
+            }
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
         }
-        }catch(Exception $e){
-        echo json_encode(array('error'=>$e->getMessage()));
+    }
+    public function saveRotuladoProducto()
+    {
+        try {
+            $data = $this->input->post();
+            $files = $_FILES;
+            $response = $this->PedidosPagadosModel->saveRotuladoProducto($data,$files);
+            echo json_encode(array('status' => 'success', 'data' => $response));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
+    public function saveOrdenCompra()
+    {
+        try {
+            $data = $this->input->post();
+
+            $response = $this->PedidosPagadosModel->saveOrdenCompra($data);
+            echo json_encode(array('status' => 'success', 'data' => $response));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
         }
     }
 }
