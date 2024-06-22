@@ -2236,7 +2236,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function getPedidosPagosDetails($idPedido){
         try{
-            $this->db->select('*');
+            $this->db->select('*,pacp.id as idPayment');
             $this->db->from('payments_agente_compra_pedido pacp');
             $this->db->join('payment_types ptacp','ptacp.id = pacp.id_type_payment','left');
 
@@ -2248,69 +2248,91 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
     }
     public function savePagos($data,$files){
-        $pathGarantizado = "assets/images/agentecompra/garantizados/".$data['idPedido']."/pagos/";
-        
-        
-        //pago-1 pago-2 pago-3 .. iterate 
-        $pathPagos = "assets/images/agentecompra/orden-compra/".$data['idPedido']."/pagos/";
-        $pagosURLS=[];
-        $index=1;
-        foreach($files as $key=>$file){
-            if($key=="pago-garantia"){
+        $pathGarantizado = "assets/images/agentecompra/garantizados/" . $data['idPedido'] . "/pagos/";
+        $pathPagos = "assets/images/agentecompra/orden-compra/" . $data['idPedido'] . "/pagos/";
+        $pagosURLS = [];
+        $index = 1;
+    
+        // Process payment files
+        foreach ($files as $key => $file) {
+            if ($key === "pago-garantia") {
                 continue;
-            }
-            else if(array_key_exists("pago-".$index,$files)){
-                    $file=$files["pago-".$index];
-                    $fileURL=$this->uploadSingleFile($file,$pathPagos);
-                    $pagosURLS[$key.'_URL']=$fileURL;
-            }
-            else if($data[$key.'_URL']!="null"){
-                    $pagosURLS[$key.'_URL']=$data[$key.'_URL'];
+            } else if (array_key_exists("pago-" . $index, $files)) {
+                $file = $files["pago-" . $index];
+                $fileURL = $this->uploadSingleFile($file, $pathPagos);
+                $pagosURLS[$key . '_URL'] = $fileURL??$data["pago-" . $index . "_URL"];
+            } else if ($data[$key . '_URL'] != "null") {
+                $pagosURLS[$key . '_URL'] = $data[$key . '_URL']??$data[$key."_URL"];
+
             }
             $index++;
         }
-        if(array_key_exists('liquidacion',$files)){
-            $fileURL=$this->uploadSingleFile($files['liquidacion'],$pathPagos);
-            $pagosURLS['liquidacion_URL']=$fileURL;
+    
+        // Process liquidation file
+        if (array_key_exists('liquidacion', $files)) {
+            $fileURL = $this->uploadSingleFile($files['liquidacion'], $pathPagos);
+            $pagosURLS['liquidacion_URL'] = $fileURL;
+        } else if ($data['liquidacion_URL']) {
+            $pagosURLS['liquidacion_URL'] = $data['liquidacion_URL'];
         }
-        if($data['liquidacion_URL']){
-            $pagosURLS['liquidacion_URL']=$data['liquidacion_URL'];    
+    
+        // Process payment guarantee file
+        if (array_key_exists('pago-garantia', $files)) {
+            $fileURL = $this->uploadSingleFile($files['pago-garantia'], $pathGarantizado);
+            $pagosURLS['pago-garantia_URL'] = $fileURL??$data['pago-garantia_URL'];
+        } else if ($data['pago-garantia_URL']) {
+            $pagosURLS['pago-garantia_URL'] = $data['pago-garantia_URL'];
         }
-
-        if(array_key_exists('pago-garantia',$files)){
-            $fileURL=$this->uploadSingleFile($files['file'],$pathGarantizado);
-            $pagosURLS['pago-garantia_URL']=$fileURL;
-        }
-        if($data['pago-garantia_URL']){
-            $pagosURLS['pago-garantia_URL']=$data['pago-garantia_URL'];      
-        }
-        foreach($pagosURLS as $key=>$value){
-            $dataToInsert=array(
-                'file_url'=>$value,
-                'id_pedido'=>$data['idPedido'],
-            );
-            //check if exists payment with id_pedido=$data['idPedido'] and id_type_payment=1
-           
-            if($key=='pago-garantia_URL'){
-                $this->db->where('id_pedido',$data['idPedido']);
-                $this->db->where('id_type_payment',1);
-                $query = $this->db->get('payments_agente_compra_pedido');
-                $result = $query->row();
-                //update
-                $this->db->where('id',$result->id);
-                $dataToInsert['id_type_payment']=1;
-
-                $this->db->update('payments_agente_compra_pedido',$dataToInsert);
-            }else if($key=='liquidacion_URL'){
-                $dataToInsert['id_type_payment']=3;
-                //insert
-                $this->db->insert('payments_agente_compra_pedido',$dataToInsert);
-            }else{
-                $dataToInsert['id_type_payment']=2;
-                //insert
-                $this->db->insert('payments_agente_compra_pedido',$dataToInsert);
+    
+        // Insert or update records in the database
+        $index = 1;
+        foreach ($pagosURLS as $key => $value) {
+            $dataToInsert = [
+                'file_url' => $value,
+                'id_pedido' => $data['idPedido'],
+            ];
+    
+            if ($key == 'pago-garantia_URL') {
+                $dataToInsert['id_type_payment'] = 1;
+                $dataToInsert['value'] = intval($data['pago-garantia-value']);
+                $this->updateOrInsertPayment($data['idPedido'], $data['pago-garantia_ID'], $dataToInsert);
+            } else if ($key == 'liquidacion_URL') {
+                $dataToInsert['id_type_payment'] = 3;
+                $dataToInsert['value'] = 0;
+                $this->updateOrInsertPayment($data['idPedido'], $data['liquidacion_ID'], $dataToInsert);
+            } else {
+                $dataToInsert['id_type_payment'] = 2;
+                $dataToInsert['value'] = intval($data['pago-' . $index . '-value']);
+                $this->updateOrInsertPayment($data['idPedido'], $data['pago-' . $index . '_ID'], $dataToInsert);
+                $index++;
             }
         }
-        return array('status'=>'success','message'=>$pagosURLS);
+        $total=$this->getPedidoPagos($data['idPedido'])['data'];
+        if($total->orden_total<=$total->pago_cliente){
+            $this->updateStep($data['step'],"COMPLETED"); 
+        }
+        return $total;
+        return ['status' => 'success', 'message' => "Pagos guardados"];
+    }
+    function updateStep($idStep,$status){
+        $data=array('status'=>$status,'id_permision_role'=>$this->user->Nu_Tipo_Privilegio_Acceso);
+        $this->db->where('id',$idStep);
+        $this->db->update('agente_compra_order_steps',$data);
+    }   
+    function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert) {
+        if(!$dataToInsert['file_url'])return;
+        $this->db->where('id_pedido', intval($idPedido));
+        $this->db->where('id', intval($idPayment));
+        $query = $this->db->get('payments_agente_compra_pedido');
+        $result = $query->row();
+        
+        if ($result ){
+            // Update existing record
+            $this->db->where('id', $result->id);
+            $this->db->update('payments_agente_compra_pedido', $dataToInsert);
+        } else {
+            // Insert new record if not found
+            $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
+        }
     }
 }

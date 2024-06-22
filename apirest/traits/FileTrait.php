@@ -52,10 +52,10 @@ trait FileTrait
         $fileName = $file['name'];
         $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($fileName, $fileType, $this->allowedExtensions, $this->allowedContentTypes);
         if (!$validateExtensionAndContentTypes) {
-            return array('error' => 'Invalid extension or content type');
+            return null;
         }
         if (!$this->validateSize($fileSize, $this->maxFileSize)) {
-            return array('error' => 'File size exceeds limit');
+            return null;
         }
         try {
             $uploadedFilePath = $this->uploadFile($fileTname, $fileName, $path);

@@ -29,7 +29,7 @@ let idPedido = null;
 let productoSelected = null;
 let selectedStep = null;
 let containerSteps = null;
-let containerPagos=null;
+let containerPagos = null;
 $(function () {
   sectionTitle = $("#section-title");
   containerVer = $("#container-ver");
@@ -39,7 +39,7 @@ $(function () {
   containerOrdenCompra.hide();
   containerRotulado = $("#container-rotulado");
   containerSteps = $("#steps");
-  containerPagos=$("#container-pagos");
+  containerPagos = $("#container-pagos");
   containerPagos.hide();
   $(".select2").select2();
 
@@ -6829,6 +6829,7 @@ function _generarConsolidaTrading($modal_delete, ID) {
 }
 //get order progress section
 const getOrderProgress = (id) => {
+  +$(".step-column").remove();
   idPedido = id;
   url = base_url + "AgenteCompra/PedidosPagados/getOrderProgress";
   const steps = $("#steps");
@@ -6849,12 +6850,19 @@ const getOrderProgress = (id) => {
           steps.append(stepTemplate(step, i));
           console.log(step);
           if (step.status == "COMPLETED") {
-            //REMOVE step-container AND ADD step-container-completed
             $(`#step-${i}`)
               .removeClass("step-container")
               .addClass("step-container-completed");
           }
         });
+        const configButtons = {
+          btnCancel: {
+            text: "Regresar",
+            action: "hideSteps()",
+          },
+        };
+        $(".steps-buttons").append(getActionButtons(configButtons));
+
         //set data to modal
       } else {
         loading.hide();
@@ -6871,7 +6879,7 @@ const getOrderProgress = (id) => {
 };
 const stepTemplate = (step, i) => {
   const stepHTML = `
-    <div class="col-12 col-lg-2">
+    <div class="col-12 col-lg-2 step-column" >
       <div class="step-container" onclick="openStepFunction(${i + 1},${
     step.id
   })"  id="step-${i}">
@@ -6892,72 +6900,101 @@ const openStepFunction = (i, stepId) => {
     if (i == 1) {
       openOrdenCompra(response);
     }
-    if(i==2){
+    if (i == 2) {
       openPagos(response);
     }
   });
 };
-const openPagos=(response)=>{
-  response=JSON.parse(response);
+const openPagos = (response) => {
+  $("#container_orden-compra").hide();
+  response = JSON.parse(response);
   containerPagos.show();
-  if(response.status=="success"){
-    const data=response.data;
+  if (response.status == "success") {
+    const data = response.data;
     $("#orden_total").html(data.orden_total);
     $("#pago_cliente").html(data.pago_cliente);
-    if(response.pagosData){
-      const pagosData=response.pagosData;
-      const existsGarantia=pagosData.some(pago=>pago.name=='garantia');
-      pagosData.forEach((pago,i)=>{
-        if(pago.name=='garantia'){
-          console.log(pago);
+    if (response.pagosData) {
+      const pagosData = response.pagosData;
+      const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
+      let indexPagos = 1;
+      pagosData.forEach((pago) => {
+        if (pago.name == "garantia") {
           $("#pago-garantia").hide();
+          $("#pago-garantia_ID").remove();
+          $("#pago-garantia-container").append(
+            `<input type="hidden" name="pago-garantia_ID" id="pago-garantia_ID" value="${pago.idPayment}">`
+          );
           $("#pago-garantia_URL").val(pago.file_url);
           $("#pago-garantia-div").append(`
-            <a href="${pago.file_url}" id="pago-garantia-btnlink" class="btn btn-primary" target="_blank">Ver Garantia</a>`);
-        }else{
-          
+            <a href="${pago.file_url}" id="pago-garantia-btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Garantia</a>`);
+          $("#pago-garantia-value").val(pago.value);
+        } else if (pago.name == "normal") {
+          $(`#pago-${indexPagos}_URL`).val(pago.file_url);
+          $(`#pago-${indexPagos}`).hide();
+          $(`#pago-${indexPagos}_ID`).remove();
+          $(`#pago-${indexPagos}-container`).append(
+            `<input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`
+          );
+          $(`#pago-${indexPagos}-btnlink`).remove();
+          $(`#pago-${indexPagos}-div`).append(`
+            <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Pago</a>`);
+          $(`#pago-${indexPagos}-value`).val(pago.value);
+          indexPagos++;
+        } else if (pago.name == "liquidacion") {
+          $(`#liquidacion_URL`).val(pago.file_url);
+          $(`#liquidacion`).hide();
+          $(`#liquidacion_ID`).remove();
+          $(`#liquidacion-container`).append(
+            `<input type="hidden" name="liquidacion_ID" id="liquidacion_ID" value="${pago.idPayment}">`
+          );
+          $("#liquidacion_btnlink").remove();
+          $(`#liquidacion-container`).append(`
+            <a href="${pago.file_url}" id="liquidacion_btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Liquidacion</a>`);
         }
       });
-      if(!existsGarantia){
+      if (!existsGarantia) {
         $("#pago-garantia-container").html("<div></div>");
       }
-      const buttonsConfig={
-        btnSave:{
-          text:"Guardar",
-          action:"savePagos()"
+      const buttonsConfig = {
+        btnSave: {
+          text: "Guardar",
+          action: "savePagos()",
         },
-        btnCancel:{
-          text:"Regresar",
-          action:"hidePagos()"
-        }
-      }
-      const buttonsHTML=getActionButtons(buttonsConfig);
-      $('#pagos-buttons').append(buttonsHTML);
-  }
-}
-}
-const savePagos=()=>{
-  const form=$("#pagos-form");
-  const formData=new FormData(form[0]);
-  formData.append("idPedido",idPedido);
-  formData.append("step",selectedStep);
-  console.log(formData);
-  const url=base_url+"AgenteCompra/PedidosPagados/savePagos";
-  $.ajax({
-    url:url,
-    type:"POST",
-    data:formData,
-    processData:false,
-    contentType:false,
-    success:function(response){
-      console.log(response);
-    },
-    error:function(jqXHR,textStatus,errorThrown){
-      console.log(jqXHR.responseText);
+        btnCancel: {
+          text: "Regresar",
+          action: "hidePagos()",
+        },
+      };
+      const buttonsHTML = getActionButtons(buttonsConfig);
+      $("#pagos-buttons").append(buttonsHTML);
     }
+  }
+};
+const savePagos = () => {
+  const form = $("#pagos-form");
+  const formData = new FormData(form[0]);
+  formData.append("idPedido", idPedido);
+  formData.append("step", selectedStep);
+  console.log(formData);
+  const url = base_url + "AgenteCompra/PedidosPagados/savePagos";
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      response = JSON.parse(response);
+      if (response.status == "success") {
+        hidePagos();
+        getOrderProgress(idPedido);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
   });
-
-}
+};
 
 const openOrdenCompra = (response) => {
   const { status, data, priviligie, pedidoData } = JSON.parse(response);
@@ -7248,17 +7285,42 @@ const getContainerRotuladoView = (producto) => {
   return rotuladoTemplate;
 };
 const getActionButtons = (data) => {
-  const buttons = `
-    <div class="row buttons">
-      <div class="col-12 col-md-6">
-        <div class="btn btn-primary" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
-      </div>
-      <div class="col-12 col-md-6">
-        <div class="btn btn-secondary" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
-      </div>
-    </div>`;
-  return buttons;
+  try {
+    let buttons = "";
+
+    if (data.hasOwnProperty("btnSave") && data.hasOwnProperty("btnCancel")) {
+      buttons = `
+      <div class="row buttons">
+        <div class="col-12 col-md-6">
+          <div class="btn btn-primary" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="btn btn-secondary" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+        </div>
+      </div>`;
+    } else if (data.hasOwnProperty("btnSave")) {
+      buttons = `
+      <div class="row buttons">
+        <div class="col-12 col-md-6">
+          <div class="btn btn-primary" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+        </div>
+      </div>`;
+    } else if (data.hasOwnProperty("btnCancel")) {
+      buttons = `
+      <div class="row buttons">
+        <div class="col-12 col-md-6">
+          <div class="btn btn-secondary" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+        </div>
+      </div>`;
+    }
+    console.log(buttons,data); 
+    return buttons;
+  } catch (e) {
+    console.log(e);
+    return "";
+  }
 };
+
 const hideRotuladoView = () => {
   containerRotulado.empty();
   containerRotulado.hide();
@@ -7273,12 +7335,12 @@ const hideOrdenCompra = () => {
   containerListar.show();
   containerSteps.empty();
 };
-const hidePagos=()=>{
+const hidePagos = () => {
   containerPagos.hide();
   $("#pagos-buttons").empty();
   $("#pago-garantia-btnlink").remove();
   containerVer.show();
-}
+};
 const saveOrdenCompra = () => {
   console.log(selectedStep);
   const url = base_url + "AgenteCompra/PedidosPagados/saveOrdenCompra";
@@ -7306,3 +7368,12 @@ const saveOrdenCompra = () => {
     },
   });
 };
+const hideSteps = () => {
+  containerSteps.empty();
+  $(".steps-buttons").empty();
+  containerListar.show();
+  
+
+
+}
+
