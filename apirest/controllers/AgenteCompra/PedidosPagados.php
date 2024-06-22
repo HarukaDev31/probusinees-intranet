@@ -3604,4 +3604,14 @@ class PedidosPagados extends CI_Controller
             echo json_encode(array('error' => $e->getMessage()));
         }
     }
+    public function savePagos(){
+        try {
+            $data = $this->input->post();
+            $files = $_FILES;
+            $response = $this->PedidosPagadosModel->savePagos($data,$files);
+            echo json_encode(array('status' => 'success', 'data' => $response));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
 }

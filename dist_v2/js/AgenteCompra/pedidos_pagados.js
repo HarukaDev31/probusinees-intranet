@@ -6899,14 +6899,66 @@ const openStepFunction = (i, stepId) => {
 };
 const openPagos=(response)=>{
   response=JSON.parse(response);
-  console.log(response,response.status);
   containerPagos.show();
   if(response.status=="success"){
     const data=response.data;
     $("#orden_total").html(data.orden_total);
     $("#pago_cliente").html(data.pago_cliente);
+    if(response.pagosData){
+      const pagosData=response.pagosData;
+      const existsGarantia=pagosData.some(pago=>pago.name=='garantia');
+      pagosData.forEach((pago,i)=>{
+        if(pago.name=='garantia'){
+          console.log(pago);
+          $("#pago-garantia").hide();
+          $("#pago-garantia_URL").val(pago.file_url);
+          $("#pago-garantia-div").append(`
+            <a href="${pago.file_url}" id="pago-garantia-btnlink" class="btn btn-primary" target="_blank">Ver Garantia</a>`);
+        }else{
+          
+        }
+      });
+      if(!existsGarantia){
+        $("#pago-garantia-container").html("<div></div>");
+      }
+      const buttonsConfig={
+        btnSave:{
+          text:"Guardar",
+          action:"savePagos()"
+        },
+        btnCancel:{
+          text:"Regresar",
+          action:"hidePagos()"
+        }
+      }
+      const buttonsHTML=getActionButtons(buttonsConfig);
+      $('#pagos-buttons').append(buttonsHTML);
   }
 }
+}
+const savePagos=()=>{
+  const form=$("#pagos-form");
+  const formData=new FormData(form[0]);
+  formData.append("idPedido",idPedido);
+  formData.append("step",selectedStep);
+  console.log(formData);
+  const url=base_url+"AgenteCompra/PedidosPagados/savePagos";
+  $.ajax({
+    url:url,
+    type:"POST",
+    data:formData,
+    processData:false,
+    contentType:false,
+    success:function(response){
+      console.log(response);
+    },
+    error:function(jqXHR,textStatus,errorThrown){
+      console.log(jqXHR.responseText);
+    }
+  });
+
+}
+
 const openOrdenCompra = (response) => {
   const { status, data, priviligie, pedidoData } = JSON.parse(response);
 
@@ -7221,6 +7273,12 @@ const hideOrdenCompra = () => {
   containerListar.show();
   containerSteps.empty();
 };
+const hidePagos=()=>{
+  containerPagos.hide();
+  $("#pagos-buttons").empty();
+  $("#pago-garantia-btnlink").remove();
+  containerVer.show();
+}
 const saveOrdenCompra = () => {
   console.log(selectedStep);
   const url = base_url + "AgenteCompra/PedidosPagados/saveOrdenCompra";

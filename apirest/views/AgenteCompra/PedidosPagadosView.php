@@ -12,7 +12,8 @@
       </div>
     </div><!-- /.container-fluid -->
   </section>
-<?php //array_debug($this->user); ?>
+  <?php //array_debug($this->user); 
+  ?>
   <section class="content">
     <div class="container-fluid">
       <div class="row">
@@ -53,36 +54,36 @@
 
                       <th>Servicio</th>
                       <th>Incoterms</th>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {?>
-                      <th>Descarga</th><!--peru-->
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5) {?>
-                      <th>Pagos</th><!--peru-->
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {?>
-                      <th>Voucher</th>
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
-                      <th>China</th>
-                      <th class="no-sort">Negociación</th>
-                      <th class="no-sort">Booking</th>
-                      <th class="no-sort">Recep. Carga</th>
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
-                      <th class="no-sort">Pay</th>
-                      <!--<th class="no-sort">Booking</th>-->
-                      <!--<th class="no-sort">Insp.</th>-->
-                      <th class="no-sort">Pay 2</th>
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
-                      <th class="no-sort">Insp.</th>
-                      <!--<th class="no-sort">Invoice P.</th>-->
-                      <!--<th class="no-sort">Despacho</th>-->
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
-                      <!--<th class="no-sort">Invoice</th>-->
-                      <!--<th class="no-sort">Supervisar</th>-->
-                      <?php }?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { ?>
+                        <th>Descarga</th><!--peru-->
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5) { ?>
+                        <th>Pagos</th><!--peru-->
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { ?>
+                        <th>Voucher</th>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
+                        <th>China</th>
+                        <th class="no-sort">Negociación</th>
+                        <th class="no-sort">Booking</th>
+                        <th class="no-sort">Recep. Carga</th>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
+                        <th class="no-sort">Pay</th>
+                        <!--<th class="no-sort">Booking</th>-->
+                        <!--<th class="no-sort">Insp.</th>-->
+                        <th class="no-sort">Pay 2</th>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
+                        <th class="no-sort">Insp.</th>
+                        <!--<th class="no-sort">Invoice P.</th>-->
+                        <!--<th class="no-sort">Despacho</th>-->
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
+                        <!--<th class="no-sort">Invoice</th>-->
+                        <!--<th class="no-sort">Supervisar</th>-->
+                      <?php } ?>
                       <th>Ver</th>
                       <!-- <th>Status</th> -->
                     </tr>
@@ -92,337 +93,343 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-$attributes = array('id' => 'form-pedido');
-echo form_open('', $attributes);
-?>
-                  <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
-                  <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
-                  <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
-                  <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
+                $attributes = array('id' => 'form-pedido');
+                echo form_open('', $attributes);
+                ?>
+                <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
+                <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
+                <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
+                <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
 
-                  <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 d-none">
-                      <label>Estado</label>
-                      <div class="form-group">
-                        <div id="div-estado" style="font-size: 1.4rem;"></div>
-                      </div>
+                <div class="row">
+                  <div class="col-12 col-sm-12 col-md-12 d-none">
+                    <label>Estado</label>
+                    <div class="form-group">
+                      <div id="div-estado" style="font-size: 1.4rem;"></div>
                     </div>
+                  </div>
 
-                    <?php
-$sClassOcultar = '';
-if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) {
-    $sClassOcultar = 'd-none';
-}
+                  <?php
+                  $sClassOcultar = '';
+                  if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) {
+                    $sClassOcultar = 'd-none';
+                  }
 
-?>
-                    <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
-                      <label>Cliente</label>
-                      <div class="form-group">
-                        <input type="text" name="No_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
+                  ?>
+                  <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
+                    <label>Cliente</label>
+                    <div class="form-group">
+                      <input type="text" name="No_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                      <span class="help-block text-danger" id="error"></span>
                     </div>
+                  </div>
 
-                    <div class="col-12 col-sm-4 col-md-4 d-none">
-                      <label>Email</label>
-                      <div class="form-group">
-                        <input type="text" name="Txt_Email_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
+                  <div class="col-12 col-sm-4 col-md-4 d-none">
+                    <label>Email</label>
+                    <div class="form-group">
+                      <input type="text" name="Txt_Email_Contacto" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                      <span class="help-block text-danger" id="error"></span>
                     </div>
+                  </div>
 
-                    <div class="col-12 col-sm-4 col-md-2 d-none">
-                      <label>Celular</label>
-                      <div class="form-group">
-                        <input type="text" inputmode="tel" name="Nu_Celular_Contacto" class="form-control required" placeholder="Ingresar" maxlength="11" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
+                  <div class="col-12 col-sm-4 col-md-2 d-none">
+                    <label>Celular</label>
+                    <div class="form-group">
+                      <input type="text" inputmode="tel" name="Nu_Celular_Contacto" class="form-control required" placeholder="Ingresar" maxlength="11" autocomplete="off">
+                      <span class="help-block text-danger" id="error"></span>
                     </div>
+                  </div>
 
-                    <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
-                      <label>Empresa</label>
-                      <div class="form-group">
-                        <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
+                  <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
+                    <label>Empresa</label>
+                    <div class="form-group">
+                      <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                      <span class="help-block text-danger" id="error"></span>
                     </div>
+                  </div>
 
-                    <div class="col-12 col-sm-4 col-md-4 d-none">
-                      <label>RUC</label>
-                      <div class="form-group">
-                        <input type="text" name="Nu_Documento_Identidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
+                  <div class="col-12 col-sm-4 col-md-4 d-none">
+                    <label>RUC</label>
+                    <div class="form-group">
+                      <input type="text" name="Nu_Documento_Identidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                      <span class="help-block text-danger" id="error"></span>
                     </div>
+                  </div>
 
-                    <div class="col-6 col-sm-12 col-md-6 text-left <?php echo $sClassOcultar; ?>">
-                      <label>Pagos</label>
-                      <div class="form-group">
-                        <button type="button" class="btn btn-secondary" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">Pagar 30%</button>
-                        <button type="button" id="btn-descargar_pago_30" class="btn btn-secondary d-none" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()"><span id="span-pago_30"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                  <div class="col-6 col-sm-12 col-md-6 text-left <?php echo $sClassOcultar; ?>">
+                    <label>Pagos</label>
+                    <div class="form-group">
+                      <button type="button" class="btn btn-secondary" alt="Subir pago 30%" title="Subir pago 30%" onclick="subirPago30()">Pagar 30%</button>
+                      <button type="button" id="btn-descargar_pago_30" class="btn btn-secondary d-none" alt="Descargar pago 30%" title="Descargar pago 30%" onclick="descargarPago30()"><span id="span-pago_30"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
 
-                        <button type="button" class="btn btn-secondary" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">Pagar 70%</button>
-                        <button type="button" id="btn-descargar_pago_100" class="btn btn-secondary d-none" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()"><span id="span-pago_100"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                      <button type="button" class="btn btn-secondary" alt="Subir pago 100%" title="Subir pago 100%" onclick="subirPago100()">Pagar 70%</button>
+                      <button type="button" id="btn-descargar_pago_100" class="btn btn-secondary d-none" alt="Descargar pago 100%" title="Descargar pago 100%" onclick="descargarPago100()"><span id="span-pago_100"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
 
-                        <button type="button" class="btn btn-secondary" alt="Subir pago servicio" title="Subir pago servicio" onclick="subirPagoServicio()">Pagar servicio</button>
-                        <button type="button" id="btn-descargar_pago_servicio" class="btn btn-secondary d-none" alt="Descargar pago servicio" title="Descargar pago servicio" onclick="descargarPagoServicio()"><span id="span-pago_servicio"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
-                      </div>
+                      <button type="button" class="btn btn-secondary" alt="Subir pago servicio" title="Subir pago servicio" onclick="subirPagoServicio()">Pagar servicio</button>
+                      <button type="button" id="btn-descargar_pago_servicio" class="btn btn-secondary d-none" alt="Descargar pago servicio" title="Descargar pago servicio" onclick="descargarPagoServicio()"><span id="span-pago_servicio"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
                     </div>
+                  </div>
 
-                    <div class="col-6 col-sm-12 col-md-6 text-left <?php echo $sClassOcultar; ?>">
-                      <label>Otros Pagos</label>
-                      <div class="form-group">
-                        <button type="button" class="btn btn-secondary" alt="Subir Flete" title="Subir Flete" onclick="subirPagoFlete()">Pagar Flete</button>
-                        <button type="button" id="btn-descargar_flete" class="btn btn-secondary d-none" alt="Descargar Flete" title="Descargar Flete" onclick="descargarPagoFlete()"><span id="span-flete"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                  <div class="col-6 col-sm-12 col-md-6 text-left <?php echo $sClassOcultar; ?>">
+                    <label>Otros Pagos</label>
+                    <div class="form-group">
+                      <button type="button" class="btn btn-secondary" alt="Subir Flete" title="Subir Flete" onclick="subirPagoFlete()">Pagar Flete</button>
+                      <button type="button" id="btn-descargar_flete" class="btn btn-secondary d-none" alt="Descargar Flete" title="Descargar Flete" onclick="descargarPagoFlete()"><span id="span-flete"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
 
-                        <button type="button" class="btn btn-secondary" alt="Subir Costo Origen" title="Subir Costo Origen" onclick="subirPagoCostoOrigen()">Costo Origen</button>
-                        <button type="button" id="btn-descargar_costo_origen" class="btn btn-secondary d-none" alt="Descargar Costo Origen" title="Descargar Costo Origen" onclick="descargarPagoCostosOrigen()"><span id="span-costo_origen"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                      <button type="button" class="btn btn-secondary" alt="Subir Costo Origen" title="Subir Costo Origen" onclick="subirPagoCostoOrigen()">Costo Origen</button>
+                      <button type="button" id="btn-descargar_costo_origen" class="btn btn-secondary d-none" alt="Descargar Costo Origen" title="Descargar Costo Origen" onclick="descargarPagoCostosOrigen()"><span id="span-costo_origen"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
 
-                        <button type="button" class="btn btn-secondary" alt="Subir Costo FTA" title="Subir Costo FTA" onclick="subirPagoFTA()">Costo FTA</button>
-                        <button type="button" id="btn-descargar_fta" class="btn btn-secondary d-none" alt="Descargar Costo FTA" title="Descargar Costo FTA" onclick="descargarPagoFTA()"><span id="span-fta"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                      <button type="button" class="btn btn-secondary" alt="Subir Costo FTA" title="Subir Costo FTA" onclick="subirPagoFTA()">Costo FTA</button>
+                      <button type="button" id="btn-descargar_fta" class="btn btn-secondary d-none" alt="Descargar Costo FTA" title="Descargar Costo FTA" onclick="descargarPagoFTA()"><span id="span-fta"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
 
-                        <button type="button" class="btn btn-secondary" alt="Subir Costo Gastos" title="Subir Costo Gastos" onclick="subirPagoCuadrilla()">Gastos</button>
-                        <button type="button" id="btn-descargar_pago_cuadrilla" class="btn btn-secondary d-none" alt="Descargar Costo Gastos" title="Descargar Costo Gastos" onclick="descargarPagoCuadrilla()"><span id="span-cuadrilla"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                      <button type="button" class="btn btn-secondary" alt="Subir Costo Gastos" title="Subir Costo Gastos" onclick="subirPagoCuadrilla()">Gastos</button>
+                      <button type="button" id="btn-descargar_pago_cuadrilla" class="btn btn-secondary d-none" alt="Descargar Costo Gastos" title="Descargar Costo Gastos" onclick="descargarPagoCuadrilla()"><span id="span-cuadrilla"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
 
-                        <!-- ahora lo utilizaremos para otros gastos y se agrego campo de texto libre para concepto
+                      <!-- ahora lo utilizaremos para otros gastos y se agrego campo de texto libre para concepto
                         <button type="button" class="btn btn-secondary" alt="Subir Costo Cuadrilla" title="Subir Costo Cuadrilla" onclick="subirPagoCuadrilla()">Cuadrilla</button>
                         <button type="button" id="btn-descargar_pago_cuadrilla" class="btn btn-secondary d-none" alt="Descargar Costo Cuadrilla" title="Descargar Costo Cuadrilla" onclick="descargarPagoCuadrilla()"><span id="span-cuadrilla"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
                         -->
 
-                        <button type="button" class="btn btn-secondary" alt="Subir Otros Costos" title="Subir Otros Costo" onclick="subirPagoOtrosCostos()">Otros Costo</button>
-                        <button type="button" id="btn-descargar_otros_costos" class="btn btn-secondary d-none" alt="Descargar Otros Costo" title="Descargar Otros Costo" onclick="descargarPagoOtrosCostos()"><span id="span-otros_costo"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                      <button type="button" class="btn btn-secondary" alt="Subir Otros Costos" title="Subir Otros Costo" onclick="subirPagoOtrosCostos()">Otros Costo</button>
+                      <button type="button" id="btn-descargar_otros_costos" class="btn btn-secondary d-none" alt="Descargar Otros Costo" title="Descargar Otros Costo" onclick="descargarPagoOtrosCostos()"><span id="span-otros_costo"></span> <i class="fas fa-download" aria-hidden="true"></i></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 col-sm-8 col-md-8 d-none">
+                    <label>Producto</label>
+                    <div class="form-group">
+                      <input type="hidden" id="txt-AID" name="AID" class="form-control">
+                      <input type="hidden" id="txt-ID_Producto" name="ID_Producto" class="form-control">
+                      <input type="hidden" id="txt-ID_Unidad_Medida" name="ID_Unidad_Medida" class="form-control">
+                      <input type="hidden" id="txt-ID_Unidad_Medida_2" name="ID_Unidad_Medida_2" class="form-control">
+                      <input type="hidden" id="txt-Precio_Producto" name="Precio_Producto" class="form-control">
+                      <input type="hidden" id="txt-Cantidad_Configurada_Producto" name="Cantidad_Configurada_Producto" class="form-control">
+                      <input type="hidden" id="txt-Nombre_Producto" name="Nombre_Producto" class="form-control">
+                      <input type="hidden" id="txt-Nombre_Unidad_Medida" name="Nombre_Unidad_Medida" class="form-control">
+                      <input type="text" id="txt-ANombre" name="ANombre" class="form-control autocompletar" placeholder="Buscar por Nombre" value="" autocomplete="off">
+                      <span class="help-block text-danger" id="error"></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-sm-2 col-md-2 d-none">
+                    <label>Cantidad</label>
+                    <div class="form-group">
+                      <input type="text" id="txt-Qt_Producto_Descargar" inputmode="decimal" name="Qt_Producto_Descargar" class="form-control input-decimal" placeholder="Ingresar cantidad" value="1" autocomplete="off">
+                      <span class="help-block" id="error"></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-sm-2 col-md-2 d-none">
+                    <label class="hidden-xs">&nbsp;</label>
+                    <div class="form-group">
+                      <button type="button" id="btn-addProductosEnlaces" class="btn btn-success btn-block"> Agregar</button>
+                    </div>
+                  </div>
+
+                  <div class="col-xs-12 col-sm-12 col-md-12 mt-3 <?php echo $this->user->Nu_Tipo_Privilegio_Acceso == 1 ? '' : 'd-none'; ?>">
+                    <div class="col-12 col-sm-2 col-md-2">
+                      <label>Total Cliente</label>
+                      <div class="form-group">
+                        <span id="span-total_cliente"></span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-2 col-md-2">
+                      <label>Saldo Cliente</label>
+                      <div class="form-group">
+                        <span id="span-saldo_cliente"></span>
                       </div>
                     </div>
                   </div>
 
-                  <div class="row">
-                    <div class="col-12 col-sm-8 col-md-8 d-none">
-                      <label>Producto</label>
-                      <div class="form-group">
-                        <input type="hidden" id="txt-AID" name="AID" class="form-control">
-                        <input type="hidden" id="txt-ID_Producto" name="ID_Producto" class="form-control">
-                        <input type="hidden" id="txt-ID_Unidad_Medida" name="ID_Unidad_Medida" class="form-control">
-                        <input type="hidden" id="txt-ID_Unidad_Medida_2" name="ID_Unidad_Medida_2" class="form-control">
-                        <input type="hidden" id="txt-Precio_Producto" name="Precio_Producto" class="form-control">
-                        <input type="hidden" id="txt-Cantidad_Configurada_Producto" name="Cantidad_Configurada_Producto" class="form-control">
-                        <input type="hidden" id="txt-Nombre_Producto" name="Nombre_Producto" class="form-control">
-                        <input type="hidden" id="txt-Nombre_Unidad_Medida" name="Nombre_Unidad_Medida" class="form-control">
-                        <input type="text" id="txt-ANombre" name="ANombre" class="form-control autocompletar" placeholder="Buscar por Nombre" value="" autocomplete="off">
-                        <span class="help-block text-danger" id="error"></span>
-                      </div>
+                  <div class="col-xs-12 col-sm-12 col-md-12 mt-3 <?php echo $this->user->Nu_Tipo_Privilegio_Acceso == 1 ? 'd-none' : ''; ?>">
+                    <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos <button type="button" id="btn-excel_order_tracking" class="btn btn-default" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(1)" data-id_pedido="">Descargar &nbsp;<i class="fa fa-file-excel text-success"></i></button></h3>
+
+                    <div class="table-responsive div-Compuesto tableFixHeadV2">
+                      <table id="table-Producto_Enlace" class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                          <tr>
+                            <th style='display:none;' class="text-left">ID</th>
+                            <th class="text-left" width="10%">Product_Photo</th>
+                            <th class="text-left">Product_Name</th>
+                            <th class="text-right">Qty</th>
+                            <th class="text-right">Price</th>
+                            <th class="text-right">Amount</th>
+                            <!--<th class="text-right">Deposit_#1</th>-->
+                            <!--<th class="text-right">Balance</th>-->
+                            <!--<th class="text-right">Deposit_#2</th>-->
+                            <th class="text-right">T. Producción</th>
+                            <!--<th class="text-right">C. Delivery</th>--><!-- cabecera costo de delivery por proveedor no es por item-->
+                            <th class="text-center">fecha_Entrega</th>
+                            <th class="text-center">Change Supplier</th>
+                            <th class="text-center">Eliminar Item</th>
+                            <!--<th class="text-right">Supplier</th>--><!--proveedor-->
+                            <!--<th class="text-right">Phone_Image_Supplier</th>--><!--celular imagen de tarjeta de presentación-->
+                            <!--<th class="text-right"></th>-->
+                          </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                      </table>
                     </div>
 
-                    <div class="col-12 col-sm-2 col-md-2 d-none">
-                      <label>Cantidad</label>
-                      <div class="form-group">
-                        <input type="text" id="txt-Qt_Producto_Descargar" inputmode="decimal" name="Qt_Producto_Descargar" class="form-control input-decimal" placeholder="Ingresar cantidad" value="1" autocomplete="off">
-                        <span class="help-block" id="error"></span>
-                      </div>
+                    <div class="table-responsive div-Producto_Recepcion_Carga tableFixHeadV2">
+                      <table id="table-Producto_Recepcion_Carga" class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                          <tr>
+                            <th style='display:none;' class="text-left">ID</th>
+                            <th class="text-center" width="50px">Product_Photo</th>
+                            <th class="text-center">Product_Name</th>
+                            <th class="text-center" width="150px">Qty Total</th>
+                            <th class="text-center">Nro. Cajas</th>
+                            <th class="text-center">Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                      </table>
                     </div>
 
-                    <div class="col-12 col-sm-2 col-md-2 d-none">
-                      <label class="hidden-xs">&nbsp;</label>
-                      <div class="form-group">
-                        <button type="button" id="btn-addProductosEnlaces" class="btn btn-success btn-block"> Agregar</button>
-                      </div>
+                    <div class="table-responsive div-Invoice_Proveedor tableFixHeadV2">
+                      <table id="table-Invoice_Proveedor" class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                          <tr>
+                            <th style='display:none;' class="text-left">ID</th>
+                            <th class="text-center" width="50px">Supplier</th>
+                            <th class="text-center">Invoice y PL</th>
+                            <th class="text-center"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                      </table>
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-12 mt-3 <?php echo $this->user->Nu_Tipo_Privilegio_Acceso == 1 ? '' : 'd-none'; ?>">
-                      <div class="col-12 col-sm-2 col-md-2">
-                        <label>Total Cliente</label>
-                        <div class="form-group">
-                          <span id="span-total_cliente"></span>
-                        </div>
-                      </div>
-                      <div class="col-12 col-sm-2 col-md-2">
-                        <label>Saldo Cliente</label>
-                        <div class="form-group">
-                          <span id="span-saldo_cliente"></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="col-xs-12 col-sm-12 col-md-12 mt-3 <?php echo $this->user->Nu_Tipo_Privilegio_Acceso == 1 ? 'd-none' : ''; ?>">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos <button type="button" id="btn-excel_order_tracking" class="btn btn-default" alt="Orden Tracking" title="Orden Tracking" href="javascript:void(0)" onclick="generarExcelOrderTracking(1)" data-id_pedido="">Descargar &nbsp;<i class="fa fa-file-excel text-success"></i></button></h3>
-
-                      <div class="table-responsive div-Compuesto tableFixHeadV2">
-                        <table id="table-Producto_Enlace" class="table table-bordered table-hover">
-                          <thead class="thead-light">
-                            <tr>
-                              <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-left" width="10%">Product_Photo</th>
-                              <th class="text-left">Product_Name</th>
-                              <th class="text-right">Qty</th>
-                              <th class="text-right">Price</th>
-                              <th class="text-right">Amount</th>
-                              <!--<th class="text-right">Deposit_#1</th>-->
-                              <!--<th class="text-right">Balance</th>-->
-                              <!--<th class="text-right">Deposit_#2</th>-->
-                              <th class="text-right">T. Producción</th>
-                              <!--<th class="text-right">C. Delivery</th>--><!-- cabecera costo de delivery por proveedor no es por item-->
-                              <th class="text-center">fecha_Entrega</th>
-                              <th class="text-center">Change Supplier</th>
-                              <th class="text-center">Eliminar Item</th>
-                              <!--<th class="text-right">Supplier</th>--><!--proveedor-->
-                              <!--<th class="text-right">Phone_Image_Supplier</th>--><!--celular imagen de tarjeta de presentación-->
-                              <!--<th class="text-right"></th>-->
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
-
-                      <div class="table-responsive div-Producto_Recepcion_Carga tableFixHeadV2">
-                        <table id="table-Producto_Recepcion_Carga" class="table table-bordered table-hover">
-                          <thead class="thead-light">
-                            <tr>
-                              <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-center" width="50px">Product_Photo</th>
-                              <th class="text-center">Product_Name</th>
-                              <th class="text-center" width="150px">Qty Total</th>
-                              <th class="text-center">Nro. Cajas</th>
-                              <th class="text-center">Estado</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
-
-                      <div class="table-responsive div-Invoice_Proveedor tableFixHeadV2">
-                        <table id="table-Invoice_Proveedor" class="table table-bordered table-hover">
-                          <thead class="thead-light">
-                            <tr>
-                              <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-center" width="50px">Supplier</th>
-                              <th class="text-center">Invoice y PL</th>
-                              <th class="text-center"></th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
-
-                      <div class="table-responsive div-Pago_Proveedor tableFixHeadV2">
-                        <table id="table-Pago_Proveedor" class="table table-bordered table-hover">
-                          <thead class="thead-light">
-                            <tr>
-                              <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-center">Supplier</th>
-                              <!--<th class="text-center">Cuenta Bancaria</th>-->
-                              <th class="text-center">Importe</th>
-                              <th class="text-center">voucher</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div><!-- ./table -->
-
-                  <div class="row mt-3">
-                    <div class="col-6 col-md-6">
-                      <div class="form-group">
-                        <button type="button" id="btn-cancelar" class="btn btn-danger btn-lg btn-block">Salir</button>
-                      </div>
-                    </div>
-                    <div class="col-6 col-md-6">
-                      <div class="form-group">
-                        <button type="submit" id="btn-save" class="btn btn-success btn-lg btn-block btn-verificar">Guardar</button>
-                      </div>
+                    <div class="table-responsive div-Pago_Proveedor tableFixHeadV2">
+                      <table id="table-Pago_Proveedor" class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                          <tr>
+                            <th style='display:none;' class="text-left">ID</th>
+                            <th class="text-center">Supplier</th>
+                            <!--<th class="text-center">Cuenta Bancaria</th>-->
+                            <th class="text-center">Importe</th>
+                            <th class="text-center">voucher</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
+                </div><!-- ./table -->
+
+                <div class="row mt-3">
+                  <div class="col-6 col-md-6">
+                    <div class="form-group">
+                      <button type="button" id="btn-cancelar" class="btn btn-danger btn-lg btn-block">Salir</button>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-6">
+                    <div class="form-group">
+                      <button type="submit" id="btn-save" class="btn btn-success btn-lg btn-block btn-verificar">Guardar</button>
+                    </div>
+                  </div>
+                </div>
                 <?php echo form_close(); ?>
               </div>
             </div>
-              <div class="card-body"  id="container-ver"  >
-                <h1 class="m-0 p-0">Avances</h1>
-                <div class="separator-line"></div>
-                <div id="steps" class="w-100 row pt-2" style="height: 400px;">
-                  <div class="spinner-border text-primary" id="loading-steps" role="status">
-                  </div>
+            <div class="card-body" id="container-ver">
+              <h1 class="m-0 p-0">Avances</h1>
+              <div class="separator-line"></div>
+              <div id="steps" class="w-100 row pt-2" style="height: 400px;">
+                <div class="spinner-border text-primary" id="loading-steps" role="status">
                 </div>
               </div>
-              <div class="card-body" id="container_orden-compra">
-                  <div class="orden-compra_header_china"></div>
-                  <div class="orden-compra_header row">
-                    <div class="col-12 col-md-3">
-                      Imagen
-                    </div>
-                    <div class="col-12 col-md-2">
-                      Nombre
-                    </div>
-                    <div class="col-12 col-md-2">
-                      Cantidad
-                    </div>
-                    <div class="col-12 col-md-3">
-                      Caracteristicas
-                    </div>
-                    <div class="col-12 col-md-2">
-                      Link
-                    </div>
-                  </div>
+            </div>
+            <div class="card-body" id="container_orden-compra">
+              <div class="orden-compra_header_china"></div>
+              <div class="orden-compra_header row">
+                <div class="col-12 col-md-3">
+                  Imagen
                 </div>
-              <div class="card-body" id="container-rotulado">
+                <div class="col-12 col-md-2">
+                  Nombre
+                </div>
+                <div class="col-12 col-md-2">
+                  Cantidad
+                </div>
+                <div class="col-12 col-md-3">
+                  Caracteristicas
+                </div>
+                <div class="col-12 col-md-2">
+                  Link
+                </div>
               </div>
-              <form class="card-body" id="container-pagos">
-                <div class="row" id="pagos-header">
-                  <div class="col-12 col-md-3">
-                    <label>ORDEN TOTAL</label>
-                    <span class="pagos-header-input" id="orden_total">0</span>
-                  </div>
-                  <div class="col-12 col-md-3">
-                    <label>PAGO CLIENTE:</label>
-                    <span class="pagos-header-input" id="pago_cliente">0</span>
-                  </div>
+            </div>
+            <div class="card-body" id="container-rotulado">
+            </div>
+            <div class="card-body" id="container-pagos">
+              <div class="row" id="pagos-header">
+                <div class="col-12 col-md-3">
+                  <label>ORDEN TOTAL</label>
+                  <span class="pagos-header-input" id="orden_total">0</span>
                 </div>
-                <div class="w-100 row" id="pagos-body">
-                  <div class="col-12 col-md-5">
-                    <div class="pago row" id="pago-garantia">
-                        <div class="col-12 col-md-8">
-                          <label>PAGO GARANTIA</label>
-                          <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL"/>
-                        </div>
-                        <div class="col-12 col-md-4">
-                        <input type="file" name="pago-garantia" id="pago-garantia" class="form-control"/>
-                        </div>
+                <div class="col-12 col-md-3">
+                  <label>PAGO CLIENTE:</label>
+                  <span class="pagos-header-input" id="pago_cliente">0</span>
+                </div>
+              </div>
+              <div class="w-100 row" id="pagos-body">
+                <form class="row w-100" id="pagos-form">
+                  <div class="first-column col-12 col-md-6">
+                    <div class="pago row" id="pago-garantia-container">
+                      <div class="col-12 col-md-8">
+                        <label>PAGO GARANTIA</label>
+                        <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL" />
+                      </div>
+                      <div class="col-12 col-md-4" id="pago-garantia-div">
+                        <input type="file" name="pago-garantia" id="pago-garantia" class="form-control" />
+                      </div>
                     </div>
-                    <div class="pago row" id="pago-1">
-                        <div class="col-12 col-md-8">
-                          <label>PAGO 1:</label>
-                          <input type="hidden" name="pago-1_URL" id="pago-1_URL"/>
-                        </div>
-                        <div class="col-12 col-md-4">
-                        <input type="file" name="pago-1" id="pago-1" class="form-control"/>
-                        </div>
+                    <div class="pago row" id="pago-1-container">
+                      <div class="col-12 col-md-8">
+                        <label>PAGO 1:</label>
+                        <input type="hidden" name="pago-1_URL" id="pago-1_URL" />
+                      </div>
+                      <div class="col-12 col-md-4" id="pago-1-div">
+                        <input type="file" name="pago-1" id="pago-1" class="form-control" />
+                      </div>
                     </div>
-                    <div class="pago row" id="pago-2">
-                        <div class="col-12 col-md-8">
-                          <label>PAGO 2:</label>
-                          <input type="hidden" name="pago-2_URL" id="pago-2_URL"/>
-                        </div>
-                        <div class="col-12 col-md-4">
-                        <input type="file" name="pago-2" id="pago-2" class="form-control"/>
-                        </div>
+                    <div class="pago row" id="pago-2-container">
+                      <div class="col-12 col-md-8">
+                        <label>PAGO 2:</label>
+                        <input type="hidden" name="pago-2_URL" id="pago-2_URL" />
+                      </div>
+                      <div class="col-12 col-md-4" id="pago-2-div">
+                        <input type="file" name="pago-2" id="pago-2" class="form-control" />
+                      </div>
                     </div>
                   </div>
-                  <div class="col-12 col-md-7">
+                  <div class="col-12 col-md-6">
                     <div class="form-group">
                       <label>LIQUIDACION:</label>
-                      <input type="hidden" name="liquidacion_URL" id="liquidacion_URL"/>
-                      <input type="file" name="liquidacion" id="liquidacion" class="form-control"/>
+                      <input type="hidden" name="liquidacion_URL" id="liquidacion_URL" />
+                      <input type="file" name="liquidacion" id="liquidacion" class="form-control" />
                     </div>
                     <div class="form-group">
                       <label>NOTAS:</label>
-                      <textarea class="form-control" name="notas-pagos" id="notas-pagos" ></textarea>  
+                      <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
                     </div>
                   </div>
-                </div>
-              </form>
+
+                </form>
+
+              </div>
+              <div class="row" id="pagos-buttons"></div>
+
             </div>
+          </div>
 
 
         </div>
@@ -458,7 +465,7 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
 <!-- modal agregar pagos -->
 <div class="modal fade modal-agregar_pago" id="modal-agregar_pago">
   <?php $attributes = array('id' => 'form-agregar_pago_proveedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-agregar_pago">
@@ -509,7 +516,7 @@ echo form_open('', $attributes);?>
 <!-- modal agregar pagos -->
 <div class="modal fade modal-agregar_inspeccion" id="modal-agregar_inspeccion">
   <?php $attributes = array('id' => 'form-agregar_inspeccion');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-agregar_inspeccion">
@@ -565,7 +572,7 @@ echo form_open('', $attributes);?>
 <!-- modal documento -->
 <div class="modal fade modal-documento_entrega" id="modal-documento_entrega">
   <?php $attributes = array('id' => 'form-documento_entrega');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-documento_entrega">
@@ -604,7 +611,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago 30% cliente -->
 <div class="modal fade modal-pago_cliente_30" id="modal-pago_cliente_30">
   <?php $attributes = array('id' => 'form-pago_cliente_30');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_cliente_30">
@@ -671,7 +678,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago 100% cliente -->
 <div class="modal fade modal-pago_cliente_100" id="modal-pago_cliente_100">
   <?php $attributes = array('id' => 'form-pago_cliente_100');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_cliente_100">
@@ -738,7 +745,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago servicio cliente -->
 <div class="modal fade modal-pago_cliente_servicio" id="modal-pago_cliente_servicio">
   <?php $attributes = array('id' => 'form-pago_cliente_servicio');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_cliente_servicio">
@@ -806,7 +813,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago flete -->
 <div class="modal fade modal-pago_flete" id="modal-pago_flete">
   <?php $attributes = array('id' => 'form-pago_flete');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_flete">
@@ -873,7 +880,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago costos_origen -->
 <div class="modal fade modal-costos_origen" id="modal-costos_origen">
   <?php $attributes = array('id' => 'form-costos_origen');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-costos_origen">
@@ -940,7 +947,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago pago_fta -->
 <div class="modal fade modal-pago_fta" id="modal-pago_fta">
   <?php $attributes = array('id' => 'form-pago_fta');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_fta">
@@ -1007,7 +1014,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago otros_cuadrilla -->
 <div class="modal fade modal-otros_cuadrilla" id="modal-otros_cuadrilla">
   <?php $attributes = array('id' => 'form-otros_cuadrilla');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-otros_cuadrilla">
@@ -1082,7 +1089,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago pago_fta -->
 <div class="modal fade modal-otros_costos" id="modal-otros_costos">
   <?php $attributes = array('id' => 'form-otros_costos');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-otros_costos">
@@ -1175,7 +1182,7 @@ echo form_open('', $attributes);?>
 <!-- Modal proveedor -->
 <div class="modal fade modal-proveedor" id="modal-default">
   <?php $attributes = array('id' => 'form-proveedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1266,7 +1273,7 @@ echo form_open('', $attributes);?>
 <!-- Modal booking -->
 <div class="modal fade modal-booking" id="modal-default">
   <?php $attributes = array('id' => 'form-booking');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1314,7 +1321,7 @@ echo form_open('', $attributes);?>
 <!-- modal fecha_entrega_shipper -->
 <div class="modal fade modal-fecha_entrega_shipper" id="modal-fecha_entrega_shipper">
   <?php $attributes = array('id' => 'form-fecha_entrega_shipper');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-fecha_entrega_shipper">
@@ -1345,7 +1352,7 @@ echo form_open('', $attributes);?>
 <!-- modal cambio_item_proveedor -->
 <div class="modal fade modal-cambio_item_proveedor" id="modal-cambio_item_proveedor">
   <?php $attributes = array('id' => 'form-cambio_item_proveedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-cambio_item_proveedor">
@@ -1414,8 +1421,10 @@ echo form_open('', $attributes);?>
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
-                    <div class="col-12 col-sm-6 mb-1"><h6 class="card-title mb-2" style="font-weight:bold">
-                      <span class="fw-bold">Nombre Proveedor</span></h6>
+                    <div class="col-12 col-sm-6 mb-1">
+                      <h6 class="card-title mb-2" style="font-weight:bold">
+                        <span class="fw-bold">Nombre Proveedor</span>
+                      </h6>
                       <div class="form-group">
                         <input type="text" inputmode="text" id="modal-contacto_proveedor1" name="addProducto[1][contacto_proveedor]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
@@ -1482,7 +1491,7 @@ echo form_open('', $attributes);
 <!-- Modal booking_consolidado -->
 <div class="modal fade modal-booking_consolidado" id="modal-default">
   <?php $attributes = array('id' => 'form-booking_consolidado');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1523,7 +1532,7 @@ echo form_open('', $attributes);?>
 <!-- Modal inspeccion -->
 <div class="modal fade modal-booking_inspeccion" id="modal-default">
   <?php $attributes = array('id' => 'form-booking_inspeccion');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1589,7 +1598,7 @@ echo form_open('', $attributes);?>
 <!-- modal supervisar_llenado_contenedor -->
 <div class="modal fade modal-supervisar_llenado_contenedor" id="modal-supervisar_llenado_contenedor">
   <?php $attributes = array('id' => 'form-supervisar_llenado_contenedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-supervisar_llenado_contenedor">
@@ -1629,7 +1638,7 @@ echo form_open('', $attributes);?>
 <!-- Modal reserva_booking_trading -->
 <div class="modal fade modal-reserva_booking_trading" id="modal-default">
   <?php $attributes = array('id' => 'form-reserva_booking_trading');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1711,7 +1720,7 @@ echo form_open('', $attributes);?>
 <!-- Modal costos_origen_china -->
 <div class="modal fade modal-costos_origen_china" id="modal-default">
   <?php $attributes = array('id' => 'form-costos_origen_china');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1817,7 +1826,7 @@ echo form_open('', $attributes);?>
 <!-- modal docs_exportacion -->
 <div class="modal fade modal-docs_exportacion" id="modal-docs_exportacion">
   <?php $attributes = array('id' => 'form-docs_exportacion');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-docs_exportacion">
@@ -1886,7 +1895,7 @@ echo form_open('', $attributes);?>
 <!-- modal despacho_shipper -->
 <div class="modal fade modal-despacho_shipper" id="modal-despacho_shipper">
   <?php $attributes = array('id' => 'form-despacho_shipper');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -1924,7 +1933,7 @@ echo form_open('', $attributes);?>
 <!-- Modal cliente -->
 <div class="modal fade modal-revision_bl" id="modal-default">
   <?php $attributes = array('id' => 'form-revision_bl');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -2051,7 +2060,7 @@ echo form_open('', $attributes);?>
 <!-- modal entrega_docs_cliente -->
 <div class="modal fade modal-entrega_docs_cliente" id="modal-entrega_docs_cliente">
   <?php $attributes = array('id' => 'form-entrega_docs_cliente');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -2106,7 +2115,7 @@ echo form_open('', $attributes);?>
 <!-- Modal pagos_logisticos -->
 <div class="modal fade modal-pagos_logisticos" id="modal-default">
   <?php $attributes = array('id' => 'form-pagos_logisticos');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -2219,13 +2228,17 @@ echo form_open('', $attributes);?>
 
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>SubTotal ¥: <label id="pagos_logisticos-subtotal-yuan"></label></h6></strong>
+              <strong>
+                <h6>SubTotal ¥: <label id="pagos_logisticos-subtotal-yuan"></label></h6>
+              </strong>
             </div>
           </div>
 
           <div class="col-6 col-lg-9 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>SubTotal $: <label id="pagos_logisticos-subtotal-dolar"></label></h6></strong>
+              <strong>
+                <h6>SubTotal $: <label id="pagos_logisticos-subtotal-dolar"></label></h6>
+              </strong>
             </div>
           </div>
 
@@ -2295,13 +2308,17 @@ echo form_open('', $attributes);?>
 
           <div class="col-6 col-lg-3 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>Total ¥: <label id="pagos_logisticos-total-yuan"></label></h6></strong>
+              <strong>
+                <h6>Total ¥: <label id="pagos_logisticos-total-yuan"></label></h6>
+              </strong>
             </div>
           </div>
 
           <div class="col-6 col-lg-9 div-pagos_logisticos-cif_ddp">
             <div class="form-group">
-              <strong><h6>Total $: <label id="pagos_logisticos-total-dolar"></label></h6></strong>
+              <strong>
+                <h6>Total $: <label id="pagos_logisticos-total-dolar"></label></h6>
+              </strong>
             </div>
           </div>
         </div>
@@ -2314,87 +2331,92 @@ echo form_open('', $attributes);?>
 
   </div><!-- /.modal-dialog -->
   <style scoped>
-      .step-container{
-        display: flex;
-        flex-direction: column;
-        border:1px solid #ccc;
-        border-radius: 1em;
-        align-items: center;
-        padding: 4em 0;
-        margin-bottom: 10px;
-      }.step-container-completed{
-        display: flex;
-        flex-direction: column;
-        border:1px solid #ccc;
-        border-radius: 1em;
-        align-items: center;
-        padding: 4em 0;
-        margin-bottom: 10px;
-        background-color: #85C1E9;
-        color:white;
-      }
-      .step-container:hover{
-        background-color: #f9f9f9;
-      }
-      .separator-line{
-        width: 100%;
-        height: 0.1em;
-        background-color: black;
-        margin: 1em 0;
-      }/* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
+    .step-container {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 1em;
+      align-items: center;
+      padding: 4em 0;
+      margin-bottom: 10px;
+    }
 
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+    .step-container-completed {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 1em;
+      align-items: center;
+      padding: 4em 0;
+      margin-bottom: 10px;
+      background-color: #85C1E9;
+      color: white;
+    }
 
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+    .step-container:hover {
+      background-color: #f9f9f9;
+    }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+    .separator-line {
+      width: 100%;
+      height: 0.1em;
+      background-color: black;
+      margin: 1em 0;
+    }
 
-input:checked + .slider {
-  background-color: #2196F3;
-}
+    /* The switch - the box around the slider */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
+    /* Hide default HTML checkbox */
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
 
-      </style>
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked+.slider {
+      background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+  </style>
   <?php echo form_close(); ?>
 </div><!-- /. Modal pagos_logisticos -->
