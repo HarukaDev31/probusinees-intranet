@@ -30,6 +30,7 @@ let productoSelected = null;
 let selectedStep = null;
 let containerSteps = null;
 let containerPagos = null;
+let containerCoordination = null;
 $(function () {
   sectionTitle = $("#section-title");
   containerVer = $("#container-ver");
@@ -41,6 +42,7 @@ $(function () {
   containerSteps = $("#steps");
   containerPagos = $("#container-pagos");
   containerPagos.hide();
+  containerCoordination = $("#container-coordination");
   $(".select2").select2();
 
   $("#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China").change(function () {
@@ -1174,7 +1176,7 @@ $(function () {
         var term = term.toLowerCase();
         $.post(
           base_url +
-            "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
+          "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
           { global_search: term },
           function (arrData) {
             response(arrData);
@@ -2607,17 +2609,17 @@ function invoiceProveedor(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -2630,9 +2632,9 @@ function invoiceProveedor(ID) {
           table_enlace_producto += "<th class='text-left'>"; //Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor si es diferente de vacio descargar
           if (
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              "" &&
+            "" &&
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              null
+            null
           ) {
             table_enlace_producto +=
               '<button class="btn btn-link" alt="Descargar Invoice y PL" title="Descargar Invoice y PL" href="javascript:void(0)" onclick="descargarInvoicePlProveedor(' +
@@ -2660,9 +2662,9 @@ function invoiceProveedor(ID) {
           table_enlace_producto += "<th class='text-center'>";
           if (
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              "" &&
+            "" &&
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              null
+            null
           ) {
             table_enlace_producto += "";
           } else {
@@ -2692,10 +2694,10 @@ function invoiceProveedor(ID) {
 
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -2937,17 +2939,17 @@ function recepcionCarga(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -3011,8 +3013,8 @@ function recepcionCarga(ID) {
 
         cantidad_item =
           !isNaN(cantidad_item_final_recepcion_carga) &&
-          cantidad_item_final_recepcion_carga > 0 &&
-          cantidad_item_final_recepcion_carga != ""
+            cantidad_item_final_recepcion_carga > 0 &&
+            cantidad_item_final_recepcion_carga != ""
             ? cantidad_item_final_recepcion_carga
             : cantidad_item;
 
@@ -3109,10 +3111,10 @@ function recepcionCarga(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -3350,12 +3352,12 @@ function coordinarPagosProveedor(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -3530,10 +3532,10 @@ function coordinarPagosProveedor(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -3769,12 +3771,12 @@ function verPedido(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -3993,10 +3995,10 @@ function verPedido(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -4537,12 +4539,12 @@ function subirInspeccion(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -5394,10 +5396,10 @@ function asignarPedido(ID_Pedido_Cabecera, Nu_Estado) {
         for (var x = 0; x < l; x++) {
           $("#cbo-guardar_personal_china-ID_Usuario").append(
             '<option value="' +
-              response.result[x].ID +
-              '">' +
-              response.result[x].Nombre +
-              "</option>"
+            response.result[x].ID +
+            '">' +
+            response.result[x].Nombre +
+            "</option>"
           );
         }
       } else {
@@ -5752,17 +5754,17 @@ function pagarProveedores(ID, tipo_pago) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -5990,10 +5992,10 @@ function pagarProveedores(ID, tipo_pago) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -6211,12 +6213,12 @@ function bookingTrading(id) {
                 selected = 'selected="selected"';
               $("#cbo-shipper").append(
                 '<option value="' +
-                  responseShipper.result[x].ID +
-                  '" ' +
-                  selected +
-                  ">" +
-                  responseShipper.result[x].Nombre +
-                  "</option>"
+                responseShipper.result[x].ID +
+                '" ' +
+                selected +
+                ">" +
+                responseShipper.result[x].Nombre +
+                "</option>"
               );
             }
           } else {
@@ -6880,9 +6882,8 @@ const getOrderProgress = (id) => {
 const stepTemplate = (step, i) => {
   const stepHTML = `
     <div class="col-12 col-lg-2 step-column" >
-      <div class="step-container" onclick="openStepFunction(${i + 1},${
-    step.id
-  })"  id="step-${i}">
+      <div class="step-container" onclick="openStepFunction(${i + 1},${step.id
+    })"  id="step-${i}">
       <span class="step">${step.name}</span>
       <span>Image</span>
       </div>
@@ -6897,13 +6898,93 @@ const openStepFunction = (i, stepId) => {
   url = base_url + "AgenteCompra/PedidosPagados/getStepByRole";
   //ajax post
   $.post(url, { idPedido: idPedido, step: i }, function (response) {
+    const responseParsed = JSON.parse(response);
+    currentPrivilege = responseParsed.priviligie;
     if (i == 1) {
       openOrdenCompra(response);
     }
     if (i == 2) {
-      openPagos(response);
+      if (currentPrivilege == 1) {
+        openPagos(response);
+      } else if (currentPrivilege == 2) {
+        openCoordination(response)
+      }
     }
   });
+};
+const openCoordination = (response) => {
+  console.log(response, "coordination");
+  const bodyDIV = getSupplierCoordinationTemplate(JSON.parse(response).data);
+  containerCoordination.append(bodyDIV);  
+}
+const getSupplierCoordinationHeader = () => {
+  return `
+  <thead>
+      <tr>
+          <th colspan="3" class="coordination-supplier-column c-supplier-column">SUPPLIER</th>
+          <th class="coordination-imagen-column c-imagen-column">IMAGEN</th>
+          <th class="coordination-nombre-column c-nombre-column">NOMBRE</th>
+          <th class="coordination-qty-column c-qty-column">QTY</th>
+          <th class="coordination-precio-column c-precio-column">PRECIO</th>
+          <th class="coordination-total-column c-total-column">TOTAL</th>
+          <th class="coordination-tproducto-column c-tproducto-column">T.PRODUCTO</th>
+          <th class="coordination-tentrega-column c-tentrega-column">T.ENTREGA</th>
+          <th class="coordination-pago1-column c-pago1-column">PAGO 1</th>
+          <th class="coordination-pago2-column c-pago2-column">PAGO 2</th>
+          <th class="coordination-estado-column c-estado-column">ESTADO</th>
+      </tr>
+  </thead>
+  `;
+};
+
+const getSupplierCoordinationTemplate = (data) => {
+  let html = `<table class="supplier-table">`;
+  html += getSupplierCoordinationHeader();
+  html += `<tbody>`;
+  data.forEach((supplier) => {
+      const detalles = JSON.parse(supplier.detalles);
+      const rowspan = detalles.length;
+
+      html += `
+      <tr>
+          <td class="supplier-info" rowspan="${rowspan}" colspan="3">
+              <div>Nombre: ${supplier.name}</div>
+              <div>Teléfono: ${supplier.phone}</div>
+              <btn class="btn btn-primary btn-coordinar">Cambiar</btn>
+          </td>
+      `;
+
+      detalles.forEach((detail, index) => {
+          if (index === 0) {
+              html += `
+              <td class="c-imagen-column">img</td>
+              <td class="c-nombre-column">${detail.nombre_producto} ${detail.product_code}</td>
+              <td class="c-qty-column">${detail.qty_product}</td>
+              <td class="c-precio-column">${detail.price_product}</td>
+              <td class="c-total-column" rowspan="${rowspan}">${detail.total_producto}</td>
+              <td class="c-tproducto-column">${detail.paymentType}</td>
+              <td class="c-tentrega-column" rowspan="${rowspan}"></td>
+              <td class="c-pago1-column" rowspan="${rowspan}">${detail.pago1}</td>
+              <td class="c-pago2-column" rowspan="${rowspan}">${detail.pago2}</td>
+              <td class="c-estado-column" rowspan="${rowspan}">${detail.estado}</td>
+              </tr>
+              `;
+          } else {
+              html += `
+              <tr class="detail">
+                  <td class="c-imagen-column">img</td>
+                  <td class="c-nombre-column">${detail.nombre_producto} ${detail.product_code}</td>
+                  <td class="c-qty-column">${detail.qty_product}</td>
+                  <td class="c-precio-column">${detail.price_product}</td>
+                  <td class="c-tproducto-column">${detail.paymentType}</td>
+              </tr>
+              `;
+          }
+      });
+  });
+  html += `</tbody>`;
+  html += `</table>`;
+  return html;
 };
 const openPagos = (response) => {
   $("#container_orden-compra").hide();
@@ -7078,22 +7159,19 @@ const getProductTemplate = (producto) => {
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
-      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${
-    producto.Txt_Producto
-  }" class="img-fluid">
+      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${producto.Txt_Producto
+    }" class="img-fluid">
     </div>
     <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
       <span>${producto.Txt_Producto}</span>
-      ${
-        currentPrivilege == priviligesPersonalPeru
-          ? `<div class="btn btn-primary"  id="btn-rotulado" onclick='openRotuladoView(${JSON.stringify(
-              producto
-            )})'>Rotulado</div>`
-          : `
-      <span class="btn btn-primary">ITEM CODE :${
-        producto.product_code ? producto.product_code : ""
+      ${currentPrivilege == priviligesPersonalPeru
+      ? `<div class="btn btn-primary"  id="btn-rotulado" onclick='openRotuladoView(${JSON.stringify(
+        producto
+      )})'>Rotulado</div>`
+      : `
+      <span class="btn btn-primary">ITEM CODE :${producto.product_code ? producto.product_code : ""
       }</span>`
-      }
+    }
     </div>
     <div class="col-12 col-lg-2">
       <span>${producto.Qt_Producto}</span>
@@ -7102,9 +7180,8 @@ const getProductTemplate = (producto) => {
           <span>${producto.Txt_Descripcion}</span>
     </div>
     <div class="col-12 col-lg-2">
-      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${
-    producto.Txt_Url_Link_Pagina_Producto
-  }</a>
+      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${producto.Txt_Url_Link_Pagina_Producto
+    }</a>
     </div>
   </div>`;
   return template;
@@ -7147,14 +7224,12 @@ const openRotuladoView = (producto) => {
     if (isChecked) {
       empaqueDiv.append(`
         <div id="empaque_input-container">
-          <input name="empaque_URL" type="hidden" value="${
-            productoSelected.empaque_URL
-          }">
-          ${
-            productoSelected.empaque_URL
-              ? `<a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-link">Descargar</a>`
-              : `<input type="file" name="empaque" class="form-control">`
-          }
+          <input name="empaque_URL" type="hidden" value="${productoSelected.empaque_URL
+        }">
+          ${productoSelected.empaque_URL
+          ? `<a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-link">Descargar</a>`
+          : `<input type="file" name="empaque" class="form-control">`
+        }
         </div>
       `);
     } else {
@@ -7179,14 +7254,12 @@ const openRotuladoView = (producto) => {
     if (isChecked) {
       vimDiv.append(`
         <div id="vim_motor_input-container">
-          <input name="vim_motor_URL" type="hidden" value="${
-            productoSelected.vim_motor_URL
-          }">
-          ${
-            productoSelected.vim_motor_URL
-              ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>`
-              : `<input type="file" name="vim_motor" class="form-control">`
-          }
+          <input name="vim_motor_URL" type="hidden" value="${productoSelected.vim_motor_URL
+        }">
+          ${productoSelected.vim_motor_URL
+          ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>`
+          : `<input type="file" name="vim_motor" class="form-control">`
+        }
         </div>
       `);
     } else {
@@ -7242,14 +7315,12 @@ const getContainerRotuladoView = (producto) => {
       <div class="col-12 col-md-5">
         <div class="form-group">
           <label>CAJA MASTER:</label>
-          <input name="caja_master_URL" type="hidden" value="${
-            producto.caja_master_URL
-          }">
-          ${
-            producto.caja_master_URL
-              ? `<a href="${producto.caja_master_URL}" class="btn btn-link" target="_blank">Descargar</a>`
-              : '<input type="file" name="caja_master" class="form-control">'
-          }
+          <input name="caja_master_URL" type="hidden" value="${producto.caja_master_URL
+    }">
+          ${producto.caja_master_URL
+      ? `<a href="${producto.caja_master_URL}" class="btn btn-link" target="_blank">Descargar</a>`
+      : '<input type="file" name="caja_master" class="form-control">'
+    }
         </div>
         <div class="form-group" id="empaque_container">
           <div class="conditional-field">
@@ -7276,9 +7347,8 @@ const getContainerRotuladoView = (producto) => {
       </div>
       <div class="col-12 col-md-7">
           <label>Notas</label>
-          <textarea name="notas_rotulado" class="form-control" rows="5">${
-            producto.notas_rotulado
-          }</textarea>
+          <textarea name="notas_rotulado" class="form-control" rows="5">${producto.notas_rotulado
+    }</textarea>
       </div>
     </form>
   `;
@@ -7313,7 +7383,7 @@ const getActionButtons = (data) => {
         </div>
       </div>`;
     }
-    console.log(buttons,data); 
+    console.log(buttons, data);
     return buttons;
   } catch (e) {
     console.log(e);
@@ -7372,7 +7442,7 @@ const hideSteps = () => {
   containerSteps.empty();
   $(".steps-buttons").empty();
   containerListar.show();
-  
+
 
 
 }

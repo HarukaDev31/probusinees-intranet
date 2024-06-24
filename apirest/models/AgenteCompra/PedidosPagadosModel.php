@@ -28,6 +28,7 @@ class PedidosPagadosModel extends CI_Model
     public $order = array('Fe_Registro' => 'desc');
     public $get_productos="get_agente_compra_pedido_productos";
     public $table_payments="payments_agente_compra_pedido";
+    public $sp_suppliers="get_suppliers_products";
     public function __construct()
     {
         parent::__construct();
@@ -2333,6 +2334,15 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         } else {
             // Insert new record if not found
             $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
+        }
+    }
+    public function getSupplierProducts($idPedido){
+        try{
+            $sp="CALL ".$this->sp_suppliers."(".$idPedido.")";
+            $query = $this->db->query($sp);
+            return $query->result();
+        }catch (Exception $e){
+            throw new Exception($e->getMessage());
         }
     }
 }

@@ -13,7 +13,7 @@
     </div><!-- /.container-fluid -->
   </section>
   <?php //array_debug($this->user);
-?>
+  ?>
   <section class="content">
     <div class="container-fluid">
       <div class="row">
@@ -54,36 +54,36 @@
 
                       <th>Servicio</th>
                       <th>Incoterms</th>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { ?>
                         <th>Descarga</th><!--peru-->
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5) {?>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5) { ?>
                         <th>Pagos</th><!--peru-->
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {?>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { ?>
                         <th>Voucher</th>
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
                         <th>China</th>
                         <th class="no-sort">Negociación</th>
                         <th class="no-sort">Booking</th>
                         <th class="no-sort">Recep. Carga</th>
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
                         <th class="no-sort">Pay</th>
                         <!--<th class="no-sort">Booking</th>-->
                         <!--<th class="no-sort">Insp.</th>-->
                         <th class="no-sort">Pay 2</th>
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
                         <th class="no-sort">Insp.</th>
                         <!--<th class="no-sort">Invoice P.</th>-->
                         <!--<th class="no-sort">Despacho</th>-->
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
+                      <?php } ?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
                         <!--<th class="no-sort">Invoice</th>-->
                         <!--<th class="no-sort">Supervisar</th>-->
-                      <?php }?>
+                      <?php } ?>
                       <th>Ver</th>
                       <!-- <th>Status</th> -->
                     </tr>
@@ -93,9 +93,9 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-$attributes = array('id' => 'form-pedido');
-echo form_open('', $attributes);
-?>
+                $attributes = array('id' => 'form-pedido');
+                echo form_open('', $attributes);
+                ?>
                 <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
                 <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
                 <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
@@ -110,12 +110,12 @@ echo form_open('', $attributes);
                   </div>
 
                   <?php
-$sClassOcultar = '';
-if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) {
-    $sClassOcultar = 'd-none';
-}
+                  $sClassOcultar = '';
+                  if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) {
+                    $sClassOcultar = 'd-none';
+                  }
 
-?>
+                  ?>
                   <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
                     <label>Cliente</label>
                     <div class="form-group">
@@ -441,6 +441,9 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
               <div class="row" id="pagos-buttons"></div>
 
             </div>
+            <div class="card-body" id="container-coordination">
+
+            </div>
           </div>
 
 
@@ -477,7 +480,7 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
 <!-- modal agregar pagos -->
 <div class="modal fade modal-agregar_pago" id="modal-agregar_pago">
   <?php $attributes = array('id' => 'form-agregar_pago_proveedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-agregar_pago">
@@ -528,7 +531,7 @@ echo form_open('', $attributes);?>
 <!-- modal agregar pagos -->
 <div class="modal fade modal-agregar_inspeccion" id="modal-agregar_inspeccion">
   <?php $attributes = array('id' => 'form-agregar_inspeccion');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-agregar_inspeccion">
@@ -584,7 +587,7 @@ echo form_open('', $attributes);?>
 <!-- modal documento -->
 <div class="modal fade modal-documento_entrega" id="modal-documento_entrega">
   <?php $attributes = array('id' => 'form-documento_entrega');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-documento_entrega">
@@ -623,7 +626,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago 30% cliente -->
 <div class="modal fade modal-pago_cliente_30" id="modal-pago_cliente_30">
   <?php $attributes = array('id' => 'form-pago_cliente_30');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_cliente_30">
@@ -690,7 +693,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago 100% cliente -->
 <div class="modal fade modal-pago_cliente_100" id="modal-pago_cliente_100">
   <?php $attributes = array('id' => 'form-pago_cliente_100');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_cliente_100">
@@ -757,7 +760,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago servicio cliente -->
 <div class="modal fade modal-pago_cliente_servicio" id="modal-pago_cliente_servicio">
   <?php $attributes = array('id' => 'form-pago_cliente_servicio');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_cliente_servicio">
@@ -825,7 +828,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago flete -->
 <div class="modal fade modal-pago_flete" id="modal-pago_flete">
   <?php $attributes = array('id' => 'form-pago_flete');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_flete">
@@ -892,7 +895,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago costos_origen -->
 <div class="modal fade modal-costos_origen" id="modal-costos_origen">
   <?php $attributes = array('id' => 'form-costos_origen');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-costos_origen">
@@ -959,7 +962,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago pago_fta -->
 <div class="modal fade modal-pago_fta" id="modal-pago_fta">
   <?php $attributes = array('id' => 'form-pago_fta');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-pago_fta">
@@ -1026,7 +1029,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago otros_cuadrilla -->
 <div class="modal fade modal-otros_cuadrilla" id="modal-otros_cuadrilla">
   <?php $attributes = array('id' => 'form-otros_cuadrilla');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-otros_cuadrilla">
@@ -1101,7 +1104,7 @@ echo form_open('', $attributes);?>
 <!-- modal pago pago_fta -->
 <div class="modal fade modal-otros_costos" id="modal-otros_costos">
   <?php $attributes = array('id' => 'form-otros_costos');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-otros_costos">
@@ -1194,7 +1197,7 @@ echo form_open('', $attributes);?>
 <!-- Modal proveedor -->
 <div class="modal fade modal-proveedor" id="modal-default">
   <?php $attributes = array('id' => 'form-proveedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1285,7 +1288,7 @@ echo form_open('', $attributes);?>
 <!-- Modal booking -->
 <div class="modal fade modal-booking" id="modal-default">
   <?php $attributes = array('id' => 'form-booking');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1333,7 +1336,7 @@ echo form_open('', $attributes);?>
 <!-- modal fecha_entrega_shipper -->
 <div class="modal fade modal-fecha_entrega_shipper" id="modal-fecha_entrega_shipper">
   <?php $attributes = array('id' => 'form-fecha_entrega_shipper');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-fecha_entrega_shipper">
@@ -1364,7 +1367,7 @@ echo form_open('', $attributes);?>
 <!-- modal cambio_item_proveedor -->
 <div class="modal fade modal-cambio_item_proveedor" id="modal-cambio_item_proveedor">
   <?php $attributes = array('id' => 'form-cambio_item_proveedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-cambio_item_proveedor">
@@ -1503,7 +1506,7 @@ echo form_open('', $attributes);
 <!-- Modal booking_consolidado -->
 <div class="modal fade modal-booking_consolidado" id="modal-default">
   <?php $attributes = array('id' => 'form-booking_consolidado');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1544,7 +1547,7 @@ echo form_open('', $attributes);?>
 <!-- Modal inspeccion -->
 <div class="modal fade modal-booking_inspeccion" id="modal-default">
   <?php $attributes = array('id' => 'form-booking_inspeccion');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1610,7 +1613,7 @@ echo form_open('', $attributes);?>
 <!-- modal supervisar_llenado_contenedor -->
 <div class="modal fade modal-supervisar_llenado_contenedor" id="modal-supervisar_llenado_contenedor">
   <?php $attributes = array('id' => 'form-supervisar_llenado_contenedor');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-supervisar_llenado_contenedor">
@@ -1650,7 +1653,7 @@ echo form_open('', $attributes);?>
 <!-- Modal reserva_booking_trading -->
 <div class="modal fade modal-reserva_booking_trading" id="modal-default">
   <?php $attributes = array('id' => 'form-reserva_booking_trading');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1732,7 +1735,7 @@ echo form_open('', $attributes);?>
 <!-- Modal costos_origen_china -->
 <div class="modal fade modal-costos_origen_china" id="modal-default">
   <?php $attributes = array('id' => 'form-costos_origen_china');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1838,7 +1841,7 @@ echo form_open('', $attributes);?>
 <!-- modal docs_exportacion -->
 <div class="modal fade modal-docs_exportacion" id="modal-docs_exportacion">
   <?php $attributes = array('id' => 'form-docs_exportacion');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body" id="modal-body-docs_exportacion">
@@ -1907,7 +1910,7 @@ echo form_open('', $attributes);?>
 <!-- modal despacho_shipper -->
 <div class="modal fade modal-despacho_shipper" id="modal-despacho_shipper">
   <?php $attributes = array('id' => 'form-despacho_shipper');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -1945,7 +1948,7 @@ echo form_open('', $attributes);?>
 <!-- Modal cliente -->
 <div class="modal fade modal-revision_bl" id="modal-default">
   <?php $attributes = array('id' => 'form-revision_bl');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -2072,7 +2075,7 @@ echo form_open('', $attributes);?>
 <!-- modal entrega_docs_cliente -->
 <div class="modal fade modal-entrega_docs_cliente" id="modal-entrega_docs_cliente">
   <?php $attributes = array('id' => 'form-entrega_docs_cliente');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -2127,7 +2130,7 @@ echo form_open('', $attributes);?>
 <!-- Modal pagos_logisticos -->
 <div class="modal fade modal-pagos_logisticos" id="modal-default">
   <?php $attributes = array('id' => 'form-pagos_logisticos');
-echo form_open('', $attributes);?>
+  echo form_open('', $attributes); ?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -2343,6 +2346,14 @@ echo form_open('', $attributes);?>
 
   </div><!-- /.modal-dialog -->
   <style scoped>
+    .coordination-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      border: 1px solid black;
+      padding: 1em 2em;
+    }
+
     .step-container {
       display: flex;
       flex-direction: column;
@@ -2352,16 +2363,18 @@ echo form_open('', $attributes);?>
       padding: 4em 0;
       margin-bottom: 10px;
     }
-      /* a{
+
+    /* a{
         margin: 0;
         max-width: 100%;
         overflow-x: auto;
       } */
     .orden-compra_header div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
     .step-container-completed {
       display: flex;
       flex-direction: column;
@@ -2373,9 +2386,12 @@ echo form_open('', $attributes);?>
       background-color: #85C1E9;
       color: white;
     }
+
     .step-container-completed span {
       text-align: center;
-    }.step-container span {
+    }
+
+    .step-container span {
       text-align: center;
     }
 
@@ -2443,35 +2459,120 @@ echo form_open('', $attributes);?>
       -ms-transform: translateX(26px);
       transform: translateX(26px);
     }
+
     .btn-ver-pago {
       width: 120px;
-      margin-left:2em;
+      margin-left: 2em;
       height: 75px;
       display: flex;
       justify-content: center;
       align-items: center;
-    }.pago{
+    }
+
+    .pago {
       margin-bottom: 1em;
-    }.pagos-header-input{
+    }
+
+    .pagos-header-input {
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 1em 2em;
       border: 1px solid #ccc;
-    }.orden-compra_header{
+    }
+
+    .orden-compra_header {
       border: 1px solid;
       padding: 1em 0;
       margin-bottom: 1em;
-    }.producto div {
+    }
+
+    .producto div {
       display: flex;
       justify-content: center;
       align-items: center;
 
-    }.producto{
+    }
+
+    .producto {
       border: 1px solid #ccc;
       border-radius: 1em;
-        padding: 2em 1em;
+      padding: 2em 1em;
     }
+
+    body {
+    font-family: Arial, sans-serif;
+}
+
+.supplier-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.supplier-table th,
+.supplier-table td {
+    border: 1px solid #000;
+    padding: 10px;
+    text-align: left;
+}
+
+.supplier-table th {
+    background-color: #f2f2f2;
+}
+
+.supplier-info {
+    background-color: #d9edf7;
+    padding: 10px;
+}
+
+.detail {
+    background-color: #f9f9f9;
+}
+    .button {
+      padding: 10px 20px;
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .red {
+      background-color: red;
+    }
+
+    .blue {
+      background-color: blue;
+    }
+
+    .green {
+      background-color: green;
+    /* }.detail{
+      display: flex;
+      flex-direction: row;
+    }.c-imagen-column{
+      width: 200px;
+    }.c-nombre-column{
+      width: 200px;
+    }.c-qty-column{
+      width: 100px;
+    }.c-precio-column{
+      width: 100px;
+    }.c-total-column{
+      width: 100px;
+    }.c-tproducto-column{
+      width: 100px;
+    }.c-tentrega-column{
+      width: 100px;
+    }.c-pago1-column{
+      width: 100px;
+    }
+    .c-pago2-column{
+      width: 100px;
+    }
+    .c-estado-column{
+      width: 100px;
+    }.c-supplier-column{
+      width: 300px;
+    } */
   </style>
   <?php echo form_close(); ?>
-</div><!-- /. Modal pagos_logisticos -->

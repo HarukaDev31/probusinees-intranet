@@ -5,7 +5,7 @@ class PedidosPagados extends CI_Controller
 {
     private $jefeChinaPrivilegio = 5;
     private $personalChinaPrivilegio = 2;
-    private $personalPeruPrivilegio=1;
+    private $personalPeruPrivilegio = 1;
     private $upload_path = '../assets/images/clientes/';
     private $file_path = '../assets/images/logos/';
     private $logo_cliente_path = '../assets/images/logos/';
@@ -118,7 +118,6 @@ class PedidosPagados extends CI_Controller
                 if ($row->Ss_Comision_Interna_Trading > 0) {
                     $btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
                 }
-
             }
 
             $rows[] = $dropdown_estado . $btn_comision_trading;
@@ -196,7 +195,7 @@ class PedidosPagados extends CI_Controller
             if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {
                 $rows[] = $dropdown_estado;
             }
-//china
+            //china
 
             // if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) {
             //     //Negociar con proveedores
@@ -382,15 +381,15 @@ class PedidosPagados extends CI_Controller
             exit('No se puede eliminar y acceder');
         }
 
-        $data = array(
-        );
-        echo json_encode($this->PedidosPagadosModel->actualizarPedido(
-            array(
-                'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
-            ),
-            $data,
-            $this->input->post('addProducto')
-        )
+        $data = array();
+        echo json_encode(
+            $this->PedidosPagadosModel->actualizarPedido(
+                array(
+                    'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
+                ),
+                $data,
+                $this->input->post('addProducto')
+            )
         );
     }
 
@@ -626,8 +625,7 @@ class PedidosPagados extends CI_Controller
                 ->setCellValue('J' . $fila, 'DEPOSIT #2')
                 ->setCellValue('K' . $fila, 'DELIVERY DATE')
                 ->setCellValue('L' . $fila, 'SUPPLIER')
-                ->setCellValue('M' . $fila, 'PHONE NUMBER')
-            ;
+                ->setCellValue('M' . $fila, 'PHONE NUMBER');
 
             $objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
             $objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_left_general);
@@ -733,8 +731,7 @@ class PedidosPagados extends CI_Controller
                     ->setCellValue('H' . $fila, $row->Ss_Pago_1_Proveedor)
                     ->setCellValue('I' . $fila, $fBalance)
                     ->setCellValue('J' . $fila, $row->Ss_Pago_2_Proveedor)
-                    ->setCellValue('K' . $fila, $row->Nu_Dias_Delivery)
-                ;
+                    ->setCellValue('K' . $fila, $row->Nu_Dias_Delivery);
 
                 $objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_top_general);
                 $objPHPExcel->getActiveSheet()->getStyle('B' . $fila)->applyFromArray($BStyle_left_general);
@@ -1412,12 +1409,13 @@ class PedidosPagados extends CI_Controller
                 'Nu_Tipo_Pay_Proveedor_China' => $this->input->post('proveedor-Nu_Tipo_Pay_Proveedor_China'),
                 'No_Banco_China' => $this->input->post('proveedor-No_Banco_China'),
             );
-            echo json_encode($this->PedidosPagadosModel->actualizarProveedor(
-                array('ID_Entidad' => $this->input->post('proveedor-ID_Entidad')),
-                $data,
-                array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('proveedor-ID_Pedido_Detalle_Producto_Proveedor')),
-                $data_entidad
-            )
+            echo json_encode(
+                $this->PedidosPagadosModel->actualizarProveedor(
+                    array('ID_Entidad' => $this->input->post('proveedor-ID_Entidad')),
+                    $data,
+                    array('ID_Pedido_Detalle_Producto_Proveedor' => $this->input->post('proveedor-ID_Pedido_Detalle_Producto_Proveedor')),
+                    $data_entidad
+                )
             );
         } else {
             echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
@@ -1732,12 +1730,13 @@ class PedidosPagados extends CI_Controller
                 'Nu_Documento_Identidad' => $this->input->post('revision_bl-Nu_Documento_Identidad'),
                 'Txt_Direccion_Entidad' => $this->input->post('revision_bl-Txt_Direccion_Entidad'),
             );
-            echo json_encode($this->PedidosPagadosModel->revisionBL(
-                array('ID_Pedido_Cabecera' => $this->input->post('revision_bl-ID_Pedido_Cabecera')),
-                $data,
-                array('ID_Entidad' => $this->input->post('revision_bl-ID_Entidad')),
-                $data_cliente
-            )
+            echo json_encode(
+                $this->PedidosPagadosModel->revisionBL(
+                    array('ID_Pedido_Cabecera' => $this->input->post('revision_bl-ID_Pedido_Cabecera')),
+                    $data,
+                    array('ID_Entidad' => $this->input->post('revision_bl-ID_Entidad')),
+                    $data_cliente
+                )
             );
         } else {
             echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
@@ -1752,33 +1751,43 @@ class PedidosPagados extends CI_Controller
             'Nu_Verificar_Entrega_Docs_Cliente' => 1,
         );
         if (isset($_POST['entrega_docs_cliente-Nu_Commercial_Invoice']) && $this->input->post('entrega_docs_cliente-Nu_Commercial_Invoice') == 'option1') {
-            $data = array_merge($data, array(
-                'Nu_Commercial_Invoice' => 1,
-            )
+            $data = array_merge(
+                $data,
+                array(
+                    'Nu_Commercial_Invoice' => 1,
+                )
             );
         }
         if (isset($_POST['entrega_docs_cliente-Nu_Packing_List']) && $this->input->post('entrega_docs_cliente-Nu_Packing_List') == 'option2') {
-            $data = array_merge($data, array(
-                'Nu_Packing_List' => 1,
-            )
+            $data = array_merge(
+                $data,
+                array(
+                    'Nu_Packing_List' => 1,
+                )
             );
         }
         if (isset($_POST['entrega_docs_cliente-Nu_BL']) && $this->input->post('entrega_docs_cliente-Nu_BL') == 'option3') {
-            $data = array_merge($data, array(
-                'Nu_BL' => 1,
-            )
+            $data = array_merge(
+                $data,
+                array(
+                    'Nu_BL' => 1,
+                )
             );
         }
         if (isset($_POST['entrega_docs_cliente-Nu_FTA']) && $this->input->post('entrega_docs_cliente-Nu_FTA') == 'option4') {
-            $data = array_merge($data, array(
-                'Nu_FTA' => 1,
-            )
+            $data = array_merge(
+                $data,
+                array(
+                    'Nu_FTA' => 1,
+                )
             );
         }
         if (isset($_POST['entrega_docs_cliente-Nu_FTA_Detalle']) && $this->input->post('entrega_docs_cliente-Nu_FTA_Detalle') == 'option5') {
-            $data = array_merge($data, array(
-                'Nu_FTA_Detalle' => 1,
-            )
+            $data = array_merge(
+                $data,
+                array(
+                    'Nu_FTA_Detalle' => 1,
+                )
             );
         }
         if (!$this->input->is_ajax_request()) {
@@ -2365,8 +2374,7 @@ class PedidosPagados extends CI_Controller
                     ->setCellValue('M' . $fila, $fTotalCajas)
                     ->setCellValue('N' . $fila, $row->Qt_Cbm)
                     ->setCellValue('O' . $fila, $fCbmTotal)
-                    ->setCellValue('Q' . $fila, $row->Nu_Dias_Delivery . ' DIAS')
-                ;
+                    ->setCellValue('Q' . $fila, $row->Nu_Dias_Delivery . ' DIAS');
 
                 $objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->getAlignment()->setWrapText(true);
 
@@ -3227,8 +3235,7 @@ class PedidosPagados extends CI_Controller
                     ->setCellValue('M' . $fila, $fTotalCajas)
                     ->setCellValue('N' . $fila, $row->Qt_Cbm)
                     ->setCellValue('O' . $fila, $fCbmTotal)
-                    ->setCellValue('Q' . $fila, $row->Nu_Dias_Delivery . ' DIAS')
-                ;
+                    ->setCellValue('Q' . $fila, $row->Nu_Dias_Delivery . ' DIAS');
 
                 $objPHPExcel->getActiveSheet()->getStyle('G' . $fila)->getAlignment()->setWrapText(true);
 
@@ -3529,7 +3536,6 @@ class PedidosPagados extends CI_Controller
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
         }
-
     }
     public function getStepByRole()
     {
@@ -3541,37 +3547,41 @@ class PedidosPagados extends CI_Controller
                 //if peru personal
                 if ($priviligie == $this->personalPeruPrivilegio) {
                     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
-                    echo json_encode(array('status' => 'success', 'data' => $data,'priviligie'=>$priviligie));
+                    echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
                     return;
                 }
                 //if china personal
-                if ($priviligie == $this->personalChinaPrivilegio||$priviligie == $this->jefeChinaPrivilegio) {
+                if ($priviligie == $this->personalChinaPrivilegio || $priviligie == $this->jefeChinaPrivilegio) {
                     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
-                    $pedidoData=$this->PedidosPagadosModel->getPedidoData($idPedido);
-                    echo json_encode(array('status' => 'success', 'data' => $data,'pedidoData'=>$pedidoData,'priviligie'=>$priviligie));
+                    $pedidoData = $this->PedidosPagadosModel->getPedidoData($idPedido);
+                    echo json_encode(array('status' => 'success', 'data' => $data, 'pedidoData' => $pedidoData, 'priviligie' => $priviligie));
                     return;
-
-                }else{
-                    echo json_encode(array('status' => 'error', 'data' => [],'priviligie'=>$priviligie));
+                } else {
+                    echo json_encode(array('status' => 'error', 'data' => [], 'priviligie' => $priviligie));
                     return;
-
-                }   
+                }
             }
-            if($step == 2){
+            if ($step == 2) {
                 //if peru personal
                 if ($priviligie == $this->personalPeruPrivilegio) {
                     $data = $this->PedidosPagadosModel->getPedidoPagos($idPedido);
-                    echo json_encode(array('status' => 'success', 'data' => $data['data'],
-                    'pagosData'=>$data['pagos'],'priviligie'=>$priviligie));
+                    echo json_encode(array(
+                        'status' => 'success', 'data' => $data['data'],
+                        'pagosData' => $data['pagos'], 'priviligie' => $priviligie
+                    ));
+                    return;
+                } else if ($priviligie == $this->personalChinaPrivilegio || $priviligie == $this->jefeChinaPrivilegio) {
+                    $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido);
+                    echo json_encode(array(
+                        'status' => 'success',
+                        'data' => $data,
+                        'priviligie' => $priviligie
+                    ));
+                    return;
+                } else {
+                    echo json_encode(array('status' => 'error', 'data' => [], 'priviligie' => $priviligie));
                     return;
                 }
-                //if china personal
-                // if ($priviligie == $this->personalChinaPrivilegio||$priviligie == $this->jefeChinaPrivilegio) {
-                //     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
-                //     $pedidoData=$this->PedidosPagadosModel->getPedidoData($idPedido);
-                //     echo json_encode(array('status' => 'success', 'data' => $data,'pedidoData'=>$pedidoData,'priviligie'=>$priviligie));
-                //     return;
-
                 // }else{
                 //     echo json_encode(array('status' => 'error', 'data' => [],'priviligie'=>$priviligie));
                 //     return;
@@ -3587,7 +3597,7 @@ class PedidosPagados extends CI_Controller
         try {
             $data = $this->input->post();
             $files = $_FILES;
-            $response = $this->PedidosPagadosModel->saveRotuladoProducto($data,$files);
+            $response = $this->PedidosPagadosModel->saveRotuladoProducto($data, $files);
             echo json_encode(array('status' => 'success', 'data' => $response));
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
@@ -3604,11 +3614,12 @@ class PedidosPagados extends CI_Controller
             echo json_encode(array('error' => $e->getMessage()));
         }
     }
-    public function savePagos(){
+    public function savePagos()
+    {
         try {
             $data = $this->input->post();
             $files = $_FILES;
-            $response = $this->PedidosPagadosModel->savePagos($data,$files);
+            $response = $this->PedidosPagadosModel->savePagos($data, $files);
             echo json_encode(array('status' => 'success', 'data' => $response));
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
