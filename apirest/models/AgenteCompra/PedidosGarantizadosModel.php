@@ -24,6 +24,7 @@ class PedidosGarantizadosModel extends CI_Model
     public $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
     public $table_pais = 'pais';
     public $table_agente_compra_correlativo = 'agente_compra_correlativo';
+    public $table_coordination = "agente_compra_coordination_supplier";
     public $table_usuario_intero = 'usuario';
     private $jefeChinaPrivilegio = 5;
     private $personalChinaPrivilegio = 2;
@@ -157,6 +158,7 @@ class PedidosGarantizadosModel extends CI_Model
 		ACPDPP.Nu_Selecciono_Proveedor,
 		ACPDPP.Qt_Producto_Caja_Final,
 		ACPDPP.Txt_Nota_Final,
+        S.id_supplier,
 		S.name as nombre_proveedor,
         S.phone as celular_proveedor,
 		ACPDPP.main_photo,
@@ -359,7 +361,7 @@ class PedidosGarantizadosModel extends CI_Model
         }
     }
 
-    public function elegirItemProveedor($id_detalle, $ID, $status, $sCorrelativoCotizacion, $sNameItem)
+    public function elegirItemProveedor($id_detalle, $ID, $status, $sCorrelativoCotizacion, $sNameItem, $id_pedido, $id_supplier)
     {
         $query = "SELECT Nu_Selecciono_Proveedor FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle = " . $id_detalle . " AND Nu_Selecciono_Proveedor=1";
         $objProveedor = $this->db->query($query)->row();
@@ -373,9 +375,29 @@ class PedidosGarantizadosModel extends CI_Model
                 'Cotización ' . $sCorrelativoCotizacion . ' ' . $sElegirProveedor . ' de ' . $sNameItem,
                 ''
             );
-
+            $coordinationSupplier = array(
+                'id_pedido' => $id_pedido,
+                'id_supplier' => $id_supplier,
+                'estado' => "PENDIENTE",
+            );
+            //check in $table_coordination if exists row with this id_pedido and id_supplier
+            $query = $this->db->get_where($this->table_coordination, [
+                'id_pedido' => $id_pedido,
+                'id_supplier' => $id_supplier,
+            ]);
+            if ($query->num_rows() == 0 && $status == 1) {
+                $this->db->insert($this->table_coordination, $coordinationSupplier);
+            }else if($query->num_rows()>0 && $status == 0){
+                //set update_at to current date ROW with id_pedido and id_supplier
+                 
+                $this->db->update($this->table_coordination, ['updated_at' => date('Y-m-d H:i:s', time())], ['id_pedido' => $id_pedido, 'id_supplier' => intval($id_supplier)]);
+            }else if($query->num_rows()>0 && $status == 1){
+                //set updated_at as null
+                $this->db->update($this->table_coordination, ['updated_at' => null], ['id_pedido' => $id_pedido, 'id_supplier' => $id_supplier  ]);
+            }
             return array('status' => 'success', 'message' => 'Proveedor seleccionado');
         }
+
         return array('status' => 'error', 'message' => 'Error al seleccionar proveedor');
     }
 
@@ -387,8 +409,24 @@ class PedidosGarantizadosModel extends CI_Model
             'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China,
         );
 
-        if ($Nu_Estado == 5) { //aprobado creo nueva fecha de emision para O.C. Aprobadas
-            //generar proceso de estado de checklist del chinito
+        if ($Nu_Estado == 5) {
+
+            /**
+             * select ID_Pedido_Detalle,count(ID_Pedido_Detalle) as count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =231 group by ID_Pedido_Detalle ;
+             */
+            $query = "SELECT ID_Pedido_Detalle,count(ID_Pedido_Detalle) as suppliers_count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =" . $ID . " and acpdpp.Nu_Selecciono_Proveedor =1 group by ID_Pedido_Detalle ";
+            $result = $this->db->query($query)->result();
+            //check if exists count of ID_Pedido_Detalle is greater than 1
+            $isValidToContinue=true;
+            foreach ($result as $row) {
+                if ($row->suppliers_count > 1) {
+                    $isValidToContinue=false;
+                    break;
+                }
+            }
+            if(!$isValidToContinue){
+                return array('status' => 'error', 'message' => 'Error al aprobar la cotización hay items con mas de un proveedor');
+            }
             $arrDataTour = array(
                 'ID_Pedido_Cabecera' => $ID,
                 'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China,
@@ -749,7 +787,6 @@ Nu_Correlativo
             $this->db->trans_begin();
             $path = "assets/images/garantizados/" . $arrPost['documento_pago_garantizado-id_cabecera'] . "/pagos/";
 
-       
             $Txt_Url_Imagen_Producto = $this->uploadSingleFile($data_files['image_documento'], $path);
 
             // $where = array('id_pedido' => $arrPost['documento_pago_garantizado-id_cabecera']);

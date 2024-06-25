@@ -572,6 +572,9 @@ $(function () {
     var id = $(this).data("id");
     var correlativo = $(this).data("correlativo");
     var name_item = $(this).data("name_item");
+    var id_supplier = $(this).data("id_supplier");
+    let pedidoID=$("#txt-EID_Pedido_Cabecera_item").val()
+ 
     $("#btn-confirmation").on("click", function () {
       $("#modal-confirmation").modal("hide");
 
@@ -586,7 +589,8 @@ $(function () {
         "/" +
         correlativo +
         "/" +
-        encodeURIComponent(name_item);
+        encodeURIComponent(name_item)+
+        "/"+pedidoID+"/"+id_supplier;
       $.ajax({
         url: url,
         type: "GET",
@@ -646,7 +650,8 @@ $(function () {
     var id = $(this).data("id");
     var correlativo = $(this).data("correlativo");
     var name_item = $(this).data("name_item");
-
+    var id_supplier = $(this).data("id_supplier");
+    let pedidoID=$("#txt-EID_Pedido_Cabecera_item").val()
     console.log("correlativo " + correlativo);
     console.log("name_item " + name_item);
 
@@ -661,7 +666,8 @@ $(function () {
       "/" +
       correlativo +
       "/" +
-      encodeURIComponent(name_item);
+      encodeURIComponent(name_item)+
+      "/"+pedidoID+"/"+id_supplier;;
     $.ajax({
       url: url,
       type: "GET",
@@ -2153,7 +2159,7 @@ function getItemTemplate(i, mode, detalle) {
     <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-
+      <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
       <div class = "row" >
         <div class="col-6 col-md-3 col-lg-2">
           <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
@@ -2253,6 +2259,7 @@ function getItemTemplate(i, mode, detalle) {
       `;
   var id_detalle = detalle[i - 1]["ID_Pedido_Detalle"];
   var id_item = detalle[i - 1]["ID_Pedido_Detalle_Producto_Proveedor"];
+  var id_supplier = detalle[i - 1]["id_supplier"];
   if (mode == "edit") {
   } else {
     if (detalle[i - 1]["Nu_Selecciono_Proveedor"] == 0) {
@@ -2262,6 +2269,7 @@ function getItemTemplate(i, mode, detalle) {
               data-id="${id_item}" 
               data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}" 
               data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}" 
+              data-id_supplier="${id_supplier}"
               class="btn btn-danger btn-block btn-seleccionar_proveedor">
               <i class="fas fa-check"></i>&nbsp; Seleccionar proveedor
             </button>`;
@@ -2270,6 +2278,7 @@ function getItemTemplate(i, mode, detalle) {
             <button type="button" id="btn-desmarcar_proveedor${id_item}" 
               data-id_detalle="${id_detalle}" 
               data-id="${id_item}" 
+              data-id_supplier="${id_supplier}"
               data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}" 
               data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}" 
               class="btn btn-secondary btn-block btn-desmarcar_proveedor">

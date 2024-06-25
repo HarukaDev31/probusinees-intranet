@@ -3625,4 +3625,36 @@ class PedidosPagados extends CI_Controller
             echo json_encode(array('error' => $e->getMessage()));
         }
     }
+    public function getProductData(){
+        try {
+            $idProducto = $this->input->post('idProducto');
+            $data = $this->PedidosPagadosModel->getProductData($idProducto);
+            echo json_encode(array('status' => 'success', 'data' => $data));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
+    public function saveCoordination()
+    {
+        try {
+            $data = $this->input->post();
+            $files = $_FILES;
+            $response = $this->PedidosPagadosModel->saveCoordination($data,$files);
+            echo json_encode(array('status' => 'success', 'data' => $response));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
+    public function getSupplierItems()
+    {
+        try {
+            $idPedido = $this->input->post('idPedido');
+            $idSupplier = $this->input->post('idSupplier');
+            $idCoordination = $this->input->post('idCoordination');
+            $data = $this->PedidosPagadosModel->getSupplierItems($idPedido, $idSupplier, $idCoordination);
+            echo json_encode(array('status' => 'success', 'data' => $data));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
 }

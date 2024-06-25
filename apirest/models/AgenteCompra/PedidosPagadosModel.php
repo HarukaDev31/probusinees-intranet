@@ -18,6 +18,7 @@ class PedidosPagadosModel extends CI_Model
     public $table_departamento = 'departamento';
     public $table_provincia = 'provincia';
     public $table_distrito = 'distrito';
+    public $table_suppliers = 'suppliers';
     public $table_tipo_documento_identidad = 'tipo_documento_identidad';
     public $table_importacion_grupal_cabecera = 'importacion_grupal_cabecera';
     public $table_pais = 'pais';
@@ -2344,5 +2345,98 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }catch (Exception $e){
             throw new Exception($e->getMessage());
         }
+    }public function getProductData($idProducto){
+        try{
+            $this->db->select('*');
+            $this->db->from('agente_compra_pedido_detalle');
+            $this->db->where('ID_Pedido_Detalle',$idProducto);
+            $query = $this->db->get();
+            return $query->row();
+        }catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
+    }
+    public function saveCoordination($data,$files){
+        
+        foreach($data['item'] as  $key=>$row){
+            if($row['code']=="" || $row['code']==null || $row['code']=="null")continue;
+            $producto_detalle=[
+                'ID_Pedido_Detalle'=>$key,
+                'product_code'=>$row['code'],
+            ];
+            $this->db->where('ID_Pedido_Detalle',$key);
+            $this->db->update('agente_compra_pedido_detalle',$producto_detalle); 
+        }
+        foreach($data['coordination'] as $key=>$row){
+            $path='assets/images/coordination/orden-compra/'.$key;
+            $pago1Url = isset($files['coordination']['name'][$key]['pago_1_file']) ? 
+            $this->uploadSingleFile([
+                'name' => $files['coordination']['name'][$key]['pago_1_file'],
+                'type' => $files['coordination']['type'][$key]['pago_1_file'],
+                'tmp_name' => $files['coordination']['tmp_name'][$key]['pago_1_file'],
+                'error' => $files['coordination']['error'][$key]['pago_1_file'],
+                'size' => $files['coordination']['size'][$key]['pago_1_file'],
+            ],$path) : null;
+
+        $pago2Url = isset($files['coordination']['name'][$key]['pago_2_file']) ? 
+            $this->uploadSingleFile([
+                'name' => $files['coordination']['name'][$key]['pago_2_file'],
+                'type' => $files['coordination']['type'][$key]['pago_2_file'],
+                'tmp_name' => $files['coordination']['tmp_name'][$key]['pago_2_file'],
+                'error' => $files['coordination']['error'][$key]['pago_2_file'],
+                'size' => $files['coordination']['size'][$key]['pago_2_file'],
+            ],$path) : null;
+            $producto_detalle=[
+                'id_coordination'=>$key,
+                'pago_1_value'=>$row['pago_1_value'],
+                'pago_2_value'=>$row['pago_2_value'],
+                
+                'estado'=>$row['estado'],
+                
+            ];
+            //if pago_1_file is not null
+            if($pago1Url){
+                $producto_detalle['pago_1_URL']=$pago1Url;
+            }
+            //if pago_2_URL is not null
+            if($pago2Url){
+                $producto_detalle['pago_2_URL']=$pago2Url;
+            }
+           //update agente_compra_coordination_supplier
+            $this->db->where('id_coordination',$key);
+            $this->db->update('agente_compra_coordination_supplier',$producto_detalle);
+            
+        }
+            
+    }public function getSupplierItems($ID_pedido,$ID_supplier,$ID_coordination){
+        $this->db->select('
+		ACPDPP.ID_Pedido_Detalle,
+		ACPDPP.ID_Pedido_Cabecera,
+		ACPDPP.ID_Pedido_Detalle_Producto_Proveedor,
+		ACPDPP.Ss_Precio,
+		ACPDPP.Qt_Producto_Moq,
+		ACPDPP.Qt_Producto_Caja,
+		ACPDPP.Qt_Cbm,
+		ACPDPP.Nu_Dias_Delivery,
+		ACPDPP.Ss_Costo_Delivery,
+		ACPDPP.Txt_Nota,
+		ACPDPP.Nu_Selecciono_Proveedor,
+		ACPDPP.Qt_Producto_Caja_Final,
+		ACPDPP.Txt_Nota_Final,
+        S.id_supplier,
+		S.name as nombre_proveedor,
+        S.phone as celular_proveedor,
+		ACPDPP.main_photo,
+		ACPDPP.secondary_photo,
+		ACPDPP.terciary_photo,
+		ACPDPP.primary_video,
+		ACPDPP.secondary_video,
+		');
+        $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP');
+            $this->db->join($this->table_suppliers . ' AS S', 'S.id_supplier = ACPDPP.ID_Entidad_Proveedor', 'left');
+        $this->db->where('ACPDPP.ID_Pedido_Cabecera', $ID_pedido);
+        $this->db->where('ACPDPP.ID_Entidad_Proveedor', $ID_supplier);
+        $query = $this->db->get();
+        return $query->result();
     }
 }

@@ -1176,7 +1176,7 @@ $(function () {
         var term = term.toLowerCase();
         $.post(
           base_url +
-          "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
+            "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
           { global_search: term },
           function (arrData) {
             response(arrData);
@@ -2609,17 +2609,17 @@ function invoiceProveedor(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-            detalle[i]["Fe_Entrega_Proveedor"] != null
+          detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-              detalle[i]["Fe_Entrega_Proveedor"],
-              "fecha_bd",
-              "-"
-            )
+                detalle[i]["Fe_Entrega_Proveedor"],
+                "fecha_bd",
+                "-"
+              )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -2632,9 +2632,9 @@ function invoiceProveedor(ID) {
           table_enlace_producto += "<th class='text-left'>"; //Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor si es diferente de vacio descargar
           if (
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-            "" &&
+              "" &&
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-            null
+              null
           ) {
             table_enlace_producto +=
               '<button class="btn btn-link" alt="Descargar Invoice y PL" title="Descargar Invoice y PL" href="javascript:void(0)" onclick="descargarInvoicePlProveedor(' +
@@ -2662,9 +2662,9 @@ function invoiceProveedor(ID) {
           table_enlace_producto += "<th class='text-center'>";
           if (
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-            "" &&
+              "" &&
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-            null
+              null
           ) {
             table_enlace_producto += "";
           } else {
@@ -2694,10 +2694,10 @@ function invoiceProveedor(ID) {
 
       $("#span-saldo_cliente").html(
         "$ " +
-        (fTotalCliente -
-          (parseFloat(response.Ss_Pago_30_Cliente) +
-            parseFloat(response.Ss_Pago_100_Cliente) +
-            parseFloat(response.Ss_Pago_Servicio_Cliente)))
+          (fTotalCliente -
+            (parseFloat(response.Ss_Pago_30_Cliente) +
+              parseFloat(response.Ss_Pago_100_Cliente) +
+              parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -2939,17 +2939,17 @@ function recepcionCarga(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-            detalle[i]["Fe_Entrega_Proveedor"] != null
+          detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-              detalle[i]["Fe_Entrega_Proveedor"],
-              "fecha_bd",
-              "-"
-            )
+                detalle[i]["Fe_Entrega_Proveedor"],
+                "fecha_bd",
+                "-"
+              )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -3013,8 +3013,8 @@ function recepcionCarga(ID) {
 
         cantidad_item =
           !isNaN(cantidad_item_final_recepcion_carga) &&
-            cantidad_item_final_recepcion_carga > 0 &&
-            cantidad_item_final_recepcion_carga != ""
+          cantidad_item_final_recepcion_carga > 0 &&
+          cantidad_item_final_recepcion_carga != ""
             ? cantidad_item_final_recepcion_carga
             : cantidad_item;
 
@@ -3111,10 +3111,10 @@ function recepcionCarga(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-        (fTotalCliente -
-          (parseFloat(response.Ss_Pago_30_Cliente) +
-            parseFloat(response.Ss_Pago_100_Cliente) +
-            parseFloat(response.Ss_Pago_Servicio_Cliente)))
+          (fTotalCliente -
+            (parseFloat(response.Ss_Pago_30_Cliente) +
+              parseFloat(response.Ss_Pago_100_Cliente) +
+              parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -3352,12 +3352,12 @@ function coordinarPagosProveedor(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-            detalle[i]["Fe_Entrega_Proveedor"] != null
+          detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-              detalle[i]["Fe_Entrega_Proveedor"],
-              "fecha_bd",
-              "-"
-            )
+                detalle[i]["Fe_Entrega_Proveedor"],
+                "fecha_bd",
+                "-"
+              )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -3532,10 +3532,10 @@ function coordinarPagosProveedor(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-        (fTotalCliente -
-          (parseFloat(response.Ss_Pago_30_Cliente) +
-            parseFloat(response.Ss_Pago_100_Cliente) +
-            parseFloat(response.Ss_Pago_Servicio_Cliente)))
+          (fTotalCliente -
+            (parseFloat(response.Ss_Pago_30_Cliente) +
+              parseFloat(response.Ss_Pago_100_Cliente) +
+              parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -3771,12 +3771,12 @@ function verPedido(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-            detalle[i]["Fe_Entrega_Proveedor"] != null
+          detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-              detalle[i]["Fe_Entrega_Proveedor"],
-              "fecha_bd",
-              "-"
-            )
+                detalle[i]["Fe_Entrega_Proveedor"],
+                "fecha_bd",
+                "-"
+              )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -3995,10 +3995,10 @@ function verPedido(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-        (fTotalCliente -
-          (parseFloat(response.Ss_Pago_30_Cliente) +
-            parseFloat(response.Ss_Pago_100_Cliente) +
-            parseFloat(response.Ss_Pago_Servicio_Cliente)))
+          (fTotalCliente -
+            (parseFloat(response.Ss_Pago_30_Cliente) +
+              parseFloat(response.Ss_Pago_100_Cliente) +
+              parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -4539,12 +4539,12 @@ function subirInspeccion(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-            detalle[i]["Fe_Entrega_Proveedor"] != null
+          detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-              detalle[i]["Fe_Entrega_Proveedor"],
-              "fecha_bd",
-              "-"
-            )
+                detalle[i]["Fe_Entrega_Proveedor"],
+                "fecha_bd",
+                "-"
+              )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -5396,10 +5396,10 @@ function asignarPedido(ID_Pedido_Cabecera, Nu_Estado) {
         for (var x = 0; x < l; x++) {
           $("#cbo-guardar_personal_china-ID_Usuario").append(
             '<option value="' +
-            response.result[x].ID +
-            '">' +
-            response.result[x].Nombre +
-            "</option>"
+              response.result[x].ID +
+              '">' +
+              response.result[x].Nombre +
+              "</option>"
           );
         }
       } else {
@@ -5754,17 +5754,17 @@ function pagarProveedores(ID, tipo_pago) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-            detalle[i]["Fe_Entrega_Proveedor"] != null
+          detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-              detalle[i]["Fe_Entrega_Proveedor"],
-              "fecha_bd",
-              "-"
-            )
+                detalle[i]["Fe_Entrega_Proveedor"],
+                "fecha_bd",
+                "-"
+              )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -5992,10 +5992,10 @@ function pagarProveedores(ID, tipo_pago) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-        (fTotalCliente -
-          (parseFloat(response.Ss_Pago_30_Cliente) +
-            parseFloat(response.Ss_Pago_100_Cliente) +
-            parseFloat(response.Ss_Pago_Servicio_Cliente)))
+          (fTotalCliente -
+            (parseFloat(response.Ss_Pago_30_Cliente) +
+              parseFloat(response.Ss_Pago_100_Cliente) +
+              parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -6213,12 +6213,12 @@ function bookingTrading(id) {
                 selected = 'selected="selected"';
               $("#cbo-shipper").append(
                 '<option value="' +
-                responseShipper.result[x].ID +
-                '" ' +
-                selected +
-                ">" +
-                responseShipper.result[x].Nombre +
-                "</option>"
+                  responseShipper.result[x].ID +
+                  '" ' +
+                  selected +
+                  ">" +
+                  responseShipper.result[x].Nombre +
+                  "</option>"
               );
             }
           } else {
@@ -6882,8 +6882,9 @@ const getOrderProgress = (id) => {
 const stepTemplate = (step, i) => {
   const stepHTML = `
     <div class="col-12 col-lg-2 step-column" >
-      <div class="step-container" onclick="openStepFunction(${i + 1},${step.id
-    })"  id="step-${i}">
+      <div class="step-container" onclick="openStepFunction(${i + 1},${
+    step.id
+  })"  id="step-${i}">
       <span class="step">${step.name}</span>
       <span>Image</span>
       </div>
@@ -6891,6 +6892,115 @@ const stepTemplate = (step, i) => {
   `;
   return stepHTML;
 };
+
+const getItemTemplate=(i,detalle) =>{
+  div_items = `
+  <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
+    <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+    <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+    <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
+    <div class = "row" >
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-precio${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+        <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Moq<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-moq${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Qty_caja<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-qty_caja${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Cbm<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-cbm${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Shipping Cost<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-costo_delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-6">
+        <div class="row h-100">
+          <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
+            <!--Upload Icon-->
+            <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
+            <label>Imagen Principal</label>
+            </br>
+            <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
+            <input type="file" name="file[${i}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+            </div>
+          </div>
+          <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+          <div class="form-group" id="container-uploadimg2-${i}">
+          <label>Imagen 2</label>
+          <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
+          <input type="file" name="file[${i}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+          </div>
+            <div class="form-group" id="container-uploadimg3-${i}">
+            <label>Imagen 3</label>
+            <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
+            <input type="file" name="file[${i}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+            <div class="form-group" id="container-uploadvideo1-${i}">
+            <label>Video 1</label>
+            <input type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
+            <input type="file" name="file[${i}][primary_video]" class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+            <div class="form-group"  id="container-uploadvideo2-${i}">
+            <label>Video 2</label>
+            <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
+            <input type="file" name="file[${i}][secondary_video]" class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-6">
+        <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+        <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-celular_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+        <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
+        <div class="form-group">
+          <textarea id="modal-notas${i}" data-correlativo="${i}" name="addProducto[${i}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
+        </div>
+
+      </div>
+    </div>
+    `;
+      var id_detalle = detalle[i - 1]["ID_Pedido_Detalle"];
+      var id_item = detalle[i - 1]["ID_Pedido_Detalle_Producto_Proveedor"];
+      var id_supplier = detalle[i - 1]["id_supplier"];
+      return div_items;
+}
 const openStepFunction = (i, stepId) => {
   $("#container-ver").hide();
   containerOrdenCompra.show();
@@ -6907,17 +7017,65 @@ const openStepFunction = (i, stepId) => {
       if (currentPrivilege == 1) {
         openPagos(response);
       } else if (currentPrivilege == 2) {
-        openCoordination(response)
+        openCoordination(response);
       }
     }
   });
 };
 const openCoordination = (response) => {
   console.log(response, "coordination");
-  const bodyDIV = getSupplierCoordinationTemplate(JSON.parse(response).data);
-  containerCoordination.append(bodyDIV);  
-}
-const getSupplierCoordinationHeader = () => {
+  containerOrdenCompra.hide();
+  const headerDiv=getSupplierCoordinationHeader(JSON.parse(response).data);
+  containerCoordination.append(headerDiv);
+  const bodyDIV = getSupplierCoordinationTableTemplate(
+    JSON.parse(response).data
+  );
+  containerCoordination.append(bodyDIV);
+  const configButtons = {
+    btnCancel: {
+      text: "Regresar",
+      action: "hideCoordination()",
+    },
+    btnSave: {
+      text: "Guardar",
+      action: "saveCoordination()",
+    },
+  };
+  containerCoordination.append(getActionButtons(configButtons));
+};
+const hideCoordination = () => {
+  containerCoordination.empty();
+  //show steps
+  containerVer.show();
+};
+const saveCoordination = () => {
+  const form = $("#form-coordination");
+  const formData = new FormData(form[0]);
+  url = base_url + "AgenteCompra/PedidosPagados/saveCoordination";
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      console.log(response);
+      const responseParsed = JSON.parse(response);
+      if (responseParsed.status == "success") {
+        hideCoordination();
+        getOrderProgress(idPedido);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};
+/**
+ * This function is used to get the header of the table
+ * @returns {string} html
+ */
+const getSupplierCoordinationTableHeader = () => {
   return `
   <thead>
       <tr>
@@ -6927,7 +7085,7 @@ const getSupplierCoordinationHeader = () => {
           <th class="coordination-qty-column c-qty-column">QTY</th>
           <th class="coordination-precio-column c-precio-column">PRECIO</th>
           <th class="coordination-total-column c-total-column">TOTAL</th>
-          <th class="coordination-tproducto-column c-tproducto-column">T.PRODUCTO</th>
+          <th class="coordination-tproducto-column c-tproducto-column">DELIVERY</th>
           <th class="coordination-tentrega-column c-tentrega-column">T.ENTREGA</th>
           <th class="coordination-pago1-column c-pago1-column">PAGO 1</th>
           <th class="coordination-pago2-column c-pago2-column">PAGO 2</th>
@@ -6936,55 +7094,351 @@ const getSupplierCoordinationHeader = () => {
   </thead>
   `;
 };
-
-const getSupplierCoordinationTemplate = (data) => {
-  let html = `<table class="supplier-table">`;
-  html += getSupplierCoordinationHeader();
+/**
+ *  This function is used to get the body of the table
+ * @param {Array} data
+ * @returns {string} html
+ */
+const getSupplierCoordinationTableTemplate = (data) => {
+  let html = `
+  <form id="form-coordination">
+  <table class="supplier-table">`;
+  html += getSupplierCoordinationTableHeader();
   html += `<tbody>`;
   data.forEach((supplier) => {
-      const detalles = JSON.parse(supplier.detalles);
-      const rowspan = detalles.length;
+    const detalles = JSON.parse(supplier.detalles);
+    const rowspan = detalles.length;
 
-      html += `
+    html += `
       <tr>
           <td class="supplier-info" rowspan="${rowspan}" colspan="3">
               <div>Nombre: ${supplier.name}</div>
               <div>Teléfono: ${supplier.phone}</div>
-              <btn class="btn btn-primary btn-coordinar">Cambiar</btn>
+              <btn class="btn btn-primary btn-coordinar" onclick="openSupplierItems(
+              ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Cambiar</btn>
           </td>
       `;
 
-      detalles.forEach((detail, index) => {
-          if (index === 0) {
-              html += `
+    detalles.forEach((detail, index) => {
+      if (index === 0) {
+        html += `
               <td class="c-imagen-column">img</td>
-              <td class="c-nombre-column">${detail.nombre_producto} ${detail.product_code}</td>
+              <td class="c-nombre-column">${detail.nombre_producto} 
+              <div class="input-group ">
+                <span class="input-group-text" id="basic-addon1">ITEM CODE:</span>
+                <input type="text" class="form-control" name="item['${
+                  detail.ID_Pedido_Detalle
+                }']['code']" aria-describedby="basic-addon1" id="item['${
+          detail.ID_Pedido_Detalle
+        }']['code']"
+              </div>
+              <div class="btn btn-success" onclick="openRotuladofromCoordination(${
+                detail.ID_Pedido_Detalle
+              })">Perú</div>
+             </td>
               <td class="c-qty-column">${detail.qty_product}</td>
               <td class="c-precio-column">${detail.price_product}</td>
-              <td class="c-total-column" rowspan="${rowspan}">${detail.total_producto}</td>
-              <td class="c-tproducto-column">${detail.paymentType}</td>
-              <td class="c-tentrega-column" rowspan="${rowspan}"></td>
-              <td class="c-pago1-column" rowspan="${rowspan}">${detail.pago1}</td>
-              <td class="c-pago2-column" rowspan="${rowspan}">${detail.pago2}</td>
-              <td class="c-estado-column" rowspan="${rowspan}">${detail.estado}</td>
+              <td class="c-total-column" rowspan="${rowspan}">${
+          supplier.total
+        }</td>
+              <td class="c-tproduccion-column" rowspan="${rowspan}">${
+          supplier.tentrega
+        }</td>
+              <td class="c-tentrega-column" rowspan="${rowspan}">${
+          supplier.dead_line
+        }</td>
+
+              <td class="c-pago1-column" rowspan="${rowspan}">
+                <input type="number" class="form-control" value="${
+                  supplier.pago_1_value
+                }" name="coordination[${
+          supplier.id_coordination
+        }][pago_1_value]"/>
+                <div class="btn btn-primary" onclick='openInputFile("input-pago1-${
+                  supplier.id_coordination
+                }","${supplier.pago_1_URL}")'>Voucher</div>
+                <input type="file" class="form-control d-none" id="input-pago1-${
+                  supplier.id_coordination
+                }" name="coordination[${
+          supplier.id_coordination
+        }][pago_1_file]"/>
+              </td>
+              <td class="c-pago2-column" rowspan="${rowspan}">
+                <input type="number" class="form-control" disabled value="${
+                  parseFloat(supplier.total) - parseFloat(supplier.pago_1_value)
+                }" name="coordination[${
+          supplier.id_coordination
+        }][pago_2_value]"/>
+                <div class="btn btn-primary" onclick='openInputFile("input-pago2-${
+                  supplier.id_coordination
+                }","${supplier.pago_2_URL}")'>Voucher</div>
+                <input type="file" class="form-control d-none" id="input-pago2-${
+                  supplier.id_coordination
+                }" name="coordination[${
+          supplier.id_coordination
+        }][pago_2_file]"/>
+              </td>
+              <td class="c-estado-column" rowspan="${rowspan}">
+              <select class="form-select" aria-label="Default select example" name="coordination[${
+                supplier.id_coordination
+              }][estado]">
+                <option value="PENDIENTE" ${
+                  supplier.estado == "PENDIENTE" ? "selected" : ""
+                }>PENDIENTE</option>
+                <option value="CONFORME" ${
+                  supplier.estado == "CONFORME" ? "selected" : ""
+                }>CONFORME</option>
+              </select>
+              </td>
               </tr>
               `;
-          } else {
-              html += `
+      } else {
+        html += `
               <tr class="detail">
                   <td class="c-imagen-column">img</td>
-                  <td class="c-nombre-column">${detail.nombre_producto} ${detail.product_code}</td>
-                  <td class="c-qty-column">${detail.qty_product}</td>
+                  <td class="c-nombre-column">${detail.nombre_producto} 
+                                <div class="input-group ">
+                                  <span class="input-group-text" id="basic-addon1">ITEM CODE:</span>
+                                  <input type="text" class="form-control" name="item['${detail.ID_Pedido_Detalle}']['code']" aria-describedby="basic-addon1" item['${detail.ID_Pedido_Detalle}']['code']>
+                                </div>
+                                <div class="btn btn-success" onclick="openRotuladofromCoordination(${detail.ID_Pedido_Detalle})">Perú</div>
+                              </td>
+                               <td class="c-qty-column">${detail.qty_product}</td>
                   <td class="c-precio-column">${detail.price_product}</td>
-                  <td class="c-tproducto-column">${detail.paymentType}</td>
               </tr>
               `;
-          }
-      });
+      }
+    });
   });
   html += `</tbody>`;
   html += `</table>`;
+  html += `</form>`;
   return html;
+};
+const openSupplierItems=(id_pedido,id_supplier,id_coordination) => {
+  console.log(id_pedido,id_supplier )
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getSupplierItems",
+    type: "POST",
+    data: { idPedido: id_pedido, idSupplier: id_supplier, idCoordination: id_coordination},
+    success: function (response) {
+      response = JSON.parse(response);
+      if (response.status == "success") {
+        const data = response.data;
+        const btnsConfig = {
+          btnSave: {
+            text: "Guardar",
+            action: `saveSupplierItems(${id_pedido},${id_supplier},${id_coordination})`,
+          },
+          btnCancel: {
+            text: "Cancelar",
+            action: "returnToCoordination()",
+          },
+        };
+        openSupplierItemsView(data, btnsConfig);
+        containerCoordination.hide();
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+}
+const saveSupplierItems = (id_pedido, id_supplier, id_coordination) => {
+  const form = $("#table-elegir_productos_proveedor");
+  const formData = new FormData(form[0]);
+  url = base_url + "AgenteCompra/PedidosPagados/saveSupplierItems";
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      response = JSON.parse(response);
+      if (response.status == "success") {
+        hideSupplierItems();
+        getOrderProgress(id_pedido);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+
+}
+const openSupplierItemsView = (detalles, btnsConfig) => {
+      const container = $("#table-elegir_productos_proveedor");
+      container.empty();
+
+
+      for (i = 0; i < detalles.length; i++) {
+        let item = getItemTemplate(i + 1, "select", detalles[i]);
+        console.log(item)
+        container.append(item);
+        container.find(`#modal-precio${i + 1}`).val(detalles[i]["Ss_Precio"]);
+        container.find(`#modal-moq${i + 1}`).val(detalles[i]["Qt_Producto_Moq"]);
+        container
+          .find(`#modal-qty_caja${i + 1}`)
+          .val(detalles[i]["Qt_Producto_Caja"]);
+        container.find(`#modal-cbm${i + 1}`).val(detalles[i]["Qt_Cbm"]);
+        container
+          .find(`#modal-delivery${i + 1}`)
+          .val(detalles[i]["Nu_Dias_Delivery"]);
+        container
+          .find(`#modal-costo_delivery${i + 1}`)
+          .val(detalles[i]["Ss_Costo_Delivery"]);
+        container
+          .find(`#modal-nombre_proveedor${i + 1}`)
+          .val(detalles[i]["No_Contacto_Proveedor"]);
+        container
+          .find(`#modal-celular_proveedor${i + 1}`)
+          .val(detalles[i]["No_Celular_Contacto_Proveedor"]);
+        container
+          .find(`#modal-detalle${i + 1}`)
+          .val(detalles[i]["ID_Pedido_Detalle_Producto_Proveedor"]);
+        container
+          .find(`#modal-pedido-cabecera${i + 1}`)
+          .val(detalles[i]["ID_Pedido_Cabecera"]);
+        container
+          .find(`#modal-nombre_proveedor${i + 1}`)
+          .val(detalles[i]["nombre_proveedor"]);
+        container
+          .find(`#modal-celular_proveedor${i + 1}`)
+          .val(detalles[i]["celular_proveedor"]);
+
+        container
+          .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
+          .val(detalles[i]["main_photo"]);
+        if (detalles[i]["main_photo"] != null) {
+          container
+            .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
+            .val(detalles[i]["main_photo"]);
+          container.find(`#btn-uploadprimaryimg-${i + 1}`).hide();
+          container
+            .find(`#container-uploadprimaryimg-${i + 1}`)
+            .append(
+              `<img src="${detalles[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+            );
+        }
+        if (detalles[i]["secondary_photo"] != null) {
+          container
+            .find(`#btn-uploadimg2-URL-${i + 1}`)
+            .val(detalles[i]["secondary_photo"]);
+          container.find(`#btn-uploadimg2-${i + 1}`).hide();
+          container
+            .find(`#container-uploadimg2-${i + 1}`)
+            .append(
+              `<img src="${detalles[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+            );
+        }
+        if (detalles[i]["terciary_photo"] != null) {
+          container
+            .find(`#btn-uploadimg3-URL-${i + 1}`)
+            .val(detalles[i]["terciary_photo"]);
+          container.find(`#btn-uploadimg3-${i + 1}`).hide();
+          container
+            .find(`#container-uploadimg3-${i + 1}`)
+            .append(
+              `<img src="${detalles[i]["terciary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+            );
+        }
+        if (detalles[i]["primary_video"] != null) {
+          container
+            .find(`#btn-uploadvideo1-URL-${i + 1}`)
+            .val(detalles[i]["primary_video"]);
+          container.find(`#btn-uploadvideo1-${i + 1}`).hide();
+          container
+            .find(`#container-uploadvideo1-${i + 1}`)
+            .append(
+              `<video src="${detalles[i]["primary_video"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2" controls></video>`
+            );
+        }
+        if (detalles[i]["secondary_video"] != null) {
+          container
+            .find(`#btn-uploadvideo2-URL-${i + 1}`)
+            .val(detalles[i]["secondary_video"]);
+          container.find(`#btn-uploadvideo2-${i + 1}`).hide();
+          container
+            .find(`#container-uploadvideo2-${i + 1}`)
+            .append(
+              "<video src='" +
+                detalles[i]["secondary_video"] +
+                "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
+            );
+        }
+      }
+      container.append(getActionButtons(btnsConfig));
+}
+const getSupplierCoordinationHeader = (data) => {
+  let montoTotal = 0;
+  let primerPago = 0;
+  let segundoPago = 0;
+  data.forEach((supplier) => {
+    const detalles = JSON.parse(supplier.detalles);
+    montoTotal += parseFloat(supplier.total);
+    primerPago += parseFloat(supplier.pago_1_value);
+    
+  });
+  segundoPago = montoTotal - primerPago;
+  return `
+  <div class="row coordination-header">
+    <div class="col-12 col-lg-3">
+      <label>MONTO TOTAL:</label>
+      <input type="number" class="form-control" value="${montoTotal}" disabled>
+    </div>
+    <div class="col-12 col-lg-3">
+      <label>PRIMER PAGO:</label>
+      <input type="number" class="form-control" value="${primerPago}" disabled>
+    </div>
+    <div class="col-12 col-lg-3">
+      <label>SEGUNDO PAGO:</label>
+      <input type="number" class="form-control" value="${segundoPago}" disabled>
+    </div>
+  </div>
+  `;
+};
+
+const openInputFile = (idInput, fileURL) => {
+  if (fileURL != null && fileURL != "" && fileURL != "null") {
+    //open in new tab
+    window.open(fileURL);
+  } else {
+    $(`#${idInput}`).click();
+  }
+};
+const openRotuladofromCoordination = (id) => {
+  console.log(currentPrivilege, "currentPrivilege");
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getProductData",
+    type: "POST",
+    data: { idProducto: id },
+    success: function (response) {
+      response = JSON.parse(response);
+      if (response.status == "success") {
+        const data = response.data;
+        containerCoordination.hide();
+        const btnsConfig = {
+          btnSave: {
+            text: "Guardar",
+            action: `saveRotuladoProducto(${JSON.stringify(productoSelected)})`,
+          },
+          btnCancel: {
+            text: "Cancelar",
+            action: "returnToCoordination()",
+          },
+        };
+        openRotuladoView(data, btnsConfig);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};
+const returnToCoordination = () => {
+  hideRotuladoView();
+  containerCoordination.show();
 };
 const openPagos = (response) => {
   $("#container_orden-compra").hide();
@@ -7159,41 +7613,47 @@ const getProductTemplate = (producto) => {
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
-      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${producto.Txt_Producto
-    }" class="img-fluid">
+      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${
+    producto.Txt_Producto
+  }" class="img-fluid">
     </div>
     <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
       <span>${producto.Txt_Producto}</span>
-      ${currentPrivilege == priviligesPersonalPeru
-      ? `<div class="btn btn-primary"  id="btn-rotulado" onclick='openRotuladoView(${JSON.stringify(
-        producto
-      )})'>Rotulado</div>`
-      : `
-      <span class="btn btn-primary">ITEM CODE :${producto.product_code ? producto.product_code : ""
+      ${
+        currentPrivilege == priviligesPersonalPeru
+          ? `<div class="btn btn-primary btn-rotulado"   onclick='openRotuladoView(${JSON.stringify(
+              producto
+            )})'>Rotulado</div>`
+          : `
+      <span class="btn btn-primary">ITEM CODE :${
+        producto.product_code ? producto.product_code : ""
       }</span>`
-    }
+      }
     </div>
     <div class="col-12 col-lg-2">
       <span>${producto.Qt_Producto}</span>
     </div>
     <div class="col-12 col-lg-3">
-          <span>${producto.Txt_Descripcion}</span>
+          <span style="word-break: break-word;">${producto.Txt_Descripcion}</span>
     </div>
     <div class="col-12 col-lg-2">
-      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${producto.Txt_Url_Link_Pagina_Producto
-    }</a>
+      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${
+    producto.Txt_Url_Link_Pagina_Producto
+  }</a>
     </div>
   </div>`;
   return template;
 };
-const openRotuladoView = (producto) => {
+const openRotuladoView = (producto, btsconfig = null) => {
   sectionTitle.html("Rotulado");
   containerOrdenCompra.hide();
   if (!productoSelected) {
     productoSelected = producto;
   }
   containerRotulado.append(getContainerRotuladoView(productoSelected));
-  const buttonsData = {
+  //if currentprivilege is !=1
+
+  let buttonsData = {
     btnSave: {
       text: "Guardar",
       action: `saveRotuladoProducto(${JSON.stringify(productoSelected)})`,
@@ -7203,6 +7663,9 @@ const openRotuladoView = (producto) => {
       action: "hideRotuladoView() ",
     },
   };
+  if (btsconfig) {
+    buttonsData = btsconfig;
+  }
 
   const btnSection = $("#btns-section");
   btnSection.append(getActionButtons(buttonsData));
@@ -7213,7 +7676,7 @@ const openRotuladoView = (producto) => {
     empaqueDiv.append(`
       <div id="empaque_input-container">
         <input name="empaque_URL" type="hidden" value="${productoSelected.empaque_URL}">
-        <a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-link">Descargar</a>
+        <a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>
       </div>
     `);
   }
@@ -7224,12 +7687,14 @@ const openRotuladoView = (producto) => {
     if (isChecked) {
       empaqueDiv.append(`
         <div id="empaque_input-container">
-          <input name="empaque_URL" type="hidden" value="${productoSelected.empaque_URL
-        }">
-          ${productoSelected.empaque_URL
-          ? `<a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-link">Descargar</a>`
-          : `<input type="file" name="empaque" class="form-control">`
-        }
+          <input name="empaque_URL" type="hidden" value="${
+            productoSelected.empaque_URL
+          }">
+          ${
+            productoSelected.empaque_URL
+              ? `<a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>`
+              : `<input type="file" name="empaque" class="form-control">`
+          }
         </div>
       `);
     } else {
@@ -7254,18 +7719,33 @@ const openRotuladoView = (producto) => {
     if (isChecked) {
       vimDiv.append(`
         <div id="vim_motor_input-container">
-          <input name="vim_motor_URL" type="hidden" value="${productoSelected.vim_motor_URL
-        }">
-          ${productoSelected.vim_motor_URL
-          ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>`
-          : `<input type="file" name="vim_motor" class="form-control">`
-        }
+          <input name="vim_motor_URL" type="hidden" value="${
+            productoSelected.vim_motor_URL
+          }">
+          ${
+            productoSelected.vim_motor_URL
+              ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>`
+              : `<input type="file" name="vim_motor" class="form-control">`
+          }
         </div>
       `);
     } else {
       vimDiv.find("#vim_motor_input-container").remove();
     }
   });
+  if (currentPrivilege != 1) {
+    //if empaque_input-container not exists hide empaque-container
+    if (!$("#empaque_input-container").length) {
+      $("#empaque_container").hide();
+    }
+    //if vim_motor_input-container not exists hide vim_motor_container
+    if (!$("#vim_motor_input-container").length) {
+      $("#vim_motor_container").hide();
+    }
+    //find button save in rotulado view and hide it
+    containerRotulado.find(".button-save").hide();
+    containerRotulado.find(".switch").hide();
+  }
   containerRotulado.show();
 };
 const saveRotuladoProducto = (producto) => {
@@ -7315,12 +7795,14 @@ const getContainerRotuladoView = (producto) => {
       <div class="col-12 col-md-5">
         <div class="form-group">
           <label>CAJA MASTER:</label>
-          <input name="caja_master_URL" type="hidden" value="${producto.caja_master_URL
-    }">
-          ${producto.caja_master_URL
-      ? `<a href="${producto.caja_master_URL}" class="btn btn-link" target="_blank">Descargar</a>`
-      : '<input type="file" name="caja_master" class="form-control">'
-    }
+          <input name="caja_master_URL" type="hidden" value="${
+            producto.caja_master_URL
+          }">
+          ${
+            producto.caja_master_URL
+              ? `<a href="${producto.caja_master_URL}" class="btn btn-outline-secondary d-block text-center" target="_blank">Descargar</a>`
+              : '<input type="file" name="caja_master" class="form-control">'
+          }
         </div>
         <div class="form-group" id="empaque_container">
           <div class="conditional-field">
@@ -7347,8 +7829,9 @@ const getContainerRotuladoView = (producto) => {
       </div>
       <div class="col-12 col-md-7">
           <label>Notas</label>
-          <textarea name="notas_rotulado" class="form-control" rows="5">${producto.notas_rotulado
-    }</textarea>
+          <textarea name="notas_rotulado" class="form-control" rows="5">${
+            producto.notas_rotulado
+          }</textarea>
       </div>
     </form>
   `;
@@ -7362,24 +7845,24 @@ const getActionButtons = (data) => {
       buttons = `
       <div class="row buttons">
         <div class="col-12 col-md-6">
-          <div class="btn btn-primary" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+          <div class="btn btn-primary button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="btn btn-secondary" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+          <div class="btn btn-secondary button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
         </div>
       </div>`;
     } else if (data.hasOwnProperty("btnSave")) {
       buttons = `
       <div class="row buttons">
         <div class="col-12 col-md-6">
-          <div class="btn btn-primary" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+          <div class="btn btn-primary  button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
         </div>
       </div>`;
     } else if (data.hasOwnProperty("btnCancel")) {
       buttons = `
       <div class="row buttons">
         <div class="col-12 col-md-6">
-          <div class="btn btn-secondary" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+          <div class="btn btn-secondary  button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
         </div>
       </div>`;
     }
@@ -7441,9 +7924,6 @@ const saveOrdenCompra = () => {
 const hideSteps = () => {
   containerSteps.empty();
   $(".steps-buttons").empty();
+  containerVer.hide();
   containerListar.show();
-
-
-
-}
-
+};
