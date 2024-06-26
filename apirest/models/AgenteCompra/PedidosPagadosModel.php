@@ -1,8 +1,9 @@
 <?php
 require_once APPPATH . 'traits/FileTrait.php';
+require_once APPPATH . 'traits/SupplierTraits.php';
 class PedidosPagadosModel extends CI_Model
 {
-    use FileTrait;
+    use FileTrait,SupplierTraits;
     public $table = 'agente_compra_pedido_cabecera';
     public $table_agente_compra_pedido_detalle = 'agente_compra_pedido_detalle';
     public $table_agente_compra_pedido_detalle_producto_proveedor = 'agente_compra_pedido_detalle_producto_proveedor';
@@ -2433,10 +2434,221 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		ACPDPP.secondary_video,
 		');
         $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP');
-            $this->db->join($this->table_suppliers . ' AS S', 'S.id_supplier = ACPDPP.ID_Entidad_Proveedor', 'left');
+        $this->db->join($this->table_suppliers . ' AS S', 'S.id_supplier = ACPDPP.ID_Entidad_Proveedor', 'left');
+        $this->db->join('agente_compra_coordination_supplier ACS','ACS.id_supplier=S.id_supplier','left');
+        $this->db->where('ACPDPP.Nu_Selecciono_Proveedor', "1");
+
         $this->db->where('ACPDPP.ID_Pedido_Cabecera', $ID_pedido);
         $this->db->where('ACPDPP.ID_Entidad_Proveedor', $ID_supplier);
+        $this->db->where('ACS.id_pedido', $ID_pedido);
+        $this->db->where('ACS.updated_at is null');
         $query = $this->db->get();
         return $query->result();
+    }
+    public function saveSupplierItems($arrPost,$data_files){
+        
+        $this->db->trans_begin();
+
+        try {
+            $existsInitialSupplierCoordination=[];
+
+            $results = [];
+
+            $filesKey = [
+                "main_photo",
+                "secondary_photo",
+                "terciary_photo",
+                "primary_video",
+                "secondary_video",
+            ];
+            $results = $this->processFiles($data_files, null, $filesKey, $arrPost);
+            $existsindex=0;
+            foreach ($arrPost['addProducto'] as $key => $row) {
+                $Txt_Url_Imagen_Proveedor = '';
+
+                //if $results not have key path return error
+                if (!array_key_exists('paths', $results)) {
+                    return array(
+                        'status' => 'error',
+                        'message' => 'No se cargaron los archivos multimedia ',
+                    );
+                }
+                // if(isset($data_files['addProveedor']) && !empty($data_files['addProveedor']) && !empty($data_files['addProveedor']['name'][$key])) {
+                //     $_FILES['img_proveedor']['name'] = $data_files['addProveedor']['name'][$key];
+                //     $_FILES['img_proveedor']['type'] = $data_files['addProveedor']['type'][$key];
+                //     $_FILES['img_proveedor']['tmp_name'] = $data_files['addProveedor']['tmp_name'][$key];
+                //     $_FILES['img_proveedor']['error'] = $data_files['addProveedor']['error'][$key];
+                //     $_FILES['img_proveedor']['size'] = $data_files['addProveedor']['size'][$key];
+
+                //     $config['upload_path'] = $path;
+                //     $config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
+                //     $config['max_size'] = 3072;//1024 KB = 3 MB
+                //     $config['encrypt_name'] = TRUE;
+                //     $config['max_filename'] = '255';
+
+                //     $this->load->library('upload', $config);
+                //     if (!$this->upload->do_upload('img_proveedor')){
+                //         $this->db->trans_rollback();
+                //         return array(
+                //             'status' => 'error',
+                //             'message' => 'No se cargo imagen proveedor ' . strip_tags($this->upload->display_errors()),
+                //         );
+                //     } else {
+                //         $arrUploadFile = $this->upload->data();
+                //         $Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
+                //     }
+                // }
+                $existsInitialSupplierCoordination[$existsindex]=true;
+                $cantidad = $row['cantidad_oculta'];
+                if (isset($row['cantidad'])) {
+                    $cantidad = $row['cantidad'];
+                    if ($row['cantidad'] < $row['cantidad_oculta']) {
+                        $cantidad = $row['cantidad_oculta'];
+                    }
+
+                }
+
+                $nota = '';
+                if (isset($row['nota'])) {
+                    $nota = nl2br($row['nota']);
+                }
+
+                $precio = $row['precio'];
+                if ($row['precio'] < $row['precio_oculta']) {
+                    $precio = $row['precio_oculta'];
+                }
+
+                $moq = $row['moq'];
+                if ($row['moq'] < $row['moq_oculta']) {
+                    $moq = $row['moq_oculta'];
+                }
+
+                $caja = $row['qty_caja'];
+                if ($row['qty_caja'] < $row['caja_oculta']) {
+                    $caja = $row['caja_oculta'];
+                }
+
+                $cbm = $row['cbm'];
+                if ($row['cbm'] < $row['cbm_oculta']) {
+                    $cbm = $row['cbm_oculta'];
+                }
+
+                $delivery = $row['delivery'];
+                if ($row['delivery'] < $row['delivery_oculta']) {
+                    $delivery = $row['delivery_oculta'];
+                }
+
+                $costo_delivery = $row['shipping_cost'];
+                if ($row['shipping_cost'] < $row['costo_delivery_oculta']) {
+                    $costo_delivery = $row['costo_delivery_oculta'];
+                }
+
+                $nota_historica = $row['nota_historica'];
+                if (empty($row['nota_historica'])) {
+                    $nota_historica = $row['nota_historica_oculta'];
+                }
+
+                $contacto_proveedor = $row['contacto_proveedor'];
+                if (empty($row['contacto_proveedor'])) {
+                    $contacto_proveedor = $row['contacto_proveedor'];
+                }
+                $existsSupplier = $this->db->get_where($this->table_suppliers, array('phone' => $row['celular_proveedor']))->row();
+                $idSupplier = 0;
+                if (empty($existsSupplier)) {
+                    /// generate code recursively until it does not exist in supplier table
+                    $code = $this->generateSupplierCode($row['nombre_proveedor']);
+                    while ($this->db->get_where($this->table_suppliers, array('code' => $code))->num_rows() > 0) {
+                        $code = $this->generateSupplierCode($row['nombre_proveedor']);
+                    }
+
+                    $arrSupplier = array(
+                        "name" => $row['nombre_proveedor'],
+                        "phone" => $row['celular_proveedor'],
+                        "code" => $code,
+                    );
+
+                    if ($this->db->insert('suppliers', $arrSupplier) > 0) {
+                        $idSupplier = $this->db->insert_id();
+                    } else {
+                        $this->db->trans_rollback();
+                        return array(
+                            'status' => 'error',
+                            'message' => 'No registro proveedor',
+                        );
+                    }
+                } else {
+                    $idSupplier = $existsSupplier->id_supplier;
+                }
+
+                $arrActualizar[] = array(
+                    'ID_Pedido_Detalle_Producto_Proveedor' =>intval( $row['proovedor-id']),
+                    'Qt_Producto_Caja_Final' => $cantidad,
+                    'Txt_Nota_Final' => $nota,
+                    'Ss_Precio' => $precio,
+                    'Qt_Producto_Moq' => $moq,
+                    'Qt_Producto_Caja' => $caja,
+                    'Qt_Cbm' => $cbm,
+                    'Nu_Dias_Delivery' => $delivery,
+                    'Ss_Costo_Delivery' => $costo_delivery,
+                    'Txt_Nota' => nl2br($nota_historica),
+                    'No_Contacto_Proveedor' => $contacto_proveedor,
+                    'main_photo' => $results['paths'][$key]['main_photo'],
+                    'secondary_photo' => $results['paths'][$key]['secondary_photo'],
+                    'terciary_photo' => $results['paths'][$key]['terciary_photo'],
+                    'primary_video' => $results['paths'][$key]['primary_video'],
+                    'secondary_video' => $results['paths'][$key]['secondary_video'],
+                    'ID_Entidad_Proveedor' => $idSupplier,
+                );
+                $cordinationID=$arrPost['modal_coordination_id'];
+                if($cordinationID!=0){
+                    $existsSupplierCoordination = $this->db->get_where('agente_compra_coordination_supplier', array('id_coordination' => $cordinationID,'id_supplier'=>$idSupplier))->row();
+                    //if not exists insert 
+                    if(empty($existsSupplierCoordination)){
+                        $toInsert=array('id_supplier'=>$idSupplier,'id_pedido'=>$row['pedido-cabecera'],
+                        'estado'=>"PENDIENTE");
+                        $this->db->insert('agente_compra_coordination_supplier',$toInsert);
+                        $existsInitialSupplierCoordination[$existsindex]=false;
+                    }
+                }
+                $existsindex++;
+            }
+            //check if all items in $existsInitialSupplierCoordination are true
+            
+            $allItemsExists=false;
+            foreach($existsInitialSupplierCoordination as $item){
+                if($item==true){
+                    $allItemsExists=true;
+                    break;
+                }
+            }
+            if(!$allItemsExists){
+                //remove agente_compra_coordination_supplier with cordinationID
+                $this->db->where('id_coordination',$cordinationID);
+                $this->db->delete('agente_compra_coordination_supplier');   
+
+            }
+            
+            $this->db->query('SET FOREIGN KEY_CHECKS=1');
+            $status=$this->db->update_batch($this->table_agente_compra_pedido_detalle_producto_proveedor, $arrActualizar, 'ID_Pedido_Detalle_Producto_Proveedor');
+          
+            if ($status === false) {
+                $this->db->trans_rollback();
+                
+                return array('status' => 'error', 'message' => 'error al actualizar datos');
+            } else {
+                //registrar evento de notificacion
+                $notificacion = $this->NotificacionModel->procesarNotificacion(
+                    $this->user->No_Usuario,
+                    'Pedidos Garantizados',
+                    'Cotización ' . $arrPost['Item_ECorrelativo_Editar'] . ' edito proveedor de ' . $arrPost['Item_Ename_producto_Editar'],
+                    ''
+                );
+
+                $this->db->trans_commit();
+                return array('status' => 'success', 'message' => 'Datos actualizados');
+            }
+        } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
     }
 }

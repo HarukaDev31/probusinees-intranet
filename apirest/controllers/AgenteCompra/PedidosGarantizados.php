@@ -32,7 +32,7 @@ class PedidosGarantizados extends CI_Controller {
 	}
 
 	public function ajax_list(){
-		$arrData = $this->PedidosGarantizadosModel->get_datatables();
+		$arrData = $this->PedidosGarantizadosModel->get_datatables($this->user);
         $data = array();
         foreach ($arrData as $row) {
 			$rows = array();
@@ -78,17 +78,20 @@ class PedidosGarantizados extends CI_Controller {
             $rows[] = $dropdown_estado;
 
 			//asignar personal de china desde perú
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
+			if($this->user->Nu_Tipo_Privilegio_Acceso==5|| $this->user->Nu_Tipo_Privilegio_Acceso==1) {
 				$btn_asignar_personal_china = '';
 				if($this->user->Nu_Tipo_Privilegio_Acceso==5){//1=probusiness
 					$btn_asignar_personal_china = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->Nu_Estado . '\')"><i class="far fa-user fa-2x text-danger" aria-hidden="true"></i></button>';
 					//if(!empty($row->ID_Usuario_Interno_Empresa_China)){
-					if(!empty($row->ID_Usuario_Interno_China)){
+				}
+				if(!empty($row->ID_Usuario_Interno_China) ){
+					if($this->user->Nu_Tipo_Privilegio_Acceso==5|| $this->user->Nu_Tipo_Privilegio_Acceso==1){
 						$btn_asignar_personal_china = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
+	
+					}if($this->user->Nu_Tipo_Privilegio_Acceso==5){
 						$btn_asignar_personal_china .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Interno_Empresa_China . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
 					}
 				}
-
 				$rows[] = $btn_asignar_personal_china;
 			}
 
@@ -114,7 +117,7 @@ class PedidosGarantizados extends CI_Controller {
 			//confirmar cotización
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 
-			//EXCEL cliente de pedido
+			// //EXCEL cliente de pedido
 			if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
 				$excel_agente_compra = '<button class="btn" alt="Proforma Trading" title="Proforma Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
 				$excel_consolida_trading = '<button class="btn" alt="Proforma C. Trading" title="Proforma C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
@@ -124,20 +127,20 @@ class PedidosGarantizados extends CI_Controller {
 
 			//estado peru
 			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoImportacionIntegral($row->Nu_Importacion_Integral);
-			$dropdown_estado = '<div class="dropdown">';
-				$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
-					$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
-				$dropdown_estado .= '<span class="caret"></span></button>';
-				$dropdown_estado .= '<ul class="dropdown-menu">';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Si" title="Si" href="javascript:void(0)" onclick="cambiarEstadoImpotacionIntegral(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $sCorrelativoCotizacion. '\');">Si</a></li>';
-					$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="No" title="No" href="javascript:void(0)" onclick="cambiarEstadoImpotacionIntegral(\'' . $row->ID_Pedido_Cabecera . '\',0, \'' . $sCorrelativoCotizacion. '\');">No</a></li>';
-				$dropdown_estado .= '</ul>';
-			$dropdown_estado .= '</div>';
+			// $dropdown_estado = '<div class="dropdown">';
+			// 	$dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+			// 		$dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+			// 	$dropdown_estado .= '<span class="caret"></span></button>';
+			// 	$dropdown_estado .= '<ul class="dropdown-menu">';
+			// 		$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Si" title="Si" href="javascript:void(0)" onclick="cambiarEstadoImpotacionIntegral(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $sCorrelativoCotizacion. '\');">Si</a></li>';
+			// 		$dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="No" title="No" href="javascript:void(0)" onclick="cambiarEstadoImpotacionIntegral(\'' . $row->ID_Pedido_Cabecera . '\',0, \'' . $sCorrelativoCotizacion. '\');">No</a></li>';
+			// 	$dropdown_estado .= '</ul>';
+			// $dropdown_estado .= '</div>';
 			
-			if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
-				$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-			}
-            $rows[] = $dropdown_estado;
+			// if($this->user->Nu_Tipo_Privilegio_Acceso==2){//no tiene acceso a cambiar status de Perú
+			// 	$dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+			// }
+            // $rows[] = $dropdown_estado;
 			
             $data[] = $rows;
         }

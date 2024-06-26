@@ -37,7 +37,7 @@ class PedidosGarantizadosModel extends CI_Model
         parent::__construct();
     }
 
-    public function _get_datatables_query()
+    public function _get_datatables_query($user)
     {
         $this->db->select($this->table . '.*, P.No_Pais,
         PAY.file_url,
@@ -52,7 +52,9 @@ class PedidosGarantizadosModel extends CI_Model
             ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
             ->where_in($this->table . '.Nu_Estado', array(2, 3, 4, 8));
-
+        if($user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio) {
+            $this->db->where($this->table . '.ID_Usuario_Interno_China', $user->ID_Usuario);
+        }
         $this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
 
         if (!empty($this->input->post('ID_Pedido_Cabecera'))) {
@@ -65,9 +67,9 @@ class PedidosGarantizadosModel extends CI_Model
         }
     }
 
-    public function get_datatables()
+    public function get_datatables($user)
     {
-        $this->_get_datatables_query();
+        $this->_get_datatables_query($user);
 
         $query = $this->db->get();
         return $query->result();
@@ -795,9 +797,9 @@ Nu_Correlativo
                 "id_pedido" => $arrPost['documento_pago_garantizado-id_cabecera'],
                 "file_url" => $Txt_Url_Imagen_Producto,
             );
-            $this->db->insert($this->paymentsTable, $data);
+            $status=$this->db->insert($this->table_payments, $data);
 
-            if ($this->db->trans_status() === false) {
+            if ($status === false) {
                 $this->db->trans_rollback();
                 return array('status' => 'error', 'message' => 'Error al insertar');
             } else {

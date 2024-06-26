@@ -131,7 +131,7 @@ class PedidosAgenteModel extends CI_Model{
 								'ID_Pedido_Cabecera' => $ID
 							);
 							$arrTour = $this->generarEstadoProcesoAgenteCompra($arrDataTour);
-
+							$cotizationCode=$this->generateCotizationCode();
 							//actualizar tabla para agregar correlativo
 							$data = array(
 								'ID_Agente_Compra_Correlativo' => $ID_Agente_Compra_Correlativo,
@@ -139,7 +139,9 @@ class PedidosAgenteModel extends CI_Model{
 								'Fe_Emision_Cotizacion' => dateNow('fecha'),
 								'Fe_Registro_Hora_Cotizacion' => dateNow('fecha_hora'),
 								'ID_Usuario_Interno_Empresa' => $this->user->ID_Usuario,
-								'ID_Usuario_Pedido' => $arrUsuarioCliente['ID_Usuario'] //para cliente
+								'ID_Usuario_Pedido' => $arrUsuarioCliente['ID_Usuario'],
+								'cotizacionCode'=>$cotizationCode
+								 //para cliente
 							);
 
 							if ($this->db->update($this->table, $data, $where) > 0) {
@@ -257,11 +259,21 @@ class PedidosAgenteModel extends CI_Model{
 		$query = "SELECT Txt_Url_Imagen_Producto FROM agente_compra_pedido_detalle WHERE ID_Pedido_Detalle = " . $id . " LIMIT 1";
 		return $this->db->query($query)->row();
 	}
-
+	public function generateCotizationCode(){
+		//get current month first 3 letters
+		$Fe_Month = substr(date('F', strtotime(dateNow('fecha'))), 0, 3);
+		//get count of rows with Nu_Estado=2 and Fe_Registro_Hora_Cotizacion month = current month
+		$query = "SELECT COUNT(*) AS count FROM agente_compra_pedido_cabecera WHERE Nu_Estado=2 AND MONTH(Fe_Registro_Hora_Cotizacion) = MONTH(NOW())";
+		//concatenate current month first 3 letters and count + 1
+		$Nu_Correlativo = $this->db->query($query)->row()->count + 1;
+		$Nu_Correlativo = str_pad($Nu_Correlativo, 4, '0', STR_PAD_LEFT);
+		return $Fe_Month . $Nu_Correlativo;
+	}
 	public function generarCorrelativo(){
 		$Nu_Correlativo = 0;
 		$Fe_Year = ToYear(dateNow('fecha'));
-		$Fe_Month = ToMonth(dateNow('fecha'));
+		//get current month first 3 letters
+		$Fe_Month = substr(date('F', strtotime($Fe_Month)), 0, 3);
 
 		$objCorrelativo = $this->db->query("SELECT ID_Agente_Compra_Correlativo FROM agente_compra_correlativo WHERE ID_Empresa = " . $this->user->ID_Empresa . " AND Fe_Year = '" . $Fe_Year . "' AND Fe_Month = '" . $Fe_Month . "' LIMIT 1")->row();
 		if(is_object($objCorrelativo)){

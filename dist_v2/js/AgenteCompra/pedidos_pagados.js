@@ -113,8 +113,7 @@ $(function () {
           $("#modal-message").modal("hide");
         }, 1700);
 
-        //Message for developer
-        console.log(jqXHR.responseText);
+        console.error(jqXHR.responseText);
 
         $("#btn-save_pagos_logisticos").text("");
         $("#btn-save_pagos_logisticos").append("Guardar");
@@ -195,10 +194,7 @@ $(function () {
           setTimeout(function () {
             $("#modal-message").modal("hide");
           }, 1700);
-
-          //Message for developer
-          console.log(jqXHR.responseText);
-
+          console.error(jqXHR.responseText);
           $("#btn-guardar_entrega_docs_cliente").text("");
           $("#btn-guardar_entrega_docs_cliente").append("Guardar");
           $("#btn-guardar_entrega_docs_cliente").attr("disabled", false);
@@ -6893,12 +6889,14 @@ const stepTemplate = (step, i) => {
   return stepHTML;
 };
 
-const getItemTemplate=(i,detalle) =>{
+const getItemTemplate = (i,mode, detalle) => {
+  console.log(detalle)
   div_items = `
   <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
-    <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+    <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][proovedor-id]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
     <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-    <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
+    <input type="hidden" id="modal_proveedor-id-${i}" name="addProducto[${i}][detalle-id]" />
+    <input type="hidden" class="modal_coordination_id" name="modal_coordination_id"/>
     <div class = "row" >
       <div class="col-6 col-md-3 col-lg-2">
         <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
@@ -6996,11 +6994,11 @@ const getItemTemplate=(i,detalle) =>{
       </div>
     </div>
     `;
-      var id_detalle = detalle[i - 1]["ID_Pedido_Detalle"];
-      var id_item = detalle[i - 1]["ID_Pedido_Detalle_Producto_Proveedor"];
-      var id_supplier = detalle[i - 1]["id_supplier"];
-      return div_items;
-}
+  // var id_detalle = detalle["ID_Pedido_Detalle"];
+  // var id_item = detalle["ID_Pedido_Detalle_Producto_Proveedor"];
+  // var id_supplier = detalle["id_supplier"];
+  return div_items;
+};
 const openStepFunction = (i, stepId) => {
   $("#container-ver").hide();
   containerOrdenCompra.show();
@@ -7025,7 +7023,7 @@ const openStepFunction = (i, stepId) => {
 const openCoordination = (response) => {
   console.log(response, "coordination");
   containerOrdenCompra.hide();
-  const headerDiv=getSupplierCoordinationHeader(JSON.parse(response).data);
+  const headerDiv = getSupplierCoordinationHeader(JSON.parse(response).data);
   containerCoordination.append(headerDiv);
   const bodyDIV = getSupplierCoordinationTableTemplate(
     JSON.parse(response).data
@@ -7215,12 +7213,16 @@ const getSupplierCoordinationTableTemplate = (data) => {
   html += `</form>`;
   return html;
 };
-const openSupplierItems=(id_pedido,id_supplier,id_coordination) => {
-  console.log(id_pedido,id_supplier )
+const openSupplierItems = (id_pedido, id_supplier, id_coordination) => {
+  console.log(id_pedido, id_supplier, id_coordination, "openSupplierItems");
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/getSupplierItems",
     type: "POST",
-    data: { idPedido: id_pedido, idSupplier: id_supplier, idCoordination: id_coordination},
+    data: {
+      idPedido: id_pedido,
+      idSupplier: id_supplier,
+      idCoordination: id_coordination,
+    },
     success: function (response) {
       response = JSON.parse(response);
       if (response.status == "success") {
@@ -7235,7 +7237,7 @@ const openSupplierItems=(id_pedido,id_supplier,id_coordination) => {
             action: "returnToCoordination()",
           },
         };
-        openSupplierItemsView(data, btnsConfig);
+        openSupplierItemsView(data, btnsConfig, id_coordination);
         containerCoordination.hide();
       }
     },
@@ -7243,7 +7245,7 @@ const openSupplierItems=(id_pedido,id_supplier,id_coordination) => {
       console.log(jqXHR.responseText);
     },
   });
-}
+};
 const saveSupplierItems = (id_pedido, id_supplier, id_coordination) => {
   const form = $("#table-elegir_productos_proveedor");
   const formData = new FormData(form[0]);
@@ -7265,111 +7267,111 @@ const saveSupplierItems = (id_pedido, id_supplier, id_coordination) => {
       console.log(jqXHR.responseText);
     },
   });
+};
+const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
+  console.log(detalles, "openSupplierItemsView", idCoordination);
+  const container = $("#table-elegir_productos_proveedor");
+  container.empty();
+  container.show();
+  for (i = 0; i < detalles.length; i++) {
+    let item = getItemTemplate(i + 1, "select", detalles[i], idCoordination);
+    container.append(item);
+    container.find(`#modal-precio${i + 1}`).val(detalles[i]["Ss_Precio"]);
+    container.find(`#modal-moq${i + 1}`).val(detalles[i]["Qt_Producto_Moq"]);
+    container.find(".modal_coordination_id").val(idCoordination);
+    container.find(`#modal_proveedor-id-${i+1}`).val(detalles[i]["ID_Pedido_Detalle"])    
+    container
+      .find(`#modal-qty_caja${i + 1}`)
+      .val(detalles[i]["Qt_Producto_Caja"]);
+    container.find(`#modal-cbm${i + 1}`).val(detalles[i]["Qt_Cbm"]);
+    container
+      .find(`#modal-delivery${i + 1}`)
+      .val(detalles[i]["Nu_Dias_Delivery"]);
+    container
+      .find(`#modal-costo_delivery${i + 1}`)
+      .val(detalles[i]["Ss_Costo_Delivery"]);
+    container
+      .find(`#modal-nombre_proveedor${i + 1}`)
+      .val(detalles[i]["No_Contacto_Proveedor"]);
+    container
+      .find(`#modal-celular_proveedor${i + 1}`)
+      .val(detalles[i]["No_Celular_Contacto_Proveedor"]);
+    container
+      .find(`#modal-detalle${i + 1}`)
+      .val(detalles[i]["ID_Pedido_Detalle_Producto_Proveedor"]);
+    container
+      .find(`#modal-pedido-cabecera${i + 1}`)
+      .val(detalles[i]["ID_Pedido_Cabecera"]);
+    container
+      .find(`#modal-nombre_proveedor${i + 1}`)
+      .val(detalles[i]["nombre_proveedor"]);
+    container
+      .find(`#modal-celular_proveedor${i + 1}`)
+      .val(detalles[i]["celular_proveedor"]);
 
-}
-const openSupplierItemsView = (detalles, btnsConfig) => {
-      const container = $("#table-elegir_productos_proveedor");
-      container.empty();
-
-
-      for (i = 0; i < detalles.length; i++) {
-        let item = getItemTemplate(i + 1, "select", detalles[i]);
-        console.log(item)
-        container.append(item);
-        container.find(`#modal-precio${i + 1}`).val(detalles[i]["Ss_Precio"]);
-        container.find(`#modal-moq${i + 1}`).val(detalles[i]["Qt_Producto_Moq"]);
-        container
-          .find(`#modal-qty_caja${i + 1}`)
-          .val(detalles[i]["Qt_Producto_Caja"]);
-        container.find(`#modal-cbm${i + 1}`).val(detalles[i]["Qt_Cbm"]);
-        container
-          .find(`#modal-delivery${i + 1}`)
-          .val(detalles[i]["Nu_Dias_Delivery"]);
-        container
-          .find(`#modal-costo_delivery${i + 1}`)
-          .val(detalles[i]["Ss_Costo_Delivery"]);
-        container
-          .find(`#modal-nombre_proveedor${i + 1}`)
-          .val(detalles[i]["No_Contacto_Proveedor"]);
-        container
-          .find(`#modal-celular_proveedor${i + 1}`)
-          .val(detalles[i]["No_Celular_Contacto_Proveedor"]);
-        container
-          .find(`#modal-detalle${i + 1}`)
-          .val(detalles[i]["ID_Pedido_Detalle_Producto_Proveedor"]);
-        container
-          .find(`#modal-pedido-cabecera${i + 1}`)
-          .val(detalles[i]["ID_Pedido_Cabecera"]);
-        container
-          .find(`#modal-nombre_proveedor${i + 1}`)
-          .val(detalles[i]["nombre_proveedor"]);
-        container
-          .find(`#modal-celular_proveedor${i + 1}`)
-          .val(detalles[i]["celular_proveedor"]);
-
-        container
-          .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
-          .val(detalles[i]["main_photo"]);
-        if (detalles[i]["main_photo"] != null) {
-          container
-            .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
-            .val(detalles[i]["main_photo"]);
-          container.find(`#btn-uploadprimaryimg-${i + 1}`).hide();
-          container
-            .find(`#container-uploadprimaryimg-${i + 1}`)
-            .append(
-              `<img src="${detalles[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
-            );
-        }
-        if (detalles[i]["secondary_photo"] != null) {
-          container
-            .find(`#btn-uploadimg2-URL-${i + 1}`)
-            .val(detalles[i]["secondary_photo"]);
-          container.find(`#btn-uploadimg2-${i + 1}`).hide();
-          container
-            .find(`#container-uploadimg2-${i + 1}`)
-            .append(
-              `<img src="${detalles[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
-            );
-        }
-        if (detalles[i]["terciary_photo"] != null) {
-          container
-            .find(`#btn-uploadimg3-URL-${i + 1}`)
-            .val(detalles[i]["terciary_photo"]);
-          container.find(`#btn-uploadimg3-${i + 1}`).hide();
-          container
-            .find(`#container-uploadimg3-${i + 1}`)
-            .append(
-              `<img src="${detalles[i]["terciary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
-            );
-        }
-        if (detalles[i]["primary_video"] != null) {
-          container
-            .find(`#btn-uploadvideo1-URL-${i + 1}`)
-            .val(detalles[i]["primary_video"]);
-          container.find(`#btn-uploadvideo1-${i + 1}`).hide();
-          container
-            .find(`#container-uploadvideo1-${i + 1}`)
-            .append(
-              `<video src="${detalles[i]["primary_video"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2" controls></video>`
-            );
-        }
-        if (detalles[i]["secondary_video"] != null) {
-          container
-            .find(`#btn-uploadvideo2-URL-${i + 1}`)
-            .val(detalles[i]["secondary_video"]);
-          container.find(`#btn-uploadvideo2-${i + 1}`).hide();
-          container
-            .find(`#container-uploadvideo2-${i + 1}`)
-            .append(
-              "<video src='" +
-                detalles[i]["secondary_video"] +
-                "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
-            );
-        }
-      }
-      container.append(getActionButtons(btnsConfig));
-}
+    container
+      .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
+      .val(detalles[i]["main_photo"]);
+    if (detalles[i]["main_photo"] != null) {
+      container
+        .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
+        .val(detalles[i]["main_photo"]);
+      container.find(`#btn-uploadprimaryimg-${i + 1}`).hide();
+      container
+        .find(`#container-uploadprimaryimg-${i + 1}`)
+        .append(
+          `<img src="${detalles[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+        );
+    }
+    if (detalles[i]["secondary_photo"] != null) {
+      container
+        .find(`#btn-uploadimg2-URL-${i + 1}`)
+        .val(detalles[i]["secondary_photo"]);
+      container.find(`#btn-uploadimg2-${i + 1}`).hide();
+      container
+        .find(`#container-uploadimg2-${i + 1}`)
+        .append(
+          `<img src="${detalles[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+        );
+    }
+    if (detalles[i]["terciary_photo"] != null) {
+      container
+        .find(`#btn-uploadimg3-URL-${i + 1}`)
+        .val(detalles[i]["terciary_photo"]);
+      container.find(`#btn-uploadimg3-${i + 1}`).hide();
+      container
+        .find(`#container-uploadimg3-${i + 1}`)
+        .append(
+          `<img src="${detalles[i]["terciary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+        );
+    }
+    if (detalles[i]["primary_video"] != null) {
+      container
+        .find(`#btn-uploadvideo1-URL-${i + 1}`)
+        .val(detalles[i]["primary_video"]);
+      container.find(`#btn-uploadvideo1-${i + 1}`).hide();
+      container
+        .find(`#container-uploadvideo1-${i + 1}`)
+        .append(
+          `<video src="${detalles[i]["primary_video"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2" controls></video>`
+        );
+    }
+    if (detalles[i]["secondary_video"] != null) {
+      container
+        .find(`#btn-uploadvideo2-URL-${i + 1}`)
+        .val(detalles[i]["secondary_video"]);
+      container.find(`#btn-uploadvideo2-${i + 1}`).hide();
+      container
+        .find(`#container-uploadvideo2-${i + 1}`)
+        .append(
+          "<video src='" +
+            detalles[i]["secondary_video"] +
+            "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
+        );
+    }
+  }
+  container.append(getActionButtons(btnsConfig));
+};
 const getSupplierCoordinationHeader = (data) => {
   let montoTotal = 0;
   let primerPago = 0;
@@ -7378,7 +7380,6 @@ const getSupplierCoordinationHeader = (data) => {
     const detalles = JSON.parse(supplier.detalles);
     montoTotal += parseFloat(supplier.total);
     primerPago += parseFloat(supplier.pago_1_value);
-    
   });
   segundoPago = montoTotal - primerPago;
   return `
@@ -7408,7 +7409,6 @@ const openInputFile = (idInput, fileURL) => {
   }
 };
 const openRotuladofromCoordination = (id) => {
-  console.log(currentPrivilege, "currentPrivilege");
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/getProductData",
     type: "POST",
@@ -7432,12 +7432,14 @@ const openRotuladofromCoordination = (id) => {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log(jqXHR.responseText);
+      console.error(jqXHR.responseText);
     },
   });
 };
 const returnToCoordination = () => {
   hideRotuladoView();
+  const container = $("#table-elegir_productos_proveedor");
+  container.hide();
   containerCoordination.show();
 };
 const openPagos = (response) => {
@@ -7510,7 +7512,6 @@ const savePagos = () => {
   const formData = new FormData(form[0]);
   formData.append("idPedido", idPedido);
   formData.append("step", selectedStep);
-  console.log(formData);
   const url = base_url + "AgenteCompra/PedidosPagados/savePagos";
   $.ajax({
     url: url,
@@ -7526,7 +7527,7 @@ const savePagos = () => {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log(jqXHR.responseText);
+      console.error(jqXHR.responseText);
     },
   });
 };
@@ -7634,7 +7635,9 @@ const getProductTemplate = (producto) => {
       <span>${producto.Qt_Producto}</span>
     </div>
     <div class="col-12 col-lg-3">
-          <span style="word-break: break-word;">${producto.Txt_Descripcion}</span>
+          <span style="word-break: break-word;">${
+            producto.Txt_Descripcion
+          }</span>
     </div>
     <div class="col-12 col-lg-2">
       <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${
@@ -7766,7 +7769,6 @@ const saveRotuladoProducto = (producto) => {
     contentType: false,
     processData: false,
     success: function (response) {
-      console.log(response);
       const { status, data } = JSON.parse(response);
       if (status == "success") {
         hideRotuladoView();
@@ -7784,12 +7786,11 @@ const saveRotuladoProducto = (producto) => {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log(jqXHR.responseText);
+      console.error(jqXHR.responseText);
     },
   });
 };
 const getContainerRotuladoView = (producto) => {
-  console.log(producto);
   const rotuladoTemplate = `
     <form class="row" id="form-rotulado">
       <div class="col-12 col-md-5">
@@ -7866,10 +7867,9 @@ const getActionButtons = (data) => {
         </div>
       </div>`;
     }
-    console.log(buttons, data);
     return buttons;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return "";
   }
 };
@@ -7895,7 +7895,6 @@ const hidePagos = () => {
   containerVer.show();
 };
 const saveOrdenCompra = () => {
-  console.log(selectedStep);
   const url = base_url + "AgenteCompra/PedidosPagados/saveOrdenCompra";
   const form = $("#pedido-form");
   const formData = new FormData(form[0]);
@@ -7908,7 +7907,6 @@ const saveOrdenCompra = () => {
     contentType: false,
     processData: false,
     success: function (response) {
-      console.log(response);
       const { status, data } = JSON.parse(response);
       if (status == "success") {
         hideOrdenCompra();
@@ -7917,7 +7915,7 @@ const saveOrdenCompra = () => {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log(jqXHR.responseText);
+      console.error(jqXHR.responseText);
     },
   });
 };
