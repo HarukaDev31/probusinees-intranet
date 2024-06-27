@@ -216,7 +216,7 @@ $(function () {
         var term = term.toLowerCase();
         $.post(
           base_url +
-            "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
+          "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
           { global_search: term },
           function (arrData) {
             response(arrData);
@@ -386,7 +386,7 @@ $(function () {
   });
 
   /*
-	$(".width_full").keyup(function (e) {
+  $(".width_full").keyup(function (e) {
     console.log('ga');
     $('#hidden-sCorrelativoCotizacion').val('');
   })
@@ -573,8 +573,8 @@ $(function () {
     var correlativo = $(this).data("correlativo");
     var name_item = $(this).data("name_item");
     var id_supplier = $(this).data("id_supplier");
-    let pedidoID=$("#txt-EID_Pedido_Cabecera_item").val()
- 
+    let pedidoID = $("#txt-EID_Pedido_Cabecera_item").val()
+
     $("#btn-confirmation").on("click", function () {
       $("#modal-confirmation").modal("hide");
 
@@ -589,8 +589,8 @@ $(function () {
         "/" +
         correlativo +
         "/" +
-        encodeURIComponent(name_item)+
-        "/"+pedidoID+"/"+id_supplier;
+        encodeURIComponent(name_item) +
+        "/" + pedidoID + "/" + id_supplier;
       $.ajax({
         url: url,
         type: "GET",
@@ -651,7 +651,7 @@ $(function () {
     var correlativo = $(this).data("correlativo");
     var name_item = $(this).data("name_item");
     var id_supplier = $(this).data("id_supplier");
-    let pedidoID=$("#txt-EID_Pedido_Cabecera_item").val()
+    let pedidoID = $("#txt-EID_Pedido_Cabecera_item").val()
     console.log("correlativo " + correlativo);
     console.log("name_item " + name_item);
 
@@ -666,8 +666,8 @@ $(function () {
       "/" +
       correlativo +
       "/" +
-      encodeURIComponent(name_item)+
-      "/"+pedidoID+"/"+id_supplier;;
+      encodeURIComponent(name_item) +
+      "/" + pedidoID + "/" + id_supplier;;
     $.ajax({
       url: url,
       type: "GET",
@@ -1167,10 +1167,10 @@ function verPedido(ID) {
         var id_item = detalle[i]["ID_Pedido_Detalle"];
         var href_link =
           detalle[i]["Txt_Url_Link_Pagina_Producto"] != "" &&
-          detalle[i]["Txt_Url_Link_Pagina_Producto"] != null
+            detalle[i]["Txt_Url_Link_Pagina_Producto"] != null
             ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" +
-              detalle[i]["Txt_Url_Link_Pagina_Producto"] +
-              "' role='button'>Link</a>"
+            detalle[i]["Txt_Url_Link_Pagina_Producto"] +
+            "' role='button'>Link</a>"
             : "";
         var nombre_producto =
           detalle[i]["Txt_Producto"] != "" && detalle[i]["Txt_Producto"] != null
@@ -1407,7 +1407,8 @@ function cambiarEstado(ID, Nu_Estado, ID_Usuario_Interno_Empresa_China) {
       $("#moda-message-content").removeClass("bg-danger bg-warning bg-success");
       $("#modal-message").modal("show");
       $("#moda-message-content").addClass("bg-warning");
-      $(".modal-title-message").text("Primero asignar personal de china");
+      $(".modal-title-message").text("Primero china debe terminar de cotizar");
+      return;
     }
   } else if (Nu_Estado == 8) sNombreEstado = "Obervado";
 
@@ -1684,7 +1685,7 @@ function isExistTableTemporalProducto($id) {
 
 function form_pedido() {
   if ($("#table-Producto_Enlace >tbody >tr").length == 0) {
-    
+
     $("#txt-ANombre")
       .closest(".form-group")
       .find(".help-block")
@@ -1701,7 +1702,7 @@ function form_pedido() {
       'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>'
     );
     var postData = new FormData($("#form-pedido")[0]);
-      url = base_url + "AgenteCompra/PedidosGarantizados/crudPedidoGrupal";
+    url = base_url + "AgenteCompra/PedidosGarantizados/crudPedidoGrupal";
     $.ajax({
       type: "POST",
       dataType: "JSON",
@@ -2158,7 +2159,7 @@ function scrollToError($sMetodo, $IdElemento) {
     "slow"
   );
 }
-function getItemTemplate(i, mode, detalle) {
+function getItemTemplate(i, mode, detalle, privilegio) {
   div_items = `
     <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
@@ -2264,8 +2265,7 @@ function getItemTemplate(i, mode, detalle) {
   var id_detalle = detalle[i - 1]["ID_Pedido_Detalle"];
   var id_item = detalle[i - 1]["ID_Pedido_Detalle_Producto_Proveedor"];
   var id_supplier = detalle[i - 1]["id_supplier"];
-  if (mode == "edit") {
-  } else {
+  if (privilegio == 1) {
     if (detalle[i - 1]["Nu_Selecciono_Proveedor"] == 0) {
       div_items += `
             <button type="button" id="btn-seleccionar_proveedor${id_item}" 
@@ -2288,8 +2288,10 @@ function getItemTemplate(i, mode, detalle) {
               class="btn btn-secondary btn-block btn-desmarcar_proveedor">
               <i class="fas fa-times"></i>&nbsp; Deseleccionar proveedor
             </button>`;
+
     }
   }
+  div_items += `<div class="separator-line"></div>`;
   div_items += `</div>`;
   return div_items;
 }
@@ -2303,12 +2305,13 @@ function getItemProveedor(id_detalle) {
     type: "GET",
     dataType: "JSON",
     success: function (response) {
-      var detalle = response;
+      var detalle = response["data"];
+      let privilegio = response["privilegio"];
       const container = $("#table-elegir_productos_proveedor tbody");
       container.empty();
 
       for (i = 0; i < detalle.length; i++) {
-        let item = getItemTemplate(i + 1, "select", detalle);
+        let item = getItemTemplate(i + 1, "select", detalle, privilegio);
 
         container.append(item);
         container.find(`#modal-precio${i + 1}`).val(detalle[i]["Ss_Precio"]);
@@ -2398,8 +2401,8 @@ function getItemProveedor(id_detalle) {
             .find(`#container-uploadvideo2-${i + 1}`)
             .append(
               "<video src='" +
-                detalle[i]["secondary_video"] +
-                "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
+              detalle[i]["secondary_video"] +
+              "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
             );
         }
 
@@ -2416,7 +2419,7 @@ function getItemProveedor(id_detalle) {
         var cantidad_final = detalle[i]["Qt_Producto_Caja_Final"];
         var nota_final =
           detalle[i]["Txt_Nota_Final"] != "" &&
-          detalle[i]["Txt_Nota_Final"] != null
+            detalle[i]["Txt_Nota_Final"] != null
             ? detalle[i]["Txt_Nota_Final"]
             : "";
         var cantidad_html =
@@ -3124,10 +3127,10 @@ function asignarPedido(ID_Pedido_Cabecera, Nu_Estado) {
         for (var x = 0; x < l; x++) {
           $("#cbo-guardar_personal_china-ID_Usuario").append(
             '<option value="' +
-              response.result[x].ID +
-              '">' +
-              response.result[x].Nombre +
-              "</option>"
+            response.result[x].ID +
+            '">' +
+            response.result[x].Nombre +
+            "</option>"
           );
         }
       } else {

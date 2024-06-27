@@ -51,6 +51,7 @@ class PedidosPagados extends CI_Controller
 
             $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0, 3)) . str_pad($row->Nu_Correlativo, 3, "0", STR_PAD_LEFT);
             //$rows[] = $row->No_Pais;
+            $rows[]=$row->No_Pais;
             $rows[] = $sCorrelativoCotizacion;
             $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
 

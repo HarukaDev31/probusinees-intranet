@@ -159,7 +159,8 @@ class PedidosGarantizados extends CI_Controller {
     }
     	
 	public function getItemProveedor($ID){
-        echo json_encode($this->PedidosGarantizadosModel->getItemProveedor($this->security->xss_clean($ID)));
+		$data=$this->PedidosGarantizadosModel->getItemProveedor($this->security->xss_clean($ID));
+        echo json_encode(array('data'=>$data,'privilegio'=>$this->user->Nu_Tipo_Privilegio_Acceso));
     }
     	
 	public function getItemImagenProveedor($ID){

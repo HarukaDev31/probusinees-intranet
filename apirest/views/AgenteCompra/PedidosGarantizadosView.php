@@ -143,7 +143,7 @@
                     <div class="col-12 col-sm-4 col-md-4">
                       <label>Cotizacion</label>
                       <div class="form-group" id="container-file_cotizacion">
-                        <input type="file" id="file_cotizacion" name="file_cotizacion" class="form-control " accept="application/pdf">
+                        <input type="file" id="file_cotizacion" name="file_cotizacion" class="" accept="application/pdf">
                         <!-- <textarea name="Txt_Observaciones_Garantizado" class="form-control" rows="1" placeholder="Opcional" style="height: 38px !important;"></textarea> -->
                       </div>
                     </div>
@@ -552,7 +552,12 @@ input[type="file"]::file-selector-button:hover {
 input[type="file"]::file-selector-button:active {
   background-color: #e5e7eb;
 }
-
+.separator-line {
+      width: 100%;
+      height: 0.1em;
+      background-color: black;
+      margin: 1em 0;
+    }
 </style>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>

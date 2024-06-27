@@ -105,7 +105,12 @@ class PedidosGarantizadosModel extends CI_Model
         }
         $sCorrelativoCotizacion = $query[0]->sCorrelativoCotizacion;
         if ($acceso == $this->personalChinaPrivilegio || $acceso == $this->jefeChinaPrivilegio) {
-            $this->cambiarEstadoChina($ID, 2, $sCorrelativoCotizacion);
+            //get current estadochina from this pedido 
+            $query2 = $this->db->get_where($this->table, ['ID_Pedido_Cabecera' => $ID]);
+            $estadoChina = $query2->row()->Nu_Estado_China;
+            if($estadoChina == 1){
+                $query2 = $this->cambiarEstadoChina($ID, 2, $sCorrelativoCotizacion);
+            }
         }
         return $query;
 
