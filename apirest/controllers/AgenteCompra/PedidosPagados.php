@@ -41,34 +41,67 @@ class PedidosPagados extends CI_Controller
             $this->load->view('footer_v2', array("js_pedidos_pagados" => true));
         }
     }
+    public function getStatusOrdenCompraLabel($id,$privilegio,$idpedido){
+        $HTML="";
+        if($privilegio==$this->jefeChinaPrivilegio || $privilegio==$this->personalChinaPrivilegio){
+           $HTML='<select class="form-control" id="status_'.$id.'" onchange="changeStatusOrden(this.value,'.$idpedido.')">
+                <option value="1" '.($id==1?'selected':'').'>Pendiente</option>
+                <option value="2" '.($id==2?'selected':'').'>En Produccion</option>
+                <option value="3" '.($id==3?'selected':'').'>Recepcionado</option>
+                <option value="4" '.($id==4?'selected':'').'>Inspeccionado</option>
+                <option value="5" '.($id==5?'selected':'').'>Entregado</option>
 
+            </select>';
+        }else{
+            switch ($id) {
+                case 1:
+                    $HTML='<span class="badge bg-secondary">Pendiente</span>';
+                    break;
+                case 2:
+                    $HTML='<span class="badge bg-success">En Produccion</span>';
+                    break;
+                case 3:
+                    $HTML='<span class="badge bg-danger">Recepcionado</span>';
+                    break;
+                case 4:
+                    $HTML='<span class="badge bg-warning">Inspeccionado</span>';
+                    break;
+                case 5:
+                    $HTML='<span class="badge bg-info">Entregado</span>';
+                    break;
+                default:
+                    $HTML='<span class="badge bg-secondary">Pendiente</span>';
+                    break;
+            }
+        }
+        return $HTML;
+    }
     public function ajax_list()
     {
         $arrData = $this->PedidosPagadosModel->get_datatables();
         $data = array();
         foreach ($arrData as $row) {
             $rows = array();
-
             $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0, 3)) . str_pad($row->Nu_Correlativo, 3, "0", STR_PAD_LEFT);
-            //$rows[] = $row->No_Pais;
+            $divPagosEstado= '';
+            if($row->is_closed==0){
+                if($row->total_pagos>0){
+                    $divPagosEstado = '<span class="badge bg-primary">Pago '.$row->total_pagos.'</span>';
+                }
+                else{
+                    $divPagosEstado = '<span class="badge bg-secondary">Pendiente</span>';
+                }
+            }else{
+                $divPagosEstado = '<span class="badge bg-success">Pagado</span>';
+            }
+            $estadoChina=$this->getStatusOrdenCompraLabel($row->id_estado_orden_compra,$this->user->Nu_Tipo_Privilegio_Acceso,$row->ID_Pedido_Cabecera);
+            $avance=$this->getOrderProgressLabel($this->user->Nu_Tipo_Privilegio_Acceso,$row->ID_Pedido_Cabecera);
             $rows[]=$row->No_Pais;
+           
             $rows[] = $sCorrelativoCotizacion;
             $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
 
-            // if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
-            //     $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
-            // }
-
-            // //asignar personal de china desde perú
-            // $btn_asignar_personal_china = '';
-            // if($this->user->Nu_Tipo_Privilegio_Acceso==1){//1=probusiness
-            //     //$btn_asignar_personal_china = '<button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="asignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->Nu_Estado . '\')"><i class="far fa-user fa-2x" aria-hidden="true"></i></button>';
-            //     if(!empty($row->ID_Usuario_Interno_Jefe_China)){
-            //         $btn_asignar_personal_china = '<span class="badge bg-secondary">' . $row->No_Usuario_Jefe . '</span>';
-            //         //$btn_asignar_personal_china .= '<br><button class="btn btn-xs btn-link" alt="Asginar pedido" title="Asginar pedido" href="javascript:void(0)"  onclick="removerAsignarPedido(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $row->ID_Usuario_Interno_Jefe_China . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
-            //     }
-            // }
-
+    
             if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 2) {
                 // $rows[] = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
                 //$rows[] = $btn_asignar_personal_china;
@@ -143,211 +176,19 @@ class PedidosPagados extends CI_Controller
             }
 
             $rows[] = $dropdown_estado; //incoterms
+            $rows[] = $divPagosEstado;
+            $rows[] = $estadoChina;
+            $rows[] = "<button class='btn btn-xs btn-link' alt='Editar' title='Editar' href='javascript:void(0)'
+			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ")'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
 
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { //no tiene acceso a cambiar status de Perú
+            //no tiene acceso a cambiar status de Perú
                 $excel_orden_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
                 if ($row->Nu_Tipo_Servicio == 2) {
                     $excel_orden_compra = '<button class="btn" alt="Orden Compra C. Trading" title="Orden Compra C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
                 }
                 $rows[] = $excel_orden_compra;
-            }
-
-            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($row->Nu_Estado);
-            $dropdown_estado = '<div class="dropdown">';
-            $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
-            $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
-            $dropdown_estado .= '<span class="caret"></span></button>';
-            $dropdown_estado .= '<ul class="dropdown-menu">';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Enviado" title="Enviado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Volver a Garantizado</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 30%" title="Pago 30%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Pago 30%</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago 70%" title="Pago 70%" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',7, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Pago 70%</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pago Servicio" title="Pago Servicio" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',9, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Pago Servicio</a></li>';
-            $dropdown_estado .= '</ul>';
-            $dropdown_estado .= '</div>';
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == 2) { //no tiene acceso a cambiar status de Perú
-                $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-            }
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 5) {
-                $rows[] = $dropdown_estado;
-            }
-
-            // if($this->user->Nu_Tipo_Privilegio_Acceso==1){
-            //     $rows[] = '<button class="btn btn-xs btn-link" alt="Recepcion de carga" title="Recepcion de carga" href="javascript:void(0)"  onclick="recepcionCarga(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-            // }
-
-            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($row->Nu_Estado_China);
-            $dropdown_estado = '<div class="dropdown">';
-            $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
-            $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
-            $dropdown_estado .= '<span class="caret"></span></button>';
-            $dropdown_estado .= '<ul class="dropdown-menu">';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Producción" title="Producción" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Producción</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Inspección" title="Inspección" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Inspección</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Entregado" title="Entregado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">Entregado</a></li>';
-            $dropdown_estado .= '</ul>';
-            $dropdown_estado .= '</div>';
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { //no tiene acceso a cambiar status de China
-                $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-            }
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {
-                $rows[] = $dropdown_estado;
-            }
-            //china
-
-            // if($this->user->Nu_Tipo_Privilegio_Acceso!=5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) {
-            //     //Negociar con proveedores
-            //     $rows[] = '<button class="btn btn-xs btn-link" alt="Negociar con proveedor" title="Negociar con proveedor" href="javascript:void(0)"  onclick="coordinarPagosProveedor(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-handshake fa-2x" aria-hidden="true"></i></button>';
-
-            //     //Booking
-            //     $rows[] = '<button class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="booking(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
-
-            //     //Recepcion de carga
-            //     $rows[] = '<button class="btn btn-xs btn-link" alt="Recepcion de carga" title="Recepcion de carga" href="javascript:void(0)"  onclick="recepcionCarga(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-            // }
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {
-                //Pagos
-                $rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 1)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
-                //$rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
-
-                //Reserva de Booking
-                /*
-                $iIdTareaPedido = 0;//ninguno
-                if ($row->Nu_Tipo_Servicio==1){//trading
-                $iIdTareaPedido = 20;
-                } else if ($row->Nu_Tipo_Servicio==2) {//consolida trading
-                $iIdTareaPedido = 14;
-                }
-
-                $btn_reserva_booking = '<button class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingConsolidado(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-box fa-2x" aria-hidden="true"></i></button>';
-                if($row->Nu_Tipo_Servicio==1)
-                $btn_reserva_booking = '';
-                $rows[] = $btn_reserva_booking;
-
-                //Inspección
-                $btn_inpseccion = '<button class="btn btn-xs btn-link" alt="Inspeccion" title="Inspeccion" href="javascript:void(0)"  onclick="bookingInspeccion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\', \'' . $row->ID_Usuario_Interno_China . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
-                 */
-
-                /*
-                $btn_reserva_booking = '';
-                $btn_costos_origen = '';
-                $btn_docs_exportacion = '';
-                $btn_despacho_shipper = '';
-                $btn_revision_bl = '';
-                $btn_entrega_docs_cliente = '';
-                $btn_pagos_logisticos = '';
-                if($row->Nu_Tipo_Servicio==1) {
-                $btn_reserva_booking = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Booking" title="Booking" href="javascript:void(0)"  onclick="bookingTrading(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-ship fa-2x" aria-hidden="true"></i></button>';
-
-                //Costos de Origen
-                $iIdTareaPedido = 0;//ninguno
-                if ($row->Nu_Tipo_Servicio==1){//trading
-                $iIdTareaPedido = 23;
-                }
-                $btn_costos_origen = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Costos Origen" title="Costos Origen" href="javascript:void(0)"  onclick="costosOrigenTradingChina(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
-
-                //Docs Exportacion
-                $iIdTareaPedido = 0;//ninguno
-                if ($row->Nu_Tipo_Servicio==1){//trading
-                $iIdTareaPedido = 24;
-                }
-                $btn_docs_exportacion = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Docs Exportacion" title="Docs Exportacion" href="javascript:void(0)"  onclick="docsExportacion(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-file fa-2x" aria-hidden="true"></i></button>';
-
-                //Despacho al Shipper
-                $iIdTareaPedido = 0;//ninguno
-                if ($row->Nu_Tipo_Servicio==1){//trading
-                $iIdTareaPedido = 25;
-                }
-                $btn_despacho_shipper = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Despacho al Shipper" title="Despacho al Shipper" href="javascript:void(0)"  onclick="despachoShipper(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-check fa-2x" aria-hidden="true"></i></button>';
-
-                //Despacho al Shipper
-                $iIdTareaPedido = 0;//ninguno
-                if ($row->Nu_Tipo_Servicio==1){//trading
-                $iIdTareaPedido = 26;
-                }
-                $btn_revision_bl = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Revision de BL" title="Revision de BL" href="javascript:void(0)"  onclick="revisionBL(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-warehouse fa-2x" aria-hidden="true"></i></button>';
-
-                //Despacho al Shipper
-                $iIdTareaPedido = 0;//ninguno
-                if ($row->Nu_Tipo_Servicio==1){//trading
-                $iIdTareaPedido = 27;
-                }
-                $btn_entrega_docs_cliente = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Entrega de Docs Cliente" title="Entrega de Docs Cliente" href="javascript:void(0)"  onclick="entregaDocsCliente(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-user fa-2x" aria-hidden="true"></i></button>';
-
-                //Despacho al Shipper
-                $iIdTareaPedido = 0;//ninguno
-                if ($row->Nu_Tipo_Servicio==1){//trading
-                $iIdTareaPedido = 28;
-                }
-                $btn_pagos_logisticos = '<br>' . '<button type="button" class="btn btn-xs btn-link" alt="Pagos Logísticos" title="Pagos Logísticos" href="javascript:void(0)"  onclick="pagosLogisticos(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
-                }
-
-                $rows[] = $btn_inpseccion . $btn_reserva_booking . $btn_costos_origen . $btn_docs_exportacion . $btn_despacho_shipper . $btn_revision_bl . $btn_entrega_docs_cliente . $btn_pagos_logisticos;
-                 */
-
-                //Pagos 2
-                $rows[] = '<button class="btn btn-xs btn-link" alt="Pagar proveedor" title="Pagar proveedor" href="javascript:void(0)"  onclick="pagarProveedores(\'' . $row->ID_Pedido_Cabecera . '\', 2)"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
-            }
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 1) {
-                //inspeccion
-                $btn_inspeccion = '';
-                if ($row->Nu_Estado_China == 5 || $row->Nu_Estado_China == 6) {
-                    $btn_inspeccion = '<button class="btn btn-xs btn-link" alt="Subir inspección" title="Subir inspección" href="javascript:void(0)"  onclick="subirInspeccion(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-search fa-2x" aria-hidden="true"></i></button>';
-                }
-
-                $rows[] = $btn_inspeccion;
-
-                //Invoice proveedor
-                $rows[] = '<button class="btn btn-xs btn-link" alt="Invoice proveedor" title="Invoice proveedor" href="javascript:void(0)"  onclick="invoiceProveedor(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel fa-2x" aria-hidden="true"></i></button>';
-
-                //Despacho
-                $btn_despacho = '<button class="btn btn-xs btn-link" alt="Despacho" title="Despacho" href="javascript:void(0)"  onclick="despacho(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
-
-                $rows[] = $btn_despacho . '<br>' . (!empty($row->Fe_Entrega_Shipper_Forwarder) ? ToDateBD($row->Fe_Entrega_Shipper_Forwarder) : '');
-            }
-            $rows[] = "<button class='btn btn-xs btn-link' alt='Editar' title='Editar' href='javascript:void(0)'
-			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ")'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
-
-            // if($this->user->Nu_Tipo_Privilegio_Acceso==5 && $this->user->Nu_Tipo_Privilegio_Acceso!=1) {
-            //     //entregado
-            //     /*
-            //     $btn_entregado = '';
-            //     if($row->Nu_Estado_China==6)
-            //         $btn_entregado = '<button class="btn btn-xs btn-link" alt="Subir documento" title="Subir documento" href="javascript:void(0)" onclick="documentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-folder fa-2x" aria-hidden="true"></i></button>';
-
-            //     if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
-            //         $btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarDocumentoEntregado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
-            //     }
-
-            //     if(!empty($row->Txt_Url_Archivo_Documento_Entrega)) {
-            //         $btn_entregado .= '<br><button class="btn btn-xs btn-link" alt="Descargar" title="Descargar" href="javascript:void(0)" onclick="descargarDocumentoDetalle(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
-            //     }
-
-            //     $rows[] = $btn_entregado;
-
-            //     //Supervisar llenado de contenedor
-            //     $btn_supervisar = '<button class="btn btn-xs btn-link" alt="Supervisar" title="Supervisar" href="javascript:void(0)"  onclick="supervisarContenedor(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-truck fa-2x" aria-hidden="true"></i></button>';
-
-            //     $rows[] = $btn_supervisar;
-            //     */
-            // }
-
-            //jalar en que tarea se quedo
-            // $span_estado_proceso = '<span class="badge bg-secondary">No ejecuto tarea</span>';
-            // $arrResponseTarea = $this->PedidosPagadosModel->listadoTareaPorPedido($row->ID_Pedido_Cabecera);
-            // if(is_object($arrResponseTarea)){
-            //     //$arrResponseStatusTarea = $this->PedidosPagadosModel->verificarTarea($row->ID_Pedido_Cabecera,$arrResponseTarea->ID_Proceso);
-            //     //$span_status_tarea = ($arrResponseStatusTarea->Nu_Estado_Proceso == 1 ? 'success' : 'danger');
-            //     $span_status_tarea = 'danger';
-            //     $span_estado_proceso = '<span class="badge bg-' . $span_status_tarea . '">' . $arrResponseTarea->No_Proceso . '</span>';
-            // }
-            // $rows[] = $span_estado_proceso;//status
-
+                $rows[] = $avance;
+            
             $data[] = $rows;
         }
         $output = array(
@@ -355,7 +196,7 @@ class PedidosPagados extends CI_Controller
         );
         echo json_encode($output);
     }
-
+    
     public function ajax_edit($ID)
     {
         $arrReponse = $this->PedidosPagadosModel->get_by_id($this->security->xss_clean($ID));
@@ -3667,5 +3508,33 @@ class PedidosPagados extends CI_Controller
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
         }
+    }
+    public function cambiarEstadoOrden(){
+        try {
+            $data = $this->input->post();
+            $id_pedido = $data['id_pedido'];
+            $estado = $data['estado'];
+            $response = $this->PedidosPagadosModel->cambiarEstadoOrden($id_pedido,$estado);
+            echo json_encode(array('status' => 'success', 'data' => $response));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
+    public function getOrderProgressLabel($privilegio,$id_pedido){
+        $response = $this->PedidosPagadosModel->getOrderProgressLabel($privilegio,$id_pedido);
+        $HTML="";
+        if($response->completed==0){
+           //return a bar with the progress 0%
+              $HTML = '<div class="progress" style="height:auto">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 100%;height: 30px" aria-label="30px high" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                      </div>';
+        }else{
+            //return a bar with the progress with the percentage division from total and completed
+            $percentage = ($response->completed/$response->total)*100;
+            $HTML = '<div class="progress" style="height:auto">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: '.$percentage.'%;height: 30px" aria-label="30px high" aria-valuenow="'.$percentage.'" aria-valuemin="0" aria-valuemax="100">'.$percentage.'%</div>
+                      </div>';
+        }
+        return $HTML;
     }
 }

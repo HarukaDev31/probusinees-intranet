@@ -4836,91 +4836,91 @@ function cambiarTipoServicio(
   Nu_Tipo_Servicio,
   ID_Usuario_Interno_Empresa_China
 ) {
-  if (ID_Usuario_Interno_Empresa_China == 0) {
-    //3 - Enviado
-    $("#moda-message-content").removeClass("bg-danger bg-warning bg-success");
-    $("#modal-message").modal("show");
+  // if (ID_Usuario_Interno_Empresa_China == 0) {
+  //   //3 - Enviado
+  //   $("#moda-message-content").removeClass("bg-danger bg-warning bg-success");
+  //   $("#modal-message").modal("show");
 
-    $("#moda-message-content").addClass("bg-warning");
-    $(".modal-title-message").html("Primero asignar Jefe de China");
+  //   $("#moda-message-content").addClass("bg-warning");
+  //   $(".modal-title-message").html("Primero asignar Jefe de China");
 
-    setTimeout(function () {
-      $("#modal-message").modal("hide");
-    }, 3100);
-  } else {
-    var $modal_delete = $("#modal-message-delete");
-    $modal_delete.modal("show");
+  //   setTimeout(function () {
+  //     $("#modal-message").modal("hide");
+  //   }, 3100);
+  // } else {
+  var $modal_delete = $("#modal-message-delete");
+  $modal_delete.modal("show");
 
-    $(".modal-message-delete").removeClass(
-      "modal-danger modal-warning modal-success"
-    );
-    $(".modal-message-delete").addClass("modal-success");
+  $(".modal-message-delete").removeClass(
+    "modal-danger modal-warning modal-success"
+  );
+  $(".modal-message-delete").addClass("modal-success");
 
-    var sNombreEstado = "Trading";
-    if (Nu_Tipo_Servicio == 2) sNombreEstado = "C. Trading";
+  var sNombreEstado = "Trading";
+  if (Nu_Tipo_Servicio == 2) sNombreEstado = "C. Trading";
 
-    $("#modal-title").html(
-      "¿Deseas cambiar estado a <strong>" + sNombreEstado + "</strong>?"
-    );
+  $("#modal-title").html(
+    "¿Deseas cambiar estado a <strong>" + sNombreEstado + "</strong>?"
+  );
 
-    $("#btn-cancel-delete")
-      .off("click")
-      .click(function () {
-        $modal_delete.modal("hide");
+  $("#btn-cancel-delete")
+    .off("click")
+    .click(function () {
+      $modal_delete.modal("hide");
+    });
+
+  $("#btn-save-delete")
+    .off("click")
+    .click(function () {
+      $("#btn-save-delete").text("");
+      $("#btn-save-delete").attr("disabled", true);
+      $("#btn-save-delete").append(
+        'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>'
+      );
+
+      url =
+        base_url +
+        "AgenteCompra/PedidosPagados/cambiarTipoServicio/" +
+        ID +
+        "/" +
+        Nu_Tipo_Servicio +
+        "/" +
+        ID_Usuario_Interno_Empresa_China;
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "JSON",
+        success: function (response) {
+          $modal_delete.modal("hide");
+
+          $("#btn-save-delete").text("");
+          $("#btn-save-delete").append("Aceptar");
+          $("#btn-save-delete").attr("disabled", false);
+
+          $(".modal-message").removeClass(
+            "modal-danger modal-warning modal-success"
+          );
+          $("#modal-message").modal("show");
+
+          if (response.status == "success") {
+            $(".modal-message").addClass(response.style_modal);
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 1100);
+            reload_table_Entidad();
+          } else {
+            $(".modal-message").addClass(response.style_modal);
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 1500);
+          }
+        },
       });
-
-    $("#btn-save-delete")
-      .off("click")
-      .click(function () {
-        $("#btn-save-delete").text("");
-        $("#btn-save-delete").attr("disabled", true);
-        $("#btn-save-delete").append(
-          'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>'
-        );
-
-        url =
-          base_url +
-          "AgenteCompra/PedidosPagados/cambiarTipoServicio/" +
-          ID +
-          "/" +
-          Nu_Tipo_Servicio +
-          "/" +
-          ID_Usuario_Interno_Empresa_China;
-        $.ajax({
-          url: url,
-          type: "GET",
-          dataType: "JSON",
-          success: function (response) {
-            $modal_delete.modal("hide");
-
-            $("#btn-save-delete").text("");
-            $("#btn-save-delete").append("Aceptar");
-            $("#btn-save-delete").attr("disabled", false);
-
-            $(".modal-message").removeClass(
-              "modal-danger modal-warning modal-success"
-            );
-            $("#modal-message").modal("show");
-
-            if (response.status == "success") {
-              $(".modal-message").addClass(response.style_modal);
-              $(".modal-title-message").text(response.message);
-              setTimeout(function () {
-                $("#modal-message").modal("hide");
-              }, 1100);
-              reload_table_Entidad();
-            } else {
-              $(".modal-message").addClass(response.style_modal);
-              $(".modal-title-message").text(response.message);
-              setTimeout(function () {
-                $("#modal-message").modal("hide");
-              }, 1500);
-            }
-          },
-        });
-      });
-  }
+    });
 }
+// }
 
 function clearHTMLTextArea(str) {
   str = str.replace(/<br>/gi, "");
@@ -4930,7 +4930,24 @@ function clearHTMLTextArea(str) {
   str = str.replace(/<br >/gi, "");
   return str;
 }
-
+const changeStatusOrden = (estado, id_pedido) => {
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/cambiarEstadoOrden",
+    type: "POST",
+    data: {
+      id_pedido,
+      estado,
+    },
+    success: function (response) {
+      if (response == "success") {
+        reload_table_Entidad();
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};
 function subirPagoServicio() {
   $('[name="pago_cliente_servicio-id_cabecera"]').val(
     $("#txt-EID_Pedido_Cabecera").val()
@@ -6877,20 +6894,18 @@ const getOrderProgress = (id) => {
 };
 const stepTemplate = (step, i) => {
   const stepHTML = `
-    <div class="col-12 col-lg-2 step-column" >
       <div class="step-container" onclick="openStepFunction(${i + 1},${
     step.id
   })"  id="step-${i}">
       <span class="step">${step.name}</span>
-      <span>Image</span>
+      <img src="${step.iconURL} " class="step-icon w-100" />
       </div>
-    </div>
   `;
   return stepHTML;
 };
 
-const getItemTemplate = (i,mode, detalle) => {
-  console.log(detalle)
+const getItemTemplate = (i, mode, detalle) => {
+  console.log(detalle);
   div_items = `
   <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
     <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][proovedor-id]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
@@ -7279,7 +7294,9 @@ const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
     container.find(`#modal-precio${i + 1}`).val(detalles[i]["Ss_Precio"]);
     container.find(`#modal-moq${i + 1}`).val(detalles[i]["Qt_Producto_Moq"]);
     container.find(".modal_coordination_id").val(idCoordination);
-    container.find(`#modal_proveedor-id-${i+1}`).val(detalles[i]["ID_Pedido_Detalle"])    
+    container
+      .find(`#modal_proveedor-id-${i + 1}`)
+      .val(detalles[i]["ID_Pedido_Detalle"]);
     container
       .find(`#modal-qty_caja${i + 1}`)
       .val(detalles[i]["Qt_Producto_Caja"]);
@@ -7448,13 +7465,13 @@ const openPagos = (response) => {
   containerPagos.show();
   if (response.status == "success") {
     const data = response.data;
-    $("#orden_total").html(data.orden_total);
-    $("#pago_cliente").html(data.pago_cliente);
+    $("#orden_total").html('$'+data.orden_total);
+    $("#pago_cliente").html('$'+data.pago_cliente);
     if (response.pagosData) {
       const pagosData = response.pagosData;
       const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
       let indexPagos = 1;
-      pagosData.forEach((pago) => {
+      pagosData.forEach((pago,i) => {
         if (pago.name == "garantia") {
           $("#pago-garantia").hide();
           $("#pago-garantia_ID").remove();
@@ -7474,7 +7491,7 @@ const openPagos = (response) => {
           );
           $(`#pago-${indexPagos}-btnlink`).remove();
           $(`#pago-${indexPagos}-div`).append(`
-            <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Pago</a>`);
+            <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
           $(`#pago-${indexPagos}-value`).val(pago.value);
           indexPagos++;
         } else if (pago.name == "liquidacion") {
@@ -7486,9 +7503,79 @@ const openPagos = (response) => {
           );
           $("#liquidacion_btnlink").remove();
           $(`#liquidacion-container`).append(`
-            <a href="${pago.file_url}" id="liquidacion_btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Liquidacion</a>`);
+            <a href="${pago.file_url}" id="liquidacion_btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Liquidacion</a>`);
         }
+       
+
       });
+      const pago_switch_3=$(`#pago3_URL_switch`);
+      const pago3Div=$(`#pago-3-div`);
+      const pago_switch_4=$(`#pago4_URL_switch`);
+      const pago4Div=$(`#pago-4-div`);
+      if(indexPagos>3){
+        if(pagosData[2].file_url!=null){
+          pago_switch_3.prop('checked',true);
+          //append input hide with pago_ID
+          pago3Div.append(`<input type="hidden" name="pago-3_ID" id="pago-3_ID" value="${pagosData[2].idPayment}">`);
+        }else{
+          pago_switch_3.prop('checked',false);
+        }
+      }
+        pago_switch_3.change(function(){
+          if($(this).is(':checked')){
+            if( indexPagos>3){
+              if(pagosData[2].file_url ){
+              pago3Div.append(`<a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-3_URL">Ver Pago</a>`);
+              pago3Div.append(`<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`);
+
+            }
+
+            }else {
+              console.log("append",pago3Div);
+              pago3Div.append(`<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off" />`);
+              //append input type number
+              pago3Div.append(`<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`);
+
+            }
+          }else{
+            pago3Div.find('#pago-3-btnlink').remove();
+            pago3Div.find('#pago3-file').remove();
+            pago3Div.find('#pago-3_value').remove();
+          }
+        });
+            ///append an a tag with the link to the file
+
+      
+      if(indexPagos>4){
+        if(pagosData[3].file_url!=null){
+          pago_switch_4.prop('checked',true);
+          pago4Div.append(`<input type="hidden" name="pago-4_ID" id="pago-4_ID" value="${pagosData[3].idPayment}">`);
+        }else{
+          pago_switch_4.prop('checked',false);
+        }
+      }
+        pago_switch_4.change(function(){
+          if($(this).is(':checked')){
+            if( indexPagos>4){
+              if(pagosData[3].file_url ){
+              pago4Div.append(`<a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-4_URL">Ver Pago</a>`);
+              pago4Div.append(`<input type="number" name="pago-4-value" id="pago-4_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`);
+
+            }
+
+            }else {
+              console.log("append",pago4Div);
+              pago4Div.append(`<input type="file" name="pago-4" id="pago4-file" class="" placeholder="" value="" autocomplete="off" />`);
+              //append input type number
+              pago4Div.append(`<input type="number" name="pago-4-value" id="pago-4_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`);
+            }
+          }else{
+            pago4Div.find('#pago-4-btnlink').remove();
+            pago4Div.find('#pago4-file').remove();
+            pago4Div.find('#pago-4_value').remove();
+          }
+        });
+          //append a with 
       if (!existsGarantia) {
         $("#pago-garantia-container").html("<div></div>");
       }
@@ -7556,11 +7643,12 @@ const openOrdenCompra = (response) => {
       $("#tc").val(pedidoData.Ss_Tipo_Cambio);
       $("#total-usd").val(totalUSD);
     }
+    let buttonsData = {};
     if (
       [priviligesPersonalChina, priviligesJefeChina].includes(currentPrivilege)
     ) {
       $("#btn-rotulado").hide();
-      const buttonsData = {
+      buttonsData = {
         btnSave: {
           text: "Guardar",
           action: `saveOrdenCompra()`,
@@ -7572,6 +7660,15 @@ const openOrdenCompra = (response) => {
       };
       const butttonsTemplate = getActionButtons(buttonsData);
       containerOrdenCompra.append(butttonsTemplate);
+    } else {
+      buttonsData = {
+        btnCancel: {
+          text: "Regresar",
+          action: "hideOrdenCompra()",
+        },
+      };
+      const btnsTemplate = getActionButtons(buttonsData);
+      containerOrdenCompra.append(btnsTemplate);
     }
   }
 };
@@ -7616,7 +7713,7 @@ const getProductTemplate = (producto) => {
     <div class="col-12 col-lg-3">
       <img src="${producto.Txt_Url_Imagen_Producto}" alt="${
     producto.Txt_Producto
-  }" class="img-fluid">
+  }" class="img-cuz">
     </div>
     <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
       <span>${producto.Txt_Producto}</span>
@@ -7635,12 +7732,12 @@ const getProductTemplate = (producto) => {
       <span>${producto.Qt_Producto}</span>
     </div>
     <div class="col-12 col-lg-3">
-          <span style="word-break: break-word;">${
+          <span style="word-break: break-word;overflow:auto">${
             producto.Txt_Descripcion
           }</span>
     </div>
     <div class="col-12 col-lg-2">
-      <a href="${producto.Txt_Url_Link_Pagina_Producto}" class="btn btn-link">${
+      <a href="${producto.Txt_Url_Link_Pagina_Producto}" target="_blank" class="btn btn-link" style="word-break: break-word;overflow:auto">${
     producto.Txt_Url_Link_Pagina_Producto
   }</a>
     </div>
@@ -7696,7 +7793,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
           ${
             productoSelected.empaque_URL
               ? `<a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>`
-              : `<input type="file" name="empaque" class="form-control">`
+              : `<input type="file" name="empaque" class="">`
           }
         </div>
       `);
@@ -7711,7 +7808,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
     vimDiv.append(`
       <div id="vim_motor_input-container">
         <input name="vim_motor_URL" type="hidden" value="${productoSelected.vim_motor_URL}">
-        <a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>
+        <a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>
       </div>
     `);
   }
@@ -7727,8 +7824,8 @@ const openRotuladoView = (producto, btsconfig = null) => {
           }">
           ${
             productoSelected.vim_motor_URL
-              ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-link">Descargar</a>`
-              : `<input type="file" name="vim_motor" class="form-control">`
+              ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>`
+              : `<input type="file" name="vim_motor" class="">`
           }
         </div>
       `);
@@ -7802,12 +7899,12 @@ const getContainerRotuladoView = (producto) => {
           ${
             producto.caja_master_URL
               ? `<a href="${producto.caja_master_URL}" class="btn btn-outline-secondary d-block text-center" target="_blank">Descargar</a>`
-              : '<input type="file" name="caja_master" class="form-control">'
+              : '<input type="file" name="caja_master" class="">'
           }
         </div>
         <div class="form-group" id="empaque_container">
           <div class="conditional-field">
-            <label>Empaque</label>
+            <label>EMPAQUE</label>
             <label class="switch">
               <input type="checkbox" id="empaque_URL_switch" >
               <span class="slider"></span>

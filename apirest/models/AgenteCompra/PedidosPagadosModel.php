@@ -40,12 +40,14 @@ class PedidosPagadosModel extends CI_Model
     {
         $this->db->select(' CORRE.Fe_Month, Nu_Estado_China,' . $this->table . '.*, P.No_Pais,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
+        (select count(*) from payments_agente_compra_pedido where id_pedido = '.$this->table.'.ID_Pedido_Cabecera and id_type_payment=2) as total_pagos,
+        if((select count(*) from payments_agente_compra_pedido where id_pedido = '.$this->table.'.ID_Pedido_Cabecera and id_type_payment=3)>0,1,0) as is_closed ,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, USRCHINA.No_Nombres_Apellidos AS No_Usuario, USRJEFECHINA.No_Nombres_Apellidos AS No_Usuario_Jefe')
             ->from($this->table)
             ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
             ->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
             ->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
-
+            ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
             //->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
             ->join($this->table_usuario_intero . ' AS USRJEFECHINA', 'USRJEFECHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Jefe_China', 'left')
             ->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
@@ -2094,7 +2096,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->select('
 		id,
 		name,
-		status
+		status,
+        iconURL 
 		');
             $this->db->from($this->table_order_steps);
             $this->db->where('id_pedido', $idPedido);
@@ -2223,12 +2226,19 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function getPedidoPagos($idPedido){
         try{
-            $this->db->select('ifnull(round(sum(acpdpp.Ss_Precio*acpd.Qt_Producto),2),0) as orden_total,ifnull(sum(pacp.value),0) pago_cliente');
+            $this->db->select('ifnull(round(sum(acpdpp.Ss_Precio*acpd.Qt_Producto),2),0) as orden_total');
             $this->db->from('agente_compra_pedido_detalle acpd');
             $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp','acpdpp.ID_Pedido_Detalle =acpd.ID_Pedido_Detalle','left');
-            $this->db->join('payments_agente_compra_pedido pacp','acpd.ID_Pedido_Cabecera =pacp.id_pedido','left');
             $this->db->where('acpd.ID_Pedido_Cabecera',$idPedido);
-            $queryData = $this->db->get()->row();
+            $this->db->where('acpdpp.Nu_Selecciono_Proveedor',1);
+            $orden_total = $this->db->get()->row();
+            //select sum of all payments_agente_compra_pedido.value with id_pedido=$idPedido
+            $this->db->select('ifnull(round(sum(pacp.value),2),0) as pago_cliente');    
+            $this->db->from('payments_agente_compra_pedido pacp');
+            $this->db->where('pacp.id_pedido',$idPedido);
+            $pago_cliente = $this->db->get()->row();
+
+            $queryData =array_merge((array)$orden_total,(array)$pago_cliente);
             $pagosData = $this->getPedidosPagosDetails($idPedido);
             return [
                 "data"=>$queryData,
@@ -2258,20 +2268,31 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $index = 1;
     
         // Process payment files
-        foreach ($files as $key => $file) {
-            if ($key === "pago-garantia") {
-                continue;
-            } else if (array_key_exists("pago-" . $index, $files)) {
-                $file = $files["pago-" . $index];
-                $fileURL = $this->uploadSingleFile($file, $pathPagos);
-                $pagosURLS[$key . '_URL'] = $fileURL??$data["pago-" . $index . "_URL"];
-            } else if ($data[$key . '_URL'] != "null") {
-                $pagosURLS[$key . '_URL'] = $data[$key . '_URL']??$data[$key."_URL"];
+        // foreach ($files as $key => $file) {
+        //     if ($key === "pago-garantia") {
+        //         continue;
+        //     } else if (array_key_exists("pago-" . $index, $files)) {
+        //         $file = $files["pago-" . $index];
+        //         $fileURL = $this->uploadSingleFile($file, $pathPagos);
+        //         $pagosURLS[$key . '_URL'] = $fileURL??$data[$key."_URL"];
+        //     } else if ($data[$key . '_URL'] != "null") {
+        //         $pagosURLS[$key . '_URL'] = $data[$key . '_URL']??$data[$key."_URL"];
 
+        //     }
+        //     $index++;
+        // }
+        foreach($data as $key=>$value){
+            if($key=="pago-garantia"){
+                continue;
+            }else if(strpos($key,"pago-")!==false && strpos($key,"_ID")===false && $value!="null" && 
+            strpos($key,"_URL")===false && strpos($key,"_ID")===false){ 
+                $file = $files['pago-'.substr($key,5,1)];
+                $num=substr($key,5,1);
+                $fileURL = $this->uploadSingleFile($file, $pathPagos);
+                $pagosURLS["pago-".$num. '_URL'] = $fileURL??$data["pago-".$num."_URL"];
+            
             }
-            $index++;
         }
-    
         // Process liquidation file
         if (array_key_exists('liquidacion', $files)) {
             $fileURL = $this->uploadSingleFile($files['liquidacion'], $pathPagos);
@@ -2290,6 +2311,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     
         // Insert or update records in the database
         $index = 1;
+        return $pagosURLS;
         foreach ($pagosURLS as $key => $value) {
             $dataToInsert = [
                 'file_url' => $value,
@@ -2306,8 +2328,15 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $this->updateOrInsertPayment($data['idPedido'], $data['liquidacion_ID'], $dataToInsert);
             } else {
                 $dataToInsert['id_type_payment'] = 2;
-                $dataToInsert['value'] = intval($data['pago-' . $index . '-value']);
-                $this->updateOrInsertPayment($data['idPedido'], $data['pago-' . $index . '_ID'], $dataToInsert);
+                $num = substr($key, 5, 1);
+                
+                $idToCheck=-1;
+                if(array_key_exists('pago-'.$num.'_ID',$data)){
+                    $idToCheck=$data['pago-'.$num.'_ID']; 
+                }
+
+                $dataToInsert['value'] = intval($data['pago-' . $num . '-value']);
+                $this->updateOrInsertPayment($data['idPedido'], $idToCheck, $dataToInsert);
                 $index++;
             }
         }
@@ -2324,7 +2353,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->update('agente_compra_order_steps',$data);
     }   
     function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert) {
-        if(!$dataToInsert['file_url'])return;
+        if(!$dataToInsert['file_url']){
+            //delete record if file_url is null where id=idPayment
+            $this->db->where('id', $idPayment);
+            $this->db->delete('payments_agente_compra_pedido');
+            return;
+        }
         $this->db->where('id_pedido', intval($idPedido));
         $this->db->where('id', intval($idPayment));
         $query = $this->db->get('payments_agente_compra_pedido');
@@ -2650,6 +2684,25 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
+    } public function cambiarEstadoOrden($idPedido,$estado){
+        try{
+            $this->db->where('ID_Pedido_Cabecera',$idPedido);
+            $this->db->update('agente_compra_pedido_cabecera',array('id_estado_orden_compra'=>$estado));
+            return ['status'=>'success','message'=>'Estado actualizado'];
+        }catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
+    }public function getOrderProgressLabel($privilegio,$idPedido){
+        try{
+             //select count(id),(count  STATUS ENUM ="COMPLETED")from agente_compra_order_steps where id_pedido = $id_pedido and id_privilegio = $privilegio
+            $this->db->select('count(id) as total, SUM(status = "COMPLETED") as completed');
+            $this->db->from('agente_compra_order_steps');
+            $this->db->where('id_pedido',$idPedido);
+            $this->db->where('id_permision_role',$privilegio);
+            return $this->db->get()->row();
+        }catch (Exception $e){
+            throw new Exception($e->getMessage());
         }
     }
 }

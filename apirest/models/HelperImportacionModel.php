@@ -1,12 +1,31 @@
 <?php
 class HelperImportacionModel extends CI_Model{
+		
+	private $defaultAgenteSteps=[];
 
-	private $defaultAgenteSteps=array("ORDEN DE COMPRA","PAGOS","RECEPCION DE CARGA","INSPECCIÓN","DOCUMENTACIÓN");
-	private $defautlAgenteChinaSteps=array("ORDEN DE COMPRA","Coordinación","RECEPCION DE CARGA","INSPECCIÓN","DOCUMENTACIÓN");
-	private $defaultJefeChina=array("ORDEN DE COMPRA","PAGOS","BOOKING","INSPECCIÓN","DOCUMENTACIÓN");
+	private $defautlAgenteChinaSteps=[];
+	private $defaultJefeChina=[];
 
 	public function __construct(){
 		parent::__construct();
+		$this->defaultAgenteSteps=array(
+			["name"=>"ORDEN DE COMPRA","iconURL"=>base_url()."assets/icons/orden.png"],
+			["name"=>"PAGOS","iconURL"=>base_url()."assets/icons/pagos.png"],
+			["name"=>"RECEPCION DE CARGA","iconURL"=>base_url()."assets/icons/recepcion.png"],
+			["name"=>"INSPECCIÓN","iconURL"=>base_url()."assets/icons/inspeccion.png"],
+			["name"=>"DOCUMENTACIÓN","iconURL"=>base_url()."assets/icons/documentacion.png"]);
+		$this->defautlAgenteChinaSteps=array(
+			["name"=>"ORDEN DE COMPRA","iconURL"=>base_url()."assets/icons/orden.png"],
+			["name"=>"Coordinación","iconURL"=>base_url()."assets/icons/coordinacion.png"],
+			["name"=>"RECEPCION DE CARGA","iconURL"=>base_url()."assets/icons/recepcion.png"],
+			["name"=>"INSPECCIÓN","iconURL"=>base_url()."assets/icons/inspeccion.png"],
+			["name"=>"DOCUMENTACIÓN","iconURL"=>base_url()."assets/icons/documentacion.png"]);
+		$this->defaultJefeChina=array(
+			["name"=>"ORDEN DE COMPRA","iconURL"=>base_url()."assets/icons/orden.png"],
+			["name"=>"Coordinación","iconURL"=>base_url()."assets/icons/coordinacion.png"],
+			["name"=>"RECEPCION DE CARGA","iconURL"=>base_url()."assets/icons/recepcion.png"],
+			["name"=>"INSPECCIÓN","iconURL"=>base_url()."assets/icons/inspeccion.png"],
+			["name"=>"DOCUMENTACIÓN","iconURL"=>base_url()."assets/icons/documentacion.png"]);
 	}
 
 	function obtenerEstadoImportacionIntegral($iEstado){
@@ -288,7 +307,8 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 						"id_pedido"=>$idPedido,
 						'id_permision_role'=>$privilegiesArray[$key],
 						'id_order'=>$agenteIndex,
-						'name'=>$step,
+						'name'=>$step['name'],
+						'iconURL'=>$step['iconURL'],
 						'status'=>'PENDING'
 					];
 					$agenteIndex++;
@@ -301,7 +321,8 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 						"id_pedido"=>$idPedido,
 						'id_permision_role'=>$privilegiesArray[$key],
 						'id_order'=>$agenteChinaIndex,
-						'name'=>$step,
+						'name'=>$step['name'],
+						'iconURL'=>$step['iconURL'],
 						'status'=>'PENDING'
 					];
 					$agenteChinaIndex++;
@@ -314,7 +335,8 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 						"id_pedido"=>$idPedido,
 						'id_permision_role'=>$privilegiesArray[$key],
 						'id_order'=>$jefeChinaIndex,
-						'name'=>$step,
+						'name'=>$step['name'],
+						'iconURL'=>$step['iconURL'],
 						'status'=>'PENDING'
 					];
 					$jefeChinaIndex++;
