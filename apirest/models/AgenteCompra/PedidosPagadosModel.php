@@ -2122,6 +2122,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
     }public function saveRotuladoProducto($data,$files){
         try{
+
             //get caja_master file in $files
             $idPedido = $data['idPedido'];
             $idProducto=$data['idProducto'];
@@ -2165,7 +2166,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('ID_Pedido_Detalle',$idProducto);
             $this->db->update('agente_compra_pedido_detalle',$datatoInsert);
             //check if all agente_compra_pedido_detalle with ID_PEDIDO_CABECERA=$idPedido have null in caja_master_URL
-            if($this->checkIfPedidoHasAllProductsRotulated($idPedido)==0){
+            $waos=$this->checkIfPedidoHasAllProductsRotulated($idPedido);
+            if($waos==0){
                 //update table agente_compra_order_steps where id=stepID
                 $this->db->where('id',$stepID);
                 $this->db->update('agente_compra_order_steps',array('status'=>"COMPLETED"));
@@ -2175,19 +2177,23 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             return array('status'=>'success','message'=>$datatoInsert);
         }
         catch (Exception $e){
+            echo $e->getMessage();
             throw new Exception($e->getMessage());
         }
     }
     function checkIfPedidoHasAllProductsRotulated($idPedido){
         try{
-            $this->db->select('count(*) as total');
-            $this->db->from($this->table_agente_compra_pedido_detalle);
-            $this->db->where('ID_Pedido_Cabecera',$idPedido);
-            $this->db->where('caja_master_URL is null');
-            $query = $this->db->get();
-            $result = $query->row();
-            return $result->total;  
+            $query="SELECT COUNT(*) AS total
+            FROM agente_compra_pedido_detalle AS acpd
+            JOIN agente_compra_pedido_detalle_producto_proveedor AS acpdpp 
+            ON acpdpp.ID_Pedido_Detalle = acpd.ID_Pedido_Detalle
+            WHERE acpd.caja_master_URL IS NULL
+            AND acpd.ID_Pedido_Cabecera = 1
+            and acpdpp.Nu_Selecciono_Proveedor =1;";
+            $query = $this->db->query($query);
+            return $query->row()->total;
         }catch (Exception $e){
+            echo $e->getMessage();  
             throw new Exception($e->getMessage());
         }
     }
@@ -2393,12 +2399,14 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
     }
     public function saveCoordination($data,$files){
-        
+        $idPedido=$data['id-pedido'];
+        $currentStep=$data['current-step'];
         foreach($data['item'] as  $key=>$row){
-            if($row['code']=="" || $row['code']==null || $row['code']=="null")continue;
+            if($row=="" || $row==null || $row=="null")continue;
+
             $producto_detalle=[
                 'ID_Pedido_Detalle'=>$key,
-                'product_code'=>$row['code'],
+                'product_code'=>$row[0]
             ];
             $this->db->where('ID_Pedido_Detalle',$key);
             $this->db->update('agente_compra_pedido_detalle',$producto_detalle); 
@@ -2441,7 +2449,17 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
            //update agente_compra_coordination_supplier
             $this->db->where('id_coordination',$key);
             $this->db->update('agente_compra_coordination_supplier',$producto_detalle);
-            
+            //check if all suppliers in agente_compra_coordination_supplier have estado enum='COMPLETED' where id_pedido=
+            $this->db->select('count(*) as total');
+            $this->db->from('agente_compra_coordination_supplier');
+            $this->db->where('id_pedido',$idPedido);
+            $this->db->where('estado','COMPLETED');
+            $query = $this->db->get();
+            $result = $query->row();
+            if($result->total==count($data['coordination'])){
+                $this->updateStep($currentStep,"COMPLETED");
+            }
+            return ['status'=>'success','message'=>'Coordination saved'];
         }
             
     }public function getSupplierItems($ID_pedido,$ID_supplier,$ID_coordination){

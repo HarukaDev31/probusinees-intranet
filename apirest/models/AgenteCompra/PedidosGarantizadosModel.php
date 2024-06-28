@@ -381,7 +381,8 @@ class PedidosGarantizadosModel extends CI_Model
                 'Pedidos Garantizados',
                 'Cotización ' . $sCorrelativoCotizacion . ' ' . $sElegirProveedor . ' de ' . $sNameItem,
                 ''
-            );
+            );  
+            //get all 
             $coordinationSupplier = array(
                 'id_pedido' => $id_pedido,
                 'id_supplier' => $id_supplier,
