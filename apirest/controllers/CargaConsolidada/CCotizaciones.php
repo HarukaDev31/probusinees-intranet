@@ -61,13 +61,14 @@ class CCotizaciones extends CI_Controller
             <button class="btn btn-xs btn-link" alt="Descargar" title="Descargar PDF" href="javascript:void(0)" onclick="descargarBoletaPDF(' . $row->ID_Cotizacion . ', \'' . $row->CotizacionCode . '\', \'' . $row->N_Cliente . '\')"><i class="fas fa-file-pdf fa-2x text-danger" aria-hidden="true" id="descargar-pdf-' . $row->ID_Cotizacion . '"></i></button>
           </div>';
             $rows[] = '<button class="btn btn-xs btn-link" alt="Modificar" title="Modificar" href="javascript:void(0)" onclick="verCotizacion(' . $row->ID_Cotizacion . ',' . $row->CotizacionCode . ')"><i class="far fa-edit fa-2x" aria-hidden="true" id="ver-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';
-            //select with options pendiente,cotizado,confirmado
+            //row with button to delete cotizacion 
+            $rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarCotizacion(' . $row->ID_Cotizacion . ')"><i class="far fa-trash-alt fa-2x text-danger" aria-hidden="true" id="eliminar-cotizacion(' . $row->ID_Cotizacion . ')"></i></button>';   
             $rows[] = '<select class="form-control" id="selectEstado" name="selectEstado" onchange="updateEstadoCotizacion(this,' . $row->ID_Cotizacion . ')">
             <option value="1" ' . ($row->Cotizacion_Status_ID == 1 ? 'selected' : '') . '>Pendiente</option>
             <option value="2" ' . ($row->Cotizacion_Status_ID == 2 ? 'selected' : '') . '>Cotizado</option>
             <option value="3" ' . ($row->Cotizacion_Status_ID == 3 ? 'selected' : '') . '>Confirmado</option>
             </select>';
-            $rows[] = $row->Cotizacion_Status_ID;
+            $rows[] = $row->Cotizacion_Status_ID;   
             $data[] = $rows;
         }
         $output = array(
@@ -250,7 +251,7 @@ class CCotizaciones extends CI_Controller
                     "qty" => $objPHPExcel->getActiveSheet()->getCell('F' . $i)->getCalculatedValue(),
                     "costounit" => number_format(round($objPHPExcel->getActiveSheet()->getCell('G' . $i)->getCalculatedValue(), 2), 2, '.', ','),
                     "preciounit" => number_format(round($objPHPExcel->getActiveSheet()->getCell('I' . $i)->getCalculatedValue(), 2), 2, '.', ','),
-                    "total" => number_format(round($objPHPExcel->getActiveSheet()->getCell('J' . $i)->getCalculatedValue(), 2), 2, '.', ','),
+                    "total" => round($objPHPExcel->getActiveSheet()->getCell('J' . $i)->getCalculatedValue(), 2),
                     "preciounitpen" => number_format(round($objPHPExcel->getActiveSheet()->getCell('K' . $i)->getCalculatedValue(), 2), 2, '.', ','),
                 ];
                 $items[] = $item;
@@ -293,7 +294,7 @@ class CCotizaciones extends CI_Controller
                     $total = 0;
                     $cantidad = 0;
                     foreach ($value as $item) {
-                        $total += $item['total'];
+                        $total = $item['total'];
                         $cantidad += $item['qty'];
                         $itemsHtml .= '<tr>
                         <td colspan="1">' . $item['index'] . '</td>
@@ -301,16 +302,16 @@ class CCotizaciones extends CI_Controller
                         <td colspan="1">' . $item['qty'] . '</td>
                         <td colspan="2">$ ' . $item['costounit'] . '</td>
                         <td colspan="1">$ ' . $item['preciounit'] . '</td>
-                        <td colspan="1">$ ' . $item['total'] . '</td>
+                        <td colspan="1">$ ' . number_format($item['total'], 2, '.', ',') . '</td>
                         <td colspan="1">S/. ' . $item['preciounitpen'] . '</td>
                     </tr>';
                     }
                     $itemsHtml .= '<tr>
                     <td colspan="6" >TOTAL</td>
-                    <td >' . number_format($cantidad, 2, '.', ',') . '</td>
+                    <td >' . $cantidad. '</td>
                     <td colspan="2" style="border:none!important"></td>
                     <td style="border:none!important"></td>
-                    <td >$ ' . number_format($total, 2, '.', ',') . '</td>
+                    <td >$ ' . number_format($total, 2, '.', ','). '</td>
                     <td style="border:none!important"></td>
 
                 </tr>';
@@ -401,5 +402,11 @@ class CCotizaciones extends CI_Controller
     public function getTarifas()
     {
         echo json_encode($this->CCotizacionesModel->getTarifas());
+    }
+    public function deleteCotization(){
+        $postData = file_get_contents('php://input');
+        $data = json_decode($postData, true);
+        $id = $data['ID_Cotizacion'];
+        echo json_encode($this->CCotizacionesModel->deleteCotization($id));
     }
 }

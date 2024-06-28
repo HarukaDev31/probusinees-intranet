@@ -75,7 +75,7 @@ $(function () {
     },
     order: [
       [2, "desc"],
-      [10, "asc"],
+      [11, "asc"],
       [0, "desc"]
     ],
     ajax: {
@@ -91,7 +91,7 @@ $(function () {
         orderable: false,
       },
       {
-        targets: [1, 10], // Target the 10th (index 9) column
+        targets: [1, 11], // Target the 10th (index 9) column
         visible: false, // Hide this column
       },
       {
@@ -112,6 +112,37 @@ $(function () {
     ],
   });
 });
+const eliminarCotizacion= (ID) => {
+  $('#modal-delete').modal('show');
+  $('#modal-delete').find('#btn-eliminar-cotizacion').attr('onclick', `eliminarCotizacionConfirm(${ID})`);
+ 
+
+}
+const eliminarCotizacionConfirm = (ID) => {
+  $('#modal-delete').modal('hide');
+  $("#loading-spinner").show();
+  url = base_url + "CargaConsolidada/CCotizaciones/deleteCotization";
+  $.ajax({
+    url: url,
+    type: "POST",
+    dataType: "JSON",
+    contentType: "application/json; charset=utf-8",
+
+    data: JSON.stringify({ ID_Cotizacion: ID }),
+
+    success: function (response) {
+      if (response.status == "success") {
+        $("#loading-spinner").hide();
+
+        table_Entidad.ajax.reload();
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR);
+      $("#loading-spinner").hide();
+    },
+  });
+}
 function verCotizacion(ID, CID) {
   CotizacionID = ID;
   CCotizacion = CID;

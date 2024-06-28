@@ -31,6 +31,7 @@ class CCotizacionesModel extends CI_Model
         WHERE ccdt.ID_Cotizacion = carga_consolidada_cotizaciones_cabecera.ID_Cotizacion) as Tributos_Pendientes');
         $this->db->from($this->table);
         $this->db->join($this->table_tipo_cliente, 'carga_consolidada_cotizaciones_cabecera.ID_Tipo_Cliente = carga_consolidada_tipo_cliente.ID_Tipo_Cliente', 'join');
+        $this->db->where('carga_consolidada_cotizaciones_cabecera.deleted_at', null);
     }
 
     public function get_datatables()
@@ -2192,5 +2193,11 @@ Pronto le aviso nuevos avances, que tengan buen día🚢
         $this->db->order_by('ID_Tipo_Cliente, limite_inf');
         $query = $this->db->get();
         return $query->result();
+    }
+    public function deleteCotization($ID_Cotizacion)
+    {   
+        $this->db->where('ID_Cotizacion', $ID_Cotizacion);
+        $this->db->update($this->table, array("deleted_at" => date('Y-m-d H:i:s')));
+        return array("status" => "success");
     }
 }
