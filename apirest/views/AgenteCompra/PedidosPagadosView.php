@@ -360,7 +360,7 @@
             <div class="card-body" id="container-rotulado">
             </div>
             <div class="card-body" id="container-pagos">
-              <div class="row w-75 d-flex justify-content-between" id="pagos-header">
+              <div class="row w-100 d-flex justify-content-between" id="pagos-header">
                 <div class="col-12 col-md-3 d-flex align-items-center">
                   <label>ORDEN TOTAL</label>
                 </div>
@@ -411,16 +411,16 @@
                         <input type="number" name="pago-2-value" id="pago-2-value" class="form-control"/ />
                       </div>
                     </div>
-                    <div class="pago row ml-3 form-group col-12 col-md-10 d-flex flex-row align-items-center" id="pago-3-div">
+                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-3-div">
                       <div class="conditional-field">
                         <label>PAGO 3:</label>
                         <label class="switch">
                           <input type="checkbox" id="pago3_URL_switch">
                           <span class="slider"></span>
                         </label>
+                        </div>
                       </div>
-                    </div>
-                    <div class="pago row  ml-3 form-group col-12 col-md-10 d-flex flex-row align-items-center" id="pago-4-div">
+                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-4-div">
                       <div class="conditional-field">
                         <label>PAGO 4:</label>
                         <label class="switch">
@@ -2620,7 +2620,9 @@ echo form_open('', $attributes);
       padding: 0.5em 2em;
       border: 1px solid #ccc;
     }
-
+    .card-body{
+      padding: 2em 1em!important;
+    }
     .orden-compra_header {
       -webkit-box-shadow: 0px 5px 3px 0px rgba(209, 209, 209, 1);
       -moz-box-shadow: 0px 5px 3px 0px rgba(209, 209, 209, 1);

@@ -98,7 +98,7 @@ class PedidosPagados extends CI_Controller
             $avance=$this->getOrderProgressLabel($this->user->Nu_Tipo_Privilegio_Acceso,$row->ID_Pedido_Cabecera);
             $rows[]=$row->No_Pais;
            
-            $rows[] = $sCorrelativoCotizacion;
+            $rows[] = $row->cotizacionCode;
             $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
 
     

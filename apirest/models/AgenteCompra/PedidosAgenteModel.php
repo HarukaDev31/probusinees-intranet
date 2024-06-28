@@ -263,7 +263,7 @@ class PedidosAgenteModel extends CI_Model{
 		//get current month first 3 letters
 		$Fe_Month = substr(date('F', strtotime(dateNow('fecha'))), 0, 3);
 		//get count of rows with Nu_Estado=2 and Fe_Registro_Hora_Cotizacion month = current month
-		$query = "SELECT COUNT(*) AS count FROM agente_compra_pedido_cabecera WHERE Nu_Estado=2 AND MONTH(Fe_Registro_Hora_Cotizacion) = MONTH(NOW())";
+		$query = "SELECT COUNT(*) AS count FROM agente_compra_pedido_cabecera WHERE Nu_Estado>2 AND MONTH(Fe_Registro_Hora_Cotizacion) = MONTH(NOW())";
 		//concatenate current month first 3 letters and count + 1
 		$Nu_Correlativo = $this->db->query($query)->row()->count + 1;
 		$Nu_Correlativo = str_pad($Nu_Correlativo, 4, '0', STR_PAD_LEFT);
@@ -273,8 +273,8 @@ class PedidosAgenteModel extends CI_Model{
 		$Nu_Correlativo = 0;
 		$Fe_Year = ToYear(dateNow('fecha'));
 		//get current month first 3 letters
-		$Fe_Month = substr(date('F', strtotime($Fe_Month)), 0, 3);
-
+		$Fe_Month = dateNow('fecha');
+		$Fe_Month2 = substr(date('F', strtotime($Fe_Month)), 0, 3);
 		$objCorrelativo = $this->db->query("SELECT ID_Agente_Compra_Correlativo FROM agente_compra_correlativo WHERE ID_Empresa = " . $this->user->ID_Empresa . " AND Fe_Year = '" . $Fe_Year . "' AND Fe_Month = '" . $Fe_Month . "' LIMIT 1")->row();
 		if(is_object($objCorrelativo)){
 			$ID_Agente_Compra_Correlativo = $objCorrelativo->ID_Agente_Compra_Correlativo;
@@ -282,18 +282,18 @@ class PedidosAgenteModel extends CI_Model{
 			$this->db->query($query);
 		} else {
 			$query = "INSERT INTO agente_compra_correlativo(
-ID_Empresa,
-ID_Organizacion,
-Fe_Year,
-Fe_Month,
-Nu_Correlativo
-) VALUES (
-" . $this->user->ID_Empresa . ",
-" . $this->user->ID_Organizacion . ",
-" . $Fe_Year . ",
-" . $Fe_Month . ",
-1
-);";
+				ID_Empresa,
+				ID_Organizacion,
+				Fe_Year,
+				Fe_Month,
+				Nu_Correlativo
+				) VALUES (
+				" . $this->user->ID_Empresa . ",
+				" . $this->user->ID_Organizacion . ",
+				" . $Fe_Year . ",
+				" . $Fe_Month . ",
+				1
+				);";
 			$this->db->query($query);
 			$ID_Agente_Compra_Correlativo = $this->db->insert_id();
 		}

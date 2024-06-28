@@ -2296,7 +2296,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $num=substr($key,5,1);
                 $fileURL = $this->uploadSingleFile($file, $pathPagos);
                 $pagosURLS["pago-".$num. '_URL'] = $fileURL??$data["pago-".$num."_URL"];
-            
+                
             }
         }
         // Process liquidation file
@@ -2317,7 +2317,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     
         // Insert or update records in the database
         $index = 1;
-        return $pagosURLS;
         foreach ($pagosURLS as $key => $value) {
             $dataToInsert = [
                 'file_url' => $value,
@@ -2335,19 +2334,19 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             } else {
                 $dataToInsert['id_type_payment'] = 2;
                 $num = substr($key, 5, 1);
-                
+
                 $idToCheck=-1;
                 if(array_key_exists('pago-'.$num.'_ID',$data)){
                     $idToCheck=$data['pago-'.$num.'_ID']; 
                 }
 
                 $dataToInsert['value'] = intval($data['pago-' . $num . '-value']);
-                $this->updateOrInsertPayment($data['idPedido'], $idToCheck, $dataToInsert);
+                $waos=$this->updateOrInsertPayment($data['idPedido'], $idToCheck, $dataToInsert);
                 $index++;
             }
         }
         $total=$this->getPedidoPagos($data['idPedido'])['data'];
-        if($total->orden_total<=$total->pago_cliente){
+        if($total->orden_total>=$total->pago_cliente){
             $this->updateStep($data['step'],"COMPLETED"); 
         }
         return $total;
@@ -2359,7 +2358,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->update('agente_compra_order_steps',$data);
     }   
     function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert) {
-        if(!$dataToInsert['file_url']){
+        if(!$dataToInsert['file_url'] && $idPayment == -1){
             //delete record if file_url is null where id=idPayment
             $this->db->where('id', $idPayment);
             $this->db->delete('payments_agente_compra_pedido');

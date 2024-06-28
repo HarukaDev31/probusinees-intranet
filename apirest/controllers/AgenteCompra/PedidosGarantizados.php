@@ -39,7 +39,7 @@ class PedidosGarantizados extends CI_Controller {
 
 			$sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0 , 3)) . str_pad($row->Nu_Correlativo,3,"0",STR_PAD_LEFT);
             $rows[] = $row->No_Pais;
-            $rows[] = $sCorrelativoCotizacion;
+            $rows[] = $row->cotizacionCode;
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;//quitar para el chino
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;//quitar para el chino

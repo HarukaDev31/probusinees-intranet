@@ -1303,7 +1303,8 @@ function verPedido(ID) {
         table_enlace_producto += "</tr>";
 
         table_enlace_producto += "<tr><td class='text-center' colspan='4'>";
-        if (response.Nu_Estado_China != 3) {
+        console.log(response,"EDIT")
+        if (response.Nu_Estado_China != 3 && response.Nu_Tipo_Privilegio_Acceso!=1) {
           //cotizacio china
           table_enlace_producto += '<div class="row">';
           table_enlace_producto += '<div class="col">';

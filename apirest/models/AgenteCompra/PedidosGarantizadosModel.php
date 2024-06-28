@@ -850,7 +850,7 @@ Nu_Correlativo
             );
         }
 
-        if ($this->user->Nu_Tipo_Privilegio_Acceso == 2) { //china
+        if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso==5    ) { //china
             $arrMessageUser = array(
                 'ID_Usuario_Destino' => $this->user->ID_Usuario,
                 'Txt_Usuario_Destino' => nl2br($data['message_chat']),
