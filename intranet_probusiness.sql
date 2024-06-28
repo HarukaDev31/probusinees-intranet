@@ -1,21 +1,4 @@
-CREATE TABLE agente_compra_order_steps (
-    id INT NOT NULL AUTO_INCREMENT,
-    id_pedido INT  unsigned NOT NULL,
-    id_permision_role int not null,
-    id_order int not null,
-    name VARCHAR(100) NOT NULL,
-    status ENUM('PENDING', 'PROGRESS', 'COMPLETED'),
-    created_at datetime  default now(),
-    updated_at datetime,
-    PRIMARY KEY (id),
-    FOREIGN KEY (id_pedido) REFERENCES agente_compra_pedido_cabecera(ID_Pedido_Cabecera)
-);
-CREATE PROCEDURE probussiness_v3.get_agente_compra_pedido_productos(
-in p_id_producto int)
-begin
-	select * from agente_compra_pedido_detalle acpd where acpd.ID_Pedido_Cabecera=p_id_producto
-END
-CREATE DEFINER=`root`@`localhost` PROCEDURE `probussiness_v3`.`get_suppliers_products`(IN p_id_pedido INT)
+CREATE PROCEDURE probussiness_v3.get_suppliers_products(IN p_id_pedido INT)
 BEGIN
     SELECT 
         s.name,
@@ -32,8 +15,8 @@ BEGIN
                         '","qty_product":"', IFNULL(a2.Qt_Producto, ''),
                         '","price_product":"', IFNULL(b.Ss_Precio, ''),
                         '","total_producto":"', IFNULL(b.Ss_Precio * a2.Qt_Producto, ''),
-                        '","paymentType":"', IFNULL(b.Ss_Precio, ''),
-                        '","tentrega":"', IFNULL(b.Ss_Precio, ''),
+                        '","delivery":"', IFNULL(b.Ss_Costo_Delivery, ''),
+                        '","tentrega":"', IFNULL( DATE_ADD(NOW(), INTERVAL Nu_Dias_Delivery DAY),now()),
                         '","pago1":"', IFNULL(b.Ss_Precio, ''),
                         '","pago1URL":"', IFNULL(NULL, ''),
                         '","pago2":"', IFNULL(b.Ss_Precio, ''),
