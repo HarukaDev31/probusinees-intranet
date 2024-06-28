@@ -7029,7 +7029,7 @@ const openStepFunction = (i, stepId) => {
     if (i == 2) {
       if (currentPrivilege == 1) {
         openPagos(response);
-      } else if (currentPrivilege == 2) {
+      } else  {
         openCoordination(response);
       }
     }
