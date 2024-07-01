@@ -558,10 +558,10 @@ $("#modal-upload-excel").on("show.bs.modal", function (event) {
       let indexAntiguo = 1;
       let indexSocio = 1;
       response.forEach((element) => {
-        if (element.ID_Tipo_Cliente == 1) {
+        if (element.ID_Tipo_Cliente == 2) {
           $(`#tarifa-antiguo-${indexAntiguo}`).val(element.tarifa);
           indexAntiguo++;
-        } else if (element.ID_Tipo_Cliente == 2) {
+        } else if (element.ID_Tipo_Cliente == 1) {
           $(`#tarifa-nuevo-${indexNuevo}`).val(element.tarifa);
           indexNuevo++;
         } else if (element.ID_Tipo_Cliente == 3) {
