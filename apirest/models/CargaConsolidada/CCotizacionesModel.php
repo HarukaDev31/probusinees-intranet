@@ -1577,19 +1577,9 @@ class CCotizacionesModel extends CI_Model
         //get $CobroCell value of formula
         $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
         $ImpuestosCellValue=round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
-        $ClientName= $objPHPExcel->getActiveSheet()->getCell('C8')->getValue(); 
         //convert $expirationDate dd//mm/yyyy to day de mes de año
         $expirationDate = date('d/m/Y', strtotime($expirationDate));
-        $N20CellValue=
-        "Hola ".$ClientName." 😁 un gusto saludarte!   
-A continuación te envío la cotización final de tu importación📋📦.      
-🙋‍♂️ PAGO PENDIENTE :      
-☑️Costo CBM: $".$CobroCellValue."  
-☑️Impuestos: $".$ImpuestosCellValue."
-☑️ Total: $".($ImpuestosCellValue+$CobroCellValue)."
-Pronto le aviso nuevos avances, que tengan buen día🚢     
-Último día de pago:".$expirationDate;
-        $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
+
         for ($row = 36; $row <= 39; $row++) {
             for ($col = 1; $col <= 12; $col++) {
                 $cell = PHPExcel_Cell::stringFromColumnIndex($col) . $row;
@@ -1794,8 +1784,19 @@ Pronto le aviso nuevos avances, que tengan buen día🚢
             //remove borders from b36 to l39
             $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
         }
-        //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
+        $ClientName= $objPHPExcel->getActiveSheet()->getCell('C8')->getValue(); 
 
+        //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
+        $N20CellValue=
+        "Hola ".$ClientName." 😁 un gusto saludarte!   
+    A continuación te envío la cotización final de tu importación📋📦.      
+    🙋‍♂️ PAGO PENDIENTE :      
+    ☑️Costo CBM: $".$CobroCellValue."  
+    ☑️Impuestos: $".$ImpuestosCellValue."
+    ☑️ Total: $".($ImpuestosCellValue+$CobroCellValue)."
+    Pronto le aviso nuevos avances, que tengan buen día🚢     
+    Último día de pago:".$expirationDate;
+            $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
         //select
         //remove page 2
         $objPHPExcel->removeSheetByIndex(1);
