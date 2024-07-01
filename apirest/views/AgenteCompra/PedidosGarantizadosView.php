@@ -56,7 +56,7 @@
                       <?php }?>
                       <th>Perú</th>
                       <?php if ($this->user->Nu_Tipo_Privilegio_Acceso !=2) {?>
-                      <th class="no-sort">Personal</th>
+                      <th class="no-sort">Encargado</th>
                       <?php }?>
                       <th>China</th>
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1): ?>
