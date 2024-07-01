@@ -3,11 +3,11 @@
 class MoodleRestPro {
   function make_test_user( $arrPost ){
     $user = new stdClass();
-    $user->username = $arrPost['username'];
+    $user->username = strtolower($arrPost['username']);
     $user->password = $arrPost['password'];
     $user->firstname = $arrPost['firstname'];
     $user->lastname = $arrPost['username'];
-    $user->email = $arrPost['email'];
+    $user->email = strtolower($arrPost['email']);
     $user->auth = 'manual';
     $user->lang = 'es';
     $user->calendartype = 'gregorian';
@@ -22,12 +22,11 @@ class MoodleRestPro {
     $course->categoryid = 1;
     return $course;
   }
-
+ 
   function create_user( $user, $token )
   {
     $users = array( $user );
     $params = array( 'users' => $users );
-
     $response = $this->call_moodle( 'core_user_create_users', $params, $token );
 
     if ( $this->xmlresponse_is_exception( $response ) ) {
@@ -356,13 +355,14 @@ class MoodleRestPro {
     try {
       $token = '2a41772b01afcf26da875fc1ab59bf45';
       $user_data_1 = $this->make_test_user( $arrPost );
+      echo json_encode($user_data_1);
       $user_id_1 = $this->create_user( $user_data_1, $token );
       return $user_id_1;
     } 
     catch ( Exception $e ) {
       return array(
         'status' => 'error',
-        'message' => "Caught exception: " .  $e->getMessage()
+        'message' => "Error de Mooddle" .  $e->getMessage()
       );
       //echo "\nCaught exception:\n" .  $e->getMessage() . "\n";
     }

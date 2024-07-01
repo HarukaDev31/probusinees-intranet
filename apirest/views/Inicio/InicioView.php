@@ -31,7 +31,7 @@
               <div class="small-box bg-warning">
                 <div class="inner">
                   <h3><?php echo $iCantidadCotizacion; ?></h3>
-                  <p>Pedidos Pendientes</p>
+                  <p>Cotizaciones Pendientes </p>
                 </div>
                 <div class="icon">
                   <i class="ion ion-bag"></i>

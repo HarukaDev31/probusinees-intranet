@@ -132,10 +132,11 @@ class PedidosCurso extends CI_Controller {
 				'username' => $result->No_Usuario,
 				'password' => $this->encryption->decrypt($result->No_Password),
 				'firstname' => $result->No_Nombres_Apellidos,
+				"lastname" => "lastname",
 				'email' => $result->No_Usuario,
 			);
-			$response_usuario_moodle = $MoodleRestPro->createUser($arrPost);
 
+			$response_usuario_moodle = $MoodleRestPro->createUser($arrPost);
 			if($response_usuario_moodle['status']=='success'){
 				// Property added to the object
 				$arrParams['criteria'][0]['key']='username';

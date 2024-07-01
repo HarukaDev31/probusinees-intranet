@@ -31,6 +31,7 @@ class CCotizacionesModel extends CI_Model
         WHERE ccdt.ID_Cotizacion = carga_consolidada_cotizaciones_cabecera.ID_Cotizacion) as Tributos_Pendientes');
         $this->db->from($this->table);
         $this->db->join($this->table_tipo_cliente, 'carga_consolidada_cotizaciones_cabecera.ID_Tipo_Cliente = carga_consolidada_tipo_cliente.ID_Tipo_Cliente', 'join');
+        $this->db->where('carga_consolidada_cotizaciones_cabecera.deleted_at', null);
     }
 
     public function get_datatables()
@@ -368,7 +369,7 @@ class CCotizacionesModel extends CI_Model
 
             } else {
                 //set specific width for column
-                $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setWidth(2000);
+                // $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setWidth(20);
             }
 
             //set auto size for columns
@@ -946,7 +947,7 @@ class CCotizacionesModel extends CI_Model
             foreach ($columnsToApply as $column) {
                 //set font to calibri
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setName('Calibri');
-                //set font size to 11
+                //set column width to 20
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
                 $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -1089,7 +1090,11 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setCellValue('L10', "");
 
         $objPHPExcel->getActiveSheet()->setCellValue('F11', $query[0]["tipo_cliente"]);
+        //set c columns width 40
 
+        $objPHPExcel->getActiveSheet()->getColumnDimension("C")->setAutoSize(true);
+
+      
         //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
 
         //select
@@ -1098,9 +1103,10 @@ class CCotizacionesModel extends CI_Model
         //set sheet 3 title to 2
         $objPHPExcel->setActiveSheetIndex(1);
         $objPHPExcel->getActiveSheet()->setTitle('2');
+
         return $objPHPExcel;
     }
-    public function generateMassiveExcelPayrolls($objPHPExcel, $tarifas)
+    public function generateMassiveExcelPayrolls($objPHPExcel, $tarifas,$expirationDate)
     {
         //init more memory
         $originalMemoryLimit = ini_get('memory_limit');
@@ -1114,9 +1120,9 @@ class CCotizacionesModel extends CI_Model
 
         foreach ($data as $key => $value) {
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value, $tarifas);
+            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value, $tarifas, $expirationDate);
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-            $excelFileName = 'Boleta_' . $value['cliente']['nombre'] . '.xlsx';
+            $excelFileName = 'Cotizacion' . $value['cliente']['nombre'] . '.xlsx';
             $excelFilePath = 'assets/downloads/' . $excelFileName;
             $objWriter->save($excelFilePath);
             $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
@@ -1132,7 +1138,7 @@ class CCotizacionesModel extends CI_Model
         return $zipFilePath;
     }
 
-    public function getFinalCotizacionExcel($objPHPExcel, $data, $tarifas)
+    public function getFinalCotizacionExcel($objPHPExcel, $data, $tarifas,$expirationDate)
     {
         //GOD IMPLEMENTATION
         $newSheet = $objPHPExcel->createSheet();
@@ -1405,7 +1411,7 @@ class CCotizacionesModel extends CI_Model
             $antidumpingSum += $producto["antidumping"];
             //set currency format with $ symbol
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '26')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $producto["ad_valorem"] / 100);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $producto["ad_valorem"] );
             //set porcentage format
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '27')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
             //set text color red
@@ -1568,7 +1574,22 @@ class CCotizacionesModel extends CI_Model
 
         //k30 =$query[0]["Flete"]/$query[0]["Distribucion"]
         $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $CobroCell);
-
+        //get $CobroCell value of formula
+        $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
+        $ImpuestosCellValue=round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
+        $ClientName= $objPHPExcel->getActiveSheet()->getCell('C8')->getValue(); 
+        //convert $expirationDate dd//mm/yyyy to day de mes de año
+        $expirationDate = date('d/m/Y', strtotime($expirationDate));
+        $N20CellValue=
+        "Hola ".$ClientName." 😁 un gusto saludarte!   
+A continuación te envío la cotización final de tu importación📋📦.      
+🙋‍♂️ PAGO PENDIENTE :      
+☑️Costo CBM: $".$CobroCellValue."  
+☑️Impuestos: $".$ImpuestosCellValue."
+☑️ Total: $".($ImpuestosCellValue+$CobroCellValue)."
+Pronto le aviso nuevos avances, que tengan buen día🚢     
+Último día de pago:".$expirationDate;
+        $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
         for ($row = 36; $row <= 39; $row++) {
             for ($col = 1; $col <= 12; $col++) {
                 $cell = PHPExcel_Cell::stringFromColumnIndex($col) . $row;
@@ -2172,5 +2193,11 @@ class CCotizacionesModel extends CI_Model
         $this->db->order_by('ID_Tipo_Cliente, limite_inf');
         $query = $this->db->get();
         return $query->result();
+    }
+    public function deleteCotization($ID_Cotizacion)
+    {   
+        $this->db->where('ID_Cotizacion', $ID_Cotizacion);
+        $this->db->update($this->table, array("deleted_at" => date('Y-m-d H:i:s')));
+        return array("status" => "success");
     }
 }

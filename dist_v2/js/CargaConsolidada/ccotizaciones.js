@@ -75,7 +75,7 @@ $(function () {
     },
     order: [
       [2, "desc"],
-      [10, "asc"],
+      [11, "asc"],
       [0, "desc"]
     ],
     ajax: {
@@ -91,7 +91,7 @@ $(function () {
         orderable: false,
       },
       {
-        targets: [1, 10], // Target the 10th (index 9) column
+        targets: [1, 11], // Target the 10th (index 9) column
         visible: false, // Hide this column
       },
       {
@@ -112,6 +112,37 @@ $(function () {
     ],
   });
 });
+const eliminarCotizacion= (ID) => {
+  $('#modal-delete').modal('show');
+  $('#modal-delete').find('#btn-eliminar-cotizacion').attr('onclick', `eliminarCotizacionConfirm(${ID})`);
+ 
+
+}
+const eliminarCotizacionConfirm = (ID) => {
+  $('#modal-delete').modal('hide');
+  $("#loading-spinner").show();
+  url = base_url + "CargaConsolidada/CCotizaciones/deleteCotization";
+  $.ajax({
+    url: url,
+    type: "POST",
+    dataType: "JSON",
+    contentType: "application/json; charset=utf-8",
+
+    data: JSON.stringify({ ID_Cotizacion: ID }),
+
+    success: function (response) {
+      if (response.status == "success") {
+        $("#loading-spinner").hide();
+
+        table_Entidad.ajax.reload();
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR);
+      $("#loading-spinner").hide();
+    },
+  });
+}
 function verCotizacion(ID, CID) {
   CotizacionID = ID;
   CCotizacion = CID;
@@ -505,6 +536,17 @@ const guardarTributos = (button) => {
 let currentButton = null;
 
 $("#modal-upload-excel").on("show.bs.modal", function (event) {
+  //set current date + 1 week not use moment 
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const formattedDate = `${year}-${month < 10 ? "0" + month : month}-${
+    day < 10 ? "0" + day : day
+  }`;
+  $("#date-cotizacion").val(formattedDate);
+  
   url = base_url + "CargaConsolidada/CCotizaciones/getTarifas";
 
   $.ajax({
@@ -831,6 +873,13 @@ const getData = () => {
 };
 const uploadExcel = () => {
   const fileInput = $("#file-upload-excel")[0];
+  const dateInput = $("#date-cotizacion")[0];
+  const date = dateInput.value;
+  //CHECK IF DATE IS VALID 
+  if (date == "") {
+    alert("Por favor ingrese una fecha valida");
+    return;
+  }
 
   // Check if a file is selected
   if (fileInput.files.length === 0) {
@@ -999,6 +1048,7 @@ const uploadExcel = () => {
   tarifas.push(...tarifasSocio);
 
   formData.append("tarifas", JSON.stringify(tarifas));
+  formData.append("expiration_date", date);
   //send file to server
   $("#modal-upload-excel").modal("hide");
 
@@ -1068,7 +1118,7 @@ const descargarReporte = async(ID_Cotizacion, C_Cotizacion) => {
     },
   });
 };
-const descargarBoletaPDF = (ID_Cotizacion,C_Cotizacion) => {
+const descargarBoletaPDF = (ID_Cotizacion,C_Cotizacion,CName) => {
   $.ajax({
     url: base_url + "CargaConsolidada/CCotizaciones/descargarBoleta",
     type: "POST",
@@ -1089,7 +1139,7 @@ const descargarBoletaPDF = (ID_Cotizacion,C_Cotizacion) => {
       const formattedDate = `${currentDate.getDate()}_${
         currentDate.getMonth() + 1
       }_${currentDate.getFullYear()}`;
-      link.download = "Boleta_" + formattedDate + ".pdf";
+      link.download = `Cotizacion_${C_Cotizacion}_${CName}_${formattedDate}.pdf`
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

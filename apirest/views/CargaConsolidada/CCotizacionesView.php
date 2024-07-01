@@ -1,4 +1,24 @@
 <div class="content-wrapper">
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title mr-1" id="modal-delete">Eliminar Cotizacion Final</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ¿Está seguro que desea eliminar la cotización?
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-eliminar-cotizacion" class="btn btn-primary">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <div class="container-fluid">
@@ -68,6 +88,7 @@
                       <th>Tipo de Cliente</th>
                       <th>Descargar</th>
                       <th>Ver</th>
+                      <th>Eliminar</th>
                       <th>Estado</th>
                       <th>Estado_ID</th>
                     </tr>
@@ -257,7 +278,7 @@
         <h5 class="modal-title mr-1" id="modal-upload-excel">Subir Cotizacion Final</h5>
           <a href="<?php echo base_url('assets/downloads/Massive_Payroll.xlsx'); ?>" class="btn btn-primary" aria-hidden="true" title="Descargar Plantilla" download>
           <!--i with download icon and hover text-->
-          <i class="fas fa-download" "></i>
+          <i class="fas fa-download"></i>
       </a>
 
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -270,6 +291,11 @@
             <label for="file-upload-excel">Subir Archivo Excel</label>
             <!--download template button-->
             <input type="file" class="form-control-file" id="file-upload-excel" name="file-upload-excel" accept=".xls,.xlsx">
+          </div>
+          <div  class="form-group">
+            <!--date picker for date of the cotizacion-->
+            <label for="date-cotizacion">Fecha de Vencimiento</label>
+            <input type="date" class="form-control" id="date-cotizacion" name="date-cotizacion" value="">
           </div>
           <div class="form-group " id="tarifas-container">
             <div class="row mx-auto w-100" id="headers">
@@ -425,5 +451,6 @@
       </div>
     </div>
   </div>
+  
 </div>
-
+<!-- Modal  delete confirmation-->
