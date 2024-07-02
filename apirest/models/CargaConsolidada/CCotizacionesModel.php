@@ -1453,7 +1453,7 @@ class CCotizacionesModel extends CI_Model
             //initial column 44=sum(initialcolumn16+initialcolumn40+initialcolumn32)
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                 $InitialColumn . '44',
-                "=SUM(" . $InitialColumn . "15," . $InitialColumn . "40," . $InitialColumn . "32," . $InitialColumn . "26)"
+                "=SUM(" . $InitialColumn . "15," . $InitialColumn . "40," . $InitialColumn . "32,(" . $InitialColumn . "26*" . $InitialColumn . "10))"
             );
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '44')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '45', $producto["cantidad"]);
