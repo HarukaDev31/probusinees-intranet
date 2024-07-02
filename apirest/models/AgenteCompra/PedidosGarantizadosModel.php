@@ -129,12 +129,7 @@ class PedidosGarantizadosModel extends CI_Model
 		IGPD.Txt_Producto,
 		IGPD.Txt_Descripcion,
 		IGPD.Qt_Producto,
-		ACPDPP.Qt_Producto_Caja_Final,
-		ACPDPP.Ss_Precio,
-		ACPDPP.Qt_Producto_Caja,
-		ACPDPP.Qt_Cbm,
-		ACPDPP.Nu_Dias_Delivery,
-		ACPDPP.Ss_Costo_Delivery');
+		ACPDPP.*');
         $this->db->from($this->table);
         $this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
         $this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
@@ -173,6 +168,8 @@ class PedidosGarantizadosModel extends CI_Model
 		ACPDPP.terciary_photo,
 		ACPDPP.primary_video,
 		ACPDPP.secondary_video,
+        ACPDPP.unidad_medida,
+        ACPDPP.kg_box
 		');
         $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP');
         $this->db->join($this->table . ' AS ACPC', 'ACPC.ID_Pedido_Cabecera = ACPDPP.ID_Pedido_Cabecera', 'join');
@@ -287,10 +284,7 @@ class PedidosGarantizadosModel extends CI_Model
                     $costo_delivery = $row['costo_delivery_oculta'];
                 }
 
-                $nota_historica = $row['nota_historica'];
-                if (empty($row['nota_historica'])) {
-                    $nota_historica = $row['nota_historica_oculta'];
-                }
+                $nota_historica = $row['notas'];
 
                 $contacto_proveedor = $row['contacto_proveedor'];
                 if (empty($row['contacto_proveedor'])) {
@@ -341,6 +335,8 @@ class PedidosGarantizadosModel extends CI_Model
                     'terciary_photo' => $results['paths'][$key]['terciary_photo'],
                     'primary_video' => $results['paths'][$key]['primary_video'],
                     'secondary_video' => $results['paths'][$key]['secondary_video'],
+                    'unidad_medida' => $row['unidad_medida'],
+                    'kg_box' => $row['kgbox'],
                     'ID_Entidad_Proveedor' => $idSupplier,
                 );
 
@@ -662,7 +658,7 @@ class PedidosGarantizadosModel extends CI_Model
                 'Qt_Cbm' => $row['cbm'],
                 'Nu_Dias_Delivery' => $row['delivery'],
                 'Ss_Costo_Delivery' => $row['shipping_cost'],
-                'Txt_Nota' => nl2br($row['nota']),
+                'Txt_Nota' => nl2br($row['notas']),
                 'No_Contacto_Proveedor' => $row['contacto_proveedor'],
                 'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
                 "main_photo" => $results['paths'][$key]['main_photo'],
@@ -671,6 +667,8 @@ class PedidosGarantizadosModel extends CI_Model
                 "primary_video" => $results['paths'][$key]['primary_video'],
                 "secondary_video" => $results['paths'][$key]['secondary_video'],
                 'ID_Entidad_Proveedor' => $idSupplier,
+                'unidad_medida' => $row['unidad_medida'],
+                'kg_box' => $row['kgbox'],
             );
             $this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor', $arrDetalle);
             $id = $this->db->insert_id();

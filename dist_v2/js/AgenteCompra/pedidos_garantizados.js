@@ -873,6 +873,7 @@ $(function () {
                     elemento.classList[3] == "cbm" ||
                     elemento.classList[3] == "delivery" ||
                     elemento.classList[3] == "shipping_cost" ||
+                    elemento.classList[3] == "kgbox" ||
                     elemento.classList[3] == "celular_proveedor") &&
                     (isNaN(parseFloat($("#" + elemento.id).val())) ||
                       parseFloat($("#" + elemento.id).val()) < 0.0)) ||
@@ -1303,7 +1304,6 @@ function verPedido(ID) {
         table_enlace_producto += "</tr>";
 
         table_enlace_producto += "<tr><td class='text-center' colspan='4'>";
-        console.log(response,"EDIT")
         if (response.Nu_Estado_China != 3 && response.Nu_Tipo_Privilegio_Acceso!=1) {
           //cotizacio china
           table_enlace_producto += '<div class="row">';
@@ -1811,6 +1811,19 @@ function generarAgenteCompra(ID) {
 function _generarAgenteCompra($modal_delete, ID) {
   $modal_delete.modal("hide");
   url = base_url + "AgenteCompra/PedidosGarantizados/generarAgenteCompra/" + ID;
+  // $.ajax({
+  //   url: url,
+  //   type: "GET",
+  //   dataType: "JSON",
+  //   success: function (response) {
+  //     if (response.status == "success") {
+  //       window.open(response.url, "_blank");
+  //     } else {
+  //       $(".modal-message").removeClass(
+  //         "modal-danger modal-warning modal-success"
+  //       );
+  //     }}});
+        
   window.open(url, "_blank");
 }
 
@@ -1890,6 +1903,25 @@ function addItems() {
           <input type="text" id="modal-costo_delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
         </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Kg / box <span class="label-advertencia text-danger"> *</span><span/>
+        <div class="form-group">
+          <input type="text" id="modal-kgbox${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][kgbox]" class="arrProducto form-control required kgbox input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Unidad Medida<span class="label-advertencia text-danger"> *</span><span/>
+        <select id="modal-unidad_medida${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
+          <option value="un">Unidades</option>
+          <option value="mt">Metros</option>
+          <option value="pc">Piezas</option>
+          <option value="kg">Kilogramos</option>
+          <option value="pa">Pares</option>
+          <option value="lt">Litros</option>
+          </select>
+        <span class="help-block text-danger" id="error"></span>
       </div>
     </div>
     <div class="row">
@@ -2209,6 +2241,25 @@ function getItemTemplate(i, mode, detalle, privilegio) {
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
+         <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Kg / box <span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-kgbox${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][kgbox]" class="arrProducto form-control required kgbox input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Unidad Medida<span class="label-advertencia text-danger"> *</span><span/>
+          <select id="modal-unidad_medida${i}" data-correlativo="${i}" name="addProducto[${i}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
+            <option value="un">Unidades</option>
+            <option value="mt">Metros</option>
+            <option value="pc">Piezas</option>
+            <option value="kg">Kilogramos</option>
+            <option value="pa">Pares</option>
+            <option value="lt">Litros</option>
+            </select>
+          <span class="help-block text-danger" id="error"></span>
+        </div>
       </div>
       <div class="row">
         <div class="col-12 col-md-6 col-lg-6">
@@ -2259,7 +2310,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           <div class="form-group">
             <textarea id="modal-notas${i}" data-correlativo="${i}" name="addProducto[${i}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
           </div>
-
+          
         </div>
       </div>
       `;
@@ -2327,6 +2378,9 @@ function getItemProveedor(id_detalle) {
         container
           .find(`#modal-costo_delivery${i + 1}`)
           .val(detalle[i]["Ss_Costo_Delivery"]);
+        container.find(`#modal-notas${i + 1}`).val(detalle[i]["Txt_Nota"]);
+        container.find(`#modal-kgbox${i + 1}`).val(detalle[i]["kg_box"]);
+        container.find(`#modal-unidad_medida${i + 1}`).val(detalle[i]["unidad_medida"]);
         container
           .find(`#modal-nombre_proveedor${i + 1}`)
           .val(detalle[i]["No_Contacto_Proveedor"]);
