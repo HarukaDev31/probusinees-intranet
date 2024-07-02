@@ -1794,10 +1794,6 @@ Pronto le aviso nuevos avances, que tengan buen día🚢
             //remove borders from b36 to l39
             $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
         }
-        //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
-
-        //select
-        //remove page 2
         $objPHPExcel->removeSheetByIndex(1);
         //set sheet 3 title to 2
         $objPHPExcel->setActiveSheetIndex(1);
