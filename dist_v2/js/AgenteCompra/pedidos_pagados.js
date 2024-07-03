@@ -6810,6 +6810,17 @@ function generarAgenteCompra(ID) {
 function _generarAgenteCompra($modal_delete, ID) {
   $modal_delete.modal("hide");
   url = base_url + "AgenteCompra/PedidosPagados/generarAgenteCompra/" + ID;
+  // $.ajax({
+  //   url: url,
+  //   type: "GET",
+  //   dataType: "JSON",
+  //   success: function (response) {
+  //     console.log(response);
+  //   },
+  //   error: function (jqXHR, textStatus, errorThrown) {
+  //     //$( '#modal-loader' ).modal('hide');
+  //   },
+  // });
   window.open(url, "_blank");
 }
 

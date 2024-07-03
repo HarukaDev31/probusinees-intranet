@@ -2051,23 +2051,21 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		' . $this->table . '.Nu_Correlativo,
 		' . $this->table . '.Fe_Emision_Cotizacion,
 		' . $this->table . '.Ss_Tipo_Cambio,
+        ' . $this->table . '.cotizacionCode,
 		CORRE.Fe_Month,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, CLI.Nu_Documento_Identidad_Externo,
 		IGPD.Txt_Url_Imagen_Producto,
 		IGPD.Txt_Producto,
+        PAIS.No_Pais,
 		IGPD.Txt_Descripcion,
-		ACPDPP.Qt_Producto_Caja_Final,
-		ACPDPP.Ss_Precio,
-		ACPDPP.Qt_Producto_Caja,
-		ACPDPP.Qt_Cbm,
-		ACPDPP.Nu_Dias_Delivery,
-		ACPDPP.Ss_Costo_Delivery');
+		ACPDPP.*');
         $this->db->from($this->table);
         $this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
         $this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
         $this->db->join($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP', 'ACPDPP.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera AND IGPD.ID_Pedido_Detalle=ACPDPP.ID_Pedido_Detalle', 'join');
         $this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
+        $this->db->join($this->table_pais . ' AS PAIS', 'PAIS.ID_Pais = CLI.ID_Pais', 'join');
         $this->db->where($this->table . '.ID_Pedido_Cabecera', $ID);
         $this->db->where('ACPDPP.Nu_Selecciono_Proveedor', 1);
         $query = $this->db->get();

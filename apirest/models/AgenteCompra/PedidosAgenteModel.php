@@ -260,11 +260,8 @@ class PedidosAgenteModel extends CI_Model{
 		return $this->db->query($query)->row();
 	}
 	public function generateCotizationCode(){
-		//get current month first 3 letters
-		$Fe_Month = substr(date('F', strtotime(dateNow('fecha'))), 0, 3);
-		//get count of rows with Nu_Estado=2 and Fe_Registro_Hora_Cotizacion month = current month
-		$query = "SELECT COUNT(*) AS count FROM agente_compra_pedido_cabecera WHERE Nu_Estado>2 AND MONTH(Fe_Registro_Hora_Cotizacion) = MONTH(NOW())";
-		//concatenate current month first 3 letters and count + 1
+		$Fe_Month = strtoupper(substr(date('F', strtotime(dateNow('fecha'))), 0, 3));
+		$query = "SELECT COUNT(*) AS count FROM agente_compra_pedido_cabecera WHERE Nu_Estado>=2 AND MONTH(Fe_Registro_Hora_Cotizacion) = MONTH(NOW())";
 		$Nu_Correlativo = $this->db->query($query)->row()->count + 1;
 		$Nu_Correlativo = str_pad($Nu_Correlativo, 4, '0', STR_PAD_LEFT);
 		return $Fe_Month . $Nu_Correlativo;
