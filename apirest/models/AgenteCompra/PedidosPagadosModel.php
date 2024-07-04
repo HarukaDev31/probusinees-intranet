@@ -2376,9 +2376,10 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
         }
     }
-    public function getSupplierProducts($idPedido){
+    public function getSupplierProducts($idPedido,$idSupplier){
         try{
-            $sp="CALL ".$this->sp_suppliers."(".$idPedido.")";
+            $idSupplier = !$idSupplier ? "null" : $idSupplier;
+            $sp="CALL ".$this->sp_suppliers."(".$idPedido.",".$idSupplier.")";
             $query = $this->db->query($sp);
             return $query->result();
         }catch (Exception $e){

@@ -146,15 +146,15 @@ class PedidosPagados extends CI_Controller
                 $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
             }
 
-            $btn_comision_trading = '';
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {
-                $btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">Comisión</button>';
-                if ($row->Ss_Comision_Interna_Trading > 0) {
-                    $btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
-                }
-            }
+                // $btn_comision_trading = '';
+                // if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {
+                //     $btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">Comisión</button>';
+                //     if ($row->Ss_Comision_Interna_Trading > 0) {
+                //         $btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
+                //     }
+                // }
 
-            $rows[] = $dropdown_estado . $btn_comision_trading;
+            $rows[] = $dropdown_estado ;
 
             $arrEstadoRegistro = $this->HelperImportacionModel->obtenerIncoterms($row->Nu_Tipo_Incoterms);
             $dropdown_estado = '<div class="dropdown">';
@@ -1896,7 +1896,7 @@ class PedidosPagados extends CI_Controller
                     ));
                     return;
                 } else if ($priviligie == $this->personalChinaPrivilegio || $priviligie == $this->jefeChinaPrivilegio) {
-                    $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido);
+                    $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido,null);
                     echo json_encode(array(
                         'status' => 'success',
                         'data' => $data,
@@ -1976,8 +1976,7 @@ class PedidosPagados extends CI_Controller
         try {
             $idPedido = $this->input->post('idPedido');
             $idSupplier = $this->input->post('idSupplier');
-            $idCoordination = $this->input->post('idCoordination');
-            $data = $this->PedidosPagadosModel->getSupplierItems($idPedido, $idSupplier, $idCoordination);
+            $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, $idSupplier);    
             echo json_encode(array('status' => 'success', 'data' => $data));
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
@@ -2023,5 +2022,62 @@ class PedidosPagados extends CI_Controller
                       </div>';
         }
         return $HTML;
+    }public function downloadSupplierExcel(){
+        $postData=$this->input->post();
+        $idPedido=$postData['idPedido'];
+        $idSupplier=$postData['idSupplier'];
+     
+        $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, $idSupplier);
+        $templatePath = 'assets/downloads/agente_compra/INVOICE_PROVEEDOR.xls';
+        $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Cotizacion.xlsx"');
+        header('Cache-Control: max-age=0');
+        $objPHPExcel->getActiveSheet()->setCellValue('C11', $data[0]->cotizacionCode);
+        $initialDetailrow = 16;
+        $lastDetailrow = 18;
+        $tempUrl = array(); 
+        foreach(json_decode($data[0]->detalles,true) as $key=>$detalle){
+    
+            if (!empty($detalle['imagenURL'])) {
+                $objDrawing = new PHPExcel_Worksheet_Drawing();
+                // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
+                // $row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
+                $image = file_get_contents($detalle['imagenURL']);
+                if ($image !== false) {
+                    $path = 'assets/img/';
+                    $filename = $path . uniqid() . '.jpg';
+                    file_put_contents($filename, $image);
+                    $tempUrl[] = $filename;
+                    $objDrawing->setPath($filename);
+                    $objDrawing->setWidthAndHeight(148, 500);
+                    $objDrawing->setResizeProportional(true);
+                    $objDrawing->setCoordinates('B' . $initialDetailrow);
+                    $objDrawing->setOffsetX(10); // Ajusta el desplazamiento X si es necesario
+                    $objDrawing->setOffsetY(10); // Ajusta el desplazamiento Y si es necesario
+                    $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+
+                }
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue("E" . $initialDetailrow, $detalle['descripcion']);
+            $objPHPExcel->getActiveSheet()->setCellValue("K" . $initialDetailrow, $detalle['qty_product']);
+            $objPHPExcel->getActiveSheet()->setCellValue("L" . $initialDetailrow, $detalle['unidad_medida']);
+            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialDetailrow, $detalle['price_product']);
+            $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialDetailrow,"要贴麦头");
+            $initialDetailrow++;
+        }
+
+        if($initialDetailrow<=$lastDetailrow){
+			$objPHPExcel->getActiveSheet()->removeRow($initialDetailrow, $lastDetailrow-$initialDetailrow+1);
+		}
+        $objPHPExcel->getActiveSheet()->setCellValue('J'. ($initialDetailrow),"=SUM(J16:J".($initialDetailrow-1).")");
+        $objPHPExcel->getActiveSheet()->setCellValue('N'. ($initialDetailrow),"=SUM(N16:N".($initialDetailrow-1).")");
+        $objPHPExcel->getActiveSheet()->setCellValue('R'. ($initialDetailrow+2),"=SUM(R16:R".($initialDetailrow-1).")");
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        foreach ($tempUrl as $key => $val) {
+            unlink($val);
+        }
+        exit();  
     }
 }

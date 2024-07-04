@@ -135,18 +135,17 @@
                     <div class="col-12 col-sm-4 col-md-2">
                       <label>T.C.</label>
                       <div class="form-group">
-                        <input type="text" name="Ss_Tipo_Cambio" class="form-control required" placeholder="Ingresar" autocomplete="off">
+                        <input type="text" name="Ss_Tipo_Cambio" min="0.01" class="form-control required" placeholder="Ingresar" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
 
-                    <div class="col-12 col-sm-4 col-md-4">
+                    <!-- <div class="col-12 col-sm-4 col-md-4">
                       <label>Cotizacion</label>
                       <div class="form-group" id="container-file_cotizacion">
                         <input type="file" id="file_cotizacion" name="file_cotizacion" class="" accept="application/pdf">
-                        <!-- <textarea name="Txt_Observaciones_Garantizado" class="form-control" rows="1" placeholder="Opcional" style="height: 38px !important;"></textarea> -->
                       </div>
-                    </div>
+                    </div> -->
                   </div>
 
                   <div class="row">

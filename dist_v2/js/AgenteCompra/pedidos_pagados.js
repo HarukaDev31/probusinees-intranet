@@ -7133,17 +7133,23 @@ const getSupplierCoordinationTableTemplate = (data) => {
   html += `<tbody>`;
   data.forEach((supplier) => {
     const detalles = JSON.parse(supplier.detalles);
+    const sumDelivery = detalles.reduce(
+      (acc, detail) => acc + parseFloat(detail.shipping_cost),
+      0);
     const rowspan = detalles.length;
     html += `
       <tr>
           <td class="supplier-info" rowspan="${rowspan}" colspan="3">
               <div>Nombre: ${supplier.name}</div>
               <div>Teléfono: ${supplier.phone}</div>
+              <div>Costo shipping: ${sumDelivery}</div>
               <input type="hidden" name="id-pedido" value="${supplier.id_pedido}"/>
               <input type="hidden" name="current-step" value="${selectedStep}"/>
 
               <btn class="btn btn-outline-secondary btn-coordinar" onclick="openSupplierItems(
               ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Cambiar</btn>
+              <btn class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
+              ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Descargar Excel</btn>
           </td>
       `;
 
@@ -7243,6 +7249,44 @@ const getSupplierCoordinationTableTemplate = (data) => {
   html += `</form>`;
   return html;
 };
+const downloadSupplierExcel = (id_pedido, id_supplier, id_coordination) => {
+  url = base_url + "AgenteCompra/PedidosPagados/downloadSupplierExcel";
+    $.ajax({
+      url: url,
+      type: "POST",
+      xhrFields: {
+        responseType: "blob",
+      },
+
+      data:{
+        idPedido: id_pedido,
+        idSupplier: id_supplier,
+        idCoordination: id_coordination,
+      },
+      success: function (response) {
+        //return blob to download
+        var blob = new Blob([response], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        var link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        const currentDate = new Date();
+        //format date to dd_mm_yyyy
+        const formattedDate = `${currentDate.getDate()}_${
+          currentDate.getMonth() + 1
+        }_${currentDate.getFullYear()}`;
+        link.download =
+          "Cotizacion_" + formattedDate + ".xlsx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
+      },
+    });
+}
 const openSupplierItems = (id_pedido, id_supplier, id_coordination) => {
   console.log(id_pedido, id_supplier, id_coordination, "openSupplierItems");
   $.ajax({
@@ -7719,7 +7763,7 @@ const openOrdenCompra = (response) => {
       $("#btn-rotulado").hide();
       buttonsData = {
         btnSave: {
-          text: "Guardar",
+          text: "Verificar",
           action: `saveOrdenCompra()`,
         },
         btnCancel: {
@@ -7792,7 +7836,7 @@ const getProductTemplate = (producto) => {
               producto
             )})'>Rotulado</div>`
           : `
-      <span class="btn btn-primary">ITEM CODE :${
+      <span class="badge badge-success">ITEM CODE :${
         producto.product_code ? producto.product_code : ""
       }</span>`
       }
@@ -7801,14 +7845,14 @@ const getProductTemplate = (producto) => {
       <span>${producto.Qt_Producto}</span>
     </div>
     <div class="col-12 col-lg-3">
-          <span style="word-break: break-word;overflow:auto">${
+          <span style="word-break: break-word;overflow:auto;max-height:200px">${
             producto.Txt_Descripcion
           }</span>
     </div>
     <div class="col-12 col-lg-2">
       <a href="${
         producto.Txt_Url_Link_Pagina_Producto
-      }" target="_blank" class="btn btn-link" style="word-break: break-word;overflow:auto">${
+      }" target="_blank" class="btn btn-link" style="word-break: break-word;overflow:auto;max-height:200px">${
     producto.Txt_Url_Link_Pagina_Producto
   }</a>
     </div>
@@ -8013,11 +8057,11 @@ const getActionButtons = (data) => {
     if (data.hasOwnProperty("btnSave") && data.hasOwnProperty("btnCancel")) {
       buttons = `
       <div class="row buttons mt-2">
-        <div class="col-12 col-md-6">
-          <div class="btn btn-primary button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+        <div class="col-12 col-md-6 d-flex">
+          <div class="btn mx-auto btn-primary button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
         </div>
-        <div class="col-12 col-md-6">
-          <div class="btn btn-secondary button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+        <div class="col-12 col-md-6 d-flex">
+          <div class="btn mx-auto btn-secondary button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
         </div>
       </div>`;
     } else if (data.hasOwnProperty("btnSave")) {

@@ -216,7 +216,7 @@ $(function () {
         var term = term.toLowerCase();
         $.post(
           base_url +
-          "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
+            "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
           { global_search: term },
           function (arrData) {
             response(arrData);
@@ -573,7 +573,7 @@ $(function () {
     var correlativo = $(this).data("correlativo");
     var name_item = $(this).data("name_item");
     var id_supplier = $(this).data("id_supplier");
-    let pedidoID = $("#txt-EID_Pedido_Cabecera_item").val()
+    let pedidoID = $("#txt-EID_Pedido_Cabecera_item").val();
 
     $("#btn-confirmation").on("click", function () {
       $("#modal-confirmation").modal("hide");
@@ -590,7 +590,10 @@ $(function () {
         correlativo +
         "/" +
         encodeURIComponent(name_item) +
-        "/" + pedidoID + "/" + id_supplier;
+        "/" +
+        pedidoID +
+        "/" +
+        id_supplier;
       $.ajax({
         url: url,
         type: "GET",
@@ -651,7 +654,7 @@ $(function () {
     var correlativo = $(this).data("correlativo");
     var name_item = $(this).data("name_item");
     var id_supplier = $(this).data("id_supplier");
-    let pedidoID = $("#txt-EID_Pedido_Cabecera_item").val()
+    let pedidoID = $("#txt-EID_Pedido_Cabecera_item").val();
     console.log("correlativo " + correlativo);
     console.log("name_item " + name_item);
 
@@ -667,7 +670,10 @@ $(function () {
       correlativo +
       "/" +
       encodeURIComponent(name_item) +
-      "/" + pedidoID + "/" + id_supplier;;
+      "/" +
+      pedidoID +
+      "/" +
+      id_supplier;
     $.ajax({
       url: url,
       type: "GET",
@@ -1129,7 +1135,7 @@ function verPedido(ID) {
         $("#container-file_cotizacion").append(`
           <a id="btn-file_cotizacion" href="${response.file_cotizacion}" target="_blank" class="btn btn-primary" role="button">
           <i class="fa fa-download"></i>
-          Descargar Cotizacion</a>`)
+          Descargar Cotizacion</a>`);
       }
 
       var yuan_venta = response.Ss_Tipo_Cambio;
@@ -1168,10 +1174,10 @@ function verPedido(ID) {
         var id_item = detalle[i]["ID_Pedido_Detalle"];
         var href_link =
           detalle[i]["Txt_Url_Link_Pagina_Producto"] != "" &&
-            detalle[i]["Txt_Url_Link_Pagina_Producto"] != null
+          detalle[i]["Txt_Url_Link_Pagina_Producto"] != null
             ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" +
-            detalle[i]["Txt_Url_Link_Pagina_Producto"] +
-            "' role='button'>Link</a>"
+              detalle[i]["Txt_Url_Link_Pagina_Producto"] +
+              "' role='button'>Link</a>"
             : "";
         var nombre_producto =
           detalle[i]["Txt_Producto"] != "" && detalle[i]["Txt_Producto"] != null
@@ -1304,7 +1310,10 @@ function verPedido(ID) {
         table_enlace_producto += "</tr>";
 
         table_enlace_producto += "<tr><td class='text-center' colspan='4'>";
-        if (response.Nu_Estado_China != 3 && response.Nu_Tipo_Privilegio_Acceso!=1) {
+        if (
+          (response.Nu_Estado_China != 3 && response.Nu_Tipo_Privilegio_Acceso != 1)||
+          response.Nu_Tipo_Privilegio_Acceso != 1
+        ) {
           //cotizacio china
           table_enlace_producto += '<div class="row">';
           table_enlace_producto += '<div class="col">';
@@ -1345,22 +1354,24 @@ function verPedido(ID) {
           table_enlace_producto += "</div>";
           table_enlace_producto += "</div>";
         } else {
-          table_enlace_producto +=
-            '<button type="button" id="btn-elegir_proveedor' +
-            id_item +
-            '" data-name_producto="' +
-            nombre_producto +
-            '" data-id_empresa="' +
-            response.ID_Empresa +
-            '" data-id_organizacion="' +
-            response.ID_Organizacion +
-            '" data-id_pedido_cabecera="' +
-            response.ID_Pedido_Cabecera +
-            '" data-correlativo="' +
-            response.sCorrelativoCotizacion +
-            '" data-id_pedido_detalle="' +
-            id_item +
-            '" class="btn btn-danger btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
+          if (parseInt(response.count_proveedor > 0)) {
+            table_enlace_producto +=
+              '<button type="button" id="btn-elegir_proveedor' +
+              id_item +
+              '" data-name_producto="' +
+              nombre_producto +
+              '" data-id_empresa="' +
+              response.ID_Empresa +
+              '" data-id_organizacion="' +
+              response.ID_Organizacion +
+              '" data-id_pedido_cabecera="' +
+              response.ID_Pedido_Cabecera +
+              '" data-correlativo="' +
+              response.sCorrelativoCotizacion +
+              '" data-id_pedido_detalle="' +
+              id_item +
+              '" class="btn btn-danger btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
+          }
         }
         table_enlace_producto += "</td></tr>";
       }
@@ -1686,7 +1697,6 @@ function isExistTableTemporalProducto($id) {
 
 function form_pedido() {
   if ($("#table-Producto_Enlace >tbody >tr").length == 0) {
-
     $("#txt-ANombre")
       .closest(".form-group")
       .find(".help-block")
@@ -1823,7 +1833,7 @@ function _generarAgenteCompra($modal_delete, ID) {
   //         "modal-danger modal-warning modal-success"
   //       );
   //     }}});
-        
+
   window.open(url, "_blank");
 }
 
@@ -2340,7 +2350,6 @@ function getItemTemplate(i, mode, detalle, privilegio) {
               class="btn btn-secondary btn-block btn-desmarcar_proveedor">
               <i class="fas fa-times"></i>&nbsp; Deseleccionar proveedor
             </button>`;
-
     }
   }
   div_items += `<div class="separator-line"></div>`;
@@ -2380,7 +2389,9 @@ function getItemProveedor(id_detalle) {
           .val(detalle[i]["Ss_Costo_Delivery"]);
         container.find(`#modal-notas${i + 1}`).val(detalle[i]["Txt_Nota"]);
         container.find(`#modal-kgbox${i + 1}`).val(detalle[i]["kg_box"]);
-        container.find(`#modal-unidad_medida${i + 1}`).val(detalle[i]["unidad_medida"]);
+        container
+          .find(`#modal-unidad_medida${i + 1}`)
+          .val(detalle[i]["unidad_medida"]);
         container
           .find(`#modal-nombre_proveedor${i + 1}`)
           .val(detalle[i]["No_Contacto_Proveedor"]);
@@ -2456,8 +2467,8 @@ function getItemProveedor(id_detalle) {
             .find(`#container-uploadvideo2-${i + 1}`)
             .append(
               "<video src='" +
-              detalle[i]["secondary_video"] +
-              "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
+                detalle[i]["secondary_video"] +
+                "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
             );
         }
 
@@ -2474,7 +2485,7 @@ function getItemProveedor(id_detalle) {
         var cantidad_final = detalle[i]["Qt_Producto_Caja_Final"];
         var nota_final =
           detalle[i]["Txt_Nota_Final"] != "" &&
-            detalle[i]["Txt_Nota_Final"] != null
+          detalle[i]["Txt_Nota_Final"] != null
             ? detalle[i]["Txt_Nota_Final"]
             : "";
         var cantidad_html =
@@ -2836,7 +2847,10 @@ function descargarDocumentoPagoGarantizado(id) {
           base_url +
           "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/" +
           id;
-        $("#a-download_image_pago_garantizado").attr("href", response.url_image);
+        $("#a-download_image_pago_garantizado").attr(
+          "href",
+          response.url_image
+        );
         //$("#a-download_image_pago_garantizado").attr("data-id_pago", id);
       } else {
         alert(response.message);
@@ -3182,10 +3196,10 @@ function asignarPedido(ID_Pedido_Cabecera, Nu_Estado) {
         for (var x = 0; x < l; x++) {
           $("#cbo-guardar_personal_china-ID_Usuario").append(
             '<option value="' +
-            response.result[x].ID +
-            '">' +
-            response.result[x].Nombre +
-            "</option>"
+              response.result[x].ID +
+              '">' +
+              response.result[x].Nombre +
+              "</option>"
           );
         }
       } else {

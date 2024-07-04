@@ -85,6 +85,7 @@ class PedidosGarantizadosModel extends CI_Model
         $this->db->select('CORRE.Fe_Month, Nu_Estado_China,
 		(SELECT Ss_Venta_Oficial FROM tasa_cambio WHERE ID_Empresa=1 AND Fe_Ingreso="' . dateNow('fecha') . '" LIMIT 1) AS yuan_venta,
 		' . $this->table . '.*,
+        (select count(*) from agente_compra_pedido_detalle_producto_proveedor where ID_Pedido_Cabecera=' . $this->table . '.ID_Pedido_Cabecera and Nu_Selecciono_Proveedor=1) as count_proveedor,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
