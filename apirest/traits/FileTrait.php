@@ -133,8 +133,8 @@ trait FileTrait
                 $type = $data_files['file']['type'][$filesIndex][$keyFile];
                 $name = $data_files['file']['name'][$filesIndex][$keyFile];
                 $size = $data_files['file']['size'][$filesIndex][$keyFile] / 1024; // size in KB
-                $allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP');
-                $allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp');
+                $allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','mp4','MP4','avi','AVI','mov','MOV','flv','FLV','wmv','WMV','3gp','3GP','mkv','MKV','webm','WEBM');
+                $allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','video/mp4','video/avi','video/mov','video/flv','video/wmv','video/3gp','video/mkv','video/webm');
                 $maxSize = 3072; // 1024 KB = 3 MB
 
                 $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($name, $type, $allowedExtensions, $allowedContentTypes);

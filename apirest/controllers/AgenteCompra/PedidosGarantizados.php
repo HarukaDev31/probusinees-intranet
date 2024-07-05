@@ -119,11 +119,14 @@ class PedidosGarantizados extends CI_Controller {
 			$rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 
 			// //EXCEL cliente de pedido
-			if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
+			if($this->user->Nu_Tipo_Privilegio_Acceso==1) {
 				$excel_agente_compra = '<button class="btn" alt="Proforma Trading" title="Proforma Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
 				$excel_consolida_trading = '<button class="btn" alt="Proforma C. Trading" title="Proforma C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
 				$rows[] = $excel_agente_compra . '<br>' . $excel_consolida_trading;
 				$rows[] = '<span class="badge bg-danger">7 días</span><br>T.C. $ ' . round($row->Ss_Tipo_Cambio, 2);
+			}else{
+				$excel_consolida_trading = '<button class="btn" alt="Proforma C. Trading" title="Proforma C. Trading" href="javascript:void(0)" onclick="generarCotizacionChina(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading/Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+				$rows[] = $excel_consolida_trading;	
 			}
 
 			//estado peru
@@ -221,7 +224,84 @@ class PedidosGarantizados extends CI_Controller {
 		echo json_encode($this->PedidosGarantizadosModel->addPedidoItemProveedor($formData,$fileData));
 		exit();
 	}
+	public function generarCotizacionChina($ID){
+		$data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));
+		$this->load->library('PHPExcel');
+		// echo json_encode($data);
+        $templatePath = 'assets/downloads/agente_compra/COTIZACION-CHINA.xls';
+		$objPHPExcel = PHPExcel_IOFactory::load($templatePath);
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="cotizacion-garantizada.xlsx"');
+        header('Cache-Control: max-age=0');
+		//set D10	 = $data[0]->No_Contacto
+		$objPHPExcel->getActiveSheet()->setCellValue('D10', $data[0]->No_Contacto);
+		$objPHPExcel->getActiveSheet()->setCellValue('D11', $data[0]->Nu_Celular_Contacto);
+		$objPHPExcel->getActiveSheet()->setCellValue('D12', $data[0]->Txt_Email_Contacto);
+		// $objPHPExcel->getActiveSheet()->setCellValue('E21', "TRADING");
+		$objPHPExcel->getActiveSheet()->setCellValue('L10', date('d/m/Y'));
+		$objPHPExcel->getActiveSheet()->setCellValue('U10', $data[0]->Ss_Tipo_Cambio);
+		// $objPHPExcel->getActiveSheet()->setCellValue('E35', "=K32");
+		$initialRow=17;
+		$lastProductrow=18;
+		$tempUrl = array();
+		foreach($data as $key => $val){
+			//get $val->Txt_Url_Imagen_Producto and set image in cell
+			if (!empty($val->Txt_Url_Imagen_Producto)) {
+				$objDrawing = new PHPExcel_Worksheet_Drawing();
+				// $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
+				// $row->Txt_Url_Imagen_Producto = str_replace("assets","public_html/assets", $row->Txt_Url_Imagen_Producto);
+				$image = file_get_contents($val->Txt_Url_Imagen_Producto);
+				if ($image !== false) {
+					$path = 'assets/img/';
+					$filename = $path . uniqid() . '.jpg';
+					file_put_contents($filename, $image);
+					$tempUrl[] = $filename;
+					$objDrawing->setPath($filename);
+					$objDrawing->setWidthAndHeight(148, 500);
+					$objDrawing->setResizeProportional(true);
+					$objDrawing->setCoordinates('C' . $initialRow);
+					$objDrawing->setOffsetX(10); // Ajusta el desplazamiento X si es necesario
+					$objDrawing->setOffsetY(10); // Ajusta el desplazamiento Y si es necesario
+					$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 
+				}
+			}
+			// $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
+	
+
+
+			$objPHPExcel->getActiveSheet()->setCellValue("D". $initialRow, $val->Txt_Producto);
+			$objPHPExcel->getActiveSheet()->setCellValue("E". $initialRow, $val->Txt_Descripcion);
+			$objPHPExcel->getActiveSheet()->setCellValue("G". $initialRow, $val->Qt_Producto);
+			$objPHPExcel->getActiveSheet()->setCellValue("H". $initialRow, $val->unidad_medida);
+			$objPHPExcel->getActiveSheet()->setCellValue("I". $initialRow, $val->Ss_Precio);
+			$objPHPExcel->getActiveSheet()->setCellValue("N". $initialRow, $val->Qt_Producto_Caja);
+			$objPHPExcel->getActiveSheet()->setCellValue("P". $initialRow, "=P". $initialRow."/N". $initialRow);
+			$objPHPExcel->getActiveSheet()->setCellValue("Q". $initialRow, $val->Qt_Cbm);
+			$objPHPExcel->getActiveSheet()->setCellValue("R". $initialRow, $val->kg_box);
+			$objPHPExcel->getActiveSheet()->setCellValue("T". $initialRow, $val->Ss_Costo_Delivery);
+			$objPHPExcel->getActiveSheet()->setCellValue("U". $initialRow, $val->Nu_Dias_Delivery);
+			$objPHPExcel->getActiveSheet()->setCellValue("V". $initialRow, $val->Txt_Nota);
+			$initialRow++;
+		}
+		if($initialRow<=$lastProductrow){
+			$objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow-$initialRow+1);
+		}
+		$objPHPExcel->getActiveSheet()->setCellValue('K'. ($initialRow),"=SUM(K17:K".($initialRow-1).")"); 
+		$objPHPExcel->getActiveSheet()->setCellValue('L'. ($initialRow),"=SUM(L17:L".($initialRow-1).")");
+		$objPHPExcel->getActiveSheet()->setCellValue('N'. ($initialRow),"=SUM(N17:N".($initialRow-1).")");
+		$objPHPExcel->getActiveSheet()->setCellValue('P'. ($initialRow),"=SUM(P17:P".($initialRow-1).")");
+		$objPHPExcel->getActiveSheet()->setCellValue('R'. ($initialRow),"=SUM(R17:R".($initialRow-1).")");
+		$objPHPExcel->getActiveSheet()->setCellValue('S'. ($initialRow),"=SUM(S17:S".($initialRow-1).")"); 
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		//SET NAME FILE
+        $objWriter->save('php://output');
+		
+
+        exit(); //
+		
+	}
 	//generar cotización PDF para pedido de cliente	
 	public function generarAgenteCompra($ID){
         $data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));

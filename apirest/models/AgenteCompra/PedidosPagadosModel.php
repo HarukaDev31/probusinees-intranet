@@ -2134,6 +2134,9 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $existingvimmotorURL=$data['vim_motor_URL'];
 
             $path = "assets/images/agentecompra/orden-compra/".$idPedido."/".$idProducto."/rotulado/";
+            $this->allowedContentTypes=array('image','application','text','application/zip','application/x-rar-compressed','application/x-7z-compressed','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/msword','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-excel','application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.presentationml.presentation','application/pdf');
+            $this->allowedExtensions=array('jpg','jpeg','png','gif','bmp','pdf','doc','docx','xls','xlsx','ppt','pptx','txt','zip','rar','7z');
+            $this->maxFileSize=10240;
             if($existingcajaMasterURL!="null"){
                 $cajaMasterURL=$existingcajaMasterURL;
             }
@@ -2143,9 +2146,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             if($existingempaqueURL!="null"){
                 $empaqueURL=$existingempaqueURL;
             }
-
             if(array_key_exists('empaque',$files)){
-                    $empaqueURL=$this->uploadSingleFile($files['empaque'],$path);
+                $empaqueURL=$this->uploadSingleFile($files['empaque'],$path);
             }
             if($existingvimmotorURL!="null"){
                 $vimmotorURL=$existingvimmotorURL;

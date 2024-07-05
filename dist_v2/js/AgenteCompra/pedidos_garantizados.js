@@ -524,15 +524,42 @@ $(function () {
     ".img-table_item",
     function () {
       $(".img-responsive").attr("src", "");
-
       $(".modal-ver_item").modal("show");
-      $(".img-responsive").attr("src", $(this).data("url_img"));
+      console.log($(this));
+      $(".img-responsive").attr("src", $(this).data("url_img")||$(this)[0].currentSrc);
       $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
+      $("#a-download_image").attr("data-src",$(this)[0].currentSrc);
     }
   );
 
   $("#a-download_image").click(function () {
     id = $(this).data("id_item");
+    src=$(this).data("src");
+    filename=src.split("/").pop();
+
+    if(src){
+      $.ajax({
+        url: src,
+        method: 'GET',
+        xhrFields: {
+            responseType: 'blob' // Important
+        },
+        success: function(data) {
+            const blobUrl = window.URL.createObjectURL(data);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('Error downloading file:', textStatus, errorThrown);
+        }
+    });
+      return;
+    }
     url = base_url + "AgenteCompra/PedidosGarantizados/downloadImage/" + id;
 
     var popupwin = window.open(url);
@@ -1354,7 +1381,7 @@ function verPedido(ID) {
           table_enlace_producto += "</div>";
           table_enlace_producto += "</div>";
         } else {
-          if (parseInt(response.count_proveedor > 0)) {
+          if (parseInt(response.count_proveedor )> 0) {
             table_enlace_producto +=
               '<button type="button" id="btn-elegir_proveedor' +
               id_item +
@@ -1794,6 +1821,23 @@ function calcularTotales() {
   $("#label-total_importe").text(Math.round10(fImporteTotal, -2));
 }
 
+const generarCotizacionChina = (ID) => {
+  url = base_url + "AgenteCompra/PedidosGarantizados/generarCotizacionChina/" + ID;
+  // $.ajax({
+  //   url: url,
+  //   type: "GET",
+  //   dataType: "JSON",
+  //   success: function (response) {
+  //     if (response.status == "success") {
+  //       window.open(response.url, "_blank");
+  //     } else {
+  //       $(".modal-message").removeClass(
+  //         "modal-danger modal-warning modal-success"
+  //       );
+  //     }}});
+
+  window.open(url, "_blank");
+}
 function generarAgenteCompra(ID) {
   var $modal_delete = $("#modal-message-delete");
   $modal_delete.modal("show");
@@ -2280,27 +2324,27 @@ function getItemTemplate(i, mode, detalle, privilegio) {
               <label>Imagen Principal</label>
               </br>
               <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
-              <input type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+              <input type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
               </div>
             </div>
             <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
             <div class="form-group" id="container-uploadimg2-${i}">
             <label>Imagen 2</label>
             <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
-            <input type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+            <input type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
             </div>
               <div class="form-group" id="container-uploadimg3-${i}">
               <label>Imagen 3</label>
               <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
-              <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+              <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input></div>
               <div class="form-group" id="container-uploadvideo1-${i}">
               <label>Video 1</label>
               <input type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
-              <input type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+              <input type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
               <div class="form-group"  id="container-uploadvideo2-${i}">
               <label>Video 2</label>
               <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
-              <input type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+              <input type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
 
             </div>
           </div>
@@ -2455,7 +2499,7 @@ function getItemProveedor(id_detalle) {
           container
             .find(`#container-uploadvideo1-${i + 1}`)
             .append(
-              `<video src="${detalle[i]["primary_video"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2" controls></video>`
+              `<video src="${detalle[i]["primary_video"]}" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls></video>`
             );
         }
         if (detalle[i]["secondary_video"] != null) {
@@ -2468,7 +2512,7 @@ function getItemProveedor(id_detalle) {
             .append(
               "<video src='" +
                 detalle[i]["secondary_video"] +
-                "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
+                "' class='img-thumbnail  img-fluid img-resize mb-2 w-100' controls></video>"
             );
         }
 

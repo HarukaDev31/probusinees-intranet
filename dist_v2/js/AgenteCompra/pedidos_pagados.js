@@ -7739,10 +7739,10 @@ const openOrdenCompra = (response) => {
     currentPrivilege = parseInt(priviligie);
     $(".orden-compra_header").show();
     $(".orden-compra_header_china").append(getProductsTemplateHeader());
-    data.forEach((producto) => {
-      containerOrdenCompra.append(getProductTemplate(producto));
+    data.forEach((producto,index) => {
+      containerOrdenCompra.append(getProductTemplate(producto,index));
       if (producto.caja_master_URL) {
-        $("#btn-rotulado").removeClass("btn-primary").addClass("btn-secondary");
+        $(`#btn-rotulado-${index}`).removeClass("btn-primary").addClass("btn-outline-secondary");
       }
     });
     if (typeof pedidoData != "undefined") {
@@ -7820,7 +7820,7 @@ const getProductsTemplateHeader = () => {
   return templateHeader;
 };
 
-const getProductTemplate = (producto) => {
+const getProductTemplate = (producto,index) => {
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
@@ -7832,7 +7832,7 @@ const getProductTemplate = (producto) => {
       <span>${producto.Txt_Producto}</span>
       ${
         currentPrivilege == priviligesPersonalPeru
-          ? `<div class="btn btn-primary btn-rotulado"   onclick='openRotuladoView(${JSON.stringify(
+          ? `<div class="btn btn-primary btn-rotulado " id="btn-rotulado-${index}"  onclick='openRotuladoView(${JSON.stringify(
               producto
             )})'>Rotulado</div>`
           : `

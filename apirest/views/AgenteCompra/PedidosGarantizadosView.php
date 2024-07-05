@@ -62,10 +62,8 @@
                       <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1): ?>
                         <th class="no-sort">Ver</th>
                       <?php endif;?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
                       <th class="no-sort">Proforma</th>
                       <!-- <th class="no-sort">Vencimiento</th> -->
-                      <?php }?>
                       <!-- <th class="no-sort">Importación Integral</th> -->
                     </tr>
                   </thead>
