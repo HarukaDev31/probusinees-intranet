@@ -72,7 +72,10 @@
 
                       <th>Ver</th>
 
-                      <th>Descarga</th>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { ?>
+                        <th class="no-sort">Estado Orden </th>
+
+                      <?php } ?>
                       <th>Avance</th>
                       <!-- <th>Status</th> -->
                     </tr>

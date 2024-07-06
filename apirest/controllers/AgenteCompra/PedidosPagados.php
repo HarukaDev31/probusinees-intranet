@@ -146,15 +146,15 @@ class PedidosPagados extends CI_Controller
                 $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
             }
 
-                // $btn_comision_trading = '';
-                // if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {
-                //     $btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">Comisión</button>';
-                //     if ($row->Ss_Comision_Interna_Trading > 0) {
-                //         $btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
-                //     }
-                // }
+            // $btn_comision_trading = '';
+            // if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {
+            //     $btn_comision_trading = '<button class="btn btn-link" alt="Agregar comisión Trading" title="Agregar comisión Trading" href="javascript:void(0)" onclick="agregarComisionTrading(\'' . $row->ID_Pedido_Cabecera . '\')">Comisión</button>';
+            //     if ($row->Ss_Comision_Interna_Trading > 0) {
+            //         $btn_comision_trading = "<br>" . '$ ' . $row->Ss_Comision_Interna_Trading;
+            //     }
+            // }
 
-            $rows[] = $dropdown_estado ;
+            $rows[] = $dropdown_estado;
 
             $arrEstadoRegistro = $this->HelperImportacionModel->obtenerIncoterms($row->Nu_Tipo_Incoterms);
             $dropdown_estado = '<div class="dropdown">';
@@ -180,13 +180,14 @@ class PedidosPagados extends CI_Controller
             $rows[] = $estadoChina;
             $rows[] = "<button class='btn btn-xs btn-link' alt='Editar' title='Editar' href='javascript:void(0)'
 			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ")'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
-
-            //no tiene acceso a cambiar status de Perú
-            $excel_orden_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
-            if ($row->Nu_Tipo_Servicio == 2) {
-                $excel_orden_compra = '<button class="btn" alt="Orden Compra C. Trading" title="Orden Compra C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
+                //no tiene acceso a cambiar status de Perú
+                $excel_orden_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+                if ($row->Nu_Tipo_Servicio == 2) {
+                    $excel_orden_compra = '<button class="btn" alt="Orden Compra C. Trading" title="Orden Compra C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+                }
+                $rows[] = $excel_orden_compra;
             }
-            $rows[] = $excel_orden_compra;
             $rows[] = $avance;
 
             $data[] = $rows;
@@ -1708,7 +1709,7 @@ class PedidosPagados extends CI_Controller
         $tempUrl = array();
 
         foreach ($data as $key => $val) {
-            
+
             if (!empty($val->Txt_Url_Imagen_Producto)) {
                 $objDrawing = new PHPExcel_Worksheet_Drawing();
                 // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -1726,7 +1727,6 @@ class PedidosPagados extends CI_Controller
                     $objDrawing->setOffsetX(10); // Ajusta el desplazamiento X si es necesario
                     $objDrawing->setOffsetY(10); // Ajusta el desplazamiento Y si es necesario
                     $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-
                 }
             }
             // $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
@@ -1744,21 +1744,20 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
             $initialRow++;
         }
-        if($initialRow<=$lastProductrow){
-            $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow-$initialRow+1);
+        if ($initialRow <= $lastProductrow) {
+            $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow - $initialRow + 1);
         }
-        $objPHPExcel->getActiveSheet()->setCellValue('L'. ($initialRow),"=SUM(L26:L".($initialRow-1).")"); 
-		$objPHPExcel->getActiveSheet()->setCellValue('M'. ($initialRow),"=SUM(M26:M".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('O'. ($initialRow),"=SUM(O26:O".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('Q'. ($initialRow),"=SUM(Q26:Q".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('S'. ($initialRow),"=SUM(S26:S".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('T'. ($initialRow),"=SUM(T26:T".($initialRow-1).")"); 
+        $objPHPExcel->getActiveSheet()->setCellValue('L' . ($initialRow), "=SUM(L26:L" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('M' . ($initialRow), "=SUM(M26:M" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('O' . ($initialRow), "=SUM(O26:O" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('Q' . ($initialRow), "=SUM(Q26:Q" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('S' . ($initialRow), "=SUM(S26:S" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('T' . ($initialRow), "=SUM(T26:T" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         exit();
-
     }
 
     //generar cotización PDF para pedido de cliente
@@ -1789,7 +1788,7 @@ class PedidosPagados extends CI_Controller
         $tempUrl = array();
 
         foreach ($data as $key => $val) {
-            
+
             if (!empty($val->Txt_Url_Imagen_Producto)) {
                 $objDrawing = new PHPExcel_Worksheet_Drawing();
                 // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -1807,7 +1806,6 @@ class PedidosPagados extends CI_Controller
                     $objDrawing->setOffsetX(10); // Ajusta el desplazamiento X si es necesario
                     $objDrawing->setOffsetY(10); // Ajusta el desplazamiento Y si es necesario
                     $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-
                 }
             }
             // $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
@@ -1826,18 +1824,18 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $val->Txt_Nota);
             $initialRow++;
         }
-        if($initialRow<=$lastProductrow){
-			$objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow-$initialRow+1);
-		}
-        $objPHPExcel->getActiveSheet()->setCellValue('L'. ($initialRow),"=SUM(L26:L".($initialRow-1).")"); 
-		$objPHPExcel->getActiveSheet()->setCellValue('M'. ($initialRow),"=SUM(M26:M".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('O'. ($initialRow),"=SUM(O26:O".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('Q'. ($initialRow),"=SUM(Q26:Q".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('S'. ($initialRow),"=SUM(S26:S".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('T'. ($initialRow),"=SUM(T26:T".($initialRow-1).")"); 
+        if ($initialRow <= $lastProductrow) {
+            $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow - $initialRow + 1);
+        }
+        $objPHPExcel->getActiveSheet()->setCellValue('L' . ($initialRow), "=SUM(L26:L" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('M' . ($initialRow), "=SUM(M26:M" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('O' . ($initialRow), "=SUM(O26:O" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('Q' . ($initialRow), "=SUM(Q26:Q" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('S' . ($initialRow), "=SUM(S26:S" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('T' . ($initialRow), "=SUM(T26:T" . ($initialRow - 1) . ")");
         //SET COLUMN E AUTOSIZE AND AUTOAJUST TEXT
         $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
-        
+
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         foreach ($tempUrl as $key => $val) {
@@ -1896,7 +1894,7 @@ class PedidosPagados extends CI_Controller
                     ));
                     return;
                 } else if ($priviligie == $this->personalChinaPrivilegio || $priviligie == $this->jefeChinaPrivilegio) {
-                    $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido,null);
+                    $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, null);
                     echo json_encode(array(
                         'status' => 'success',
                         'data' => $data,
@@ -1976,7 +1974,7 @@ class PedidosPagados extends CI_Controller
         try {
             $idPedido = $this->input->post('idPedido');
             $idSupplier = $this->input->post('idSupplier');
-            $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, $idSupplier);    
+            $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, $idSupplier);
             echo json_encode(array('status' => 'success', 'data' => $data));
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
@@ -2022,11 +2020,13 @@ class PedidosPagados extends CI_Controller
                       </div>';
         }
         return $HTML;
-    }public function downloadSupplierExcel(){
-        $postData=$this->input->post();
-        $idPedido=$postData['idPedido'];
-        $idSupplier=$postData['idSupplier'];
-     
+    }
+    public function downloadSupplierExcel()
+    {
+        $postData = $this->input->post();
+        $idPedido = $postData['idPedido'];
+        $idSupplier = $postData['idSupplier'];
+
         $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, $idSupplier);
         $templatePath = 'assets/downloads/agente_compra/INVOICE_PROVEEDOR.xls';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
@@ -2036,9 +2036,9 @@ class PedidosPagados extends CI_Controller
         $objPHPExcel->getActiveSheet()->setCellValue('C11', $data[0]->cotizacionCode);
         $initialDetailrow = 16;
         $lastDetailrow = 18;
-        $tempUrl = array(); 
-        foreach(json_decode($data[0]->detalles,true) as $key=>$detalle){
-    
+        $tempUrl = array();
+        foreach (json_decode($data[0]->detalles, true) as $key => $detalle) {
+
             if (!empty($detalle['imagenURL'])) {
                 $objDrawing = new PHPExcel_Worksheet_Drawing();
                 // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -2056,28 +2056,27 @@ class PedidosPagados extends CI_Controller
                     $objDrawing->setOffsetX(10); // Ajusta el desplazamiento X si es necesario
                     $objDrawing->setOffsetY(10); // Ajusta el desplazamiento Y si es necesario
                     $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-
                 }
             }
             $objPHPExcel->getActiveSheet()->setCellValue("E" . $initialDetailrow, $detalle['descripcion']);
             $objPHPExcel->getActiveSheet()->setCellValue("K" . $initialDetailrow, $detalle['qty_product']);
             $objPHPExcel->getActiveSheet()->setCellValue("L" . $initialDetailrow, $detalle['unidad_medida']);
             $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialDetailrow, $detalle['price_product']);
-            $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialDetailrow,"要贴麦头");
+            $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialDetailrow, "要贴麦头");
             $initialDetailrow++;
         }
 
-        if($initialDetailrow<=$lastDetailrow){
-			$objPHPExcel->getActiveSheet()->removeRow($initialDetailrow, $lastDetailrow-$initialDetailrow+1);
-		}
-        $objPHPExcel->getActiveSheet()->setCellValue('J'. ($initialDetailrow),"=SUM(J16:J".($initialDetailrow-1).")");
-        $objPHPExcel->getActiveSheet()->setCellValue('N'. ($initialDetailrow),"=SUM(N16:N".($initialDetailrow-1).")");
-        $objPHPExcel->getActiveSheet()->setCellValue('R'. ($initialDetailrow+2),"=SUM(R16:R".($initialDetailrow-1).")");
+        if ($initialDetailrow <= $lastDetailrow) {
+            $objPHPExcel->getActiveSheet()->removeRow($initialDetailrow, $lastDetailrow - $initialDetailrow + 1);
+        }
+        $objPHPExcel->getActiveSheet()->setCellValue('J' . ($initialDetailrow), "=SUM(J16:J" . ($initialDetailrow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('N' . ($initialDetailrow), "=SUM(N16:N" . ($initialDetailrow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('R' . ($initialDetailrow + 2), "=SUM(R16:R" . ($initialDetailrow - 1) . ")");
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         foreach ($tempUrl as $key => $val) {
             unlink($val);
         }
-        exit();  
+        exit();
     }
 }
