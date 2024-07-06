@@ -2653,7 +2653,7 @@ echo form_open('', $attributes);
 
     .supplier-table {
       width: 100%;
-      border-collapse: separate;
+      border-collapse: collapse;
       border-spacing: 0px 0.4em;
     }
 
@@ -2671,11 +2671,12 @@ echo form_open('', $attributes);
       box-shadow: 0px 5px 5px 0px rgba(163, 163, 163, 1);
     }
 
-    .supplier-table tr {
-      -webkit-box-shadow: 5px 5px 5px 0px rgba(163, 163, 163, 1);
-      -moz-box-shadow: 5px 5px 5px 0px rgba(163, 163, 163, 1);
-      box-shadow: 5px 5px 5px 0px rgba(163, 163, 163, 1);
-      border-radius: 1em;
+    .supplier-table tr td{
+      box-shadow: -1px 10px 5px -5px rgba(201,194,194,0.75);
+      -webkit-box-shadow: -1px 10px 5px -5px rgba(201,194,194,0.75);
+      -moz-box-shadow: -1px 10px 5px -5px rgba(201,194,194,0.75);
+      border-left: none;
+      border-right: none;
     }
 
     .supplier-info {

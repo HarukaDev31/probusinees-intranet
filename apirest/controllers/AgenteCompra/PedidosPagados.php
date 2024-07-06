@@ -1974,7 +1974,8 @@ class PedidosPagados extends CI_Controller
         try {
             $idPedido = $this->input->post('idPedido');
             $idSupplier = $this->input->post('idSupplier');
-            $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, $idSupplier);
+            $idCoordination = $this->input->post('idCoordination');
+            $data = $this->PedidosPagadosModel->getSupplierItems($idPedido, $idSupplier,$idCoordination);    
             echo json_encode(array('status' => 'success', 'data' => $data));
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));

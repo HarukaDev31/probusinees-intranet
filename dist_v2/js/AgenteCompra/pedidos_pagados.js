@@ -1480,7 +1480,32 @@ $(function () {
   $("#a-download_image").click(function () {
     id = $(this).data("id_item");
     url = base_url + "AgenteCompra/PedidosPagados/downloadImage/" + id;
+    src = $(this).data("src");
+    filename = src.split("/").pop();
 
+    if (src) {
+      $.ajax({
+        url: src,
+        method: "GET",
+        xhrFields: {
+          responseType: "blob", // Important
+        },
+        success: function (data) {
+          const blobUrl = window.URL.createObjectURL(data);
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(blobUrl);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error downloading file:", textStatus, errorThrown);
+        },
+      });
+      return;
+    }
     var popupwin = window.open(url);
     setTimeout(function () {
       popupwin.close();
@@ -6975,20 +7000,27 @@ const getItemTemplate = (i, mode, detalle) => {
             <!--Upload Icon-->
             <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
             <label>Imagen Principal</label>
+            ${detalle["main_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',1)">Eliminar</span>`}  
             </br>
             <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
             <input type="file" name="file[${i}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+               
             </div>
           </div>
           <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
           <div class="form-group" id="container-uploadimg2-${i}">
           <label>Imagen 2</label>
-          <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
+          <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>  
+          ${detalle["secondary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',2)">Eliminar</span>`}          
           <input type="file" name="file[${i}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
           </div>
             <div class="form-group" id="container-uploadimg3-${i}">
             <label>Imagen 3</label>
             <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
+            ${detalle["terciary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',3)">Eliminar</span>`}
             <input type="file" name="file[${i}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
             <div class="form-group" id="container-uploadvideo1-${i}">
             <label>Video 1</label>
@@ -7026,6 +7058,19 @@ const getItemTemplate = (i, mode, detalle) => {
   // var id_supplier = detalle["id_supplier"];
   return div_items;
 };
+const deleteImage = (i,imgIndex) => {
+  if(imgIndex==1){
+    $(`#container-uploadprimaryimg-${i}`).find("img").remove();
+    $(`#btn-uploadprimaryimg-${i}`).css("display", "flex");
+    $(`#btn-uploadprimaryimg-URL-${i}`).val("null");
+    return;
+  }
+  $(`#container-uploadimg${imgIndex}-${i}`).find("img").remove();
+  // set #btn-uploadimg3-${i} display flex
+  $(`#btn-uploadimg${imgIndex}-${i}`).css("display", "flex");
+  $(`#btn-uploadimg${imgIndex}-URL-${i}`).val("null");
+};
+ 
 const openStepFunction = (i, stepId) => {
   $("#container-ver").hide();
   containerOrdenCompra.show();
@@ -7074,6 +7119,7 @@ const hideCoordination = () => {
 };
 const saveCoordination = () => {
   const form = $("#form-coordination");
+  $("orden-compra_header").hide();
   const formData = new FormData(form[0]);
   url = base_url + "AgenteCompra/PedidosPagados/saveCoordination";
   $.ajax({
@@ -7112,7 +7158,7 @@ const getSupplierCoordinationTableHeader = () => {
           <th class="coordination-precio-column c-precio-column">PRECIO</th>
           <th class="coordination-total-column c-total-column">TOTAL</th>
           <th class="coordination-tproducto-column c-tproducto-column">DELIVERY</th>
-          <th class="coordination-tentrega-column c-tentrega-column">T.ENTREGA</th>
+          <th class="coordination-tentrega-column c-tentrega-column">F.ENTREGA</th>
           <th class="coordination-pago1-column c-pago1-column">PAGO 1</th>
           <th class="coordination-pago2-column c-pago2-column">PAGO 2</th>
           <th class="coordination-estado-column c-estado-column">ESTADO</th>
@@ -7125,6 +7171,21 @@ const getSupplierCoordinationTableHeader = () => {
  * @param {Array} data
  * @returns {string} html
  */
+$("#table-elegir_productos_proveedor").on(
+  "click",
+  ".img-table_item",
+  function () {
+    $(".img-responsive").attr("src", "");
+    $(".modal-ver_item").modal("show");
+    console.log($(this));
+    $(".img-responsive").attr(
+      "src",
+      $(this).data("url_img") || $(this)[0].currentSrc
+    );
+    $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
+    $("#a-download_image").attr("data-src", $(this)[0].currentSrc);
+  }
+);
 const getSupplierCoordinationTableTemplate = (data) => {
   let html = `
   <form id="form-coordination">
@@ -7135,7 +7196,12 @@ const getSupplierCoordinationTableTemplate = (data) => {
     const detalles = JSON.parse(supplier.detalles);
     const sumDelivery = detalles.reduce(
       (acc, detail) => acc + parseFloat(detail.shipping_cost),
-      0);
+      0
+    );
+    const total = detalles.reduce(
+      (acc, detail) => acc + detail.qty_product * detail.price_product,
+      0
+    );
     const rowspan = detalles.length;
     html += `
       <tr>
@@ -7146,7 +7212,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
               <input type="hidden" name="id-pedido" value="${supplier.id_pedido}"/>
               <input type="hidden" name="current-step" value="${selectedStep}"/>
 
-              <btn class="btn btn-outline-secondary btn-coordinar" onclick="openSupplierItems(
+              <btn class="btn btn-outline-secondary btn-coordinar w-100 mb-1  " onclick="openSupplierItems(
               ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Cambiar</btn>
               <btn class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
               ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Descargar Excel</btn>
@@ -7156,10 +7222,14 @@ const getSupplierCoordinationTableTemplate = (data) => {
     detalles.forEach((detail, index) => {
       if (index === 0) {
         html += `
-              <td class="c-imagen-column">img</td>
+              <td class="c-imagen-column">
+              <img src="${
+                detail.imagenURL
+              }" alt="imagen" class="img-thumbnail" />
+              </td>
               <td class="c-nombre-column">${detail.nombre_producto} 
-              <div class="input-group ">
-                <span class="input-group-text" id="basic-addon1">ITEM CODE:</span>
+              <div class="input-group mt-3">
+                <span class="input-group-text mb-1 mx-0" id="basic-addon1">ITEM CODE:</span>
                 <input type="text" class="form-control" name="item[${
                   detail.ID_Pedido_Detalle
                 }]['code']" aria-describedby="basic-addon1"
@@ -7170,17 +7240,40 @@ const getSupplierCoordinationTableTemplate = (data) => {
                 detail.ID_Pedido_Detalle
               })">Perú</div>
              </td>
-              <td class="c-qty-column">${parseFloat(detail.qty_product)}</td>
-              <td class="c-precio-column">${detail.price_product}</td>
+              <td class="c-qty-column">
+              <input type="number" class="form-control" value="${parseFloat(
+                detail.qty_product
+              )}"
+              name="proveedor[${
+                detail.ID_Pedido_Detalle_Producto_Proveedor
+              }][qty_product]"/>
+              </td>
+              <td class="c-precio-column">
+              <input type="number" class="form-control" value="${parseFloat(
+                detail.price_product
+              )}"
+              name="proveedor[${
+                detail.ID_Pedido_Detalle_Producto_Proveedor
+              }][price_product]"/>
+              </td>
               <td class="c-total-column" rowspan="${rowspan}">${parseFloat(
           detail.total_producto
         ).toFixed(2)}</td>
-              <td class="c-tproduccion-column" rowspan="${rowspan}">${
-          detail.delivery
-        }</td>
-              <td class="c-tentrega-column" rowspan="${rowspan}">${
-          detail.tentrega
-        }</td>
+              <td class="c-tproduccion-column" rowspan="${rowspan}">
+              <input type="number" class="form-control" value="${
+                detail.delivery
+              }"
+              name="proveedor[${
+                detail.ID_Pedido_Detalle_Producto_Proveedor
+              }][delivery]"/>
+              </td>
+              <td class="c-tentrega-column" rowspan="${rowspan}">
+              <input type="date" class="form-control" value="${
+                detail.tentrega.split(" ")[0]
+              }" name="proveedor[${
+          detail.ID_Pedido_Detalle_Producto_Proveedor
+        }][tentrega]"/>
+              </td>
 
               <td class="c-pago1-column" rowspan="${rowspan}">
                 <input type="number" class="form-control" value="${
@@ -7188,9 +7281,30 @@ const getSupplierCoordinationTableTemplate = (data) => {
                 }" name="coordination[${
           supplier.id_coordination
         }][pago_1_value]"/>
-                <div class="btn btn-primary" onclick='openInputFile("input-pago1-${
+                <div class="btn 
+                mt-1 mx-auto 
+                ${
+                  supplier.pago_1_URL == null
+                    ? "btn-primary"
+                    : "btn-outline-primary"
+                }"
+                onclick='openInputFile("input-pago1-${
                   supplier.id_coordination
-                }","${supplier.pago_1_URL}")'>Voucher</div>
+                }","${supplier.pago_1_URL}")'
+                id="btn-pago1-${supplier.id_coordination}">Voucher</div>
+                <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago1','${
+                  supplier.id_coordination
+                }')">Quitar</span>
+                <input type="hidden"
+                id="input-pago1-url-${supplier.id_coordination}"
+                name="coordination[${
+                  supplier.id_coordination
+                }][pago_1_url]" value="${supplier.pago_1_URL}"/>
+                <input type="hidden" 
+                id="input-pago2-url-${supplier.id_coordination}"
+                name="coordination[${
+                  supplier.id_coordination
+                }][pago_2_url]" value="${supplier.pago_2_URL}"/>
                 <input type="file" class="form-control d-none" id="input-pago1-${
                   supplier.id_coordination
                 }" name="coordination[${
@@ -7199,13 +7313,23 @@ const getSupplierCoordinationTableTemplate = (data) => {
               </td>
               <td class="c-pago2-column" rowspan="${rowspan}">
                 <input type="number" class="form-control" disabled value="${
-                  parseFloat(supplier.total) - parseFloat(supplier.pago_1_value)
+                  parseFloat(total) - parseFloat(supplier.pago_1_value)
                 }" name="coordination[${
           supplier.id_coordination
         }][pago_2_value]"/>
-                <div class="btn btn-primary" onclick='openInputFile("input-pago2-${
+                <div class="btn mt-1 mx-auto ${
+                  supplier.pago_2_URL == null
+                    ? "btn-primary"
+                    : "btn-outline-primary"
+                }"
+        onclick='openInputFile("input-pago2-${supplier.id_coordination}","${
+          supplier.pago_2_URL
+        }")'
+                
+                id="btn-pago2-${supplier.id_coordination}">Voucher</div>
+                <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago2','${
                   supplier.id_coordination
-                }","${supplier.pago_2_URL}")'>Voucher</div>
+                }')">Quitar</span>
                 <input type="file" class="form-control d-none" id="input-pago2-${
                   supplier.id_coordination
                 }" name="coordination[${
@@ -7229,7 +7353,9 @@ const getSupplierCoordinationTableTemplate = (data) => {
       } else {
         html += `
               <tr class="detail">
-                  <td class="c-imagen-column">img</td>
+                  <td class="c-imagen-column"><img src="${
+                detail.imagenURL
+              }" alt="imagen" class="img-thumbnail" /></td>
                   <td class="c-nombre-column">${detail.nombre_producto} 
                                 <div class="input-group ">
                                   <span class="input-group-text" id="basic-addon1">ITEM CODE:</span>
@@ -7251,42 +7377,40 @@ const getSupplierCoordinationTableTemplate = (data) => {
 };
 const downloadSupplierExcel = (id_pedido, id_supplier, id_coordination) => {
   url = base_url + "AgenteCompra/PedidosPagados/downloadSupplierExcel";
-    $.ajax({
-      url: url,
-      type: "POST",
-      xhrFields: {
-        responseType: "blob",
-      },
+  $.ajax({
+    url: url,
+    type: "POST",
+    xhrFields: {
+      responseType: "blob",
+    },
 
-      data:{
-        idPedido: id_pedido,
-        idSupplier: id_supplier,
-        idCoordination: id_coordination,
-      },
-      success: function (response) {
-        //return blob to download
-        var blob = new Blob([response], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        var link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        const currentDate = new Date();
-        //format date to dd_mm_yyyy
-        const formattedDate = `${currentDate.getDate()}_${
-          currentDate.getMonth() + 1
-        }_${currentDate.getFullYear()}`;
-        link.download =
-          "Cotizacion_" + formattedDate + ".xlsx";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR.responseText);
-      },
-    });
-}
+    data: {
+      idPedido: id_pedido,
+      idSupplier: id_supplier,
+      idCoordination: id_coordination,
+    },
+    success: function (response) {
+      //return blob to download
+      var blob = new Blob([response], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      var link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      const currentDate = new Date();
+      //format date to dd_mm_yyyy
+      const formattedDate = `${currentDate.getDate()}_${
+        currentDate.getMonth() + 1
+      }_${currentDate.getFullYear()}`;
+      link.download = "Cotizacion_" + formattedDate + ".xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};
 const openSupplierItems = (id_pedido, id_supplier, id_coordination) => {
   console.log(id_pedido, id_supplier, id_coordination, "openSupplierItems");
   $.ajax({
@@ -7313,6 +7437,7 @@ const openSupplierItems = (id_pedido, id_supplier, id_coordination) => {
         };
         openSupplierItemsView(data, btnsConfig, id_coordination);
         containerCoordination.hide();
+        $(".orden-compra_header").hide();
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -7346,9 +7471,11 @@ const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
   const container = $("#table-elegir_productos_proveedor");
   container.empty();
   container.show();
+  $(".orden-compra_header").hide();
   for (i = 0; i < detalles.length; i++) {
     let item = getItemTemplate(i + 1, "select", detalles[i], idCoordination);
     container.append(item);
+    console.log(detalles[i]);
     container.find(`#modal-precio${i + 1}`).val(detalles[i]["Ss_Precio"]);
     container.find(`#modal-moq${i + 1}`).val(detalles[i]["Qt_Producto_Moq"]);
     container.find(".modal_coordination_id").val(idCoordination);
@@ -7428,7 +7555,7 @@ const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
       container
         .find(`#container-uploadvideo1-${i + 1}`)
         .append(
-          `<video src="${detalles[i]["primary_video"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2" controls></video>`
+          `<video src="${detalles[i]["primary_video"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2 w-100" controls></video>`
         );
     }
     if (detalles[i]["secondary_video"] != null) {
@@ -7441,7 +7568,7 @@ const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
         .append(
           "<video src='" +
             detalles[i]["secondary_video"] +
-            "' class='img-thumbnail img-table_item img-fluid img-resize mb-2' controls></video>"
+            "' class='img-thumbnail img-table_item img-fluid img-resize mb-2 w-100' controls></video>"
         );
     }
   }
@@ -7583,15 +7710,14 @@ const openPagos = (response) => {
         if (pagosData[2].file_url != null) {
           pago_switch_3.prop("checked", true);
           //append input hide with pago_ID
-          if($("#pago-3_ID").length == 0){
+          if ($("#pago-3_ID").length == 0) {
             pago3Div.append(
               `<input type="hidden" name="pago-3_ID" id="pago-3_ID" value="${pagosData[2].idPayment}">`
             );
-            if($("#pago-3_value").length == 0){
+            if ($("#pago-3_value").length == 0) {
               pago3Div.append(
                 `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
               );
-
             }
           }
         } else {
@@ -7603,29 +7729,28 @@ const openPagos = (response) => {
         if ($(this).is(":checked")) {
           if (indexPagos > 3) {
             if (pagosData[2].file_url) {
-              if($("#pago-3-btnlink").length == 0){
+              if ($("#pago-3-btnlink").length == 0) {
                 pago3Div.append(
                   `<a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-3_URL">Ver Pago</a>`
                 );
               }
-              if($("#pago-3_value").length == 0){
+              if ($("#pago-3_value").length == 0) {
                 pago3Div.append(
                   `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
                 );
               }
             }
           } else {
-            if($("#pago3-file").length == 0){
+            if ($("#pago3-file").length == 0) {
               pago3Div.append(
                 `<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off" />`
               );
             }
-            if($("#pago-3_value").length == 0){
+            if ($("#pago-3_value").length == 0) {
               pago3Div.append(
                 `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
               );
             }
-            
           }
         } else {
           pago3Div.find("#pago-3-btnlink").remove();
@@ -7640,21 +7765,19 @@ const openPagos = (response) => {
 
         if (pagosData[3].file_url != null) {
           pago_switch_4.prop("checked", true);
-          if($("#pago-4_ID").length == 0){
+          if ($("#pago-4_ID").length == 0) {
             pago3Div.append(
               `<input type="hidden" name="pago-4_ID" id="pago-4_ID" value="${pagosData[3].idPayment}">`
             );
-            if($("#pago-4_value").length == 0){
+            if ($("#pago-4_value").length == 0) {
               pago3Div.append(
                 `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control" placeholder="Valor" value="${pagosData[3].value}" autocomplete="off" />`
               );
-
             }
           }
         } else {
           pago_switch_4.prop("checked", false);
           $("pago4-file").remove();
-
         }
       }
       pago_switch_4.change(function () {
@@ -7670,13 +7793,13 @@ const openPagos = (response) => {
             }
           } else {
             console.log("append", pago4Div);
-            if($("#pago4-file").length == 0){
+            if ($("#pago4-file").length == 0) {
               pago4Div.append(
                 `<input type="file" name="pago-4" id="pago4-file" class="" placeholder="" value="" autocomplete="off" />`
               );
             }
             //append input type number
-            if($("#pago-4_value").length == 0){
+            if ($("#pago-4_value").length == 0) {
               pago4Div.append(
                 `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
               );
@@ -7739,10 +7862,12 @@ const openOrdenCompra = (response) => {
     currentPrivilege = parseInt(priviligie);
     $(".orden-compra_header").show();
     $(".orden-compra_header_china").append(getProductsTemplateHeader());
-    data.forEach((producto,index) => {
-      containerOrdenCompra.append(getProductTemplate(producto,index));
+    data.forEach((producto, index) => {
+      containerOrdenCompra.append(getProductTemplate(producto, index));
       if (producto.caja_master_URL) {
-        $(`#btn-rotulado-${index}`).removeClass("btn-primary").addClass("btn-outline-secondary");
+        $(`#btn-rotulado-${index}`)
+          .removeClass("btn-primary")
+          .addClass("btn-outline-secondary");
       }
     });
     if (typeof pedidoData != "undefined") {
@@ -7820,7 +7945,7 @@ const getProductsTemplateHeader = () => {
   return templateHeader;
 };
 
-const getProductTemplate = (producto,index) => {
+const getProductTemplate = (producto, index) => {
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
@@ -8135,6 +8260,19 @@ const saveOrdenCompra = () => {
       console.error(jqXHR.responseText);
     },
   });
+};
+const setInputFileToNull = (file, id) => {
+  const inputURL = `input-${file}-url-${id}`;
+  const btnInput = `btn-${file}-${id}`;
+  $(`#${inputURL}`).val("");
+  //remove btn-outline-primary class and add btn-primary
+  $(`#${btnInput}`).removeClass("btn-outline-primary").addClass("btn-primary");
+  //set onclick to openInputFile
+  $(`#${btnInput}`).attr(
+    "onclick",
+    `openInputFile('input-${file}-${id}',null)`
+  );
+  //set fileinput onclick
 };
 const hideSteps = () => {
   containerSteps.empty();

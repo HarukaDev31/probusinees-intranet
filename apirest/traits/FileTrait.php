@@ -118,7 +118,7 @@ trait FileTrait
                             $paths[$filesIndex][$keyFile] = null;
                             continue;
                         }
-                        if ($product[$keyFile] != "" && $product[$keyFile] != null) {
+                        if ($product[$keyFile] != "" && $product[$keyFile]!="null" && $product[$keyFile] != null) {
                             $paths[$filesIndex][$keyFile] = $product[$keyFile];
                             $results[$filesIndex][$keyFile] = "No file uploaded for this key, using existing file";
                             continue;
