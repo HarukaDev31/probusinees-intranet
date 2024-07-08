@@ -59,9 +59,8 @@
                       <th class="no-sort">Encargado</th>
                       <?php }?>
                       <th>China</th>
-                      <?php if ($this->MenuModel->verificarAccesoMenuCRUD()->Nu_Editar == 1): ?>
-                        <th class="no-sort">Ver</th>
-                      <?php endif;?>
+                      <th class="no-sort">Ver</th>
+                        
                       <th class="no-sort">Proforma</th>
                       <!-- <th class="no-sort">Vencimiento</th> -->
                       <!-- <th class="no-sort">Importación Integral</th> -->

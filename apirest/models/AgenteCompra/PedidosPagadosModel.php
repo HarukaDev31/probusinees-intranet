@@ -2416,7 +2416,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             if ($row == "" || $row == null || $row == "null") {
                 continue;
             }
-
             $producto_detalle = [
                 'ID_Pedido_Detalle' => $key,
                 'product_code' => $row[0],
@@ -2764,5 +2763,13 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
+    }
+    function updateOrdenPedido($data){
+        $idPedido=$data['idPedido']; 
+        $value=$data['value'];
+        //update   ordenCotizacion  in table agente_compra_pedido_cabecera where ID_Pedido_Cabecera=$idPedido
+        $this->db->where('ID_Pedido_Cabecera', $idPedido);
+        $this->db->update('agente_compra_pedido_cabecera', array('ordenCotizacion' => $value));
+        return ['status' => 'success', 'message' => 'Orden de cotización actualizada'];
     }
 }

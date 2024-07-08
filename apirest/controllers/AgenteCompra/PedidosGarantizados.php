@@ -306,17 +306,23 @@ class PedidosGarantizados extends CI_Controller {
 	public function generarAgenteCompra($ID){
         $data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));
 		$this->load->library('PHPExcel');
-		// echo json_encode($data);
         $templatePath = 'assets/downloads/agente_compra/TRADING-PERU.xls';
 		$objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="Cotizacion.xlsx"');
+        header("Content-Disposition: attachment;filename=Cotizacion_".$data[0]->cotizacionCode."_Garantizado.xlsx");
         header('Cache-Control: max-age=0');
 		//set D10	 = $data[0]->No_Contacto
 		$objPHPExcel->getActiveSheet()->setCellValue('E18', $data[0]->No_Contacto);
 		$objPHPExcel->getActiveSheet()->setCellValue('E19', $data[0]->Nu_Celular_Contacto);
+		//set horizontal alignment left
+		$objPHPExcel->getActiveSheet()->getStyle('E19')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 		$objPHPExcel->getActiveSheet()->setCellValue('E20', $data[0]->Txt_Email_Contacto);
 		$objPHPExcel->getActiveSheet()->setCellValue('E21', "TRADING");
+		$objPHPExcel->getActiveSheet()->setCellValue('E22', $data[0]->No_Pais);
+		$objPHPExcel->getActiveSheet()->setCellValue('K18', $data[0]->No_Entidad);
+		$objPHPExcel->getActiveSheet()->setCellValue('K19', $data[0]->Nu_Documento_Identidad);
+		$objPHPExcel->getActiveSheet()->setCellValue('K20', $data[0]->cotizacionCode);
+
 		$objPHPExcel->getActiveSheet()->setCellValue('K21', date('d/m/Y'));
 		$objPHPExcel->getActiveSheet()->setCellValue('S22', $data[0]->Ss_Tipo_Cambio);
 		$objPHPExcel->getActiveSheet()->setCellValue('E35', "=K32");
@@ -336,8 +342,8 @@ class PedidosGarantizados extends CI_Controller {
 					file_put_contents($filename, $image);
 					$tempUrl[] = $filename;
 					$objDrawing->setPath($filename);
-					$objDrawing->setWidthAndHeight(148, 500);
-					$objDrawing->setResizeProportional(true);
+					$objDrawing->setWidthAndHeight(148, 300);
+					$objDrawing->setResizeProportional(false);
 					$objDrawing->setCoordinates('D' . $initialRow);
 					$objDrawing->setOffsetX(10); // Ajusta el desplazamiento X si es necesario
 					$objDrawing->setOffsetY(10); // Ajusta el desplazamiento Y si es necesario

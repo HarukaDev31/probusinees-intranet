@@ -1984,6 +1984,7 @@ function addItems() {
           <div class="col-12 col-md-6 col-lg-6 d-flex flex-column justify-content-center">
             <!--Upload Icon-->
             <label>Imagen Principal</label>
+            
             <input type="file" name="file[${iCounterItems}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/>
           </div>
           <div class="col-12 col-md-6 col-lg-6 d-flex flex-column justify-content-center">
@@ -2247,6 +2248,7 @@ function scrollToError($sMetodo, $IdElemento) {
   );
 }
 function getItemTemplate(i, mode, detalle, privilegio) {
+  
   div_items = `
     <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
@@ -2322,6 +2324,8 @@ function getItemTemplate(i, mode, detalle, privilegio) {
               <!--Upload Icon-->
               <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
               <label>Imagen Principal</label>
+              ${detalle[i-1]["main_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',1)">Eliminar</span>`}  
               </br>
               <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
               <input type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
@@ -2330,19 +2334,28 @@ function getItemTemplate(i, mode, detalle, privilegio) {
             <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
             <div class="form-group" id="container-uploadimg2-${i}">
             <label>Imagen 2</label>
+            ${detalle[i-1]["secondary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',2)">Eliminar</span>`}   
             <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
             <input type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
             </div>
               <div class="form-group" id="container-uploadimg3-${i}">
               <label>Imagen 3</label>
+                ${detalle[i-1]["terciary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',3)">Eliminar</span>`}
               <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
               <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input></div>
               <div class="form-group" id="container-uploadvideo1-${i}">
               <label>Video 1</label>
+                  ${detalle[i-1]["primary_video"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteVideo('${i}',1)">Eliminar</span>`}
+
               <input type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
               <input type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
               <div class="form-group"  id="container-uploadvideo2-${i}">
               <label>Video 2</label>
+              ${detalle[i-1]["secondary_video"] == null ? "" : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteVideo('${i}',2)">Eliminar</span>`}
               <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
               <input type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
 
@@ -2499,7 +2512,7 @@ function getItemProveedor(id_detalle) {
           container
             .find(`#container-uploadvideo1-${i + 1}`)
             .append(
-              `<video src="${detalle[i]["primary_video"]}" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls></video>`
+              `<video src="${detalle[i]["primary_video"]}" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video1-${i + 1}"></video>`
             );
         }
         if (detalle[i]["secondary_video"] != null) {
@@ -2510,9 +2523,8 @@ function getItemProveedor(id_detalle) {
           container
             .find(`#container-uploadvideo2-${i + 1}`)
             .append(
-              "<video src='" +
-                detalle[i]["secondary_video"] +
-                "' class='img-thumbnail  img-fluid img-resize mb-2 w-100' controls></video>"
+              `<video src="${detalle[i]["secondary_video"]}" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video2-${i + 1}"></video>`
+
             );
         }
 
@@ -3393,4 +3405,23 @@ function cambiarEstadoImpotacionIntegral(ID, Nu_Estado, sCorrelativo) {
         },
       });
     });
+}
+const deleteImage = (i,imgIndex) => {
+  if(imgIndex==1){
+    $(`#container-uploadprimaryimg-${i}`).find("img").remove();
+    $(`#btn-uploadprimaryimg-${i}`).css("display", "flex");
+    $(`#btn-uploadprimaryimg-URL-${i}`).val("null");
+    return;
+  }
+  $(`#container-uploadimg${imgIndex}-${i}`).find("img").remove();
+  // set #btn-uploadimg3-${i} display flex
+  $(`#btn-uploadimg${imgIndex}-${i}`).css("display", "flex");
+  $(`#btn-uploadimg${imgIndex}-URL-${i}`).val("null");
+};
+const deleteVideo = (index,videoIndex) => {
+    $(`#btn-uploadvideo${videoIndex}-${index}`).css("display", "flex");
+    $(`#btn-uploadvideo${videoIndex}-URL-${index}`).val("null");
+    console.log($(`video${videoIndex}-${index}`));
+    $(`#video${videoIndex}-${index}`).remove();
+
 }

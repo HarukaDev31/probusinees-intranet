@@ -6879,13 +6879,20 @@ function _generarConsolidaTrading($modal_delete, ID) {
   window.open(url, "_blank");
 }
 //get order progress section
-const getOrderProgress = (id) => {
-  +$(".step-column").remove();
+const getOrderProgress = (id, idServicio = null) => {
+  if (idServicio != 2) {
+    $("#cotizacionOrdenContainer").hide();
+  } else {
+    $("#cotizacionOrdenContainer").show();
+  }
+  $(".step-column").remove();
   idPedido = id;
   url = base_url + "AgenteCompra/PedidosPagados/getOrderProgress";
   const steps = $("#steps");
   const loading = $("#loading-steps");
-  //use post method to get data
+  //set name attr  =orden['id']
+
+  $("#consolidadoOrden").attr("name", `orden[${id}]`);
   $.post(url, { idPedido: id }, function (response) {
     //parse response
     try {
@@ -6912,6 +6919,10 @@ const getOrderProgress = (id) => {
             text: "Regresar",
             action: "hideSteps()",
           },
+          btnSave: {
+            text: "Guardar",
+            action: "saveOrderProgress()",
+          },
         };
         $(".steps-buttons").append(getActionButtons(configButtons));
 
@@ -6927,6 +6938,28 @@ const getOrderProgress = (id) => {
 
       //show error message
     }
+  });
+};
+const saveOrderProgress = () => {
+  const url = base_url + "AgenteCompra/PedidosPagados/updateOrdenPedido";
+  //from  name ordern['id'] get id
+  hideSteps();
+  idPedido = $("#consolidadoOrden").attr("name").split("[")[1].split("]")[0];
+  const data = {
+    idPedido,
+    value: $("#consolidadoOrden").val(),
+  };
+  $.ajax({
+    url,
+    type: "POST",
+    data,
+    success: function (response) {
+      try {
+        response = JSON.parse(response);
+      } catch (e) {
+        console.log(e);
+      }
+    },
   });
 };
 const stepTemplate = (step, i) => {
@@ -7000,8 +7033,12 @@ const getItemTemplate = (i, mode, detalle) => {
             <!--Upload Icon-->
             <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
             <label>Imagen Principal</label>
-            ${detalle["main_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',1)">Eliminar</span>`}  
+            ${
+              detalle["main_photo"] == null
+                ? ""
+                : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',1)">Eliminar</span>`
+            }  
             </br>
             <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
             <input type="file" name="file[${i}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
@@ -7012,15 +7049,23 @@ const getItemTemplate = (i, mode, detalle) => {
           <div class="form-group" id="container-uploadimg2-${i}">
           <label>Imagen 2</label>
           <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>  
-          ${detalle["secondary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',2)">Eliminar</span>`}          
+          ${
+            detalle["secondary_photo"] == null
+              ? ""
+              : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',2)">Eliminar</span>`
+          }          
           <input type="file" name="file[${i}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
           </div>
             <div class="form-group" id="container-uploadimg3-${i}">
             <label>Imagen 3</label>
             <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
-            ${detalle["terciary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',3)">Eliminar</span>`}
+            ${
+              detalle["terciary_photo"] == null
+                ? ""
+                : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',3)">Eliminar</span>`
+            }
             <input type="file" name="file[${i}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
             <div class="form-group" id="container-uploadvideo1-${i}">
             <label>Video 1</label>
@@ -7058,8 +7103,8 @@ const getItemTemplate = (i, mode, detalle) => {
   // var id_supplier = detalle["id_supplier"];
   return div_items;
 };
-const deleteImage = (i,imgIndex) => {
-  if(imgIndex==1){
+const deleteImage = (i, imgIndex) => {
+  if (imgIndex == 1) {
     $(`#container-uploadprimaryimg-${i}`).find("img").remove();
     $(`#btn-uploadprimaryimg-${i}`).css("display", "flex");
     $(`#btn-uploadprimaryimg-URL-${i}`).val("null");
@@ -7070,7 +7115,7 @@ const deleteImage = (i,imgIndex) => {
   $(`#btn-uploadimg${imgIndex}-${i}`).css("display", "flex");
   $(`#btn-uploadimg${imgIndex}-URL-${i}`).val("null");
 };
- 
+
 const openStepFunction = (i, stepId) => {
   $("#container-ver").hide();
   containerOrdenCompra.show();
@@ -7154,7 +7199,7 @@ const getSupplierCoordinationTableHeader = () => {
           <th colspan="3" class="coordination-supplier-column c-supplier-column">SUPPLIER</th>
           <th class="coordination-imagen-column c-imagen-column">IMAGEN</th>
           <th class="coordination-nombre-column c-nombre-column">NOMBRE</th>
-          <th class="coordination-qty-column c-qty-column">QTY</th>
+          <th class="coordination-qty-column c-qty-column w-100">QTY</th>
           <th class="coordination-precio-column c-precio-column">PRECIO</th>
           <th class="coordination-total-column c-total-column">TOTAL</th>
           <th class="coordination-tproducto-column c-tproducto-column">DELIVERY</th>
@@ -7234,8 +7279,9 @@ const getSupplierCoordinationTableTemplate = (data) => {
                   detail.ID_Pedido_Detalle
                 }]['code']" aria-describedby="basic-addon1"
                 value="${detail.product_code}"
-                id="item['${detail.ID_Pedido_Detalle}']['code']"
+                id="item['${detail.ID_Pedido_Detalle}']['code']">
               </div>
+
               <div class="btn btn-success" onclick="openRotuladofromCoordination(${
                 detail.ID_Pedido_Detalle
               })">Perú</div>
@@ -7354,19 +7400,37 @@ const getSupplierCoordinationTableTemplate = (data) => {
         html += `
               <tr class="detail">
                   <td class="c-imagen-column"><img src="${
-                detail.imagenURL
-              }" alt="imagen" class="img-thumbnail" /></td>
+                    detail.imagenURL
+                  }" alt="imagen" class="img-thumbnail" /></td>
                   <td class="c-nombre-column">${detail.nombre_producto} 
                                 <div class="input-group ">
                                   <span class="input-group-text" id="basic-addon1">ITEM CODE:</span>
-                                  <input type="text" class="form-control" name="item['${detail.ID_Pedido_Detalle}']['code']" aria-describedby="basic-addon1" item['${detail.ID_Pedido_Detalle}']['code']>
+                                  <input type="text" class="form-control" name="item[${
+                                    detail.ID_Pedido_Detalle
+                                  }]['code']" aria-describedby="basic-addon1" 
+                                  value="${detail.product_code}"
+        >
                                 </div>
-                                <div class="btn btn-success" onclick="openRotuladofromCoordination(${detail.ID_Pedido_Detalle})">Perú</div>
+                                <div class="btn btn-success" onclick="openRotuladofromCoordination(${
+                                  detail.ID_Pedido_Detalle
+                                })">Perú</div>
                               </td>
-                               <td class="c-qty-column">${detail.qty_product}</td>
-                  <td class="c-precio-column">${detail.price_product}</td>
-              </tr>
-              `;
+                               <td class="c-qty-column">
+                                <input type="number" class="form-control" value="${parseFloat(
+                                  detail.qty_product
+                                )}"
+                                name="proveedor[${
+                                  detail.ID_Pedido_Detalle_Producto_Proveedor
+                                }][qty_product]"/>
+                                </td>
+                                <td class="c-precio-column"><input type="number" class="form-control" value="${parseFloat(
+                                  detail.price_product
+                                )}"
+                                name="proveedor[${
+                                  detail.ID_Pedido_Detalle_Producto_Proveedor
+                                }][price_product]"/></td>
+                                </tr>
+                                `;
       }
     });
   });

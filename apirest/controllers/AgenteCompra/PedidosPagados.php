@@ -179,7 +179,7 @@ class PedidosPagados extends CI_Controller
             $rows[] = $divPagosEstado;
             $rows[] = $estadoChina;
             $rows[] = "<button class='btn btn-xs btn-link' alt='Editar' title='Editar' href='javascript:void(0)'
-			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ")'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
+			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ",".$row->Nu_Tipo_Servicio.")'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
             if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
                 //no tiene acceso a cambiar status de Perú
                 $excel_orden_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
@@ -2038,8 +2038,13 @@ class PedidosPagados extends CI_Controller
         $initialDetailrow = 16;
         $lastDetailrow = 18;
         $tempUrl = array();
+        $envio=0;
+        $pago1=$data[0]->pago_1_value;
+        $pago2=0;
+        $total=0;
         foreach (json_decode($data[0]->detalles, true) as $key => $detalle) {
-
+            $envio+=$detalle['shipping_cost'];
+            $total+=$detalle['total_producto'];
             if (!empty($detalle['imagenURL'])) {
                 $objDrawing = new PHPExcel_Worksheet_Drawing();
                 // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -2070,14 +2075,27 @@ class PedidosPagados extends CI_Controller
         if ($initialDetailrow <= $lastDetailrow) {
             $objPHPExcel->getActiveSheet()->removeRow($initialDetailrow, $lastDetailrow - $initialDetailrow + 1);
         }
+        $pago2=$total-$pago1;
         $objPHPExcel->getActiveSheet()->setCellValue('J' . ($initialDetailrow), "=SUM(J16:J" . ($initialDetailrow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('N' . ($initialDetailrow), "=SUM(N16:N" . ($initialDetailrow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('R' . ($initialDetailrow + 2), "=SUM(R16:R" . ($initialDetailrow - 1) . ")");
+        $initialDetailrow += 3;
+        $objPHPExcel->getActiveSheet()->setCellValue('R' . ($initialDetailrow), $envio);
+        $initialDetailrow += 1;
+        $objPHPExcel->getActiveSheet()->setCellValue('R' . ($initialDetailrow), $pago1);
+        $initialDetailrow += 1;
+        $objPHPExcel->getActiveSheet()->setCellValue('R' . ($initialDetailrow), $pago2);
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         foreach ($tempUrl as $key => $val) {
             unlink($val);
         }
         exit();
+    }
+    function updateOrdenPedido(){
+        $data = $this->input->post();
+
+        $response = $this->PedidosPagadosModel->updateOrdenPedido($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }
