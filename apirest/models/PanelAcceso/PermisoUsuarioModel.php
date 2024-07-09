@@ -59,9 +59,7 @@ AND (MNUSUBPADRE.Nu_Cantidad_Menu_Hijos = 0 OR MNUSUBPADRE.Nu_Cantidad_Menu_Hijo
 AND MNU.Nu_Seguridad = 0
 AND MNU.Nu_Activo = 0
 " . $cond_tipo_sistema . "
-ORDER BY
-MNU.ID_Padre,
-MNU.Nu_Orden;";
+;";
 			$arrData = $this->db->query($query)->result();
 			$i = 0;
 			foreach ($arrData as $row) {
