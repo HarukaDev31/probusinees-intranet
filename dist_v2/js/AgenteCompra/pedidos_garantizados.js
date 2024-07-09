@@ -57,7 +57,7 @@ $(function () {
       //if click  $("btn-confirmation") then call function
       $("#btn-confirmation").on("click", function () {
         $("#modal-confirmation").modal("hide");
-
+        const selected=$("#cbo-guardar_personal_china-ID_Usuario option:selected").text();
         $("#btn-guardar_personal_china").text("");
         $("#btn-guardar_personal_china").attr("disabled", true);
         $("#btn-guardar_personal_china").html(
@@ -81,10 +81,14 @@ $(function () {
             if (response.status == "success") {
               $(".modal-guardar_personal_china").modal("hide");
               $("#moda-message-content").addClass("bg-" + response.status);
-              $(".modal-title-message").text(response.message);
+              let alertMessage = `Pedido asignado a ${selected}`;
+              if(selected=="maryam.china@probusiness.pe"){
+                alertMessage += " \nPuedes agregar nombre y características de los productos en ingles";
+              }
+              $(".modal-title-message").text(alertMessage);
               setTimeout(function () {
                 $("#modal-message").modal("hide");
-              }, 1100);
+              },2500 );
 
               reload_table_Entidad();
             } else {
@@ -1235,7 +1239,13 @@ function verPedido(ID) {
           "<h6 class='font-weight-bold font-medium'>" +
           nombre_producto +
           "</h6>";
-
+        if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe"){
+          table_enlace_producto += "<div class='d-flex flex-row align-items-center '>";
+          table_enlace_producto += "<span class='mr-1'>Ingles</span>";
+          //add input text name txtproductoIngles
+          table_enlace_producto += '<input type="text" class="form-control" name="addProductoTable[' + id_item + '][txtproductoIngles]" value="' + detalle[i]['Txt_Producto_Ingles']??'' + '">';
+          table_enlace_producto += "</div>";
+        }
         cantidad_item =
           !isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item != ""
             ? cantidad_item
@@ -1289,6 +1299,15 @@ function verPedido(ID) {
           '][caracteristicas]" style="height: 200px;">' +
           clearHTMLTextArea(detalle[i]["Txt_Descripcion"]) +
           "</textarea>";
+          if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe"){
+            table_enlace_producto += "<span class='mr-1'>Ingles</span>";
+
+            table_enlace_producto +=  '<textarea class="form-control" placeholder="" name="addProductoTable[' +
+            id_item +
+            '][caracteristicas_ingles]" style="height: 200px;">' +
+            clearHTMLTextArea(detalle[i]["Txt_Description_Ingles"]??' ') +
+            "</textarea>";
+          }
         //button de chat que abre un modal
         var class_button_chat =
           parseInt(detalle[i]["Nu_Envio_Mensaje_Chat_Producto"]) > 0
@@ -1931,7 +1950,7 @@ function addItems() {
         </div>
       </div>
       <div class="col-6 col-md-3 col-lg-2">
-        <span class="fw-bold">Qty_caja<span class="label-advertencia text-danger"> *</span><span/>
+        <span class="fw-bold">Pcs/Caja<span class="label-advertencia text-danger"> *</span><span/>
         <div class="form-group">
           <input type="text" id="modal-qty_caja${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
@@ -2270,7 +2289,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           </div>
         </div>
         <div class="col-6 col-md-3 col-lg-2">
-          <span class="fw-bold">Qty_caja<span class="label-advertencia text-danger"> *</span><span/>
+          <span class="fw-bold">Pcs/Caja<span class="label-advertencia text-danger"> *</span><span/>
           <div class="form-group">
             <input type="text" id="modal-qty_caja${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
             <span class="help-block text-danger" id="error"></span>

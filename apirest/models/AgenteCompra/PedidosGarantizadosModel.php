@@ -87,7 +87,9 @@ class PedidosGarantizadosModel extends CI_Model
 		' . $this->table . '.*,
         (select count(*) from agente_compra_pedido_detalle_producto_proveedor where ID_Pedido_Cabecera=' . $this->table . '.ID_Pedido_Cabecera) as count_proveedor,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
+        USR.*,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
+        IGPD.Txt_Producto_Ingles, IGPD.Txt_Description_Ingles,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
 		IGPD.Nu_Envio_Mensaje_Chat_Producto, TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido');
         $this->db->from($this->table);
@@ -95,6 +97,7 @@ class PedidosGarantizadosModel extends CI_Model
         $this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
         $this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join');
         $this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join');
+        $this->db->join('usuario AS USR', 'USR.ID_Usuario = ' . $this->table . '.ID_Usuario_Interno_China', 'left');
         $this->db->where($this->table . '.ID_Pedido_Cabecera', $ID);
         $query = $this->db->get();
         $query = $query->result();
@@ -550,9 +553,12 @@ class PedidosGarantizadosModel extends CI_Model
                     'ID_Organizacion' => $data['ID_Organizacion'],
                     'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
                     'Txt_Producto' => $row['nombre_comercial'],
+                    'Txt_Producto_Ingles' => $row['txtproductoIngles'],
+                    'Txt_Description_Ingles' => nl2br($row['caracteristicas_ingles']),
                     'Txt_Descripcion' => nl2br($row['caracteristicas']),
                     'Qt_Producto' => $row['cantidad'],
                     'Txt_Url_Imagen_Producto' => $Txt_Url_Imagen_Producto,
+
                     'Txt_Url_Link_Pagina_Producto' => $row['link'],
                 );
                 ++$iCounter;
@@ -568,6 +574,8 @@ class PedidosGarantizadosModel extends CI_Model
                     'ID_Pedido_Detalle' => $row['id_item'],
                     'Qt_Producto' => $row['cantidad'], //agergar input de cantidad
                     'Txt_Descripcion' => nl2br($row['caracteristicas']),
+                    'Txt_Producto_Ingles' => $row['txtproductoIngles'],
+                    'Txt_Description_Ingles' => nl2br($row['caracteristicas_ingles']),
                 );
             }
             $this->db->update_batch('agente_compra_pedido_detalle', $arrSaleOrderDetailUPD, 'ID_Pedido_Detalle');
@@ -915,8 +923,6 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
         $data = array('ID_Usuario_Interno_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
         //$data = array( 'ID_Usuario_Interno_Empresa_China' => $arrPost['cbo-guardar_personal_china-ID_Usuario']);
         if ($this->db->update($this->table, $data, $where) > 0) {
-            //agregar tour para chinito
-            //pendiente
 
             $where_progreso = array(
                 'ID_Pedido_Cabecera' => $arrPost['guardar_personal_china-ID_Pedido_Cabecera'],

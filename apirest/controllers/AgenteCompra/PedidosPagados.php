@@ -1688,7 +1688,7 @@ class PedidosPagados extends CI_Controller
         $templatePath = 'assets/downloads/agente_compra/TRADING-ORDEN-PERU.xlsx';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="Cotizacion.xlsx"');
+        header('Content-Disposition: attachment;filename=TRADING_ORDEN_PERU_' . $data[0]->cotizacionCode . '.xlsx');
         header('Cache-Control: max-age=0');
 
         $objPHPExcel->getActiveSheet()->setCellValue('F17', $data[0]->No_Contacto);
@@ -1768,7 +1768,7 @@ class PedidosPagados extends CI_Controller
         $templatePath = 'assets/downloads/agente_compra/CTRADING-ORDEN-PERU.xlsx';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="Cotizacion.xlsx"');
+        header('Content-Disposition: attachment;filename="CTRADING_ORDEN_PERU_' . $data[0]->cotizacionCode . '.xlsx"');
         header('Cache-Control: max-age=0');
 
         $objPHPExcel->getActiveSheet()->setCellValue('F17', $data[0]->No_Contacto);

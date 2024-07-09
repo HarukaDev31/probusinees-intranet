@@ -1110,6 +1110,8 @@ class CCotizacionesModel extends CI_Model
     {
         //init more memory
         $originalMemoryLimit = ini_get('memory_limit');
+        //set memory limit to 512M
+        ini_set('memory_limit', '1024M');
         $this->load->library('PHPExcel');
         $this->load->library('zip');
         // Create a new PHPExcel object
@@ -1121,6 +1123,7 @@ class CCotizacionesModel extends CI_Model
         foreach ($data as $key => $value) {
             $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
             $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value, $tarifas, $expirationDate);
+            // return $objPHPExcel;
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $excelFileName = 'Cotizacion' . $value['cliente']['nombre'] . '.xlsx';
             $excelFilePath = 'assets/downloads/' . $excelFileName;
@@ -1136,6 +1139,20 @@ class CCotizacionesModel extends CI_Model
         ini_set('memory_limit', $originalMemoryLimit);
         gc_collect_cycles();
         return $zipFilePath;
+    }
+    function incrementColumn($column) {
+        $length = strlen($column);
+        $i = $length - 1;
+        while ($i >= 0) {
+            if ($column[$i] == 'Z') {
+                $column[$i] = 'A';
+                $i--;
+            } else {
+                $column[$i] = chr(ord($column[$i]) + 1);
+                return $column;
+            }
+        }
+        return 'A' . $column;
     }
 
     public function getFinalCotizacionExcel($objPHPExcel, $data, $tarifas,$expirationDate)
@@ -1193,11 +1210,14 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->getStartColor()->setARGB($yellowColor);
         $objPHPExcel->getActiveSheet()->getColumnDimension("B")->setAutoSize(true);
         $InitialColumn = 'C';
+        
         $totalRows = 0;
         $cbmTotal = 0;
         $pesoTotal = 0;
         //first iterate for tributes zone, set values and apply styles to cells
         foreach ($data['cliente']['productos'] as $producto) {
+            //validate if $InitialColumn is more than Z then set A$
+            
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '5', $producto["nombre"]);
             //APLY BACKGROUND COLOR BLUE AND LETTERS WHITE
@@ -1218,7 +1238,9 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '12')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             //set auto size for columns
-            $InitialColumn++;
+
+            $InitialColumn = $this->incrementColumn($InitialColumn);
+
             $totalRows++;
             $cbmTotal += $producto['cbm'];
             $pesoTotal += $producto['peso'];
@@ -1226,6 +1248,7 @@ class CCotizacionesModel extends CI_Model
         }
         $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
         //get tarifas from db
+        return $objPHPExcel;
         $tipoCliente = trim($data['cliente']["tipo"]);
         //SET CURRENT SHEET TO TITLE TO $tipoCliente
 
@@ -1804,182 +1827,69 @@ Pronto le aviso nuevos avances, que tengan buen día🚢
 
     public function getMassiveExcelData($objPHPExcel)
     {
-        //PHPExcel_Cell::extractAllCellReferencesInRange($mergedRange);
         $this->load->library('PHPExcel');
-
+    
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Massive_Payroll.xlsx';
         $excel = $objPHPExcel;
         $worksheet = $excel->getActiveSheet();
-
+    
         // Obtener los rangos de celdas mergeadas
         $mergedCells = $worksheet->getMergeCells();
-        $columnClientes = [];
-        $columnTipoClientes = [];
-        $columnDNIClientes = [];
-        $columnPhoneClientes = [];
-        $columnProductos = [];
-        $columnCantidad = [];
-        $columnPrecioUnitario = [];
-        $columnAntidumping = [];
-        $columnValoracion = [];
-        $columnAdValorem = [];
-        $columnPercepcion = [];
-        $columnPeso = [];
-        $columnCBM = [];
-
-        // Filtrar y agregar los rangos mergeados en las columnas correspondientes a sus respectivos arrays
-        foreach ($mergedCells as $mergedRange) {
-            if (preg_match('/^A\d+:A\d+$/', $mergedRange)) {
-                $columnClientes[] = $mergedRange;
-            }
-            if (preg_match('/^B\d+:B\d+$/', $mergedRange)) {
-                $columnTipoClientes[] = $mergedRange;
-            }
-            if (preg_match('/^C\d+:C\d+$/', $mergedRange)) {
-                $columnDNIClientes[] = $mergedRange;
-            }
-            if (preg_match('/^D\d+:D\d+$/', $mergedRange)) {
-                $columnPhoneClientes[] = $mergedRange;
-            }
-            if (preg_match('/^F\d+:F\d+$/', $mergedRange)) {
-                $columnProductos[] = $mergedRange;
-            }
-            if (preg_match('/^G\d+:G\d+$/', $mergedRange)) {
-                $columnCantidad[] = $mergedRange;
-            }
-            if (preg_match('/^H\d+:H\d+$/', $mergedRange)) {
-                $columnPrecioUnitario[] = $mergedRange;
-            }
-            if (preg_match('/^I\d+:I\d+$/', $mergedRange)) {
-                $columnAntidumping[] = $mergedRange;
-            }
-            if (preg_match('/^J\d+:J\d+$/', $mergedRange)) {
-                $columnValoracion[] = $mergedRange;
-            }
-            if (preg_match('/^K\d+:K\d+$/', $mergedRange)) {
-                $columnAdValorem[] = $mergedRange;
-            }
-            if (preg_match('/^L\d+:L\d+$/', $mergedRange)) {
-                $columnPercepcion[] = $mergedRange;
-            }
-            if (preg_match('/^M\d+:M\d+$/', $mergedRange)) {
-                $columnPeso[] = $mergedRange;
-            }
-            if (preg_match('/^N\d+:N\d+$/', $mergedRange)) {
-                $columnCBM[] = $mergedRange;
-            }
+        $columns = [
+            'A' => 'clientes',
+            'B' => 'tipo_clientes',
+            'C' => 'dni_clientes',
+            'D' => 'phone_clientes',
+            'F' => 'productos',
+            'G' => 'cantidad',
+            'H' => 'precio_unitario',
+            'I' => 'antidumping',
+            'J' => 'valoracion',
+            'K' => 'ad_valorem',
+            'L' => 'percepcion',
+            'M' => 'peso',
+            'N' => 'cbm',
+        ];
+    
+        $columnData = [];
+        foreach ($columns as $col => $key) {
+            $columnData[$key] = array_filter($mergedCells, function ($range) use ($col) {
+                return preg_match("/^{$col}\d+:{$col}\d+$/", $range);
+            });
+            usort($columnData[$key], function ($a, $b) use ($col) {
+                preg_match("/^{$col}(\d+):{$col}\d+$/", $a, $matchesA);
+                preg_match("/^{$col}(\d+):{$col}\d+$/", $b, $matchesB);
+                return $matchesA[1] - $matchesB[1];
+            });
         }
-        // Ordenar los rangos en función del número de fila inicial para cada columna
-        usort($columnClientes, function ($a, $b) {
-            preg_match('/^A(\d+):A\d+$/', $a, $matchesA);
-            preg_match('/^A(\d+):A\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnTipoClientes, function ($a, $b) {
-            preg_match('/^B(\d+):B\d+$/', $a, $matchesA);
-            preg_match('/^B(\d+):B\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnDNIClientes, function ($a, $b) {
-            preg_match('/^C(\d+):C\d+$/', $a, $matchesA);
-            preg_match('/^C(\d+):C\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnPhoneClientes, function ($a, $b) {
-            preg_match('/^D(\d+):D\d+$/', $a, $matchesA);
-            preg_match('/^D(\d+):D\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnProductos, function ($a, $b) {
-            preg_match('/^F(\d+):F\d+$/', $a, $matchesA);
-            preg_match('/^F(\d+):F\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-
-        usort($columnCantidad, function ($a, $b) {
-            preg_match('/^G(\d+):G\d+$/', $a, $matchesA);
-            preg_match('/^G(\d+):G\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-
-        usort($columnPrecioUnitario, function ($a, $b) {
-            preg_match('/^H(\d+):H\d+$/', $a, $matchesA);
-            preg_match('/^H(\d+):H\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnAntidumping, function ($a, $b) {
-            preg_match('/^I(\d+):I\d+$/', $a, $matchesA);
-            preg_match('/^I(\d+):I\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnValoracion, function ($a, $b) {
-            preg_match('/^J(\d+):J\d+$/', $a, $matchesA);
-            preg_match('/^J(\d+):J\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnAdValorem, function ($a, $b) {
-            preg_match('/^K(\d+):K\d+$/', $a, $matchesA);
-            preg_match('/^K(\d+):K\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnPercepcion, function ($a, $b) {
-            preg_match('/^L(\d+):L\d+$/', $a, $matchesA);
-            preg_match('/^L(\d+):L\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnPeso, function ($a, $b) {
-            preg_match('/^M(\d+):M\d+$/', $a, $matchesA);
-            preg_match('/^M(\d+):M\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-        usort($columnCBM, function ($a, $b) {
-            preg_match('/^N(\d+):N\d+$/', $a, $matchesA);
-            preg_match('/^N(\d+):N\d+$/', $b, $matchesB);
-            return $matchesA[1] - $matchesB[1];
-        });
-
+    
         $clients = [];
-        foreach ($columnClientes as $key => $mergedRangeA) {
-            // Obtener la primera celda del rango de la columna A
+        foreach ($columnData['clientes'] as $key => $mergedRangeA) {
             $rangeA = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeA);
             $firstCellA = $rangeA[0];
             $valueA = $worksheet->getCell($firstCellA)->getValue();
             if ($valueA == null) {
                 continue;
             }
-            // Obtener el tipo de cliente
-            $mergedRangeB = $columnTipoClientes[$key];
-            $rangeB = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeB);
-            $firstCellB = $rangeB[0];
-            $valueB = $worksheet->getCell($firstCellB)->getValue();
-            if ($valueB == null) {
-                continue;
-            }
-            $mergedRangeC = $columnDNIClientes[$key];
-            $rangeC = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeC);
-            $firstCellC = $rangeC[0];
-            $valueC = $worksheet->getCell($firstCellC)->getValue();
-
-            $mergedRangeD = $columnPhoneClientes[$key];
-            $rangeD = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeD);
-            $firstCellD = $rangeD[0];
-            $valueD = $worksheet->getCell($firstCellD)->getValue();
-            if ($valueD == null) {
-                continue;
-            }
-            // Inicializar el array de productos para este cliente
-            $productos = [];
-
-            // Obtener los límites del rango de la columna A
+    
+            $client = [
+                'nombre' => $valueA,
+                'tipo' => $worksheet->getCell(PHPExcel_Cell::extractAllCellReferencesInRange($columnData['tipo_clientes'][$key])[0])->getValue(),
+                'dni' => $worksheet->getCell(PHPExcel_Cell::extractAllCellReferencesInRange($columnData['dni_clientes'][$key])[0])->getValue(),
+                'telefono' => $worksheet->getCell(PHPExcel_Cell::extractAllCellReferencesInRange($columnData['phone_clientes'][$key])[0])->getValue(),
+                'productos' => [],
+            ];
+    
             preg_match('/^A(\d+):A(\d+)$/', $mergedRangeA, $matchesA);
             $startRowA = $matchesA[1];
             $endRowA = $matchesA[2];
-            foreach ($columnProductos as $key => $mergedRangeF) {
+    
+            foreach ($columnData['productos'] as $key => $mergedRangeF) {
                 preg_match('/^F(\d+):F(\d+)$/', $mergedRangeF, $matchesF);
                 $startRowF = $matchesF[1];
                 $endRowF = $matchesF[2];
-
+    
                 if ($startRowF >= $startRowA && $endRowF <= $endRowA) {
                     $rangeF = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeF);
                     $firstCellF = $rangeF[0];
@@ -1987,162 +1897,47 @@ Pronto le aviso nuevos avances, que tengan buen día🚢
                     if ($producto == null) {
                         continue;
                     }
-                    // Obtener cantidad, precio unitario, valoración, ad valorem, percepción, peso y CBM
-                    $valueG = $valueH = $valueI = $valueJ = $valueK = $valueL = $valueM = $valueN = null;
-                    foreach ($columnCantidad as $mergedRangeG) {
-                        preg_match('/^G(\d+):G(\d+)$/', $mergedRangeG, $matchesG);
-                        $startRowG = $matchesG[1];
-                        $endRowG = $matchesG[2];
-                        if ($startRowG == $startRowF && $endRowG == $endRowF) {
-                            $rangeG = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeG);
-                            $firstCellG = $rangeG[0];
-                            $valueG = $worksheet->getCell($firstCellG)->getValue();
-                            if ($valueG == null) {
-                                continue;
-                            }
-                            break;
-                        }
+    
+                    $productoData = [
+                        'nombre' => $producto,
+                        'cantidad' => $this->getCellValue($worksheet, $columnData['cantidad'], $startRowF, $endRowF),
+                        'precio_unitario' => round($this->getCellValue($worksheet, $columnData['precio_unitario'], $startRowF, $endRowF),2),
+                        'antidumping' => $this->getCellValue($worksheet, $columnData['antidumping'], $startRowF, $endRowF, 0),
+                        'valoracion' => $this->getCellValue($worksheet, $columnData['valoracion'], $startRowF, $endRowF, 0),
+                        'ad_valorem' => $this->getCellValue($worksheet, $columnData['ad_valorem'], $startRowF, $endRowF, 0),
+                        'percepcion' => $this->getCellValue($worksheet, $columnData['percepcion'], $startRowF, $endRowF, 0.035),
+                        'peso' => $this->getCellValue($worksheet, $columnData['peso'], $startRowF, $endRowF, 0),
+                        'cbm' => round($this->getCellValue($worksheet, $columnData['cbm'], $startRowF, $endRowF),2),
+                    ];
+    
+                    if ($productoData['cantidad'] !== null && $productoData['precio_unitario'] !== null && $productoData['cbm'] !== null) {
+                        $client['productos'][] = $productoData;
                     }
-                    foreach ($columnPrecioUnitario as $mergedRangeH) {
-                        preg_match('/^H(\d+):H(\d+)$/', $mergedRangeH, $matchesH);
-                        $startRowH = $matchesH[1];
-                        $endRowH = $matchesH[2];
-                        if ($startRowH == $startRowF && $endRowH == $endRowF) {
-                            $rangeH = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeH);
-                            $firstCellH = $rangeH[0];
-                            $valueH = $worksheet->getCell($firstCellH)->getValue();
-                            if ($valueH == null) {
-                                continue;
-                            }
-                            break;
-
-                        }
-                    }
-                    $return = false;
-                    foreach ($columnAntidumping as $mergedRangeI) {
-                        preg_match('/^I(\d+):I(\d+)$/', $mergedRangeI, $matchesI);
-                        $startRowI = $matchesI[1];
-                        $endRowI = $matchesI[2];
-                        if ($startRowI == $startRowF && $endRowI == $endRowF) {
-                            $rangeI = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeI);
-                            $firstCellI = $rangeI[0];
-                            $valueI = $worksheet->getCell($firstCellI)->getValue();
-
-                            if ($valueI == null || $valueI == "-") {
-                                $valueI = 0;
-                            }
-                        }
-                    }
-
-                    foreach ($columnValoracion as $mergedRangeJ) {
-                        preg_match('/^J(\d+):J(\d+)$/', $mergedRangeJ, $matchesJ);
-                        $startRowJ = $matchesJ[1];
-                        $endRowJ = $matchesJ[2];
-                        if ($startRowJ == $startRowF && $endRowJ == $endRowF) {
-
-                            $rangeJ = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeJ);
-                            $firstCellJ = $rangeJ[0];
-
-                            $valueJ = $worksheet->getCell($firstCellJ)->getValue();
-                            if ($valueJ == null || $valueJ == "-") {
-                                $valueJ = 0;
-
-                            }
-                            break;
-
-                        }
-                    }
-                    foreach ($columnAdValorem as $mergedRangeK) {
-                        preg_match('/^K(\d+):K(\d+)$/', $mergedRangeK, $matchesK);
-                        $startRowK = $matchesK[1];
-                        $endRowK = $matchesK[2];
-                        if ($startRowK == $startRowF && $endRowK == $endRowF) {
-                            $rangeK = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeK);
-                            $firstCellK = $rangeK[0];
-                            $valueK = $worksheet->getCell($firstCellK)->getValue();
-                            if ($valueK == null || $valueK == "-") {
-                                $valueK = 0;
-                            }
-                            break;
-
-                        }
-                    }
-                    foreach ($columnPercepcion as $mergedRangeL) {
-                        preg_match('/^L(\d+):L(\d+)$/', $mergedRangeL, $matchesL);
-                        $startRowL = $matchesL[1];
-                        $endRowL = $matchesL[2];
-                        if ($startRowL == $startRowF && $endRowL == $endRowF) {
-                            $rangeL = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeL);
-                            $firstCellL = $rangeL[0];
-                            $valueL = $worksheet->getCell($firstCellL)->getValue();
-                            if ($valueL == null || $valueL == "-") {
-                                $valueL = 0.035;
-                            }
-                            break;
-
-                        }
-
-                    }
-                    foreach ($columnPeso as $mergedRangeM) {
-                        preg_match('/^M(\d+):M(\d+)$/', $mergedRangeM, $matchesM);
-                        $startRowM = $matchesM[1];
-                        $endRowM = $matchesM[2];
-                        if ($startRowM == $startRowF && $endRowM == $endRowF) {
-                            $rangeM = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeM);
-                            $firstCellM = $rangeM[0];
-                            $valueM = $worksheet->getCell($firstCellM)->getValue();
-                            if ($valueM == null || $valueM == "-") {
-                                $valueM = 0;
-                            }
-                            break;
-
-                        }
-                    }
-                    foreach ($columnCBM as $mergedRangeN) {
-                        preg_match('/^N(\d+):N(\d+)$/', $mergedRangeN, $matchesN);
-                        $startRowN = $matchesN[1];
-                        $endRowN = $matchesN[2];
-                        if ($startRowN == $startRowF && $endRowN == $endRowF) {
-                            $rangeN = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeN);
-                            $firstCellN = $rangeN[0];
-                            $valueN = $worksheet->getCell($firstCellN)->getValue();
-                            if ($valueN == null || $valueN == "-") {
-                                continue;
-                            }
-                            break;
-
-                        }
-                    }
-                    if ($valueG != null && $valueH != null && $valueN != null) {
-                        $productos[] = [
-                            'nombre' => $producto,
-                            'cantidad' => $valueG,
-                            'precio_unitario' => $valueH,
-                            'antidumping' => $valueI,
-                            'valoracion' => $valueJ,
-                            'ad_valorem' => $valueK,
-                            'percepcion' => $valueL,
-                            'peso' => $valueM,
-                            'cbm' => $valueN,
-                        ];
-                    }
-
                 }
             }
-
-            // Añadir cliente con sus datos y productos al array de clientes
-            $clients[] = [
-                'cliente' => [
-                    'nombre' => $valueA,
-                    'tipo' => $valueB,
-                    'dni' => $valueC,
-                    'telefono' => $valueD,
-                    'productos' => $productos,
-                ],
-            ];
+    
+            $clients[] = ['cliente' => $client];
         }
+    
         return $clients;
     }
+    
+    private function getCellValue($worksheet, $columnRanges, $startRow, $endRow, $defaultValue = null)
+    {
+        foreach ($columnRanges as $mergedRange) {
+            preg_match('/^\w(\d+):\w(\d+)$/', $mergedRange, $matches);
+            $startRowMatch = $matches[1];
+            $endRowMatch = $matches[2];
+            if ($startRowMatch == $startRow && $endRowMatch == $endRow) {
+                $range = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRange);
+                $firstCell = $range[0];
+                $value = $worksheet->getCell($firstCell)->getValue();
+                return $value === null || $value === "-" ? $defaultValue : $value;
+            }
+        }
+        return $defaultValue;
+    }
+    
 
     public function get_cotization_tributos($ID_Producto)
     {

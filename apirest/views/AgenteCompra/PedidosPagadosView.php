@@ -1430,7 +1430,7 @@
                       </div>
                     </div>
                     <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">
-                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span></h6>
+                      <h6 class="card-title mb-2" style="font-weight:bold"><span class="fw-bold">Pcs/Caja<span class="label-advertencia text-danger"> *</span></span></h6>
                       <div class="form-group">
                         <input type="text" id="modal-qty_caja1" data-correlativo="1" inputmode="decimal" name="addProducto[1][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>

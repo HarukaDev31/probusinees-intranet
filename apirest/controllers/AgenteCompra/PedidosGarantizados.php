@@ -231,7 +231,7 @@ class PedidosGarantizados extends CI_Controller {
         $templatePath = 'assets/downloads/agente_compra/COTIZACION-CHINA.xls';
 		$objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="cotizacion-garantizada.xlsx"');
+        header('Content-Disposition: attachment;filename=TRADING_CHINA_'.$data[0]->cotizacionCode.'_Garantizado.xlsx');
         header('Cache-Control: max-age=0');
 		//set D10	 = $data[0]->No_Contacto
 		$objPHPExcel->getActiveSheet()->setCellValue('D10', $data[0]->No_Contacto);
@@ -239,6 +239,8 @@ class PedidosGarantizados extends CI_Controller {
 		$objPHPExcel->getActiveSheet()->setCellValue('D12', $data[0]->Txt_Email_Contacto);
 		// $objPHPExcel->getActiveSheet()->setCellValue('E21', "TRADING");
 		$objPHPExcel->getActiveSheet()->setCellValue('L10', date('d/m/Y'));
+		$objPHPExcel->getActiveSheet()->setCellValue('L11', $data[0]->No_Entidad);
+		$objPHPExcel->getActiveSheet()->setCellValue('L12', $data[0]->Nu_Documento_Identidad);
 		$objPHPExcel->getActiveSheet()->setCellValue('U10', $data[0]->Ss_Tipo_Cambio);
 		// $objPHPExcel->getActiveSheet()->setCellValue('E35', "=K32");
 		$initialRow=17;
@@ -272,16 +274,19 @@ class PedidosGarantizados extends CI_Controller {
 
 			$objPHPExcel->getActiveSheet()->setCellValue("D". $initialRow, $val->Txt_Producto);
 			$objPHPExcel->getActiveSheet()->setCellValue("E". $initialRow, $val->Txt_Descripcion);
-			$objPHPExcel->getActiveSheet()->setCellValue("G". $initialRow, $val->Qt_Producto);
+			$objPHPExcel->getActiveSheet()->setCellValue("F". $initialRow, $val->Qt_Producto);
+			$objPHPExcel->getActiveSheet()->setCellValue("G". $initialRow, $val->Qt_Producto_Moq);
 			$objPHPExcel->getActiveSheet()->setCellValue("H". $initialRow, $val->unidad_medida);
 			$objPHPExcel->getActiveSheet()->setCellValue("I". $initialRow, $val->Ss_Precio);
-			$objPHPExcel->getActiveSheet()->setCellValue("N". $initialRow, $val->Qt_Producto_Caja);
-			$objPHPExcel->getActiveSheet()->setCellValue("P". $initialRow, "=P". $initialRow."/N". $initialRow);
-			$objPHPExcel->getActiveSheet()->setCellValue("Q". $initialRow, $val->Qt_Cbm);
-			$objPHPExcel->getActiveSheet()->setCellValue("R". $initialRow, $val->kg_box);
-			$objPHPExcel->getActiveSheet()->setCellValue("T". $initialRow, $val->Ss_Costo_Delivery);
-			$objPHPExcel->getActiveSheet()->setCellValue("U". $initialRow, $val->Nu_Dias_Delivery);
-			$objPHPExcel->getActiveSheet()->setCellValue("V". $initialRow, $val->Txt_Nota);
+			$objPHPExcel->getActiveSheet()->setCellValue("M". $initialRow, $val->Qt_Producto_Caja);
+			$objPHPExcel->getActiveSheet()->setCellValue("O". $initialRow, "=P". $initialRow."/N". $initialRow);
+			$objPHPExcel->getActiveSheet()->setCellValue("P". $initialRow, $val->Qt_Cbm);
+			$objPHPExcel->getActiveSheet()->setCellValue("Q". $initialRow, $val->kg_box);
+			$objPHPExcel->getActiveSheet()->setCellValue("R". $initialRow, "=Q". $initialRow."*N". $initialRow);
+
+			$objPHPExcel->getActiveSheet()->setCellValue("S". $initialRow, $val->Ss_Costo_Delivery);
+			$objPHPExcel->getActiveSheet()->setCellValue("T". $initialRow, $val->Nu_Dias_Delivery);
+			$objPHPExcel->getActiveSheet()->setCellValue("U". $initialRow, $val->Txt_Nota);
 			$initialRow++;
 		}
 		if($initialRow<=$lastProductrow){
@@ -289,7 +294,7 @@ class PedidosGarantizados extends CI_Controller {
 		}
 		$objPHPExcel->getActiveSheet()->setCellValue('K'. ($initialRow),"=SUM(K17:K".($initialRow-1).")"); 
 		$objPHPExcel->getActiveSheet()->setCellValue('L'. ($initialRow),"=SUM(L17:L".($initialRow-1).")");
-		$objPHPExcel->getActiveSheet()->setCellValue('N'. ($initialRow),"=SUM(N17:N".($initialRow-1).")");
+		// $objPHPExcel->getActiveSheet()->setCellValue('N'. ($initialRow),"=SUM(N17:N".($initialRow-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue('P'. ($initialRow),"=SUM(P17:P".($initialRow-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue('R'. ($initialRow),"=SUM(R17:R".($initialRow-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue('S'. ($initialRow),"=SUM(S17:S".($initialRow-1).")"); 

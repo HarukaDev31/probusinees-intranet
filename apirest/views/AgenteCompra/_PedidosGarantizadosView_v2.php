@@ -194,7 +194,7 @@
                   <!--
 Precio Ss_Precio
 moq Qt_Producto_Moq
-qty_caja Qt_Producto_Caja
+Pcs/Caja Qt_Producto_Caja
 cbm Qt_Cbm
 delivery (es un campo texto?) Nu_Dias_Delivery
 observaciones (opcional)	Txt_Nota
@@ -237,7 +237,7 @@ observaciones (opcional)	Txt_Nota
                               
                               <div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-3">
                                 <h6 class="card-title mb-2" style="font-weight:bold">
-                                  <span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>
+                                  <span class="fw-bold">Pcs/Caja<span class="label-advertencia text-danger"> *</span></span>
                                 </h6>
                                 <div class="form-group">
                                   <input type="text" id="modal-qty_caja1" inputmode="decimal" data-correlativo="1" name="addProducto[1][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
