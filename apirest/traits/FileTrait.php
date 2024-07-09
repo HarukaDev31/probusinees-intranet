@@ -108,7 +108,6 @@ trait FileTrait
             $path = "assets/images/agentecompra/garantizados/" . $data['addProducto'][$filesIndex]['pedido-cabecera'] . "/" . $data['addProducto'][$filesIndex]['id_detalle'];
 
             foreach ($filesKey as $keyFile) {
-                return $data_files;
                 if (empty($data_files['file']['tmp_name'][$filesIndex][$keyFile])) {
                     // Skip if no file is uploaded for this key
                     if ($data) {
@@ -136,7 +135,7 @@ trait FileTrait
                 $size = $data_files['file']['size'][$filesIndex][$keyFile] / 1024; // size in KB
                 $allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','mp4','MP4','avi','AVI','mov','MOV','flv','FLV','wmv','WMV','3gp','3GP','mkv','MKV','webm','WEBM');
                 $allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','video/mp4','video/avi','video/mov','video/flv','video/wmv','video/3gp','video/mkv','video/webm');
-                $maxSize = 10240; // 1024 KB = 3 MB
+                $maxSize = 20240; // 1024 KB = 3 MB
 
                 $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($name, $type, $allowedExtensions, $allowedContentTypes);
                 $validateSize = $this->validateSize($size, $maxSize);
