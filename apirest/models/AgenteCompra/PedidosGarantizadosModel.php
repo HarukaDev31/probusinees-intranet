@@ -607,6 +607,7 @@ class PedidosGarantizadosModel extends CI_Model
      */
     public function addPedidoItemProveedor($data, $data_files)
     {
+      try{
         $this->db->trans_begin();
 
         //actualizar cabecera
@@ -703,6 +704,10 @@ class PedidosGarantizadosModel extends CI_Model
         }
         $this->checkAllProductsWithSupplier($pedidoID, $correlativo);
         return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
+    }catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
+      }
 
     }
     public function checkAllProductsWithSupplier($idPedido, $correlativo)
