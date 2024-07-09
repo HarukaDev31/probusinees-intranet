@@ -48,7 +48,7 @@
                   <thead class="thead-light">
                     <tr>
                       <th>País</th>
-                      <th>N° Cotización</th>
+                      <th>N° Orden</th>
                       <th>Fecha</th>
                       <!--  -->
 
