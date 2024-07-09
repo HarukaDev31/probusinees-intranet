@@ -87,6 +87,7 @@ trait FileTrait
                 return "Failed to move uploaded file to $destination";
             }
         } catch (Exception $e) {
+            echo $e->getMessage();
             return $e->getMessage();
         }
     }

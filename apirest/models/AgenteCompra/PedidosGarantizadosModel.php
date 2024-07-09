@@ -211,7 +211,7 @@ class PedidosGarantizadosModel extends CI_Model
                 "secondary_video",
             ];
             $results = $this->processFiles($data_files, null, $filesKey, $arrPost);
-
+            return $results;
             foreach ($arrPost['addProducto'] as $key => $row) {
                 $Txt_Url_Imagen_Proveedor = '';
 
