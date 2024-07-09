@@ -108,6 +108,7 @@ trait FileTrait
             $path = "assets/images/agentecompra/garantizados/" . $data['addProducto'][$filesIndex]['pedido-cabecera'] . "/" . $data['addProducto'][$filesIndex]['id_detalle'];
 
             foreach ($filesKey as $keyFile) {
+                return $data_files;
                 if (empty($data_files['file']['tmp_name'][$filesIndex][$keyFile])) {
                     // Skip if no file is uploaded for this key
                     if ($data) {
