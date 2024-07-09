@@ -504,7 +504,6 @@ class PedidosGarantizadosModel extends CI_Model
         $fileCotizacion = $data['file_cotizacion'];
         $this->allowedExtensions = array('pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'webp');
         $this->allowedContentTypes = array('application/pdf', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/gif', 'image/webp');
-        
         $pedido = $where['ID_Pedido_Cabecera'];
 
         $path = "assets/images/agentecompra/cotizaciones/" . $pedido . "/";
