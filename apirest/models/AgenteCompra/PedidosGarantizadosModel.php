@@ -180,7 +180,7 @@ class PedidosGarantizadosModel extends CI_Model
 		');
         $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP');
         $this->db->join($this->table . ' AS ACPC', 'ACPC.ID_Pedido_Cabecera = ACPDPP.ID_Pedido_Cabecera', 'join');
-        $this->db->join($this->table_suppliers . ' AS S', 'S.id_supplier = ACPDPP.ID_Entidad_Proveedor', 'join');
+        $this->db->join($this->table_suppliers . ' AS S', 'S.id_supplier = ACPDPP.ID_Entidad_Proveedor', 'left');
         $this->db->where('ACPDPP.ID_Pedido_Detalle', $ID);
         $query = $this->db->get();
         return $query->result();
@@ -607,7 +607,6 @@ class PedidosGarantizadosModel extends CI_Model
      */
     public function addPedidoItemProveedor($data, $data_files)
     {
-      try{
         $this->db->trans_begin();
 
         //actualizar cabecera
@@ -704,10 +703,6 @@ class PedidosGarantizadosModel extends CI_Model
         }
         $this->checkAllProductsWithSupplier($pedidoID, $correlativo);
         return array('status' => 'success', 'style_modal' => 'modal-success', 'message' => 'Registro guardado');
-    }catch (Exception $e) {
-            echo 'Caught exception: ', $e->getMessage(), "\n";
-        }
-      }
 
     }
     public function checkAllProductsWithSupplier($idPedido, $correlativo)
