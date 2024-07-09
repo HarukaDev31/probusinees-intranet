@@ -504,6 +504,7 @@ class PedidosGarantizadosModel extends CI_Model
         $fileCotizacion = $data['file_cotizacion'];
         $this->allowedExtensions = array('pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'webp');
         $this->allowedContentTypes = array('application/pdf', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/gif', 'image/webp');
+        
         $pedido = $where['ID_Pedido_Cabecera'];
 
         $path = "assets/images/agentecompra/cotizaciones/" . $pedido . "/";
@@ -805,7 +806,9 @@ Nu_Correlativo
         if (isset($data_files['image_documento']['name'])) {
             $this->db->trans_begin();
             $path = "assets/images/garantizados/" . $arrPost['documento_pago_garantizado-id_cabecera'] . "/pagos/";
-
+            $this->allowedContentTypes = array('image', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
+            $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
+            $this->maxFileSize = 20240;
             $Txt_Url_Imagen_Producto = $this->uploadSingleFile($data_files['image_documento'], $path);
 
             // $where = array('id_pedido' => $arrPost['documento_pago_garantizado-id_cabecera']);
