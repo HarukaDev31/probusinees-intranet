@@ -1240,10 +1240,10 @@ function verPedido(ID) {
           nombre_producto +
           "</h6>";
         if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe"){
-          table_enlace_producto += "<div class='d-flex flex-row align-items-center '>";
+          table_enlace_producto += "<div class='d-flex flex-row align-items-center'>";
           table_enlace_producto += "<span class='mr-1'>Ingles</span>";
           //add input text name txtproductoIngles
-          table_enlace_producto += '<input type="text" class="form-control" name="addProductoTable[' + id_item + '][txtproductoIngles]" value="' + detalle[i]['Txt_Producto_Ingles']??'' + '">';
+          table_enlace_producto += '<input type="text" class="form-control" name="addProductoTable[' + id_item + '][txtproductoIngles]" value="' + (detalle[i]['Txt_Producto_Ingles']?detalle[i]['Txt_Producto_Ingles']:'') + '">';
           table_enlace_producto += "</div>";
         }
         cantidad_item =
