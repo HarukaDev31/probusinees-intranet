@@ -1986,7 +1986,7 @@ function addItems() {
       <div class="col-6 col-md-3 col-lg-2">
         <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
         <div class="form-group">
-          <input type="text" id="modal-delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][delivery]" class="arrProducto form-control required delivery input-number_letter" placeholder="" value="" autocomplete="off" />
+          <input type="text" id="modal-delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][delivery]" class="arrProducto form-control required delivery" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
         </div>
       </div>
@@ -2325,7 +2325,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
         <div class="col-6 col-md-3 col-lg-2">
           <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
           <div class="form-group">
-            <input type="text" id="modal-delivery${i}" data-correlativo="${i}"  name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery input-number_letter" placeholder="" value="" autocomplete="off" />
+            <input type="text" id="modal-delivery${i}" data-correlativo="${i}"  name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery " placeholder="" value="" autocomplete="off" />
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
