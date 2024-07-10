@@ -908,7 +908,7 @@ $(function () {
                     elemento.classList[3] == "moq" ||
                     elemento.classList[3] == "qty_caja" ||
                     elemento.classList[3] == "cbm" ||
-                    elemento.classList[3] == "delivery" ||
+                    // elemento.classList[3] == "delivery" ||
                     elemento.classList[3] == "shipping_cost" ||
                     elemento.classList[3] == "kgbox" ||
                     elemento.classList[3] == "celular_proveedor") &&
@@ -1144,7 +1144,7 @@ function verPedido(ID) {
       var detalle = response;
       response = response[0];
 
-      $("#span-id_pedido").html(response.sCorrelativoCotizacion);
+      $("#span-id_pedido").html(response.cotizacionCode);
 
       $(".div-AgregarEditar").show();
 
@@ -1235,27 +1235,37 @@ function verPedido(ID) {
           "</td>" +
           "<td class='text-center td-name' width='30%'>";
 
-        table_enlace_producto +=
-          "<h6 class='font-weight-bold font-medium'>" +
-          nombre_producto +
-          "</h6>";
-        if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe"){
-          table_enlace_producto += "<div class='d-flex flex-row align-items-center'>";
-          table_enlace_producto += "<span class='mr-1'>Ingles</span>";
-          //add input text name txtproductoIngles
-          table_enlace_producto += '<input type="text" class="form-control" name="addProductoTable[' + id_item + '][txtproductoIngles]" value="' + (detalle[i]['Txt_Producto_Ingles']?detalle[i]['Txt_Producto_Ingles']:'') + '">';
-          table_enlace_producto += "</div>";
-        }
+       
+          if(detalle[i]["currentUser"]=="maryam.china@probusiness.pe"){
+            table_enlace_producto +=
+            "<h6 class='font-weight-bold font-medium'>" +
+            (detalle[i]['Txt_Producto_Ingles']??nombre_producto) +
+            "</h6>";
+          }else{
+            
+            table_enlace_producto +=
+            "<h6 class='font-weight-bold font-medium'>" +
+            nombre_producto +
+            "</h6>";
+          }
+         
         cantidad_item =
           !isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item != ""
             ? cantidad_item
             : 0;
         //if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-        table_enlace_producto += '<div class="row mb-2">';
-        table_enlace_producto += '<div class="col col-sm-6 text-right">';
-        table_enlace_producto += "<span class='mt-3'>Cantidad</span>";
-        table_enlace_producto += "</div>";
-        table_enlace_producto += '<div class="col col-sm-2">';
+        table_enlace_producto += '<div class="d-flex flex-column mb-2">';
+        if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe" && detalle[i]["currentUser"]!="maryam.china@probusiness.pe"){
+          table_enlace_producto += "<div class='d-flex flex-row align-items-center w-100 justify-content-center mb-2' style='column-gap:1em'>";
+          table_enlace_producto += "<span class=''>Ingles</span>";
+          //add input text name txtproductoIngles
+          table_enlace_producto += '<input type="text" class="form-control"  style="width:300px" name="addProductoTable[' + id_item + '][txtproductoIngles]" value="' + (detalle[i]['Txt_Producto_Ingles']?detalle[i]['Txt_Producto_Ingles']:'') + '">';
+          table_enlace_producto += "</div>";
+        }
+        table_enlace_producto += '<div class="d-flex flex-row align-items-center w-100 justify-content-center mb-2" style="column-gap:1em">';
+        
+        table_enlace_producto += "<span class=''>Cantidad</span>";
+
         table_enlace_producto +=
           '<input type="hidden" name="addProductoTable[' +
           id_item +
@@ -1263,7 +1273,7 @@ function verPedido(ID) {
           id_item +
           '">';
         table_enlace_producto +=
-          '<input type="text" inputmode="decimal" class="form-control input-decimal" name="addProductoTable[' +
+          '<input type="number" style="width:300px" inputmode="decimal" class="form-control input-decimal" name="addProductoTable[' +
           id_item +
           '][cantidad]" value="' +
           Math.round10(cantidad_item, -2) +
@@ -1293,13 +1303,23 @@ function verPedido(ID) {
         //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
         //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
         table_enlace_producto += "<td class='text-left td-name' width='20%'>";
-        table_enlace_producto +=
+        if(detalle[i]["currentUser"]=="maryam.china@probusiness.pe"){
+          table_enlace_producto +=
+          '<textarea class="form-control" placeholder="" name="addProductoTable[' +
+          id_item +
+          '][caracteristicas]" style="height: 200px;">' +
+          clearHTMLTextArea((detalle[i]["Txt_Description_Ingles"]??detalle[i]["Txt_Description"])??'') +
+          "</textarea>";
+        }else{
+          table_enlace_producto +=
           '<textarea class="form-control" placeholder="" name="addProductoTable[' +
           id_item +
           '][caracteristicas]" style="height: 200px;">' +
           clearHTMLTextArea(detalle[i]["Txt_Descripcion"]) +
           "</textarea>";
-          if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe"){
+
+        }
+          if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe" && detalle[i]["currentUser"]!="maryam.china@probusiness.pe"){
             table_enlace_producto += "<span class='mr-1'>Ingles</span>";
 
             table_enlace_producto +=  '<textarea class="form-control" placeholder="" name="addProductoTable[' +
@@ -1966,7 +1986,7 @@ function addItems() {
       <div class="col-6 col-md-3 col-lg-2">
         <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
         <div class="form-group">
-          <input type="text" id="modal-delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
+          <input type="text" id="modal-delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][delivery]" class="arrProducto form-control required delivery input-number_letter" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
         </div>
       </div>
@@ -2305,7 +2325,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
         <div class="col-6 col-md-3 col-lg-2">
           <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
           <div class="form-group">
-            <input type="text" id="modal-delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
+            <input type="text" id="modal-delivery${i}" data-correlativo="${i}"  name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery input-number_letter" placeholder="" value="" autocomplete="off" />
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>

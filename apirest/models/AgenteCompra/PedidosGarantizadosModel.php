@@ -52,7 +52,7 @@ class PedidosGarantizadosModel extends CI_Model
             ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
             ->where_in($this->table . '.Nu_Estado', array(2, 3, 4, 8));
-        if($user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio) {
+        if ($user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio) {
             $this->db->where($this->table . '.ID_Usuario_Interno_China', $user->ID_Usuario);
         }
         $this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
@@ -87,7 +87,7 @@ class PedidosGarantizadosModel extends CI_Model
 		' . $this->table . '.*,
         (select count(*) from agente_compra_pedido_detalle_producto_proveedor where ID_Pedido_Cabecera=' . $this->table . '.ID_Pedido_Cabecera) as count_proveedor,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-        USR.*,
+        USR.No_Usuario,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
         IGPD.Txt_Producto_Ingles, IGPD.Txt_Description_Ingles,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
@@ -106,13 +106,14 @@ class PedidosGarantizadosModel extends CI_Model
             $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0, 3)) . str_pad($row->Nu_Correlativo, 3, "0", STR_PAD_LEFT);
             $row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
             $row->Nu_Tipo_Privilegio_Acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
+            $row->currentUser = $this->user->Txt_Email;
         }
         $sCorrelativoCotizacion = $query[0]->sCorrelativoCotizacion;
         if ($acceso == $this->personalChinaPrivilegio || $acceso == $this->jefeChinaPrivilegio) {
-            //get current estadochina from this pedido 
+            //get current estadochina from this pedido
             $query2 = $this->db->get_where($this->table, ['ID_Pedido_Cabecera' => $ID]);
             $estadoChina = $query2->row()->Nu_Estado_China;
-            if($estadoChina == 1){
+            if ($estadoChina == 1) {
                 $query2 = $this->cambiarEstadoChina($ID, 2, $sCorrelativoCotizacion);
             }
         }
@@ -384,8 +385,8 @@ class PedidosGarantizadosModel extends CI_Model
                 'Pedidos Garantizados',
                 'Cotización ' . $sCorrelativoCotizacion . ' ' . $sElegirProveedor . ' de ' . $sNameItem,
                 ''
-            );  
-            //get all 
+            );
+            //get all
             $coordinationSupplier = array(
                 'id_pedido' => $id_pedido,
                 'id_supplier' => $id_supplier,
@@ -398,13 +399,13 @@ class PedidosGarantizadosModel extends CI_Model
             ]);
             if ($query->num_rows() == 0 && $status == 1) {
                 $this->db->insert($this->table_coordination, $coordinationSupplier);
-            }else if($query->num_rows()>0 && $status == 0){
+            } else if ($query->num_rows() > 0 && $status == 0) {
                 //set update_at to current date ROW with id_pedido and id_supplier
-                 
+
                 $this->db->update($this->table_coordination, ['updated_at' => date('Y-m-d H:i:s', time())], ['id_pedido' => $id_pedido, 'id_supplier' => intval($id_supplier)]);
-            }else if($query->num_rows()>0 && $status == 1){
+            } else if ($query->num_rows() > 0 && $status == 1) {
                 //set updated_at as null
-                $this->db->update($this->table_coordination, ['updated_at' => null], ['id_pedido' => $id_pedido, 'id_supplier' => $id_supplier  ]);
+                $this->db->update($this->table_coordination, ['updated_at' => null], ['id_pedido' => $id_pedido, 'id_supplier' => $id_supplier]);
             }
             return array('status' => 'success', 'message' => 'Proveedor seleccionado');
         }
@@ -420,7 +421,7 @@ class PedidosGarantizadosModel extends CI_Model
             'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China,
         );
 
-        if ($Nu_Estado == 5) {
+        if ($Nu_Estado == 5|| $Nu_Estado ==3) {
 
             /**
              * select ID_Pedido_Detalle,count(ID_Pedido_Detalle) as count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =231 group by ID_Pedido_Detalle ;
@@ -428,14 +429,14 @@ class PedidosGarantizadosModel extends CI_Model
             $query = "SELECT ID_Pedido_Detalle,count(ID_Pedido_Detalle) as suppliers_count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =" . $ID . " and acpdpp.Nu_Selecciono_Proveedor =1 group by ID_Pedido_Detalle ";
             $result = $this->db->query($query)->result();
             //check if exists count of ID_Pedido_Detalle is greater than 1
-            $isValidToContinue=true;
+            $isValidToContinue = true;
             foreach ($result as $row) {
                 if ($row->suppliers_count > 1) {
-                    $isValidToContinue=false;
+                    $isValidToContinue = false;
                     break;
                 }
             }
-            if(!$isValidToContinue){
+            if (!$isValidToContinue) {
                 return array('status' => 'error', 'message' => 'Error al aprobar la cotización hay items con mas de un proveedor');
             }
             $arrDataTour = array(
@@ -547,19 +548,27 @@ class PedidosGarantizadosModel extends CI_Model
                     $Txt_Url_Imagen_Producto = str_replace("public_html/", "", $Txt_Url_Imagen_Producto);
                 }
 
-                $arrSaleOrderDetail[] = array(
+                $arrSaleOrderDetail[$iCounter] = array(
                     'ID_Empresa' => $data['ID_Empresa'],
                     'ID_Organizacion' => $data['ID_Organizacion'],
                     'ID_Pedido_Cabecera' => $where['ID_Pedido_Cabecera'],
                     'Txt_Producto' => $row['nombre_comercial'],
-                    'Txt_Producto_Ingles' => $row['txtproductoIngles'],
-                    'Txt_Description_Ingles' => nl2br($row['caracteristicas_ingles']),
                     'Txt_Descripcion' => nl2br($row['caracteristicas']),
+
                     'Qt_Producto' => $row['cantidad'],
                     'Txt_Url_Imagen_Producto' => $Txt_Url_Imagen_Producto,
 
                     'Txt_Url_Link_Pagina_Producto' => $row['link'],
                 );
+                if (array_key_exists('caracteristicas_ingles', $row)) {
+                    $arrSaleOrderDetail[$iCounter]['Txt_Description_Ingles'] = nl2br($row['caracteristicas_ingles']);
+
+                }if (
+                    array_key_exists('txtproductoIngles', $row)) {
+                    $arrSaleOrderDetail[$iCounter]['Txt_Producto_Ingles'] = $row['txtproductoIngles'];
+
+                }
+                
                 ++$iCounter;
             }
             $this->db->insert_batch('agente_compra_pedido_detalle', $arrSaleOrderDetail);
@@ -567,15 +576,24 @@ class PedidosGarantizadosModel extends CI_Model
 
         //actualizar productos de tabla de cliente
         if (!empty($arrProductoTable)) {
+            $arrayIndex=0;
             foreach ($arrProductoTable as $row) {
                 //array_debug($row);
-                $arrSaleOrderDetailUPD[] = array(
+                $arrSaleOrderDetailUPD[$arrayIndex] = array(
                     'ID_Pedido_Detalle' => $row['id_item'],
                     'Qt_Producto' => $row['cantidad'], //agergar input de cantidad
                     'Txt_Descripcion' => nl2br($row['caracteristicas']),
-                    'Txt_Producto_Ingles' => $row['txtproductoIngles'],
-                    'Txt_Description_Ingles' => nl2br($row['caracteristicas_ingles']),
+                    
                 );
+                if (array_key_exists('caracteristicas_ingles', $row)) {
+                    $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Description_Ingles'] = nl2br($row['caracteristicas_ingles']);
+
+                }if (
+                    array_key_exists('txtproductoIngles', $row)) {
+                        $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Producto_Ingles'] = $row['txtproductoIngles'];
+
+                }
+                $arrayIndex++;
             }
             $this->db->update_batch('agente_compra_pedido_detalle', $arrSaleOrderDetailUPD, 'ID_Pedido_Detalle');
         }
@@ -815,7 +833,7 @@ Nu_Correlativo
                 "id_pedido" => $arrPost['documento_pago_garantizado-id_cabecera'],
                 "file_url" => $Txt_Url_Imagen_Producto,
             );
-            $status=$this->db->insert($this->table_payments, $data);
+            $status = $this->db->insert($this->table_payments, $data);
 
             if ($status === false) {
                 $this->db->trans_rollback();
@@ -862,7 +880,7 @@ Nu_Correlativo
             );
         }
 
-        if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso==5    ) { //china
+        if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) { //china
             $arrMessageUser = array(
                 'ID_Usuario_Destino' => $this->user->ID_Usuario,
                 'Txt_Usuario_Destino' => nl2br($data['message_chat']),

@@ -55,12 +55,12 @@
                       <th class="no-sort">Garantía</th>
                       <?php }?>
                       <th>Perú</th>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso !=2) {?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
                       <th class="no-sort">Encargado</th>
                       <?php }?>
                       <th>China</th>
                       <th class="no-sort">Ver</th>
-                        
+
                       <th class="no-sort">Proforma</th>
                       <!-- <th class="no-sort">Vencimiento</th> -->
                       <!-- <th class="no-sort">Importación Integral</th> -->
@@ -71,10 +71,10 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-                  //$attributes = array('id' => 'form-pedido');
-                  $attributes = array('id' => 'form-pedido', 'enctype' => 'multipart/form-data');
-                  echo form_open('', $attributes);
-                  ?>
+//$attributes = array('id' => 'form-pedido');
+$attributes = array('id' => 'form-pedido', 'enctype' => 'multipart/form-data');
+echo form_open('', $attributes);
+?>
                   <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
                   <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
                   <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
@@ -260,9 +260,9 @@ echo form_open('', $attributes);
               </div><!--div agregar productos de proveedor -->
               <div class="box-body" id="div-elegir_item_proveedor">
                 <?php
-              $attributes = array('id' => 'form-arrItemsProveedor');
-              echo form_open('', $attributes);
-              ?>
+$attributes = array('id' => 'form-arrItemsProveedor');
+echo form_open('', $attributes);
+?>
                   <input type="hidden" id="txt-EID_Empresa_item" name="EID_Empresa_item" class="form-control">
                   <input type="hidden" id="txt-EID_Organizacion_item" name="EID_Organizacion_item" class="form-control">
                   <input type="hidden" id="txt-EID_Pedido_Cabecera_item" name="EID_Pedido_Cabecera_item" class="form-control">
@@ -554,6 +554,16 @@ input[type="file"]::file-selector-button:active {
       background-color: black;
       margin: 1em 0;
     }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 </style>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>
