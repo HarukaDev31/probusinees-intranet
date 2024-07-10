@@ -564,6 +564,13 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+.supplier-list{
+  background: white;
+    padding: 0;
+    border: 1px solid #DFDFDF;
+    width: 100%;
+
+}
 </style>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>

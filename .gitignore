@@ -3,3 +3,4 @@ apirest/logs/*
 
 backups/*
 !backups/.gitkeep
+assets/*
