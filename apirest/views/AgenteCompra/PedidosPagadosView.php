@@ -47,7 +47,7 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
                     <tr>
-                      <th>País <?php echo $this->user->Nu_Tipo_Privilegio_Acceso  ?></th>
+                      <th>País </th>
                       <th>N° Orden</th>
                       <th>Fecha</th>
                       <!--  -->

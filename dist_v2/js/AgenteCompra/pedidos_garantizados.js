@@ -2299,7 +2299,10 @@ function addItems() {
       }, 200);
     });
   $("#modal-precio" + iCounterItems).trigger("focus");
-
+    if(i>=2){
+      $(`#modal-nombre_proveedor${i}`).val($(`#modal-nombre_proveedor${1}`).val());
+      $(`#modal-celular_proveedor${i}`).val($(`#modal-celular_proveedor${1}`).val());
+    }
   validateNumberLetter();
   validateDecimal();
   validateNumber();

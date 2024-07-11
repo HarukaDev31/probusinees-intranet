@@ -239,7 +239,7 @@ echo form_open('', $attributes);
                   <div class="row div-agregar_proveedor">
                     <div class="col-12 col-sm-12 col-md-12 shadow p-0" id="div-button-add_item">
                       <div class="d-grid gap">
-                        <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col">Nuevo proveedor</button>
+                        <button type="button" id="btn-add_item" class="btn btn-danger btn-lg col">Otra Opción</button>
                       </div>
                     </div>
                   </div>

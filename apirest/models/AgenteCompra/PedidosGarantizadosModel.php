@@ -88,6 +88,7 @@ class PedidosGarantizadosModel extends CI_Model
         (select count(*) from agente_compra_pedido_detalle_producto_proveedor where ID_Pedido_Cabecera=' . $this->table . '.ID_Pedido_Cabecera) as count_proveedor,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
         USR.No_Usuario,
+        USR.Txt_Email,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
         IGPD.Txt_Producto_Ingles, IGPD.Txt_Description_Ingles,
 		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
