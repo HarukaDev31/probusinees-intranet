@@ -1816,7 +1816,8 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
         }
         $ClientName = $objPHPExcel->getActiveSheet()->getCell('C8')->getValue();
-
+        //ajustar texto in c column
+        $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setWrapText(true);
         //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
         $N20CellValue =
             "Hola " . $ClientName . " 😁 un gusto saludarte!
