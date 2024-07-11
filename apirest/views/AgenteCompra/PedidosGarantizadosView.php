@@ -567,9 +567,17 @@ input[type=number] {
 .supplier-list{
   background: white;
     padding: 0;
-    border: 1px solid #DFDFDF;
+    border: 1px solid #BFC9CA;
     width: 100%;
-
+}
+.supplier-list option{
+  list-style: none;
+  padding: 10px;
+  border-bottom: 1px solid #BFC9CA;
+  cursor: pointer;
+}
+.supplier-list option:hover{
+  background: #BFC9CA;
 }
 </style>
 <!-- ./ asignar pedido personal de china -->
