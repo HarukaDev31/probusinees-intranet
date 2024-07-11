@@ -971,13 +971,12 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->getActiveSheet()->unmergeCells('C' . $lastRow . ':E' . $lastRow);
             $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
 
-        } else if(count($query) >=7) {
+        } else if (count($query) >= 7) {
             //UNMERGE b to l
             $objPHPExcel->getActiveSheet()->unmergeCells('B' . $lastRow . ':L' . $lastRow);
             $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
 
-
-        }else{
+        } else {
             $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
         }
 
@@ -1094,7 +1093,6 @@ class CCotizacionesModel extends CI_Model
 
         $objPHPExcel->getActiveSheet()->getColumnDimension("C")->setAutoSize(true);
 
-      
         //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
 
         //select
@@ -1106,7 +1104,7 @@ class CCotizacionesModel extends CI_Model
 
         return $objPHPExcel;
     }
-    public function generateMassiveExcelPayrolls($objPHPExcel, $tarifas,$expirationDate)
+    public function generateMassiveExcelPayrolls($objPHPExcel, $tarifas, $expirationDate)
     {
         //init more memory
         $originalMemoryLimit = ini_get('memory_limit');
@@ -1140,22 +1138,31 @@ class CCotizacionesModel extends CI_Model
         gc_collect_cycles();
         return $zipFilePath;
     }
-    function incrementColumn($column) {
+    public function incrementColumn($column, $increment = 1)
+    {
+        $column = strtoupper($column); // Asegurarse de que todas las letras sean mayúsculas
         $length = strlen($column);
-        $i = $length - 1;
-        while ($i >= 0) {
-            if ($column[$i] == 'Z') {
-                $column[$i] = 'A';
-                $i--;
-            } else {
-                $column[$i] = chr(ord($column[$i]) + 1);
-                return $column;
-            }
-        }
-        return 'A' . $column;
-    }
+        $number = 0;
 
-    public function getFinalCotizacionExcel($objPHPExcel, $data, $tarifas,$expirationDate)
+        // Convertir la columna a un número
+        for ($i = 0; $i < $length; $i++) {
+            $number = $number * 26 + (ord($column[$i]) - ord('A') + 1);
+        }
+
+        // Incrementar el número
+        $number += $increment;
+
+        // Convertir el número de vuelta a una columna
+        $newColumn = '';
+        while ($number > 0) {
+            $remainder = ($number - 1) % 26;
+            $newColumn = chr(ord('A') + $remainder) . $newColumn;
+            $number = intval(($number - 1) / 26);
+        }
+
+        return $newColumn;
+    }
+    public function getFinalCotizacionExcel($objPHPExcel, $data, $tarifas, $expirationDate)
     {
         //GOD IMPLEMENTATION
         $newSheet = $objPHPExcel->createSheet();
@@ -1210,14 +1217,14 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->getStartColor()->setARGB($yellowColor);
         $objPHPExcel->getActiveSheet()->getColumnDimension("B")->setAutoSize(true);
         $InitialColumn = 'C';
-        
+
         $totalRows = 0;
         $cbmTotal = 0;
         $pesoTotal = 0;
         //first iterate for tributes zone, set values and apply styles to cells
         foreach ($data['cliente']['productos'] as $producto) {
             //validate if $InitialColumn is more than Z then set A$
-            
+
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '5', $producto["nombre"]);
             //APLY BACKGROUND COLOR BLUE AND LETTERS WHITE
@@ -1248,7 +1255,6 @@ class CCotizacionesModel extends CI_Model
         }
         $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
         //get tarifas from db
-        return $objPHPExcel;
         $tipoCliente = trim($data['cliente']["tipo"]);
         //SET CURRENT SHEET TO TITLE TO $tipoCliente
 
@@ -1263,10 +1269,14 @@ class CCotizacionesModel extends CI_Model
                 return $tarifa["id_tipo_cliente"] == 3;
             }
         });
-        $TarifasStartColumn = chr(ord($InitialColumn) + 5);
-        $TarifasStartColumn2 = chr(ord($InitialColumn) + 6);
-        $TarifasStartColumn3 = chr(ord($InitialColumn) + 7);
-        $TarifasStartColumn4 = chr(ord($InitialColumn) + 8);
+        // $TarifasStartColumn = chr(ord($InitialColumn) + 5);
+        // $TarifasStartColumn2 = chr(ord($InitialColumn) + 6);
+        // $TarifasStartColumn3 = chr(ord($InitialColumn) + 7);
+        // $TarifasStartColumn4 = chr(ord($InitialColumn) + 8);
+        $TarifasStartColumn = $this->incrementColumn($InitialColumn, 5);
+        $TarifasStartColumn2 = $this->incrementColumn($InitialColumn, 6);
+        $TarifasStartColumn3 = $this->incrementColumn($InitialColumn, 7);
+        $TarifasStartColumn4 = $this->incrementColumn($InitialColumn, 8);
         $objPHPExcel->getActiveSheet()->getColumnDimension($TarifasStartColumn)->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension($TarifasStartColumn2)->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension($TarifasStartColumn3)->setAutoSize(true);
@@ -1279,7 +1289,6 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn2 . '9', "CBM Limite Superior");
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn3 . '9', "Tarifa");
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn4 . '9', "Tipo de Tarifa");
-
         $initialRow = 10;
         $tarifaCell = "";
         $tipoTarifa = "";
@@ -1363,7 +1372,6 @@ class CCotizacionesModel extends CI_Model
         $initialRow++;
         //create remaining zones and apply styles
         $InitialColumnLetter = chr(ord($InitialColumn) - 1);
-
         $objPHPExcel->getActiveSheet()->getStyle('B5:' . $InitialColumn . '19')->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle('B28:' . $InitialColumn . '32')->applyFromArray($borders);
 
@@ -1434,7 +1442,7 @@ class CCotizacionesModel extends CI_Model
             $antidumpingSum += $producto["antidumping"];
             //set currency format with $ symbol
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '26')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $producto["ad_valorem"] );
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $producto["ad_valorem"]);
             //set porcentage format
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '27')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
             //set text color red
@@ -1599,7 +1607,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $CobroCell);
         //get $CobroCell value of formula
         $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
-        $ImpuestosCellValue=round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
+        $ImpuestosCellValue = round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
         //convert $expirationDate dd//mm/yyyy to day de mes de año
         $expirationDate = date('d/m/Y', strtotime($expirationDate));
 
@@ -1690,14 +1698,14 @@ class CCotizacionesModel extends CI_Model
                     $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
                 }
             }
-            $InitialColumn++;
+            $InitialColumn = $this->incrementColumn($InitialColumn);
             $lastRow = $row;
         };
-        $notUsedDefaultRows = 3-$productsCount;
-        if($notUsedDefaultRows>=0){
-            for($i=0;$i<=$notUsedDefaultRows;$i++){
+        $notUsedDefaultRows = 3 - $productsCount;
+        if ($notUsedDefaultRows >= 0) {
+            for ($i = 0; $i <= $notUsedDefaultRows; $i++) {
                 $row = 36 + $productsCount + $i;
-                $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray( array(
+                $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray(array(
                     'borders' => array(
                         'allborders' => array(
                             'style' => PHPExcel_Style_Border::BORDER_NONE,
@@ -1724,8 +1732,8 @@ class CCotizacionesModel extends CI_Model
 
             //merge k to l
         }
-        if($notUsedDefaultRows>=0){
-            //unmerge c to e 
+        if ($notUsedDefaultRows >= 0) {
+            //unmerge c to e
             $objPHPExcel->getActiveSheet()->mergeCells('C' . $lastRow . ':E' . $lastRow);
 
             $objPHPExcel->getActiveSheet()->unmergeCells('C' . $lastRow . ':E' . $lastRow);
@@ -1807,19 +1815,19 @@ class CCotizacionesModel extends CI_Model
             //remove borders from b36 to l39
             $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
         }
-        $ClientName= $objPHPExcel->getActiveSheet()->getCell('C8')->getValue(); 
+        $ClientName = $objPHPExcel->getActiveSheet()->getCell('C8')->getValue();
 
         //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
-        $N20CellValue=
-        "Hola ".$ClientName." 😁 un gusto saludarte!   
-    A continuación te envío la cotización final de tu importación📋📦.      
-    🙋‍♂️ PAGO PENDIENTE :      
-    ☑️Costo CBM: $".$CobroCellValue."  
-    ☑️Impuestos: $".$ImpuestosCellValue."
-    ☑️ Total: $".($ImpuestosCellValue+$CobroCellValue)."
-    Pronto le aviso nuevos avances, que tengan buen día🚢     
-    Último día de pago:".$expirationDate;
-            $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
+        $N20CellValue =
+            "Hola " . $ClientName . " 😁 un gusto saludarte!
+    A continuación te envío la cotización final de tu importación📋📦.
+    🙋‍♂️ PAGO PENDIENTE :
+    ☑️Costo CBM: $" . $CobroCellValue . "
+    ☑️Impuestos: $" . $ImpuestosCellValue . "
+    ☑️ Total: $" . ($ImpuestosCellValue + $CobroCellValue) . "
+    Pronto le aviso nuevos avances, que tengan buen día🚢
+    Último día de pago:" . $expirationDate;
+        $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
         //select
         //remove page 2
         $objPHPExcel->removeSheetByIndex(1);
@@ -1833,12 +1841,12 @@ class CCotizacionesModel extends CI_Model
     public function getMassiveExcelData($objPHPExcel)
     {
         $this->load->library('PHPExcel');
-    
+
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Massive_Payroll.xlsx';
         $excel = $objPHPExcel;
         $worksheet = $excel->getActiveSheet();
-    
+
         // Obtener los rangos de celdas mergeadas
         $mergedCells = $worksheet->getMergeCells();
         $columns = [
@@ -1856,7 +1864,7 @@ class CCotizacionesModel extends CI_Model
             'M' => 'peso',
             'N' => 'cbm',
         ];
-    
+
         $columnData = [];
         foreach ($columns as $col => $key) {
             $columnData[$key] = array_filter($mergedCells, function ($range) use ($col) {
@@ -1868,7 +1876,7 @@ class CCotizacionesModel extends CI_Model
                 return $matchesA[1] - $matchesB[1];
             });
         }
-    
+
         $clients = [];
         foreach ($columnData['clientes'] as $key => $mergedRangeA) {
             $rangeA = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeA);
@@ -1877,7 +1885,7 @@ class CCotizacionesModel extends CI_Model
             if ($valueA == null) {
                 continue;
             }
-    
+
             $client = [
                 'nombre' => $valueA,
                 'tipo' => $worksheet->getCell(PHPExcel_Cell::extractAllCellReferencesInRange($columnData['tipo_clientes'][$key])[0])->getValue(),
@@ -1885,16 +1893,16 @@ class CCotizacionesModel extends CI_Model
                 'telefono' => $worksheet->getCell(PHPExcel_Cell::extractAllCellReferencesInRange($columnData['phone_clientes'][$key])[0])->getValue(),
                 'productos' => [],
             ];
-    
+
             preg_match('/^A(\d+):A(\d+)$/', $mergedRangeA, $matchesA);
             $startRowA = $matchesA[1];
             $endRowA = $matchesA[2];
-    
+
             foreach ($columnData['productos'] as $key => $mergedRangeF) {
                 preg_match('/^F(\d+):F(\d+)$/', $mergedRangeF, $matchesF);
                 $startRowF = $matchesF[1];
                 $endRowF = $matchesF[2];
-    
+
                 if ($startRowF >= $startRowA && $endRowF <= $endRowA) {
                     $rangeF = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeF);
                     $firstCellF = $rangeF[0];
@@ -1902,31 +1910,31 @@ class CCotizacionesModel extends CI_Model
                     if ($producto == null) {
                         continue;
                     }
-    
+
                     $productoData = [
                         'nombre' => $producto,
                         'cantidad' => $this->getCellValue($worksheet, $columnData['cantidad'], $startRowF, $endRowF),
-                        'precio_unitario' => round($this->getCellValue($worksheet, $columnData['precio_unitario'], $startRowF, $endRowF),2),
+                        'precio_unitario' => round($this->getCellValue($worksheet, $columnData['precio_unitario'], $startRowF, $endRowF), 2),
                         'antidumping' => $this->getCellValue($worksheet, $columnData['antidumping'], $startRowF, $endRowF, 0),
                         'valoracion' => $this->getCellValue($worksheet, $columnData['valoracion'], $startRowF, $endRowF, 0),
                         'ad_valorem' => $this->getCellValue($worksheet, $columnData['ad_valorem'], $startRowF, $endRowF, 0),
                         'percepcion' => $this->getCellValue($worksheet, $columnData['percepcion'], $startRowF, $endRowF, 0.035),
                         'peso' => $this->getCellValue($worksheet, $columnData['peso'], $startRowF, $endRowF, 0),
-                        'cbm' => round($this->getCellValue($worksheet, $columnData['cbm'], $startRowF, $endRowF),2),
+                        'cbm' => round($this->getCellValue($worksheet, $columnData['cbm'], $startRowF, $endRowF), 2),
                     ];
-    
+
                     if ($productoData['cantidad'] !== null && $productoData['precio_unitario'] !== null && $productoData['cbm'] !== null) {
                         $client['productos'][] = $productoData;
                     }
                 }
             }
-    
+
             $clients[] = ['cliente' => $client];
         }
-    
+
         return $clients;
     }
-    
+
     private function getCellValue($worksheet, $columnRanges, $startRow, $endRow, $defaultValue = null)
     {
         foreach ($columnRanges as $mergedRange) {
@@ -1942,7 +1950,6 @@ class CCotizacionesModel extends CI_Model
         }
         return $defaultValue;
     }
-    
 
     public function get_cotization_tributos($ID_Producto)
     {
@@ -1991,7 +1998,7 @@ class CCotizacionesModel extends CI_Model
         return $query->result();
     }
     public function deleteCotization($ID_Cotizacion)
-    {   
+    {
         $this->db->where('ID_Cotizacion', $ID_Cotizacion);
         $this->db->update($this->table, array("deleted_at" => date('Y-m-d H:i:s')));
         return array("status" => "success");

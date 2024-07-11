@@ -13,7 +13,7 @@ let search_global_autocomplete =
 let replace_global_autocomplete = ["", "", "", "", "", "", "", "", ""];
 //28 caracteres
 // FIN AUTOCOMPLETE
-
+let findTimeOut = null;
 var fToday = new Date(),
   fYear = fToday.getFullYear(),
   fMonth = fToday.getMonth() + 1,
@@ -57,7 +57,9 @@ $(function () {
       //if click  $("btn-confirmation") then call function
       $("#btn-confirmation").on("click", function () {
         $("#modal-confirmation").modal("hide");
-        const selected=$("#cbo-guardar_personal_china-ID_Usuario option:selected").text();
+        const selected = $(
+          "#cbo-guardar_personal_china-ID_Usuario option:selected"
+        ).text();
         $("#btn-guardar_personal_china").text("");
         $("#btn-guardar_personal_china").attr("disabled", true);
         $("#btn-guardar_personal_china").html(
@@ -82,13 +84,14 @@ $(function () {
               $(".modal-guardar_personal_china").modal("hide");
               $("#moda-message-content").addClass("bg-" + response.status);
               let alertMessage = `Pedido asignado a ${selected}`;
-              if(selected=="maryam.china@probusiness.pe"){
-                alertMessage += " \nPuedes agregar nombre y características de los productos en ingles";
+              if (selected == "maryam.china@probusiness.pe") {
+                alertMessage +=
+                  " \nPuedes agregar nombre y características de los productos en ingles";
               }
               $(".modal-title-message").text(alertMessage);
               setTimeout(function () {
                 $("#modal-message").modal("hide");
-              },2500 );
+              }, 2500);
 
               reload_table_Entidad();
             } else {
@@ -530,38 +533,41 @@ $(function () {
       $(".img-responsive").attr("src", "");
       $(".modal-ver_item").modal("show");
       console.log($(this));
-      $(".img-responsive").attr("src", $(this).data("url_img")||$(this)[0].currentSrc);
+      $(".img-responsive").attr(
+        "src",
+        $(this).data("url_img") || $(this)[0].currentSrc
+      );
       $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
-      $("#a-download_image").attr("data-src",$(this)[0].currentSrc);
+      $("#a-download_image").attr("data-src", $(this)[0].currentSrc);
     }
   );
 
   $("#a-download_image").click(function () {
     id = $(this).data("id_item");
-    src=$(this).data("src");
-    filename=src.split("/").pop();
+    src = $(this).data("src");
+    filename = src.split("/").pop();
 
-    if(src){
+    if (src) {
       $.ajax({
         url: src,
-        method: 'GET',
+        method: "GET",
         xhrFields: {
-            responseType: 'blob' // Important
+          responseType: "blob", // Important
         },
-        success: function(data) {
-            const blobUrl = window.URL.createObjectURL(data);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(blobUrl);
+        success: function (data) {
+          const blobUrl = window.URL.createObjectURL(data);
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(blobUrl);
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error('Error downloading file:', textStatus, errorThrown);
-        }
-    });
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error downloading file:", textStatus, errorThrown);
+        },
+      });
       return;
     }
     url = base_url + "AgenteCompra/PedidosGarantizados/downloadImage/" + id;
@@ -908,7 +914,7 @@ $(function () {
                     elemento.classList[3] == "moq" ||
                     elemento.classList[3] == "qty_caja" ||
                     elemento.classList[3] == "cbm" ||
-                    elemento.classList[3] == "delivery" ||
+                    // elemento.classList[3] == "delivery" ||
                     elemento.classList[3] == "shipping_cost" ||
                     elemento.classList[3] == "kgbox" ||
                     elemento.classList[3] == "celular_proveedor") &&
@@ -1144,7 +1150,7 @@ function verPedido(ID) {
       var detalle = response;
       response = response[0];
 
-      $("#span-id_pedido").html(response.sCorrelativoCotizacion);
+      $("#span-id_pedido").html(response.cotizacionCode);
 
       $(".div-AgregarEditar").show();
 
@@ -1235,27 +1241,47 @@ function verPedido(ID) {
           "</td>" +
           "<td class='text-center td-name' width='30%'>";
 
-        table_enlace_producto +=
-          "<h6 class='font-weight-bold font-medium'>" +
-          nombre_producto +
-          "</h6>";
-        if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe"){
-          table_enlace_producto += "<div class='d-flex flex-row align-items-center'>";
-          table_enlace_producto += "<span class='mr-1'>Ingles</span>";
-          //add input text name txtproductoIngles
-          table_enlace_producto += '<input type="text" class="form-control" name="addProductoTable[' + id_item + '][txtproductoIngles]" value="' + (detalle[i]['Txt_Producto_Ingles']?detalle[i]['Txt_Producto_Ingles']:'') + '">';
-          table_enlace_producto += "</div>";
+        if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
+          table_enlace_producto +=
+            "<h6 class='font-weight-bold font-medium'>" +
+            (detalle[i]["Txt_Producto_Ingles"] ?? nombre_producto) +
+            "</h6>";
+        } else {
+          table_enlace_producto +=
+            "<h6 class='font-weight-bold font-medium'>" +
+            nombre_producto +
+            "</h6>";
         }
+
         cantidad_item =
           !isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item != ""
             ? cantidad_item
             : 0;
         //if(!isNaN(cantidad_item) && cantidad_item > 0 && cantidad_item!=''){
-        table_enlace_producto += '<div class="row mb-2">';
-        table_enlace_producto += '<div class="col col-sm-6 text-right">';
-        table_enlace_producto += "<span class='mt-3'>Cantidad</span>";
-        table_enlace_producto += "</div>";
-        table_enlace_producto += '<div class="col col-sm-2">';
+        table_enlace_producto += '<div class="d-flex flex-column mb-2">';
+        if (
+          detalle[i]["Txt_Email"] == "maryam.china@probusiness.pe" &&
+          detalle[i]["currentUser"] != "maryam.china@probusiness.pe"
+        ) {
+          table_enlace_producto +=
+            "<div class='d-flex flex-row align-items-center w-100 justify-content-center mb-2' style='column-gap:1em'>";
+          table_enlace_producto += "<span class=''>Ingles</span>";
+          //add input text name txtproductoIngles
+          table_enlace_producto +=
+            '<input type="text" class="form-control"  style="width:300px" name="addProductoTable[' +
+            id_item +
+            '][txtproductoIngles]" value="' +
+            (detalle[i]["Txt_Producto_Ingles"]
+              ? detalle[i]["Txt_Producto_Ingles"]
+              : "") +
+            '">';
+          table_enlace_producto += "</div>";
+        }
+        table_enlace_producto +=
+          '<div class="d-flex flex-row align-items-center w-100 justify-content-center mb-2" style="column-gap:1em">';
+
+        table_enlace_producto += "<span class=''>Cantidad</span>";
+
         table_enlace_producto +=
           '<input type="hidden" name="addProductoTable[' +
           id_item +
@@ -1263,7 +1289,7 @@ function verPedido(ID) {
           id_item +
           '">';
         table_enlace_producto +=
-          '<input type="text" inputmode="decimal" class="form-control input-decimal" name="addProductoTable[' +
+          '<input type="number" style="width:300px" inputmode="decimal" class="form-control input-decimal" name="addProductoTable[' +
           id_item +
           '][cantidad]" value="' +
           Math.round10(cantidad_item, -2) +
@@ -1293,21 +1319,38 @@ function verPedido(ID) {
         //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
         //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
         table_enlace_producto += "<td class='text-left td-name' width='20%'>";
-        table_enlace_producto +=
-          '<textarea class="form-control" placeholder="" name="addProductoTable[' +
-          id_item +
-          '][caracteristicas]" style="height: 200px;">' +
-          clearHTMLTextArea(detalle[i]["Txt_Descripcion"]) +
-          "</textarea>";
-          if(detalle[i]["Txt_Email"]=="maryam.china@probusiness.pe"){
-            table_enlace_producto += "<span class='mr-1'>Ingles</span>";
+        if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
+          table_enlace_producto +=
+            '<textarea class="form-control" placeholder="" name="addProductoTable[' +
+            id_item +
+            '][caracteristicas]" style="height: 200px;">' +
+            clearHTMLTextArea(
+              detalle[i]["Txt_Description_Ingles"] ??
+                detalle[i]["Txt_Description"] ??
+                ""
+            ) +
+            "</textarea>";
+        } else {
+          table_enlace_producto +=
+            '<textarea class="form-control" placeholder="" name="addProductoTable[' +
+            id_item +
+            '][caracteristicas]" style="height: 200px;">' +
+            clearHTMLTextArea(detalle[i]["Txt_Descripcion"]) +
+            "</textarea>";
+        }
+        if (
+          detalle[i]["Txt_Email"] == "maryam.china@probusiness.pe" &&
+          detalle[i]["currentUser"] != "maryam.china@probusiness.pe"
+        ) {
+          table_enlace_producto += "<span class='mr-1'>Ingles</span>";
 
-            table_enlace_producto +=  '<textarea class="form-control" placeholder="" name="addProductoTable[' +
+          table_enlace_producto +=
+            '<textarea class="form-control" placeholder="" name="addProductoTable[' +
             id_item +
             '][caracteristicas_ingles]" style="height: 200px;">' +
-            clearHTMLTextArea(detalle[i]["Txt_Description_Ingles"]??' ') +
+            clearHTMLTextArea(detalle[i]["Txt_Description_Ingles"] ?? " ") +
             "</textarea>";
-          }
+        }
         //button de chat que abre un modal
         var class_button_chat =
           parseInt(detalle[i]["Nu_Envio_Mensaje_Chat_Producto"]) > 0
@@ -1357,7 +1400,8 @@ function verPedido(ID) {
 
         table_enlace_producto += "<tr><td class='text-center' colspan='4'>";
         if (
-          (response.Nu_Estado_China != 3 && response.Nu_Tipo_Privilegio_Acceso != 1)||
+          (response.Nu_Estado_China != 3 &&
+            response.Nu_Tipo_Privilegio_Acceso != 1) ||
           response.Nu_Tipo_Privilegio_Acceso != 1
         ) {
           //cotizacio china
@@ -1400,7 +1444,7 @@ function verPedido(ID) {
           table_enlace_producto += "</div>";
           table_enlace_producto += "</div>";
         } else {
-          if (parseInt(response.count_proveedor )> 0) {
+          if (parseInt(response.count_proveedor) > 0) {
             table_enlace_producto +=
               '<button type="button" id="btn-elegir_proveedor' +
               id_item +
@@ -1841,7 +1885,8 @@ function calcularTotales() {
 }
 
 const generarCotizacionChina = (ID) => {
-  url = base_url + "AgenteCompra/PedidosGarantizados/generarCotizacionChina/" + ID;
+  url =
+    base_url + "AgenteCompra/PedidosGarantizados/generarCotizacionChina/" + ID;
   // $.ajax({
   //   url: url,
   //   type: "GET",
@@ -1856,7 +1901,7 @@ const generarCotizacionChina = (ID) => {
   //     }}});
 
   window.open(url, "_blank");
-}
+};
 function generarAgenteCompra(ID) {
   var $modal_delete = $("#modal-message-delete");
   $modal_delete.modal("show");
@@ -1929,6 +1974,21 @@ function _generarConsolidaTrading($modal_delete, ID) {
   url =
     base_url + "AgenteCompra/PedidosGarantizados/generarConsolidaTrading/" + ID;
   window.open(url, "_blank");
+  // $.ajax({
+  //   url: url,
+  //   type: "GET",
+  //   dataType: "JSON",
+  //   success: function (response) {
+  //     console.log(response);
+  //     if (response.status == "success") {
+  //       window.open(response.url, "_blank");
+  //     } else {
+  //       $(".modal-message").removeClass(
+  //         "modal-danger modal-warning modal-success"
+  //       );
+  //     }
+  //   },
+  // });
 }
 
 function addItems() {
@@ -1966,7 +2026,7 @@ function addItems() {
       <div class="col-6 col-md-3 col-lg-2">
         <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
         <div class="form-group">
-          <input type="text" id="modal-delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
+          <input type="text" id="modal-delivery${iCounterItems}" data-correlativo="${iCounterItems}" inputmode="decimal" name="addProducto[${iCounterItems}][delivery]" class="arrProducto form-control required delivery" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
         </div>
       </div>
@@ -2020,8 +2080,9 @@ function addItems() {
       </div>
       <div class="col-12 col-md-6 col-lg-6">
         <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
+        <div class="form-group" style="position:relative">
           <input type="text" id="modal-nombre_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+          <ul class="supplier-list supplier-list${iCounterItems}" style="position:absolute"></ul>
           <span class="help-block text-danger" id="error"></span>
         </div>
         <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
@@ -2221,10 +2282,23 @@ function addItems() {
   // div_items += "</div>";
   // div_items += "</div>";
   // div_items += "</div>";
-
+  const i = iCounterItems;
   $("#div-arrItems").append(div_items);
-
-  $("#modal-precio" + iCounterItems).focus();
+  $("#div-arrItems")
+    .find(`#modal-nombre_proveedor${i}`)
+    .on("input", () => {
+      getSuppliersByName(i);
+    });
+  //modal nombre proveedor on focus out
+  $("#div-arrItems")
+    .find(`#modal-nombre_proveedor${i}`)
+    .on("focusout", () => {
+      console.log("focusout");
+      setTimeout(() => {
+        $(".supplier-list" + i).html("");
+      }, 200);
+    });
+  $("#modal-precio" + iCounterItems).trigger("focus");
 
   validateNumberLetter();
   validateDecimal();
@@ -2267,12 +2341,13 @@ function scrollToError($sMetodo, $IdElemento) {
   );
 }
 function getItemTemplate(i, mode, detalle, privilegio) {
-  
   div_items = `
     <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-      <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
+      <input type="hidden" id="modal_proveedor-id-${i}" value="${
+    detalle.id_pedido
+  }"/>
       <div class = "row" >
         <div class="col-6 col-md-3 col-lg-2">
           <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
@@ -2305,7 +2380,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
         <div class="col-6 col-md-3 col-lg-2">
           <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
           <div class="form-group">
-            <input type="text" id="modal-delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
+            <input type="text" id="modal-delivery${i}" data-correlativo="${i}"  name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery " placeholder="" value="" autocomplete="off" />
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
@@ -2343,8 +2418,12 @@ function getItemTemplate(i, mode, detalle, privilegio) {
               <!--Upload Icon-->
               <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
               <label>Imagen Principal</label>
-              ${detalle[i-1]["main_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',1)">Eliminar</span>`}  
+              ${
+                detalle[i - 1]["main_photo"] == null
+                  ? ""
+                  : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',1)">Eliminar</span>`
+              }  
               </br>
               <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
               <input type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
@@ -2353,28 +2432,44 @@ function getItemTemplate(i, mode, detalle, privilegio) {
             <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
             <div class="form-group" id="container-uploadimg2-${i}">
             <label>Imagen 2</label>
-            ${detalle[i-1]["secondary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',2)">Eliminar</span>`}   
+            ${
+              detalle[i - 1]["secondary_photo"] == null
+                ? ""
+                : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',2)">Eliminar</span>`
+            }   
             <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
             <input type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
             </div>
               <div class="form-group" id="container-uploadimg3-${i}">
               <label>Imagen 3</label>
-                ${detalle[i-1]["terciary_photo"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',3)">Eliminar</span>`}
+                ${
+                  detalle[i - 1]["terciary_photo"] == null
+                    ? ""
+                    : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteImage('${i}',3)">Eliminar</span>`
+                }
               <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
               <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input></div>
               <div class="form-group" id="container-uploadvideo1-${i}">
               <label>Video 1</label>
-                  ${detalle[i-1]["primary_video"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteVideo('${i}',1)">Eliminar</span>`}
+                  ${
+                    detalle[i - 1]["primary_video"] == null
+                      ? ""
+                      : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteVideo('${i}',1)">Eliminar</span>`
+                  }
 
               <input type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
               <input type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
               <div class="form-group"  id="container-uploadvideo2-${i}">
               <label>Video 2</label>
-              ${detalle[i-1]["secondary_video"] == null ? "" : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteVideo('${i}',2)">Eliminar</span>`}
+              ${
+                detalle[i - 1]["secondary_video"] == null
+                  ? ""
+                  : `<span class="fw-bold  btn btn-danger"
+              onclick="deleteVideo('${i}',2)">Eliminar</span>`
+              }
               <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
               <input type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
 
@@ -2383,8 +2478,12 @@ function getItemTemplate(i, mode, detalle, privilegio) {
         </div>
         <div class="col-12 col-md-6 col-lg-6">
           <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
-          <div class="form-group">
+          <div class="form-group" style="position:relative">
             <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+                <ul class="supplier-list supplier-list${i}" style="position:absolute">
+                </ul>
+            </li>
+            </ul>
             <span class="help-block text-danger" id="error"></span>
           </div>
           <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
@@ -2486,7 +2585,15 @@ function getItemProveedor(id_detalle) {
         container
           .find(`#modal-celular_proveedor${i + 1}`)
           .val(detalle[i]["celular_proveedor"]);
-
+        container.find(`#modal-nombre_proveedor${i + 1}`).on("input", () => {
+          getSuppliersByName(i);
+        });
+        //modal nombre proveedor on focus out
+        container.find(`#modal-nombre_proveedor${i + 1}`).on("focusout", () => {
+          setTimeout(() => {
+            $(".supplier-list" + i).html("");
+          }, 200);
+        });
         container
           .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
           .val(detalle[i]["main_photo"]);
@@ -2531,7 +2638,11 @@ function getItemProveedor(id_detalle) {
           container
             .find(`#container-uploadvideo1-${i + 1}`)
             .append(
-              `<video src="${detalle[i]["primary_video"]}" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video1-${i + 1}"></video>`
+              `<video src="${
+                detalle[i]["primary_video"]
+              }" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video1-${
+                i + 1
+              }"></video>`
             );
         }
         if (detalle[i]["secondary_video"] != null) {
@@ -2542,8 +2653,11 @@ function getItemProveedor(id_detalle) {
           container
             .find(`#container-uploadvideo2-${i + 1}`)
             .append(
-              `<video src="${detalle[i]["secondary_video"]}" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video2-${i + 1}"></video>`
-
+              `<video src="${
+                detalle[i]["secondary_video"]
+              }" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video2-${
+                i + 1
+              }"></video>`
             );
         }
 
@@ -3425,8 +3539,8 @@ function cambiarEstadoImpotacionIntegral(ID, Nu_Estado, sCorrelativo) {
       });
     });
 }
-const deleteImage = (i,imgIndex) => {
-  if(imgIndex==1){
+const deleteImage = (i, imgIndex) => {
+  if (imgIndex == 1) {
     $(`#container-uploadprimaryimg-${i}`).find("img").remove();
     $(`#btn-uploadprimaryimg-${i}`).css("display", "flex");
     $(`#btn-uploadprimaryimg-URL-${i}`).val("null");
@@ -3437,10 +3551,39 @@ const deleteImage = (i,imgIndex) => {
   $(`#btn-uploadimg${imgIndex}-${i}`).css("display", "flex");
   $(`#btn-uploadimg${imgIndex}-URL-${i}`).val("null");
 };
-const deleteVideo = (index,videoIndex) => {
-    $(`#btn-uploadvideo${videoIndex}-${index}`).css("display", "flex");
-    $(`#btn-uploadvideo${videoIndex}-URL-${index}`).val("null");
-    console.log($(`video${videoIndex}-${index}`));
-    $(`#video${videoIndex}-${index}`).remove();
+const deleteVideo = (index, videoIndex) => {
+  $(`#btn-uploadvideo${videoIndex}-${index}`).css("display", "flex");
+  $(`#btn-uploadvideo${videoIndex}-URL-${index}`).val("null");
+  console.log($(`video${videoIndex}-${index}`));
+  $(`#video${videoIndex}-${index}`).remove();
+};
+const getSuppliersByName = (index) => {
+  const component = $(`#modal-nombre_proveedor${index}`);
+  const list = $(`.supplier-list${index}`);
+  console.log(component, list, index);
+  const name = component.val();
+  if (name.length < 1) return list.html("");
+  if (findTimeOut) clearTimeout(findTimeOut);
+  findTimeOut = setTimeout(() => {
+    $.ajax({
+      url: base_url + "AgenteCompra/PedidosGarantizados/getSuppliersByName",
+      type: "POST",
+      data: { name },
+      dataType: "JSON",
+      success: function (response) {
+        list.html("");
 
-}
+        response.forEach((supplier, i) => {
+          list.append(
+            `<option value="${supplier.name}" id="option-${index}-${i}">${supplier.name}</option>`
+          );
+          $(`#option-${index}-${i}`).click(() => {
+            component.val(supplier.name);
+            $(`#modal-celular_proveedor${index}`).val(supplier.phone);
+            list.html("");
+          });
+        });
+      },
+    });
+  }, 500);
+};

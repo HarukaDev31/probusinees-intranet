@@ -335,7 +335,10 @@ class PedidosGarantizados extends CI_Controller {
 		$lastProductrow=31;
 		$tempUrl = array();
 		foreach($data as $key => $val){
-			//get $val->Txt_Url_Imagen_Producto and set image in cell
+			if($initialRow>$lastProductrow){
+				$objPHPExcel->getActiveSheet()->insertNewRowBefore($initialRow, 1);
+			}
+		
 			if (!empty($val->Txt_Url_Imagen_Producto)) {
 				$objDrawing = new PHPExcel_Worksheet_Drawing();
 				// $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -357,7 +360,7 @@ class PedidosGarantizados extends CI_Controller {
 				}
 			}
 			// $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
-	
+			
 
 
 			$objPHPExcel->getActiveSheet()->setCellValue("E". $initialRow, $val->Txt_Producto);
@@ -368,7 +371,7 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->setCellValue("I". $initialRow, $val->unidad_medida);
 			$objPHPExcel->getActiveSheet()->setCellValue("J". $initialRow, $val->Ss_Precio);
 			$objPHPExcel->getActiveSheet()->setCellValue("N". $initialRow, $val->Qt_Producto_Caja);
-			$objPHPExcel->getActiveSheet()->setCellValue("P". $initialRow, "=O". $initialRow."/Q". $initialRow);
+			$objPHPExcel->getActiveSheet()->setCellValue("P". $initialRow, "=Q". $initialRow."/O". $initialRow);
 			$objPHPExcel->getActiveSheet()->setCellValue("Q". $initialRow, $val->Qt_Cbm);
 			$objPHPExcel->getActiveSheet()->setCellValue("R". $initialRow, $val->kg_box);
 			$objPHPExcel->getActiveSheet()->setCellValue("T". $initialRow, $val->Ss_Costo_Delivery);
@@ -421,6 +424,10 @@ class PedidosGarantizados extends CI_Controller {
 		$initialRow=17;
 		$lastProductrow=18;
 		foreach($data as $key => $val){
+			if($initialRow>$lastProductrow){
+				//insert a new row
+				$objPHPExcel->getActiveSheet()->insertNewRowBefore($initialRow, 1);
+			}
 			if (!empty($val->Txt_Url_Imagen_Producto)) {
 				$objDrawing = new PHPExcel_Worksheet_Drawing();
 				// $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -447,6 +454,8 @@ class PedidosGarantizados extends CI_Controller {
 			$objPHPExcel->getActiveSheet()->setCellValue("G". $initialRow, $val->Qt_Producto_Moq);
 
 			$objPHPExcel->getActiveSheet()->setCellValue("H". $initialRow, $val->unidad_medida);
+			$objPHPExcel->getActiveSheet()->setCellValue("J". $initialRow, "=I". $initialRow . "*U10");
+			$objPHPExcel->getActiveSheet()->setCellValue("K". $initialRow, "=G". $initialRow . "*I". $initialRow);	
 			$objPHPExcel->getActiveSheet()->setCellValue("L". $initialRow, "=J". $initialRow . "*G". $initialRow);
 
 			$objPHPExcel->getActiveSheet()->setCellValue("I". $initialRow, $val->Ss_Precio);
@@ -464,6 +473,7 @@ class PedidosGarantizados extends CI_Controller {
 		if($initialRow<=$lastProductrow){
 			$objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow-$initialRow+1);
 		}
+		
 		$objPHPExcel->getActiveSheet()->setCellValue('K'. ($initialRow),"=SUM(K17:K".($initialRow-1).")"); 
 		$objPHPExcel->getActiveSheet()->setCellValue('L'. ($initialRow),"=SUM(L17:L".($initialRow-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue('P'. ($initialRow),"=SUM(P17:P".($initialRow-1).")");
@@ -1316,5 +1326,9 @@ class PedidosGarantizados extends CI_Controller {
 	public function cambiarEstadoImpotacionIntegral($ID, $Nu_Estado, $sCorrelativoCotizacion){
 		if (!$this->input->is_ajax_request()) exit('No se puede eliminar y acceder');
     	echo json_encode($this->PedidosGarantizadosModel->cambiarEstadoImpotacionIntegral($this->security->xss_clean($ID), $this->security->xss_clean($Nu_Estado), $this->security->xss_clean($sCorrelativoCotizacion)));
+	}
+	public function getSuppliersByName(){
+		echo json_encode($this->PedidosGarantizadosModel->getSuppliersByName($this->input->post()));
+		
 	}
 }
