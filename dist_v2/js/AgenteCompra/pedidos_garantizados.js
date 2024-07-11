@@ -3563,6 +3563,7 @@ const deleteVideo = (index, videoIndex) => {
 const getSuppliersByName = (index) => {
   const component = $(`#modal-nombre_proveedor${index}`);
   const list = $(`.supplier-list${index}`);
+  const idPedido=$("#txt-EID_Pedido_Cabecera_item").val();
   console.log(component, list, index);
   const name = component.val();
   if (name.length < 1) return list.html("");
@@ -3571,7 +3572,9 @@ const getSuppliersByName = (index) => {
     $.ajax({
       url: base_url + "AgenteCompra/PedidosGarantizados/getSuppliersByName",
       type: "POST",
-      data: { name },
+      data: { name,
+        idPedido
+       },
       dataType: "JSON",
       success: function (response) {
         list.html("");

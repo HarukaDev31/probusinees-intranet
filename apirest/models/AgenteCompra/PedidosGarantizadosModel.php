@@ -1085,7 +1085,12 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
         return array('status' => 'error', 'message' => 'Error al guardar');
     }
     public function getSuppliersByName($data){
-        $query = "SELECT id_supplier,name,phone FROM suppliers WHERE name LIKE '%".$data['name']."%'";
+        $query = "SELECT id_supplier,name,phone FROM suppliers s
+        join agente_compra_pedido_detalle_producto_proveedor acpdpp on acpdpp.ID_Entidad_Proveedor =s.id_supplier
+
+         WHERE name LIKE '%".$data['name']."%'
+         AND acpdpp.ID_Pedido_Cabecera=".$data['idPedido']."
+         ";
         return $this->db->query($query)->result();
     }
 }
