@@ -1711,7 +1711,9 @@ class PedidosPagados extends CI_Controller
         $tempUrl = array();
 
         foreach ($data as $key => $val) {
-
+            if($initialRow>$lastProductrow){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($initialRow, 1);
+            }
             if (!empty($val->Txt_Url_Imagen_Producto)) {
                 $objDrawing = new PHPExcel_Worksheet_Drawing();
                 // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -1790,7 +1792,9 @@ class PedidosPagados extends CI_Controller
         $tempUrl = array();
 
         foreach ($data as $key => $val) {
-
+            if($initialRow>$lastProductrow){
+				$objPHPExcel->getActiveSheet()->insertNewRowBefore($initialRow, 1);
+			}
             if (!empty($val->Txt_Url_Imagen_Producto)) {
                 $objDrawing = new PHPExcel_Worksheet_Drawing();
                 // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
@@ -2045,6 +2049,9 @@ class PedidosPagados extends CI_Controller
         $pago2=0;
         $total=0;
         foreach (json_decode($data[0]->detalles, true) as $key => $detalle) {
+            if($initialDetailrow>$lastDetailrow){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($initialDetailrow, 1);
+            }
             $envio+=$detalle['shipping_cost'];
             $total+=$detalle['total_producto'];
             if (!empty($detalle['imagenURL'])) {

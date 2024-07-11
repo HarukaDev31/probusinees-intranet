@@ -250,6 +250,9 @@ class PedidosGarantizados extends CI_Controller {
 		$tempUrl = array();
 		foreach($data as $key => $val){
 			//get $val->Txt_Url_Imagen_Producto and set image in cell
+			if($initialRow>$lastProductrow){
+				$objPHPExcel->getActiveSheet()->insertNewRowBefore($initialRow, 1);
+			}
 			if (!empty($val->Txt_Url_Imagen_Producto)) {
 				$objDrawing = new PHPExcel_Worksheet_Drawing();
 				// $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);
