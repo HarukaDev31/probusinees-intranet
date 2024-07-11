@@ -234,6 +234,8 @@ class PedidosGarantizados extends CI_Controller {
         header('Content-Disposition: attachment;filename=TRADING_CHINA_'.$data[0]->cotizacionCode.'_Garantizado.xlsx');
         header('Cache-Control: max-age=0');
 		//set D10	 = $data[0]->No_Contacto
+		$objPHPExcel->getActiveSheet()->setCellValue('B8', "COTIZACION:".$data[0]->cotizacionCode);
+
 		$objPHPExcel->getActiveSheet()->setCellValue('D10', $data[0]->No_Contacto);
 		$objPHPExcel->getActiveSheet()->setCellValue('D11', $data[0]->Nu_Celular_Contacto);
 		$objPHPExcel->getActiveSheet()->setCellValue('D12', $data[0]->Txt_Email_Contacto);
