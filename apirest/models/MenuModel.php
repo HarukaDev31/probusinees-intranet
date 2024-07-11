@@ -29,7 +29,9 @@ class MenuModel extends CI_Model{
 				" . $this->where_id_grupo . "
 				ORDER BY
 				MNU.ID_Padre ASC,
-				MNU.Nu_Orden;";
+				MNU.Nu_Orden,
+				MNU.ID_MENU ASC
+				;";
 		$arrMenuPadre = $this->db->query($sql)->result();
 		
 		foreach($arrMenuPadre as $rowPadre){

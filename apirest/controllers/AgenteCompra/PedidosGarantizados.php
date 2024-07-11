@@ -278,6 +278,8 @@ class PedidosGarantizados extends CI_Controller {
 
 
 			$objPHPExcel->getActiveSheet()->setCellValue("D". $initialRow, $val->Txt_Producto);
+			//ajustar texto a la celda
+			$objPHPExcel->getActiveSheet()->getStyle('D'.$initialRow)->getAlignment()->setWrapText(true);
 			$objPHPExcel->getActiveSheet()->setCellValue("E". $initialRow, $val->Txt_Descripcion);
 			$objPHPExcel->getActiveSheet()->setCellValue("F". $initialRow, $val->Qt_Producto);
 			$objPHPExcel->getActiveSheet()->setCellValue("G". $initialRow, $val->Qt_Producto_Moq);

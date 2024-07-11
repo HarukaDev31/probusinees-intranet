@@ -46,7 +46,7 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
                     <tr>
-                      <th>País </th>
+                      <th>País</th>
                       <th>Cotización</th>
                       <th>Fecha</th>
                       <th>Cliente</th>

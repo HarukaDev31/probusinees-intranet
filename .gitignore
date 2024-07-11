@@ -4,3 +4,4 @@ apirest/logs/*
 backups/*
 !backups/.gitkeep
 assets/*
+apirest/config/database.php
