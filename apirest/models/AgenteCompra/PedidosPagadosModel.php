@@ -2242,7 +2242,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('acpd.ID_Pedido_Cabecera', $idPedido);
             $this->db->where('acpdpp.Nu_Selecciono_Proveedor', 1);
             $orden_total = $this->db->get()->row();
-            return $orden_total;
+
             //select sum of all payments_agente_compra_pedido.value with id_pedido=$idPedido
             $this->db->select('ifnull(round(sum(pacp.value),2),0) as pago_cliente');
             $this->db->from('payments_agente_compra_pedido pacp');

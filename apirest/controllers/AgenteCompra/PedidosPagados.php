@@ -1876,7 +1876,7 @@ class PedidosPagados extends CI_Controller
                 //if peru personal
                 if ($priviligie == $this->personalPeruPrivilegio) {
                     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
-                    echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
+                    echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie),JSON_UNESCAPED_UNICODE );
                     return;
                 }
                 //if china personal
