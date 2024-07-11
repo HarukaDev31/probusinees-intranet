@@ -1090,7 +1090,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 
          WHERE name LIKE '%".$data['name']."%'
          AND acpdpp.ID_Pedido_Cabecera=".$data['idPedido']."
-         ";
+         group by 1";
         return $this->db->query($query)->result();
     }
 }
