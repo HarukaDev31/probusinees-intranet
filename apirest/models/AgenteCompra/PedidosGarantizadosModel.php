@@ -659,6 +659,7 @@ class PedidosGarantizadosModel extends CI_Model
             "primary_video",
             "secondary_video",
         ];
+        $arrDetalle = [];
         $results = $this->processFiles($data_files, $path, $filesKey, null);
         foreach ($data['addProducto'] as $key => $row) {
 
@@ -697,7 +698,6 @@ class PedidosGarantizadosModel extends CI_Model
             } else {
                 $idSupplier = $existsSupplier->id_supplier;
             }
-
             $arrDetalle[] = array(
                 'ID_Empresa' => $data['EID_Empresa_item'],
                 'ID_Organizacion' => $data['EID_Organizacion_item'],
@@ -722,8 +722,7 @@ class PedidosGarantizadosModel extends CI_Model
                 'kg_box' => $row['kgbox'],
             );
             $this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor', $arrDetalle);
-            $id = $this->db->insert_id();
-
+            $arrDetalle = [];
             if ($this->db->trans_status() === false) {
                 $this->db->trans_rollback();
                 return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
