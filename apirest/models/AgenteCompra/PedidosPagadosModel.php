@@ -2114,6 +2114,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 
             //call sp
             $query = $this->db->query("CALL get_agente_compra_pedido_productos(" . $idPedido . ")");
+            foreach ($query->result() as $row) {
+                //escape special characters
+                $row->Txt_Producto = htmlspecialchars($row->Txt_Producto, ENT_QUOTES);
+                $row->Txt_Descripcion = htmlspecialchars($row->Txt_Descripcion, ENT_QUOTES);
+                
+            }
             return $query->result();
 
         } catch (Exception $e) {
