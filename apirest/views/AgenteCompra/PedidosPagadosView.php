@@ -47,7 +47,7 @@
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
                     <tr>
-                      <th>País</th>
+                      <th>País <?php echo $this->user->Nu_Tipo_Privilegio_Acceso  ?></th>
                       <th>N° Orden</th>
                       <th>Fecha</th>
                       <!--  -->
@@ -57,7 +57,7 @@
                       <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { ?>
                         <th>Pagos</th><!--peru-->
                       <?php } ?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) { ?>
+                      <?php if ( $this->user->Nu_Tipo_Privilegio_Acceso==5) { ?>
                         <th>Peru</th><!--peru-->
                       <?php } ?>
 
@@ -72,10 +72,8 @@
 
                       <th>Ver</th>
 
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { ?>
-                        <th class="no-sort">Estado Orden </th>
+                        <th class="no-sort">Descarga</th>
 
-                      <?php } ?>
                       <th>Avance</th>
                       <!-- <th>Status</th> -->
                     </tr>
