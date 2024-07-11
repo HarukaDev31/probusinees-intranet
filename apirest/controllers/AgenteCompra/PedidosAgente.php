@@ -47,20 +47,20 @@ class PedidosAgente extends CI_Controller
             $rows[] = $row->ID_Pedido_Cabecera;
             $rows[] = allTypeDate($row->Fe_Registro, '-', 0);
 			$contacto="";
-			if(!empty($row->No_Contacto)){
-				$contacto = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
+			if(!empty($row->No_Contacto_CLI)){
+				$contacto = $row->No_Contacto_CLI . "<br>" . $row->Nu_Celular_Contacto_CLI;
 			}
-			if(!empty($row->Txt_Email_Entidad)){
-				if(!empty($row->No_Contacto)){
-					$contacto .= "<br>" . $row->Txt_Email_Entidad;
+			if(!empty($row->Txt_Email_Entidad_CLI)){
+				if(!empty($row->No_Contacto_CLI)){
+					$contacto .= "<br>" . $row->Txt_Email_Entidad_CLI;
 				}
 				else{
-					$contacto = $row->Txt_Email_Entidad;
+					$contacto = $row->Txt_Email_Entidad_CLI;
 				}
 			}	
             $rows[] = $contacto;
             //$rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto;
-            $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
+            $rows[] = $row->No_Entidad_CLI . "<br>" . $row->Nu_Documento_Identidad_CLI;
 
             //EXCEL cliente de pedido
             $rows[] = '<button class="btn btn-xs btn-link" alt="PDF" title="PDF" href="javascript:void(0)" onclick="generarExcelPedidoCliente(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fa fa-file-excel text-green fa-2x"></i></button>';
