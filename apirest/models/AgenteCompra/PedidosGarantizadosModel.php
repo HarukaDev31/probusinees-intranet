@@ -139,6 +139,7 @@ class PedidosGarantizadosModel extends CI_Model
         IGPD.Txt_Producto,
         IGPD.Txt_Descripcion,
         IGPD.Qt_Producto,
+        IGPD.ID_Pedido_Detalle,
         P.No_Pais,
         ACPDPP.*
     ');
