@@ -252,7 +252,7 @@ class PedidosGarantizados extends CI_Controller
         exit();
     }
     public function generarCotizacionChina($ID)
-    {
+    {   
         $data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));
         $this->load->library('PHPExcel');
         // echo json_encode($data);
@@ -650,6 +650,7 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialRow, $val->Ss_Costo_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("T" . $initialRow, $val->Nu_Dias_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Txt_Nota);
+
             $initialRow++;
         }
         // $objPHPExcel->getActiveSheet()->setCellValue('T'. ($initialRow),"=SUM(T26:T".($initialRow-1).")");
@@ -675,6 +676,8 @@ class PedidosGarantizados extends CI_Controller
         $objPHPExcel->getActiveSheet()->setCellValue('R' . ($initialRow), "=SUM(R17:R" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('S' . ($initialRow), "=SUM(S17:S" . ($initialRow - 1) . ")");
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objPHPExcel->getActiveSheet()->getStyle('U17:U' . $initialRow)->getAlignment()->setWrapText(true);
+
         $objWriter->save('php://output');
         foreach ($tempUrl as $val) {
             unlink($val);
