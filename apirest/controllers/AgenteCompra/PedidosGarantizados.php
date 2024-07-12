@@ -268,7 +268,6 @@ class PedidosGarantizados extends CI_Controller
         $objPHPExcel->getActiveSheet()->setCellValue('D11', $data[0]->Nu_Celular_Contacto);
         $objPHPExcel->getActiveSheet()->setCellValue('D12', $data[0]->Txt_Email_Contacto);
         // $objPHPExcel->getActiveSheet()->setCellValue('E21', "TRADING");
-        $objPHPExcel->getActiveSheet()->setCellValue('L10', date('d/m/Y'));
         $objPHPExcel->getActiveSheet()->setCellValue('L11', $data[0]->No_Entidad);
         $objPHPExcel->getActiveSheet()->setCellValue('L12', $data[0]->Nu_Documento_Identidad);
         $objPHPExcel->getActiveSheet()->setCellValue('U10', $data[0]->Ss_Tipo_Cambio);
