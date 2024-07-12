@@ -1300,7 +1300,9 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn3 . $initialRow, $tarifa["tarifa"]);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn4 . $initialRow, $tarifa["id_tipo_tarifa"] == 1 ? "Estandar" : "No Estandar");
             //set currency format with dollar symbol
-            $cbmTotal = round($cbmTotal, 2, PHP_ROUND_HALF_UP);
+            if($cbmTotal>1 && $cbmTotal<1.1){
+                $cbmTotal = 1.1;
+            }
             $limiteInf = round($tarifa["limite_inf"], 2);
             $limiteSup = round($tarifa["limite_sup"], 2);
             if ($cbmTotal >= $limiteInf && $cbmTotal <= $limiteSup) {
@@ -2004,8 +2006,4 @@ class CCotizacionesModel extends CI_Model
         $this->db->update($this->table, array("deleted_at" => date('Y-m-d H:i:s')));
         return array("status" => "success");
     }
-    function roundup($number, $precision = 0) {
-    $factor = pow(10, $precision);
-    return ceil($number * $factor) / $factor;
-}
 }

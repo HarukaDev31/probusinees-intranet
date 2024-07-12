@@ -907,7 +907,7 @@ const uploadExcel = () => {
     },
     {
       inf: 0.6,
-      sup: 1.09,
+      sup: 1.0,
       id_tipo_tarifa: 1,
     },
 
@@ -940,7 +940,7 @@ const uploadExcel = () => {
     },
     {
       inf: 0.6,
-      sup: 1.09,
+      sup: 1.0,
       id_tipo_tarifa: 1,
     },
 
@@ -968,7 +968,7 @@ const uploadExcel = () => {
   let limitesSocio = [
     {
       inf: 0,
-      sup: 1.09,
+      sup: 1.0,
       id_tipo_tarifa: 1,
     },
     {
