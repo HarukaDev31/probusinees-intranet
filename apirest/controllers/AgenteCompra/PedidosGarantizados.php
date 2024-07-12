@@ -543,7 +543,8 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue('T' . ($initialRow), "=SUM(T26:T" . ($initialRow - 1) . ")");
             $objPHPExcel->getActiveSheet()->setCellValue('E' . ($initialRow+3), "=L" . ($initialRow));
             $objPHPExcel->getActiveSheet()->setCellValue('F' . ($initialRow+3), "=M" . ($initialRow));
-
+            //ajustar texto en V column
+            $objPHPExcel->getActiveSheet()->getStyle('V26:V' . ($initialRow - 1))->getAlignment()->setWrapText(true);
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $objWriter->save('php://output');
             foreach ($tempUrl as $val) {
