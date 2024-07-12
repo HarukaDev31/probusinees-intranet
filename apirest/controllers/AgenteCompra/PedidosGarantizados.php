@@ -533,7 +533,9 @@ class PedidosGarantizados extends CI_Controller
             // if ($initialRow < $lastProductrow) {
             //     $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow - $initialRow + 1);
             // }
-
+            //ajustar texto in d and 3 column 
+            $objPHPExcel->getActiveSheet()->getStyle('D26:D' . ($initialRow - 1))->getAlignment()->setWrapText(true);
+            $objPHPExcel->getActiveSheet()->getStyle('E26:E' . ($initialRow - 1))->getAlignment()->setWrapText(true);
             $objPHPExcel->getActiveSheet()->setCellValue('L' . ($initialRow), "=SUM(L26:L" . ($initialRow - 1) . ")");
             $objPHPExcel->getActiveSheet()->setCellValue('M' . ($initialRow), "=SUM(M26:M" . ($initialRow - 1) . ")");
             $objPHPExcel->getActiveSheet()->setCellValue('O' . ($initialRow), "=SUM(O26:O" . ($initialRow - 1) . ")");
