@@ -1300,7 +1300,7 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn3 . $initialRow, $tarifa["tarifa"]);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn4 . $initialRow, $tarifa["id_tipo_tarifa"] == 1 ? "Estandar" : "No Estandar");
             //set currency format with dollar symbol
-            $cbmTotal = round($cbmTotal, 2);
+            $cbmTotal = round($cbmTotal, 2, PHP_ROUND_HALF_UP);
             $limiteInf = round($tarifa["limite_inf"], 2);
             $limiteSup = round($tarifa["limite_sup"], 2);
             if ($cbmTotal >= $limiteInf && $cbmTotal <= $limiteSup) {
@@ -1330,7 +1330,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells($TarifasStartColumn3 . $initialRow . ':' . $TarifasStartColumn4 . $initialRow);
 
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow,
-            "=ROUND(MAX(" . $pesoTotal / 1000 . "," . $cbmTotal . "),2)");
+            "=ROUNDUP(MAX(" . $pesoTotal / 1000 . "," . $cbmTotal . "),2)");
         //center horizontal
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . $initialRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         //IF TIPO TARIFA IS Estandar set the value to $tarifaCell else set the TarifaCell*cbmTotal
@@ -1915,13 +1915,13 @@ class CCotizacionesModel extends CI_Model
                     $productoData = [
                         'nombre' => $producto,
                         'cantidad' => $this->getCellValue($worksheet, $columnData['cantidad'], $startRowF, $endRowF),
-                        'precio_unitario' => round($this->getCellValue($worksheet, $columnData['precio_unitario'], $startRowF, $endRowF), 2),
+                        'precio_unitario' => $this->getCellValue($worksheet, $columnData['precio_unitario'], $startRowF, $endRowF),
                         'antidumping' => $this->getCellValue($worksheet, $columnData['antidumping'], $startRowF, $endRowF, 0),
                         'valoracion' => $this->getCellValue($worksheet, $columnData['valoracion'], $startRowF, $endRowF, 0),
                         'ad_valorem' => $this->getCellValue($worksheet, $columnData['ad_valorem'], $startRowF, $endRowF, 0),
                         'percepcion' => $this->getCellValue($worksheet, $columnData['percepcion'], $startRowF, $endRowF, 0.035),
                         'peso' => $this->getCellValue($worksheet, $columnData['peso'], $startRowF, $endRowF, 0),
-                        'cbm' => round($this->getCellValue($worksheet, $columnData['cbm'], $startRowF, $endRowF), 2),
+                        'cbm' => $this->getCellValue($worksheet, $columnData['cbm'], $startRowF, $endRowF)
                     ];
 
                     if ($productoData['cantidad'] !== null && $productoData['precio_unitario'] !== null && $productoData['cbm'] !== null) {
@@ -2004,4 +2004,8 @@ class CCotizacionesModel extends CI_Model
         $this->db->update($this->table, array("deleted_at" => date('Y-m-d H:i:s')));
         return array("status" => "success");
     }
+    function roundup($number, $precision = 0) {
+    $factor = pow(10, $precision);
+    return ceil($number * $factor) / $factor;
+}
 }

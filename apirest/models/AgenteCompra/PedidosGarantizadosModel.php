@@ -148,6 +148,8 @@ class PedidosGarantizadosModel extends CI_Model
         ACPDPP.Nu_Dias_Delivery,
         ACPDPP.Ss_Costo_Delivery,
         ACPDPP.Txt_Nota,
+        ACPDPP.unidad_medida,
+        ACPDPP.kg_box,
     ');
         $this->db->from('agente_compra_pedido_cabecera A');
         $this->db->join('agente_compra_correlativo CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo');
