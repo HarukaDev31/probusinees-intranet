@@ -963,7 +963,7 @@ $(function () {
       );
 
       var postData = new FormData($("#form-arrItems")[0]);
-      console.log(postData);
+      $("#div-arrItemsPedidos").empty();
       $.ajax({
         url:
           base_url + "AgenteCompra/PedidosGarantizados/addPedidoItemProveedor",
