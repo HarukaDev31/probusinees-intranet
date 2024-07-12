@@ -807,6 +807,7 @@ $(function () {
     $(".div-Listar").hide();
     $(".div-AgregarEditar").show();
     $("#div-add_item_proveedor").hide();
+    $("#div-arrItemsPedidos").empty();
   });
 
   $(document).on("click", "#btn-cancel_detalle_elegir_proveedor", function (e) {
@@ -1990,10 +1991,22 @@ function _generarConsolidaTrading($modal_delete, ID) {
   //   },
   // });
 }
-
+const removeItems = (iCounterItems) => {
+  if (iCounterItems > 1) {
+    $(`#card${iCounterItems}`).remove();
+    iCounterItems--;
+  }
+};
 function addItems() {
   div_items = `
-  <div id="card"${iCounterItems}" class="card border-0 rounded shadow-sm mt-3">
+  <div id="card${iCounterItems}" class="d-flex  flex-column card-cuz border-0 rounded shadow-sm mt-3">
+    ${
+      iCounterItems > 1
+        ? '<button type="button" class="btn btn-outline-danger" style="width:200px;align-self:end" onclick="removeItems(' +
+          iCounterItems +
+          ')">Eliminar Opcion</button>'
+        : ""
+    }
     <div class = "row" >
       <div class="col-6 col-md-3 col-lg-2">
         <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
@@ -2299,10 +2312,14 @@ function addItems() {
       }, 200);
     });
   $("#modal-precio" + iCounterItems).trigger("focus");
-    if(i>=2){
-      $(`#modal-nombre_proveedor${i}`).val($(`#modal-nombre_proveedor${1}`).val());
-      $(`#modal-celular_proveedor${i}`).val($(`#modal-celular_proveedor${1}`).val());
-    }
+  if (i >= 2) {
+    $(`#modal-nombre_proveedor${i}`).val(
+      $(`#modal-nombre_proveedor${1}`).val()
+    );
+    $(`#modal-celular_proveedor${i}`).val(
+      $(`#modal-celular_proveedor${1}`).val()
+    );
+  }
   validateNumberLetter();
   validateDecimal();
   validateNumber();
@@ -2343,14 +2360,50 @@ function scrollToError($sMetodo, $IdElemento) {
     "slow"
   );
 }
+const removeItemsEdit = (idProveedor, index) => {
+  //show confirm message
+  var $modal_delete = $("#modal-message-delete");
+  ///set modal title
+
+  $("#modal-title").text("¿Deseas eliminar el item seleccionado?");
+  $modal_delete.modal("show");
+  //add event to confirm button
+  $("#btn-save-delete")
+    .off("click")
+    .click(function () {
+      url = base_url + "AgenteCompra/PedidosGarantizados/removeSupplier";
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify({ idProveedor: idProveedor }),
+        contentType: "application/json; charset=utf-8", // Asegura que el contenido sea JSON
+        dataType: "json",
+        success: function (response) {
+          if (response.statusCode == 200) {
+            $("#card" + index).remove();
+            $modal_delete.modal("hide");
+          }
+        },
+      }).catch((error) => {
+        console.log(error);
+        $modal_delete.modal("hide");
+      });
+    });
+};
 function getItemTemplate(i, mode, detalle, privilegio) {
   div_items = `
-    <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
+    <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal_proveedor-id-${i}" value="${
     detalle.id_pedido
   }"/>
+  <button type="button" class="btn btn-outline-danger" style="width:200px;align-self:end" onclick="removeItemsEdit(${
+    detalle[i - 1].ID_Pedido_Detalle_Producto_Proveedor
+  },${i})">
+  Eliminar Opcion
+  </button>
+
       <div class = "row" >
         <div class="col-6 col-md-3 col-lg-2">
           <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
@@ -2419,47 +2472,51 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           <div class="row h-100">
             <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
               <!--Upload Icon-->
-              <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
-              <label>Imagen Principal</label>
-              ${
-                detalle[i - 1]["main_photo"] == null
-                  ? ""
-                  : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',1)">Eliminar</span>`
-              }  
+              <div class="form-group mx-auto d-flex flex-column " id="container-uploadprimaryimg-${i}">
+              <label class="text-center">Imagen Principal</label>
+             
               </br>
               <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
               <input type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+               ${
+                 detalle[i - 1]["main_photo"] == null
+                   ? ""
+                   : `<span class="fw-bold  btn btn-danger d-block"
+              onclick="deleteImage('${i}',1)">Eliminar</span>`
+               }  
               </div>
             </div>
             <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
             <div class="form-group" id="container-uploadimg2-${i}">
             <label>Imagen 2</label>
-            ${
-              detalle[i - 1]["secondary_photo"] == null
-                ? ""
-                : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',2)">Eliminar</span>`
-            }   
+            
             <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
             <input type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+             ${
+               detalle[i - 1]["secondary_photo"] == null
+                 ? ""
+                 : `<span class="fw-bold  btn btn-danger d-block"
+              onclick="deleteImage('${i}',2)">Eliminar</span>`
+             }  
             </div>
               <div class="form-group" id="container-uploadimg3-${i}">
               <label>Imagen 3</label>
-                ${
-                  detalle[i - 1]["terciary_photo"] == null
-                    ? ""
-                    : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',3)">Eliminar</span>`
-                }
+               
               <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
-              <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input></div>
+              <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+               ${
+                 detalle[i - 1]["terciary_photo"] == null
+                   ? ""
+                   : `<span class="fw-bold  btn btn-danger d-block"
+              onclick="deleteImage('${i}',3)">Eliminar</span>`
+               }
+              </div>
               <div class="form-group" id="container-uploadvideo1-${i}">
               <label>Video 1</label>
                   ${
                     detalle[i - 1]["primary_video"] == null
                       ? ""
-                      : `<span class="fw-bold  btn btn-danger"
+                      : `<span class="fw-bold  d-block btn btn-danger"
               onclick="deleteVideo('${i}',1)">Eliminar</span>`
                   }
 
@@ -2470,7 +2527,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
               ${
                 detalle[i - 1]["secondary_video"] == null
                   ? ""
-                  : `<span class="fw-bold  btn btn-danger"
+                  : `<span class="fw-bold  btn btn-danger d-block"
               onclick="deleteVideo('${i}',2)">Eliminar</span>`
               }
               <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
@@ -2530,7 +2587,6 @@ function getItemTemplate(i, mode, detalle, privilegio) {
             </button>`;
     }
   }
-  div_items += `<div class="separator-line"></div>`;
   div_items += `</div>`;
   return div_items;
 }
@@ -2605,389 +2661,76 @@ function getItemProveedor(id_detalle) {
             .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
             .val(detalle[i]["main_photo"]);
           container.find(`#btn-uploadprimaryimg-${i + 1}`).hide();
+          // container
+          //   .find(`#container-uploadprimaryimg-${i + 1}`)
+          //   .append(
+          //     `<img src="${detalle[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+          //   );
+          // container find (`#container-uploadprimaryimg-${i + 1}`) append img bottom to the label
           container
             .find(`#container-uploadprimaryimg-${i + 1}`)
-            .append(
+            .find("label")
+            .after(
               `<img src="${detalle[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
             );
-        }
-        if (detalle[i]["secondary_photo"] != null) {
-          container
-            .find(`#btn-uploadimg2-URL-${i + 1}`)
-            .val(detalle[i]["secondary_photo"]);
-          container.find(`#btn-uploadimg2-${i + 1}`).hide();
-          container
-            .find(`#container-uploadimg2-${i + 1}`)
-            .append(
-              `<img src="${detalle[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
-            );
-        }
-        if (detalle[i]["terciary_photo"] != null) {
-          container
-            .find(`#btn-uploadimg3-URL-${i + 1}`)
-            .val(detalle[i]["terciary_photo"]);
-          container.find(`#btn-uploadimg3-${i + 1}`).hide();
-          container
-            .find(`#container-uploadimg3-${i + 1}`)
-            .append(
-              `<img src="${detalle[i]["terciary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
-            );
-        }
-        if (detalle[i]["primary_video"] != null) {
-          container
-            .find(`#btn-uploadvideo1-URL-${i + 1}`)
-            .val(detalle[i]["primary_video"]);
-          container.find(`#btn-uploadvideo1-${i + 1}`).hide();
-          container
-            .find(`#container-uploadvideo1-${i + 1}`)
-            .append(
-              `<video src="${
-                detalle[i]["primary_video"]
-              }" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video1-${
-                i + 1
-              }"></video>`
-            );
-        }
-        if (detalle[i]["secondary_video"] != null) {
-          container
-            .find(`#btn-uploadvideo2-URL-${i + 1}`)
-            .val(detalle[i]["secondary_video"]);
-          container.find(`#btn-uploadvideo2-${i + 1}`).hide();
-          container
-            .find(`#container-uploadvideo2-${i + 1}`)
-            .append(
-              `<video src="${
-                detalle[i]["secondary_video"]
-              }" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video2-${
-                i + 1
-              }"></video>`
-            );
-        }
-
-        // container.find(`btn-uploadprimaryimg-${i}`).val(detalle[i]["main_photo"]);
-      }
-      return;
-      var table_enlace_producto = "",
-        id_item_tmp = 0;
-      for (i = 0; i < detalle.length; i++) {
-        var id_detalle = detalle[i]["ID_Pedido_Detalle"];
-        var id_item = detalle[i]["ID_Pedido_Detalle_Producto_Proveedor"];
-        var cantidad = detalle[i]["Qt_Producto_Caja"];
-        var nota = detalle[i]["Txt_Nota"];
-        var cantidad_final = detalle[i]["Qt_Producto_Caja_Final"];
-        var nota_final =
-          detalle[i]["Txt_Nota_Final"] != "" &&
-          detalle[i]["Txt_Nota_Final"] != null
-            ? detalle[i]["Txt_Nota_Final"]
-            : "";
-        var cantidad_html =
-          parseFloat(cantidad_final) > parseFloat(cantidad)
-            ? cantidad_final
-            : cantidad;
-        var contacto_proveedor = detalle[i]["No_Contacto_Proveedor"];
-        var imagen_proveedor = detalle[i]["Txt_Url_Imagen_Proveedor"];
-
-        if (id_item_tmp != id_item) {
-          table_enlace_producto +=
-            "<tr id='tr_enlace_producto" +
-            id_item +
-            "'>" +
-            "<td style='display:none;' class='text-left td-id_item'>" +
-            id_item +
-            "</td>" +
-            "<td class='text-left td-imagen'>";
-
-          for (x = 0; x < detalle.length; x++) {
-            if (id_item == detalle[x]["ID_Pedido_Detalle_Producto_Proveedor"]) {
-              table_enlace_producto +=
-                "<img data-id_item='" +
-                id_item +
-                "' data-url_img='" +
-                detalle[x]["Txt_Url_Imagen_Producto"] +
-                "' src='" +
-                detalle[x]["Txt_Url_Imagen_Producto"] +
-                "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
-              table_enlace_producto += "<br>";
+          if (detalle[i]["secondary_photo"] != null) {
+            container
+              .find(`#btn-uploadimg2-URL-${i + 1}`)
+              .val(detalle[i]["secondary_photo"]);
+            container.find(`#btn-uploadimg2-${i + 1}`).hide();
+            container
+              .find(`#container-uploadimg2-${i + 1}`)
+              .find("label")
+              .after(
+                `<img src="${detalle[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+              );
+            if (detalle[i]["terciary_photo"] != null) {
+              container
+                .find(`#btn-uploadimg3-URL-${i + 1}`)
+                .val(detalle[i]["terciary_photo"]);
+              container.find(`#btn-uploadimg3-${i + 1}`).hide();
+              container
+                .find(`#container-uploadimg3-${i + 1}`)
+                .find("label")
+                .after(
+                  `<img src="${detalle[i]["terciary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+                );
             }
+            if (detalle[i]["primary_video"] != null) {
+              container
+                .find(`#btn-uploadvideo1-URL-${i + 1}`)
+                .val(detalle[i]["primary_video"]);
+              container.find(`#btn-uploadvideo1-${i + 1}`).hide();
+              container
+                .find(`#container-uploadvideo1-${i + 1}`).find("label")
+                .after(
+                  `<video src="${
+                    detalle[i]["primary_video"]
+                  }" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video1-${
+                    i + 1
+                  }"></video>`
+                );
+            }
+            if (detalle[i]["secondary_video"] != null) {
+              container
+                .find(`#btn-uploadvideo2-URL-${i + 1}`)
+                .val(detalle[i]["secondary_video"]);
+              container.find(`#btn-uploadvideo2-${i + 1}`).hide();
+              container
+                .find(`#container-uploadvideo2-${i + 1}`).find("label")
+                .after(
+                  `<video src="${
+                    detalle[i]["secondary_video"]
+                  }" class="img-thumbnail  img-fluid img-resize mb-2 w-100" controls id="video2-${
+                    i + 1
+                  }"></video>`
+                );
+            }
+
+            // container.find(`btn-uploadprimaryimg-${i}`).val(detalle[i]["main_photo"]);
           }
-
-          table_enlace_producto += "</td>";
-
-          table_enlace_producto +=
-            "<td class='text-left td-precio'>" +
-            (
-              parseFloat(detalle[i]["Ss_Precio"]) *
-              parseFloat(detalle[i]["Ss_Tipo_Cambio"])
-            ).toPrecision(6) +
-            "</td>";
-
-          //+ "<td class='text-left td-precio'>" + detalle[i]['Ss_Precio'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-precio'>";
-          table_enlace_producto +=
-            '<input type="text" id="modal-precio' +
-            i +
-            '" data-correlativo="' +
-            i +
-            '" inputmode="decimal" name="addProducto[' +
-            i +
-            '][precio]" class="arrProducto form-control required precio input-decimal mt-0" placeholder="precio" value="' +
-            detalle[i]["Ss_Precio"] +
-            '" autocomplete="off" />';
-          table_enlace_producto += "</td>";
-
-          //table_enlace_producto += "<td class='text-left td-moq'>" + detalle[i]['Qt_Producto_Moq'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-moq'>";
-          table_enlace_producto +=
-            '<input type="text" id="modal-moq' +
-            i +
-            '" data-correlativo="' +
-            i +
-            '" inputmode="decimal" name="addProducto[' +
-            i +
-            '][moq]" class="arrProducto form-control required moq input-decimal mt-0" placeholder="moq" value="' +
-            detalle[i]["Qt_Producto_Moq"] +
-            '" autocomplete="off" />';
-          table_enlace_producto += "</td>";
-
-          //+ "<td class='text-left td-caja'>" + detalle[i]['Qt_Producto_Caja'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-caja'>";
-          table_enlace_producto +=
-            '<input type="text" id="modal-caja' +
-            i +
-            '" data-correlativo="' +
-            i +
-            '" inputmode="decimal" name="addProducto[' +
-            i +
-            '][caja]" class="arrProducto form-control required caja input-decimal mt-0" placeholder="caja" value="' +
-            detalle[i]["Qt_Producto_Caja"] +
-            '" autocomplete="off" />';
-          table_enlace_producto += "</td>";
-
-          //+ "<td class='text-left td-cbm'>" + detalle[i]['Qt_Cbm'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-cbm'>";
-          table_enlace_producto +=
-            '<input type="text" id="modal-cbm' +
-            i +
-            '" data-correlativo="' +
-            i +
-            '" inputmode="decimal" name="addProducto[' +
-            i +
-            '][cbm]" class="arrProducto form-control required cbm input-decimal mt-0" placeholder="cbm" value="' +
-            detalle[i]["Qt_Cbm"] +
-            '" autocomplete="off" />';
-          table_enlace_producto += "</td>";
-
-          //+ "<td class='text-left td-delivery'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-delivery'>";
-          table_enlace_producto +=
-            '<input type="text" id="modal-delivery' +
-            i +
-            '" data-correlativo="' +
-            i +
-            '" inputmode="decimal" name="addProducto[' +
-            i +
-            '][delivery]" class="arrProducto form-control required delivery input-decimal mt-0" placeholder="delivery" value="' +
-            detalle[i]["Nu_Dias_Delivery"] +
-            '" autocomplete="off" />';
-          table_enlace_producto += "</td>";
-
-          //+ "<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-costo_delivery'>";
-          table_enlace_producto +=
-            '<input type="text" id="modal-costo_delivery' +
-            i +
-            '" data-correlativo="' +
-            i +
-            '" inputmode="decimal" name="addProducto[' +
-            i +
-            '][costo_delivery]" class="arrProducto form-control required costo_delivery input-decimal mt-0" placeholder="costo_delivery" value="' +
-            detalle[i]["Ss_Costo_Delivery"] +
-            '" autocomplete="off" />';
-          table_enlace_producto += "</td>";
-
-          //+ "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-nota_historica'>";
-          table_enlace_producto +=
-            '<textarea id="modal-nota_historica' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][nota_historica]" class="mt-0 form-control required nota_historica" placeholder="Observaciones" rows="1" style="height: 60px;">' +
-            clearHTMLTextArea(detalle[i]["Txt_Nota"]) +
-            "</textarea>";
-          table_enlace_producto += "</td>";
-
-          //+ "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
-          table_enlace_producto +=
-            "<td class='text-left td-contacto_proveedor'>";
-          table_enlace_producto +=
-            '<input type="text" inputmode="text" id="modal-contacto_proveedor' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][contacto_proveedor]" class="mt-0 form-control required contacto_proveedor" placeholder="" maxlength="255" autocomplete="off" value="' +
-            contacto_proveedor +
-            '">';
-          table_enlace_producto += "</td>";
-
-          //+ "<td class='text-left td-nota'>" + detalle[i]['Txt_Nota'] + "</td>"
-          table_enlace_producto += "<td class='text-left td-foto_proveedor'>";
-          table_enlace_producto +=
-            '<input class="form-control" id="modal-foto_proveedor' +
-            i +
-            '" name="addProveedor[' +
-            i +
-            ']" type="file" accept="image/*">';
-          if (imagen_proveedor != "" && imagen_proveedor != null) {
-            table_enlace_producto +=
-              "<img data-id_item='" +
-              id_item +
-              "' data-url_img='" +
-              imagen_proveedor +
-              "' src='" +
-              imagen_proveedor +
-              "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
-          }
-          table_enlace_producto += "</td>";
-          table_enlace_producto += "</tr>";
-
-          table_enlace_producto += "<tr><td class='text-center' colspan='11'>";
-          if (detalle[i]["Nu_Selecciono_Proveedor"] == 0) {
-            table_enlace_producto +=
-              '<button type="button" id="btn-seleccionar_proveedor' +
-              id_item +
-              '" data-id_detalle="' +
-              id_detalle +
-              '" data-id="' +
-              id_item +
-              '" data-correlativo="' +
-              $("#txt-Item_ECorrelativo_Editar").val() +
-              '" data-name_item="' +
-              $("#txt-Item_Ename_producto_Editar").val() +
-              '" class="btn btn-danger btn-block btn-seleccionar_proveedor"><i class="fas fa-check"></i>&nbsp; Seleccionar proveedor</button>';
-          } else {
-            table_enlace_producto +=
-              '<button type="button" id="btn-desmarcar_proveedor' +
-              id_item +
-              '" data-id_detalle="' +
-              id_detalle +
-              '" data-id="' +
-              id_item +
-              '" data-correlativo="' +
-              $("#txt-Item_ECorrelativo_Editar").val() +
-              '" data-name_item="' +
-              $("#txt-Item_Ename_producto_Editar").val() +
-              '" class="btn btn-secondary btn-block btn-desmarcar_proveedor"><i class="fas fa-times"></i>&nbsp; Deseleccionar proveedor</button>';
-
-            table_enlace_producto += '<div class="row">';
-            table_enlace_producto += '<div class="col-1 col-sm-1 mt-3">';
-            table_enlace_producto += "<label>qty_total</label>"; //qty_caja_actual
-            table_enlace_producto +=
-              '<input type="text" id="modal-cantidad' +
-              i +
-              '" data-correlativo="' +
-              i +
-              '" inputmode="numeric" name="addProducto[' +
-              i +
-              '][cantidad]" class="arrProducto form-control required cantidad input-numeric" placeholder="Cantidad" value="' +
-              cantidad_html +
-              '" autocomplete="off" />';
-            table_enlace_producto += "</div>";
-            table_enlace_producto +=
-              '<div class="text-left col-11 col-sm-11 mt-3">';
-            table_enlace_producto += "<label>Observaciones</label>";
-            table_enlace_producto +=
-              '<textarea id="modal-nota' +
-              i +
-              '" name="addProducto[' +
-              i +
-              '][nota]" class="form-control required nota" placeholder="Observaciones" rows="1" style="height: 50px;">' +
-              clearHTMLTextArea(nota_final) +
-              "</textarea>";
-            table_enlace_producto += "</div>";
-          }
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-id_detalle' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][id_detalle]" class="form-control" value="' +
-            id_item +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-cantidad_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][cantidad_oculta]" class="form-control" value="' +
-            detalle[i]["Qt_Producto_Caja"] +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-precio_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][precio_oculta]" class="form-control" value="' +
-            detalle[i]["Ss_Precio"] +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-moq_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][moq_oculta]" class="form-control" value="' +
-            detalle[i]["Qt_Producto_Moq"] +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-caja_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][caja_oculta]" class="form-control" value="' +
-            detalle[i]["Qt_Producto_Caja"] +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-cbm_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][cbm_oculta]" class="form-control" value="' +
-            detalle[i]["Qt_Cbm"] +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-delivery_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][delivery_oculta]" class="form-control" value="' +
-            detalle[i]["Nu_Dias_Delivery"] +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-costo_delivery_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][costo_delivery_oculta]" class="form-control" value="' +
-            detalle[i]["Ss_Costo_Delivery"] +
-            '">';
-          table_enlace_producto +=
-            '<input type="hidden" id="modal-nota_historica_oculta' +
-            i +
-            '" name="addProducto[' +
-            i +
-            '][nota_historica_oculta]" class="form-control" value="' +
-            detalle[i]["Txt_Nota"] +
-            '">';
-          table_enlace_producto += "</td></tr>";
-
-          id_item_tmp = id_item;
         }
       }
-
-      $("#table-elegir_productos_proveedor").append(table_enlace_producto);
-
-      validateDecimal();
-      validateNumber();
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $(".modal-message").removeClass(
@@ -3563,7 +3306,7 @@ const deleteVideo = (index, videoIndex) => {
 const getSuppliersByName = (index) => {
   const component = $(`#modal-nombre_proveedor${index}`);
   const list = $(`.supplier-list${index}`);
-  const idPedido=$("#txt-EID_Pedido_Cabecera_item").val();
+  const idPedido = $("#txt-EID_Pedido_Cabecera_item").val();
   console.log(component, list, index);
   const name = component.val();
   if (name.length < 1) return list.html("");
@@ -3572,9 +3315,7 @@ const getSuppliersByName = (index) => {
     $.ajax({
       url: base_url + "AgenteCompra/PedidosGarantizados/getSuppliersByName",
       type: "POST",
-      data: { name,
-        idPedido
-       },
+      data: { name, idPedido },
       dataType: "JSON",
       success: function (response) {
         list.html("");

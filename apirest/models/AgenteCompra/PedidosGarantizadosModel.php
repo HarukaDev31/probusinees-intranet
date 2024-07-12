@@ -130,10 +130,10 @@ class PedidosGarantizadosModel extends CI_Model
         A.Ss_Tipo_Cambio,
         A.cotizacionCode,
         CORRE.Fe_Month,
-        CLI.No_Entidad, 
+        CLI.No_Entidad,
         CLI.Nu_Documento_Identidad,
-        CLI.No_Contacto, 
-        CLI.Nu_Celular_Contacto, 
+        CLI.No_Contacto,
+        CLI.Nu_Celular_Contacto,
         CLI.Txt_Email_Contacto,
         IGPD.Txt_Url_Imagen_Producto,
         IGPD.Txt_Producto,
@@ -143,18 +143,18 @@ class PedidosGarantizadosModel extends CI_Model
         P.No_Pais,
         ACPDPP.*
     ');
-    $this->db->from('agente_compra_pedido_cabecera A');
-    $this->db->join('agente_compra_correlativo CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo');
-    $this->db->join('agente_compra_pedido_detalle IGPD', 'IGPD.ID_Pedido_Cabecera = A.ID_Pedido_Cabecera');
-    $this->db->join('entidad CLI', 'CLI.ID_Entidad = A.ID_Entidad');
-    $this->db->join('pais P', 'P.ID_Pais = A.ID_Pais');
-    $this->db->join('(
-        SELECT 
+        $this->db->from('agente_compra_pedido_cabecera A');
+        $this->db->join('agente_compra_correlativo CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo');
+        $this->db->join('agente_compra_pedido_detalle IGPD', 'IGPD.ID_Pedido_Cabecera = A.ID_Pedido_Cabecera');
+        $this->db->join('entidad CLI', 'CLI.ID_Entidad = A.ID_Entidad');
+        $this->db->join('pais P', 'P.ID_Pais = A.ID_Pais');
+        $this->db->join('(
+        SELECT
             ACPDPP1.*
         FROM agente_compra_pedido_detalle_producto_proveedor ACPDPP1
         LEFT JOIN (
-            SELECT 
-                ID_Pedido_Detalle, 
+            SELECT
+                ID_Pedido_Detalle,
                 COUNT(*) AS selected_count
             FROM agente_compra_pedido_detalle_producto_proveedor
             WHERE Nu_Selecciono_Proveedor = 1
@@ -163,11 +163,11 @@ class PedidosGarantizadosModel extends CI_Model
         ON ACPDPP1.ID_Pedido_Detalle = subquery.ID_Pedido_Detalle
         WHERE (subquery.selected_count IS NULL OR ACPDPP1.Nu_Selecciono_Proveedor = 1)
     ) ACPDPP', 'IGPD.ID_Pedido_Detalle = ACPDPP.ID_Pedido_Detalle', 'left');
-    $this->db->where('A.ID_Pedido_Cabecera', $ID);
-    $this->db->order_by('A.Nu_Correlativo', 'ASC');
+        $this->db->where('A.ID_Pedido_Cabecera', $ID);
+        $this->db->order_by('A.Nu_Correlativo', 'ASC');
 
-    $query = $this->db->get();
-    return $query->result();
+        $query = $this->db->get();
+        return $query->result();
     }
     /**
      * This function loads the products in the pedidos garantizados table
@@ -442,7 +442,7 @@ class PedidosGarantizadosModel extends CI_Model
             'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China,
         );
 
-        if ($Nu_Estado == 5|| $Nu_Estado ==3) {
+        if ($Nu_Estado == 5 || $Nu_Estado == 3) {
 
             /**
              * select ID_Pedido_Detalle,count(ID_Pedido_Detalle) as count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =231 group by ID_Pedido_Detalle ;
@@ -589,7 +589,7 @@ class PedidosGarantizadosModel extends CI_Model
                     $arrSaleOrderDetail[$iCounter]['Txt_Producto_Ingles'] = $row['txtproductoIngles'];
 
                 }
-                
+
                 ++$iCounter;
             }
             $this->db->insert_batch('agente_compra_pedido_detalle', $arrSaleOrderDetail);
@@ -597,21 +597,21 @@ class PedidosGarantizadosModel extends CI_Model
 
         //actualizar productos de tabla de cliente
         if (!empty($arrProductoTable)) {
-            $arrayIndex=0;
+            $arrayIndex = 0;
             foreach ($arrProductoTable as $row) {
                 //array_debug($row);
                 $arrSaleOrderDetailUPD[$arrayIndex] = array(
                     'ID_Pedido_Detalle' => $row['id_item'],
                     'Qt_Producto' => $row['cantidad'], //agergar input de cantidad
                     'Txt_Descripcion' => nl2br($row['caracteristicas']),
-                    
+
                 );
                 if (array_key_exists('caracteristicas_ingles', $row)) {
                     $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Description_Ingles'] = nl2br($row['caracteristicas_ingles']);
 
                 }if (
                     array_key_exists('txtproductoIngles', $row)) {
-                        $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Producto_Ingles'] = $row['txtproductoIngles'];
+                    $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Producto_Ingles'] = $row['txtproductoIngles'];
 
                 }
                 $arrayIndex++;
@@ -1084,13 +1084,23 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
 
         return array('status' => 'error', 'message' => 'Error al guardar');
     }
-    public function getSuppliersByName($data){
+    public function getSuppliersByName($data)
+    {
         $query = "SELECT id_supplier,name,phone FROM suppliers s
         join agente_compra_pedido_detalle_producto_proveedor acpdpp on acpdpp.ID_Entidad_Proveedor =s.id_supplier
 
-         WHERE name LIKE '%".$data['name']."%'
-         AND acpdpp.ID_Pedido_Cabecera=".$data['idPedido']."
+         WHERE name LIKE '%" . $data['name'] . "%'
+         AND acpdpp.ID_Pedido_Cabecera=" . $data['idPedido'] . "
          group by 1";
         return $this->db->query($query)->result();
+    }
+    public function removeSupplier($data)
+    {
+        try {
+            $query = "DELETE FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle_Producto_Proveedor = " . $data['idProveedor'] ."";
+            return $this->db->query($query);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 }

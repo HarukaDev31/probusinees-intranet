@@ -579,6 +579,13 @@ input[type=number] {
 .supplier-list option:hover{
   background: #BFC9CA;
 }
+.card-cuz{
+  border: 1px solid #BFC9CA;
+  border-radius: 1em;
+  padding: 1em;
+  margin-bottom: 10px;
+  background: #F2F3F4;
+}
 </style>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>
