@@ -491,7 +491,7 @@ $(function () {
   $("#form-pedido").validate({
     rules: {
       No_Entidad: {
-        required: true,
+        required: false,
       },
     },
     messages: {
