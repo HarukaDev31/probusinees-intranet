@@ -141,7 +141,13 @@ class PedidosGarantizadosModel extends CI_Model
         IGPD.Qt_Producto,
         IGPD.ID_Pedido_Detalle,
         P.No_Pais,
-        ACPDPP.*
+        ACPDPP.Ss_Precio,
+        ACPDPP.Qt_Producto_Moq,
+        ACPDPP.Qt_Producto_Caja,
+        ACPDPP.Qt_Cbm,
+        ACPDPP.Nu_Dias_Delivery,
+        ACPDPP.Ss_Costo_Delivery,
+        ACPDPP.Txt_Nota,
     ');
         $this->db->from('agente_compra_pedido_cabecera A');
         $this->db->join('agente_compra_correlativo CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo');
