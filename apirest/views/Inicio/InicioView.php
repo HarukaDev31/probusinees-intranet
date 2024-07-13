@@ -14,7 +14,6 @@
         //echo $this->user->Nu_Tipo_Privilegio_Acceso;
         //array_debug($arrResponsePedidoSinAsignar);
         // echo $countCotizacionPedidosPendientes;
-        print_r($this->user);
         if(strtoupper($this->user->No_Grupo)=="COTIZADOR" || $this->user->No_Grupo=="GERENCIA") {
            ?>
            <div class="col-lg-12 col-12">
