@@ -40,6 +40,7 @@ class PedidosAgente extends CI_Controller
         $sMethod = $this->input->post('sMethod');
         $arrData = $this->PedidosAgenteModel->get_datatables();
         $data = array();
+        // echo json_encode($arrData);
         foreach ($arrData as $row) {
             $rows = array();
 
@@ -55,7 +56,7 @@ class PedidosAgente extends CI_Controller
 					$contacto .= "<br>" . $row->Txt_Email_Entidad_CLI;
 				}
 				else{
-					$contacto = $row->Txt_Email_Entidad_CLI;
+					$contacto .= $row->Txt_Email_Entidad_CLI;
 				}
 			}	
             $rows[] = $contacto;
