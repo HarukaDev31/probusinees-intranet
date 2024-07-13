@@ -2059,7 +2059,15 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		IGPD.Txt_Producto,
         PAIS.No_Pais,
 		IGPD.Txt_Descripcion,
-		ACPDPP.*');
+		ACPDPP.Ss_Precio,
+        ACPDPP.Qt_Producto_Moq,
+        ACPDPP.Qt_Producto_Caja,
+        ACPDPP.Qt_Cbm,
+        ACPDPP.Nu_Dias_Delivery,
+        ACPDPP.Ss_Costo_Delivery,
+        ACPDPP.Txt_Nota,
+        ACPDPP.unidad_medida,
+        ACPDPP.kg_box');
         $this->db->from($this->table);
         $this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
         $this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
