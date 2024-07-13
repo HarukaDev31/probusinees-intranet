@@ -108,6 +108,8 @@ class PedidosGarantizadosModel extends CI_Model
             $row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
             $row->Nu_Tipo_Privilegio_Acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
             $row->currentUser = $this->user->Txt_Email;
+            $row->pending_messages = $this->getPendingMessagesCount($row->ID_Pedido_Detalle,$this->user);
+
         }
         $sCorrelativoCotizacion = $query[0]->sCorrelativoCotizacion;
         if ($acceso == $this->personalChinaPrivilegio || $acceso == $this->jefeChinaPrivilegio) {
@@ -906,6 +908,17 @@ Nu_Correlativo
                 'ID_Usuario_Remitente' => $this->user->ID_Usuario,
                 'Txt_Usuario_Remitente' => nl2br($data['message_chat']),
             );
+            //update nu estado in agente_compra_pedido_cabecera to 8
+            $where = array('ID_Pedido_Cabecera' => $data['chat_producto-ID_Pedido_Cabecera_item']);
+            $toUpdate = array('Nu_Estado' => 8); //1=SI
+            $this->db->update('agente_compra_pedido_cabecera', $toUpdate, $where);
+            //foreach message with   this id_pedido_detalle where ID_Remitente not this user AND ID_USUARIO_DESTINO = 0 UPDATE TO THIS USER
+            $query="
+            UPDATE agente_compra_pedido_detalle_chat_producto
+            SET ID_Usuario_Remitente = ".$this->user->ID_Usuario."
+            WHERE ID_Pedido_Detalle = ".$data['chat_producto-ID_Pedido_Detalle_item']." AND ID_Usuario_Remitente = 0 AND ID_Usuario_Destino != ".$this->user->ID_Usuario;
+            $this->db->query($query);
+
         }
 
         if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) { //china
@@ -913,6 +926,11 @@ Nu_Correlativo
                 'ID_Usuario_Destino' => $this->user->ID_Usuario,
                 'Txt_Usuario_Destino' => nl2br($data['message_chat']),
             );
+            $query="
+            UPDATE agente_compra_pedido_detalle_chat_producto
+            SET ID_Usuario_Destino= ".$this->user->ID_Usuario."
+            WHERE ID_Pedido_Detalle = ".$data['chat_producto-ID_Pedido_Detalle_item']." AND ID_Usuario_Destino = 0 AND ID_Usuario_Remitente != ".$this->user->ID_Usuario;
+            $this->db->query($query);
         }
 
         $arrMessage = array_merge($arrMessage, $arrMessageUser);
@@ -1110,5 +1128,18 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
         } catch (Exception $e) {
             return $e->getMessage();
         }
+    }
+    public function getPendingMessagesCount($id_detalle,$user)
+    {
+        $privilegio = $user->Nu_Tipo_Privilegio_Acceso;
+        $idUsuario = $user->ID_Usuario;
+        $query="";
+        if($privilegio==1){
+            $query = "SELECT count(*) count FROM agente_compra_pedido_detalle_chat_producto WHERE ID_Pedido_Detalle = " . $id_detalle . " AND ID_Usuario_Destino != " . $idUsuario . " AND ID_Usuario_Remitente = 0";
+
+        }else{
+            $query = "SELECT count(*) count FROM agente_compra_pedido_detalle_chat_producto WHERE ID_Pedido_Detalle = " . $id_detalle . " AND ID_Usuario_Remitente != " . $idUsuario . " AND ID_Usuario_Destino = 0";
+        }
+        return intval($this->db->query($query)->row()->count);
     }
 }

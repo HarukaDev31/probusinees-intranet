@@ -1073,6 +1073,7 @@ $(function () {
         url: url,
         data: $("#form-chat_producto").serialize(),
         success: function (response) {
+          reload_table_Entidad();
           $(".modal-chat_producto").modal("hide");
 
           $("#moda-message-content").removeClass(
@@ -1360,7 +1361,7 @@ function verPedido(ID) {
         }
         //button de chat que abre un modal
         var class_button_chat =
-          parseInt(detalle[i]["Nu_Envio_Mensaje_Chat_Producto"]) > 0
+          parseInt(detalle[i]["pending_messages"]) > 0
             ? "warning"
             : "success";
         table_enlace_producto +=
@@ -1378,9 +1379,12 @@ function verPedido(ID) {
           nombre_producto +
           '" class="mt-3 btn btn-' +
           class_button_chat +
-          ' btn-block btn-chat_producto"><i class="fas fa-comments"></i>&nbsp; Novedades <span class="badge bg-danger">' +
-          detalle[i]["Nu_Envio_Mensaje_Chat_Producto"] +
-          "</span></button>";
+          ' btn-block btn-chat_producto"><i class="fas fa-comments"></i>&nbsp; Novedades'
+          if(parseInt(detalle[i]["pending_messages"]) > 0){
+            table_enlace_producto += '<span class="badge bg-danger">' +
+          detalle[i]["pending_messages"] +
+          '</span></button>';
+        }
         table_enlace_producto += "</td>";
 
         table_enlace_producto +=
