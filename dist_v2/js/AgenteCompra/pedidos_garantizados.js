@@ -595,7 +595,7 @@ $(function () {
 
     iCounterItems = 1;
     addItems();
-
+    
     $("#txt-EID_Empresa_item").val($(this).data("id_empresa"));
     $("#txt-EID_Organizacion_item").val($(this).data("id_organizacion"));
     $("#txt-EID_Pedido_Cabecera_item").val($(this).data("id_pedido_cabecera"));
@@ -2100,8 +2100,12 @@ function addItems() {
       <div class="col-12 col-md-6 col-lg-6">
         <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
         <div class="form-group" style="position:relative">
-          <input type="text" id="modal-nombre_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
-          <ul class="supplier-list supplier-list${iCounterItems}" style="position:absolute"></ul>
+                  <div class="input-group">
+                  <input type="text" id="modal-nombre_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+                  <!-- button open ul -->
+                  <button type="button" class="btn btn-outline-secondary" id="btn-open-supplier${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-supplier${iCounterItems}"><i class="fas fa-search"></i></button>
+                  </div>
+                  <ul class="supplier-list supplier-list${iCounterItems}" style="position:absolute"></ul>
           <span class="help-block text-danger" id="error"></span>
         </div>
         <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
@@ -2303,20 +2307,31 @@ function addItems() {
   // div_items += "</div>";
   const i = iCounterItems;
   $("#div-arrItems").append(div_items);
-  $("#div-arrItems")
-    .find(`#modal-nombre_proveedor${i}`)
-    .on("input", () => {
-      getSuppliersByName(i);
-    });
+  let arrcontainer=$("#div-arrItems")
+  arrcontainer.find(`#btn-open-supplier${i}`).on("click", () => {
+    getSuppliersByName(i);
+
+  })
+  arrcontainer.find(`#btn-open-supplier${i}`).on("focusout", () => {
+    console.log("focusout");
+    setTimeout(() => {
+      $(".supplier-list" + (i)).html("");
+    }, 200);
+  });
+  // $("#div-arrItems")
+  //   .find(`#modal-nombre_proveedor${i}`)
+  //   .on("input", () => {
+  //     getSuppliersByName(i);
+  //   });
   //modal nombre proveedor on focus out
-  $("#div-arrItems")
-    .find(`#modal-nombre_proveedor${i}`)
-    .on("focusout", () => {
-      console.log("focusout");
-      setTimeout(() => {
-        $(".supplier-list" + i).html("");
-      }, 200);
-    });
+  // $("#div-arrItems")
+  //   .find(`#modal-nombre_proveedor${i}`)
+  //   .on("focusout", () => {
+  //     console.log("focusout");
+  //     setTimeout(() => {
+  //       $(".supplier-list" + i).html("");
+  //     }, 200);
+  //   });
   $("#modal-precio" + iCounterItems).trigger("focus");
   if (i >= 2) {
     $(`#modal-nombre_proveedor${i}`).val(
@@ -2686,8 +2701,12 @@ function getItemTemplate(i, mode, detalle, privilegio) {
         <div class="col-12 col-md-6 col-lg-6">
           <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
           <div class="form-group" style="position:relative">
+          <div class="input-group">
             <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
-                <ul class="supplier-list supplier-list${i}" style="position:absolute">
+                              <button type="button" class="btn btn-outline-secondary" id="btn-open-supplier${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-supplier${i}"><i class="fas fa-search"></i></button>
+
+            </div>    
+            <ul class="supplier-list supplier-list${i}" style="position:absolute">
                 </ul>
             </li>
             </ul>
@@ -2754,7 +2773,7 @@ function getItemProveedor(id_detalle) {
       const container = $("#table-elegir_productos_proveedor tbody");
       container.empty();
 
-      for (i = 0; i < detalle.length; i++) {
+      for (let i = 0; i < detalle.length; i++) {
         let item = getItemTemplate(i + 1, "select", detalle, privilegio);
         currentPrivilegio = parseInt(privilegio);
         container.append(item);
@@ -2793,13 +2812,19 @@ function getItemProveedor(id_detalle) {
         container
           .find(`#modal-celular_proveedor${i + 1}`)
           .val(detalle[i]["celular_proveedor"]);
-        container.find(`#modal-nombre_proveedor${i + 1}`).on("input", () => {
-          getSuppliersByName(i);
-        });
+        container.find(`#modal-nombre_proveedor${i + 1}`);
+        console.log(i)
+        container.find(`#btn-open-supplier${i + 1}`).on("click", () => {
+          getSuppliersByName(i+1);
+
+        })
+
+
         //modal nombre proveedor on focus out
-        container.find(`#modal-nombre_proveedor${i + 1}`).on("focusout", () => {
+        container.find(`#btn-open-supplier${i + 1}`).on("focusout", () => {
+          console.log("focusout");
           setTimeout(() => {
-            $(".supplier-list" + i).html("");
+            $(".supplier-list" + (i+1)).html("");
           }, 200);
         });
         container
@@ -3455,11 +3480,16 @@ const deleteVideo = (index, videoIndex) => {
 const getSuppliersByName = (index) => {
   const component = $(`#modal-nombre_proveedor${index}`);
   const list = $(`.supplier-list${index}`);
+  if(list.children().length > 0){
+    list.html("");
+    return;
+  }
+
   const idPedido = $("#txt-EID_Pedido_Cabecera_item").val();
-  console.log(component, list, index);
   const name = component.val();
-  if (name.length < 1) return list.html("");
-  if (findTimeOut) clearTimeout(findTimeOut);
+  // if (name.length < 1) return list.html("");
+  // if (findTimeOut) clearTimeout(findTimeOut);
+  console.log(index);
   findTimeOut = setTimeout(() => {
     $.ajax({
       url: base_url + "AgenteCompra/PedidosGarantizados/getSuppliersByName",
@@ -3481,5 +3511,5 @@ const getSuppliersByName = (index) => {
         });
       },
     });
-  }, 500);
+  }, 100);
 };

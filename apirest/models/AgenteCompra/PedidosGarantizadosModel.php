@@ -1097,8 +1097,8 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
         $query = "SELECT id_supplier,name,phone FROM suppliers s
         join agente_compra_pedido_detalle_producto_proveedor acpdpp on acpdpp.ID_Entidad_Proveedor =s.id_supplier
 
-         WHERE name LIKE '%" . $data['name'] . "%'
-         AND acpdpp.ID_Pedido_Cabecera=" . $data['idPedido'] . "
+         WHERE 
+         acpdpp.ID_Pedido_Cabecera=" . $data['idPedido'] . "
          group by 1";
         return $this->db->query($query)->result();
     }
