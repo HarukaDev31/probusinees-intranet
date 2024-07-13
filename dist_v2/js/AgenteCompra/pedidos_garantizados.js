@@ -4,6 +4,7 @@ var url,
   div_items = "",
   iCounter = 0,
   iCounterItems = 1;
+  currentPrivilegio = 1;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
 // Se puede crear un arreglo a partir de la cadena
@@ -820,13 +821,19 @@ $(function () {
 
   $(document).on("click", "#btn-save_detalle_elegir_proveedor", function (e) {
     e.preventDefault();
-
+    
+    
+    if(currentPrivilegio == 1){
+      $(".div-Listar").hide();
+          $(".div-AgregarEditar").show();
+          $("#div-elegir_item_proveedor").hide();
+      return;
+    }
     $("#btn-save_detalle_elegir_proveedor").text("");
     $("#btn-save_detalle_elegir_proveedor").attr("disabled", true);
     $("#btn-save_detalle_elegir_proveedor").html(
       'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>'
     );
-
     var postData = new FormData($("#form-arrItemsProveedor")[0]);
     url =
       base_url +
@@ -838,7 +845,6 @@ $(function () {
       data: postData,
       processData: false,
       contentType: false,
-      //data		  : $('#form-arrItemsProveedor').serialize(),
       success: function (response) {
         $("#moda-message-content").removeClass(
           "bg-danger bg-warning bg-success"
@@ -2391,7 +2397,148 @@ const removeItemsEdit = (idProveedor, index) => {
     });
 };
 function getItemTemplate(i, mode, detalle, privilegio) {
-  div_items = `
+  if(privilegio == 1){
+    div_items = `
+    <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
+      <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+      <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+      <input type="hidden" id="modal_proveedor-id-${i}" value="${
+    detalle.id_pedido
+  }"/>
+ 
+
+      <div class = "row" >
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-precio${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Moq<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-moq${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Pcs/Caja<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-qty_caja${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Cbm<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-cbm${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-delivery${i}" data-correlativo="${i}"  name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery " placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Shipping Cost<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-costo_delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+         <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Kg / box <span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-kgbox${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][kgbox]" class="arrProducto form-control required kgbox input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Unidad Medida<span class="label-advertencia text-danger"> *</span><span/>
+          <select disabled id="modal-unidad_medida${i}" data-correlativo="${i}" name="addProducto[${i}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
+            <option value="un">Unidades</option>
+            <option value="mt">Metros</option>
+            <option value="pc">Piezas</option>
+            <option value="kg">Kilogramos</option>
+            <option value="pa">Pares</option>
+            <option value="lt">Litros</option>
+            </select>
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-6">
+          <div class="row h-100">
+            <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
+              <!--Upload Icon-->
+              <div class="form-group mx-auto d-flex flex-column " id="container-uploadprimaryimg-${i}">
+              <label class="text-center">Imagen Principal</label>
+             
+              </br>
+              <input disabled type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+                
+              </div>
+            </div>
+            <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+            <div class="form-group" id="container-uploadimg2-${i}">
+            <label>Imagen 2</label>
+            
+            <input disabled type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
+            <input disabled type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+             
+            </div>
+              <div class="form-group" id="container-uploadimg3-${i}">
+              <label>Imagen 3</label>
+               
+              <input disabled type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+               
+              </div>
+              <div class="form-group" id="container-uploadvideo1-${i}">
+              <label>Video 1</label>
+                
+
+              <input disabled type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
+              <div class="form-group"  id="container-uploadvideo2-${i}">
+              <label>Video 2</label>
+              
+              <input disabled type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-6">
+          <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group" style="position:relative">
+            <input disabled type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+                <ul class="supplier-list supplier-list${i}" style="position:absolute">
+                </ul>
+            </li>
+            </ul>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-celular_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
+          <div class="form-group">
+            <textarea disabled id="modal-notas${i}" data-correlativo="${i}" name="addProducto[${i}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
+          </div>
+          
+        </div>
+      </div>
+      `;
+  }else{
+    div_items = `
     <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
@@ -2559,6 +2706,8 @@ function getItemTemplate(i, mode, detalle, privilegio) {
         </div>
       </div>
       `;
+  }
+  
   var id_detalle = detalle[i - 1]["ID_Pedido_Detalle"];
   var id_item = detalle[i - 1]["ID_Pedido_Detalle_Producto_Proveedor"];
   var id_supplier = detalle[i - 1]["id_supplier"];
@@ -2607,7 +2756,7 @@ function getItemProveedor(id_detalle) {
 
       for (i = 0; i < detalle.length; i++) {
         let item = getItemTemplate(i + 1, "select", detalle, privilegio);
-
+        currentPrivilegio = parseInt(privilegio);
         container.append(item);
         container.find(`#modal-precio${i + 1}`).val(detalle[i]["Ss_Precio"]);
         container.find(`#modal-moq${i + 1}`).val(detalle[i]["Qt_Producto_Moq"]);

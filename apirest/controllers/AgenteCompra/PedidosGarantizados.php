@@ -502,7 +502,7 @@ class PedidosGarantizados extends CI_Controller
                 $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $val->Txt_Descripcion);
                 $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $val->Qt_Producto);
                 $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->Qt_Producto_Moq);
-                $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->unidad_medida);
+                $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $this->getUnitName($val->unidad_medida));
                 $objPHPExcel->getActiveSheet()->setCellValue("K" . $initialRow, $val->Ss_Precio);
                 $objPHPExcel->getActiveSheet()->setCellValue("L{$initialRow}", "=K{$initialRow}/U22");
 
@@ -657,7 +657,7 @@ class PedidosGarantizados extends CI_Controller
                 $i++;
             }
             $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto_Moq);
-            $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->unidad_medida);
+            $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $this->getUnitName($val->unidad_medida));
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
 
             $objPHPExcel->getActiveSheet()->setCellValue("K" . $initialRow, "=J" . $initialRow . "/V10");
@@ -665,13 +665,15 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("M" . $initialRow, "=MAX(H{$initialRow},F{$startRow})*K{$initialRow}");
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
             $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, $val->Qt_Cbm);
-            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=P" . $initialRow . "*O" . $initialRow);
+            // $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=P" . $initialRow . "*O" . $initialRow);
 
-            $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, "=N" . $initialRow . "*O" . $initialRow);
-            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, $val->kg_box);
-            $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialRow, $val->Ss_Costo_Delivery);
-            $objPHPExcel->getActiveSheet()->setCellValue("T" . $initialRow, $val->Nu_Dias_Delivery);
-            $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Txt_Nota);
+            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=P" . $initialRow . "*O" . $initialRow);
+            $objPHPExcel->getActiveSheet()->setCellValue("T" . $initialRow, $val->Ss_Costo_Delivery);
+            $objPHPExcel->getActiveSheet()->setCellValue("R" . $initialRow, $val->kg_box);
+            $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialRow,"=O" . $initialRow . "*R" . $initialRow);
+
+            $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
+            $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $val->Txt_Nota);
 
             $initialRow++;
         }
@@ -692,13 +694,37 @@ class PedidosGarantizados extends CI_Controller
             $imageInfo['objDrawing']->setOffsetY($height < $imageInfo['objDrawing']->getHeight() * 1.4 ? 50 : $height * 1.2);
 
         }
-        $objPHPExcel->getActiveSheet()->setCellValue('K' . ($initialRow), "=SUM(K17:K" . ($initialRow - 1) . ")");
+        // $objPHPExcel->getActiveSheet()->setCellValue('K' . ($initialRow), "=SUM(K17:K" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('L' . ($initialRow), "=SUM(L17:L" . ($initialRow - 1) . ")");
-        $objPHPExcel->getActiveSheet()->setCellValue('P' . ($initialRow), "=SUM(P17:P" . ($initialRow - 1) . ")");
-        $objPHPExcel->getActiveSheet()->setCellValue('R' . ($initialRow), "=SUM(R17:R" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('M' . ($initialRow), "=SUM(M17:M" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('Q' . ($initialRow), "=SUM(Q17:Q" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('S' . ($initialRow), "=SUM(S17:S" . ($initialRow - 1) . ")");
+        $objPHPExcel->getActiveSheet()->setCellValue('T' . ($initialRow), "=SUM(T17:T" . ($initialRow - 1) . ")");
+
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        $objPHPExcel->getActiveSheet()->getStyle('U17:U' . $initialRow)->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getStyle('V17:V' . $initialRow)->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getStyle("Q" . $initialRow)->getNumberFormat()->setFormatCode('0.00');
+        //APPLY ALL BORDERS TO COLUMN P and R
+        $objPHPExcel->getActiveSheet()->getStyle('P17:P' . ($initialRow - 1))->applyFromArray(
+            array(
+                'borders' => array(
+                    'bottom' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+            )
+        );
+        $objPHPExcel->getActiveSheet()->getStyle('R17:R' . ($initialRow - 1))->applyFromArray(
+            array(
+                'borders' => array(
+                    'bottom' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+            )
+        );
+        $objPHPExcel->getActiveSheet()->getStyle("R" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
+        $objPHPExcel->getActiveSheet()->getStyle("S" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
 
         $objWriter->save('php://output');
         foreach ($tempUrl as $val) {
