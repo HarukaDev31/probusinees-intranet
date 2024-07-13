@@ -15,7 +15,7 @@
         //array_debug($arrResponsePedidoSinAsignar);
         // echo $countCotizacionPedidosPendientes;
         // print_r($this->user);
-        if(1==1) {
+        if(strtoupper($this->user->No_Grupo)=="COTIZADOR" || $this->user->No_Grupo=="GERENCIA") {
            ?>
            <div class="col-lg-12 col-12">
             <h1 class="mb-3">Carga Consolidada</h1>
