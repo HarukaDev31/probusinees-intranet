@@ -23,13 +23,14 @@ class InicioController extends CI_Controller {
 		if(isset($this->session->userdata['usuario'])) {
 			//captar las ordenes que están sin asignar
 			$arrResponsePedidoSinAsignar = $this->ConfiguracionModel->obtenerPedidosSinAsignar();
-
+			$arrResponseCotizacionPedidoSinAsignar = $this->ConfiguracionModel->obtenerCotizacionesPedidosSinAsignar();
 			//captar las ordenes que solo le pertence a ese usuario
 			$arrResponsePedidoXUsuario = $this->ConfiguracionModel->obtenerPedidosXUsuario();
 			$this->load->view('header_v2', array("js_inicio" => true));
 			$this->load->view('Inicio/InicioView',array(
 				'arrResponsePedidoXUsuario' => $arrResponsePedidoXUsuario,
-				'arrResponsePedidoSinAsignar' => $arrResponsePedidoSinAsignar
+				'arrResponsePedidoSinAsignar' => $arrResponsePedidoSinAsignar,
+				'countCotizacionPedidosPendientes' => $arrResponseCotizacionPedidoSinAsignar->count	
 			));
 			$this->load->view('footer_v2', array("js_inicio" => true));
 		} else {

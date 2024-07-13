@@ -13,24 +13,17 @@
         //echo $this->user->ID_Usuario . "<br>";
         //echo $this->user->Nu_Tipo_Privilegio_Acceso;
         //array_debug($arrResponsePedidoSinAsignar);
-
-        if($this->user->Nu_Tipo_Privilegio_Acceso!=2) {
-          if($arrResponsePedidoSinAsignar['status']=='success'){ ?>
-            <?php
-            $iCantidadCotizacion = 0;
-            $iCantidadOCSinAsignar = 0;
-            //->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
-            //->where_in($this->table . '.Nu_Estado', array(5,6,7,9));//pagados / oc
-            foreach ($arrResponsePedidoSinAsignar['result'] as $row) {
-              $iCantidadCotizacion += ($row->Nu_Estado_Pedido == 1 ? 1 : 0);
-              $iCantidadOCSinAsignar += ($row->Nu_Estado_Pedido == 3 && $row->ID_Usuario_Interno_China == 0 ? 1 : 0);
-            ?>
-            <?php } ?>
-            <?php if($this->user->Nu_Tipo_Privilegio_Acceso==1) { ?>
+        // echo $countCotizacionPedidosPendientes;
+        // print_r($this->user);
+        if(strtoupper($this->user->No_Grupo)=="COTIZADOR" || $this->user->No_Grupo=="GERENCIA") {
+           ?>
+           <div class="col-lg-12 col-12">
+            <h1 class="mb-3">Carga Consolidada</h1>
+          </div>
             <div class="col-lg-3 col-6">
               <div class="small-box bg-warning">
                 <div class="inner">
-                  <h3><?php echo $iCantidadCotizacion; ?></h3>
+                  <h3><?php echo $countCotizacionPedidosPendientes; ?></h3>
                   <p>Cotizaciones Pendientes </p>
                 </div>
                 <div class="icon">
@@ -38,9 +31,8 @@
                 </div>
               </div>
             </div>
-            <?php } ?>
           <?php 
-          }
+          
         }
         ?>
 

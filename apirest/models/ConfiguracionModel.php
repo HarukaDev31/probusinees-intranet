@@ -709,7 +709,11 @@ Nu_Orden_Slider;";
             'query' => $query,
         );
     }
-
+    public function obtenerCotizacionesPedidosSinAsignar(){
+        $query="select count(*) as count from carga_consolidada_cotizaciones_cabecera cccc  where cccc.Cotizacion_Status_ID =1 and cccc.updated_at is  null;
+        ";
+        return $this->db->query($query)->row();
+    }
     public function obtenerPedidosXUsuario()
     {
         //->where_in($this->table . '.Nu_Estado', array(2,3,4,8));//garantizados
