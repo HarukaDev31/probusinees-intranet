@@ -2309,7 +2309,7 @@ function addItems() {
   $("#div-arrItems").append(div_items);
   let arrcontainer=$("#div-arrItems")
   arrcontainer.find(`#btn-open-supplier${i}`).on("click", () => {
-    getSuppliersByName(i);
+    getSuppliersByName(i,$("#div-arrItems"));
 
   })
   arrcontainer.find(`#btn-open-supplier${i}`).on("focusout", () => {
@@ -2815,7 +2815,7 @@ function getItemProveedor(id_detalle) {
         container.find(`#modal-nombre_proveedor${i + 1}`);
         console.log(i)
         container.find(`#btn-open-supplier${i + 1}`).on("click", () => {
-          getSuppliersByName(i+1);
+          getSuppliersByName(i+1,$("#div-arrItemsProveedor"));
 
         })
 
@@ -3477,9 +3477,21 @@ const deleteVideo = (index, videoIndex) => {
   console.log($(`video${videoIndex}-${index}`));
   $(`#video${videoIndex}-${index}`).remove();
 };
-const getSuppliersByName = (index) => {
-  const component = $(`#modal-nombre_proveedor${index}`);
-  const list = $(`.supplier-list${index}`);
+let isSelectingOption = false;
+
+const getSuppliersByName = (index,container) => {
+  
+  const component = container.find(`#modal-nombre_proveedor${index}`);
+  const list = container.find(`.supplier-list${index}`);
+  const btnOpenSupplier = container.find(`#btn-open-supplier${index}`);
+  console.log(btnOpenSupplier, index,component,list,container);
+  btnOpenSupplier.off('focusout').on('focusout', () => {
+    setTimeout(() => {
+      if (!isSelectingOption) {
+        list.html("");
+      }
+    }, 150); // Ajusta el tiempo si es necesario
+  });
   if(list.children().length > 0){
     list.html("");
     return;
@@ -3487,6 +3499,7 @@ const getSuppliersByName = (index) => {
 
   const idPedido = $("#txt-EID_Pedido_Cabecera_item").val();
   const name = component.val();
+  
   // if (name.length < 1) return list.html("");
   // if (findTimeOut) clearTimeout(findTimeOut);
   console.log(index);
@@ -3503,10 +3516,13 @@ const getSuppliersByName = (index) => {
           list.append(
             `<option value="${supplier.name}" id="option-${index}-${i}">${supplier.name}</option>`
           );
-          $(`#option-${index}-${i}`).click(() => {
+          $(`#option-${index}-${i}`).on('mousedown', () => {
+            isSelectingOption = true;
+          }).on('click', () => {
             component.val(supplier.name);
             $(`#modal-celular_proveedor${index}`).val(supplier.phone);
             list.html("");
+            isSelectingOption = false;
           });
         });
       },
