@@ -293,7 +293,7 @@ class CCotizaciones extends CI_Controller
                     $total = 0;
                     $cantidad = 0;
                     foreach ($value as $item) {
-                        $total = $item['total'];
+                        $total += $item['total'];
                         $cantidad += $item['qty'];
                         $itemsHtml .= '<tr>
                         <td colspan="1">' . $item['index'] . '</td>
