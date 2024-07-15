@@ -627,7 +627,7 @@ $(function () {
         "/" +
         correlativo +
         "/" +
-        encodeURIComponent(name_item) +
+        1+
         "/" +
         pedidoID +
         "/" +

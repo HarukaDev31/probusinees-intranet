@@ -8150,6 +8150,10 @@ const escapeHtml = (unsafe) => {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 };
+const  htmlDecode=(input)=> {
+  const doc = new DOMParser().parseFromString(input, 'text/html');
+  return doc.documentElement.textContent;
+}
 const getProductsTemplateHeader = () => {
   let templateHeader = ``;
 
