@@ -8092,6 +8092,9 @@ const openOrdenCompra = (response) => {
     // $(".orden-compra_header").show();
     // $(".orden-compra_header_china").append(getProductsTemplateHeader());
     data.forEach((producto, index) => {
+      //escape special chars product.Txt_Descripcion
+      producto.Txt_Descripcion = escapeHtml(producto.Txt_Descripcion);
+      
       containerOrdenCompra.append(getProductTemplate(producto, index));
       if (producto.caja_master_URL) {
         $(`#btn-rotulado-${index}`)
