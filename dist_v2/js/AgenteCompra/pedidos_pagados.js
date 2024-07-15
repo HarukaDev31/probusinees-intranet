@@ -7710,10 +7710,80 @@ const returnToCoordination = () => {
   container.hide();
   containerCoordination.show();
 };
+const getPagosTemplate = (data = null) => {
+  let html = `
+        <div class="first-column col-12 col-md-6">
+                    <div class="pago row" id="pago-garantia-container">
+                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+                        <label>PAGO GARANTIA</label>
+
+                        <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL" />
+                      </div>
+                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-garantia-div">
+                        <input type="file" name="pago-garantia" id="pago-garantia" class="" />
+                        <input type="number" name="pago-garantia-value" id="pago-garantia-value" class="form-control" />
+                      </div>
+                    </div>
+                    <div class="pago row" id="pago-1-container">
+                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+                        <label>PAGO 1:</label>
+                        <input type="hidden" name="pago-1_URL" id="pago-1_URL" />
+                      </div>
+                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-1-div">
+                        <input type="file" name="pago-1" id="pago-1" class="" />
+                        <input type="number" name="pago-1-value" id="pago-1-value" class="form-control" />
+                      </div>
+                    </div>
+                    <div class="pago row" id="pago-2-container">
+                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+                        <label>PAGO 2:</label>
+                        <input type="hidden" name="pago-2_URL" id="pago-2_URL" >
+
+                      </div>
+                      <div class="col-12 col-md-10 d-flex flex-row align-items-center " id="pago-2-div">
+                        <input type="file" name="pago-2" id="pago-2" class="" />
+                        <input type="number" name="pago-2-value" id="pago-2-value" class="form-control"/ />
+                      </div>
+                    </div>
+                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-3-div">
+                      <div class="conditional-field">
+                        <label>PAGO 3:</label>
+                        <label class="switch">
+                          <input type="checkbox" id="pago3_URL_switch">
+                          <span class="slider"></span>
+                        </label>
+                        </div>
+                      </div>
+                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-4-div">
+                      <div class="conditional-field">
+                        <label>PAGO 4:</label>
+                        <label class="switch">
+                          <input type="checkbox" id="pago4_URL_switch">
+                          <span class="slider"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="form-group" id="liquidacion-container">
+                      <label>LIQUIDACION:</label>
+                      <input type="hidden" name="liquidacion_URL" id="liquidacion_URL" />
+                      <input type="file" name="liquidacion" id="liquidacion" />
+                    </div>
+                    <div class="form-group">
+                      <label>NOTAS:</label>
+                      <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
+                    </div>
+                  </div> 
+  `;
+  return html;
+};
 const openPagos = (response) => {
   $("#container_orden-compra").hide();
+  $("#pago-garantia-container").hide();
   response = JSON.parse(response);
   containerPagos.show();
+  $("#pagos-form").append(getPagosTemplate());
   if (response.status == "success") {
     const data = response.data;
     $("#orden_total").html("$" + data.orden_total);
@@ -7722,6 +7792,14 @@ const openPagos = (response) => {
       const pagosData = response.pagosData;
       const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
       let indexPagos = 1;
+      $("#pago-1-value").val(0);
+      $("#pago-1_ID").remove();
+      $("#pago-1-btnlink").remove();
+      // $('#pago-1-div').append('<input type="file" name="pago-1" id="pago-1" class="">');
+      $("#pago-2-value").val(0);
+      $("#pago-2-btnlink").remove();
+      $("#pago-2_ID").remove();
+      // $('#pago-2-div').append('<input type="file" name="pago-2" id="pago-2" class="">');
       pagosData.forEach((pago, i) => {
         if (pago.name == "garantia") {
           $("#pago-garantia").hide();
@@ -7733,20 +7811,29 @@ const openPagos = (response) => {
           $("#pago-garantia-div").append(`
             <a href="${pago.file_url}" id="pago-garantia-btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Garantia</a>`);
           $("#pago-garantia-value").val(pago.value);
-        } else if (pago.name == "normal") {
-          $(`#pago-${indexPagos}_URL`).val(pago.file_url);
-          $(`#pago-${indexPagos}`).hide();
-          $(`#pago-${indexPagos}_ID`).remove();
-          $(`#pago-${indexPagos}-container`).append(
-            `<input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`
-          );
           $(`#pago-${indexPagos}-btnlink`).remove();
+
           $(`#pago-${indexPagos}-div`).append(`
             <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+        } else if (pago.name == "normal") {
+          $(`#pago-${indexPagos}`).show();
+          if (pago.file_url != null && indexPagos <= 2) {
+            $(`#pago-${indexPagos}_URL`).val(pago.file_url);
+            $(`#pago-${indexPagos}`).hide();
+            $(`#pago-${indexPagos}-div`).append(
+              `<input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`
+            );
+            $(`#pago-${indexPagos}-div`).append(`
+              <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+               $(`#pago-${indexPagos}-div`).append(`
+            <input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`);
+            }
+         
+
           if (indexPagos > 2) {
             if (!$(`#pago-${indexPagos}-div`)) {
               $(`#pago-${indexPagos}-div`).append(
-                `<input type="number" name="pago-${indexPagos}-value" id="pago-${indexPagos}-value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
+                `<input type="number" name="pago-${indexPagos}-value" id="pago-${indexPagos}-value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
               );
             }
           }
@@ -7769,38 +7856,77 @@ const openPagos = (response) => {
       const pago3Div = $(`#pago-3-div`);
       const pago_switch_4 = $(`#pago4_URL_switch`);
       const pago4Div = $(`#pago-4-div`);
+      console.log(indexPagos);
       if (indexPagos > 3) {
-        pago_switch_3.prop("checked", false);
+        pago_switch_3.prop("checked", true);
         if (pagosData[2].file_url != null) {
-          pago_switch_3.prop("checked", true);
           //append input hide with pago_ID
           if ($("#pago-3_ID").length == 0) {
             pago3Div.append(
               `<input type="hidden" name="pago-3_ID" id="pago-3_ID" value="${pagosData[2].idPayment}">`
             );
-            if ($("#pago-3_value").length == 0) {
-              pago3Div.append(
-                `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
-              );
-            }
+          }
+          if ($("#pago-3_value").length == 0) {
+            pago3Div.append(
+              `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
+            );
+          }
+          if ($(`#pago-3-btnlink`).length == 0) {
+            $(`#pago-3-div`).append(`
+                <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+          }
+          if($("#pago-3_URL").length == 0){
+            $(`#pago-3-div`).append(`
+            <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
           }
         } else {
-          pago_switch_3.prop("checked", false);
-          $("pago3-file").remove();
+          if ($("#pago3-file").length == 0) {
+            pago3Div.append(
+              '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
+            );
+          }
+          if ($("#pago-3_value").length == 0) {
+            pago3Div.append(
+              `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
+            );
+          }
         }
+      } else {
+        pago_switch_3.prop("checked", false);
+        $("pago3-file").remove();
+        $("#pago-3-btnlink").remove();
       }
       pago_switch_3.change(function () {
         if ($(this).is(":checked")) {
           if (indexPagos > 3) {
             if (pagosData[2].file_url) {
-              if ($("#pago-3-btnlink").length == 0) {
+              // if ($("#pago-3-btnlink").length == 0) {
+              //   pago3Div.append(
+              //     `<a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-3_URL">Ver Pago</a>`
+              //   );
+              // }
+              if ($("#pago-3_value").length == 0) {
                 pago3Div.append(
-                  `<a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-3_URL">Ver Pago</a>`
+                  `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
+                );
+              }
+              if ($(`#pago-3-btnlink`).length == 0) {
+                $(`#pago-3-div`).append(`
+                  <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+              }
+              if($("#pago-3_URL").length == 0){
+                $(`#pago-3-div`).append(`
+                <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
+              }
+            } else {
+              if ($("#pago3-file").length == 0) {
+                pago3Div.append(
+                  '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
                 );
               }
               if ($("#pago-3_value").length == 0) {
                 pago3Div.append(
-                  `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
+                  `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`  
                 );
               }
             }
@@ -7812,14 +7938,19 @@ const openPagos = (response) => {
             }
             if ($("#pago-3_value").length == 0) {
               pago3Div.append(
-                `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
+                `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
               );
+            }
+            if ($(`#pago-3-btnlink`).length == 0) {
+              $(`#pago-3-div`).append(`
+                <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
             }
           }
         } else {
           pago3Div.find("#pago-3-btnlink").remove();
           pago3Div.find("#pago3-file").remove();
           pago3Div.find("#pago-3_value").remove();
+          pago3Div.find(`#pago-3-btnlink`).remove();
         }
       });
       ///append an a tag with the link to the file
@@ -7830,18 +7961,30 @@ const openPagos = (response) => {
         if (pagosData[3].file_url != null) {
           pago_switch_4.prop("checked", true);
           if ($("#pago-4_ID").length == 0) {
-            pago3Div.append(
+            pago4Div.append(
               `<input type="hidden" name="pago-4_ID" id="pago-4_ID" value="${pagosData[3].idPayment}">`
             );
-            if ($("#pago-4_value").length == 0) {
-              pago3Div.append(
-                `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control" placeholder="Valor" value="${pagosData[3].value}" autocomplete="off" />`
-              );
-            }
+            
+            
+          }
+          if ($("#pago-4_value").length == 0) {
+            pago4Div.append(
+              `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="${pagosData[3].value}" autocomplete="off" />`
+            );
+          }
+          if ($(`#pago-4-btnlink`).length == 0) {
+            $(`#pago-4-div`).append(`
+              <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+          }
+          if($("#pago-4_URL").length == 0){
+            $(`#pago-4-div`).append(`
+            <input type="hidden" name="pago-4_URL" id="pago-4_URL" value="${pagosData[2].file_url}">`);
           }
         } else {
           pago_switch_4.prop("checked", false);
           $("pago4-file").remove();
+          $("#pago-4-btnlink").remove();
+          
         }
       }
       pago_switch_4.change(function () {
@@ -7849,11 +7992,17 @@ const openPagos = (response) => {
           if (indexPagos > 4) {
             if (pagosData[3].file_url) {
               pago4Div.append(
-                `<a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-4_URL">Ver Pago</a>`
+                `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" 
+                value="${pagosData[3].value}"/>`
               );
               pago4Div.append(
-                `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
+                `<a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-4_URL">Ver Pago</a>`
               );
+              
+              if ($(`#pago-4-btnlink`).length == 0 && indexPagos>4) {
+                $(`#pago-4-div`).append(`
+                  <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+              }
             }
           } else {
             console.log("append", pago4Div);
@@ -7865,14 +8014,19 @@ const openPagos = (response) => {
             //append input type number
             if ($("#pago-4_value").length == 0) {
               pago4Div.append(
-                `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control" placeholder="Valor" value="" autocomplete="off" />`
+                `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
               );
+            }
+            if ($(`#pago-4-btnlink`).length == 0 && indexPagos>4) {
+              $(`#pago-4-div`).append(`
+                <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
             }
           }
         } else {
           pago4Div.find("#pago-4-btnlink").remove();
           pago4Div.find("#pago4-file").remove();
           pago4Div.find("#pago-4_value").remove();
+          pago4Div.find(`#pago-4-btnlink`).remove();
         }
       });
       //append a with
@@ -7886,13 +8040,18 @@ const openPagos = (response) => {
         },
         btnCancel: {
           text: "Regresar",
-          action: "hidePagos()",
+          action: "hidePagos2()",
         },
       };
       const buttonsHTML = getActionButtons(buttonsConfig);
       $("#pagos-buttons").append(buttonsHTML);
     }
   }
+};
+const hidePagos2 = () => {
+  hidePagos();
+
+  $("#container-listar").show();
 };
 const savePagos = () => {
   const form = $("#pagos-form");
@@ -8059,7 +8218,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
     data: { ID_Detalle: producto.ID_Pedido_Detalle },
     success: function (response) {
       response = JSON.parse(response);
-      const item=response.data;
+      const item = response.data;
       const stringItem = JSON.stringify(item);
       containerOrdenCompra.hide();
       containerRotulado.append(getContainerRotuladoView(item));
@@ -8095,7 +8254,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
       switchEmpaque.on("change", function () {
         const isChecked = $(this).prop("checked");
         const empaqueDiv = $("#empaque_container");
-    
+
         if (isChecked) {
           $("#input-empaque").remove();
           empaqueDiv.append(`
@@ -8134,7 +8293,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
       switchVim.on("change", function () {
         const isChecked = $(this).prop("checked");
         const vimDiv = $("#vim_motor_container");
-    
+
         if (isChecked) {
           $("#input-vim_motor").remove();
           vimDiv.append(`
@@ -8170,15 +8329,10 @@ const openRotuladoView = (producto, btsconfig = null) => {
         containerRotulado.find(".switch").hide();
       }
       containerRotulado.show();
-    }
+    },
   });
 
   //if currentprivilege is !=1
-
-  
-  
-
- 
 };
 const saveRotuladoProducto = (producto) => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveRotuladoProducto";
@@ -8201,7 +8355,7 @@ const saveRotuladoProducto = (producto) => {
       const { status, data } = JSON.parse(response);
       if (status == "success") {
         hideRotuladoView();
-        openStepFunction(1,selectedStep);
+        openStepFunction(1, selectedStep);
       } else {
         alert(message);
       }
@@ -8219,9 +8373,7 @@ const getContainerRotuladoView = (producto) => {
           <label>CAJA MASTER:</label>
           <input name="caja_master_URL" 
           id="caja_master-url"
-          type="hidden" value="${
-            producto.caja_master_URL
-          }">
+          type="hidden" value="${producto.caja_master_URL}">
           <div class="d-flex flex-row w-100">
           ${
             producto.caja_master_URL
@@ -8229,7 +8381,9 @@ const getContainerRotuladoView = (producto) => {
               : '<input type="file" name="caja_master" class="">'
           }
           ${
-            producto.caja_master_URL?"<div class='btn btn-outline-danger ml-2' id='delete-caja_master' onclick='setRotuladoInputToNull(\"caja_master\")'>X</div>":""
+            producto.caja_master_URL
+              ? "<div class='btn btn-outline-danger ml-2' id='delete-caja_master' onclick='setRotuladoInputToNull(\"caja_master\")'>X</div>"
+              : ""
           }
           </div>
         </div>
@@ -8322,9 +8476,11 @@ const hidePagos = () => {
   containerPagos.hide();
   $(".step-container").remove();
   $(".step-container-completed").remove();
-
+  $("#pagos-form").empty();
   $("#pagos-buttons").empty();
   $("#pago-garantia-btnlink").remove();
+  $("#container-ver").hide();
+
   containerVer.show();
 };
 const saveOrdenCompra = () => {
@@ -8355,9 +8511,11 @@ const saveOrdenCompra = () => {
 const setRotuladoInputToNull = (idComponent) => {
   $(`#${idComponent}-url`).val("");
   $(`#input-${idComponent}`).remove();
-  $(`#${idComponent}_container`).append(`<input type="file" name="${idComponent}"  class="" id="input-${idComponent}">`);
+  $(`#${idComponent}_container`).append(
+    `<input type="file" name="${idComponent}"  class="" id="input-${idComponent}">`
+  );
   $(`#delete-${idComponent}`).remove();
-}
+};
 
 const setInputFileToNull = (file, id) => {
   const inputURL = `input-${file}-url-${id}`;

@@ -2315,12 +2315,15 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         foreach ($data as $key => $value) {
             if ($key == "pago-garantia") {
                 continue;
-            } else if (strpos($key, "pago-") !== false && strpos($key, "_ID") === false && $value != "null" &&
-                strpos($key, "_URL") === false && strpos($key, "_ID") === false) {
+            } else if ($key=="pago-1-value"|| 
+            $key=="pago-2-value"||
+            $key=="pago-3-value"||
+            $key=="pago-4-value"
+            ) {
                 $file = $files['pago-' . substr($key, 5, 1)];
                 $num = substr($key, 5, 1);
                 $fileURL = $this->uploadSingleFile($file, $pathPagos);
-                $pagosURLS["pago-" . $num . '_URL'] = $fileURL ?? $data["pago-" . $num . "_URL"];
+                $pagosURLS["pago-".$num . '_URL'] = $fileURL ?? $data["pago-". $num  . "_URL"];
 
             }
         }
@@ -2339,7 +2342,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         } else if ($data['pago-garantia_URL']) {
             $pagosURLS['pago-garantia_URL'] = $data['pago-garantia_URL'];
         }
-
         // Insert or update records in the database
         $index = 1;
         foreach ($pagosURLS as $key => $value) {
@@ -2371,10 +2373,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
         }
         $total = $this->getPedidoPagos($data['idPedido'])['data'];
-        if ($total->orden_total >= $total->pago_cliente) {
+        if (floatval($total['orden_total']) <= floatval($total['pago_cliente'])) {
             $this->updateStep($data['step'], "COMPLETED");
+        }else{
+            $this->updateStep($data['step'], "PENDING");
         }
-        return $total;
         return ['status' => 'success', 'message' => "Pagos guardados"];
     }
     public function updateStep($idStep, $status)
@@ -2385,7 +2388,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert)
     {
-        if (!$dataToInsert['file_url'] && $idPayment == -1) {
+        if($dataToInsert['file_url']==''|| $dataToInsert['file_url']=="null"){
+            $dataToInsert['file_url']=null;
+          
+        }
+        if ((!$dataToInsert['file_url'] || $dataToInsert['file_url']==null)  && $idPayment != -1) {
             //delete record if file_url is null where id=idPayment
             $this->db->where('id', $idPayment);
             $this->db->delete('payments_agente_compra_pedido');
@@ -2401,7 +2408,13 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id', $result->id);
             $this->db->update('payments_agente_compra_pedido', $dataToInsert);
         } else {
-            // Insert new record if not found
+            if($dataToInsert['file_url']==''|| $dataToInsert['file_url']=="null"){
+                $dataToInsert['file_url']=null;
+              
+            }
+            if($dataToInsert['value']==0 && $dataToInsert['file_url']==null){
+                return;
+                }
             $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
         }
     }

@@ -389,7 +389,7 @@
               <div class="row separator-line"></div>
               <div class="w-100 row" id="pagos-body">
                 <form class="row w-100" id="pagos-form">
-                  <div class="first-column col-12 col-md-6">
+                  <!-- <div class="first-column col-12 col-md-6">
                     <div class="pago row" id="pago-garantia-container">
                       <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
                         <label>PAGO GARANTIA</label>
@@ -451,7 +451,7 @@
                       <label>NOTAS:</label>
                       <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
                     </div>
-                  </div>
+                  </div> -->
 
                 </form>
 

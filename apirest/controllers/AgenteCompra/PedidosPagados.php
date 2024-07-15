@@ -1841,12 +1841,24 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->unidad_medida);
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
-            $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, "=Q" . $initialRow . "/O" . $initialRow);
-            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, $val->Qt_Cbm);
+            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=P" . $initialRow . "*O" . $initialRow);
+            $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, $val->Qt_Cbm);
             $objPHPExcel->getActiveSheet()->setCellValue("R" . $initialRow, $val->kg_box);
             $objPHPExcel->getActiveSheet()->setCellValue("T" . $initialRow, $val->Ss_Costo_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $val->Txt_Nota);
+            $objPHPExcel->getActiveSheet()->getStyle("R" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
+            $objPHPExcel->getActiveSheet()->getStyle("S" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
+            //apply all borders to column n and p   
+            $objPHPExcel->getActiveSheet()->getStyle('N' . $initialRow . ':P' . $initialRow)->applyFromArray(
+                array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                )
+            );
             $initialRow++;
         }
         if ($initialRow <= $lastProductrow) {
