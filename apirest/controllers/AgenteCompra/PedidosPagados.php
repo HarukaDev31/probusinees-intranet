@@ -1888,10 +1888,12 @@ class PedidosPagados extends CI_Controller
             $idPrivilegio = $this->user->Nu_Tipo_Privilegio_Acceso;
 
             $dbResponse = $this->PedidosPagadosModel->getOrderProgress($idPedido, $idPrivilegio);
+            $consolidadoCode = $this->PedidosPagadosModel->getConsolidadoCode($idPedido);
             //RETURN JSON RESPONSE
             echo json_encode(array(
                 "status" => "success",
                 "data" => $dbResponse,
+                "consolidadoCode" => $consolidadoCode,
             ));
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));

@@ -337,7 +337,7 @@
               ?>
                 <div class="" id="cotizacionOrdenContainer">
                   <span>Consolidado:#</span>
-                  <input class="ml-1" style="width: 100px" id="consolidadoOrden" type="number" class="form-control" value="0" />
+                  <input class="ml-1" style="width: 100px" id="consolidadoOrden" type="text" class="form-control" value="0" />
                 </div>
                 <?php
                 }

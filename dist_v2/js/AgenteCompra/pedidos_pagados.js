@@ -6901,6 +6901,8 @@ const getOrderProgress = (id, idServicio = null) => {
       if (response.status == "success") {
         //get data
         const data = response.data;
+        const consolidadoOrden = $("#consolidadoOrden");
+        consolidadoOrden.val(response.consolidadoCode);
         containerListar.hide();
         containerVer.show();
         loading.hide();
@@ -8050,7 +8052,7 @@ const openPagos = (response) => {
 };
 const hidePagos2 = () => {
   hidePagos();
-
+  $("#container-ver").hide();
   $("#container-listar").show();
 };
 const savePagos = () => {

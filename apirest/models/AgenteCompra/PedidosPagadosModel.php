@@ -2821,5 +2821,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->where('ID_Pedido_Detalle', $idDetalle);
         return $this->db->get()->row();
 
+    }public function getConsolidadoCode($idPedido)
+    {
+        $this->db->select('ordenCotizacion');
+        $this->db->from('agente_compra_pedido_cabecera');
+        $this->db->where('ID_Pedido_Cabecera', $idPedido);
+        return $this->db->get()->row()->ordenCotizacion;
     }
 }
