@@ -7923,9 +7923,13 @@ const openOrdenCompra = (response) => {
   const { status, data, priviligie, pedidoData } = JSON.parse(response);
 
   if (status == "success") {
-    currentPrivilege = parseInt(priviligie);
+    //remove all the elements from the container with class row producto and row button
+    $(".row.producto").remove();
+    $(".row.buttons").remove();
     $(".orden-compra_header").show();
-    $(".orden-compra_header_china").append(getProductsTemplateHeader());
+    currentPrivilege = parseInt(priviligie);
+    // $(".orden-compra_header").show();
+    // $(".orden-compra_header_china").append(getProductsTemplateHeader());
     data.forEach((producto, index) => {
       containerOrdenCompra.append(getProductTemplate(producto, index));
       if (producto.caja_master_URL) {
@@ -8049,108 +8053,132 @@ const getProductTemplate = (producto, index) => {
   return template;
 };
 const openRotuladoView = (producto, btsconfig = null) => {
-  sectionTitle.html("Rotulado");
-  containerOrdenCompra.hide();
-  if (!productoSelected) {
-    productoSelected = producto;
-  }
-  containerRotulado.append(getContainerRotuladoView(productoSelected));
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/openRotuladoView",
+    type: "POST",
+    data: { ID_Detalle: producto.ID_Pedido_Detalle },
+    success: function (response) {
+      response = JSON.parse(response);
+      const item=response.data;
+      const stringItem = JSON.stringify(item);
+      containerOrdenCompra.hide();
+      containerRotulado.append(getContainerRotuladoView(item));
+      let buttonsData = {
+        btnSave: {
+          text: "Guardar",
+          action: `saveRotuladoProducto(${stringItem})`,
+        },
+        btnCancel: {
+          text: "Cancelar",
+          action: "hideRotuladoView() ",
+        },
+      };
+      if (btsconfig) {
+        buttonsData = btsconfig;
+      }
+      const btnSection = $("#btns-section");
+      btnSection.append(getActionButtons(buttonsData));
+      const switchEmpaque = $("#empaque_URL_switch");
+      if (item.empaque_URL) {
+        switchEmpaque.prop("checked", true);
+        const empaqueDiv = $("#empaque_container");
+        empaqueDiv.append(`
+          <div id="empaque_input-container">
+            <input name="empaque_URL" type="hidden" value="${item.empaque_URL}">
+            <div class="d-flex flex-row w-100">
+              <a id="input-empaque" href="${item.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>
+              <button class="btn btn-outline-danger ml-2" id="delete-empaque"onclick="setRotuladoInputToNull('empaque')">X</button>
+            </div>
+          </div>
+        `);
+      }
+      switchEmpaque.on("change", function () {
+        const isChecked = $(this).prop("checked");
+        const empaqueDiv = $("#empaque_container");
+    
+        if (isChecked) {
+          $("#input-empaque").remove();
+          empaqueDiv.append(`
+            <div id="empaque_input-container">
+              <input name="empaque_URL" type="hidden" value="${
+                item.empaque_URL
+              }">
+              <div class="d-flex flex-row w-100">
+              ${
+                item.empaque_URL
+                  ? `<a id="input-empaque" href="${item.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
+                  : `<input id="input-empaque" type="file" name="empaque" class="">`
+              }
+              <button class="btn btn-outline-danger ml-2" id="delete-empaque"onclick="setRotuladoInputToNull('empaque')">X</button>
+              </div>
+            </div>
+          `);
+        } else {
+          empaqueDiv.find("#empaque_input-container").remove();
+        }
+      });
+      const switchVim = $("#vim_motor_URL_switch");
+      if (item.vim_motor_URL) {
+        switchVim.prop("checked", true);
+        const vimDiv = $("#vim_motor_container");
+        vimDiv.append(`
+          <div id="vim_motor_input-container">
+            <input name="vim_motor_URL" type="hidden" value="${item.vim_motor_URL}">
+            <div class="d-flex flex-row w-100">
+              <a id="input-vim_motor" href="${item.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>
+              <button class="btn btn-outline-danger ml-2" id="delete-vim_motor"onclick="setRotuladoInputToNull('vim_motor')">X</button>
+            </div>
+          </div>
+        `);
+      }
+      switchVim.on("change", function () {
+        const isChecked = $(this).prop("checked");
+        const vimDiv = $("#vim_motor_container");
+    
+        if (isChecked) {
+          $("#input-vim_motor").remove();
+          vimDiv.append(`
+            <div id="vim_motor_input-container">
+              <input name="vim_motor_URL" type="hidden" value="${
+                item.vim_motor_URL
+              }">
+              <div class="d-flex flex-row w-100">
+              ${
+                item.vim_motor_URL
+                  ? `<a id="input-vim_motor" href="${item.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
+                  : `<input type="file" name="vim_motor" class="">`
+              }
+              <button class="btn btn-outline-danger ml-2" id="delete-vim_motor"onclick="setRotuladoInputToNull('vim_motor')">X</button>
+              </div>
+            </div>
+          `);
+        } else {
+          vimDiv.find("#vim_motor_input-container").remove();
+        }
+      });
+      if (currentPrivilege != 1) {
+        //if empaque_input-container not exists hide empaque-container
+        if (!$("#empaque_input-container").length) {
+          $("#empaque_container").hide();
+        }
+        //if vim_motor_input-container not exists hide vim_motor_container
+        if (!$("#vim_motor_input-container").length) {
+          $("#vim_motor_container").hide();
+        }
+        //find button save in rotulado view and hide it
+        containerRotulado.find(".button-save").hide();
+        containerRotulado.find(".switch").hide();
+      }
+      containerRotulado.show();
+    }
+  });
+
   //if currentprivilege is !=1
 
-  let buttonsData = {
-    btnSave: {
-      text: "Guardar",
-      action: `saveRotuladoProducto(${JSON.stringify(productoSelected)})`,
-    },
-    btnCancel: {
-      text: "Cancelar",
-      action: "hideRotuladoView() ",
-    },
-  };
-  if (btsconfig) {
-    buttonsData = btsconfig;
-  }
+  
+  
 
-  const btnSection = $("#btns-section");
-  btnSection.append(getActionButtons(buttonsData));
-  const switchEmpaque = $("#empaque_URL_switch");
-  if (productoSelected.empaque_URL) {
-    switchEmpaque.prop("checked", true);
-    const empaqueDiv = $("#empaque_container");
-    empaqueDiv.append(`
-      <div id="empaque_input-container">
-        <input name="empaque_URL" type="hidden" value="${productoSelected.empaque_URL}">
-        <a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>
-      </div>
-    `);
-  }
-  switchEmpaque.on("change", function () {
-    const isChecked = $(this).prop("checked");
-    const empaqueDiv = $("#empaque_container");
-
-    if (isChecked) {
-      empaqueDiv.append(`
-        <div id="empaque_input-container">
-          <input name="empaque_URL" type="hidden" value="${
-            productoSelected.empaque_URL
-          }">
-          ${
-            productoSelected.empaque_URL
-              ? `<a href="${productoSelected.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>`
-              : `<input type="file" name="empaque" class="">`
-          }
-        </div>
-      `);
-    } else {
-      empaqueDiv.find("#empaque_input-container").remove();
-    }
-  });
-  const switchVim = $("#vim_motor_URL_switch");
-  if (productoSelected.vim_motor_URL) {
-    switchVim.prop("checked", true);
-    const vimDiv = $("#vim_motor_container");
-    vimDiv.append(`
-      <div id="vim_motor_input-container">
-        <input name="vim_motor_URL" type="hidden" value="${productoSelected.vim_motor_URL}">
-        <a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>
-      </div>
-    `);
-  }
-  switchVim.on("change", function () {
-    const isChecked = $(this).prop("checked");
-    const vimDiv = $("#vim_motor_container");
-
-    if (isChecked) {
-      vimDiv.append(`
-        <div id="vim_motor_input-container">
-          <input name="vim_motor_URL" type="hidden" value="${
-            productoSelected.vim_motor_URL
-          }">
-          ${
-            productoSelected.vim_motor_URL
-              ? `<a href="${productoSelected.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center">Descargar</a>`
-              : `<input type="file" name="vim_motor" class="">`
-          }
-        </div>
-      `);
-    } else {
-      vimDiv.find("#vim_motor_input-container").remove();
-    }
-  });
-  if (currentPrivilege != 1) {
-    //if empaque_input-container not exists hide empaque-container
-    if (!$("#empaque_input-container").length) {
-      $("#empaque_container").hide();
-    }
-    //if vim_motor_input-container not exists hide vim_motor_container
-    if (!$("#vim_motor_input-container").length) {
-      $("#vim_motor_container").hide();
-    }
-    //find button save in rotulado view and hide it
-    containerRotulado.find(".button-save").hide();
-    containerRotulado.find(".switch").hide();
-  }
-  containerRotulado.show();
+ 
 };
 const saveRotuladoProducto = (producto) => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveRotuladoProducto";
@@ -8173,15 +8201,7 @@ const saveRotuladoProducto = (producto) => {
       const { status, data } = JSON.parse(response);
       if (status == "success") {
         hideRotuladoView();
-        productoSelected.caja_master_URL = data.message.caja_master_URL;
-        productoSelected.empaque_URL = data.message.empaque_URL;
-        productoSelected.vim_motor_URL = data.message.vim_motor_URL;
-        productoSelected.notas_rotulado = data.message.notas_rotulado;
-        if (productoSelected.caja_master_URL) {
-          $("#btn-rotulado")
-            .removeClass("btn-primary")
-            .addClass("btn-secondary");
-        }
+        openStepFunction(1,selectedStep);
       } else {
         alert(message);
       }
@@ -8195,16 +8215,23 @@ const getContainerRotuladoView = (producto) => {
   const rotuladoTemplate = `
     <form class="row" id="form-rotulado">
       <div class="col-12 col-md-5">
-        <div class="form-group">
+        <div class="form-group" id="caja_master_container">
           <label>CAJA MASTER:</label>
-          <input name="caja_master_URL" type="hidden" value="${
+          <input name="caja_master_URL" 
+          id="caja_master-url"
+          type="hidden" value="${
             producto.caja_master_URL
           }">
+          <div class="d-flex flex-row w-100">
           ${
             producto.caja_master_URL
-              ? `<a href="${producto.caja_master_URL}" class="btn btn-outline-secondary d-block text-center" target="_blank">Descargar</a>`
+              ? `<a href="${producto.caja_master_URL}" id="input-caja_master" class="btn btn-outline-secondary  w-75 d-block text-center" target="_blank">Descargar</a>`
               : '<input type="file" name="caja_master" class="">'
           }
+          ${
+            producto.caja_master_URL?"<div class='btn btn-outline-danger ml-2' id='delete-caja_master' onclick='setRotuladoInputToNull(\"caja_master\")'>X</div>":""
+          }
+          </div>
         </div>
         <div class="form-group" id="empaque_container">
           <div class="conditional-field">
@@ -8325,6 +8352,13 @@ const saveOrdenCompra = () => {
     },
   });
 };
+const setRotuladoInputToNull = (idComponent) => {
+  $(`#${idComponent}-url`).val("");
+  $(`#input-${idComponent}`).remove();
+  $(`#${idComponent}_container`).append(`<input type="file" name="${idComponent}"  class="" id="input-${idComponent}">`);
+  $(`#delete-${idComponent}`).remove();
+}
+
 const setInputFileToNull = (file, id) => {
   const inputURL = `input-${file}-url-${id}`;
   const btnInput = `btn-${file}-${id}`;

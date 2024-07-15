@@ -2126,7 +2126,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 //escape special characters
                 $row->Txt_Producto = htmlspecialchars($row->Txt_Producto, ENT_QUOTES);
                 $row->Txt_Descripcion = htmlspecialchars($row->Txt_Descripcion, ENT_QUOTES);
-                
+
             }
             return $query->result();
 
@@ -2203,7 +2203,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             JOIN agente_compra_pedido_detalle_producto_proveedor AS acpdpp
             ON acpdpp.ID_Pedido_Detalle = acpd.ID_Pedido_Detalle
             WHERE acpd.caja_master_URL IS NULL
-            AND acpd.ID_Pedido_Cabecera = 1
+            AND acpd.ID_Pedido_Cabecera =" . $idPedido . "
             and acpdpp.Nu_Selecciono_Proveedor =1;";
             $query = $this->db->query($query);
             return $query->row()->total;
@@ -2267,7 +2267,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $pagosData = $this->getPedidosPagosDetails($idPedido);
             return [
                 "data" => $queryData,
-                "pagos" => $pagosData,  
+                "pagos" => $pagosData,
             ];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -2309,8 +2309,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         //     $index++;
         // }
         $this->allowedContentTypes = array('image', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
-            $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
-            $this->maxFileSize = 20240;
+        $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
+        $this->maxFileSize = 20240;
         foreach ($data as $key => $value) {
             if ($key == "pago-garantia") {
                 continue;
@@ -2498,8 +2498,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             ];
             //if pago_1_file is not null
 
-                $producto_detalle['pago_1_URL'] = $pago1Url;
-                $producto_detalle['pago_2_URL'] = $pago2Url;
+            $producto_detalle['pago_1_URL'] = $pago1Url;
+            $producto_detalle['pago_2_URL'] = $pago2Url;
 
             //update agente_compra_coordination_supplier
             $this->db->where('id_coordination', $key);
@@ -2782,12 +2782,30 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             throw new Exception($e->getMessage());
         }
     }
-    function updateOrdenPedido($data){
-        $idPedido=$data['idPedido']; 
-        $value=$data['value'];
+    public function updateOrdenPedido($data)
+    {
+        $idPedido = $data['idPedido'];
+        $value = $data['value'];
         //update   ordenCotizacion  in table agente_compra_pedido_cabecera where ID_Pedido_Cabecera=$idPedido
         $this->db->where('ID_Pedido_Cabecera', $idPedido);
         $this->db->update('agente_compra_pedido_cabecera', array('ordenCotizacion' => $value));
         return ['status' => 'success', 'message' => 'Orden de cotización actualizada'];
+    }
+    public function openRotuladoView($idDetalle)
+    {
+        //     $query="
+        //     select caja_master_URL,
+        // empaque_URL,
+        // vim_motor_URL,
+        // notas_rotulado,
+        // ID_Pedido_Detalle
+        // from agente_compra_pedido_detalle
+        //     "
+        $this->db->select('caja_master_URL,empaque_URL,vim_motor_URL,notas_rotulado,ID_Pedido_Detalle,
+        ID_Pedido_Cabecera');
+        $this->db->from('agente_compra_pedido_detalle');
+        $this->db->where('ID_Pedido_Detalle', $idDetalle);
+        return $this->db->get()->row();
+
     }
 }

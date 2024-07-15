@@ -2107,4 +2107,10 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->updateOrdenPedido($data);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    function openRotuladoView(){
+        $data = $this->input->post();
+        $ID_Detalle = $data['ID_Detalle'];
+        $response = $this->PedidosPagadosModel->openRotuladoView($ID_Detalle);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
 }
