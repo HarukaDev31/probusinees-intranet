@@ -8188,8 +8188,16 @@ const getProductsTemplateHeader = () => {
   }
   return templateHeader;
 };
-
+const htmltoTextAndLineBreaks = (html) => {
+  const replacedText = html.replace(/&amp;lt;/g, "<").replace(/&amp;gt;/g, ">");
+  const textWithLineBreaks = replacedText.replace(/<br \/>/g, "\n");
+  const decodedText = htmlDecode(textWithLineBreaks);
+  return decodedText;
+};
 const getProductTemplate = (producto, index) => {
+  
+
+
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
@@ -8198,7 +8206,7 @@ const getProductTemplate = (producto, index) => {
   }" class="img-cuz">
     </div>
     <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
-      <span>${producto.Txt_Producto}</span>
+      <span>${htmlDecode(escapeHtml(producto.Txt_Producto))}</span>
       ${
         currentPrivilege == priviligesPersonalPeru
           ? `<div class="btn btn-primary btn-rotulado " id="btn-rotulado-${index}"  onclick='openRotuladoView(${JSON.stringify(
@@ -8214,9 +8222,9 @@ const getProductTemplate = (producto, index) => {
       <span>${producto.Qt_Producto}</span>
     </div>
     <div class="col-12 col-lg-3">
-          <span style="word-break: break-word;overflow:auto;max-height:200px">${
-            producto.Txt_Descripcion
-          }</span>
+          <textarea style="word-break: break-word;overflow:auto;max-height:200px" class="form-control">${
+            htmltoTextAndLineBreaks(producto.Txt_Descripcion)
+          }</textarea>
     </div>
     <div class="col-12 col-lg-2">
       <a href="${
