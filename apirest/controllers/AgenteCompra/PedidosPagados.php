@@ -1737,20 +1737,39 @@ class PedidosPagados extends CI_Controller
 
             $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $val->Txt_Producto);
             $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $val->Txt_Descripcion);
-            $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto_Moq);
-            $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->unidad_medida);
+            $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto);
+            $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow,$this->getUnitName($val->unidad_medida));
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
+            $objPHPExcel->getActiveSheet()->setCellValue("L" . $initialRow, "=J" . $initialRow . "*H" . $initialRow);
+
+            $objPHPExcel->getActiveSheet()->setCellValue("M" . $initialRow, "=K" . $initialRow . "*H" . $initialRow);
+
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
-            $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, "=Q" . $initialRow . "/O" . $initialRow);
-            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, $val->Qt_Cbm);
+            $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, $val->Qt_Cbm);
+
+            $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=O" . $initialRow . "*P" . $initialRow);
             $objPHPExcel->getActiveSheet()->setCellValue("R" . $initialRow, $val->kg_box);
             $objPHPExcel->getActiveSheet()->setCellValue("T" . $initialRow, $val->Ss_Costo_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
+            $objPHPExcel->getActiveSheet()->getStyle("R" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
+            $objPHPExcel->getActiveSheet()->getStyle("S" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
+            //apply all borders to column n and p   
+            $objPHPExcel->getActiveSheet()->getStyle('N' . $initialRow . ':P' . $initialRow)->applyFromArray(
+                array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                )
+            );
+            
             $initialRow++;
         }
         if ($initialRow <= $lastProductrow) {
             $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow - $initialRow + 1);
         }
+       
         $objPHPExcel->getActiveSheet()->setCellValue('L' . ($initialRow), "=SUM(L26:L" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('M' . ($initialRow), "=SUM(M26:M" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('O' . ($initialRow), "=SUM(O26:O" . ($initialRow - 1) . ")");
@@ -2113,4 +2132,45 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->openRotuladoView($ID_Detalle);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    public function getUnitName($name){
+        switch ($name) {
+            case 'un':
+                return 'UNIDADES';
+                break;
+            case 'CAJA':
+                return 'CAJA';
+                break;
+            case 'kg':
+                return 'KILOGRAMOS';
+                break;
+            case 'mt':
+                return 'METROS';
+                break;
+            case 'lt':
+                return 'LITRO';
+                break;
+            case 'pa':
+                return 'PARES';
+                break;
+            case 'pc':
+                return 'PIEZAS';
+                break;
+            case 'MILLAR':
+                return 'MILLAR';
+                break;
+            case 'BOLSA':
+                return 'BOLSA';
+                break;
+            case 'PAQUETE':
+                return 'PAQUETE';
+                break;
+            case 'OTRO':
+                return 'OTRO';
+                break;
+            default:
+                return 'OTRO';
+                break;
+        }
+    }
+
 }
