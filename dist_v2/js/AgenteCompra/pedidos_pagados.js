@@ -8094,7 +8094,7 @@ const openOrdenCompra = (response) => {
     data.forEach((producto, index) => {
       //escape special chars product.Txt_Descripcion
       producto.Txt_Descripcion = escapeHtml(producto.Txt_Descripcion);
-      
+
       containerOrdenCompra.append(getProductTemplate(producto, index));
       if (producto.caja_master_URL) {
         $(`#btn-rotulado-${index}`)
@@ -8141,6 +8141,14 @@ const openOrdenCompra = (response) => {
       containerOrdenCompra.append(btnsTemplate);
     }
   }
+};
+const escapeHtml = (unsafe) => {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 };
 const getProductsTemplateHeader = () => {
   let templateHeader = ``;
