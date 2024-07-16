@@ -585,6 +585,9 @@ input[type=number] {
   padding: 1em;
   margin-bottom: 10px;
   background: #F2F3F4;
+}.ql-editor{
+  background: white!important;
+  min-height: 100px;
 }
 </style>
 <!-- ./ asignar pedido personal de china -->

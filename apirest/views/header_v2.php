@@ -19,6 +19,8 @@
   
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/fontawesome-free/css/all.min.css"); ?>">
   <!-- DataTables -->

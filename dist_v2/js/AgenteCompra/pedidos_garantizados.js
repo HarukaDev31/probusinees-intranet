@@ -4,7 +4,7 @@ var url,
   div_items = "",
   iCounter = 0,
   iCounterItems = 1;
-  currentPrivilegio = 1;
+currentPrivilegio = 1;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
 // Se puede crear un arreglo a partir de la cadena
@@ -15,6 +15,9 @@ let replace_global_autocomplete = ["", "", "", "", "", "", "", "", ""];
 //28 caracteres
 // FIN AUTOCOMPLETE
 let findTimeOut = null;
+let arrQuill = [];
+let arrQuillIngles = [];
+let arrQuillNotas = [];
 var fToday = new Date(),
   fYear = fToday.getFullYear(),
   fMonth = fToday.getMonth() + 1,
@@ -595,7 +598,7 @@ $(function () {
 
     iCounterItems = 1;
     addItems();
-    
+
     $("#txt-EID_Empresa_item").val($(this).data("id_empresa"));
     $("#txt-EID_Organizacion_item").val($(this).data("id_organizacion"));
     $("#txt-EID_Pedido_Cabecera_item").val($(this).data("id_pedido_cabecera"));
@@ -627,7 +630,7 @@ $(function () {
         "/" +
         correlativo +
         "/" +
-        1+
+        1 +
         "/" +
         pedidoID +
         "/" +
@@ -821,12 +824,11 @@ $(function () {
 
   $(document).on("click", "#btn-save_detalle_elegir_proveedor", function (e) {
     e.preventDefault();
-    
-    
-    if(currentPrivilegio == 1){
+
+    if (currentPrivilegio == 1) {
       $(".div-Listar").hide();
-          $(".div-AgregarEditar").show();
-          $("#div-elegir_item_proveedor").hide();
+      $(".div-AgregarEditar").show();
+      $("#div-elegir_item_proveedor").hide();
       return;
     }
     $("#btn-save_detalle_elegir_proveedor").text("");
@@ -834,6 +836,12 @@ $(function () {
     $("#btn-save_detalle_elegir_proveedor").html(
       'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>'
     );
+    arrQuillNotas.forEach(function (item, index) {
+      const content = item.root.innerHTML;
+      //escapar caracteres especiales
+      const escapedContent = encodeURIComponent(content);
+      $(`#modal-notas${index + 1}-content`).val(escapedContent);
+    });
     var postData = new FormData($("#form-arrItemsProveedor")[0]);
     url =
       base_url +
@@ -957,6 +965,7 @@ $(function () {
           }
         }
       });
+
     if (firstError != null) {
       scrollToError($("html, body"), $("#" + firstError));
     }
@@ -967,7 +976,12 @@ $(function () {
       $("#btn-save_detalle_item_proveedor").html(
         '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando'
       );
-
+      arrQuillNotas.forEach(function (item, index) {
+        const content = item.root.innerHTML;
+        //escapar caracteres especiales
+        const escapedContent = encodeURIComponent(content);
+        $(`#modal-notas${index + 1}-content`).val(escapedContent);
+      });
       var postData = new FormData($("#form-arrItems")[0]);
       $("#div-arrItemsPedidos").empty();
       $.ajax({
@@ -1252,7 +1266,10 @@ function verPedido(ID) {
         if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
           table_enlace_producto +=
             "<h6 class='font-weight-bold font-medium'>" +
-            ((detalle[i]["Txt_Producto_Ingles"].trim()!="" && detalle[i]["Txt_Producto_Ingles"]) ?detalle[i]["Txt_Producto_Ingles"]:nombre_producto)+
+            (detalle[i]["Txt_Producto_Ingles"].trim() != "" &&
+            detalle[i]["Txt_Producto_Ingles"]
+              ? detalle[i]["Txt_Producto_Ingles"]
+              : nombre_producto) +
             "</h6>";
         } else {
           table_enlace_producto +=
@@ -1328,21 +1345,27 @@ function verPedido(ID) {
         //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
         table_enlace_producto += "<td class='text-left td-name' width='20%'>";
         if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
-          const text=detalle[i]["Txt_Description_Ingles"].trim()!="" && detalle[i]["Txt_Description_Ingles"] ? detalle[i]["Txt_Description_Ingles"] : detalle[i]["Txt_Descripcion"];
-          table_enlace_producto +=
-            '<textarea class="form-control" placeholder="" name="addProductoTable[' +
-            id_item +
-            '][caracteristicas]" style="height: 200px;">' +
-            clearHTMLTextArea(
-              text) +
-            "</textarea>";
+          const text =
+            (detalle[i]["Txt_Description_Ingles"].trim() != "" &&
+            detalle[i]["Txt_Description_Ingles"])
+              ? detalle[i]["Txt_Description_Ingles"]
+              : detalle[i]["Txt_Descripcion"];
+          table_enlace_producto += `<div id="caracteristicas-ingles${i}" name="" style="height: 200px;"> </div>`;
+          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas]" value='${clearHTMLTextArea(
+            text
+          )}'>`;
         } else {
-          table_enlace_producto +=
-            '<textarea class="form-control" placeholder="" name="addProductoTable[' +
-            id_item +
-            '][caracteristicas]" style="height: 200px;">' +
-            clearHTMLTextArea(detalle[i]["Txt_Descripcion"]) +
-            "</textarea>";
+          table_enlace_producto += `<div id="caracteristicas-${i}" name="" style="height: 200px;"> </div>`;
+          table_enlace_producto += `<input type="hidden" id="caracteristicas-${i}-content" name="addProductoTable[${id_item}][caracteristicas]" value='${clearHTMLTextArea(
+            detalle[i]["Txt_Descripcion"]
+          )}'>`;
+
+          // table_enlace_producto +=
+          //   '<textarea class="form-control" placeholder="" name="addProductoTable[' +
+          //   id_item +
+          //   '][caracteristicas]" style="height: 200px;">' +
+          //   clearHTMLTextArea(detalle[i]["Txt_Descripcion"]) +
+          //   "</textarea>";
         }
         if (
           detalle[i]["Txt_Email"] == "maryam.china@probusiness.pe" &&
@@ -1350,18 +1373,22 @@ function verPedido(ID) {
         ) {
           table_enlace_producto += "<span class='mr-1'>Ingles</span>";
 
-          table_enlace_producto +=
-            '<textarea class="form-control" placeholder="" name="addProductoTable[' +
-            id_item +
-            '][caracteristicas_ingles]" style="height: 200px;">' +
-            clearHTMLTextArea(detalle[i]["Txt_Description_Ingles"] ?? " ") +
-            "</textarea>";
+          table_enlace_producto += `<div id="caracteristicas-ingles${i}" name="" style="height: 200px;"> </div>`;
+
+          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas_ingles]" value='${clearHTMLTextArea(
+            detalle[i]["Txt_Description_Ingles"]
+          )}'>`;
+
+          // table_enlace_producto +=
+          //   '<textarea class="form-control" placeholder="" name="addProductoTable[' +
+          //   id_item +
+          //   '][caracteristicas_ingles]" style="height: 200px;">' +
+          //   clearHTMLTextArea(detalle[i]["Txt_Description_Ingles"] ?? " ") +
+          //   "</textarea>";
         }
         //button de chat que abre un modal
         var class_button_chat =
-          parseInt(detalle[i]["pending_messages"]) > 0
-            ? "warning"
-            : "success";
+          parseInt(detalle[i]["pending_messages"]) > 0 ? "warning" : "success";
         table_enlace_producto +=
           '<button type="button" id="btn-chat_producto' +
           id_item +
@@ -1377,11 +1404,12 @@ function verPedido(ID) {
           nombre_producto +
           '" class="mt-3 btn btn-' +
           class_button_chat +
-          ' btn-block btn-chat_producto"><i class="fas fa-comments"></i>&nbsp; Novedades'
-          if(parseInt(detalle[i]["pending_messages"]) > 0){
-            table_enlace_producto += '<span class="badge bg-danger">' +
-          detalle[i]["pending_messages"] +
-          '</span></button>';
+          ' btn-block btn-chat_producto"><i class="fas fa-comments"></i>&nbsp; Novedades';
+        if (parseInt(detalle[i]["pending_messages"]) > 0) {
+          table_enlace_producto +=
+            '<span class="badge bg-danger">' +
+            detalle[i]["pending_messages"] +
+            "</span></button>";
         }
         table_enlace_producto += "</td>";
 
@@ -1477,6 +1505,47 @@ function verPedido(ID) {
 
       $("#span-total_cantidad_items").html(i);
       $("#table-Producto_Enlace").append(table_enlace_producto);
+      const toolbarOptions = [
+        ["bold", "italic", "underline"], // toggled buttons
+        [{ color: [] }], // dropdown with defaults from theme
+        ["clean"], // remove formatting button
+      ];
+      arrQuill = [];
+      arrQuillIngles = [];
+      for (i = 0; i < detalle.length; i++) {
+        if(detalle[i]["currentUser"] == "maryam.china@probusiness.pe"){
+          const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
+            modules: {
+              toolbar: toolbarOptions,
+            },
+            theme: "snow",
+          });
+          arrQuillIngles.push(quillIngles);
+          quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
+        }else{
+          const quill = new Quill(`#caracteristicas-${i}`, {
+            modules: {
+              toolbar: toolbarOptions,
+            },
+            theme: "snow",
+          });
+          arrQuill.push(quill);
+          quill.root.innerHTML = detalle[i]["Txt_Descripcion"];
+  
+          const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
+            modules: {
+              toolbar: toolbarOptions,
+            },
+            theme: "snow",
+          });
+          arrQuillIngles.push(quillIngles);
+          quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
+        }
+        
+
+        // var delta = quill.clipboard.convert(htmlContent);
+      }
+      // Establecer el contenido Delta en Quill
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $(".modal-message").removeClass(
@@ -1811,6 +1880,20 @@ function form_pedido() {
     $("#btn-save").html(
       'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>'
     );
+    arrQuill.forEach((quill, index) => {
+      const content = quill.root.innerHTML;
+      //escapar caracteres especiales
+      const escapedContent = encodeURIComponent(content);
+      console.log(escapedContent);
+      $(`#caracteristicas-${index}-content`).val(escapedContent);
+    });
+    arrQuillIngles.forEach((quill, index) => {
+      const content = quill.root.innerHTML;
+      //escapar caracteres especiales
+      const escapedContent = encodeURIComponent(content);
+      console.log(escapedContent);
+      $(`#caracteristicas-ingles${index}-content`).val(escapedContent);
+    });
     var postData = new FormData($("#form-pedido")[0]);
     url = base_url + "AgenteCompra/PedidosGarantizados/crudPedidoGrupal";
     $.ajax({
@@ -2115,9 +2198,10 @@ function addItems() {
           <input type="text" id="modal-celular_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
         </div>
-        <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
+        <span class="fw-bold">Notas </span>
         <div class="form-group">
-          <textarea id="modal-notas${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
+          <input type="hidden" id="modal-notas${iCounterItems}-content" name="addProducto[${iCounterItems}][notas]" value="">
+          <div id="modal-notas${iCounterItems}" data-correlativo="${iCounterItems}"   placeholder="" value="" autocomplete="off" ></div>
         </div>
 
       </div>
@@ -2125,215 +2209,35 @@ function addItems() {
   </div>
   `;
 
-  // div_items +=
-  //   '<div id="card' +
-  //   iCounterItems +
-  //   '" class="card border-0 rounded shadow-sm mt-3">';
-  // div_items += '<div class="row">';
-  // div_items += '<div class="col-sm-12">';
-  // div_items += '<div class="card-body pt-3">';
-  // div_items += '<div class="row">';
-  // div_items +=
-  //   '<div class="col-11 col-sm-11 col-md-11 col-lg-11 mb-0 mb-sm-0">';
-  // div_items +=
-  //   '<h6 class="text-left card-title mb-2 pt-0" style="text-align: left;">';
-  // div_items +=
-  //   '<span class="fw-bold" style="font-weight: bold;">Imagen<span class="label-advertencia text-danger"> *</span></span>';
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<input class="form-control" name="voucher[' +
-  //   iCounterItems +
-  //   '][]" type="file" accept="image/*" multiple></input>';
-  // //div_items += '<input class="form-control" name="addProducto[' + iCounterItems + '][voucher][]" type="file" accept="image/*" multiple></input>';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-1 col-sm-1 col-md-1 col-lg-1">';
-  // div_items += '<span class="fw-bold" style="font-weight: bold;">&nbsp;</span>';
-  // div_items +=
-  //   '<div class="d-grid gap"><button type="button" id="btn-quitar_item_' +
-  //   iCounterItems +
-  //   '" class="btn btn-outline-danger btn-quitar_item col" data-id="' +
-  //   iCounterItems +
-  //   '">X</div>';
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items +=
-  //   '<span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span></span>';
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<input type="text" id="modal-precio' +
-  //   iCounterItems +
-  //   '" data-correlativo="' +
-  //   iCounterItems +
-  //   '" inputmode="decimal" name="addProducto[' +
-  //   iCounterItems +
-  //   '][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items +=
-  //   '<span class="fw-bold">moq<span class="label-advertencia text-danger"> *</span></span>';
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<input type="text" id="modal-moq' +
-  //   iCounterItems +
-  //   '" data-correlativo="' +
-  //   iCounterItems +
-  //   '" inputmode="decimal" name="addProducto[' +
-  //   iCounterItems +
-  //   '][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items +=
-  //   '<span class="fw-bold">qty_caja<span class="label-advertencia text-danger"> *</span></span>'; //qty_caja_actual
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<input type="text" id="modal-qty_caja' +
-  //   iCounterItems +
-  //   '" data-correlativo="' +
-  //   iCounterItems +
-  //   '" inputmode="decimal" name="addProducto[' +
-  //   iCounterItems +
-  //   '][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-6 col-sm-3 col-md-3 col-lg-2 mb-0 mb-sm-0">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items +=
-  //   '<span class="fw-bold">cbm<span class="label-advertencia text-danger"> *</span></span>';
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<input type="text" id="modal-cbm' +
-  //   iCounterItems +
-  //   '" data-correlativo="' +
-  //   iCounterItems +
-  //   '" inputmode="decimal" name="addProducto[' +
-  //   iCounterItems +
-  //   '][cbm]" class="arrProducto form-control required input-decimal" cbm placeholder="" value="" autocomplete="off" />';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items += '<span class="fw-bold">Delivery</span>';
-  // div_items += "</h6>";
-  // div_items +=
-  //   '<input type="text" inputmode="numeric" id="modal-delivery' +
-  //   iCounterItems +
-  //   '" name="addProducto[' +
-  //   iCounterItems +
-  //   '][delivery]" class="arrProducto form-control input-number" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-12 col-sm-3 col-md-3 col-lg-2 mb-3 mb-sm-3">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items += '<span class="fw-bold">Shipping Cost</span>';
-  // div_items += "</h6>";
-  // div_items +=
-  //   '<input type="text" inputmode="decimal" id="modal-costo_delivery' +
-  //   iCounterItems +
-  //   '" name="addProducto[' +
-  //   iCounterItems +
-  //   '][costo_delivery]" class="arrProducto form-control input-decimal" placeholder="" minlength="1" maxlength="90" autocomplete="off" />';
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-sm-12 mb-1">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items += '<span class="fw-bold">Observaciones</span>';
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<textarea class="arrProducto form-control required nota" rows="1" placeholder="Opcional" id="modal-nota' +
-  //   iCounterItems +
-  //   '" name="addProducto[' +
-  //   iCounterItems +
-  //   '][nota]" style="height: 50px;"></textarea>';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-12 col-sm-6 mb-1">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items += '<span class="fw-bold">Nombre Proveedor</span>';
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<input type="text" inputmode="text" id="modal-contacto_proveedor' +
-  //   iCounterItems +
-  //   '" name="addProducto[' +
-  //   iCounterItems +
-  //   '][contacto_proveedor]" class="arrProducto form-control" placeholder="" maxlength="255" autocomplete="off" />';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += '<div class="col-12 col-sm-6 mb-0">';
-  // div_items += '<h6 class="card-title mb-2" style="font-weight:bold">';
-  // div_items += '<span class="fw-bold">Foto Proveedor</span>';
-  // div_items += "</h6>";
-  // div_items += '<div class="form-group">';
-  // div_items +=
-  //   '<input class="form-control" id="modal-foto_proveedor' +
-  //   iCounterItems +
-  //   '" name="proveedor[' +
-  //   iCounterItems +
-  //   ']" type="file" accept="image/*"></input>';
-  // //div_items += '<input type="text" inputmode="text" id="modal-foto_proveedor' + iCounterItems + '" name="addProducto[' + iCounterItems + '][foto_proveedor]" class="arrProducto form-control input-number" placeholder="" maxlength="255" autocomplete="off" />';
-  // div_items += '<span class="help-block text-danger" id="error"></span>';
-  // div_items += "</div>";
-  // div_items += "</div>";
-
-  // div_items += "</div>";
-  // div_items += "</div>";
-  // div_items += "</div>";
-  // div_items += "</div>";
-  // div_items += "</div>";
   const i = iCounterItems;
-  $("#div-arrItems").append(div_items);
-  let arrcontainer=$("#div-arrItems")
-  arrcontainer.find(`#btn-open-supplier${i}`).on("click", () => {
-    getSuppliersByName(i,$("#div-arrItems"));
 
-  })
+  $("#div-arrItems").append(div_items);
+  arrQuillNotas = [];
+  const toolbarOptions = [
+    ["bold", "italic", "underline"], // toggled buttons
+    [{ color: [] }], // dropdown with defaults from theme
+    ["clean"], // remove formatting button
+  ];
+  const notasQuill = new Quill(`#modal-notas${i}`, {
+    modules: {
+      toolbar: toolbarOptions,
+    },
+    theme: "snow",
+  });
+  // notasQuill.root.innerHTML=detalle[i]["Txt_Notas"];
+
+  arrQuillNotas.push(notasQuill);
+  let arrcontainer = $("#div-arrItems");
+  arrcontainer.find(`#btn-open-supplier${i}`).on("click", () => {
+    getSuppliersByName(i, $("#div-arrItems"));
+  });
   arrcontainer.find(`#btn-open-supplier${i}`).on("focusout", () => {
     console.log("focusout");
     setTimeout(() => {
-      $(".supplier-list" + (i)).html("");
+      $(".supplier-list" + i).html("");
     }, 200);
   });
-  // $("#div-arrItems")
-  //   .find(`#modal-nombre_proveedor${i}`)
-  //   .on("input", () => {
-  //     getSuppliersByName(i);
-  //   });
-  //modal nombre proveedor on focus out
-  // $("#div-arrItems")
-  //   .find(`#modal-nombre_proveedor${i}`)
-  //   .on("focusout", () => {
-  //     console.log("focusout");
-  //     setTimeout(() => {
-  //       $(".supplier-list" + i).html("");
-  //     }, 200);
-  //   });
+
   $("#modal-precio" + iCounterItems).trigger("focus");
   if (i >= 2) {
     $(`#modal-nombre_proveedor${i}`).val(
@@ -2414,14 +2318,12 @@ const removeItemsEdit = (idProveedor, index) => {
     });
 };
 function getItemTemplate(i, mode, detalle, privilegio) {
-  if(privilegio == 1){
+  if (privilegio == 1) {
     div_items = `
     <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-      <input type="hidden" id="modal_proveedor-id-${i}" value="${
-    detalle.id_pedido
-  }"/>
+      <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
  
 
       <div class = "row" >
@@ -2548,20 +2450,21 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           </div>
           <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
           <div class="form-group">
-            <textarea disabled id="modal-notas${i}" data-correlativo="${i}" name="addProducto[${i}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
+            <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
+            <div id="modal-notas${i}" data-correlativo="${i}"  placeholder="" value="" autocomplete="off" ></div>
           </div>
           
         </div>
       </div>
       `;
-  }else{
+  } else {
     div_items = `
     <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal_proveedor-id-${i}" value="${
-    detalle.id_pedido
-  }"/>
+      detalle.id_pedido
+    }"/>
   <button type="button" class="btn btn-outline-danger" style="width:200px;align-self:end" onclick="removeItemsEdit(${
     detalle[i - 1].ID_Pedido_Detalle_Producto_Proveedor
   },${i})">
@@ -2721,14 +2624,15 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           </div>
           <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
           <div class="form-group">
-            <textarea id="modal-notas${i}" data-correlativo="${i}" name="addProducto[${i}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
+            <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
+            <div id="modal-notas${i}" data-correlativo="${i}"   placeholder="" value="" autocomplete="off" ></div>
           </div>
           
         </div>
       </div>
       `;
   }
-  
+
   var id_detalle = detalle[i - 1]["ID_Pedido_Detalle"];
   var id_item = detalle[i - 1]["ID_Pedido_Detalle_Producto_Proveedor"];
   var id_supplier = detalle[i - 1]["id_supplier"];
@@ -2774,11 +2678,26 @@ function getItemProveedor(id_detalle) {
       let privilegio = response["privilegio"];
       const container = $("#table-elegir_productos_proveedor tbody");
       container.empty();
-
+      arrQuillNotas = [];
       for (let i = 0; i < detalle.length; i++) {
         let item = getItemTemplate(i + 1, "select", detalle, privilegio);
         currentPrivilegio = parseInt(privilegio);
         container.append(item);
+        
+        const toolbarOptions = [
+          ["bold", "italic", "underline"], // toggled buttons
+          [{ color: [] }], // dropdown with defaults from theme
+          ["clean"], // remove formatting button
+        ];
+        const notasQuill = new Quill(`#modal-notas${i+1}`, {
+          modules: {
+            toolbar: toolbarOptions,
+          },
+          theme: "snow",
+        });
+        // notasQuill.root.innerHTML=detalle[i]["Txt_Notas"];
+        notasQuill.root.innerHTML = detalle[i]["Txt_Nota"];
+        arrQuillNotas.push(notasQuill);
         container.find(`#modal-precio${i + 1}`).val(detalle[i]["Ss_Precio"]);
         container.find(`#modal-moq${i + 1}`).val(detalle[i]["Qt_Producto_Moq"]);
         container
@@ -2815,18 +2734,16 @@ function getItemProveedor(id_detalle) {
           .find(`#modal-celular_proveedor${i + 1}`)
           .val(detalle[i]["celular_proveedor"]);
         container.find(`#modal-nombre_proveedor${i + 1}`);
-        console.log(i)
+        console.log(i);
         container.find(`#btn-open-supplier${i + 1}`).on("click", () => {
-          getSuppliersByName(i+1,$("#div-arrItemsProveedor"));
-
-        })
-
+          getSuppliersByName(i + 1, $("#div-arrItemsProveedor"));
+        });
 
         //modal nombre proveedor on focus out
         container.find(`#btn-open-supplier${i + 1}`).on("focusout", () => {
           console.log("focusout");
           setTimeout(() => {
-            $(".supplier-list" + (i+1)).html("");
+            $(".supplier-list" + (i + 1)).html("");
           }, 200);
         });
         container
@@ -2878,7 +2795,8 @@ function getItemProveedor(id_detalle) {
                 .val(detalle[i]["primary_video"]);
               container.find(`#btn-uploadvideo1-${i + 1}`).hide();
               container
-                .find(`#container-uploadvideo1-${i + 1}`).find("label")
+                .find(`#container-uploadvideo1-${i + 1}`)
+                .find("label")
                 .after(
                   `<video src="${
                     detalle[i]["primary_video"]
@@ -2893,7 +2811,8 @@ function getItemProveedor(id_detalle) {
                 .val(detalle[i]["secondary_video"]);
               container.find(`#btn-uploadvideo2-${i + 1}`).hide();
               container
-                .find(`#container-uploadvideo2-${i + 1}`).find("label")
+                .find(`#container-uploadvideo2-${i + 1}`)
+                .find("label")
                 .after(
                   `<video src="${
                     detalle[i]["secondary_video"]
@@ -3481,27 +3400,26 @@ const deleteVideo = (index, videoIndex) => {
 };
 let isSelectingOption = false;
 
-const getSuppliersByName = (index,container) => {
-  
+const getSuppliersByName = (index, container) => {
   const component = container.find(`#modal-nombre_proveedor${index}`);
   const list = container.find(`.supplier-list${index}`);
   const btnOpenSupplier = container.find(`#btn-open-supplier${index}`);
-  console.log(btnOpenSupplier, index,component,list,container);
-  btnOpenSupplier.off('focusout').on('focusout', () => {
+  console.log(btnOpenSupplier, index, component, list, container);
+  btnOpenSupplier.off("focusout").on("focusout", () => {
     setTimeout(() => {
       if (!isSelectingOption) {
         list.html("");
       }
     }, 150); // Ajusta el tiempo si es necesario
   });
-  if(list.children().length > 0){
+  if (list.children().length > 0) {
     list.html("");
     return;
   }
 
   const idPedido = $("#txt-EID_Pedido_Cabecera_item").val();
   const name = component.val();
-  
+
   // if (name.length < 1) return list.html("");
   // if (findTimeOut) clearTimeout(findTimeOut);
   console.log(index);
@@ -3518,14 +3436,16 @@ const getSuppliersByName = (index,container) => {
           list.append(
             `<option value="${supplier.name}" id="option-${index}-${i}">${supplier.name}</option>`
           );
-          $(`#option-${index}-${i}`).on('mousedown', () => {
-            isSelectingOption = true;
-          }).on('click', () => {
-            component.val(supplier.name);
-            $(`#modal-celular_proveedor${index}`).val(supplier.phone);
-            list.html("");
-            isSelectingOption = false;
-          });
+          $(`#option-${index}-${i}`)
+            .on("mousedown", () => {
+              isSelectingOption = true;
+            })
+            .on("click", () => {
+              component.val(supplier.name);
+              $(`#modal-celular_proveedor${index}`).val(supplier.phone);
+              list.html("");
+              isSelectingOption = false;
+            });
         });
       },
     });

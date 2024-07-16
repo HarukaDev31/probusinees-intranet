@@ -219,7 +219,7 @@ class PedidosGarantizados extends CI_Controller
     public function crudPedidoGrupal()
     {
         //array_debug($this->input->post());
-
+        
         if (!$this->input->is_ajax_request()) {
             exit('No se puede eliminar y acceder');
         }
@@ -231,6 +231,7 @@ class PedidosGarantizados extends CI_Controller
             'Txt_Observaciones_Garantizado' => $this->input->post('Txt_Observaciones_Garantizado'),
             'file_cotizacion' => $_FILES['file_cotizacion'],
         );
+
 
         echo json_encode($this->PedidosGarantizadosModel->actualizarPedido(
             array(
@@ -255,6 +256,7 @@ class PedidosGarantizados extends CI_Controller
     }
     public function generarCotizacionChina($ID)
     {   
+        
         $data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));
         $this->load->library('PHPExcel');
         // echo json_encode($data);
@@ -306,7 +308,8 @@ class PedidosGarantizados extends CI_Controller
                 $objPHPExcel->getActiveSheet()->setCellValue("B{$initialRow}", $i);
                 // $objPHPExcel->getActiveSheet()->setCellValue("C{$initialRow}", $val->Txt_Producto);
                 $objPHPExcel->getActiveSheet()->setCellValue("D{$initialRow}", $val->Txt_Producto);
-                $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToTextAndLineBreaks ($val->Txt_Descripcion));
+                // $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToTextAndLineBreaks ($val->Txt_Descripcion));
+                $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToRichText($val->Txt_Descripcion));
                 if (!empty($val->Txt_Url_Imagen_Producto)) {
                     $objDrawing = new PHPExcel_Worksheet_Drawing();
                     $image = file_get_contents($val->Txt_Url_Imagen_Producto);

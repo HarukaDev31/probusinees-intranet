@@ -367,7 +367,7 @@ class PedidosGarantizadosModel extends CI_Model
                     'Qt_Cbm' => $cbm,
                     'Nu_Dias_Delivery' => $delivery,
                     'Ss_Costo_Delivery' => $costo_delivery,
-                    'Txt_Nota' => nl2br($nota_historica),
+                    'Txt_Nota' => urldecode($nota_historica),
                     'No_Contacto_Proveedor' => $contacto_proveedor,
                     'main_photo' => $results['paths'][$key]['main_photo'],
                     'secondary_photo' => $results['paths'][$key]['secondary_photo'],
@@ -609,15 +609,16 @@ class PedidosGarantizadosModel extends CI_Model
         if (!empty($arrProductoTable)) {
             $arrayIndex = 0;
             foreach ($arrProductoTable as $row) {
+                
                 //array_debug($row);
                 $arrSaleOrderDetailUPD[$arrayIndex] = array(
                     'ID_Pedido_Detalle' => $row['id_item'],
                     'Qt_Producto' => $row['cantidad'], //agergar input de cantidad
-                    'Txt_Descripcion' => nl2br($row['caracteristicas']),
+                    'Txt_Descripcion' => nl2br(urldecode($row['caracteristicas'])),
 
                 );
                 if (array_key_exists('caracteristicas_ingles', $row)) {
-                    $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Description_Ingles'] = nl2br($row['caracteristicas_ingles']);
+                    $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Description_Ingles'] = nl2br(urldecode($row['caracteristicas_ingles']));
 
                 }if (
                     array_key_exists('txtproductoIngles', $row)) {
@@ -719,7 +720,7 @@ class PedidosGarantizadosModel extends CI_Model
                 'Qt_Cbm' => $row['cbm'],
                 'Nu_Dias_Delivery' => $row['delivery'],
                 'Ss_Costo_Delivery' => $row['shipping_cost'],
-                'Txt_Nota' => nl2br($row['notas']),
+                'Txt_Nota' => urldecode($row['notas']),
                 'No_Contacto_Proveedor' => $row['contacto_proveedor'],
                 'Txt_Url_Imagen_Proveedor' => $Txt_Url_Imagen_Proveedor,
                 "main_photo" => $results['paths'][$key]['main_photo'],
