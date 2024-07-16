@@ -1252,7 +1252,7 @@ function verPedido(ID) {
         if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
           table_enlace_producto +=
             "<h6 class='font-weight-bold font-medium'>" +
-            (detalle[i]["Txt_Producto_Ingles"].trim()!=""?detalle[i]["Txt_Producto_Ingles"]:nombre_producto)+
+            ((detalle[i]["Txt_Producto_Ingles"].trim()!="" && detalle[i]["Txt_Producto_Ingles"]) ?detalle[i]["Txt_Producto_Ingles"]:nombre_producto)+
             "</h6>";
         } else {
           table_enlace_producto +=
@@ -1333,8 +1333,8 @@ function verPedido(ID) {
             id_item +
             '][caracteristicas]" style="height: 200px;">' +
             clearHTMLTextArea(
-              detalle[i]["Txt_Description_Ingles"].trim()!="" ? detalle[i]["Txt_Description_Ingles"] : detalle[i]["Txt_Description"]
-            ) +
+              ((detalle[i]["Txt_Description_Ingles"].trim()!="" && detalle[i]["Txt_Description_Ingles"]) ? detalle[i]["Txt_Description_Ingles"] : detalle[i]["Txt_Description"]
+            )) +
             "</textarea>";
         } else {
           table_enlace_producto +=
