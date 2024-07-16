@@ -1328,13 +1328,13 @@ function verPedido(ID) {
         //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
         table_enlace_producto += "<td class='text-left td-name' width='20%'>";
         if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
+          const text=detalle[i]["Txt_Description_Ingles"].trim()!="" && detalle[i]["Txt_Description_Ingles"] ? detalle[i]["Txt_Description_Ingles"] : detalle[i]["Txt_Descripcion"];
           table_enlace_producto +=
             '<textarea class="form-control" placeholder="" name="addProductoTable[' +
             id_item +
             '][caracteristicas]" style="height: 200px;">' +
             clearHTMLTextArea(
-              ((detalle[i]["Txt_Description_Ingles"].trim()!="" && detalle[i]["Txt_Description_Ingles"]) ? detalle[i]["Txt_Description_Ingles"] : detalle[i]["Txt_Description"]
-            )) +
+              text) +
             "</textarea>";
         } else {
           table_enlace_producto +=
