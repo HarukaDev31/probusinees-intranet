@@ -109,6 +109,13 @@ $(function () {
         type: 'date-dd-mm-yyyy', 
         orderable: true
       },
+      //orderable:  column 6 is a select with optiosn 1 2 and 3 order by the value of the option
+      {
+        targets: [6,7,8,9,10],
+        orderable: false,
+        
+        
+      },
       {
         className: "text-center",
         targets: "no-sort",
