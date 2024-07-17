@@ -358,6 +358,7 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("T{$initialRow}", $val->Ss_Costo_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("U{$initialRow}", $val->Nu_Dias_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("V{$initialRow}", $this->htmlToRichText($this->htmlToTextAndLineBreaks(($val->Txt_Nota))));
+            $objPHPExcel->getActiveSheet()->getRowDimension($initialRow)->setRowHeight(-1);
 
             $initialRow++;
 
@@ -533,6 +534,8 @@ class PedidosGarantizados extends CI_Controller
                 $objPHPExcel->getActiveSheet()->getStyle("Q" . $initialRow)->getNumberFormat()->setFormatCode('0.00');
                 $objPHPExcel->getActiveSheet()->getStyle("S" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
                 $objPHPExcel->getActiveSheet()->getStyle("T" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
+                $objPHPExcel->getActiveSheet()->getRowDimension($initialRow)->setRowHeight(-1);
+
                 $initialRow++;
             }
             if ($currentIDDetalle !== null) {
@@ -684,7 +687,8 @@ class PedidosGarantizados extends CI_Controller
 
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $this->htmlToRichText($this->htmlToTextAndLineBreaks(($val->Txt_Nota))));
-
+            //set auto row height
+            $objPHPExcel->getActiveSheet()->getRowDimension($initialRow)->setRowHeight(-1);
             $initialRow++;
         }
         // $objPHPExcel->getActiveSheet()->setCellValue('T'. ($initialRow),"=SUM(T26:T".($initialRow-1).")");
