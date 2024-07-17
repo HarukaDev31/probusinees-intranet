@@ -508,7 +508,7 @@ class PedidosGarantizados extends CI_Controller
                 // $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
 
                 $objPHPExcel->getActiveSheet()->setCellValue("E" . $initialRow, $val->Txt_Producto);
-                $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $this->htmlToRichText($val->Txt_Descripcion));
+                $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $this->htmlToRichText($this->htmlToTextAndLineBreaks($val->Txt_Descripcion)));
                 $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $val->Qt_Producto);
                 $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->Qt_Producto_Moq);
                 $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $this->getUnitName($val->unidad_medida));
