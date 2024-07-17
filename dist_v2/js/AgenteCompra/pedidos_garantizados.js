@@ -811,12 +811,13 @@ $(function () {
     $(".div-Listar").hide();
     $(".div-AgregarEditar").show();
     $("#div-add_item_proveedor").hide();
+    $("#div-arrItems").empty();
     $("#div-arrItemsPedidos").empty();
   });
 
   $(document).on("click", "#btn-cancel_detalle_elegir_proveedor", function (e) {
     e.preventDefault();
-
+  
     $(".div-Listar").hide();
     $(".div-AgregarEditar").show();
     $("#div-elegir_item_proveedor").hide();
@@ -1000,7 +1001,7 @@ $(function () {
           "bg-danger bg-warning bg-success"
         );
         $("#modal-message").modal("show");
-
+        $("#div-arrItems").empty();
         console.log(response);
         if (response.status == "success") {
           $("#moda-message-content").addClass("bg-" + response.status);
@@ -1522,7 +1523,7 @@ function verPedido(ID) {
               theme: "snow",
             });
             arrQuill.push(quill);
-            quill.root.innerHTML = detalle[i]["Txt_Descripcion"];
+            quill.root.innerHTML = clearHTMLTextArea(detalle[i]["Txt_Descripcion"]);
           }catch(e){
             console.log(e);
           }
@@ -1534,7 +1535,7 @@ function verPedido(ID) {
               theme: "snow",
             });
             arrQuillIngles.push(quillIngles);
-            quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
+            quillIngles.root.innerHTML = clearHTMLTextArea(detalle[i]["Txt_Description_Ingles"]);
           }catch(e){
             console.log(e);
           }
@@ -1547,7 +1548,7 @@ function verPedido(ID) {
               theme: "snow",
             });
             arrQuill.push(quill);
-            quill.root.innerHTML = detalle[i]["Txt_Descripcion"];
+            quill.root.innerHTML = clearHTMLTextArea(detalle[i]["Txt_Descripcion"]);
           }catch(e){
             console.log(e);
           }
@@ -2709,6 +2710,9 @@ function getItemProveedor(id_detalle) {
           [{ color: [] }], // dropdown with defaults from theme
           ["clean"], // remove formatting button
         ];
+        console.log(detalle[i]["Txt_Nota"],"quill",$(`#modal-notas${i + 1}`));
+        //if exist quil with the same id, destroy it
+        
         const notasQuill = new Quill(`#modal-notas${i+1}`, {
           modules: {
             toolbar: toolbarOptions,
@@ -2716,7 +2720,7 @@ function getItemProveedor(id_detalle) {
           theme: "snow",
         });
         // notasQuill.root.innerHTML=detalle[i]["Txt_Notas"];
-        notasQuill.root.innerHTML = detalle[i]["Txt_Nota"];
+        notasQuill.root.innerHTML = clearHTMLTextArea(detalle[i]["Txt_Nota"]);
         arrQuillNotas.push(notasQuill);
         container.find(`#modal-precio${i + 1}`).val(detalle[i]["Ss_Precio"]);
         container.find(`#modal-moq${i + 1}`).val(detalle[i]["Qt_Producto_Moq"]);
