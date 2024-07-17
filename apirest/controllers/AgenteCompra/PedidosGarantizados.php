@@ -291,8 +291,9 @@ class PedidosGarantizados extends CI_Controller
             }
 
             if ($currentIDDetalle != $val->ID_Pedido_Detalle) {
-                $i++;
+                
                 if ($currentIDDetalle !== null) {
+                    $i++;
                     // Merge previous rows for the same ID_Pedido_Detalle
                     $objPHPExcel->getActiveSheet()->mergeCells("B{$startRow}:B" . ($initialRow - 1));
                     $objPHPExcel->getActiveSheet()->mergeCells("C{$startRow}:C" . ($initialRow - 1));
