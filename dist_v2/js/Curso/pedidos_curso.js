@@ -21,7 +21,7 @@ $(function () {
   });
 
   url = base_url + 'Curso/PedidosCurso/ajax_list';
-  table_Entidad = $( '#table-Pedidos' ).DataTable({
+  table_Entidad = $("#table-Pedidos").DataTable({
     dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
     "<'row'<'col-sm-12'tr>>" +
     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
@@ -49,10 +49,11 @@ $(function () {
         columns: ':visible'
       }
     }],
-    'searching'   : false,
+    'searching'   : true,
     'bStateSave'  : true,
+    "lengthChange": true,
     'processing'  : true,
-    'serverSide'  : true,
+    'serverSide'  : false,
     'info'        : true,
     'autoWidth'   : false,
     'pagingType'  : 'full_numbers',
@@ -82,6 +83,7 @@ $(function () {
         data.estado_pago = $( '#cbo-filtro-estado_pago' ).val(),
         data.Filtro_Fe_Inicio = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
         data.Filtro_Fe_Fin = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
+        
       },
     },
     'columnDefs': [

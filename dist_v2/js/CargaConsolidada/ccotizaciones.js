@@ -83,6 +83,7 @@ $(function () {
       type: "POST",
       dataType: "json",
       data: function (data) {
+        // data.sMethod = $("#hidden-sMethod").val();
       },
     },
     columnDefs: [
