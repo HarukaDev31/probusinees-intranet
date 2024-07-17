@@ -291,6 +291,7 @@ class PedidosGarantizados extends CI_Controller
             }
 
             if ($currentIDDetalle != $val->ID_Pedido_Detalle) {
+                $i++;
                 if ($currentIDDetalle !== null) {
                     // Merge previous rows for the same ID_Pedido_Detalle
                     $objPHPExcel->getActiveSheet()->mergeCells("B{$startRow}:B" . ($initialRow - 1));
@@ -339,7 +340,7 @@ class PedidosGarantizados extends CI_Controller
                     }
                 }
             } else {
-                $i++;
+                
 
             }
             $objPHPExcel->getActiveSheet()->setCellValue("F{$initialRow}", $val->Qt_Producto);
@@ -455,6 +456,8 @@ class PedidosGarantizados extends CI_Controller
             }
             if ($currentIDDetalle !== $val->ID_Pedido_Detalle) {
                 if ($currentIDDetalle !== null) {
+                    $i++;
+
                     $objPHPExcel->getActiveSheet()->mergeCells("C{$startRow}:C" . ($initialRow - 1));
                     $objPHPExcel->getActiveSheet()->mergeCells("D{$startRow}:D" . ($initialRow - 1));
                     $objPHPExcel->getActiveSheet()->mergeCells("E{$startRow}:E" . ($initialRow - 1));
@@ -502,7 +505,7 @@ class PedidosGarantizados extends CI_Controller
                 }
             }
             else {
-                    $i++;
+                    
                 }
                 // $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
 
@@ -622,6 +625,7 @@ class PedidosGarantizados extends CI_Controller
             
             if ($currentIDDetalle !== $val->ID_Pedido_Detalle) {
                 if ($currentIDDetalle !== null) {
+                    $i++;
                     $objPHPExcel->getActiveSheet()->mergeCells("B{$startRow}:B" . ($initialRow - 1));
                     $objPHPExcel->getActiveSheet()->mergeCells("C{$startRow}:C" . ($initialRow - 1));
                     $objPHPExcel->getActiveSheet()->mergeCells("D{$startRow}:D" . ($initialRow - 1));
@@ -665,7 +669,7 @@ class PedidosGarantizados extends CI_Controller
                     }
                 }
             } else {
-                $i++;
+               
             }
             $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto_Moq);
             $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $this->getUnitName($val->unidad_medida));
