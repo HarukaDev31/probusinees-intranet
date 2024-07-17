@@ -229,6 +229,8 @@
 
   
 <?php if (isset($js_ccotizaciones) && $js_ccotizaciones==true) : ?>
+  <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/ccotizaciones.js'?>"></script>
 <?php endif; ?>
 <?php if (isset($js_tarifas_cotizaciones) && $js_tarifas_cotizaciones==true) : ?>

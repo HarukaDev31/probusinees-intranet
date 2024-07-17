@@ -32,6 +32,8 @@ class CCotizacionesModel extends CI_Model
         $this->db->from($this->table);
         $this->db->join($this->table_tipo_cliente, 'carga_consolidada_cotizaciones_cabecera.ID_Tipo_Cliente = carga_consolidada_tipo_cliente.ID_Tipo_Cliente', 'join');
         $this->db->where('carga_consolidada_cotizaciones_cabecera.deleted_at', null);
+        $this->db->where("Fe_Creacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
+
     }
 
     public function get_datatables()

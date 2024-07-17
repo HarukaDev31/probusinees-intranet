@@ -1,6 +1,13 @@
 var url;
 const { jsPDF } = window.jspdf;
 $(function () {
+  $( '.input-report' ).datepicker({
+    autoclose : true,
+    //startDate : new Date(fYear, fToday.getMonth(), '01'),
+    todayHighlight  : true,
+    dateFormat: 'dd/mm/yyyy',
+    format: 'dd/mm/yyyy',
+  });
   $("#button-save").hide();
   $("#button-save-excel").hide();
 
@@ -83,7 +90,8 @@ $(function () {
       type: "POST",
       dataType: "json",
       data: function (data) {
-        // data.sMethod = $("#hidden-sMethod").val();
+        data.Filtro_Fe_Inicio = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
+        data.Filtro_Fe_Fin = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
       },
     },
     columnDefs: [
@@ -112,7 +120,13 @@ $(function () {
       [10, 100, 1000, "Todos"],
     ],
   });
+  $('#btn-html_reporte').click(function () {
+    reload_table_Entidad();
+  });
 });
+const reload_table_Entidad = () => {
+  table_Entidad.ajax.reload(null, false);
+}
 const eliminarCotizacion= (ID) => {
   $('#modal-delete').modal('show');
   $('#modal-delete').find('#btn-eliminar-cotizacion').attr('onclick', `eliminarCotizacionConfirm(${ID})`);
