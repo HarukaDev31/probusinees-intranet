@@ -2451,7 +2451,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
           <div class="form-group">
             <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
-            <div id="modal-notas${i}" data-correlativo="${i}"  placeholder="" value="" autocomplete="off" ></div>
+            <div id="modal-notas${i}" data-correlativo="${i}"  placeholder="" value="" autocomplete="off" style="pointer-events:none"></div>
           </div>
           
         </div>

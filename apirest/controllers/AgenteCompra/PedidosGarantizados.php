@@ -357,7 +357,7 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("S{$initialRow}", "=O{$initialRow}*R{$initialRow}");
             $objPHPExcel->getActiveSheet()->setCellValue("T{$initialRow}", $val->Ss_Costo_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("U{$initialRow}", $val->Nu_Dias_Delivery);
-            $objPHPExcel->getActiveSheet()->setCellValue("V{$initialRow}", $this->htmlToTextAndLineBreaks($val->Txt_Nota));
+            $objPHPExcel->getActiveSheet()->setCellValue("V{$initialRow}", $this->htmlToRichText($val->Txt_Nota));
 
             $initialRow++;
 
@@ -508,7 +508,7 @@ class PedidosGarantizados extends CI_Controller
                 // $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
 
                 $objPHPExcel->getActiveSheet()->setCellValue("E" . $initialRow, $val->Txt_Producto);
-                $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $val->Txt_Descripcion);
+                $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $this->htmlToRichText($val->Txt_Descripcion));
                 $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $val->Qt_Producto);
                 $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->Qt_Producto_Moq);
                 $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $this->getUnitName($val->unidad_medida));
@@ -527,7 +527,7 @@ class PedidosGarantizados extends CI_Controller
               
                 $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Ss_Costo_Delivery);
                 $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $val->Nu_Dias_Delivery);
-                $objPHPExcel->getActiveSheet()->setCellValue("W" . $initialRow, $this->htmlToTextAndLineBreaks($val->Txt_Nota));    
+                $objPHPExcel->getActiveSheet()->setCellValue("W" . $initialRow, $this->htmlToRichText($val->Txt_Nota));    
 
 
                 $objPHPExcel->getActiveSheet()->getStyle("Q" . $initialRow)->getNumberFormat()->setFormatCode('0.00');
@@ -633,7 +633,7 @@ class PedidosGarantizados extends CI_Controller
                 $objPHPExcel->getActiveSheet()->setCellValue("B{$initialRow}", $i);
                 $objPHPExcel->getActiveSheet()->setCellValue("D{$initialRow}", $val->Txt_Producto);
 
-                $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}", $this->htmlToTextAndLineBreaks($val->Txt_Descripcion));
+                $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}", $this->htmlToRichText($val->Txt_Descripcion));
                 $objPHPExcel->getActiveSheet()->setCellValue("F{$initialRow}", $val->Qt_Producto);
                 if (!empty($val->Txt_Url_Imagen_Producto)) {
                     $objDrawing = new PHPExcel_Worksheet_Drawing();
@@ -683,7 +683,7 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialRow,"=O" . $initialRow . "*R" . $initialRow);
 
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
-            $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $this->htmlToTextAndLineBreaks($val->Txt_Nota));
+            $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $this->htmlToRichText($val->Txt_Nota));
 
             $initialRow++;
         }
