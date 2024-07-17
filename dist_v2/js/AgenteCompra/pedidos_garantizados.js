@@ -1266,7 +1266,7 @@ function verPedido(ID) {
         if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
           table_enlace_producto +=
             "<h6 class='font-weight-bold font-medium'>" +
-            (detalle[i]["Txt_Producto_Ingles"].trim() != "" &&
+            (detalle[i]["Txt_Producto_Ingles"] != "" &&
             detalle[i]["Txt_Producto_Ingles"]
               ? detalle[i]["Txt_Producto_Ingles"]
               : nombre_producto) +
@@ -1346,7 +1346,7 @@ function verPedido(ID) {
         table_enlace_producto += "<td class='text-left td-name' width='20%'>";
         if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
           const text =
-            (detalle[i]["Txt_Description_Ingles"].trim() != "" &&
+            (detalle[i]["Txt_Description_Ingles"] != "" &&
             detalle[i]["Txt_Description_Ingles"])
               ? detalle[i]["Txt_Description_Ingles"]
               : detalle[i]["Txt_Descripcion"];
@@ -1513,33 +1513,53 @@ function verPedido(ID) {
       arrQuill = [];
       arrQuillIngles = [];
       for (i = 0; i < detalle.length; i++) {
-        if(detalle[i]["currentUser"] == "maryam.china@probusiness.pe"){
-          const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
-            modules: {
-              toolbar: toolbarOptions,
-            },
-            theme: "snow",
-          });
-          arrQuillIngles.push(quillIngles);
-          quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
+        if(detalle[i]["currentUser"] == "maryam.china@probusiness.pe" || detalle[i]["Txt_Email"] == "maryam.china@probusiness.pe"){
+          try{
+            const quill = new Quill(`#caracteristicas-${i}`, {
+              modules: {
+                toolbar: toolbarOptions,
+              },
+              theme: "snow",
+            });
+            arrQuill.push(quill);
+            quill.root.innerHTML = detalle[i]["Txt_Descripcion"];
+          }catch(e){
+            console.log(e);
+          }
+          try{
+            const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
+              modules: {
+                toolbar: toolbarOptions,
+              },
+              theme: "snow",
+            });
+            arrQuillIngles.push(quillIngles);
+            quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
+          }catch(e){
+            console.log(e);
+          }
         }else{
-          const quill = new Quill(`#caracteristicas-${i}`, {
-            modules: {
-              toolbar: toolbarOptions,
-            },
-            theme: "snow",
-          });
-          arrQuill.push(quill);
-          quill.root.innerHTML = detalle[i]["Txt_Descripcion"];
+          try{
+            const quill = new Quill(`#caracteristicas-${i}`, {
+              modules: {
+                toolbar: toolbarOptions,
+              },
+              theme: "snow",
+            });
+            arrQuill.push(quill);
+            quill.root.innerHTML = detalle[i]["Txt_Descripcion"];
+          }catch(e){
+            console.log(e);
+          }
   
-          const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
-            modules: {
-              toolbar: toolbarOptions,
-            },
-            theme: "snow",
-          });
-          arrQuillIngles.push(quillIngles);
-          quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
+          // const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
+          //   modules: {
+          //     toolbar: toolbarOptions,
+          //   },
+          //   theme: "snow",
+          // });
+          // arrQuillIngles.push(quillIngles);
+          // quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
         }
         
 
@@ -2897,6 +2917,7 @@ function descargarDocumentoPagoGarantizado(id) {
 }
 
 function clearHTMLTextArea(str) {
+  if (str == null) return "";
   str = str.replace(/<br>/gi, "");
   str = str.replace(/<br\s\/>/gi, "");
   str = str.replace(/<br\/>/gi, "");
