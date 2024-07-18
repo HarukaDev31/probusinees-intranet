@@ -2660,12 +2660,8 @@ echo form_open('', $attributes);
     }
 
     /* CSS para ajustar la columna y el overflow */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
 
-th, td {
+.supplier-table th, .supplier-table td {
     border: 1px solid #ddd;
     padding: 8px;
 }
@@ -2734,14 +2730,14 @@ th, td {
 }
 
 /* Asegurar que el tbody sea scrollable si el contenido es demasiado ancho */
-table {
+.supplier-table {
     display: block;
     overflow-x: auto;
     width: 100%;
 }
 
 
-thead, tbody tr {
+.supplier-table thead, .supplier-table  tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
