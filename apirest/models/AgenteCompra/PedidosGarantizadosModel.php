@@ -457,7 +457,19 @@ class PedidosGarantizadosModel extends CI_Model
             /**
              * select ID_Pedido_Detalle,count(ID_Pedido_Detalle) as count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =231 group by ID_Pedido_Detalle ;
              */
-            $query = "SELECT ID_Pedido_Detalle,count(ID_Pedido_Detalle) as suppliers_count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =" . $ID . " and acpdpp.Nu_Selecciono_Proveedor =1 group by ID_Pedido_Detalle ";
+            $query="SELECT 
+                ID_Pedido_Detalle,
+
+                SUM(CASE WHEN Nu_Selecciono_Proveedor = 1 THEN 1 ELSE 0 END) AS suppliers_count
+            FROM 
+                agente_compra_pedido_detalle_producto_proveedor
+            WHERE 
+                ID_Pedido_Cabecera = " . $ID . "
+            GROUP BY 
+                ID_Pedido_Detalle;
+            ";
+            // $query = "SELECT ID_Pedido_Detalle,count(ID_Pedido_Detalle) as suppliers_count from agente_compra_pedido_detalle_producto_proveedor
+            //  acpdpp where ID_Pedido_Cabecera =" . $ID . " and acpdpp.Nu_Selecciono_Proveedor =1 group by ID_Pedido_Detalle ";
             $result = $this->db->query($query)->result();
             //check if exists count of ID_Pedido_Detalle is greater than 1
             $isValidToContinue = true;
