@@ -1352,7 +1352,7 @@ function verPedido(ID) {
               ? detalle[i]["Txt_Description_Ingles"]
               : detalle[i]["Txt_Descripcion"];
           table_enlace_producto += `<div id="caracteristicas-ingles${i}" name="" style="height: 200px;"> </div>`;
-          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas]" value='${clearHTMLTextArea(
+          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas_ingles]" value='${clearHTMLTextArea(
             text
           )}'>`;
         } else {
@@ -1528,6 +1528,7 @@ function verPedido(ID) {
             console.log(e);
           }
           try{
+            let textToSet = (detalle[i]["Txt_Description_Ingles"]!=null &&detalle[i]["Txt_Description_Ingles"]!="")?detalle[i]["Txt_Description_Ingles"]:detalle[i]["Txt_Descripcion"];
             const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
               modules: {
                 toolbar: toolbarOptions,
@@ -1535,7 +1536,7 @@ function verPedido(ID) {
               theme: "snow",
             });
             arrQuillIngles.push(quillIngles);
-            quillIngles.root.innerHTML = clearHTMLTextArea(detalle[i]["Txt_Description_Ingles"]);
+            quillIngles.root.innerHTML = clearHTMLTextArea(textToSet);
           }catch(e){
             console.log(e);
           }
