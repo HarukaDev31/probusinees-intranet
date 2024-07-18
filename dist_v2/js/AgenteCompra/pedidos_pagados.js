@@ -7574,6 +7574,7 @@ const openRotuladofromCoordination = (id) => {
       response = JSON.parse(response);
       if (response.status == "success") {
         const data = response.data;
+        
         containerCoordination.hide();
         const btnsConfig = {
           btnSave: {
@@ -8099,7 +8100,7 @@ const htmltoTextAndLineBreaks = (html) => {
   return decodedText;
 };
 const getProductTemplate = (producto, index) => {
-  producto.Txt_Producto = htmlDecode(escapeHtml(producto.Txt_Producto));
+  producto.Txt_Producto = escapeHtml(producto.Txt_Producto);
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
