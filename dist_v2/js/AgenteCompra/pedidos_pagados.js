@@ -8100,8 +8100,7 @@ const htmltoTextAndLineBreaks = (html) => {
   return decodedText;
 };
 const getProductTemplate = (producto, index) => {
-  producto.Txt_Descripcion = "";
-  producto.Txt_Description_ingles= "";
+  
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">

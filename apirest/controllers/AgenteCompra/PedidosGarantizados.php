@@ -62,7 +62,7 @@ class PedidosGarantizados extends CI_Controller
                 }
 
                 if (!empty($row->file_url)) {
-                    $btn_pago_garantizado_peru .= '<button class="btn btn-xs btn-link" alt="Descargar pago" title="Descargar pago" href="javascript:void(0)" onclick="descargarDocumentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\')">Descargar</button>';
+                    $btn_pago_garantizado_peru .= '<button class="btn btn-xs btn-link" alt="Descargar pago" title="Descargar pago" href="javascript:void(0)" onclick="descargarDocumentoPagoGarantizado(\'' . $row->file_url . '\')">Descargar</button>';
                 }
 
                 $rows[] = $btn_pago_garantizado_peru;
@@ -487,6 +487,7 @@ class PedidosGarantizados extends CI_Controller
                         $filename = $path . uniqid() . '.jpg';
                         file_put_contents($filename, $image);
                         $tempUrl[] = $filename;
+ // Obtener las dimensiones de la imagen
 
                         // Obtener las dimensiones de la imagen
                         $newWidth = 148; // O el valor que prefieras
@@ -496,8 +497,8 @@ class PedidosGarantizados extends CI_Controller
                         $objDrawing->setHeight(148);
                         $objDrawing->setCoordinates('C' . $startRow);
                         //SET OFFSET y
-                        $objDrawing->setOffsetX(1000);
-                        $objDrawing->setOffsetY(50);
+                        $objDrawing->setOffsetX(20);
+                        $objDrawing->setOffsetY(10);
                         $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 
                         // Guardar la información de la imagen para usarla después
@@ -557,7 +558,7 @@ class PedidosGarantizados extends CI_Controller
             foreach ($imagesInfo as $imageInfo) {
                 //get CimageInfo['startRow'] height
                 $height = $objPHPExcel->getActiveSheet()->getRowDimension($imageInfo['startRow'])->getRowHeight();
-                $imageInfo['objDrawing']->setOffsetY($height < $imageInfo['objDrawing']->getHeight() * 1.4 ? 50 : $height * 1.2);
+                $imageInfo['objDrawing']->setOffsetY($height < $imageInfo['objDrawing']->getHeight() * 1.2 ? 50 : $height * 1.2);
 
             }
             // if ($initialRow < $lastProductrow) {
@@ -735,6 +736,7 @@ class PedidosGarantizados extends CI_Controller
         //SET V COLUMN AUTO SIZE
         $objPHPExcel->getActiveSheet()->getColumnDimension('V')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getStyle('V17:V' . $initialRow)->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getStyle('D17:D' . $initialRow  )->getAlignment()->setWrapText(true);
         $objPHPExcel->getActiveSheet()->getStyle("Q" . $initialRow)->getNumberFormat()->setFormatCode('0.00');
         //APPLY ALL BORDERS TO COLUMN P and R
         $objPHPExcel->getActiveSheet()->getStyle('P17:P' . ($initialRow - 1))->applyFromArray(
@@ -863,5 +865,18 @@ class PedidosGarantizados extends CI_Controller
                 return 'OTRO';
                 break;
         }
+    }
+    public function addFileProveedor(){
+        $file = $_FILES['image_documento'];
+        $idCabecera = $this->input->post('documento_pago_garantizado-id_cabecera');
+        $response = $this->PedidosGarantizadosModel->addFileProveedor($file, $idCabecera);
+        if ($response) {
+            echo json_encode(array('statusCode' => 200, 'message' => 'Archivo subido correctamente','status' => 'success',
+                'data' => $response));
+        } else {
+            echo json_encode(array('statusCode' => 500, 'message' => 'Error al subir archivo',
+                'status' => 'error','data' => $response));
+        }
+
     }
 }

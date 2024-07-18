@@ -870,45 +870,26 @@ Nu_Correlativo
         );
     }
 
-    public function addFileProveedor($arrPost, $data_files)
-    {
-        if (isset($data_files['image_documento']['name'])) {
-            $this->db->trans_begin();
-            $path = "assets/images/garantizados/" . $arrPost['documento_pago_garantizado-id_cabecera'] . "/pagos/";
-            $this->allowedContentTypes = array('image', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
-            $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
-            $this->maxFileSize = 20240;
-            $Txt_Url_Imagen_Producto = $this->uploadSingleFile($data_files['image_documento'], $path);
-
-            // $where = array('id_pedido' => $arrPost['documento_pago_garantizado-id_cabecera']);
-            // $data = array('Txt_Url_Pago_Garantizado' => $Txt_Url_Imagen_Producto); //1=SI
-            $data = array(
-                "id_pedido" => $arrPost['documento_pago_garantizado-id_cabecera'],
-                "file_url" => $Txt_Url_Imagen_Producto,
-            );
-            $status = $this->db->insert($this->table_payments, $data);
-
-            if ($status === false) {
-                $this->db->trans_rollback();
-                return array('status' => 'error', 'message' => 'Error al insertar');
-            } else {
-                //$this->db->trans_rollback();
-                //registrar evento de notificacion
-                $notificacion = $this->NotificacionModel->procesarNotificacion(
-                    $this->user->No_Usuario,
-                    'Pedidos Garantizados',
-                    'Cotización ' . $arrPost['documento_pago_garantizado-correlativo'] . ' se realizo pago garantía',
-                    ''
+    public function addFileProveedor($file, $pedidoId){
+        $path = "assets/images/agentecompra/garantizados/" . $pedidoId . "/";
+        $fileURL = $this->uploadSingleFile($file, $path);
+        if($fileURL){
+            //check if exists file in table with this id_pedido and id_type_payment =1   
+            $query = "SELECT file_url AS Txt_Url_Imagen_Producto FROM " . $this->table_payments . " WHERE id_pedido = " . $pedidoId . " AND id_type_payment = 1 LIMIT 1";
+            $objFile = $this->db->query($query)->row();
+            if(is_object($objFile)){
+                $this->db->update('payments_agente_compra_pedido',
+                ['file_url' => $fileURL],
                 );
-
-                $this->db->trans_commit();
-                return array('status' => 'success', 'message' => 'Voucher guardado');
+            }else{
+            $this->db->insert('payments_agente_compra_pedido',
+                ['file_url' => $fileURL, 'id_pedido' => $pedidoId
+                ,'id_type_payment' => 1]);
             }
-        } else {
-            return array('status' => 'error', 'message' => 'No existe archivo');
         }
+        return $fileURL;
     }
-
+    
     public function descargarDocumentoPagoGarantizado($id)
     {
         $query = "SELECT file_url AS Txt_Url_Imagen_Producto FROM " . $this->table_payments . " WHERE id_pedido = " . $id . " LIMIT 1";

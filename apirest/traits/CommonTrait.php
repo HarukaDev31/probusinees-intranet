@@ -19,13 +19,14 @@ Trait CommonTrait{
         $replacedText = str_replace(['&amp;lt;', '&amp;gt;'], ['<', '>'], $html);
         
         // Reemplazar <br /> y variantes con saltos de línea \n
-        $textWithLineBreaks = preg_replace('/<br\s*\/?>/i', "\n", $replacedText);
+        $textWithLineBreaks = preg_replace('/<br\s*\/?>/i', "", $replacedText);
         
         // Decodificar entidades HTML
         $decodedText = html_entity_decode($textWithLineBreaks, ENT_QUOTES | ENT_HTML5);
     
         return $decodedText;
     }
+
     function htmlToRichText($html) {
    
         $richText = new PHPExcel_RichText();

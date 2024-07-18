@@ -2880,38 +2880,51 @@ function documentoPagoGarantizado(id, sCorrelativo) {
   $("#form-documento_pago_garantizado")[0].reset();
 }
 
-function descargarDocumentoPagoGarantizado(id) {
-  url =
-    base_url +
-    "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizadov2/" +
-    id;
-  $.ajax({
-    url: url,
-    type: "GET",
-    dataType: "JSON",
-    success: function (response) {
-      console.log(response);
+function descargarDocumentoPagoGarantizado(file_url) {
+  var a = document.createElement("a");
+  a.href = file_url;
+  a.download = getFileUrlName(file_url);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  
+}
+function getFileUrlName(file_url) {
+  var url = file_url;
+  var filename = url.substring(url.lastIndexOf("/") + 1);
+  return filename;
+}
+  // url =
+  //   base_url +
+  //   "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizadov2/" +
+  //   id;
+  // $.ajax({
+  //   url: url,
+  //   type: "GET",
+  //   dataType: "JSON",
+  //   success: function (response) {
+  //     console.log(response);
 
-      if (response.status == "success") {
-        $(".modal-ver_pago_garantizado").modal("show");
+  //     if (response.status == "success") {
+  //       $(".modal-ver_pago_garantizado").modal("show");
 
-        $(".img-pago_garantizado").attr("src", "");
-        $(".img-pago_garantizado").attr("src", response.url_image);
+  //       $(".img-pago_garantizado").attr("src", "");
+  //       $(".img-pago_garantizado").attr("src", response.url_image);
 
-        url =
-          base_url +
-          "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/" +
-          id;
-        $("#a-download_image_pago_garantizado").attr(
-          "href",
-          response.url_image
-        );
-        //$("#a-download_image_pago_garantizado").attr("data-id_pago", id);
-      } else {
-        alert(response.message);
-      }
-    },
-  });
+  //       url =
+  //         base_url +
+  //         "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/" +
+  //         id;
+  //       $("#a-download_image_pago_garantizado").attr(
+  //         "href",
+  //         response.url_image
+  //       );
+  //       //$("#a-download_image_pago_garantizado").attr("data-id_pago", id);
+  //     } else {
+  //       alert(response.message);
+  //     }
+  //   },
+  // });
 
   /*
   url = base_url + 'AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/' + id;
@@ -2919,7 +2932,7 @@ function descargarDocumentoPagoGarantizado(id) {
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
   */
-}
+//
 
 function clearHTMLTextArea(str) {
   if (str == null) return "";
@@ -2928,6 +2941,7 @@ function clearHTMLTextArea(str) {
   str = str.replace(/<br\/>/gi, "");
   str = str.replace(/<\/button>/gi, "");
   str = str.replace(/<br >/gi, "");
+  str= str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   return str;
 }
 
