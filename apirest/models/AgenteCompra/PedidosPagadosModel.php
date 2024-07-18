@@ -2189,6 +2189,9 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $this->db->where('id', $stepID);
                 $this->db->update('agente_compra_order_steps', array('status' => "COMPLETED"));
 
+            }else {
+                $this->db->where('id', $stepID);
+                $this->db->update('agente_compra_order_steps', array('status' => "PENDING"));
             }
             return array('status' => 'success', 'message' => $datatoInsert);
         } catch (Exception $e) {
