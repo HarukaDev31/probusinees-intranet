@@ -1,3 +1,4 @@
+
 var url, table_Entidad;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
@@ -8093,9 +8094,21 @@ const openOrdenCompra = (response) => {
     // $(".orden-compra_header_china").append(getProductsTemplateHeader());
     data.forEach((producto, index) => {
       //escape special chars product.Txt_Descripcion
-      producto.Txt_Descripcion = escapeHtml(producto.Txt_Descripcion);
+      // producto.Txt_Descripcion = escapeHtml(producto.Txt_Descripcion);
 
       containerOrdenCompra.append(getProductTemplate(producto, index));
+      const toolbarOptions = [
+        [], // toggled buttons
+     // remove formatting button
+      ];
+      const quill = new Quill(`#quill-container-${index}`, {
+        theme: "snow",
+        readOnly: true,
+        modules: {
+          toolbar: null,
+        },
+      });
+      quill.root.innerHTML = clearHTMLTextArea(producto.Txt_Descripcion);
       if (producto.caja_master_URL) {
         $(`#btn-rotulado-${index}`)
           .removeClass("btn-primary")
@@ -8142,6 +8155,15 @@ const openOrdenCompra = (response) => {
     }
   }
 };
+function clearHTMLTextArea(str) {
+  if (str == null) return "";
+  str = str.replace(/<br>/gi, "");
+  str = str.replace(/<br\s\/>/gi, "");
+  str = str.replace(/<br\/>/gi, "");
+  str = str.replace(/<\/button>/gi, "");
+  str = str.replace(/<br >/gi, "");
+  return str;
+}
 const escapeHtml = (unsafe) => {
   return unsafe
     .replace(/&/g, "&amp;")
@@ -8221,10 +8243,9 @@ const getProductTemplate = (producto, index) => {
     <div class="col-12 col-lg-2">
       <span>${producto.Qt_Producto}</span>
     </div>
-    <div class="col-12 col-lg-3">
-          <textarea style="word-break: break-word;overflow:auto;max-height:200px" class="form-control">${
-            htmltoTextAndLineBreaks(producto.Txt_Descripcion)
-          }</textarea>
+    <div class="col-12 col-lg-3 d-flex flex-column">
+          <div id="quill-container-${index}" 
+          style="word-break: break-word;overflow:auto;max-height:200px" ></div>
     </div>
     <div class="col-12 col-lg-2">
       <a href="${

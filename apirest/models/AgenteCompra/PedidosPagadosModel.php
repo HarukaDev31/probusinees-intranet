@@ -2126,7 +2126,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             foreach ($query->result() as $row) {
                 //escape special characters
                 $row->Txt_Producto = htmlspecialchars($row->Txt_Producto, ENT_QUOTES);
-                $row->Txt_Descripcion = htmlspecialchars($row->Txt_Descripcion, ENT_QUOTES);
+                // $row->Txt_Descripcion = htmlspecialchars($row->Txt_Descripcion, ENT_QUOTES);
 
             }
             return $query->result();
@@ -2332,12 +2332,14 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
         // Process liquidation file
         if (array_key_exists('liquidacion', $files)) {
-            $fileURL = $this->uploadSingleFile($files['liquidacion'], $pathPagos);
-            $pagosURLS['liquidacion_URL'] = $fileURL;
-        } else if ($data['liquidacion_URL']) {
+            if($files['liquidacion']['name']!=''){
+                $fileURL = $this->uploadSingleFile($files['liquidacion'], $pathPagos);
+                $pagosURLS['liquidacion_URL'] = $fileURL;
+            }
+            
+        }if ($data['liquidacion_URL']) {
             $pagosURLS['liquidacion_URL'] = $data['liquidacion_URL'];
         }
-
         // Process payment guarantee file
         if (array_key_exists('pago-garantia', $files)) {
             $fileURL = $this->uploadSingleFile($files['pago-garantia'], $pathGarantizado);

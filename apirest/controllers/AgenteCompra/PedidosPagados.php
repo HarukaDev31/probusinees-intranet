@@ -1,9 +1,11 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 require_once APPPATH . 'third_party/PHPExcel.php';
+require_once APPPATH . 'traits/CommonTrait.php';
 
 class PedidosPagados extends CI_Controller
 {
+    use CommonTrait;
     private $jefeChinaPrivilegio = 5;
     private $personalChinaPrivilegio = 2;
     private $personalPeruPrivilegio = 1;
@@ -1736,7 +1738,7 @@ class PedidosPagados extends CI_Controller
             // $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
 
             $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $val->Txt_Producto);
-            $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $val->Txt_Descripcion);
+            $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $this->htmlToRichText($this->htmlToTextAndLineBreaks($val->Txt_Descripcion)));
             $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto);
             $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow,$this->getUnitName($val->unidad_medida));
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
@@ -1836,7 +1838,7 @@ class PedidosPagados extends CI_Controller
             // $objDrawing->setPath($val->Txt_Url_Imagen_Producto);
 
             $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $val->Txt_Producto);
-            $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $val->Txt_Descripcion);
+            $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $this->htmlToRichText($this->htmlToTextAndLineBreaks($val->Txt_Descripcion)));
             $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto_Moq);
             $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->unidad_medida);
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
@@ -1846,7 +1848,6 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("R" . $initialRow, $val->kg_box);
             $objPHPExcel->getActiveSheet()->setCellValue("T" . $initialRow, $val->Ss_Costo_Delivery);
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
-            $objPHPExcel->getActiveSheet()->setCellValue("V" . $initialRow, $val->Txt_Nota);
             $objPHPExcel->getActiveSheet()->getStyle("R" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
             $objPHPExcel->getActiveSheet()->getStyle("S" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
             //apply all borders to column n and p   
