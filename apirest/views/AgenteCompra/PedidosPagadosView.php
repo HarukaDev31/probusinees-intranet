@@ -2659,38 +2659,113 @@ echo form_open('', $attributes);
       font-family: Arial, sans-serif;
     }
 
-    .supplier-table {
-      width: 100%;
-      border-collapse: collapse;
-      border-spacing: 0px 0.4em;
-    }
+    /* CSS para ajustar la columna y el overflow */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-    .supplier-table th,
-    .supplier-table td {
-      border: none;
-      padding: 10px;
-      text-align: left;
-    }
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+.c-supplier-column,.supplier-info {
+    width: 300px; /* Ajusta el ancho según tus necesidades */
+    max-width: 300px;
+    overflow-x: auto;
+    white-space: nowrap;
 
-    .supplier-table th {
-      background-color: #f2f2f2;
-      -webkit-box-shadow: 0px 5px 5px 0px rgba(163, 163, 163, 1);
-      -moz-box-shadow: 0px 5px 5px 0px rgba(163, 163, 163, 1);
-      box-shadow: 0px 5px 5px 0px rgba(163, 163, 163, 1);
-    }
+}
+.c-nombre-column{
+  width: 200px; /* Ajusta el ancho según tus necesidades */
+    max-width: 200px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.c-nombre-column div{
+  width: 100%;
+}
+.c-imagen-column{
+  width: 200px; /* Ajusta el ancho según tus necesidades */
+    max-width: 200px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+/* Estilo específico para la columna 'NOMBRE' */
 
-    .supplier-table tr td{
-      box-shadow: -1px 10px 5px -5px rgba(201,194,194,0.75);
-      -webkit-box-shadow: -1px 10px 5px -5px rgba(201,194,194,0.75);
-      -moz-box-shadow: -1px 10px 5px -5px rgba(201,194,194,0.75);
-      border-left: none;
-      border-right: none;
-    }
+.c-tentrega-column{
+    width: 150px; /* Ajusta el ancho según tus necesidades */
+    max-width: 150px;
+    overflow-x: auto;
+    white-space: nowrap;
 
-    .supplier-info {
-      background-color: #d9edf7;
-      padding: 10px;
-    }
+}
+.c-estado-column{
+    width: 150px; /* Ajusta el ancho según tus necesidades */
+    max-width: 150px;
+    overflow-x: auto;
+    white-space: nowrap;
+
+
+}
+.c-qty-column{
+    width: 100px; /* Ajusta el ancho según tus necesidades */
+    max-width: 100px;
+    overflow-x: auto;
+    white-space: nowrap;
+
+
+}
+.c-precio-column,.c-total-column,.c-pago1-column,.c-pago2-column,.c-tproduccion-column,.c-tproducto-column{
+    width: 150px; /* Ajusta el ancho según tus necesidades */
+    max-width: 150px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.c-pago1-column span,.c-pago2-column span{
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.c-pago1-column div,.c-pago2-column div{
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+/* Asegurar que el tbody sea scrollable si el contenido es demasiado ancho */
+table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+}
+
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Estilos generales para la tabla */
+.supplier-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.supplier-table th, .supplier-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.supplier-table th {
+    background-color: #f2f2f2;
+    text-align: center;
+}
+.supplier-info button{
+  width: 60%;
+  margin: 0 auto;
+}
 
     .detail {
       background-color: #f9f9f9;

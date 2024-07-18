@@ -1,4 +1,3 @@
-
 var url, table_Entidad;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
@@ -7202,7 +7201,7 @@ const getSupplierCoordinationTableHeader = () => {
           <th colspan="3" class="coordination-supplier-column c-supplier-column">SUPPLIER</th>
           <th class="coordination-imagen-column c-imagen-column">IMAGEN</th>
           <th class="coordination-nombre-column c-nombre-column">NOMBRE</th>
-          <th class="coordination-qty-column c-qty-column w-100">QTY</th>
+          <th class="coordination-qty-column c-qty-column ">QTY</th>
           <th class="coordination-precio-column c-precio-column">PRECIO</th>
           <th class="coordination-total-column c-total-column">TOTAL</th>
           <th class="coordination-tproducto-column c-tproducto-column">DELIVERY</th>
@@ -7254,16 +7253,18 @@ const getSupplierCoordinationTableTemplate = (data) => {
     html += `
       <tr>
           <td class="supplier-info" rowspan="${rowspan}" colspan="3">
+          <div class="mx-auto d-flex flex-column align-items-center">
               <div>Nombre: ${supplier.name}</div>
               <div>Teléfono: ${supplier.phone}</div>
               <div>Costo shipping: ${sumDelivery}</div>
               <input type="hidden" name="id-pedido" value="${supplier.id_pedido}"/>
               <input type="hidden" name="current-step" value="${selectedStep}"/>
 
-              <btn class="btn btn-outline-secondary btn-coordinar w-100 mb-1  " onclick="openSupplierItems(
-              ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Cambiar</btn>
-              <btn class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
-              ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Descargar Excel</btn>
+              <button class="btn btn-outline-secondary btn-coordinar  mb-1" onclick="openSupplierItems(
+              ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Cambiar</button>
+              <button class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
+              ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Descargar Excel</button>
+              </div>
           </td>
       `;
 
@@ -7275,7 +7276,8 @@ const getSupplierCoordinationTableTemplate = (data) => {
                 detail.imagenURL
               }" alt="imagen" class="img-thumbnail" />
               </td>
-              <td class="c-nombre-column">${detail.nombre_producto} 
+              <td class="c-nombre-column">
+              <span>${detail.nombre_producto} </span>
               <div class="input-group mt-3">
                 <span class="input-group-text mb-1 mx-0" id="basic-addon1">ITEM CODE:</span>
                 <input type="text" class="form-control" name="item[${
@@ -7309,9 +7311,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
           detail.total_producto
         ).toFixed(2)}</td>
               <td class="c-tproduccion-column" rowspan="${rowspan}">
-              <input type="number" class="form-control" value="${
-                detail.delivery
-              }"
+              <input type="text" class="form-control" value="${detail.delivery}"
               name="proveedor[${
                 detail.ID_Pedido_Detalle_Producto_Proveedor
               }][delivery]"/>
@@ -7405,7 +7405,9 @@ const getSupplierCoordinationTableTemplate = (data) => {
                   <td class="c-imagen-column"><img src="${
                     detail.imagenURL
                   }" alt="imagen" class="img-thumbnail" /></td>
-                  <td class="c-nombre-column">${detail.nombre_producto} 
+                  <td class="c-nombre-column">
+                  <span>${detail.nombre_producto} </span>
+
                                 <div class="input-group ">
                                   <span class="input-group-text" id="basic-addon1">ITEM CODE:</span>
                                   <input type="text" class="form-control" name="item[${
@@ -7828,10 +7830,9 @@ const openPagos = (response) => {
             );
             $(`#pago-${indexPagos}-div`).append(`
               <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-               $(`#pago-${indexPagos}-div`).append(`
+            $(`#pago-${indexPagos}-div`).append(`
             <input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`);
-            }
-         
+          }
 
           if (indexPagos > 2) {
             if (!$(`#pago-${indexPagos}-div`)) {
@@ -7878,7 +7879,7 @@ const openPagos = (response) => {
             $(`#pago-3-div`).append(`
                 <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
           }
-          if($("#pago-3_URL").length == 0){
+          if ($("#pago-3_URL").length == 0) {
             $(`#pago-3-div`).append(`
             <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
           }
@@ -7917,7 +7918,7 @@ const openPagos = (response) => {
                 $(`#pago-3-div`).append(`
                   <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
               }
-              if($("#pago-3_URL").length == 0){
+              if ($("#pago-3_URL").length == 0) {
                 $(`#pago-3-div`).append(`
                 <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
               }
@@ -7929,7 +7930,7 @@ const openPagos = (response) => {
               }
               if ($("#pago-3_value").length == 0) {
                 pago3Div.append(
-                  `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`  
+                  `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
                 );
               }
             }
@@ -7967,8 +7968,6 @@ const openPagos = (response) => {
             pago4Div.append(
               `<input type="hidden" name="pago-4_ID" id="pago-4_ID" value="${pagosData[3].idPayment}">`
             );
-            
-            
           }
           if ($("#pago-4_value").length == 0) {
             pago4Div.append(
@@ -7979,7 +7978,7 @@ const openPagos = (response) => {
             $(`#pago-4-div`).append(`
               <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
           }
-          if($("#pago-4_URL").length == 0){
+          if ($("#pago-4_URL").length == 0) {
             $(`#pago-4-div`).append(`
             <input type="hidden" name="pago-4_URL" id="pago-4_URL" value="${pagosData[2].file_url}">`);
           }
@@ -7987,7 +7986,6 @@ const openPagos = (response) => {
           pago_switch_4.prop("checked", false);
           $("pago4-file").remove();
           $("#pago-4-btnlink").remove();
-          
         }
       }
       pago_switch_4.change(function () {
@@ -8001,8 +7999,8 @@ const openPagos = (response) => {
               pago4Div.append(
                 `<a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-4_URL">Ver Pago</a>`
               );
-              
-              if ($(`#pago-4-btnlink`).length == 0 && indexPagos>4) {
+
+              if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
                 $(`#pago-4-div`).append(`
                   <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
               }
@@ -8020,7 +8018,7 @@ const openPagos = (response) => {
                 `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
               );
             }
-            if ($(`#pago-4-btnlink`).length == 0 && indexPagos>4) {
+            if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
               $(`#pago-4-div`).append(`
                 <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
             }
@@ -8099,7 +8097,7 @@ const openOrdenCompra = (response) => {
       containerOrdenCompra.append(getProductTemplate(producto, index));
       const toolbarOptions = [
         [], // toggled buttons
-     // remove formatting button
+        // remove formatting button
       ];
       const quill = new Quill(`#quill-container-${index}`, {
         theme: "snow",
@@ -8172,10 +8170,10 @@ const escapeHtml = (unsafe) => {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 };
-const  htmlDecode=(input)=> {
-  const doc = new DOMParser().parseFromString(input, 'text/html');
+const htmlDecode = (input) => {
+  const doc = new DOMParser().parseFromString(input, "text/html");
   return doc.documentElement.textContent;
-}
+};
 const getProductsTemplateHeader = () => {
   let templateHeader = ``;
 
@@ -8217,9 +8215,6 @@ const htmltoTextAndLineBreaks = (html) => {
   return decodedText;
 };
 const getProductTemplate = (producto, index) => {
-  
-
-
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
