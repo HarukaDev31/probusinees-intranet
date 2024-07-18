@@ -310,6 +310,8 @@ class PedidosGarantizados extends CI_Controller
                 $objPHPExcel->getActiveSheet()->setCellValue("B{$initialRow}", $i);
                 // $objPHPExcel->getActiveSheet()->setCellValue("C{$initialRow}", $val->Txt_Producto);
                 $objPHPExcel->getActiveSheet()->setCellValue("D{$initialRow}", $val->Txt_Producto);
+                //ajuastar texto  in column D}
+
                 // $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToTextAndLineBreaks ($val->Txt_Descripcion));}
                 $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToRichText($this->htmlToTextAndLineBreaks($val->Txt_Descripcion)));
                 if (!empty($val->Txt_Url_Imagen_Producto)) {
@@ -412,6 +414,8 @@ class PedidosGarantizados extends CI_Controller
         $objPHPExcel->getActiveSheet()->getColumnDimension('V')->setAutoSize(true);
 
         $objPHPExcel->getActiveSheet()->getStyle('V17:V' . $initialRow)->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getStyle('D17:D' . $initialRow)->getAlignment()->setWrapText(true);
+
         //set auto size column v 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
@@ -439,7 +443,7 @@ class PedidosGarantizados extends CI_Controller
         $objPHPExcel->getActiveSheet()->setCellValue('E22', $data[0]->No_Pais);
         $objPHPExcel->getActiveSheet()->setCellValue('M18', $data[0]->No_Entidad);
         $objPHPExcel->getActiveSheet()->setCellValue('M19', $data[0]->Nu_Documento_Identidad);
-        $objPHPExcel->getActiveSheet()->setCellValue('M20',"COTIZACION: ". $data[0]->cotizacionCode);
+        $objPHPExcel->getActiveSheet()->setCellValue('M20', $data[0]->cotizacionCode);
 
         $objPHPExcel->getActiveSheet()->setCellValue('M21', date('d/m/Y'));
         $objPHPExcel->getActiveSheet()->setCellValue('U22', $data[0]->Ss_Tipo_Cambio);

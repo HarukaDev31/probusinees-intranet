@@ -7239,6 +7239,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
   <table class="supplier-table">`;
   html += getSupplierCoordinationTableHeader();
   html += `<tbody>`;
+
   data.forEach((supplier) => {
     const detalles = JSON.parse(supplier.detalles);
     const sumDelivery = detalles.reduce(
@@ -7250,200 +7251,83 @@ const getSupplierCoordinationTableTemplate = (data) => {
       0
     );
     const rowspan = detalles.length;
-    html += `
-      <tr>
+
+    detalles.forEach((detail, index) => {
+      html += `<tr>`;
+
+      if (index === 0) {
+        html += `
           <td class="supplier-info" rowspan="${rowspan}" colspan="3">
-          <div class="mx-auto d-flex flex-column align-items-center">
+            <div class="mx-auto d-flex flex-column align-items-center">
               <div>Nombre: ${supplier.name}</div>
               <div>Teléfono: ${supplier.phone}</div>
               <div>Costo shipping: ${sumDelivery}</div>
               <input type="hidden" name="id-pedido" value="${supplier.id_pedido}"/>
               <input type="hidden" name="current-step" value="${selectedStep}"/>
 
-              <button class="btn btn-outline-secondary btn-coordinar  mb-1" onclick="openSupplierItems(
+              <button class="btn btn-outline-secondary btn-coordinar mb-1" onclick="openSupplierItems(
               ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Cambiar</button>
               <button class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
               ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Descargar Excel</button>
-              </div>
+            </div>
           </td>
-      `;
-
-    detalles.forEach((detail, index) => {
-      if (index === 0) {
-        html += `
-              <td class="c-imagen-column">
-              <img src="${
-                detail.imagenURL
-              }" alt="imagen" class="img-thumbnail" />
-              </td>
-              <td class="c-nombre-column">
-              <span>${detail.nombre_producto} </span>
-              <div class="input-group mt-3">
-                <span class="input-group-text mb-1 mx-0" id="basic-addon1">ITEM CODE:</span>
-                <input type="text" class="form-control" name="item[${
-                  detail.ID_Pedido_Detalle
-                }]['code']" aria-describedby="basic-addon1"
-                value="${detail.product_code}"
-                id="item['${detail.ID_Pedido_Detalle}']['code']">
-              </div>
-
-              <div class="btn btn-success" onclick="openRotuladofromCoordination(${
-                detail.ID_Pedido_Detalle
-              })">Perú</div>
-             </td>
-              <td class="c-qty-column">
-              <input type="number" class="form-control" value="${parseFloat(
-                detail.qty_product
-              )}"
-              name="proveedor[${
-                detail.ID_Pedido_Detalle_Producto_Proveedor
-              }][qty_product]"/>
-              </td>
-              <td class="c-precio-column">
-              <input type="number" class="form-control" value="${parseFloat(
-                detail.price_product
-              )}"
-              name="proveedor[${
-                detail.ID_Pedido_Detalle_Producto_Proveedor
-              }][price_product]"/>
-              </td>
-              <td class="c-total-column" rowspan="${rowspan}">${parseFloat(
-          detail.total_producto
-        ).toFixed(2)}</td>
-              <td class="c-tproduccion-column" rowspan="${rowspan}">
-              <input type="text" class="form-control" value="${detail.delivery}"
-              name="proveedor[${
-                detail.ID_Pedido_Detalle_Producto_Proveedor
-              }][delivery]"/>
-              </td>
-              <td class="c-tentrega-column" rowspan="${rowspan}">
-              <input type="date" class="form-control" value="${
-                detail.tentrega.split(" ")[0]
-              }" name="proveedor[${
-          detail.ID_Pedido_Detalle_Producto_Proveedor
-        }][tentrega]"/>
-              </td>
-
-              <td class="c-pago1-column" rowspan="${rowspan}">
-                <input type="number" class="form-control" value="${
-                  supplier.pago_1_value
-                }" name="coordination[${
-          supplier.id_coordination
-        }][pago_1_value]"/>
-                <div class="btn 
-                mt-1 mx-auto 
-                ${
-                  supplier.pago_1_URL == null
-                    ? "btn-primary"
-                    : "btn-outline-primary"
-                }"
-                onclick='openInputFile("input-pago1-${
-                  supplier.id_coordination
-                }","${supplier.pago_1_URL}")'
-                id="btn-pago1-${supplier.id_coordination}">Voucher</div>
-                <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago1','${
-                  supplier.id_coordination
-                }')">Quitar</span>
-                <input type="hidden"
-                id="input-pago1-url-${supplier.id_coordination}"
-                name="coordination[${
-                  supplier.id_coordination
-                }][pago_1_url]" value="${supplier.pago_1_URL}"/>
-                <input type="hidden" 
-                id="input-pago2-url-${supplier.id_coordination}"
-                name="coordination[${
-                  supplier.id_coordination
-                }][pago_2_url]" value="${supplier.pago_2_URL}"/>
-                <input type="file" class="form-control d-none" id="input-pago1-${
-                  supplier.id_coordination
-                }" name="coordination[${
-          supplier.id_coordination
-        }][pago_1_file]"/>
-              </td>
-              <td class="c-pago2-column" rowspan="${rowspan}">
-                <input type="number" class="form-control" disabled value="${
-                  parseFloat(total) - parseFloat(supplier.pago_1_value)
-                }" name="coordination[${
-          supplier.id_coordination
-        }][pago_2_value]"/>
-                <div class="btn mt-1 mx-auto ${
-                  supplier.pago_2_URL == null
-                    ? "btn-primary"
-                    : "btn-outline-primary"
-                }"
-        onclick='openInputFile("input-pago2-${supplier.id_coordination}","${
-          supplier.pago_2_URL
-        }")'
-                
-                id="btn-pago2-${supplier.id_coordination}">Voucher</div>
-                <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago2','${
-                  supplier.id_coordination
-                }')">Quitar</span>
-                <input type="file" class="form-control d-none" id="input-pago2-${
-                  supplier.id_coordination
-                }" name="coordination[${
-          supplier.id_coordination
-        }][pago_2_file]"/>
-              </td>
-              <td class="c-estado-column" rowspan="${rowspan}">
-              <select class="form-select" aria-label="Default select example" name="coordination[${
-                supplier.id_coordination
-              }][estado]">
-                <option value="PENDIENTE" ${
-                  supplier.estado == "PENDIENTE" ? "selected" : ""
-                }>PENDIENTE</option>
-                <option value="CONFORME" ${
-                  supplier.estado == "CONFORME" ? "selected" : ""
-                }>CONFORME</option>
-              </select>
-              </td>
-              </tr>
-              `;
-      } else {
-        html += `
-              <tr class="detail">
-                  <td class="c-imagen-column"><img src="${
-                    detail.imagenURL
-                  }" alt="imagen" class="img-thumbnail" /></td>
-                  <td class="c-nombre-column">
-                  <span>${detail.nombre_producto} </span>
-
-                                <div class="input-group ">
-                                  <span class="input-group-text" id="basic-addon1">ITEM CODE:</span>
-                                  <input type="text" class="form-control" name="item[${
-                                    detail.ID_Pedido_Detalle
-                                  }]['code']" aria-describedby="basic-addon1" 
-                                  value="${detail.product_code}"
-        >
-                                </div>
-                                <div class="btn btn-success" onclick="openRotuladofromCoordination(${
-                                  detail.ID_Pedido_Detalle
-                                })">Perú</div>
-                              </td>
-                               <td class="c-qty-column">
-                                <input type="number" class="form-control" value="${parseFloat(
-                                  detail.qty_product
-                                )}"
-                                name="proveedor[${
-                                  detail.ID_Pedido_Detalle_Producto_Proveedor
-                                }][qty_product]"/>
-                                </td>
-                                <td class="c-precio-column"><input type="number" class="form-control" value="${parseFloat(
-                                  detail.price_product
-                                )}"
-                                name="proveedor[${
-                                  detail.ID_Pedido_Detalle_Producto_Proveedor
-                                }][price_product]"/></td>
-                                </tr>
-                                `;
+          <td class="c-total-column" rowspan="${rowspan}">${parseFloat(total).toFixed(2)}</td>
+          <td class="c-tproduccion-column" rowspan="${rowspan}">
+            <input type="text" class="form-control" value="${detail.delivery}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor}][delivery]"/>
+          </td>
+          <td class="c-tentrega-column" rowspan="${rowspan}">
+            <input type="date" class="form-control" value="${detail.tentrega.split(" ")[0]}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor}][tentrega]"/>
+          </td>
+          <td class="c-pago1-column" rowspan="${rowspan}">
+            <input type="number" class="form-control" value="${supplier.pago_1_value}" name="coordination[${supplier.id_coordination}][pago_1_value]"/>
+            <div class="btn mt-1 mx-auto ${supplier.pago_1_URL == null ? "btn-primary" : "btn-outline-primary"}" onclick='openInputFile("input-pago1-${supplier.id_coordination}","${supplier.pago_1_URL}")' id="btn-pago1-${supplier.id_coordination}">Voucher</div>
+            <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago1','${supplier.id_coordination}')">Quitar</span>
+            <input type="hidden" id="input-pago1-url-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_1_url]" value="${supplier.pago_1_URL}"/>
+            <input type="hidden" id="input-pago2-url-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_2_url]" value="${supplier.pago_2_URL}"/>
+            <input type="file" class="form-control d-none" id="input-pago1-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_1_file]"/>
+          </td>
+          <td class="c-pago2-column" rowspan="${rowspan}">
+            <input type="number" class="form-control" disabled value="${parseFloat(total) - parseFloat(supplier.pago_1_value)}" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
+            <div class="btn mt-1 mx-auto ${supplier.pago_2_URL == null ? "btn-primary" : "btn-outline-primary"}" onclick='openInputFile("input-pago2-${supplier.id_coordination}","${supplier.pago_2_URL}")' id="btn-pago2-${supplier.id_coordination}">Voucher</div>
+            <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago2','${supplier.id_coordination}')">Quitar</span>
+            <input type="file" class="form-control d-none" id="input-pago2-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_2_file]"/>
+          </td>
+          <td class="c-estado-column" rowspan="${rowspan}">
+            <select class="form-select" aria-label="Default select example" name="coordination[${supplier.id_coordination}][estado]">
+              <option value="PENDIENTE" ${supplier.estado == "PENDIENTE" ? "selected" : ""}>PENDIENTE</option>
+              <option value="CONFORME" ${supplier.estado == "CONFORME" ? "selected" : ""}>CONFORME</option>
+            </select>
+          </td>`;
       }
+
+      html += `
+        <td class="c-imagen-column${index === 0 ? "" : "2"}">
+          <img src="${detail.imagenURL}" alt="imagen" class="img-thumbnail" />
+        </td>
+        <td class="c-nombre-column${index === 0 ? "" : "2"}">
+          <span>${detail.nombre_producto} </span>
+          <div class="input-group mt-3">
+            <span class="input-group-text mb-1 mx-0" id="basic-addon1">ITEM CODE:</span>
+            <input type="text" class="form-control" name="item[${detail.ID_Pedido_Detalle}]['code']" aria-describedby="basic-addon1" value="${detail.product_code}" id="item['${detail.ID_Pedido_Detalle}']['code']">
+          </div>
+          <div class="btn btn-success" onclick="openRotuladofromCoordination(${detail.ID_Pedido_Detalle})">Perú</div>
+        </td>
+        <td class="c-qty-column${index === 0 ? "" : "2"}">
+          <input type="number" class="form-control" value="${parseFloat(detail.qty_product)}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor}][qty_product]"/>
+        </td>
+        <td class="c-precio-column${index === 0 ? "" : "2"}">
+          <input type="number" class="form-control" value="${parseFloat(detail.price_product)}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor}][price_product]"/>
+        </td>
+      </tr>`;
     });
   });
-  html += `</tbody>`;
-  html += `</table>`;
-  html += `</form>`;
+
+  html += `</tbody></table></form>`;
   return html;
 };
+
+
+
 const downloadSupplierExcel = (id_pedido, id_supplier, id_coordination) => {
   url = base_url + "AgenteCompra/PedidosPagados/downloadSupplierExcel";
   $.ajax({
@@ -8215,6 +8099,7 @@ const htmltoTextAndLineBreaks = (html) => {
   return decodedText;
 };
 const getProductTemplate = (producto, index) => {
+  producto.Txt_Producto = htmlDecode(escapeHtml(producto.Txt_Producto));
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
