@@ -633,9 +633,12 @@ class PedidosGarantizadosModel extends CI_Model
                 $arrSaleOrderDetailUPD[$arrayIndex] = array(
                     'ID_Pedido_Detalle' => $row['id_item'],
                     'Qt_Producto' => $row['cantidad'], //agergar input de cantidad
-                    'Txt_Descripcion' => nl2br(urldecode($row['caracteristicas'])),
 
-                );
+                );                    
+
+                if(array_key_exists('caracteristicas',$row)){
+                    $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Descripcion'] = nl2br(urldecode($row['caracteristicas']));
+                }
                 if (array_key_exists('caracteristicas_ingles', $row)) {
                     $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Description_Ingles'] = nl2br(urldecode($row['caracteristicas_ingles']));
 
