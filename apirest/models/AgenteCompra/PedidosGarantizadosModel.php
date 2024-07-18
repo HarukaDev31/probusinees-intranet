@@ -462,10 +462,17 @@ class PedidosGarantizadosModel extends CI_Model
             //check if exists count of ID_Pedido_Detalle is greater than 1
             $isValidToContinue = true;
             foreach ($result as $row) {
+                if(!array_key_exists('suppliers_count',$row)){
+                    $isValidToContinue = false;
+                    break;
+                }
                 if ($row->suppliers_count > 1 || $row->suppliers_count==0) {
                     $isValidToContinue = false;
                     break;
                 }
+            }
+            if(count($result)==0){
+                $isValidToContinue = false;
             }
             if (!$isValidToContinue) {
                 return array('status' => 'error', 'message' => 'Error al aprobar la cotización hay items con mas de un proveedor o sin proveedor elegido');
