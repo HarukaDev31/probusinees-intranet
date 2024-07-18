@@ -575,13 +575,23 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue('E' . ($initialRow+3), "=M" . ($initialRow));
             $objPHPExcel->getActiveSheet()->setCellValue('F' . ($initialRow+3), "=N" . ($initialRow));
             //set auto size column w and center horizontal column f
-            $objPHPExcel->getActiveSheet()->getColumnDimension('W')->setAutoSize(true);
+            
             $objPHPExcel->getActiveSheet()->getStyle("F26:F" . ($initialRow - 1))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('W26:W' . ($initialRow - 1))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('V26:V' . ($initialRow - 1))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('W26:W' . ($initialRow - 1))->getAlignment()->setWrapText(true);
+            $objPHPExcel->getActiveSheet()->getStyle('F26:F' . ($initialRow - 1))->getAlignment()->setWrapText(true);
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $objWriter->save('php://output');
+            $sheet=$objPHPExcel->getActiveSheet();
+            //set all row auto size 
+            $objPHPExcel->getActiveSheet()->getColumnDimension('W')->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+            //SET ROW AUTO SIZE 
+            $sheet = $objPHPExcel->getActiveSheet();
+
+            
+            //set min width column F
             foreach ($tempUrl as $val) {
                 unlink($val);
             }
