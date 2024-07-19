@@ -421,6 +421,9 @@ class CCotizacionesModel extends CI_Model
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn3 . $initialRow, $tarifa["tarifa"]);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn4 . $initialRow, $tarifa["id_tipo_tarifa"] == 1 ? "Estandar" : "No Estandar");
             //set currency format with dollar symbol
+            if($CBM_Total_C>1 && $CBM_Total_C<1.1){
+                $CBM_Total_C = 1.1;
+            }
             if ($CBM_Total_C >= $tarifa["limite_inf"] && $CBM_Total_C <= $tarifa["limite_sup"]) {
                 $tarifaCell = $TarifasStartColumn3 . $initialRow;
                 $tipoTarifa = $TarifasStartColumn4 . $initialRow;

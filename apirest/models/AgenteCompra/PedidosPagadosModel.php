@@ -31,6 +31,9 @@ class PedidosPagadosModel extends CI_Model
     public $get_productos = "get_agente_compra_pedido_productos";
     public $table_payments = "payments_agente_compra_pedido";
     public $sp_suppliers = "get_suppliers_products";
+    private $jefeChinaPrivilegio = 5;
+    private $personalChinaPrivilegio = 2;
+    private $personalPeruPrivilegio = 1;
     public function __construct()
     {
         parent::__construct();
@@ -2490,7 +2493,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     $pago2UrlExists = $row['pago_2_url'];
                 }
             }
-            $pago1Url = !empty($files['coordination']['name'][$key]['pago_1_file']) ?
+            $pago1Url = empty($files['coordination']['name'][$key]['pago_1_file'])==false ?
             $this->uploadSingleFile([
                 'name' => $files['coordination']['name'][$key]['pago_1_file'],
                 'type' => $files['coordination']['type'][$key]['pago_1_file'],
@@ -2499,11 +2502,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 'size' => $files['coordination']['size'][$key]['pago_1_file'],
             ], $path) : $pago1UrlExists;
 
-            $pago2Url = !empty($files['coordination']['name'][$key]['pago_2_file']) ?
+            $pago2Url = empty($files['coordination']['name'][$key]['pago_2_file'])==
+            false ?
             $this->uploadSingleFile([
                 'name' => $files['coordination']['name'][$key]['pago_2_file'],
                 'type' => $files['coordination']['type'][$key]['pago_2_file'],
-                'tmp_name' => $files['coordination']['tmp_name'][$key]['pago_2_file'],
+                'tmp_name' => $files['c oordination']['tmp_name'][$key]['pago_2_file'],
                 'error' => $files['coordination']['error'][$key]['pago_2_file'],
                 'size' => $files['coordination']['size'][$key]['pago_2_file'],
             ], $path) : $pago2UrlExists;
@@ -2515,28 +2519,99 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 'estado' => $row['estado'],
 
             ];
+            
             //if pago_1_file is not null
 
-            $producto_detalle['pago_1_URL'] = $pago1Url;
-            $producto_detalle['pago_2_URL'] = $pago2Url;
-
-            //update agente_compra_coordination_supplier
-            $this->db->where('id_coordination', $key);
+            if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio){
+                $producto_detalle['pago_1_URL'] = $pago1Url;
+                $producto_detalle['pago_2_URL'] = $pago2Url;
+            }
+            $this->db->where('id_coordination', $producto_detalle['id_coordination']);
             $this->db->update('agente_compra_coordination_supplier', $producto_detalle);
-            //check if all suppliers in agente_compra_coordination_supplier have estado enum='COMPLETED' where id_pedido=
+
+            $this->db->select('pago_1_URL,pago_2_URL,estado_negociacion');
+            $this->db->from('agente_compra_coordination_supplier');
+            $this->db->where('id_coordination', $key);
+
+            $result = $this->db->get()->row();
+            /**
+             *  private $jefeChinaPrivilegio = 5;
+             * private $personalChinaPrivilegio = 2;
+              *  private $personalPeruPrivilegio = 1;    
+             */
+            if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio && $result->estado_negociacion==$row['estado_negociacion']){
+                //if result is not null and pago_1_URL and pago_2_URL are not null
+                if ($result->pago_2_URL != null && $result->pago_1_URL != null) {
+                    //update estado_negociacion to 'ADELANTADO' where id_pedido=$idPedido
+                    $this->db->where('id_pedido', $idPedido);
+                    $this->db->where('id_coordination', $key);
+                    $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PAGADO'));
+                    //update estado to 'COMPLETED' where id_pedido=$idPedido
+                  
+
+                }else if( $result->pago_1_URL != null ){
+                    $this->db->where('id_pedido', $idPedido);
+                    $this->db->where('id_coordination', $key);
+                    $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'ADELANTADO'));
+                }else{
+                    $this->db->where('id_pedido', $idPedido);
+                    $this->db->where('id_coordination', $key);
+                    $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PENDIENTE'));
+                }
+                // $this->updateStep($currentStep, "COMPLETED");
+            }else{
+                $this->db->where('id_pedido', $idPedido);
+                $this->db->where('id_coordination', $key);
+                $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => $row['estado_negociacion']));
+
+            }
+            
+                
+                
+        }
+        if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio){
+            //get all rows with this idpedido and get all rows with estado_negociacion='PAGADO'
             $this->db->select('count(*) as total');
             $this->db->from('agente_compra_coordination_supplier');
             $this->db->where('id_pedido', $idPedido);
-            $this->db->where('estado', 'COMPLETED');
+            
             $query = $this->db->get();
-            $result = $query->row();
-            if ($result->total == count($data['coordination'])) {
+            $total = $query->row()->total;
+            $this->db->select('count(*) as total');
+            $this->db->from('agente_compra_coordination_supplier');
+            $this->db->where('id_pedido', $idPedido);
+            $this->db->where('estado_negociacion', 'PAGADO');
+            $query = $this->db->get();
+            $total_pagado = $query->row()->total;
+            if($total==$total_pagado){
                 $this->updateStep($currentStep, "COMPLETED");
+            }else {
+                $this->updateStep($currentStep, "PENDING");
+            }
+        }else{
+            $this->db->select('count(*) as total');
+            $this->db->from('agente_compra_coordination_supplier');
+            $this->db->where('id_pedido', $idPedido);
+            
+            $query = $this->db->get();
+            $total = $query->row()->total;
+            $this->db->select('count(*) as total');
+            $this->db->from('agente_compra_coordination_supplier');
+            $this->db->where('id_pedido', $idPedido);
+            $this->db->where('estado', 'CONFORME');
+            $query = $this->db->get();
+            $total_pagado = $query->row()->total;
+            if($total==$total_pagado){
+                $this->updateStep($currentStep, "COMPLETED");
+            }else {
+                $this->updateStep($currentStep, "PENDING");
             }
         }
         return ['status' => 'success', 'message' => 'Coordination saved'];
 
-    }public function getSupplierItems($ID_pedido, $ID_supplier, $ID_coordination)
+    }
+    
+    public function getSupplierItems($ID_pedido, $ID_supplier, $ID_coordination)
     {
         $this->db->select('
 		ACPDPP.ID_Pedido_Detalle,

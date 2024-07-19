@@ -9,7 +9,7 @@ let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 // FIN AUTOCOMPLETE
 
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
-
+let arrQuillCaracteristicas = [];
 $(function () {
   //Date picker invoice
   $( '.input-report' ).datepicker({
@@ -352,7 +352,8 @@ function verPedido(ID){
           table_enlace_producto += "</td>";
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           table_enlace_producto += "<td class='text-left td-name' width='20%'>";
-          table_enlace_producto += '<textarea class="form-control" placeholder="" name="addProductoTable[' + id_item + '][caracteristicas]" style="height: 200px;">' + clearHTMLTextArea(detalle[i]['Txt_Descripcion']) + '</textarea>';
+          table_enlace_producto+='<input type="hidden" name="addProductoTable[' + id_item + '][caracteristicas]"/>'
+          table_enlace_producto += `<div id="quill-caracteristicas-${i}"  style="width:250px"></div>`;
           table_enlace_producto += "</td>";
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
           table_enlace_producto += "<td class='text-left td-name' width='10%'>" + href_link + "</td>";
@@ -363,6 +364,23 @@ function verPedido(ID){
       
       $('#span-total_cantidad_items').html(i);
       $( '#table-Producto_Enlace' ).append(table_enlace_producto);
+      arrQuillCaracteristicas = [];
+      const toolbarOptions = [
+        ["bold", "italic", "underline"], // toggled buttons
+        [{ color: [] }], // dropdown with defaults from theme
+        ["clean"], // remove formatting button
+      ];
+      detalle.forEach((element, index) => {
+        var quill = new Quill(`#quill-caracteristicas-${index}`, {
+          theme: 'snow',
+          modules: {
+            toolbar: toolbarOptions,
+          },
+        });
+        quill.root.innerHTML = element.Txt_Descripcion;
+        arrQuillCaracteristicas.push(quill);
+      });
+
       
       validateDecimal();
     },

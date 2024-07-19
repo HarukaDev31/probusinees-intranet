@@ -2726,6 +2726,14 @@ echo form_open('', $attributes);
   justify-content: center;
   align-items: center;
   text-align: center;
+  padding:1em ;
+}.supplier-table-header div:nth-child(odd){
+  background-color: #f9f9f9;
+
+}
+.supplier-table-header div:nth-child(even){
+  background-color: #f2f2f2;
+
 }
 .c-estado-column{
     width: 150px; /* Ajusta el ancho según tus necesidades */
@@ -2750,7 +2758,7 @@ echo form_open('', $attributes);
 }
 .c-precio-column,.c-total-column,.c-pago1-column,.c-pago2-column,.c-tproduccion-column,.c-tproducto-column{
     width: 150px; /* Ajusta el ancho según tus necesidades */
-   
+    padding: 1em;
     white-space: nowrap;
 }
 .c-pago1-column span,.c-pago2-column span{

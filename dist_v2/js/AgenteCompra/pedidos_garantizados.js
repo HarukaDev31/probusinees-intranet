@@ -2714,9 +2714,7 @@ function getItemProveedor(id_detalle) {
           [{ color: [] }], // dropdown with defaults from theme
           ["clean"], // remove formatting button
         ];
-        console.log(detalle[i]["Txt_Nota"],"quill",$(`#modal-notas${i + 1}`));
-        //if exist quil with the same id, destroy it
-        
+
         const notasQuill = new Quill(`#modal-notas${i+1}`, {
           modules: {
             toolbar: toolbarOptions,

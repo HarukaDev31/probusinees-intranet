@@ -229,4 +229,9 @@
   </div>
   <!-- /.modal-dialog -->
 </div>
+<style scoped>
+  .ql-toolbar {
+    width: 250px;
+  }
+  </style>
 <!-- /.modal imagen del item -->

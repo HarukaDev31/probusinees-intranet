@@ -4954,7 +4954,7 @@ function clearHTMLTextArea(str) {
   str = str.replace(/<br\/>/gi, "");
   str = str.replace(/<\/button>/gi, "");
   str = str.replace(/<br >/gi, "");
-  str= str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  str = str.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   return str;
 }
 const changeStatusOrden = (estado, id_pedido) => {
@@ -6979,7 +6979,6 @@ const stepTemplate = (step, i) => {
 };
 
 const getItemTemplate = (i, mode, detalle) => {
-  
   div_items = `
   <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
     <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][proovedor-id]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
@@ -7143,14 +7142,12 @@ const openStepFunction = (i, stepId) => {
 };
 const openCoordination = (response) => {
   containerOrdenCompra.hide();
-  let data=JSON.parse(response).data
-  
+  let data = JSON.parse(response).data;
+
   const headerDiv = getSupplierCoordinationHeader(data);
   console.log(headerDiv);
   containerCoordination.append(headerDiv);
-  const bodyDIV = getSupplierCoordinationTableTemplate(
-    data
-  );
+  const bodyDIV = getSupplierCoordinationTableTemplate(data);
   containerCoordination.append(bodyDIV);
   const configButtons = {
     btnCancel: {
@@ -7200,9 +7197,8 @@ const saveCoordination = () => {
  * @returns {string} html
  */
 const getSupplierCoordinationTableHeader = () => {
-  return `
+  let template = `
   <div class="d-flex flex-row supplier-table-header">
-      
           <div class="coordination-supplier-column c-supplier-column">SUPPLIER</div>
           <div class="coordination-imagen-column c-imagen-column">IMAGEN</div>
           <div class="coordination-nombre-column c-nombre-column">NOMBRE</div>
@@ -7214,9 +7210,13 @@ const getSupplierCoordinationTableHeader = () => {
           <div class="coordination-pago1-column c-pago1-column">PAGO 1</div>
           <div class="coordination-pago2-column c-pago2-column">PAGO 2</div>
           <div class="coordination-estado-column c-estado-column">ESTADO</div>
-      
-  </div>
+  
   `;
+  if (currentPrivilege == priviligesJefeChina) {
+    template += `<div class="coordination-c-negociacion-column c-negociacion-column">NEGOCIACION</div>`;
+  }
+  template += `</div>`;
+  return template;
 };
 /**
  *  This function is used to get the body of the table
@@ -7239,12 +7239,12 @@ $("#table-elegir_productos_proveedor").on(
   }
 );
 const getSupplierCoordinationTableTemplate = (data) => {
-  const header=getSupplierCoordinationTableHeader();
+  const header = getSupplierCoordinationTableHeader();
   let html = `
   <form id="form-coordination">
   <div class="supplier-table">`;
   html += header;
-  const defaultHeight=200;
+  const defaultHeight = 200;
 
   data.forEach((supplier) => {
     const detalles = JSON.parse(supplier.detalles);
@@ -7256,7 +7256,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
       (acc, detail) => acc + detail.qty_product * detail.price_product,
       0
     );
-    const detailsCount=detalles.length;
+    const detailsCount = detalles.length;
     const detailsImgs = detalles.map((detail) => {
       return detail.imagenURL;
     });
@@ -7265,82 +7265,188 @@ const getSupplierCoordinationTableTemplate = (data) => {
     });
     html += `
       <div class="supplier-row ">
-        <div class="supplier-info" style="height:${detailsCount*defaultHeight}px">
+        <div class="supplier-info" style="height:${
+          detailsCount * defaultHeight
+        }px">
           <div>Nombre: ${supplier.name}</div>
           <div>Teléfono: ${supplier.phone}</div>
           <div>Costo shipping: ${sumDelivery}</div>
           <input type="hidden" name="id-pedido" value="${supplier.id_pedido}"/>
           <input type="hidden" name="current-step" value="${selectedStep}"/>
           <button class="btn btn-outline-secondary btn-coordinar mb-1" onclick="openSupplierItems(
-          ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Cambiar</button>
+          ${supplier.id_pedido},${supplier.id_supplier},${
+      supplier.id_coordination
+    })">Cambiar</button>
           <button class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
-          ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination})">Descargar Excel</button>
+          ${supplier.id_pedido},${supplier.id_supplier},${
+      supplier.id_coordination
+    })">Descargar Excel</button>
         </div>`;
-        
-        detailsImgs.forEach((img) => {
-          html += ` <div class="c-imagen-column">
+
+    detailsImgs.forEach((img) => {
+      html += ` <div class="c-imagen-column">
           <img src="${img}" alt="imagen" class="img-thumbnail" />
           </div>`;
-        });
-        detalles.forEach((detail) => {
-          html += `
+    });
+    detalles.forEach((detail) => {
+      html += `
           <div class="c-nombre-column" style="height:${defaultHeight}px">
           <span>${detail.nombre_producto} </span>
           <div class="input-group mt-3 d-flex flex-row justify-content-center align-items-center mb-1 ">
             <span class="input-group-text " id="basic-addon1">ITEM CODE:</span>
-            <input type="text" class="form-control" name="item[${detail.ID_Pedido_Detalle}]['code']" aria-describedby="basic-addon1" value="${detail.product_code}" id="item['${detail.ID_Pedido_Detalle}']['code']">
+            <input type="text" class="form-control" name="item[${
+              detail.ID_Pedido_Detalle
+            }]['code']" aria-describedby="basic-addon1" value="${
+        detail.product_code
+      }" id="item['${detail.ID_Pedido_Detalle}']['code']">
           </div>
-          <div class="btn btn-success" onclick="openRotuladofromCoordination(${detail.ID_Pedido_Detalle})">Perú</div>
+          <div class="btn btn-success" onclick="openRotuladofromCoordination(${
+            detail.ID_Pedido_Detalle
+          })">Perú</div>
         </div>
           <div class="c-qty-column">
-          <input type="number" class="form-control" value="${parseFloat(detail.qty_product)}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor}][qty_product]"/>
+          <input type="number" class="form-control" value="${parseFloat(
+            detail.qty_product
+          )}" name="proveedor[${
+        detail.ID_Pedido_Detalle_Producto_Proveedor
+      }][qty_product]"/>
         </div>
         <div class="c-precio-column">
-          <input type="number" class="form-control" value="${parseFloat(detail.price_product)}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor}][price_product]"/>
+          <input type="number" class="form-control" value="${parseFloat(
+            detail.price_product
+          )}" name="proveedor[${
+        detail.ID_Pedido_Detalle_Producto_Proveedor
+      }][price_product]"/>
         </div>
-        `
-        
-        });
-        html += `
-        <div class="c-total-column" style="height:${detailsCount*defaultHeight}px">${parseFloat(total).toFixed(2)}</div>`;
-        detalles.forEach((detalle) => {
-          html += ` <div class="c-tproduccion-column">
+        `;
+    });
+    html += `
+        <div class="c-total-column" style="height:${
+          detailsCount * defaultHeight
+        }px">${parseFloat(total).toFixed(2)}</div>`;
+    detalles.forEach((detalle) => {
+      html += ` <div class="c-tproduccion-column">
           <input type="text" class="form-control" value="${detalle.delivery}" name="proveedor[${detalle.ID_Pedido_Detalle_Producto_Proveedor}][delivery]"/>
         </div>`;
-        });
-        html += `
+    });
+    html += `
         
-        <div class="c-tentrega-column"  style="height:${detailsCount*defaultHeight}px">
-          <input type="date" class="form-control" value="${detalles[0].tentrega.split(" ")[0]}" name="proveedor[${detalles[0].ID_Pedido_Detalle_Producto_Proveedor}][tentrega]"/>
-        </div>
-        <div class="c-pago1-column">
+        <div class="c-tentrega-column"  style="height:${
+          detailsCount * defaultHeight
+        }px">
+          <input type="date" class="form-control" value="${
+            detalles[0].tentrega.split(" ")[0]
+          }" name="proveedor[${
+      detalles[0].ID_Pedido_Detalle_Producto_Proveedor
+    }][tentrega]"/>
+        </div>`;
+    if (currentPrivilege == priviligesJefeChina) {
+      html += `
+          <div class="c-pago1-column">
+          <input type="number" class="form-control" value="${
+            supplier.pago_1_value
+          }" name="coordination[${supplier.id_coordination}][pago_1_value]"/>
+          <div class="btn mt-1 mx-auto ${
+            supplier.pago_1_URL == null ? "btn-primary" : "btn-outline-primary"
+          }" onclick='openInputFile("input-pago1-${
+        supplier.id_coordination
+      }","${supplier.pago_1_URL}")' id="btn-pago1-${
+        supplier.id_coordination
+      }">Voucher</div>
+          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago1','${
+            supplier.id_coordination
+          }')">Quitar</span>
+          <input type="hidden" id="input-pago1-url-${
+            supplier.id_coordination
+          }" name="coordination[${
+        supplier.id_coordination
+      }][pago_1_url]" value="${supplier.pago_1_URL}"/>
+          <input type="file" class="form-control d-none" id="input-pago1-${
+            supplier.id_coordination
+          }" name="coordination[${supplier.id_coordination}][pago_1_file]"/>
+        </div>`;
+    } else {
+      html += `
+          <div class="c-pago1-column">
           <input type="number" class="form-control" value="${supplier.pago_1_value}" name="coordination[${supplier.id_coordination}][pago_1_value]"/>
-          <div class="btn mt-1 mx-auto ${supplier.pago_1_URL == null ? "btn-primary" : "btn-outline-primary"}" onclick='openInputFile("input-pago1-${supplier.id_coordination}","${supplier.pago_1_URL}")' id="btn-pago1-${supplier.id_coordination}">Voucher</div>
-          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago1','${supplier.id_coordination}')">Quitar</span>
-          <input type="hidden" id="input-pago1-url-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_1_url]" value="${supplier.pago_1_URL}"/>
-          <input type="hidden" id="input-pago2-url-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_2_url]" value="${supplier.pago_2_URL}"/>
-          <input type="file" class="form-control d-none" id="input-pago1-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_1_file]"/>
-        </div>
-        <div class="c-pago2-column">
-          <input type="number" class="form-control" disabled value="${parseFloat(total) - parseFloat(supplier.pago_1_value)}" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
-          <div class="btn mt-1 mx-auto ${supplier.pago_2_URL == null ? "btn-primary" : "btn-outline-primary"}" onclick='openInputFile("input-pago2-${supplier.id_coordination}","${supplier.pago_2_URL}")' id="btn-pago2-${supplier.id_coordination}">Voucher</div>
-          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago2','${supplier.id_coordination}')">Quitar</span>
-          <input type="file" class="form-control d-none" id="input-pago2-${supplier.id_coordination}" name="coordination[${supplier.id_coordination}][pago_2_file]"/>
-        </div>
-        <div class="c-estado-column">
-          <select class="form-select" aria-label="Default select example" name="coordination[${supplier.id_coordination}][estado]">
-            <option value="PENDIENTE" ${supplier.estado == "PENDIENTE" ? "selected" : ""}>PENDIENTE</option>
-            <option value="CONFORME" ${supplier.estado == "CONFORME" ? "selected" : ""}>CONFORME</option>
+          </div>`;
+    }
+    if (currentPrivilege == priviligesJefeChina) {
+      html +=
+      `<div class="c-pago2-column">
+          <input type="number" class="form-control" disabled value="${
+            parseFloat(total) - parseFloat(supplier.pago_1_value)
+          }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
+          <div class="btn mt-1 mx-auto ${
+            supplier.pago_2_URL == null ? "btn-primary" : "btn-outline-primary"
+          }" onclick='openInputFile("input-pago2-${
+        supplier.id_coordination
+      }","${supplier.pago_2_URL}")' id="btn-pago2-${
+        supplier.id_coordination
+      }">Voucher</div>
+          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago2','${
+            supplier.id_coordination
+          }')">Quitar</span>
+          <input type="file" class="form-control d-none" id="input-pago2-${
+            supplier.id_coordination
+          }" name="coordination[${supplier.id_coordination}][pago_2_file]"/>
+          <input type="hidden" id="input-pago2-url-${
+            supplier.id_coordination
+          }" name="coordination[${
+        supplier.id_coordination
+      }][pago_2_url]" value="${supplier.pago_2_URL}"/>
+
+          </div>`;
+    } else {
+      html += `<div class="c-pago2-column">
+          <input type="number" class="form-control" disabled value="${
+            parseFloat(total) - parseFloat(supplier.pago_1_value)
+          }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
+          </div>`;
+    }
+
+
+
+    html += `
+    <div class="c-estado-column"> 
+          <select class="form-select" aria-label="Default select example" name="coordination[${
+            supplier.id_coordination
+          }][estado]"
+
+          ${currentPrivilege == priviligesJefeChina ? "style='pointer-events:none'" : ""} >
+            <option value="PENDIENTE" ${
+              supplier.estado == "PENDIENTE" ? "selected" : ""
+            }>PENDIENTE</option>
+            <option value="CONFORME" ${
+              supplier.estado == "CONFORME" ? "selected" : ""
+            }>CONFORME</option>
           </select>
         </div>
-      </div>`;
-
+        `;
+    if (currentPrivilege == priviligesJefeChina) {
+      html += `
+          <div class="c-negociacion-column">
+          <select class="form-select" aria-label="Default select example" name="coordination[${
+            supplier.id_coordination
+          }][estado_negociacion]">
+            <option value="PENDIENTE" ${
+              supplier.estado_negociacion == "PENDIENTE" ? "selected" : ""
+            }>PENDIENTE</option>
+            <option value="ADELANTADO" ${
+              supplier.estado_negociacion == "ADELANTADO" ? "selected" : ""
+            }>ADELANTADO</option>
+            <option value="PAGADO" ${
+              supplier.estado_negociacion == "PAGADO" ? "selected" : ""
+            }>PAGADO</option>
+          </select>
+        </div>
+        `;
+    }
+    html += `</div>`;
     // detalles.forEach((detail) => {
     //   html += `
     //   <div class="detail-row">
-       
-        
-      
+
     //   </div>`;
     // });
   });
@@ -7348,9 +7454,6 @@ const getSupplierCoordinationTableTemplate = (data) => {
   html += `</div></form>`;
   return html;
 };
-
-
-
 
 const downloadSupplierExcel = (id_pedido, id_supplier, id_coordination) => {
   url = base_url + "AgenteCompra/PedidosPagados/downloadSupplierExcel";
@@ -7598,7 +7701,7 @@ const openRotuladofromCoordination = (id) => {
       response = JSON.parse(response);
       if (response.status == "success") {
         const data = response.data;
-        
+
         containerCoordination.hide();
         const btnsConfig = {
           btnSave: {
@@ -8014,7 +8117,7 @@ const openOrdenCompra = (response) => {
           toolbar: null,
         },
       });
-      quill.root.innerHTML =clearHTMLTextArea(producto.Txt_Descripcion);
+      quill.root.innerHTML = clearHTMLTextArea(producto.Txt_Descripcion);
       if (producto.caja_master_URL) {
         $(`#btn-rotulado-${index}`)
           .removeClass("btn-primary")
@@ -8124,10 +8227,10 @@ const htmltoTextAndLineBreaks = (html) => {
 };
 const getProductTemplate = (producto, index) => {
   const productoCopy = { ...producto };
-  productoCopy.Txt_Producto = ""
-  productoCopy.Txt_Descripcion = ""
-  productoCopy.Txt_Description_Ingles = ""
-  
+  productoCopy.Txt_Producto = "";
+  productoCopy.Txt_Descripcion = "";
+  productoCopy.Txt_Description_Ingles = "";
+
   const productoJson = JSON.stringify(productoCopy);
   const template = `
   <div class="row producto">
