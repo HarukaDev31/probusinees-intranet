@@ -7264,33 +7264,33 @@ const getSupplierCoordinationTableTemplate = (data) => {
       return detail.delivery;
     });
     html += `
-      <div class="supplier-row ">
-        <div class="supplier-info" style="height:${
+      <div class="supplier-row">
+        <div class="supplier-info supplier-column" style="height:${
           detailsCount * defaultHeight
         }px">
           <div>Nombre: ${supplier.name}</div>
           <div>Teléfono: ${supplier.phone}</div>
-          <div>Costo shipping: ${sumDelivery}</div>
+          <div>Costo shipping:  ¥${sumDelivery}</div>
           <input type="hidden" name="id-pedido" value="${supplier.id_pedido}"/>
           <input type="hidden" name="current-step" value="${selectedStep}"/>
-          <button class="btn btn-outline-secondary btn-coordinar mb-1" onclick="openSupplierItems(
+          <div class="btn btn-outline-secondary btn-coordinar mb-1" onclick="openSupplierItems(
           ${supplier.id_pedido},${supplier.id_supplier},${
       supplier.id_coordination
-    })">Cambiar</button>
-          <button class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
+    })">Cambiar</div>
+          <div class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
           ${supplier.id_pedido},${supplier.id_supplier},${
       supplier.id_coordination
-    })">Descargar Excel</button>
+    })">Descargar Excel</div>
         </div>`;
 
     detailsImgs.forEach((img) => {
-      html += ` <div class="c-imagen-column">
+      html += ` <div class="c-imagen-column supplier-column">
           <img src="${img}" alt="imagen" class="img-thumbnail" />
           </div>`;
     });
     detalles.forEach((detail) => {
       html += `
-          <div class="c-nombre-column" style="height:${defaultHeight}px">
+          <div class="c-nombre-column supplier-column" style="height:${defaultHeight}px">
           <span>${detail.nombre_producto} </span>
           <div class="input-group mt-3 d-flex flex-row justify-content-center align-items-center mb-1 ">
             <span class="input-group-text " id="basic-addon1">ITEM CODE:</span>
@@ -7304,7 +7304,8 @@ const getSupplierCoordinationTableTemplate = (data) => {
             detail.ID_Pedido_Detalle
           })">Perú</div>
         </div>
-          <div class="c-qty-column">
+          <div class="c-qty-column supplier-column">
+          
           <input type="number" class="form-control" value="${parseFloat(
             detail.qty_product
           )}" name="proveedor[${
@@ -7312,18 +7313,21 @@ const getSupplierCoordinationTableTemplate = (data) => {
       }][qty_product]"/>
         </div>
         <div class="c-precio-column">
+         <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
           <input type="number" class="form-control" value="${parseFloat(
             detail.price_product
           )}" name="proveedor[${
         detail.ID_Pedido_Detalle_Producto_Proveedor
       }][price_product]"/>
+      </div>
         </div>
         `;
     });
     html += `
-        <div class="c-total-column" style="height:${
+        <div class="c-total-column supplier-column" style="height:${
           detailsCount * defaultHeight
-        }px">${parseFloat(total).toFixed(2)}</div>`;
+        }px">¥ ${parseFloat(total).toFixed(2)}</div>`;
     detalles.forEach((detalle) => {
       html += ` <div class="c-tproduccion-column">
           <input type="text" class="form-control" value="${detalle.delivery}" name="proveedor[${detalle.ID_Pedido_Detalle_Producto_Proveedor}][delivery]"/>
@@ -7331,7 +7335,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
     });
     html += `
         
-        <div class="c-tentrega-column"  style="height:${
+        <div class="c-tentrega-column supplier-column"  style="height:${
           detailsCount * defaultHeight
         }px">
           <input type="date" class="form-control" value="${
@@ -7342,10 +7346,14 @@ const getSupplierCoordinationTableTemplate = (data) => {
         </div>`;
     if (currentPrivilege == priviligesJefeChina) {
       html += `
-          <div class="c-pago1-column">
+          <div class="c-pago1-column supplier-column">
+          <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
+
           <input type="number" class="form-control" value="${
             supplier.pago_1_value
           }" name="coordination[${supplier.id_coordination}][pago_1_value]"/>
+          </div>
           <div class="btn mt-1 mx-auto ${
             supplier.pago_1_URL == null ? "btn-primary" : "btn-outline-primary"
           }" onclick='openInputFile("input-pago1-${
@@ -7367,13 +7375,17 @@ const getSupplierCoordinationTableTemplate = (data) => {
         </div>`;
     } else {
       html += `
-          <div class="c-pago1-column">
+          <div class="c-pago1-column supplier-column">
+          <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
           <input type="number" class="form-control" value="${supplier.pago_1_value}" name="coordination[${supplier.id_coordination}][pago_1_value]"/>
+          </div>
           </div>`;
     }
     if (currentPrivilege == priviligesJefeChina) {
-      html +=
-      `<div class="c-pago2-column">
+      html += `<div class="c-pago2-column supplier-column">
+      <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
           <input type="number" class="form-control" disabled value="${
             parseFloat(total) - parseFloat(supplier.pago_1_value)
           }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
@@ -7395,25 +7407,30 @@ const getSupplierCoordinationTableTemplate = (data) => {
           }" name="coordination[${
         supplier.id_coordination
       }][pago_2_url]" value="${supplier.pago_2_URL}"/>
-
+        </div>
           </div>`;
     } else {
-      html += `<div class="c-pago2-column">
+      html += `<div class="c-pago2-column supplier-column">
+      <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
           <input type="number" class="form-control" disabled value="${
             parseFloat(total) - parseFloat(supplier.pago_1_value)
           }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
+          </div>
           </div>`;
     }
 
-
-
     html += `
-    <div class="c-estado-column"> 
+    <div class="c-estado-column supplier-column"> 
           <select class="form-select" aria-label="Default select example" name="coordination[${
             supplier.id_coordination
           }][estado]"
 
-          ${currentPrivilege == priviligesJefeChina ? "style='pointer-events:none'" : ""} >
+          ${
+            currentPrivilege == priviligesJefeChina
+              ? "style='pointer-events:none'"
+              : ""
+          } >
             <option value="PENDIENTE" ${
               supplier.estado == "PENDIENTE" ? "selected" : ""
             }>PENDIENTE</option>
@@ -7425,7 +7442,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
         `;
     if (currentPrivilege == priviligesJefeChina) {
       html += `
-          <div class="c-negociacion-column">
+          <div class="c-negociacion-column supplier-column">
           <select class="form-select" aria-label="Default select example" name="coordination[${
             supplier.id_coordination
           }][estado_negociacion]">
@@ -7515,6 +7532,7 @@ const openSupplierItems = (id_pedido, id_supplier, id_coordination) => {
             action: "returnToCoordination()",
           },
         };
+        console.log(data);
         openSupplierItemsView(data, btnsConfig, id_coordination);
         containerCoordination.hide();
         $(".orden-compra_header").hide();
@@ -7555,7 +7573,6 @@ const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
   for (i = 0; i < detalles.length; i++) {
     let item = getItemTemplate(i + 1, "select", detalles[i], idCoordination);
     container.append(item);
-    console.log(detalles[i]);
     container.find(`#modal-precio${i + 1}`).val(detalles[i]["Ss_Precio"]);
     container.find(`#modal-moq${i + 1}`).val(detalles[i]["Qt_Producto_Moq"]);
     container.find(".modal_coordination_id").val(idCoordination);
@@ -7667,18 +7684,27 @@ const getSupplierCoordinationHeader = (data) => {
   });
   segundoPago = montoTotal - primerPago;
   return `
-  <div class="row coordination-header">
+  <div class="row coordination-header ">
     <div class="col-12 col-lg-3">
       <label>MONTO TOTAL:</label>
+         <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
       <input type="number" class="form-control" value="${montoTotal}" disabled>
+      </div>
     </div>
     <div class="col-12 col-lg-3">
       <label>PRIMER PAGO:</label>
+         <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
       <input type="number" class="form-control" value="${primerPago}" disabled>
+      </div>
     </div>
     <div class="col-12 col-lg-3">
       <label>SEGUNDO PAGO:</label>
+         <div class="input-group d-flex flex-row">
+            <span class="input-group-text d-flex w-auto">¥</span>
       <input type="number" class="form-control" value="${segundoPago}" disabled>
+      </div>
     </div>
   </div>
   `;

@@ -2370,8 +2370,12 @@ echo form_open('', $attributes);
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      border: 1px solid black;
+      background-color: #f9f9f9;
       padding: 1em 2em;
+      margin-bottom: 1em;
+      -webkit-box-shadow: 2px 2px 3px 0px rgba(209, 209, 209, 1);
+      -moz-box-shadow: 2px 2px 3px 0px rgba(209, 209, 209, 1);
+      box-shadow: 2px 2px 3px 0px rgba(209, 209, 209, 1);
     }
 
     .step-container {
@@ -2659,7 +2663,17 @@ echo form_open('', $attributes);
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    }.supplier-row .supplier-column:nth-child(odd){
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+
+    }.supplier-row .supplier-column:nth-child(even){
+      background-color: #f2f2f2
+      border: 1px solid #ccc;
+
     }
+    
     .ql-editor{
       display: flex!important;
       flex-direction: column!important;
@@ -2726,6 +2740,7 @@ echo form_open('', $attributes);
   justify-content: center;
   align-items: center;
   text-align: center;
+  font-weight: bold;
   padding:1em ;
 }.supplier-table-header div:nth-child(odd){
   background-color: #f9f9f9;
