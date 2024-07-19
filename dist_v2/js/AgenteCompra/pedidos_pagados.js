@@ -8310,7 +8310,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
           action: `saveRotuladoProducto(${stringItem})`,
         },
         btnCancel: {
-          text: "Cancelar",
+          text: "Regresar",
           action: "hideRotuladoView() ",
         },
       };
@@ -8508,7 +8508,7 @@ const getActionButtons = (data) => {
 
     if (data.hasOwnProperty("btnSave") && data.hasOwnProperty("btnCancel")) {
       buttons = `
-      <div class="row buttons mt-2">
+      <div class="row buttons mt-2" style="row-gap:1em">
         <div class="col-12 col-md-6 d-flex">
           <div class="btn mx-auto btn-primary button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
         </div>
