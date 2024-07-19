@@ -974,6 +974,35 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
         }
         $arrResponseSQL = $this->db->query($query);
         if ($arrResponseSQL->num_rows() > 0) {
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { //1peru
+                $arrMessageUser = array(
+                    'ID_Usuario_Remitente' => $this->user->ID_Usuario,
+                    
+                );
+                //update nu estado in agente_compra_pedido_cabecera to 8
+                $where = array('ID_Pedido_Cabecera' => $id);
+                $toUpdate = array('Nu_Estado' => 8); //1=SI
+                $this->db->update('agente_compra_pedido_cabecera', $toUpdate, $where);
+                //foreach message with   this id_pedido_detalle where ID_Remitente not this user AND ID_USUARIO_DESTINO = 0 UPDATE TO THIS USER
+                $query="
+                UPDATE agente_compra_pedido_detalle_chat_producto
+                SET ID_Usuario_Remitente = ".$this->user->ID_Usuario."
+                WHERE ID_Pedido_Detalle = ".$id." AND ID_Usuario_Remitente = 0 AND ID_Usuario_Destino != ".$this->user->ID_Usuario;
+                $this->db->query($query);
+    
+            }
+    
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) { //china
+                $arrMessageUser = array(
+                    'ID_Usuario_Destino' => $this->user->ID_Usuario,
+                );
+                $query="
+                UPDATE agente_compra_pedido_detalle_chat_producto
+                SET ID_Usuario_Destino= ".$this->user->ID_Usuario."
+                WHERE ID_Pedido_Detalle = ".$id." AND ID_Usuario_Destino = 0 AND ID_Usuario_Remitente != ".$this->user->ID_Usuario;
+                $this->db->query($query);
+            }
+    
             return array(
                 'status' => 'success',
                 'result' => $arrResponseSQL->result(),

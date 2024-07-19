@@ -497,7 +497,7 @@ class PedidosGarantizados extends CI_Controller
                         $objDrawing->setHeight(148);
                         $objDrawing->setCoordinates('C' . $startRow);
                         //SET OFFSET y
-                        $objDrawing->setOffsetX(20);
+                        $objDrawing->setOffsetX(200);
                         $objDrawing->setOffsetY(10);
                         $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 
@@ -555,12 +555,7 @@ class PedidosGarantizados extends CI_Controller
             if ($initialRow <= $lastProductrow) {
                 $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow - $initialRow + 1);
             }
-            foreach ($imagesInfo as $imageInfo) {
-                //get CimageInfo['startRow'] height
-                $height = $objPHPExcel->getActiveSheet()->getRowDimension($imageInfo['startRow'])->getRowHeight();
-                $imageInfo['objDrawing']->setOffsetY($height < $imageInfo['objDrawing']->getHeight() * 1.2 ? 50 : $height * 1.2);
-
-            }
+            
             // if ($initialRow < $lastProductrow) {
             //     $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow - $initialRow + 1);
             // }
@@ -593,9 +588,14 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->getColumnDimension('W')->setAutoSize(true);
             $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
             //SET ROW AUTO SIZE 
-            $sheet = $objPHPExcel->getActiveSheet();
 
-            
+            foreach ($imagesInfo as $imageInfo) {
+                //get CimageInfo['startRow'] height
+                $height = $objPHPExcel->getActiveSheet()->getRowDimension($imageInfo['startRow'])->getRowHeight();
+
+                $imageInfo['objDrawing']->setOffsetY($height < $imageInfo['objDrawing']->getHeight() * 1.2 ? 50 : $height * 1.2);
+    
+            }   
             //set min width column F
             foreach ($tempUrl as $val) {
                 unlink($val);

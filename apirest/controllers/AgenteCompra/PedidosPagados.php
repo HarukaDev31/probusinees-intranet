@@ -1756,6 +1756,10 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->getStyle("R" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
             $objPHPExcel->getActiveSheet()->getStyle("S" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
             //apply all borders to column n and p   
+            $objPHPExcel->getActiveSheet()->getStyle('G' . $initialRow  )->getAlignment()->setWrapText(true);
+            //SET CENTER HORIZONTAL
+            $objPHPExcel->getActiveSheet()->getStyle('G' . $initialRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
             $objPHPExcel->getActiveSheet()->getStyle('N' . $initialRow . ':P' . $initialRow)->applyFromArray(
                 array(
                     'borders' => array(
@@ -1779,7 +1783,6 @@ class PedidosPagados extends CI_Controller
         $objPHPExcel->getActiveSheet()->setCellValue('S' . ($initialRow), "=SUM(S26:S" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->setCellValue('T' . ($initialRow), "=SUM(T26:T" . ($initialRow - 1) . ")");
         $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
-
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         exit();
@@ -1839,7 +1842,7 @@ class PedidosPagados extends CI_Controller
 
             $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $val->Txt_Producto);
             $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $this->htmlToRichText($this->htmlToTextAndLineBreaks($val->Txt_Descripcion)));
-            $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto_Moq);
+            $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto);
             $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->unidad_medida);
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
@@ -1850,7 +1853,9 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("U" . $initialRow, $val->Nu_Dias_Delivery);
             $objPHPExcel->getActiveSheet()->getStyle("R" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
             $objPHPExcel->getActiveSheet()->getStyle("S" . $initialRow)->getNumberFormat()->setFormatCode('0.00" KG"');
-            //apply all borders to column n and p   
+            //set g text wrap and center horizontal
+            $objPHPExcel->getActiveSheet()->getStyle('G' . $initialRow)->getAlignment()->setWrapText(true);
+            $objPHPExcel->getActiveSheet()->getStyle('G' . $initialRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle('N' . $initialRow . ':P' . $initialRow)->applyFromArray(
                 array(
                     'borders' => array(

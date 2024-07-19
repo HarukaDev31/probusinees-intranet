@@ -595,7 +595,9 @@ $(function () {
     $("#div-add_item_proveedor").show();
 
     $("#modal-precio1").focus();
-
+  
+    arrQuillNotas = [];
+    console.log(arrQuillNotas);
     iCounterItems = 1;
     addItems();
 
@@ -915,12 +917,12 @@ $(function () {
     //validacion de articulos
     var sEstadoArticulos = true;
     var firstError = null;
+    console.log(arrQuillNotas);
 
     $("#form-arrItems")
       .find(":input")
       .each(function () {
         var elemento = this;
-        console.log(elemento);
         if (elemento.dataset.correlativo !== undefined) {
           if (elemento.classList[0] == "arrProducto") {
             if (elemento.type == "text") {
@@ -1052,7 +1054,9 @@ $(function () {
     //buscar data
     viewChatItem(id_item);
   });
-
+$(document).on('click','#close-modal-chat',function(){
+  verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val()); 
+});
   //chat de novedades de producto
   $(document).on("click", "#btn-enviar_mensaje", function (e) {
     e.preventDefault();
@@ -2234,7 +2238,6 @@ function addItems() {
   const i = iCounterItems;
 
   $("#div-arrItems").append(div_items);
-  arrQuillNotas = [];
   const toolbarOptions = [
     ["bold", "italic", "underline"], // toggled buttons
     [{ color: [] }], // dropdown with defaults from theme
