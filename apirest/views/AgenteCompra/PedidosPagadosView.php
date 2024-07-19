@@ -2669,7 +2669,7 @@ echo form_open('', $attributes);
       border: 1px solid #ccc;
 
     }.supplier-row .supplier-column:nth-child(even){
-      background-color: #f2f2f2
+      background-color: #f2f2f2;
       border: 1px solid #ccc;
 
     }
