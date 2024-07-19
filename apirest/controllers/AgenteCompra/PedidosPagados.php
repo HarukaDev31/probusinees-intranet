@@ -1933,6 +1933,7 @@ class PedidosPagados extends CI_Controller
                 //if peru personal
                 if ($priviligie == $this->personalPeruPrivilegio) {
                     $data = $this->PedidosPagadosModel->getPedidoPagos($idPedido);
+                    
                     echo json_encode(array(
                         'status' => 'success', 'data' => $data['data'],
                         'pagosData' => $data['pagos'], 'priviligie' => $priviligie,

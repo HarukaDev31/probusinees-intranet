@@ -132,7 +132,8 @@ echo form_open('', $attributes);
                     <div class="col-12 col-sm-4 col-md-2">
                       <label>T.C.</label>
                       <div class="form-group">
-                        <input type="text" name="Ss_Tipo_Cambio" min="0.01" class="form-control required" placeholder="Ingresar" autocomplete="off">
+                        <input type="text" name="Ss_Tipo_Cambio" <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 1 ? 'min="0.01" ' : ''; ?> class="form-control required" placeholder="Ingresar" autocomplete="off"> 
+                        
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>

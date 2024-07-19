@@ -941,6 +941,7 @@ $(function () {
                   (elemento.classList[3] == "nombre_proveedor" &&
                     $("#" + elemento.id).val().length == 0)
                 ) {
+                  console.log(elemento);
                   $("#" + elemento.id)
                     .closest(".form-group")
                     .find(".help-block")

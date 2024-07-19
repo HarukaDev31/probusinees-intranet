@@ -2257,20 +2257,28 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     public function getPedidoPagos($idPedido)
     {
         try {
+            $tipo_cambio=$this->db->select('Ss_Tipo_Cambio')->from('agente_compra_pedido_cabecera')->where('ID_Pedido_Cabecera', $idPedido)->get()->row()->Ss_Tipo_Cambio;
+            $tipo_cambio = $tipo_cambio==0?1:$tipo_cambio;
             $this->db->select('ifnull(round(sum(acpdpp.Ss_Precio*acpd.Qt_Producto),2),0) as orden_total');
             $this->db->from('agente_compra_pedido_detalle acpd');
             $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp', 'acpdpp.ID_Pedido_Detalle =acpd.ID_Pedido_Detalle', 'left');
             $this->db->where('acpd.ID_Pedido_Cabecera', $idPedido);
             $this->db->where('acpdpp.Nu_Selecciono_Proveedor', 1);
-            $orden_total = $this->db->get()->row();
+            $orden_total = $this->db->get()->row()->orden_total/$tipo_cambio;
+            // $tipo_cambio = $this->db->get()->row()->Ss_Tipo_Cambio==0?1:$this->db->get()->row()->Ss_Tipo_Cambio;
 
             //select sum of all payments_agente_compra_pedido.value with id_pedido=$idPedido
             $this->db->select('ifnull(round(sum(pacp.value),2),0) as pago_cliente');
             $this->db->from('payments_agente_compra_pedido pacp');
             $this->db->where('pacp.id_pedido', $idPedido);
-            $pago_cliente = $this->db->get()->row();
+            $pago_cliente = $this->db->get()->row()->pago_cliente/$tipo_cambio;
 
-            $queryData = array_merge((array) $orden_total, (array) $pago_cliente);
+            $queryData = array_merge((array) 
+            ["orden_total" => $orden_total],
+            
+            (array) 
+            ["pago_cliente" => $pago_cliente]
+        );
             $pagosData = $this->getPedidosPagosDetails($idPedido);
             return [
                 "data" => $queryData,

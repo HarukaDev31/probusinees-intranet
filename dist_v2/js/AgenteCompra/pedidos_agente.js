@@ -352,7 +352,8 @@ function verPedido(ID){
           table_enlace_producto += "</td>";
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           table_enlace_producto += "<td class='text-left td-name' width='20%'>";
-          table_enlace_producto+='<input type="hidden" name="addProductoTable[' + id_item + '][caracteristicas]"/>'
+          table_enlace_producto+=`<input type="hidden" 
+          id="quill-caracteristicas-${i}-content" name="addProductoTable[${id_item}][caracteristicas]" >`;
           table_enlace_producto += `<div id="quill-caracteristicas-${i}"  style="width:250px"></div>`;
           table_enlace_producto += "</td>";
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Descripcion'] + "</td>"
@@ -379,6 +380,7 @@ function verPedido(ID){
         });
         quill.root.innerHTML = element.Txt_Descripcion;
         arrQuillCaracteristicas.push(quill);
+        $(`#quill-caracteristicas-${index}-content`).val(clearHTMLTextArea(quill.root.innerHTML));
       });
 
       
@@ -541,7 +543,10 @@ function form_pedido(){
     $( '#btn-save' ).text('');
     $( '#btn-save' ).attr('disabled', true);
     $( '#btn-save' ).html( 'Guardando <div class="spinner-border" role="status"><span class="sr-only"></span></div>' );
-    
+    arrQuillCaracteristicas.forEach((quill, index) => {
+      const container=$(`#quill-caracteristicas-${index}-content`)
+      container.val(quill.root.innerHTML);
+    });
     var postData = new FormData($("#form-pedido")[0]);
     //$('#form-pedido').serialize(),
 
