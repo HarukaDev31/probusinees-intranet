@@ -217,7 +217,7 @@ $(function () {
   $( "#form-pedido" ).validate({
 		rules:{
 			No_Entidad: {
-				required: true
+				required: false
 			},
 		},
 		messages:{
@@ -324,6 +324,7 @@ function verPedido(ID){
         var cantidad_item = detalle[i]['Qt_Producto'];
         var id_item = detalle[i]['ID_Pedido_Detalle'];
         var href_link = (detalle[i]['Txt_Url_Link_Pagina_Producto'] != '' && detalle[i]['Txt_Url_Link_Pagina_Producto'] != null ? "<a class='btn btn-link p-0 m-0' target='_blank' rel='noopener noreferrer' href='" + detalle[i]['Txt_Url_Link_Pagina_Producto'] + "' role='button'>Link</a>" : "");
+        
         table_enlace_producto +=
         "<tr id='tr_enlace_producto" + id_item + "'>"
           + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
@@ -350,6 +351,7 @@ function verPedido(ID){
             table_enlace_producto += "<img data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
             
           table_enlace_producto += "</td>";
+          table_enlace_producto+=`<input type="hidden" name="addProductoTable[${id_item}][id_item]" value="${detalle[i]['ID_Pedido_Detalle']}">`;
           //+ "<td class='text-left td-name' width='20%'>" + detalle[i]['Txt_Producto'] + "</td>"
           table_enlace_producto += "<td class='text-left td-name' width='20%'>";
           table_enlace_producto+=`<input type="hidden" 
@@ -378,9 +380,9 @@ function verPedido(ID){
             toolbar: toolbarOptions,
           },
         });
-        quill.root.innerHTML = element.Txt_Descripcion;
+        quill.root.innerHTML = clearHTMLTextArea(element.Txt_Descripcion);
         arrQuillCaracteristicas.push(quill);
-        $(`#quill-caracteristicas-${index}-content`).val(clearHTMLTextArea(quill.root.innerHTML));
+        $(`#quill-caracteristicas-${index}-content`).val(escapeHTMLForInputValue(quill.root.innerHTML));
       });
 
       
@@ -886,11 +888,37 @@ function scrollToIOS( $sMetodo, $IdElemento ){
   }, 'slow');
 }
 
-function clearHTMLTextArea(str){
-  str=str.replace(/<br>/gi, "");
-  str=str.replace(/<br\s\/>/gi, "");
-  str=str.replace(/<br\/>/gi, "");
-  str=str.replace(/<\/button>/gi, "");
-  str=str.replace(/<br >/gi, "");
+function clearHTMLTextArea(str) {
+  if (str == null) return "";
+
+  // Reemplaza todas las variantes de <br> con una cadena vacía
+  str = str.replace(/<br\s*\/?>/gi, "");
+
+  // Reemplaza todas las entidades &quot; con comillas dobles normales
+  str = str.replace(/&quot;/g, '"');
+
+  // Asegúrate de reemplazar entidades especiales que puedan estar en el HTML
+  str = str.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");
+
+  // Reemplaza comillas dentro de los atributos de estilo para asegurarse de que no estén rotas
+  str = str.replace(/style="([^"]*?)"/g, function(match, p1) {
+      return `style="${p1.replace(/"/g, '&quot;')}"`;
+  });;
+
+  console.log(str);
   return str;
+}
+function escapeHTMLForInputValue(html) {
+  if (html == null) return "";
+
+  // Reemplaza las comillas dobles con la entidad &quot;
+  html = html.replace(/"/g, '&quot;');
+
+  // Reemplaza las comillas simples con la entidad &#39;
+  html = html.replace(/'/g, '&#39;');
+
+  // Reemplaza los caracteres de menor y mayor que con las entidades correspondientes
+  html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  return html;
 }

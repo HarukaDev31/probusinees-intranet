@@ -1357,12 +1357,12 @@ function verPedido(ID) {
               ? detalle[i]["Txt_Description_Ingles"]
               : detalle[i]["Txt_Descripcion"];
           table_enlace_producto += `<div id="caracteristicas-ingles${i}" name="" style="height: 200px;"> </div>`;
-          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas_ingles]" value='${clearHTMLTextArea(
+          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas_ingles]" value='${escapeHTMLForInputValue(
             text
           )}'>`;
         } else {
           table_enlace_producto += `<div id="caracteristicas-${i}" name="" style="height: 200px;"> </div>`;
-          table_enlace_producto += `<input type="hidden" id="caracteristicas-${i}-content" name="addProductoTable[${id_item}][caracteristicas]" value='${clearHTMLTextArea(
+          table_enlace_producto += `<input type="hidden" id="caracteristicas-${i}-content" name="addProductoTable[${id_item}][caracteristicas]" value='${escapeHTMLForInputValue(
             detalle[i]["Txt_Descripcion"]
           )}'>`;
 
@@ -1381,7 +1381,7 @@ function verPedido(ID) {
 
           table_enlace_producto += `<div id="caracteristicas-ingles${i}" name="" style="height: 200px;"> </div>`;
 
-          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas_ingles]" value='${clearHTMLTextArea(
+          table_enlace_producto += `<input type="hidden" id="caracteristicas-ingles${i}-content" name="addProductoTable[${id_item}][caracteristicas_ingles]" value='${escapeHTMLForInputValue(
             detalle[i]["Txt_Description_Ingles"]
           )}'>`;
 
@@ -2938,12 +2938,22 @@ function getFileUrlName(file_url) {
 
 function clearHTMLTextArea(str) {
   if (str == null) return "";
-  str = str.replace(/<br>/gi, "");
-  str = str.replace(/<br\s\/>/gi, "");
-  str = str.replace(/<br\/>/gi, "");
-  str = str.replace(/<\/button>/gi, "");
-  str = str.replace(/<br >/gi, "");
-  str= str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+  // Reemplaza todas las variantes de <br> con una cadena vacía
+  str = str.replace(/<br\s*\/?>/gi, "");
+
+  // Reemplaza todas las entidades &quot; con comillas dobles normales
+  str = str.replace(/&quot;/g, '"');
+
+  // Asegúrate de reemplazar entidades especiales que puedan estar en el HTML
+  str = str.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");
+
+  // Reemplaza comillas dentro de los atributos de estilo para asegurarse de que no estén rotas
+  str = str.replace(/style="([^"]*?)"/g, function(match, p1) {
+      return `style="${p1.replace(/"/g, '&quot;')}"`;
+  });;
+
+  console.log(str);
   return str;
 }
 
@@ -3493,3 +3503,17 @@ const getSuppliersByName = (index, container) => {
     });
   }, 100);
 };
+function escapeHTMLForInputValue(html) {
+  if (html == null) return "";
+
+  // Reemplaza las comillas dobles con la entidad &quot;
+  html = html.replace(/"/g, '&quot;');
+
+  // Reemplaza las comillas simples con la entidad &#39;
+  html = html.replace(/'/g, '&#39;');
+
+  // Reemplaza los caracteres de menor y mayor que con las entidades correspondientes
+  html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  return html;
+}

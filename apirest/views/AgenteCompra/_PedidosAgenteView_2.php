@@ -86,7 +86,7 @@
                     <div class="col-12 col-sm-12 col-md-6">
                       <label>Empresa</label>
                       <div class="form-group">
-                        <input type="text" name="No_Entidad" class="form-control required" placeholder="Ingresar" maxlength="100" autocomplete="off">
+                        <input type="text" name="No_Entidad" class="form-control " placeholder="Ingresar" maxlength="100" autocomplete="off">
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
