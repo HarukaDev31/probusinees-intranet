@@ -372,18 +372,24 @@
             </div>
             <div class="card-body" id="container-pagos">
               <div class="row w-100 d-flex justify-content-between" id="pagos-header">
-                <div class="col-12 col-md-3 d-flex align-items-center">
+                <div class="col-12 col-md-2 d-flex align-items-center">
                   <label>ORDEN TOTAL</label>
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                   <span class="pagos-header-input" id="orden_total">$0</span>
                 </div>
 
-                <div class="col-12 col-md-3 d-flex align-items-center">
+                <div class="col-12 col-md-2 d-flex align-items-center">
                   <label>PAGO CLIENTE:</label>
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                   <span class="pagos-header-input" id="pago_cliente">$0</span>
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-center">
+                  <label>PAGO RESTANTE:</label>
+                </div>
+                <div class="col-12 col-md-2">
+                  <span class="pagos-header-input" id="pago_restante">$0</span>
                 </div>
               </div>
               <div class="row separator-line"></div>
@@ -2695,14 +2701,14 @@ echo form_open('', $attributes);
     padding: 8px;
 }
 .c-supplier-column,.supplier-info {
-    width: 300px; /* Ajusta el ancho según tus necesidades */
+    width: 200px; /* Ajusta el ancho según tus necesidades */
  
    
     white-space: nowrap;
 
 }
 .c-nombre-column{
-  width: 300px; 
+  width: 200px; 
   padding: 1em;/* Ajusta el ancho según tus necesidades */
 }
 .c-nombre-column div{
@@ -2758,7 +2764,7 @@ echo form_open('', $attributes);
 
 }
 .c-qty-column{
-    width: 100px; /* Ajusta el ancho según tus necesidades */
+    width: 80px; /* Ajusta el ancho según tus necesidades */
     white-space: nowrap;
 }
 
@@ -2794,7 +2800,7 @@ echo form_open('', $attributes);
 .supplier-table {
     display: block;
     overflow-x: auto;
-    width:2000px!important;
+    width:1800px!important;
 }
 
 

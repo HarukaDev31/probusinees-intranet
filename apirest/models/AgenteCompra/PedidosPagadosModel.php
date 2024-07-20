@@ -2521,7 +2521,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             ], $path) : $pago2UrlExists;
             $producto_detalle = [
                 'id_coordination' => $key,
-                'pago_1_value' => $row['pago_1_value'],
                 'pago_2_value' => $row['pago_2_value'],
 
                 'estado' => $row['estado'],
@@ -2534,19 +2533,30 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $producto_detalle['pago_1_URL'] = $pago1Url;
                 $producto_detalle['pago_2_URL'] = $pago2Url;
             }
+            
             $this->db->where('id_coordination', $producto_detalle['id_coordination']);
             $this->db->update('agente_compra_coordination_supplier', $producto_detalle);
 
+            
+
+            if($this->user->Nu_Tipo_Privilegio_Acceso==$this->personalChinaPrivilegio){
+                $this->db->select('pago_1_value,pago_2_value,estado');
+                $this->db->from('agente_compra_coordination_supplier');
+                $this->db->where('id_coordination', $key);
+                $query = $this->db->get()->row();
+                if($row['pago_1_value']!=0 && $row['pago_1_value']!=$query->pago_1_value){
+                    $this->db->where('id_coordination', $key);
+                    $this->db->update('agente_compra_coordination_supplier', array('estado' => 'CONFORME',
+                    'pago_1_value' => $row['pago_1_value'],
+                ));
+                }
+            }
+            
             $this->db->select('pago_1_URL,pago_2_URL,estado_negociacion');
             $this->db->from('agente_compra_coordination_supplier');
             $this->db->where('id_coordination', $key);
-
             $result = $this->db->get()->row();
-            /**
-             *  private $jefeChinaPrivilegio = 5;
-             * private $personalChinaPrivilegio = 2;
-              *  private $personalPeruPrivilegio = 1;    
-             */
+
             if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio && $result->estado_negociacion==$row['estado_negociacion']){
                 //if result is not null and pago_1_URL and pago_2_URL are not null
                 if ($result->pago_2_URL != null && $result->pago_1_URL != null) {
@@ -2600,7 +2610,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->select('count(*) as total');
             $this->db->from('agente_compra_coordination_supplier');
             $this->db->where('id_pedido', $idPedido);
-            
             $query = $this->db->get();
             $total = $query->row()->total;
             $this->db->select('count(*) as total');
@@ -2609,7 +2618,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('estado', 'CONFORME');
             $query = $this->db->get();
             $total_pagado = $query->row()->total;
-            if($total==$total_pagado){
+            if($total==$total_pagado ){
                 $this->updateStep($currentStep, "COMPLETED");
             }else {
                 $this->updateStep($currentStep, "PENDING");

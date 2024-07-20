@@ -31,6 +31,7 @@ let selectedStep = null;
 let containerSteps = null;
 let containerPagos = null;
 let containerCoordination = null;
+let currentServicio = 1;
 $(function () {
   sectionTitle = $("#section-title");
   containerVer = $("#container-ver");
@@ -6882,6 +6883,7 @@ function _generarConsolidaTrading($modal_delete, ID) {
 }
 //get order progress section
 const getOrderProgress = (id, idServicio = null) => {
+  currentServicio = idServicio;
   if (idServicio != 2) {
     $("#cotizacionOrdenContainer").hide();
   } else {
@@ -7209,11 +7211,14 @@ const getSupplierCoordinationTableHeader = () => {
           <div class="coordination-tentrega-column c-tentrega-column">F.ENTREGA</div>
           <div class="coordination-pago1-column c-pago1-column">PAGO 1</div>
           <div class="coordination-pago2-column c-pago2-column">PAGO 2</div>
-          <div class="coordination-estado-column c-estado-column">ESTADO</div>
+          
   
   `;
   if (currentPrivilege == priviligesJefeChina) {
-    template += `<div class="coordination-c-negociacion-column c-negociacion-column">NEGOCIACION</div>`;
+    template += `<div class="coordination-estado-column c-estado-column">NEGOCIACION</div>`;
+    template += `<div class="coordination-c-negociacion-column c-negociacion-column">ESTADO</div>`;
+  }else{
+    template += `<div class="coordination-estado-column c-estado-column">ESTADO</div>`;
   }
   template += `</div>`;
   return template;
@@ -7280,7 +7285,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
           <div class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
           ${supplier.id_pedido},${supplier.id_supplier},${
       supplier.id_coordination
-    })">Descargar Excel</div>
+    })">Invoice</div>
         </div>`;
 
     detailsImgs.forEach((img) => {
@@ -7293,7 +7298,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
           <div class="c-nombre-column supplier-column" style="height:${defaultHeight}px">
           <span>${detail.nombre_producto} </span>
           <div class="input-group mt-3 d-flex flex-row justify-content-center align-items-center mb-1 ">
-            <span class="input-group-text " id="basic-addon1">ITEM CODE:</span>
+            <span class="input-group-text " id="basic-addon1"> CODE:</span>
             <input type="text" class="form-control" name="item[${
               detail.ID_Pedido_Detalle
             }]['code']" aria-describedby="basic-addon1" value="${
@@ -7302,7 +7307,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
           </div>
           <div class="btn btn-success" onclick="openRotuladofromCoordination(${
             detail.ID_Pedido_Detalle
-          })">Perú</div>
+          })">Rotulado</div>
         </div>
           <div class="c-qty-column supplier-column">
           
@@ -7676,6 +7681,7 @@ const getSupplierCoordinationHeader = (data) => {
   let primerPago = 0;
   let segundoPago = 0;
   data.forEach((supplier) => {
+    console.log(supplier.detalles);
     const detalles = JSON.parse(supplier.detalles);
     detalles.forEach((detail) => {
       montoTotal += parseFloat(detail.total_producto);
@@ -7831,6 +7837,18 @@ const openPagos = (response) => {
     const data = response.data;
     $("#orden_total").html("$" + data.orden_total);
     $("#pago_cliente").html("$" + data.pago_cliente);
+    const pagoRestante = data.orden_total - data.pago_cliente;
+    $("#pago_restante").html("$" + pagoRestante);
+    //set font bold
+    $("#pago_restante").css("font-weight", "bold");
+    if(pagoRestante<=0){
+      //add class text success
+      $("#pago_restante").addClass("text-success");
+
+    }else{
+      $("#pago_restante").removeClass("text-success");
+      $("#pago_restante").addClass("text-danger");
+    }
     if (response.pagosData) {
       const pagosData = response.pagosData;
       const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
@@ -8089,8 +8107,8 @@ const openPagos = (response) => {
 };
 const hidePagos2 = () => {
   hidePagos();
-  $("#container-ver").hide();
-  $("#container-listar").show();
+
+  getOrderProgress(idPedido,currentServicio);
 };
 const savePagos = () => {
   const form = $("#pagos-form");
@@ -8108,7 +8126,7 @@ const savePagos = () => {
       response = JSON.parse(response);
       if (response.status == "success") {
         hidePagos();
-        getOrderProgress(idPedido);
+        getOrderProgress(idPedido,currentServicio);
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -8549,9 +8567,11 @@ const hideOrdenCompra = () => {
   $(".orden-compra_header").hide();
   $(".producto").remove();
   $(".buttons").remove();
-  containerVer.hide();
-  containerListar.show();
+  // containerVer.hide();
+  // containerListar.show();
   containerSteps.empty();
+  getOrderProgress(idPedido,currentServicio);
+
   reload_table_Entidad();
 };
 const hidePagos = () => {
