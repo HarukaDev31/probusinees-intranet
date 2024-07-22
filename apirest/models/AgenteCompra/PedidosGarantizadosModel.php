@@ -56,7 +56,13 @@ class PedidosGarantizadosModel extends CI_Model
             $this->db->where($this->table . '.ID_Usuario_Interno_China', $user->ID_Usuario);
         }
         $this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
-
+        if(!empty($this->input->post('Estado'))){
+            if(in_array($this->input->post('Estado'),[1,2,3])){
+                $this->db->where_in($this->table . '.Nu_Estado_China', $this->input->post('Es   tado'));
+            }else if($this->input->post('Estado')==4){
+                $this->db->where_in($this->table . '.Nu_Estado', [8]);
+            }
+        }
         if (!empty($this->input->post('ID_Pedido_Cabecera'))) {
             $this->db->where($this->table . '.ID_Pedido_Cabecera', $this->input->post('ID_Pedido_Cabecera'));
         }
@@ -253,31 +259,6 @@ class PedidosGarantizadosModel extends CI_Model
                         'message' => 'No se cargaron los archivos multimedia ',
                     );
                 }
-                // if(isset($data_files['addProveedor']) && !empty($data_files['addProveedor']) && !empty($data_files['addProveedor']['name'][$key])) {
-                //     $_FILES['img_proveedor']['name'] = $data_files['addProveedor']['name'][$key];
-                //     $_FILES['img_proveedor']['type'] = $data_files['addProveedor']['type'][$key];
-                //     $_FILES['img_proveedor']['tmp_name'] = $data_files['addProveedor']['tmp_name'][$key];
-                //     $_FILES['img_proveedor']['error'] = $data_files['addProveedor']['error'][$key];
-                //     $_FILES['img_proveedor']['size'] = $data_files['addProveedor']['size'][$key];
-
-                //     $config['upload_path'] = $path;
-                //     $config['allowed_types'] = 'png|jpg|jpeg|webp|PNG|JPG|JPEG|WEBP';
-                //     $config['max_size'] = 3072;//1024 KB = 3 MB
-                //     $config['encrypt_name'] = TRUE;
-                //     $config['max_filename'] = '255';
-
-                //     $this->load->library('upload', $config);
-                //     if (!$this->upload->do_upload('img_proveedor')){
-                //         $this->db->trans_rollback();
-                //         return array(
-                //             'status' => 'error',
-                //             'message' => 'No se cargo imagen proveedor ' . strip_tags($this->upload->display_errors()),
-                //         );
-                //     } else {
-                //         $arrUploadFile = $this->upload->data();
-                //         $Txt_Url_Imagen_Proveedor = base_url($path . $arrUploadFile['file_name']);
-                //     }
-                // }
 
                 $cantidad = $row['cantidad_oculta'];
                 if (isset($row['cantidad'])) {
@@ -1174,5 +1155,22 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
             $query = "SELECT count(*) count FROM agente_compra_pedido_detalle_chat_producto WHERE ID_Pedido_Detalle = " . $id_detalle . " AND ID_Usuario_Remitente != " . $idUsuario . " AND ID_Usuario_Destino = 0";
         }
         return intval($this->db->query($query)->row()->count);
+    }
+    public function deleteItem($id_item){
+        try{
+            //delete from proveedores 
+            $query = "DELETE FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle = " . $id_item;
+            $this->db->query($query);
+            //delete detalle 
+            $query = "DELETE FROM agente_compra_pedido_detalle WHERE ID_Pedido_Detalle = " . $id_item;
+            $this->db->query($query);
+            return [
+                'status' => 'success',
+                'message' => 'Registro eliminado'
+            ];
+        }catch(Exception $e){
+            return $e->getMessage();
+        }
+
     }
 }

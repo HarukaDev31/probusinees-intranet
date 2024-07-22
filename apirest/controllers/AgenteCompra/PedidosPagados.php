@@ -2167,6 +2167,9 @@ class PedidosPagados extends CI_Controller
             case 'mt':
                 return 'METROS';
                 break;
+            case 'mt2':
+                return 'METRO CUADRADO';
+                break;
             case 'lt':
                 return 'LITRO';
                 break;

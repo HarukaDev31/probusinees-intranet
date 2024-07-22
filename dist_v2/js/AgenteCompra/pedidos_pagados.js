@@ -1298,7 +1298,10 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [],
+    order: [
+      [2, "desc"],
+
+    ],
     ajax: {
       url: url,
       type: "POST",
@@ -8295,7 +8298,7 @@ const getProductTemplate = (producto, index) => {
       }
     </div>
     <div class="col-12 col-lg-2">
-      <span>${producto.Qt_Producto}</span>
+      <input class="form-control text-center" type="number" name="addProducto[${producto.ID_Pedido_Detalle}]['cantidad']" value="${parseInt(producto.Qt_Producto)}"/>
     </div>
     <div class="col-12 col-lg-3 d-flex flex-column">
           <div id="quill-container-${index}" 

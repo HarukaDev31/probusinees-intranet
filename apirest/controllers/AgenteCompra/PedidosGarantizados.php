@@ -840,6 +840,9 @@ class PedidosGarantizados extends CI_Controller
             case 'mt':
                 return 'METROS';
                 break;
+            case 'mt2':
+                return 'METRO CUADRADO';
+                break;
             case 'lt':
                 return 'LITRO';
                 break;
@@ -878,5 +881,9 @@ class PedidosGarantizados extends CI_Controller
                 'status' => 'error','data' => $response));
         }
 
+    }public function deleteItem(){
+        $id_item = $this->input->post('id_item');
+        $response = $this->PedidosGarantizadosModel->deleteItem($id_item);  
+        echo json_encode($response);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
     }
 }

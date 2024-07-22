@@ -22,21 +22,31 @@
               <div class="row mb-3 div-Listar">
                 <input type="hidden" id="hidden-sCorrelativoCotizacion" name="sCorrelativoCotizacion" class="form-control" value="<?php echo $sCorrelativoCotizacion; ?>">
                 <input type="hidden" id="hidden-ID_Pedido_Cabecera" name="ID_Pedido_Cabecera" class="form-control" value="<?php echo $ID_Pedido_Cabecera; ?>">
-                <div class="col-6 col-sm-4">
+                <div class="col-4 col-sm-3">
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
                     <input type="text" id="txt-Fe_Inicio" class="form-control input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
                     <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
-                <div class="col-6 col-sm-4">
+                <div class="col-4 col-sm-3">
                   <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
                     <input type="text" id="txt-Fe_Fin" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
                     <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
-                <div class="col-12 col-sm-4">
+                <div class="col-4 col-sm-3">
+                  <label>Estado<span class="label-advertencia text-danger"> </span></label>
+                  <select id="cbo-Estado" name="cbo-Estado" class="form-control select2">
+                    <option value="0" selected>Todos</option>
+                    <option value="1">Pendiente</option>
+                    <option value="2">En Proceso</option>
+                    <option value="3">Cotizado</option>
+                    <option value="4">Observado</option>
+                  </select>
+                </div>
+                <div class="col-3 col-sm-3">
                   <label class="d-none d-sm-block">&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
@@ -192,8 +202,8 @@ echo form_open('', $attributes);
                         <table id="table-Producto_Enlace" class="table table-bordered table-hover table-striped">
                           <thead class="thead-light">
                             <tr>
-                              <th style='display:none;' class="text-left">ID</th>
-                              <th class="text-left" width="50%">Imagen Producto</th>
+                              <th  class="text-left">N°</th>
+                              <th class="text-left" width="65%">Imagen Producto</th>
                               <!--<th class="text-left" width="20%">Nombre</th>-->
                               <th class="text-left" width="20%">Características Producto</th>
                               <!--<th class="text-right">Qty</th>-->
@@ -375,7 +385,28 @@ echo form_open('', $attributes);?>
   <?php echo form_close(); ?>
 </div>
 <!-- /.modal agregar pagos -->
+<!--- modal confirmar borrar item -->
+<div class="modal fade modal-eliminar-item-pedido" id="modal-default">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Eliminar Item</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body-eliminar-item-pedido">
 
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="col btn btn-outline-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-eliminar-item-pedido" class="col btn btn-outline-success btn-lg btn-block pull-center" >Aceptar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
 <!-- modal ver pago garantizado -->
 <div class="modal fade modal-ver_pago_garantizado" id="modal-default">
   <div class="modal-dialog modal-lg">
@@ -589,6 +620,9 @@ input[type=number] {
 }.ql-editor{
   background: white!important;
   min-height: 100px;
+}
+.ql-container{
+  width: 300px;
 }
 </style>
 <!-- ./ asignar pedido personal de china -->

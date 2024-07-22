@@ -335,6 +335,7 @@ $(function () {
     info: true,
     autoWidth: false,
     responsive: false,
+    serverSide: false,
     pagingType: "full_numbers",
     oLanguage: {
       sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
@@ -376,6 +377,7 @@ $(function () {
             "fecha",
             "/"
           ));
+          data.Estado= $("#cbo-Estado").val();
       },
       complete: function () {
         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
@@ -404,11 +406,11 @@ $(function () {
     $('#hidden-sCorrelativoCotizacion').val('');
   })
   */
-  jQuery(document).on("keyup", ".width_full", function (ev) {
-    $("#hidden-sCorrelativoCotizacion").val("");
-    $("#hidden-ID_Pedido_Cabecera").val("");
-    reload_table_Entidad();
-  });
+  // jQuery(document).on("keyup", ".width_full", function (ev) {
+  //   $("#hidden-sCorrelativoCotizacion").val("");
+  //   $("#hidden-ID_Pedido_Cabecera").val("");
+  //   reload_table_Entidad();
+  // });
 
   $("#table-Pedidos_filter input").removeClass("form-control-sm");
   $("#table-Pedidos_filter input").addClass("form-control-md");
@@ -1057,8 +1059,12 @@ $(function () {
     //buscar data
     viewChatItem(id_item);
   });
-$(document).on('click','#close-modal-chat',function(){
-  verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val()); 
+// $(document).on('click','#close-modal-chat',function(){
+//   verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val()); 
+// });
+//on close modal-chat_producto
+$(document).on('hidden.bs.modal', '.modal-chat_producto', function () {
+  verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val());
 });
   //chat de novedades de producto
   $(document).on("click", "#btn-enviar_mensaje", function (e) {
@@ -1237,6 +1243,7 @@ function verPedido(ID) {
       var table_enlace_producto = "",
         ID_Entidad = 0;
       for (i = 0; i < detalle.length; i++) {
+        let index=i;
         var cantidad_item = detalle[i]["Qt_Producto"];
         var id_item = detalle[i]["ID_Pedido_Detalle"];
         var href_link =
@@ -1266,8 +1273,8 @@ function verPedido(ID) {
           "<tr id='tr_enlace_producto" +
           id_item +
           "'>" +
-          "<td style='display:none;' class='text-left td-id_item'>" +
-          id_item +
+          "<td style='vertical-align:middle' class='text-left td-id_item'>" +
+          "<span class='badge badge-pill badge-secondary w-100'>" +(index+1)+ "</span>" +
           "</td>" +
           "<td class='text-center td-name' width='30%'>";
 
@@ -1442,8 +1449,8 @@ function verPedido(ID) {
           detalle[i]["Txt_Descripcion"] +
           '">';
         table_enlace_producto += "</tr>";
-
-        table_enlace_producto += "<tr><td class='text-center' colspan='4'>";
+        table_enlace_producto +=`<tr class="tr_enlace_producto${id_item}" style="background-color: rgba(0,0,0,.05);"><td class='text-center' colspan='4'><div class='btn btn-outline-danger' id="btn-remove-item-${id_item}"  style="width:80%" >Quitar</div></td></tr>`;
+        table_enlace_producto += `<tr class="tr_enlace_producto${id_item}" style="background-color: rgba(0,0,0,.05);"><td class='text-center' colspan='4'>`;
         if (
           (response.Nu_Estado_China != 3 &&
             response.Nu_Tipo_Privilegio_Acceso != 1) ||
@@ -1470,7 +1477,8 @@ function verPedido(ID) {
             '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Agregar Proveedor</button>';
           table_enlace_producto += "</div>";
           table_enlace_producto += '<div class="col">';
-          table_enlace_producto +=
+          if(parseInt(response.count_proveedor) > 0){
+            table_enlace_producto +=
             '<button type="button" id="btn-elegir_proveedor' +
             id_item +
             '" data-name_producto="' +
@@ -1487,6 +1495,7 @@ function verPedido(ID) {
             id_item +
             '" class="btn btn-secondary btn-block btn-elegir_proveedor"><i class="far fa-edit"></i>&nbsp; Editar Proveedor</button>';
           table_enlace_producto += "</div>";
+          }
           table_enlace_producto += "</div>";
         } else {
           if (parseInt(response.count_proveedor) > 0) {
@@ -1513,6 +1522,7 @@ function verPedido(ID) {
 
       $("#span-total_cantidad_items").html(i);
       $("#table-Producto_Enlace").append(table_enlace_producto);
+      
       const toolbarOptions = [
         ["bold", "italic", "underline"], // toggled buttons
         [{ color: [] }], // dropdown with defaults from theme
@@ -1520,7 +1530,11 @@ function verPedido(ID) {
       ];
       arrQuill = [];
       arrQuillIngles = [];
-      for (i = 0; i < detalle.length; i++) {
+      for (let i = 0; i < detalle.length; i++) {
+        $(`#btn-remove-item-${detalle[i]["ID_Pedido_Detalle"]}`).click(function(){
+          console.log(detalle[i])
+          deleteItem(detalle[i]["ID_Pedido_Detalle"],detalle[i]["Txt_Producto"]);
+        });
         if(detalle[i]["currentUser"] == "maryam.china@probusiness.pe" || detalle[i]["Txt_Email"] == "maryam.china@probusiness.pe"){
           try{
             const quill = new Quill(`#caracteristicas-${i}`, {
@@ -2182,6 +2196,7 @@ function addItems() {
         <select id="modal-unidad_medida${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
           <option value="un">Unidades</option>
           <option value="mt">Metros</option>
+          <option value="mt2">Metro Cuadrado</option>
           <option value="pc">Piezas</option>
           <option value="kg">Kilogramos</option>
           <option value="pa">Pares</option>
@@ -2409,6 +2424,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           <select disabled id="modal-unidad_medida${i}" data-correlativo="${i}" name="addProducto[${i}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
             <option value="un">Unidades</option>
             <option value="mt">Metros</option>
+            <option value="mt2">Metro Cuadrado</option>
             <option value="pc">Piezas</option>
             <option value="kg">Kilogramos</option>
             <option value="pa">Pares</option>
@@ -2554,6 +2570,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           <select id="modal-unidad_medida${i}" data-correlativo="${i}" name="addProducto[${i}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
             <option value="un">Unidades</option>
             <option value="mt">Metros</option>
+            <option value="mt2">Metro Cuadrado</option>
             <option value="pc">Piezas</option>
             <option value="kg">Kilogramos</option>
             <option value="pa">Pares</option>
@@ -3519,3 +3536,49 @@ function escapeHTMLForInputValue(html) {
 
   return html;
 }
+const deleteItem=(id_item,nombre_item)=>{
+  //sho modal delete
+  $(".modal-eliminar-item-pedido").modal("show");
+  $("#modal-body-eliminar-item-pedido").html("<p>¿Desea eliminar el item <strong>"+nombre_item+"</strong>?</p>");
+  $("#btn-eliminar-item-pedido").off("click").on("click",()=>{
+    //delete item
+    $.ajax({
+      url: base_url + "AgenteCompra/PedidosGarantizados/deleteItem",
+      type: "POST",
+      data: {id_item},
+      dataType: "JSON",
+      success: function (response) {
+        if(response.status=="success"){
+          $(`#tr_enlace_producto${id_item}`).remove();
+          $(`.tr_enlace_producto${id_item}`).remove();
+          $(".modal-eliminar-item-pedido").modal("hide");
+          $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+          $("#modal-message").modal("show");
+          $(".modal-message").addClass("modal-success");
+          $(".modal-title-message").text(response.message);
+          setTimeout(function () {
+            $("#modal-message").modal("hide");
+          }, 1100);
+          reload_table_Entidad();
+        }else{
+          $(".modal-eliminar-item-pedido").modal("hide");
+          $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+          $("#modal-message").modal("show");
+          $(".modal-message").addClass("modal-danger");
+          $(".modal-title-message").text(response.message);
+          setTimeout(function () {
+            $("#modal-message").modal("hide");
+          }, 1100);
+        }
+      },
+    });
+  });
+  
+}
+const sanitizeHTML = (str) => {
+  return str.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+};
