@@ -352,7 +352,9 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [],
+    order: [
+      [1,"desc"]
+    ],
     ajax: {
       url: url,
       type: "POST",
