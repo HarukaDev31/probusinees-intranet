@@ -2073,8 +2073,10 @@ class PedidosPagados extends CI_Controller
         $postData = $this->input->post();
         $idPedido = $postData['idPedido'];
         $idSupplier = $postData['idSupplier'];
+        $idCoordination = $postData['idCoordination'];
+     
+        $data = $this->PedidosPagadosModel->getSupplierProductsInvoice($idPedido, $idSupplier,$idCoordination);
 
-        $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, $idSupplier);
         $templatePath = 'assets/downloads/agente_compra/INVOICE_PROVEEDOR.xls';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -2088,12 +2090,17 @@ class PedidosPagados extends CI_Controller
         $pago1=$data[0]->pago_1_value;
         $pago2=0;
         $total=0;
-        foreach (json_decode($data[0]->detalles, true) as $key => $detalle) {
+        foreach ($data  as  $detalle) {
+          
             if($initialDetailrow>$lastDetailrow){
                 $objPHPExcel->getActiveSheet()->insertNewRowBefore($initialDetailrow, 1);
             }
+            $detalle=(array)$detalle;
+            
             $envio+=$detalle['shipping_cost'];
+            
             $total+=$detalle['total_producto'];
+
             if (!empty($detalle['imagenURL'])) {
                 $objDrawing = new PHPExcel_Worksheet_Drawing();
                 // $row->Txt_Url_Imagen_Producto = str_replace("https://", "../../", $row->Txt_Url_Imagen_Producto);

@@ -7175,6 +7175,13 @@ const saveCoordination = () => {
   const form = $("#form-coordination");
   $("orden-compra_header").hide();
   const formData = new FormData(form[0]);
+  $(".input-total").each(function (){
+    let id= $(this).attr("id");
+    console.log(id);
+    let value = $(this).html().trim();
+    console.log(value);
+    formData.append(id,value);
+  }); 
   url = base_url + "AgenteCompra/PedidosPagados/saveCoordination";
   $.ajax({
     url: url,
@@ -7210,11 +7217,11 @@ const getSupplierCoordinationTableHeader = () => {
           <div class="coordination-qty-column c-qty-column ">QTY</div>
           <div class="coordination-precio-column c-precio-column">PRECIO</div>
           <div class="coordination-total-column c-total-column">TOTAL</div>
-          <div class="coordination-tproducto-column c-tproducto-column">DELIVERY</div>
-          <div class="coordination-tentrega-column c-tentrega-column">F.ENTREGA</div>
+          
           <div class="coordination-pago1-column c-pago1-column">PAGO 1</div>
           <div class="coordination-pago2-column c-pago2-column">PAGO 2</div>
-          
+          <div class="coordination-tproducto-column c-tproducto-column">DELIVERY</div>
+          <div class="coordination-tentrega-column c-tentrega-column">F.ENTREGA</div>
   
   `;
   if (currentPrivilege == priviligesJefeChina) {
@@ -7335,12 +7342,14 @@ const getSupplierCoordinationTableTemplate = (data) => {
     html += `
         <div class="c-total-column supplier-column" style="height:${
           detailsCount * defaultHeight
-        }px">¥ ${parseFloat(total).toFixed(2)}</div>`;
-    detalles.forEach((detalle) => {
-      html += ` <div class="c-tproduccion-column">
-          <input type="text" class="form-control" value="${detalle.delivery}" name="proveedor[${detalle.ID_Pedido_Detalle_Producto_Proveedor}][delivery]"/>
+        }px">
+          <div class="input-group d-flex flex-row"><span class="input-group-text d-flex w-auto">¥</span>
+        <span id="coordination[${
+          supplier.id_coordination
+    }][total]" class="input-total" value="${parseFloat(total).toFixed(2)}"> ${parseFloat(total).toFixed(2)}</span>
+        </div>
         </div>`;
-    });
+   
     html += `
         
         <div class="c-tentrega-column supplier-column"  style="height:${
@@ -7427,7 +7436,11 @@ const getSupplierCoordinationTableTemplate = (data) => {
           </div>
           </div>`;
     }
-
+    detalles.forEach((detalle) => {
+      html += ` <div class="c-tproduccion-column">
+          <input type="text" class="form-control" value="${detalle.delivery}" name="proveedor[${detalle.ID_Pedido_Detalle_Producto_Proveedor}][delivery]"/>
+        </div>`;
+    });
     html += `
     <div class="c-estado-column supplier-column"> 
           <select class="form-select" aria-label="Default select example" name="coordination[${
@@ -7725,6 +7738,13 @@ const openInputFile = (idInput, fileURL) => {
     window.open(fileURL);
   } else {
     $(`#${idInput}`).click();
+    //remove change event and add new one if file is selected change class of button btn-primary to btn-outline-primary
+    
+    $(`#${idInput}`).change(function () {
+      const idButton = idInput.replace("input", "btn");
+      $(`#${idButton}`).removeClass("btn-primary");
+      $(`#${idButton}`).addClass("btn-outline-primary");
+    }); 
   }
 };
 const openRotuladofromCoordination = (id) => {
@@ -8201,6 +8221,10 @@ const openOrdenCompra = (response) => {
       containerOrdenCompra.append(butttonsTemplate);
     } else {
       buttonsData = {
+        btnSave:{
+          text: "Guardar",
+          action: "saveOrdenCompra()",
+        },
         btnCancel: {
           text: "Regresar",
           action: "hideOrdenCompra()",
@@ -8298,11 +8322,11 @@ const getProductTemplate = (producto, index) => {
       }
     </div>
     <div class="col-12 col-lg-2">
-      <input class="form-control text-center" type="number" name="addProducto[${producto.ID_Pedido_Detalle}]['cantidad']" value="${parseInt(producto.Qt_Producto)}"/>
+      <input class="form-control text-center input-cantidad w-100" type="number"  name="addProducto[${producto.ID_Pedido_Detalle}][cantidad]" value="${parseInt(producto.Qt_Producto)}"/>
     </div>
     <div class="col-12 col-lg-3 d-flex flex-column">
           <div id="quill-container-${index}" 
-          class="d-block" ></div>
+          class="d-block w-100" ></div>
     </div>
     <div class="col-12 col-lg-2">
       <a href="${
@@ -8594,6 +8618,12 @@ const saveOrdenCompra = () => {
   const formData = new FormData(form[0]);
   formData.append("idPedido", idPedido);
   formData.append("stepID", selectedStep);
+  if(currentPrivilege==priviligesPersonalPeru){
+    const inputsCantidad = document.querySelectorAll(".input-cantidad");
+    inputsCantidad.forEach((input) => {
+    formData.append(input.name, input.value);
+  });
+  }
   $.ajax({
     url,
     type: "POST",

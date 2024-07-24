@@ -2192,7 +2192,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $this->db->where('id', $stepID);
                 $this->db->update('agente_compra_order_steps', array('status' => "COMPLETED"));
 
-            }else {
+            } else {
                 $this->db->where('id', $stepID);
                 $this->db->update('agente_compra_order_steps', array('status' => "PENDING"));
             }
@@ -2243,6 +2243,10 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $Ss_Tipo_Cambio = $data['tc'];
             $ID_Pedido_Cabecera = intval($data['idPedido']);
             $stepID = $data['stepID'];
+            foreach ($data['addProducto'] as $key => $row) {
+                $this->db->where('ID_Pedido_Detalle', $key);
+                $this->db->update('agente_compra_pedido_detalle', array('Qt_Producto' => $row['cantidad']));
+            }
             //update pedido cabecera table with total_rmb and Ss_Tipo_Cambio
             $this->db->where('ID_Pedido_Cabecera', $ID_Pedido_Cabecera);
             $this->db->update('agente_compra_pedido_cabecera', array('total_rmb' => $total_rmb, 'Ss_Tipo_Cambio' => $Ss_Tipo_Cambio));
@@ -2257,28 +2261,28 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     public function getPedidoPagos($idPedido)
     {
         try {
-            $tipo_cambio=$this->db->select('Ss_Tipo_Cambio')->from('agente_compra_pedido_cabecera')->where('ID_Pedido_Cabecera', $idPedido)->get()->row()->Ss_Tipo_Cambio;
-            $tipo_cambio = $tipo_cambio==0?1:$tipo_cambio;
+            $tipo_cambio = $this->db->select('Ss_Tipo_Cambio')->from('agente_compra_pedido_cabecera')->where('ID_Pedido_Cabecera', $idPedido)->get()->row()->Ss_Tipo_Cambio;
+            $tipo_cambio = $tipo_cambio == 0 ? 1 : $tipo_cambio;
             $this->db->select('ifnull(round(sum(acpdpp.Ss_Precio*acpd.Qt_Producto),2),0) as orden_total');
             $this->db->from('agente_compra_pedido_detalle acpd');
             $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp', 'acpdpp.ID_Pedido_Detalle =acpd.ID_Pedido_Detalle', 'left');
             $this->db->where('acpd.ID_Pedido_Cabecera', $idPedido);
             $this->db->where('acpdpp.Nu_Selecciono_Proveedor', 1);
-            $orden_total = $this->db->get()->row()->orden_total/$tipo_cambio;
+            $orden_total = $this->db->get()->row()->orden_total / $tipo_cambio;
             // $tipo_cambio = $this->db->get()->row()->Ss_Tipo_Cambio==0?1:$this->db->get()->row()->Ss_Tipo_Cambio;
 
             //select sum of all payments_agente_compra_pedido.value with id_pedido=$idPedido
             $this->db->select('ifnull(round(sum(pacp.value),2),0) as pago_cliente');
             $this->db->from('payments_agente_compra_pedido pacp');
             $this->db->where('pacp.id_pedido', $idPedido);
-            $pago_cliente = $this->db->get()->row()->pago_cliente/$tipo_cambio;
+            $pago_cliente = $this->db->get()->row()->pago_cliente / $tipo_cambio;
 
-            $queryData = array_merge((array) 
-            ["orden_total" => $orden_total],
-            
-            (array) 
-            ["pago_cliente" => $pago_cliente]
-        );
+            $queryData = array_merge((array)
+                ["orden_total" => $orden_total],
+
+                (array)
+                ["pago_cliente" => $pago_cliente]
+            );
             $pagosData = $this->getPedidosPagosDetails($idPedido);
             return [
                 "data" => $queryData,
@@ -2329,25 +2333,25 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         foreach ($data as $key => $value) {
             if ($key == "pago-garantia") {
                 continue;
-            } else if ($key=="pago-1-value"|| 
-            $key=="pago-2-value"||
-            $key=="pago-3-value"||
-            $key=="pago-4-value"
+            } else if ($key == "pago-1-value" ||
+                $key == "pago-2-value" ||
+                $key == "pago-3-value" ||
+                $key == "pago-4-value"
             ) {
                 $file = $files['pago-' . substr($key, 5, 1)];
                 $num = substr($key, 5, 1);
                 $fileURL = $this->uploadSingleFile($file, $pathPagos);
-                $pagosURLS["pago-".$num . '_URL'] = $fileURL ?? $data["pago-". $num  . "_URL"];
+                $pagosURLS["pago-" . $num . '_URL'] = $fileURL ?? $data["pago-" . $num . "_URL"];
 
             }
         }
         // Process liquidation file
         if (array_key_exists('liquidacion', $files)) {
-            if($files['liquidacion']['name']!=''){
+            if ($files['liquidacion']['name'] != '') {
                 $fileURL = $this->uploadSingleFile($files['liquidacion'], $pathPagos);
                 $pagosURLS['liquidacion_URL'] = $fileURL;
             }
-            
+
         }if ($data['liquidacion_URL']) {
             $pagosURLS['liquidacion_URL'] = $data['liquidacion_URL'];
         }
@@ -2391,7 +2395,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $total = $this->getPedidoPagos($data['idPedido'])['data'];
         if (floatval($total['orden_total']) <= floatval($total['pago_cliente'])) {
             $this->updateStep($data['step'], "COMPLETED");
-        }else{
+        } else {
             $this->updateStep($data['step'], "PENDING");
         }
         return ['status' => 'success', 'message' => "Pagos guardados"];
@@ -2404,11 +2408,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert)
     {
-        if($dataToInsert['file_url']==''|| $dataToInsert['file_url']=="null"){
-            $dataToInsert['file_url']=null;
-          
+        if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
+            $dataToInsert['file_url'] = null;
+
         }
-        if ((!$dataToInsert['file_url'] || $dataToInsert['file_url']==null)  && $idPayment != -1) {
+        if ((!$dataToInsert['file_url'] || $dataToInsert['file_url'] == null) && $idPayment != -1) {
             //delete record if file_url is null where id=idPayment
             $this->db->where('id', $idPayment);
             $this->db->delete('payments_agente_compra_pedido');
@@ -2424,13 +2428,13 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id', $result->id);
             $this->db->update('payments_agente_compra_pedido', $dataToInsert);
         } else {
-            if($dataToInsert['file_url']==''|| $dataToInsert['file_url']=="null"){
-                $dataToInsert['file_url']=null;
-              
+            if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
+                $dataToInsert['file_url'] = null;
+
             }
-            if($dataToInsert['value']==0 && $dataToInsert['file_url']==null){
+            if ($dataToInsert['value'] == 0 && $dataToInsert['file_url'] == null) {
                 return;
-                }
+            }
             $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
         }
     }
@@ -2486,7 +2490,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
         foreach ($data['coordination'] as $key => $row) {
             $path = 'assets/images/coordination/orden-compra/' . $key;
-            $this->allowedContentTypes = array('image', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
+            $this->allowedContentTypes = array('image/png','image/jpeg','image/jpg','image/gif', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
             $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
             $this->maxFileSize = 20240;
             $pago1UrlExists = null;
@@ -2501,7 +2505,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     $pago2UrlExists = $row['pago_2_url'];
                 }
             }
-            $pago1Url = empty($files['coordination']['name'][$key]['pago_1_file'])==false ?
+            $pago1Url = empty($files['coordination']['name'][$key]['pago_1_file']) == false ?
             $this->uploadSingleFile([
                 'name' => $files['coordination']['name'][$key]['pago_1_file'],
                 'type' => $files['coordination']['type'][$key]['pago_1_file'],
@@ -2509,8 +2513,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 'error' => $files['coordination']['error'][$key]['pago_1_file'],
                 'size' => $files['coordination']['size'][$key]['pago_1_file'],
             ], $path) : $pago1UrlExists;
-
-            $pago2Url = empty($files['coordination']['name'][$key]['pago_2_file'])==
+            $pago2Url = empty($files['coordination']['name'][$key]['pago_2_file']) ==
             false ?
             $this->uploadSingleFile([
                 'name' => $files['coordination']['name'][$key]['pago_2_file'],
@@ -2522,77 +2525,70 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $producto_detalle = [
                 'id_coordination' => $key,
                 'pago_2_value' => $row['pago_2_value'],
-
                 'estado' => $row['estado'],
-
             ];
-            
+
             //if pago_1_file is not null
 
-            if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio){
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
                 $producto_detalle['pago_1_URL'] = $pago1Url;
                 $producto_detalle['pago_2_URL'] = $pago2Url;
             }
-            
+
             $this->db->where('id_coordination', $producto_detalle['id_coordination']);
             $this->db->update('agente_compra_coordination_supplier', $producto_detalle);
 
-            
-
-            if($this->user->Nu_Tipo_Privilegio_Acceso==$this->personalChinaPrivilegio){
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio ||
+             $this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
                 $this->db->select('pago_1_value,pago_2_value,estado');
                 $this->db->from('agente_compra_coordination_supplier');
                 $this->db->where('id_coordination', $key);
                 $query = $this->db->get()->row();
-                if($row['pago_1_value']!=0 && $row['pago_1_value']!=$query->pago_1_value){
+                
+                if ($row['pago_1_value'] != 0 && $row['pago_1_value'] != $query->pago_1_value) {
                     $this->db->where('id_coordination', $key);
                     $this->db->update('agente_compra_coordination_supplier', array('estado' => 'CONFORME',
-                    'pago_1_value' => $row['pago_1_value'],
-                ));
+                        'pago_1_value' => $row['pago_1_value'],
+                    ));
                 }
             }
-            
             $this->db->select('pago_1_URL,pago_2_URL,estado_negociacion');
             $this->db->from('agente_compra_coordination_supplier');
             $this->db->where('id_coordination', $key);
             $result = $this->db->get()->row();
-
-            if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio && $result->estado_negociacion==$row['estado_negociacion']){
-                //if result is not null and pago_1_URL and pago_2_URL are not null
-                if ($result->pago_2_URL != null && $result->pago_1_URL != null) {
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio && $result->estado_negociacion == $row['estado_negociacion']) {
+                // return [$row['pago_1_value'], $row['pago_2_value'],$row['total']];
+                if (($result->pago_2_URL != null && $result->pago_1_URL != null) ||($result->pago_1_URL != null && floatval($row['pago_1_value'])>=floatval($row['total']))) {
                     //update estado_negociacion to 'ADELANTADO' where id_pedido=$idPedido
                     $this->db->where('id_pedido', $idPedido);
                     $this->db->where('id_coordination', $key);
                     $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PAGADO'));
                     //update estado to 'COMPLETED' where id_pedido=$idPedido
-                  
 
-                }else if( $result->pago_1_URL != null ){
+                } else if ($result->pago_1_URL != null) {
                     $this->db->where('id_pedido', $idPedido);
                     $this->db->where('id_coordination', $key);
                     $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'ADELANTADO'));
-                }else{
+                } else {
                     $this->db->where('id_pedido', $idPedido);
                     $this->db->where('id_coordination', $key);
                     $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PENDIENTE'));
                 }
                 // $this->updateStep($currentStep, "COMPLETED");
-            }else{
+            } else {
                 $this->db->where('id_pedido', $idPedido);
                 $this->db->where('id_coordination', $key);
                 $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => $row['estado_negociacion']));
 
             }
-            
-                
-                
+
         }
-        if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio){
+        if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
             //get all rows with this idpedido and get all rows with estado_negociacion='PAGADO'
             $this->db->select('count(*) as total');
             $this->db->from('agente_compra_coordination_supplier');
             $this->db->where('id_pedido', $idPedido);
-            
+
             $query = $this->db->get();
             $total = $query->row()->total;
             $this->db->select('count(*) as total');
@@ -2601,12 +2597,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('estado_negociacion', 'PAGADO');
             $query = $this->db->get();
             $total_pagado = $query->row()->total;
-            if($total==$total_pagado){
+            if ($total == $total_pagado) {
                 $this->updateStep($currentStep, "COMPLETED");
-            }else {
+            } else {
                 $this->updateStep($currentStep, "PENDING");
             }
-        }else{
+        } else {
             $this->db->select('count(*) as total');
             $this->db->from('agente_compra_coordination_supplier');
             $this->db->where('id_pedido', $idPedido);
@@ -2618,16 +2614,16 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('estado', 'CONFORME');
             $query = $this->db->get();
             $total_pagado = $query->row()->total;
-            if($total==$total_pagado ){
+            if ($total == $total_pagado) {
                 $this->updateStep($currentStep, "COMPLETED");
-            }else {
+            } else {
                 $this->updateStep($currentStep, "PENDING");
             }
         }
         return ['status' => 'success', 'message' => 'Coordination saved'];
 
     }
-    
+
     public function getSupplierItems($ID_pedido, $ID_supplier, $ID_coordination)
     {
         $this->db->select('
@@ -2904,14 +2900,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function openRotuladoView($idDetalle)
     {
-        //     $query="
-        //     select caja_master_URL,
-        // empaque_URL,
-        // vim_motor_URL,
-        // notas_rotulado,
-        // ID_Pedido_Detalle
-        // from agente_compra_pedido_detalle
-        //     "
         $this->db->select('caja_master_URL,empaque_URL,vim_motor_URL,notas_rotulado,ID_Pedido_Detalle,
         ID_Pedido_Cabecera');
         $this->db->from('agente_compra_pedido_detalle');
@@ -2924,5 +2912,24 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->from('agente_compra_pedido_cabecera');
         $this->db->where('ID_Pedido_Cabecera', $idPedido);
         return $this->db->get()->row()->ordenCotizacion;
+    }
+    public function getSupplierProductsInvoice($idPedido, $idSupplier, $idCoordination)
+    {
+        try {
+            $this->db->select('accs.pago_1_value,accs.pago_2_value,acpc.cotizacionCode,acpd.Txt_Descripcion as descripcion ,acpd.Txt_Producto,acpd.Txt_Url_Imagen_Producto as imagenURL,acpd.Qt_Producto as qty_product,acpdpp.unidad_medida,
+            acpdpp.Ss_Precio as price_product,acpdpp.Ss_Costo_Delivery as shipping_cost,(acpd.Qt_Producto*acpdpp.Ss_Precio) as total_producto');
+            $this->db->from('agente_compra_coordination_supplier accs');
+            $this->db->join('agente_compra_pedido_cabecera acpc', 'acpc.ID_Pedido_Cabecera = accs.id_pedido', 'left');
+            $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp', 'acpdpp.ID_Entidad_Proveedor = accs.id_supplier and acpdpp.ID_Pedido_Cabecera = accs.id_pedido', 'left');
+            $this->db->join('agente_compra_pedido_detalle acpd', 'acpd.ID_Pedido_Detalle = acpdpp.ID_Pedido_Detalle', 'left ');
+            $this->db->where('acpc.ID_Pedido_Cabecera', $idPedido);
+            $this->db->where('acpdpp.ID_Entidad_Proveedor', $idSupplier);
+            $this->db->where('accs.id_coordination', $idCoordination);
+            $this->db->where('acpdpp.Nu_Selecciono_Proveedor', "1");
+            $query = $this->db->get();
+            return $query->result();
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 }
