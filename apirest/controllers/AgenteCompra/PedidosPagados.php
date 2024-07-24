@@ -1843,7 +1843,7 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("F" . $initialRow, $val->Txt_Producto);
             $objPHPExcel->getActiveSheet()->setCellValue("G" . $initialRow, $this->htmlToRichText($this->htmlToTextAndLineBreaks($val->Txt_Descripcion)));
             $objPHPExcel->getActiveSheet()->setCellValue("H" . $initialRow, $val->Qt_Producto);
-            $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $val->unidad_medida);
+            $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $this->getUnitName($val->unidad_medida));
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
             $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=P" . $initialRow . "*O" . $initialRow);
@@ -2120,9 +2120,9 @@ class PedidosPagados extends CI_Controller
                     $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
                 }
             }
-            $objPHPExcel->getActiveSheet()->setCellValue("E" . $initialDetailrow, $detalle['descripcion']);
+            $objPHPExcel->getActiveSheet()->setCellValue("E" . $initialDetailrow, $this->htmlToRichText($this->htmlToTextAndLineBreaks($detalle['descripcion'])));
             $objPHPExcel->getActiveSheet()->setCellValue("K" . $initialDetailrow, $detalle['qty_product']);
-            $objPHPExcel->getActiveSheet()->setCellValue("L" . $initialDetailrow, $detalle['unidad_medida']);
+            $objPHPExcel->getActiveSheet()->setCellValue("L" . $initialDetailrow, $this->getUnitName($detalle['unidad_medida']));
             $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialDetailrow, $detalle['price_product']);
             $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialDetailrow, "要贴麦头");
             $initialDetailrow++;

@@ -1298,10 +1298,7 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [
-      [2, "desc"],
-
-    ],
+    order: [[2, "desc"]],
     ajax: {
       url: url,
       type: "POST",
@@ -7175,13 +7172,13 @@ const saveCoordination = () => {
   const form = $("#form-coordination");
   $("orden-compra_header").hide();
   const formData = new FormData(form[0]);
-  $(".input-total").each(function (){
-    let id= $(this).attr("id");
+  $(".input-total").each(function () {
+    let id = $(this).attr("id");
     console.log(id);
     let value = $(this).html().trim();
     console.log(value);
-    formData.append(id,value);
-  }); 
+    formData.append(id, value);
+  });
   url = base_url + "AgenteCompra/PedidosPagados/saveCoordination";
   $.ajax({
     url: url,
@@ -7227,7 +7224,7 @@ const getSupplierCoordinationTableHeader = () => {
   if (currentPrivilege == priviligesJefeChina) {
     template += `<div class="coordination-estado-column c-estado-column">NEGOCIACION</div>`;
     template += `<div class="coordination-c-negociacion-column c-negociacion-column">ESTADO</div>`;
-  }else{
+  } else {
     template += `<div class="coordination-estado-column c-estado-column">ESTADO</div>`;
   }
   template += `</div>`;
@@ -7346,10 +7343,12 @@ const getSupplierCoordinationTableTemplate = (data) => {
           <div class="input-group d-flex flex-row"><span class="input-group-text d-flex w-auto">¥</span>
         <span id="coordination[${
           supplier.id_coordination
-    }][total]" class="input-total" value="${parseFloat(total).toFixed(2)}"> ${parseFloat(total).toFixed(2)}</span>
+        }][total]" class="input-total form-control" value="${parseFloat(
+      total
+    ).toFixed(2)}"> ${parseFloat(total).toFixed(2)}</span>
         </div>
         </div>`;
-   
+
     html += `
         
         <div class="c-tentrega-column supplier-column"  style="height:${
@@ -7739,12 +7738,12 @@ const openInputFile = (idInput, fileURL) => {
   } else {
     $(`#${idInput}`).click();
     //remove change event and add new one if file is selected change class of button btn-primary to btn-outline-primary
-    
+
     $(`#${idInput}`).change(function () {
       const idButton = idInput.replace("input", "btn");
       $(`#${idButton}`).removeClass("btn-primary");
       $(`#${idButton}`).addClass("btn-outline-primary");
-    }); 
+    });
   }
 };
 const openRotuladofromCoordination = (id) => {
@@ -7783,71 +7782,108 @@ const returnToCoordination = () => {
   containerCoordination.show();
 };
 const getPagosTemplate = (data = null) => {
-  let html = `
-        <div class="first-column col-12 col-md-6">
-                    <div class="pago row" id="pago-garantia-container">
-                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-                        <label>PAGO GARANTIA</label>
-
-                        <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL" />
-                      </div>
-                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-garantia-div">
-                        <input type="file" name="pago-garantia" id="pago-garantia" class="" />
-                        <input type="number" name="pago-garantia-value" id="pago-garantia-value" class="form-control" />
-                      </div>
-                    </div>
-                    <div class="pago row" id="pago-1-container">
-                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-                        <label>PAGO 1:</label>
-                        <input type="hidden" name="pago-1_URL" id="pago-1_URL" />
-                      </div>
-                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-1-div">
-                        <input type="file" name="pago-1" id="pago-1" class="" />
-                        <input type="number" name="pago-1-value" id="pago-1-value" class="form-control" />
-                      </div>
-                    </div>
-                    <div class="pago row" id="pago-2-container">
-                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-                        <label>PAGO 2:</label>
-                        <input type="hidden" name="pago-2_URL" id="pago-2_URL" >
-
-                      </div>
-                      <div class="col-12 col-md-10 d-flex flex-row align-items-center " id="pago-2-div">
-                        <input type="file" name="pago-2" id="pago-2" class="" />
-                        <input type="number" name="pago-2-value" id="pago-2-value" class="form-control"/ />
-                      </div>
-                    </div>
-                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-3-div">
-                      <div class="conditional-field">
-                        <label>PAGO 3:</label>
-                        <label class="switch">
-                          <input type="checkbox" id="pago3_URL_switch">
-                          <span class="slider"></span>
-                        </label>
-                        </div>
-                      </div>
-                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-4-div">
-                      <div class="conditional-field">
-                        <label>PAGO 4:</label>
-                        <label class="switch">
-                          <input type="checkbox" id="pago4_URL_switch">
-                          <span class="slider"></span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <div class="form-group" id="liquidacion-container">
-                      <label>LIQUIDACION:</label>
-                      <input type="hidden" name="liquidacion_URL" id="liquidacion_URL" />
-                      <input type="file" name="liquidacion" id="liquidacion" />
-                    </div>
-                    <div class="form-group">
-                      <label>NOTAS:</label>
-                      <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
-                    </div>
-                  </div> 
+  let html = `<div>
+    <div class="row">
+     <span>Pagos <span class="add-payments">+</span>
+        </span>
+      <div class="col-12 col-md-3">    
+        <div class="payment-container">
+          <div class="upload-payment">
+              <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+              <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+          </div>
+          <div class="payment-name"></div>
+          <div class="input-group">
+            <span class="input-group-text" >$</span>
+            <input type="text" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">    
+        <div class="payment-container">
+          <div class="upload-payment container-div">
+              <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+              <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+          </div>
+          <div class="payment-name container-div"></div>
+          <div class="input-group ">
+            <span class="input-group-text" >$</span>
+            <input type="text" class="form-control">
+          </div>
+        </div>
+      </div>
+  </div>
   `;
+  // let html = `
+  //       <div class="first-column col-12 col-md-6">
+  //                   <div class="pago row" id="pago-garantia-container">
+  //                     <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+  //                       <label>PAGO GARANTIA</label>
+  //                       <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL" />
+  //                     </div>
+  //                     <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-garantia-div">
+  //                       <input type="file" name="pago-garantia" id="pago-garantia" class="" />
+  //                       <input type="number" name="pago-garantia-value" id="pago-garantia-value" class="form-control" />
+  //                     </div>
+  //                   </div>
+  //                   <div class="pago row" id="pago-1-container">
+  //                     <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+  //                       <label>PAGO 1:</label>
+  //                       <input type="hidden" name="pago-1_URL" id="pago-1_URL" />
+  //                     </div>
+  //                     <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-1-div">
+  //                       <input type="file" name="pago-1" id="pago-1" />
+  //                       <input type="number" name="pago-1-value" id="pago-1-value" class="form-control" />
+  //                     </div>
+  //                   </div>
+  //                   <div class="pago row" id="pago-2-container">
+  //                     <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+  //                       <label>PAGO 2:</label>
+  //                       <input type="hidden" name="pago-2_URL" id="pago-2_URL" >
+
+  //                     </div>
+  //                     <div class="col-12 col-md-10 d-flex flex-row align-items-center " id="pago-2-div">
+  //                       <input type="file" name="pago-2" id="pago-2" class="" />
+  //                       <input type="number" name="pago-2-value" id="pago-2-value" class="form-control"/ />
+  //                     </div>
+  //                   </div>
+  //                   <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-3-div">
+  //                     <div class="conditional-field">
+  //                       <label>PAGO 3:</label>
+  //                       <label class="switch">
+  //                         <input type="checkbox" id="pago3_URL_switch">
+  //                         <span class="slider"></span>
+  //                       </label>
+  //                       </div>
+  //                     </div>
+  //                   <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-4-div">
+  //                     <div class="conditional-field">
+  //                       <label>PAGO 4:</label>
+  //                       <label class="switch">
+  //                         <input type="checkbox" id="pago4_URL_switch">
+  //                         <span class="slider"></span>
+  //                       </label>
+  //                     </div>
+  //                   </div>
+  //                 </div>
+  //                 <div class="col-12 col-md-6">
+  //                   <div class="form-group" id="liquidacion-container">
+  //                     <label>LIQUIDACION:</label>
+  //                     <input type="hidden" name="liquidacion_URL" id="liquidacion_URL" />
+  //                     <input type="file" name="liquidacion" id="liquidacion" />
+  //                   </div>
+  //                   <div class="form-group">
+  //                     <label>NOTAS:</label>
+  //                     <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
+  //                   </div>
+  //                 </div>
+  //         `;
   return html;
 };
 const openPagos = (response) => {
@@ -7864,274 +7900,269 @@ const openPagos = (response) => {
     $("#pago_restante").html("$" + pagoRestante);
     //set font bold
     $("#pago_restante").css("font-weight", "bold");
-    if(pagoRestante<=0){
+    if (pagoRestante <= 0) {
       //add class text success
       $("#pago_restante").addClass("text-success");
-
-    }else{
+    } else {
       $("#pago_restante").removeClass("text-success");
       $("#pago_restante").addClass("text-danger");
     }
-    if (response.pagosData) {
-      const pagosData = response.pagosData;
-      const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
-      let indexPagos = 1;
-      $("#pago-1-value").val(0);
-      $("#pago-1_ID").remove();
-      $("#pago-1-btnlink").remove();
-      // $('#pago-1-div').append('<input type="file" name="pago-1" id="pago-1" class="">');
-      $("#pago-2-value").val(0);
-      $("#pago-2-btnlink").remove();
-      $("#pago-2_ID").remove();
-      // $('#pago-2-div').append('<input type="file" name="pago-2" id="pago-2" class="">');
-      pagosData.forEach((pago, i) => {
-        if (pago.name == "garantia") {
-          $("#pago-garantia").hide();
-          $("#pago-garantia_ID").remove();
-          $("#pago-garantia-container").append(
-            `<input type="hidden" name="pago-garantia_ID" id="pago-garantia_ID" value="${pago.idPayment}">`
-          );
-          $("#pago-garantia_URL").val(pago.file_url);
-          $("#pago-garantia-div").append(`
-            <a href="${pago.file_url}" id="pago-garantia-btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Garantia</a>`);
-          $("#pago-garantia-value").val(pago.value);
-          $(`#pago-${indexPagos}-btnlink`).remove();
+    // if (response.pagosData) {
+    //   const pagosData = response.pagosData;
+    //   const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
+    //   let indexPagos = 1;
+    //   $("#pago-1-value").val(0);
+    //   $("#pago-1_ID").remove();
+    //   $("#pago-1-btnlink").remove();
+    //   // $('#pago-1-div').append('<input type="file" name="pago-1" id="pago-1" class="">');
+    //   $("#pago-2-value").val(0);
+    //   $("#pago-2-btnlink").remove();
+    //   $("#pago-2_ID").remove();
+    //   // $('#pago-2-div').append('<input type="file" name="pago-2" id="pago-2" class="">');
+    //   pagosData.forEach((pago, i) => {
+    //     if (pago.name == "garantia") {
+    //       $("#pago-garantia").hide();
+    //       $("#pago-garantia_ID").remove();
+    //       $("#pago-garantia-container").append(
+    //         `<input type="hidden" name="pago-garantia_ID" id="pago-garantia_ID" value="${pago.idPayment}">`
+    //       );
+    //       $("#pago-garantia_URL").val(pago.file_url);
+    //       $("#pago-garantia-div").append(`
+    //         <a href="${pago.file_url}" id="pago-garantia-btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Garantia</a>`);
+    //       $("#pago-garantia-value").val(pago.value);
+    //       $(`#pago-${indexPagos}-btnlink`).remove();
 
-          $(`#pago-${indexPagos}-div`).append(`
-            <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-        } else if (pago.name == "normal") {
-          $(`#pago-${indexPagos}`).show();
-          if (pago.file_url != null && indexPagos <= 2) {
-            $(`#pago-${indexPagos}_URL`).val(pago.file_url);
-            $(`#pago-${indexPagos}`).hide();
-            $(`#pago-${indexPagos}-div`).append(
-              `<input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`
-            );
-            $(`#pago-${indexPagos}-div`).append(`
-              <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-            $(`#pago-${indexPagos}-div`).append(`
-            <input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`);
-          }
+    //       $(`#pago-${indexPagos}-div`).append(`
+    //         <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //     } else if (pago.name == "normal") {
+    //       $(`#pago-${indexPagos}`).show();
+    //       if (pago.file_url != null && indexPagos <= 2) {
+    //         $(`#pago-${indexPagos}_URL`).val(pago.file_url);
+    //         $(`#pago-${indexPagos}`).hide();
+    //         $(`#pago-${indexPagos}-div`).append(
+    //           `<input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`
+    //         );
+    //         $(`#pago-${indexPagos}-div`).append(`
+    //           <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //         $(`#pago-${indexPagos}-div`).append(`
+    //         <input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`);
+    //       }
 
-          if (indexPagos > 2) {
-            if (!$(`#pago-${indexPagos}-div`)) {
-              $(`#pago-${indexPagos}-div`).append(
-                `<input type="number" name="pago-${indexPagos}-value" id="pago-${indexPagos}-value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
-              );
-            }
-          }
-          $(`#pago-${indexPagos}-value`).val(pago.value);
+    //       if (indexPagos > 2) {
+    //         if (!$(`#pago-${indexPagos}-div`)) {
+    //           $(`#pago-${indexPagos}-div`).append(
+    //             `<input type="number" name="pago-${indexPagos}-value" id="pago-${indexPagos}-value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
+    //           );
+    //         }
+    //       }
+    //       $(`#pago-${indexPagos}-value`).val(pago.value);
 
-          indexPagos++;
-        } else if (pago.name == "liquidacion") {
-          $(`#liquidacion_URL`).val(pago.file_url);
-          $(`#liquidacion`).hide();
-          $(`#liquidacion_ID`).remove();
-          $(`#liquidacion-container`).append(
-            `<input type="hidden" name="liquidacion_ID" id="liquidacion_ID" value="${pago.idPayment}">`
-          );
-          $("#liquidacion_btnlink").remove();
-          $(`#liquidacion-container`).append(`
-            <a href="${pago.file_url}" id="liquidacion_btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Liquidacion</a>`);
-        }
-      });
-      const pago_switch_3 = $(`#pago3_URL_switch`);
-      const pago3Div = $(`#pago-3-div`);
-      const pago_switch_4 = $(`#pago4_URL_switch`);
-      const pago4Div = $(`#pago-4-div`);
-      console.log(indexPagos);
-      if (indexPagos > 3) {
-        pago_switch_3.prop("checked", true);
-        if (pagosData[2].file_url != null) {
-          //append input hide with pago_ID
-          if ($("#pago-3_ID").length == 0) {
-            pago3Div.append(
-              `<input type="hidden" name="pago-3_ID" id="pago-3_ID" value="${pagosData[2].idPayment}">`
-            );
-          }
-          if ($("#pago-3_value").length == 0) {
-            pago3Div.append(
-              `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
-            );
-          }
-          if ($(`#pago-3-btnlink`).length == 0) {
-            $(`#pago-3-div`).append(`
-                <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-          }
-          if ($("#pago-3_URL").length == 0) {
-            $(`#pago-3-div`).append(`
-            <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
-          }
-        } else {
-          if ($("#pago3-file").length == 0) {
-            pago3Div.append(
-              '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
-            );
-          }
-          if ($("#pago-3_value").length == 0) {
-            pago3Div.append(
-              `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
-            );
-          }
-        }
-      } else {
-        pago_switch_3.prop("checked", false);
-        $("pago3-file").remove();
-        $("#pago-3-btnlink").remove();
-      }
-      pago_switch_3.change(function () {
-        if ($(this).is(":checked")) {
-          if (indexPagos > 3) {
-            if (pagosData[2].file_url) {
-              // if ($("#pago-3-btnlink").length == 0) {
-              //   pago3Div.append(
-              //     `<a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-3_URL">Ver Pago</a>`
-              //   );
-              // }
-              if ($("#pago-3_value").length == 0) {
-                pago3Div.append(
-                  `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
-                );
-              }
-              if ($(`#pago-3-btnlink`).length == 0) {
-                $(`#pago-3-div`).append(`
-                  <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-              }
-              if ($("#pago-3_URL").length == 0) {
-                $(`#pago-3-div`).append(`
-                <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
-              }
-            } else {
-              if ($("#pago3-file").length == 0) {
-                pago3Div.append(
-                  '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
-                );
-              }
-              if ($("#pago-3_value").length == 0) {
-                pago3Div.append(
-                  `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
-                );
-              }
-            }
-          } else {
-            if ($("#pago3-file").length == 0) {
-              pago3Div.append(
-                `<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off" />`
-              );
-            }
-            if ($("#pago-3_value").length == 0) {
-              pago3Div.append(
-                `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
-              );
-            }
-            if ($(`#pago-3-btnlink`).length == 0) {
-              $(`#pago-3-div`).append(`
-                <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-            }
-          }
-        } else {
-          pago3Div.find("#pago-3-btnlink").remove();
-          pago3Div.find("#pago3-file").remove();
-          pago3Div.find("#pago-3_value").remove();
-          pago3Div.find(`#pago-3-btnlink`).remove();
-        }
-      });
-      ///append an a tag with the link to the file
+    //       indexPagos++;
+    //     } else if (pago.name == "liquidacion") {
+    //       $(`#liquidacion_URL`).val(pago.file_url);
+    //       $(`#liquidacion`).hide();
+    //       $(`#liquidacion_ID`).remove();
+    //       $(`#liquidacion-container`).append(
+    //         `<input type="hidden" name="liquidacion_ID" id="liquidacion_ID" value="${pago.idPayment}">`
+    //       );
+    //       $("#liquidacion_btnlink").remove();
+    //       $(`#liquidacion-container`).append(`
+    //         <a href="${pago.file_url}" id="liquidacion_btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Liquidacion</a>`);
+    //     }
+    //   });
+    //   const pago_switch_3 = $(`#pago3_URL_switch`);
+    //   const pago3Div = $(`#pago-3-div`);
+    //   const pago_switch_4 = $(`#pago4_URL_switch`);
+    //   const pago4Div = $(`#pago-4-div`);
+    //   console.log(indexPagos);
+    //   if (indexPagos > 3) {
+    //     pago_switch_3.prop("checked", true);
+    //     if (pagosData[2].file_url != null) {
+    //       //append input hide with pago_ID
+    //       if ($("#pago-3_ID").length == 0) {
+    //         pago3Div.append(
+    //           `<input type="hidden" name="pago-3_ID" id="pago-3_ID" value="${pagosData[2].idPayment}">`
+    //         );
+    //       }
+    //       if ($("#pago-3_value").length == 0) {
+    //         pago3Div.append(
+    //           `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
+    //         );
+    //       }
+    //       if ($(`#pago-3-btnlink`).length == 0) {
+    //         $(`#pago-3-div`).append(`
+    //             <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //       }
+    //       if ($("#pago-3_URL").length == 0) {
+    //         $(`#pago-3-div`).append(`
+    //         <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
+    //       }
+    //     } else {
+    //       if ($("#pago3-file").length == 0) {
+    //         pago3Div.append(
+    //           '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
+    //         );
+    //       }
+    //       if ($("#pago-3_value").length == 0) {
+    //         pago3Div.append(
+    //           `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
+    //         );
+    //       }
+    //     }
+    //   } else {
+    //     pago_switch_3.prop("checked", false);
+    //     $("pago3-file").remove();
+    //     $("#pago-3-btnlink").remove();
+    //   }
+    //   pago_switch_3.change(function () {
+    //     if ($(this).is(":checked")) {
+    //       if (indexPagos > 3) {
+    //         if (pagosData[2].file_url) {
 
-      if (indexPagos > 4) {
-        pago_switch_4.prop("checked", false);
+    //           if ($("#pago-3_value").length == 0) {
+    //             pago3Div.append(
+    //               `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
+    //             );
+    //           }
+    //           if ($(`#pago-3-btnlink`).length == 0) {
+    //             $(`#pago-3-div`).append(`
+    //               <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //           }
+    //           if ($("#pago-3_URL").length == 0) {
+    //             $(`#pago-3-div`).append(`
+    //             <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
+    //           }
+    //         } else {
+    //           if ($("#pago3-file").length == 0) {
+    //             pago3Div.append(
+    //               '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
+    //             );
+    //           }
+    //           if ($("#pago-3_value").length == 0) {
+    //             pago3Div.append(
+    //               `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
+    //             );
+    //           }
+    //         }
+    //       } else {
+    //         if ($("#pago3-file").length == 0) {
+    //           pago3Div.append(
+    //             `<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off" />`
+    //           );
+    //         }
+    //         if ($("#pago-3_value").length == 0) {
+    //           pago3Div.append(
+    //             `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
+    //           );
+    //         }
+    //         if ($(`#pago-3-btnlink`).length == 0) {
+    //           $(`#pago-3-div`).append(`
+    //             <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //         }
+    //       }
+    //     } else {
+    //       pago3Div.find("#pago-3-btnlink").remove();
+    //       pago3Div.find("#pago3-file").remove();
+    //       pago3Div.find("#pago-3_value").remove();
+    //       pago3Div.find(`#pago-3-btnlink`).remove();
+    //     }
+    //   });
+    //   ///append an a tag with the link to the file
 
-        if (pagosData[3].file_url != null) {
-          pago_switch_4.prop("checked", true);
-          if ($("#pago-4_ID").length == 0) {
-            pago4Div.append(
-              `<input type="hidden" name="pago-4_ID" id="pago-4_ID" value="${pagosData[3].idPayment}">`
-            );
-          }
-          if ($("#pago-4_value").length == 0) {
-            pago4Div.append(
-              `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="${pagosData[3].value}" autocomplete="off" />`
-            );
-          }
-          if ($(`#pago-4-btnlink`).length == 0) {
-            $(`#pago-4-div`).append(`
-              <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-          }
-          if ($("#pago-4_URL").length == 0) {
-            $(`#pago-4-div`).append(`
-            <input type="hidden" name="pago-4_URL" id="pago-4_URL" value="${pagosData[2].file_url}">`);
-          }
-        } else {
-          pago_switch_4.prop("checked", false);
-          $("pago4-file").remove();
-          $("#pago-4-btnlink").remove();
-        }
-      }
-      pago_switch_4.change(function () {
-        if ($(this).is(":checked")) {
-          if (indexPagos > 4) {
-            if (pagosData[3].file_url) {
-              pago4Div.append(
-                `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" 
-                value="${pagosData[3].value}"/>`
-              );
-              pago4Div.append(
-                `<a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-4_URL">Ver Pago</a>`
-              );
+    //   if (indexPagos > 4) {
+    //     pago_switch_4.prop("checked", false);
 
-              if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
-                $(`#pago-4-div`).append(`
-                  <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-              }
-            }
-          } else {
-            console.log("append", pago4Div);
-            if ($("#pago4-file").length == 0) {
-              pago4Div.append(
-                `<input type="file" name="pago-4" id="pago4-file" class="" placeholder="" value="" autocomplete="off" />`
-              );
-            }
-            //append input type number
-            if ($("#pago-4_value").length == 0) {
-              pago4Div.append(
-                `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
-              );
-            }
-            if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
-              $(`#pago-4-div`).append(`
-                <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-            }
-          }
-        } else {
-          pago4Div.find("#pago-4-btnlink").remove();
-          pago4Div.find("#pago4-file").remove();
-          pago4Div.find("#pago-4_value").remove();
-          pago4Div.find(`#pago-4-btnlink`).remove();
-        }
-      });
-      //append a with
-      if (!existsGarantia) {
-        $("#pago-garantia-container").html("<div></div>");
-      }
-      const buttonsConfig = {
-        btnSave: {
-          text: "Guardar",
-          action: "savePagos()",
-        },
-        btnCancel: {
-          text: "Regresar",
-          action: "hidePagos2()",
-        },
-      };
-      const buttonsHTML = getActionButtons(buttonsConfig);
-      $("#pagos-buttons").append(buttonsHTML);
-    }
+    //     if (pagosData[3].file_url != null) {
+    //       pago_switch_4.prop("checked", true);
+    //       if ($("#pago-4_ID").length == 0) {
+    //         pago4Div.append(
+    //           `<input type="hidden" name="pago-4_ID" id="pago-4_ID" value="${pagosData[3].idPayment}">`
+    //         );
+    //       }
+    //       if ($("#pago-4_value").length == 0) {
+    //         pago4Div.append(
+    //           `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="${pagosData[3].value}" autocomplete="off" />`
+    //         );
+    //       }
+    //       if ($(`#pago-4-btnlink`).length == 0) {
+    //         $(`#pago-4-div`).append(`
+    //           <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //       }
+    //       if ($("#pago-4_URL").length == 0) {
+    //         $(`#pago-4-div`).append(`
+    //         <input type="hidden" name="pago-4_URL" id="pago-4_URL" value="${pagosData[2].file_url}">`);
+    //       }
+    //     } else {
+    //       pago_switch_4.prop("checked", false);
+    //       $("pago4-file").remove();
+    //       $("#pago-4-btnlink").remove();
+    //     }
+    //   }
+    //   pago_switch_4.change(function () {
+    //     if ($(this).is(":checked")) {
+    //       if (indexPagos > 4) {
+    //         if (pagosData[3].file_url) {
+    //           pago4Div.append(
+    //             `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off"
+    //             value="${pagosData[3].value}"/>`
+    //           );
+    //           pago4Div.append(
+    //             `<a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-4_URL">Ver Pago</a>`
+    //           );
+
+    //           if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
+    //             $(`#pago-4-div`).append(`
+    //               <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //           }
+    //         }
+    //       } else {
+    //         console.log("append", pago4Div);
+    //         if ($("#pago4-file").length == 0) {
+    //           pago4Div.append(
+    //             `<input type="file" name="pago-4" id="pago4-file" class="" placeholder="" value="" autocomplete="off" />`
+    //           );
+    //         }
+    //         //append input type number
+    //         if ($("#pago-4_value").length == 0) {
+    //           pago4Div.append(
+    //             `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
+    //           );
+    //         }
+    //         if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
+    //           $(`#pago-4-div`).append(`
+    //             <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
+    //         }
+    //       }
+    //     } else {
+    //       pago4Div.find("#pago-4-btnlink").remove();
+    //       pago4Div.find("#pago4-file").remove();
+    //       pago4Div.find("#pago-4_value").remove();
+    //       pago4Div.find(`#pago-4-btnlink`).remove();
+    //     }
+    //   });
+    //   //append a with
+    //   if (!existsGarantia) {
+    //     $("#pago-garantia-container").html("<div></div>");
+    //   }
+    //   const buttonsConfig = {
+    //     btnSave: {
+    //       text: "Guardar",
+    //       action: "savePagos()",
+    //     },
+    //     btnCancel: {
+    //       text: "Regresar",
+    //       action: "hidePagos2()",
+    //     },
+    //   };
+    //   const buttonsHTML = getActionButtons(buttonsConfig);
+    //   $("#pagos-buttons").append(buttonsHTML);
+    // }
   }
 };
 const hidePagos2 = () => {
   hidePagos();
 
-  getOrderProgress(idPedido,currentServicio);
+  getOrderProgress(idPedido, currentServicio);
 };
 const savePagos = () => {
   const form = $("#pagos-form");
@@ -8149,7 +8180,7 @@ const savePagos = () => {
       response = JSON.parse(response);
       if (response.status == "success") {
         hidePagos();
-        getOrderProgress(idPedido,currentServicio);
+        getOrderProgress(idPedido, currentServicio);
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -8221,7 +8252,7 @@ const openOrdenCompra = (response) => {
       containerOrdenCompra.append(butttonsTemplate);
     } else {
       buttonsData = {
-        btnSave:{
+        btnSave: {
           text: "Guardar",
           action: "saveOrdenCompra()",
         },
@@ -8322,7 +8353,9 @@ const getProductTemplate = (producto, index) => {
       }
     </div>
     <div class="col-12 col-lg-2">
-      <input class="form-control text-center input-cantidad w-100" type="number"  name="addProducto[${producto.ID_Pedido_Detalle}][cantidad]" value="${parseInt(producto.Qt_Producto)}"/>
+      <input class="form-control text-center input-cantidad w-100" type="number"  name="addProducto[${
+        producto.ID_Pedido_Detalle
+      }][cantidad]" value="${parseInt(producto.Qt_Producto)}"/>
     </div>
     <div class="col-12 col-lg-3 d-flex flex-column">
           <div id="quill-container-${index}" 
@@ -8597,7 +8630,7 @@ const hideOrdenCompra = () => {
   // containerVer.hide();
   // containerListar.show();
   containerSteps.empty();
-  getOrderProgress(idPedido,currentServicio);
+  getOrderProgress(idPedido, currentServicio);
 
   reload_table_Entidad();
 };
@@ -8618,11 +8651,11 @@ const saveOrdenCompra = () => {
   const formData = new FormData(form[0]);
   formData.append("idPedido", idPedido);
   formData.append("stepID", selectedStep);
-  if(currentPrivilege==priviligesPersonalPeru){
+  if (currentPrivilege == priviligesPersonalPeru) {
     const inputsCantidad = document.querySelectorAll(".input-cantidad");
     inputsCantidad.forEach((input) => {
-    formData.append(input.name, input.value);
-  });
+      formData.append(input.name, input.value);
+    });
   }
   $.ajax({
     url,

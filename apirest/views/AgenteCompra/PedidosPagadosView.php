@@ -2923,5 +2923,24 @@ echo form_open('', $attributes);
     input[type=number] {
       -moz-appearance: textfield;
     }
+  .payment-container{
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.4em;
+  }
+  .upload-payment{
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    padding: 0.5em;
+    
+  }.upload-payment svg{
+    width: 150px;
+    height: 100px;
+  }.container-div{
+    -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  }
   </style>
   <?php echo form_close(); ?>
