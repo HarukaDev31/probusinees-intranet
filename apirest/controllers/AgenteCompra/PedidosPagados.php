@@ -2160,6 +2160,13 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->openRotuladoView($ID_Detalle);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    public function deletePago()
+    {
+        $data = $this->input->post();
+        $idPayment = $data['idPayment'];
+        $response = $this->PedidosPagadosModel->deletePago($idPayment);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
     public function getUnitName($name){
         switch ($name) {
             case 'un':

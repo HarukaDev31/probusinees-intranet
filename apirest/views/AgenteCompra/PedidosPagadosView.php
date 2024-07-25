@@ -482,7 +482,23 @@
   <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-
+<div class="modal fade modal-confirmation" id="modal-confirmation">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body-confirmation">
+        <div class="col-xs-12">
+          <label id="modal-message-confirmation-title">¿Está seguro de eliminar este pago?</label>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="btn-cancel-confirmation" class="btn btn-outline-danger btn-lg col" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="btn-confirmation" class="col btn btn-success btn-lg btn-block">Eliminar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
 <!-- modal ver imagen del item -->
 <div class="modal fade modal-ver_item" id="modal-default">
   <div class="modal-dialog modal-lg">
@@ -2928,11 +2944,37 @@ echo form_open('', $attributes);
     flex-direction: column;
     row-gap: 0.4em;
     align-items: center;
+    justify-content: space-between;
+    height: 350px;
+    position: relative;
+  }.liquidacion-garantia-container{
+    height:270px!important;
+  }.liquidacion-container{
+    height: 100%!important;
+  }textarea{
+    -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    resize: none;
+  }
+  .remove-item{
+    position: absolute;
+    right: 2em;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    border-radius: 1em;
+    background: #F1948A;
+    align-items: center;
     justify-content: center;
+    color: white;
+  }.remove-item:hover{
+    cursor: pointer;
+    background-color: #E74C3C;
   }
   .upload-payment{
     width: 180px;
-    height: 180px;
+    height: 180px!important;
     border-radius: 50%;
     padding: 0.5em;
     display: flex;
@@ -2947,9 +2989,28 @@ echo form_open('', $attributes);
   
   .not-filled:hover svg path{
     stroke: white;
-  }.filled{
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .upload-payment.filled:hover{
+    animation: pulse 1s infinite;
+  }
+  .filled{
     background-color: #3498DB;
-  }.filled svg path{
+    color:white;
+  }.filled:hover{
+    cursor: pointer;
+  }
+  .filled svg path{
     stroke: white;
   }.add-payments-container{
     font-weight: bold;
@@ -2981,9 +3042,9 @@ echo form_open('', $attributes);
     -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
     -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
     box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
-    border-radius: 1em;
+    border-radius: 3em;
     width: 250px;
-    margin-bottom: 1em;
+    height: 70px!important;
     text-align: center;
     word-wrap: break-word;
     word-break: break-all;
