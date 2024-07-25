@@ -394,7 +394,7 @@
               </div>
               <div class="row separator-line"></div>
               <div class="w-100 row" id="pagos-body">
-                <form class="row w-100" id="pagos-form">
+                <form class="col-12 w-100" id="pagos-form">
                   <!-- <div class="first-column col-12 col-md-6">
                     <div class="pago row" id="pago-garantia-container">
                       <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
@@ -2927,16 +2927,72 @@ echo form_open('', $attributes);
     display: flex;
     flex-direction: column;
     row-gap: 0.4em;
+    align-items: center;
+    justify-content: center;
   }
   .upload-payment{
     width: 180px;
     height: 180px;
     border-radius: 50%;
     padding: 0.5em;
+    display: flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items: center;
     
-  }.upload-payment svg{
-    width: 150px;
-    height: 100px;
+  }.not-filled:hover{
+    background-color: #3498DB;
+    cursor:pointer;
+  }
+  
+  .not-filled:hover svg path{
+    stroke: white;
+  }.filled{
+    background-color: #3498DB;
+  }.filled svg path{
+    stroke: white;
+  }.add-payments-container{
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+  }.add-payments-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 1em;
+    -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  }.add-payments-button:hover{
+    background-color: #3498DB;
+    color:white;
+    cursor: pointer;
+  }
+  
+  .payment-name{
+    font-size: 1.2em;
+    font-weight: bold;
+    padding:1em 0.5em;
+    -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    border-radius: 1em;
+    width: 250px;
+    margin-bottom: 1em;
+    text-align: center;
+    word-wrap: break-word;
+    word-break: break-all;
+    align-self: center;
+  }
+  
+  .upload-payment svg{
+    width: 120px;
+    height: 120px;
   }.container-div{
     -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
     -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
