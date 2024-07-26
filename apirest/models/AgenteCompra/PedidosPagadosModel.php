@@ -41,8 +41,8 @@ class PedidosPagadosModel extends CI_Model
 
     public function _get_datatables_query()
     {
-        $this->db->select(' CORRE.Fe_Month, Nu_Estado_China,' . $this->table . '.*, P.No_Pais,
-		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
+        $this->db->select('CORRE.Fe_Month, Nu_Estado_China,' . $this->table . '.*, P.No_Pais,
+		CLI.No_Entidad, CLI.Nu_Documento_Identidad,CLI.No_Contacto,
         (select count(*) from payments_agente_compra_pedido where id_pedido = ' . $this->table . '.ID_Pedido_Cabecera and id_type_payment=2) as total_pagos,
         if((select count(*) from payments_agente_compra_pedido where id_pedido = ' . $this->table . '.ID_Pedido_Cabecera and id_type_payment=3)>0,1,0) as is_closed ,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto, USRCHINA.No_Nombres_Apellidos AS No_Usuario, USRJEFECHINA.No_Nombres_Apellidos AS No_Usuario_Jefe')
@@ -2311,7 +2311,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $pathGarantizado = "assets/images/agentecompra/garantizados/" . $data['idPedido'] . "/pagos/";
         $pathPagos = "assets/images/agentecompra/orden-compra/" . $data['idPedido'] . "/pagos/";
 
-        
         // Process payment files
         // foreach ($files as $key => $file) {
         //     if ($key === "pago-garantia") {
@@ -2326,33 +2325,33 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         //     }
         //     $index++;
         // }
-        $this->allowedContentTypes = array('image/jpg','image/jpeg','image/png','image/gif','image/bmp',
-         'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
+        $this->allowedContentTypes = array('image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/bmp',
+            'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
         $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
         $this->maxFileSize = 20240;
-        foreach($data['file'] as $key=>$value){
-            $paymentData=[];
-            $fileURL=null;
-            if($files['file']['name'][$key]['file'] != ''){
+        foreach ($data['file'] as $key => $value) {
+            $paymentData = [];
+            $fileURL = null;
+            if ($files['file']['name'][$key]['file'] != '') {
                 $fileURL = $this->uploadSingleFile(
                     [
-                        'name'=>$files['file']['name'][$key]['file'],
-                        'type'=>$files['file']['type'][$key]['file'],
-                        'tmp_name'=>$files['file']['tmp_name'][$key]['file'],
-                        'error'=>$files['file']['error'][$key]['file'],
-                        'size'=>$files['file']['size'][$key]['file'],
+                        'name' => $files['file']['name'][$key]['file'],
+                        'type' => $files['file']['type'][$key]['file'],
+                        'tmp_name' => $files['file']['tmp_name'][$key]['file'],
+                        'error' => $files['file']['error'][$key]['file'],
+                        'size' => $files['file']['size'][$key]['file'],
                     ], $pathPagos);
                 $paymentData['file_url'] = $fileURL;
             }
             $paymentData['value'] = $value['value'];
             $paymentData['id_type_payment'] = 2;
             $paymentData['id_pedido'] = $data['idPedido'];
-            if(is_numeric($value['id'])){
+            if (is_numeric($value['id'])) {
                 $this->db->where('id', $value['id']);
                 $this->db->update('payments_agente_compra_pedido', $paymentData);
             }
-            if(!isset($value['id'])){
-                if($fileURL||$value['value']!=""){
+            if (!isset($value['id'])) {
+                if ($fileURL || $value['value'] != "") {
                     $this->db->insert('payments_agente_compra_pedido', $paymentData);
 
                 }
@@ -2362,153 +2361,153 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         if ($files['garantia']['name']['file'] != '') {
             $garantiaURL = $this->uploadSingleFile(
                 [
-                    'name'=>$files['garantia']['name']['file'],
-                    'type'=>$files['garantia']['type']['file'],
-                    'tmp_name'=>$files['garantia']['tmp_name']['file'],
-                    'error'=>$files['garantia']['error']['file'],
-                    'size'=>$files['garantia']['size']['file'],
+                    'name' => $files['garantia']['name']['file'],
+                    'type' => $files['garantia']['type']['file'],
+                    'tmp_name' => $files['garantia']['tmp_name']['file'],
+                    'error' => $files['garantia']['error']['file'],
+                    'size' => $files['garantia']['size']['file'],
                 ], $pathGarantizado);
 
         }
-        if(isset($data['garantia']['id'])){
+        if (isset($data['garantia']['id'])) {
             $this->db->where('id', $data['garantia']['id']);
-            $this->db->update('payments_agente_compra_pedido', ['value'=>$data['garantia']['value'],'id_type_payment'=>1,'id_pedido'=>$data['idPedido']]);
-        }else{
-            if($garantiaURL||$data['garantia']['value']!=""){
+            $this->db->update('payments_agente_compra_pedido', ['value' => $data['garantia']['value'], 'id_type_payment' => 1, 'id_pedido' => $data['idPedido']]);
+        } else {
+            if ($garantiaURL || $data['garantia']['value'] != "") {
                 $this->db->insert('payments_agente_compra_pedido', [
-                    'file_url'=>$garantiaURL,'value'=>$data['garantia']['value'],'id_type_payment'=>1,'id_pedido'=>$data['idPedido']]);
+                    'file_url' => $garantiaURL, 'value' => $data['garantia']['value'], 'id_type_payment' => 1, 'id_pedido' => $data['idPedido']]);
             }
         }
         $liquidacionURL = null;
         if ($files['liquidacion']['name']['file'] != '') {
             $liquidacionURL = $this->uploadSingleFile(
                 [
-                    'name'=>$files['liquidacion']['name']['file'],
-                    'type'=>$files['liquidacion']['type']['file'],
-                    'tmp_name'=>$files['liquidacion']['tmp_name']['file'],
-                    'error'=>$files['liquidacion']['error']['file'],
-                    'size'=>$files['liquidacion']['size']['file'],
+                    'name' => $files['liquidacion']['name']['file'],
+                    'type' => $files['liquidacion']['type']['file'],
+                    'tmp_name' => $files['liquidacion']['tmp_name']['file'],
+                    'error' => $files['liquidacion']['error']['file'],
+                    'size' => $files['liquidacion']['size']['file'],
                 ]
                 , $pathGarantizado);
 
         }
-        if(isset($data['liquidacion']['id'])){
+        if (isset($data['liquidacion']['id'])) {
             $this->db->where('id', $data['liquidacion']['id']);
-            $this->db->update('payments_agente_compra_pedido', ['value'=>$data['liquidacion']['value'],'id_type_payment'=>3,'id_pedido'=>$data['idPedido']]);
-        }else{
-            if($liquidacionURL||$data['liquidacion']['value']!=""){
+            $this->db->update('payments_agente_compra_pedido', ['value' => $data['liquidacion']['value'], 'id_type_payment' => 3, 'id_pedido' => $data['idPedido']]);
+        } else {
+            if ($liquidacionURL || $data['liquidacion']['value'] != "") {
                 $this->db->insert('payments_agente_compra_pedido', [
-                    'file_url'=>$liquidacionURL,'value'=>$data['liquidacion']['value'],'id_type_payment'=>3,'id_pedido'=>$data['idPedido']]);
+                    'file_url' => $liquidacionURL, 'value' => $data['liquidacion']['value'], 'id_type_payment' => 3, 'id_pedido' => $data['idPedido']]);
             }
         }
         return ['status' => 'success', 'message' => "Pagos guardados"];
-    //     foreach ($data as $key => $value) {
-    //         if ($key == "pago-garantia") {
-    //             continue;
-    //         } else if ($key == "pago-1-value" ||
-    //             $key == "pago-2-value" ||
-    //             $key == "pago-3-value" ||
-    //             $key == "pago-4-value"
-    //         ) {
-    //             $file = $files['pago-' . substr($key, 5, 1)];
-    //             $num = substr($key, 5, 1);
-    //             $fileURL = $this->uploadSingleFile($file, $pathPagos);
-    //             $pagosURLS["pago-" . $num . '_URL'] = $fileURL ?? $data["pago-" . $num . "_URL"];
+        //     foreach ($data as $key => $value) {
+        //         if ($key == "pago-garantia") {
+        //             continue;
+        //         } else if ($key == "pago-1-value" ||
+        //             $key == "pago-2-value" ||
+        //             $key == "pago-3-value" ||
+        //             $key == "pago-4-value"
+        //         ) {
+        //             $file = $files['pago-' . substr($key, 5, 1)];
+        //             $num = substr($key, 5, 1);
+        //             $fileURL = $this->uploadSingleFile($file, $pathPagos);
+        //             $pagosURLS["pago-" . $num . '_URL'] = $fileURL ?? $data["pago-" . $num . "_URL"];
 
-    //         }
-    //     }
-    //     // Process liquidation file
-    //     if (array_key_exists('liquidacion', $files)) {
-    //         if ($files['liquidacion']['name'] != '') {
-    //             $fileURL = $this->uploadSingleFile($files['liquidacion'], $pathPagos);
-    //             $pagosURLS['liquidacion_URL'] = $fileURL;
-    //         }
+        //         }
+        //     }
+        //     // Process liquidation file
+        //     if (array_key_exists('liquidacion', $files)) {
+        //         if ($files['liquidacion']['name'] != '') {
+        //             $fileURL = $this->uploadSingleFile($files['liquidacion'], $pathPagos);
+        //             $pagosURLS['liquidacion_URL'] = $fileURL;
+        //         }
 
-    //     }if ($data['liquidacion_URL']) {
-    //         $pagosURLS['liquidacion_URL'] = $data['liquidacion_URL'];
-    //     }
-    //     // Process payment guarantee file
-    //     if (array_key_exists('pago-garantia', $files)) {
-    //         $fileURL = $this->uploadSingleFile($files['pago-garantia'], $pathGarantizado);
-    //         $pagosURLS['pago-garantia_URL'] = $fileURL ?? $data['pago-garantia_URL'];
-    //     } else if ($data['pago-garantia_URL']) {
-    //         $pagosURLS['pago-garantia_URL'] = $data['pago-garantia_URL'];
-    //     }
-    //     // Insert or update records in the database
-    //     $index = 1;
-    //     foreach ($pagosURLS as $key => $value) {
-    //         $dataToInsert = [
-    //             'file_url' => $value,
-    //             'id_pedido' => $data['idPedido'],
-    //         ];
+        //     }if ($data['liquidacion_URL']) {
+        //         $pagosURLS['liquidacion_URL'] = $data['liquidacion_URL'];
+        //     }
+        //     // Process payment guarantee file
+        //     if (array_key_exists('pago-garantia', $files)) {
+        //         $fileURL = $this->uploadSingleFile($files['pago-garantia'], $pathGarantizado);
+        //         $pagosURLS['pago-garantia_URL'] = $fileURL ?? $data['pago-garantia_URL'];
+        //     } else if ($data['pago-garantia_URL']) {
+        //         $pagosURLS['pago-garantia_URL'] = $data['pago-garantia_URL'];
+        //     }
+        //     // Insert or update records in the database
+        //     $index = 1;
+        //     foreach ($pagosURLS as $key => $value) {
+        //         $dataToInsert = [
+        //             'file_url' => $value,
+        //             'id_pedido' => $data['idPedido'],
+        //         ];
 
-    //         if ($key == 'pago-garantia_URL') {
-    //             $dataToInsert['id_type_payment'] = 1;
-    //             $dataToInsert['value'] = intval($data['pago-garantia-value']);
-    //             $this->updateOrInsertPayment($data['idPedido'], $data['pago-garantia_ID'], $dataToInsert);
-    //         } else if ($key == 'liquidacion_URL') {
-    //             $dataToInsert['id_type_payment'] = 3;
-    //             $dataToInsert['value'] = 0;
-    //             $this->updateOrInsertPayment($data['idPedido'], $data['liquidacion_ID'], $dataToInsert);
-    //         } else {
-    //             $dataToInsert['id_type_payment'] = 2;
-    //             $num = substr($key, 5, 1);
+        //         if ($key == 'pago-garantia_URL') {
+        //             $dataToInsert['id_type_payment'] = 1;
+        //             $dataToInsert['value'] = intval($data['pago-garantia-value']);
+        //             $this->updateOrInsertPayment($data['idPedido'], $data['pago-garantia_ID'], $dataToInsert);
+        //         } else if ($key == 'liquidacion_URL') {
+        //             $dataToInsert['id_type_payment'] = 3;
+        //             $dataToInsert['value'] = 0;
+        //             $this->updateOrInsertPayment($data['idPedido'], $data['liquidacion_ID'], $dataToInsert);
+        //         } else {
+        //             $dataToInsert['id_type_payment'] = 2;
+        //             $num = substr($key, 5, 1);
 
-    //             $idToCheck = -1;
-    //             if (array_key_exists('pago-' . $num . '_ID', $data)) {
-    //                 $idToCheck = $data['pago-' . $num . '_ID'];
-    //             }
+        //             $idToCheck = -1;
+        //             if (array_key_exists('pago-' . $num . '_ID', $data)) {
+        //                 $idToCheck = $data['pago-' . $num . '_ID'];
+        //             }
 
-    //             $dataToInsert['value'] = intval($data['pago-' . $num . '-value']);
-    //             $waos = $this->updateOrInsertPayment($data['idPedido'], $idToCheck, $dataToInsert);
-    //             $index++;
-    //         }
-    //     }
-    //     $total = $this->getPedidoPagos($data['idPedido'])['data'];
-    //     if (floatval($total['orden_total']) <= floatval($total['pago_cliente'])) {
-    //         $this->updateStep($data['step'], "COMPLETED");
-    //     } else {
-    //         $this->updateStep($data['step'], "PENDING");
-    //     }
-    //     return ['status' => 'success', 'message' => "Pagos guardados"];
-    // }
-    // public function updateStep($idStep, $status)
-    // {
-    //     $data = array('status' => $status, 'id_permision_role' => $this->user->Nu_Tipo_Privilegio_Acceso);
-    //     $this->db->where('id', $idStep);
-    //     $this->db->update('agente_compra_order_steps', $data);
-    // }
-    // public function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert)
-    // {
-    //     if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
-    //         $dataToInsert['file_url'] = null;
+        //             $dataToInsert['value'] = intval($data['pago-' . $num . '-value']);
+        //             $waos = $this->updateOrInsertPayment($data['idPedido'], $idToCheck, $dataToInsert);
+        //             $index++;
+        //         }
+        //     }
+        //     $total = $this->getPedidoPagos($data['idPedido'])['data'];
+        //     if (floatval($total['orden_total']) <= floatval($total['pago_cliente'])) {
+        //         $this->updateStep($data['step'], "COMPLETED");
+        //     } else {
+        //         $this->updateStep($data['step'], "PENDING");
+        //     }
+        //     return ['status' => 'success', 'message' => "Pagos guardados"];
+        // }
+        // public function updateStep($idStep, $status)
+        // {
+        //     $data = array('status' => $status, 'id_permision_role' => $this->user->Nu_Tipo_Privilegio_Acceso);
+        //     $this->db->where('id', $idStep);
+        //     $this->db->update('agente_compra_order_steps', $data);
+        // }
+        // public function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert)
+        // {
+        //     if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
+        //         $dataToInsert['file_url'] = null;
 
-    //     }
-    //     if ((!$dataToInsert['file_url'] || $dataToInsert['file_url'] == null) && $idPayment != -1) {
-    //         //delete record if file_url is null where id=idPayment
-    //         $this->db->where('id', $idPayment);
-    //         $this->db->delete('payments_agente_compra_pedido');
-    //         return;
-    //     }
-    //     $this->db->where('id_pedido', intval($idPedido));
-    //     $this->db->where('id', intval($idPayment));
-    //     $query = $this->db->get('payments_agente_compra_pedido');
-    //     $result = $query->row();
+        //     }
+        //     if ((!$dataToInsert['file_url'] || $dataToInsert['file_url'] == null) && $idPayment != -1) {
+        //         //delete record if file_url is null where id=idPayment
+        //         $this->db->where('id', $idPayment);
+        //         $this->db->delete('payments_agente_compra_pedido');
+        //         return;
+        //     }
+        //     $this->db->where('id_pedido', intval($idPedido));
+        //     $this->db->where('id', intval($idPayment));
+        //     $query = $this->db->get('payments_agente_compra_pedido');
+        //     $result = $query->row();
 
-    //     if ($result) {
-    //         // Update existing record
-    //         $this->db->where('id', $result->id);
-    //         $this->db->update('payments_agente_compra_pedido', $dataToInsert);
-    //     } else {
-    //         if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
-    //             $dataToInsert['file_url'] = null;
+        //     if ($result) {
+        //         // Update existing record
+        //         $this->db->where('id', $result->id);
+        //         $this->db->update('payments_agente_compra_pedido', $dataToInsert);
+        //     } else {
+        //         if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
+        //             $dataToInsert['file_url'] = null;
 
-    //         }
-    //         if ($dataToInsert['value'] == 0 && $dataToInsert['file_url'] == null) {
-    //             return;
-    //         }
-    //         $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
-    //     }
+        //         }
+        //         if ($dataToInsert['value'] == 0 && $dataToInsert['file_url'] == null) {
+        //             return;
+        //         }
+        //         $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
+        //     }
     }
     public function getSupplierProducts($idPedido, $idSupplier)
     {
@@ -2562,7 +2561,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
         foreach ($data['coordination'] as $key => $row) {
             $path = 'assets/images/coordination/orden-compra/' . $key;
-            $this->allowedContentTypes = array('image/png','image/jpeg','image/jpg','image/gif', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
+            $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
             $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
             $this->maxFileSize = 20240;
             $pago1UrlExists = null;
@@ -2611,12 +2610,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->update('agente_compra_coordination_supplier', $producto_detalle);
 
             if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio ||
-             $this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
+                $this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
                 $this->db->select('pago_1_value,pago_2_value,estado');
                 $this->db->from('agente_compra_coordination_supplier');
                 $this->db->where('id_coordination', $key);
                 $query = $this->db->get()->row();
-                
+
                 if ($row['pago_1_value'] != 0 && $row['pago_1_value'] != $query->pago_1_value) {
                     $this->db->where('id_coordination', $key);
                     $this->db->update('agente_compra_coordination_supplier', array('estado' => 'CONFORME',
@@ -2630,7 +2629,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $result = $this->db->get()->row();
             if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio && $result->estado_negociacion == $row['estado_negociacion']) {
                 // return [$row['pago_1_value'], $row['pago_2_value'],$row['total']];
-                if (($result->pago_2_URL != null && $result->pago_1_URL != null) ||($result->pago_1_URL != null && floatval($row['pago_1_value'])>=floatval($row['total']))) {
+                if (($result->pago_2_URL != null && $result->pago_1_URL != null) || ($result->pago_1_URL != null && floatval($row['pago_1_value']) >= floatval($row['total']))) {
                     //update estado_negociacion to 'ADELANTADO' where id_pedido=$idPedido
                     $this->db->where('id_pedido', $idPedido);
                     $this->db->where('id_coordination', $key);
@@ -3010,4 +3009,99 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->delete('payments_agente_compra_pedido');
         return ['status' => 'success', 'message' => 'Pago eliminado'];
     }
+    public function getAlmacenData($idPedido)
+    {
+        $this->db->select("accs.id_pedido,acpdpp.ID_Pedido_Detalle,acpdpp.ID_Pedido_Detalle_Producto_Proveedor,
+            acpd.Txt_Url_Imagen_Producto,
+            acpd.Txt_Producto ,
+            acpd.product_code,
+            s.name ,
+            s.phone,
+            IFNULL(acpdpp.fecha_entrega,'') Fe_Entrega_Proveedor,
+            ifnull(acpdpp.total_box,0) total_box,
+            ifnull(acpdpp.total_cbm,0) total_cbm,
+            ifnull(acpdpp.total_kg,0) total_kg,
+            acpdpp.almacen_foto1,
+            acpdpp.almacen_foto2,
+            acpdpp.almacen_estado");
+        $this->db->from('agente_compra_coordination_supplier accs');
+        $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp', 'acpdpp.ID_Entidad_Proveedor = accs.id_supplier and acpdpp.ID_Pedido_Cabecera = accs.id_pedido and acpdpp.Nu_Selecciono_Proveedor =1 ', 'join');
+        $this->db->join('agente_compra_pedido_detalle acpd', 'acpd.ID_Pedido_Detalle = acpdpp.ID_Pedido_Detalle', 'join');
+        $this->db->join('suppliers s', 's.id_supplier = acpdpp.ID_Entidad_Proveedor', 'join');
+        $this->db->where('accs.id_pedido', $idPedido);
+
+        return $this->db->get()->result();
+
+    }public function saveAlmacenData($data)
+    {
+        $id_pedido = $data['idPedido'];
+        foreach ($data['almacen'] as $key => $row) {
+            $dataToInsert = [
+
+            ];
+            if (array_key_exists('total_box', $row)) {
+                $dataToInsert['total_box'] = $row['total_box'];
+            }
+            if (array_key_exists('total_cbm', $row)) {
+                $dataToInsert['total_cbm'] = $row['total_cbm'];
+            }
+            if (array_key_exists('total_kg', $row)) {
+                $dataToInsert['total_kg'] = $row['total_kg'];
+            }
+            $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $key);
+            $this->db->update('agente_compra_pedido_detalle_producto_proveedor', $dataToInsert);
+        }
+        $this->db->where('ID_Pedido_Cabecera', intval($id_pedido));
+        $this->db->update('agente_compra_pedido_cabecera', array('estado_almacen' => 'RECIBIENDO'));
+        return ['status' => 'success', 'message' => 'Datos de almacen actualizados'];
+    }
+    public function cambiarEstadoAlmacen($idPedido, $estado)
+    {
+        try {
+            $this->db->where('ID_Pedido_Cabecera', $idPedido);
+            $this->db->update('agente_compra_pedido_cabecera', array('estado_almacen' => $estado));
+            return ['status' => 'success', 'message' => 'Estado actualizado'];
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+    public function saveSupplierPhotos($id, $files)
+    {
+        try {
+            $path = 'assets/images/almacen/' . $id;
+            $dataToInsert = [];
+            $pagosIndex = 0;
+            foreach ($files as $key => $file) {
+                
+                $this->setAllowedExtensionsImagesOfficeFiles();
+                $this->maxFileSize = 20240;
+                $fileUrl = $this->uploadSingleFile([
+                    'name' => $file['name'],
+                    'type' => $file['type'],
+                    'tmp_name' => $file['tmp_name'],
+                    'error' => $file['error'],
+                    'size' => $file['size'],
+                ], $path);
+                if ($fileUrl) {
+                    $keyIndex = 'almacen_foto' . ($pagosIndex + 1);
+                    $dataToInsert[0][$keyIndex] = $fileUrl;
+
+                }
+                $pagosIndex++;
+            }
+            $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $id);
+            $this->db->update('agente_compra_pedido_detalle_producto_proveedor', $dataToInsert[0]);
+            return ['status' => 'success', 'message' => 'Fotos guardadas'];
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+    public function getSupplierPhotos($id)
+    {
+        $this->db->select('almacen_foto1,almacen_foto2,ID_Pedido_Detalle_Producto_Proveedor as idSupplier');
+        $this->db->from('agente_compra_pedido_detalle_producto_proveedor');
+        $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $id);
+        return $this->db->get()->row();
+    }
+
 }

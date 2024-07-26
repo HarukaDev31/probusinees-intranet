@@ -39,6 +39,11 @@ trait FileTrait
         }
         return true;
     }
+    public function setAllowedExtensionsImagesOfficeFiles()
+    {
+        $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf');
+        $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/pdf');
+    }
     /*
     * This function is used to upload a single file
     * @param $file - The file data

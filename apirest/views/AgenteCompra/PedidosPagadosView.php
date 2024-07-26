@@ -48,9 +48,18 @@
                   <thead class="thead-light">
                     <tr>
                       <th>País </th>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso ==6) {
+                         ?>
+                          <th>Fecha</th>
+                          <th>Cliente</th>
+                          <th>Empresa</th>
+                          <th>N° Orden</th>
+                          <th>Ver</th>
+                          <th>Estado</th>
+                        <?php }else{ ?>
                       <th>N° Orden</th>
+
                       <th>Fecha</th>
-                      <!--  -->
 
                       <th>Servicio</th>
                       <th>Incoterms</th>
@@ -75,6 +84,8 @@
                         <th class="no-sort">Descarga</th>
 
                       <th>Avance</th>
+                      <?php } ?>
+
                       <!-- <th>Status</th> -->
                     </tr>
                   </thead>
@@ -348,6 +359,8 @@
               </div>
               <div class="steps-buttons row"></div>
             </div>
+            <form class="card-body almacen-form" id="container_almacen">
+            </form>
             <div class="card-body" id="container_orden-compra">
               <div class="orden-compra_header_china"></div>
               <div class="orden-compra_header row">
@@ -2822,12 +2835,6 @@ echo form_open('', $attributes);
 
 
 
-/* Estilos generales para la tabla */
-.supplier-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
 .supplier-table th, .supplier-table td {
     border: 1px solid #ddd;
     padding: 8px;
@@ -3001,14 +3008,12 @@ echo form_open('', $attributes);
       transform: scale(1);
     }
   }
-  .upload-payment.filled:hover{
+  /* .upload-payment:hover{
     animation: pulse 1s infinite;
-  }
+  } */
   .filled{
     background-color: #3498DB;
     color:white;
-  }.filled:hover{
-    cursor: pointer;
   }
   .filled svg path{
     stroke: white;
@@ -3058,6 +3063,45 @@ echo form_open('', $attributes);
     -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
     -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
     box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  }
+  .almacen-table{
+
+  }.almacen-header .column{
+    text-align: center;
+    
+  }
+   .imagen-column, .nombre-column{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 300px;
+  } .fentrega-column, .fotos-column, .estado-column{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 250px;
+  } .totalbox-column, .totalcbm-column, .totalkg-column{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 200px;
+  }.camera-not-filled,.camara-filled{
+    height: 50px;
+    width: 50px;
+  }
+  .camera-not-filled path{
+    stroke: #3498DB;
+    
+  }
+  .camera-filled path{
+    stroke: #D5DBDB;
+    
+  }
+  .camera-not-filled:hover,.camera-filled:hover{
+    cursor: pointer;
   }
   </style>
   <?php echo form_close(); ?>

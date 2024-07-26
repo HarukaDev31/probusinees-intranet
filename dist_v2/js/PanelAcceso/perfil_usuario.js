@@ -204,6 +204,7 @@ function agregarPerfilUsuario(){
   $( '#cbo-privilegio' ).append( '<option value="5">Jefe China</option>' );
   $( '#cbo-privilegio' ).append( '<option value="3">Proveedor Externo</option>' );
   $( '#cbo-privilegio' ).append( '<option value="4">Cliente</option>' );
+  $( '#cbo-privilegio' ).append( '<option value="6">Almacen China</option>' );
 }
 
 function verPerfilUsuario(ID_Grupo){
@@ -295,6 +296,10 @@ function verPerfilUsuario(ID_Grupo){
       selected = '';
       if (response.Nu_Tipo_Privilegio_Acceso == '4')
         selected = 'selected="selected"';
+      selected = '';
+      if (response.Nu_Tipo_Privilegio_Acceso == '6')
+        selected = 'selected="selected"';
+      $('#cbo-privilegio').append('<option value="6" ' + selected + '>Almacen China</option>');
       $('#cbo-privilegio').append('<option value="4" ' + selected + '>Cliente</option>');
       
       $( '#modal-Perfil_Usuario' ).modal('show');

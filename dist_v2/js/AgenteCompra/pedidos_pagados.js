@@ -11,9 +11,15 @@ let replace_global_autocomplete = ["", "", "", "", "", "", "", "", ""];
 let priviligesPersonalPeru = 1;
 let priviligesPersonalChina = 2;
 let priviligesJefeChina = 5;
+let priviligesAlmacen = 6;
 let currentPrivilege = null;
 let pagosCount = 2;
-
+const editIcon = `<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Edit / Edit_Pencil_02">
+<path id="Vector" d="M4 16.0001V20.0001L8 20.0001L18.8686 9.13146L18.8695 9.13061C19.265 8.73516 19.4628 8.53736 19.5369 8.3092C19.6021 8.10835 19.6022 7.89201 19.5369 7.69117C19.4627 7.46284 19.2646 7.26474 18.8686 6.86872L17.1288 5.12892C16.7345 4.7346 16.5369 4.53704 16.3091 4.46301C16.1082 4.39775 15.8919 4.39775 15.691 4.46301C15.463 4.53709 15.2652 4.73488 14.8704 5.12976L14.8686 5.13146L4 16.0001Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>`;
 var fToday = new Date(),
   fYear = fToday.getFullYear(),
   fMonth = fToday.getMonth() + 1,
@@ -33,6 +39,7 @@ let selectedStep = null;
 let containerSteps = null;
 let containerPagos = null;
 let containerCoordination = null;
+let containerAlmacen = null;
 let currentServicio = 1;
 $(function () {
   sectionTitle = $("#section-title");
@@ -45,6 +52,8 @@ $(function () {
   containerSteps = $("#steps");
   containerPagos = $("#container-pagos");
   containerPagos.hide();
+  containerAlmacen = $("#container_almacen");
+  containerAlmacen.hide();
   containerCoordination = $("#container-coordination");
   $(".select2").select2();
 
@@ -7351,17 +7360,6 @@ const getSupplierCoordinationTableTemplate = (data) => {
         </div>
         </div>`;
 
-    html += `
-        
-        <div class="c-tentrega-column supplier-column"  style="height:${
-          detailsCount * defaultHeight
-        }px">
-          <input type="date" class="form-control" value="${
-            detalles[0].tentrega.split(" ")[0]
-          }" name="proveedor[${
-      detalles[0].ID_Pedido_Detalle_Producto_Proveedor
-    }][tentrega]"/>
-        </div>`;
     if (currentPrivilege == priviligesJefeChina) {
       html += `
           <div class="c-pago1-column supplier-column">
@@ -7442,6 +7440,16 @@ const getSupplierCoordinationTableTemplate = (data) => {
           <input type="text" class="form-control" value="${detalle.delivery}" name="proveedor[${detalle.ID_Pedido_Detalle_Producto_Proveedor}][delivery]"/>
         </div>`;
     });
+    html += `
+    <div class="c-tentrega-column supplier-column"  style="height:${
+      detailsCount * defaultHeight
+    }px">
+      <input type="date" class="form-control" value="${
+        detalles[0].tentrega.split(" ")[0]
+      }" name="proveedor[${
+      detalles[0].ID_Pedido_Detalle_Producto_Proveedor
+    }][tentrega]"/>
+    </div>`;
     html += `
     <div class="c-estado-column supplier-column"> 
           <select class="form-select" aria-label="Default select example" name="coordination[${
@@ -7889,70 +7897,7 @@ const getPagosTemplate = (data = null) => {
       
   </div>
   `;
-  // let html = `
-  //       <div class="first-column col-12 col-md-6">
-  //                   <div class="pago row" id="pago-garantia-container">
-  //                     <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-  //                       <label>PAGO GARANTIA</label>
-  //                       <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL" />
-  //                     </div>
-  //                     <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-garantia-div">
-  //                       <input type="file" name="pago-garantia" id="pago-garantia" class="" />
-  //                       <input type="number" name="pago-garantia-value" id="pago-garantia-value" class="form-control" />
-  //                     </div>
-  //                   </div>
-  //                   <div class="pago row" id="pago-1-container">
-  //                     <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-  //                       <label>PAGO 1:</label>
-  //                       <input type="hidden" name="pago-1_URL" id="pago-1_URL" />
-  //                     </div>
-  //                     <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-1-div">
-  //                       <input type="file" name="pago-1" id="pago-1" />
-  //                       <input type="number" name="pago-1-value" id="pago-1-value" class="form-control" />
-  //                     </div>
-  //                   </div>
-  //                   <div class="pago row" id="pago-2-container">
-  //                     <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-  //                       <label>PAGO 2:</label>
-  //                       <input type="hidden" name="pago-2_URL" id="pago-2_URL" >
-
-  //                     </div>
-  //                     <div class="col-12 col-md-10 d-flex flex-row align-items-center " id="pago-2-div">
-  //                       <input type="file" name="pago-2" id="pago-2" class="" />
-  //                       <input type="number" name="pago-2-value" id="pago-2-value" class="form-control"/ />
-  //                     </div>
-  //                   </div>
-  //                   <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-3-div">
-  //                     <div class="conditional-field">
-  //                       <label>PAGO 3:</label>
-  //                       <label class="switch">
-  //                         <input type="checkbox" id="pago3_URL_switch">
-  //                         <span class="slider"></span>
-  //                       </label>
-  //                       </div>
-  //                     </div>
-  //                   <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-4-div">
-  //                     <div class="conditional-field">
-  //                       <label>PAGO 4:</label>
-  //                       <label class="switch">
-  //                         <input type="checkbox" id="pago4_URL_switch">
-  //                         <span class="slider"></span>
-  //                       </label>
-  //                     </div>
-  //                   </div>
-  //                 </div>
-  //                 <div class="col-12 col-md-6">
-  //                   <div class="form-group" id="liquidacion-container">
-  //                     <label>LIQUIDACION:</label>
-  //                     <input type="hidden" name="liquidacion_URL" id="liquidacion_URL" />
-  //                     <input type="file" name="liquidacion" id="liquidacion" />
-  //                   </div>
-  //                   <div class="form-group">
-  //                     <label>NOTAS:</label>
-  //                     <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
-  //                   </div>
-  //                 </div>
-  //         `;
+  
   return html;
 };
 const openPagos = (response) => {
@@ -7966,12 +7911,7 @@ const openPagos = (response) => {
 <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
 <path d="M12 2L12 15M12 15L9 11.5M12 15L15 11.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
-  const editIcon=`<?xml version="1.0" encoding="utf-8"?>
-  <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g id="Edit / Edit_Pencil_02">
-  <path id="Vector" d="M4 16.0001V20.0001L8 20.0001L18.8686 9.13146L18.8695 9.13061C19.265 8.73516 19.4628 8.53736 19.5369 8.3092C19.6021 8.10835 19.6022 7.89201 19.5369 7.69117C19.4627 7.46284 19.2646 7.26474 18.8686 6.86872L17.1288 5.12892C16.7345 4.7346 16.5369 4.53704 16.3091 4.46301C16.1082 4.39775 15.8919 4.39775 15.691 4.46301C15.463 4.53709 15.2652 4.73488 14.8704 5.12976L14.8686 5.13146L4 16.0001Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  </svg>`
+ 
   pagosCount = 2;
   if (response.status == "success") {
     const data = response.data;
@@ -8025,10 +7965,14 @@ const openPagos = (response) => {
         } else {
           $("#liquidacion-name").html(fileName);
         }
-        $(".liquidacion-container").removeClass("not-filled").addClass("filled");
+        $(".liquidacion-container")
+          .removeClass("not-filled")
+          .addClass("filled");
       } else {
         $("#liquidacion-name").html("Seleccionar archivo");
-        $(".liquidacion-container").removeClass("filled").addClass("not-filled");
+        $(".liquidacion-container")
+          .removeClass("filled")
+          .addClass("not-filled");
       }
     });
     $("#garantia-file").change(function () {
@@ -8083,14 +8027,17 @@ const openPagos = (response) => {
       let pagocontainer;
       let pagosN = pagosData.filter((pago) => pago.name == "normal");
       let pagosG = pagosData.filter((pago) => pago.name == "garantia");
-      let pagosL= pagosData.filter((pago) => pago.name == "liquidacion");
+      let pagosL = pagosData.filter((pago) => pago.name == "liquidacion");
       pagosL.forEach((pago, i) => {
         pagocontainer = $(`.liquidacion-container`);
         pagocontainer.empty();
         pagocontainer.append(downloadSvg);
         $(`#liquidacion-description`).val(pago.description);
-        pagocontainer.parent().
-        append(`<span class="remove-item" onclick="openFileSelector('liquidacion-file')">${editIcon}</span>`);
+        pagocontainer
+          .parent()
+          .append(
+            `<span class="remove-item" onclick="openFileSelector('liquidacion-file')">${editIcon}</span>`
+          );
         if (pago.file_url != null) {
           const fileName = pago.file_url.split("/").pop();
           if (fileName.length > 15) {
@@ -8098,7 +8045,9 @@ const openPagos = (response) => {
           } else {
             $(`#liquidacion-name`).html(fileName);
           }
-          $(`.liquidacion-container`).removeClass("not-filled").addClass("filled");
+          $(`.liquidacion-container`)
+            .removeClass("not-filled")
+            .addClass("filled");
           $(`.liquidacion-container`).append(
             `<input type="hidden" name="liquidacion[id]" value="${pago.idPayment}">`
           );
@@ -8148,13 +8097,17 @@ const openPagos = (response) => {
         if (currenIndex <= 2) {
           pagocontainer = $(`.pago${currenIndex}-container`);
           pagocontainer.empty();
-          pagocontainer.parent().append(`<span class="remove-item" onclick="openFileSelector('pago${currenIndex}-file')">${editIcon}</span>`);
+          pagocontainer
+            .parent()
+            .append(
+              `<span class="remove-item" onclick="openFileSelector('pago${currenIndex}-file')">${editIcon}</span>`
+            );
 
           pagocontainer.append(downloadSvg);
-          
+
           // $(`.pago${currenIndex}-container`).val(pago.value);
           $(`#pago${currenIndex}-value`).val(pago.value);
-          
+
           if (pago.file_url != null) {
             const fileName = pago.file_url.split("/").pop();
             if (fileName.length > 15) {
@@ -8220,7 +8173,6 @@ const openPagos = (response) => {
           }
         }
       });
-
     }
     //   const pagosData = response.pagosData;
     //   const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
@@ -9142,4 +9094,400 @@ const downloadFile = (url) => {
   link.download = url.split("/").pop();
   link.click();
   link.remove();
+};
+const getAlmacenData = (idPedido) => {
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getAlmacenData",
+    type: "POST",
+    data: { idPedido },
+    success: function (response) {
+      response = JSON.parse(response);
+      if (response.status == "success") {
+        openAlmacenView(response.data);
+      }
+    },
+  });
+};
+//Almacen China functions
+
+const getAlmacenViewTitle = (cotizacionCode = "") => {
+  return `
+  <h2>
+    <strong>RECEPCION DE CARGA: 
+      ${
+        cotizacionCode
+          ? `<span class="text-primary">${cotizacionCode}</span>`
+          : ""
+      }
+    </strong>
+  </h2>
+`;
+};
+const getAlmacenViewHeader = () => {
+  return `
+  <div id="almacen_header" class="row w-100">
+    <div class="col-12 col-md-4">
+      <div class="input-group mb-3">
+        <span class="input-group-text" >TOTAL BOX</span>
+        <input type="text" class="form-control" id="total-box">
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="input-group mb-3">
+        <span class="input-group-text" >TOTAL CBM</span>
+        <input type="text" class="form-control" id="total-cbm">
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="input-group mb-3">
+        <span class="input-group-text" >TOTAL KG</span>
+        <input type="text" class="form-control" id="total-kg">
+      </div>
+    </div>
+  </div>
+  `;
+};
+const getAlmacenTableHeader = () => {
+  return `<div class="almacen-table d-flex flex-column">
+          <div class="almacen-header d-flex flex-row">
+            <div class="imagen-column column">IMAGEN</div>
+            <div class="nombre-column column">NOMBRE PRODUCTO</div>
+            <div class="fentrega-column column">F.ENTREGA</div>
+            <div class="totalbox-column column">TOTAL BOX</div>
+            <div class="totalcbm-column column">TOTAL CBM</div>
+            <div class="totalkg-column column">TOTAL KG</div>
+            <div class="fotos-column column">FOTOS</div>
+            <div class="estado-column column">ESTADO</div>
+          </div>`;
+};
+const getAlmacenTableBody = (data,cotizacionCode) => {
+  let tableBody = "";
+  if (!data) return tableBody;
+  let totalCBM = 0;
+  let totalKG = 0;
+  let totalBox = 0;
+  data.forEach((producto) => {
+    if (producto.total_cbm) totalCBM += parseFloat(producto.total_cbm);
+    if (producto.total_kg) totalKG += parseFloat(producto.total_kg);
+    if (producto.total_box) totalBox += parseFloat(producto.total_box);
+    tableBody += `<div class="almacen-row d-flex flex-row">
+      <div class="imagen-column column">
+        <img src="${producto.Txt_Url_Imagen_Producto}" alt="${
+      producto.Txt_Producto
+    }" class="img-cuz">
+      </div>
+      <div class="nombre-column column">
+      <div>
+      <strong>${producto.Txt_Producto}</strong>
+      </div>
+       <div class="input-group mt-3 d-flex flex-row justify-content-center align-items-center mb-1 ">
+            <span class="input-group-text" > CODE:</span>
+            <input type="text" class="form-control"  value="${
+              producto.product_code
+            }">
+          </div>
+      </div>
+      <div class="fentrega-column column">
+      <input type="date" class="form-control" disabled value="${
+        producto.Fe_Entrega_Proveedor.split(" ")[0]
+      }"/>
+      </div>
+      <div class="totalbox-column column">
+        <input type="number" class="form-control total_box" 
+        name="almacen[${producto.ID_Pedido_Detalle_Producto_Proveedor}][total_box]"
+        value="${
+          producto.total_box
+        }">
+      </div>
+      <div class="totalcbm-column column">
+        <input type="number" class="form-control total_cbm" 
+        name="almacen[${producto.ID_Pedido_Detalle_Producto_Proveedor}][total_cbm]"
+        value="${
+          producto.total_cbm
+        }">
+      </div>
+      <div class="totalkg-column column">
+        <input type="number" class="form-control total_kg"
+        name="almacen[${producto.ID_Pedido_Detalle_Producto_Proveedor}][total_kg]"
+        value="${producto.total_kg}">
+      </div>
+      <div class="fotos-column column">
+          <svg 
+          onclick="viewSupplierPhotos(${producto.ID_Pedido_Detalle_Producto_Proveedor},'${cotizacionCode}')"
+          class="${producto.estado_almacen == 2 ? "camera-filled" : "camera-not-filled"}"
+          viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+      </div>
+      <div class="estado-column column">
+        <select class="form-select" id="estado-${producto.ID_Pedido_Detalle}">
+          <option value="0" ${
+            producto.estado_almacen == 1 ? "selected" : ""
+          }>Pendiente</option>
+          <option value="1" ${
+            producto.estado_almacen == 2 ? "selected" : ""
+          }>Recibido</option>
+        </select>
+      </div>
+    </div>`;
+  });
+  $("#total-box").val(totalBox);
+  $("#total-cbm").val(totalCBM);
+  $("#total-kg").val(totalKG);
+  return tableBody + "</div>";
+};
+/**
+ * This function opens  the almacen table view
+ * @param {*} data
+ */
+const openAlmacenView = (data) => {
+  const { cotizacionCode } = data || {};
+  let id_pedido = 0;
+  if(data){
+    id_pedido = data[0].id_pedido;
+  }
+  const almacenTitle = getAlmacenViewTitle(cotizacionCode);
+  const almacenHeader = getAlmacenViewHeader();
+  const almacenTableHeader = getAlmacenTableHeader();
+  containerListar.hide();
+  containerAlmacen
+    .empty()
+    .append(almacenTitle)
+    .append(almacenHeader)
+    .append(almacenTableHeader).show();
+  const almacenTableBody = getAlmacenTableBody(data,cotizacionCode);
+  containerAlmacen.append(almacenTableBody);
+  const actionButtons = {
+    btnSave: {
+      text: "Guardar",
+      action: `saveAlmacenData(${id_pedido})`,
+    },
+    btnCancel: {
+      text: "Regresar",
+      action: "hideAlmacenView()",
+    },
+  };
+  const buttonsTemplate = getActionButtons(actionButtons);
+  containerAlmacen.append(buttonsTemplate);
+  updateTotal(".total_box", "#total-box");
+  updateTotal(".total_cbm", "#total-cbm");
+  updateTotal(".total_kg", "#total-kg");
+};
+const updateTotal = (inputClass, totalId) => {
+  $(document).on("input", inputClass, function () {
+    let totalSum = 0;
+
+    $(inputClass).each(function () {
+      const value = parseFloat($(this).val());
+      if (!isNaN(value)) {
+        totalSum += value;
+      }
+    });
+    $(totalId).val(totalSum);
+  });
+};
+const saveAlmacenData = (idPedido) => {
+  const url = base_url + "AgenteCompra/PedidosPagados/saveAlmacenData";
+  const form = $(".almacen-form");
+  const formData = new FormData(form[0]);
+  formData.append("idPedido", idPedido);
+  $.ajax({
+    url,
+    type: "POST",
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function (response) {
+      const { status, data } = JSON.parse(response);
+      if (status == "success") {
+        hideAlmacenView();
+      } else {
+        alert(message);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error(jqXHR.responseText);
+    },
+  });
+}
+const changeStatusAlmacen= (estado, id_pedido) => {
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/cambiarEstadoAlmacen",
+    type: "POST",
+    data: {
+      id_pedido,
+      estado,
+    },
+    success: function (response) {
+      if (response == "success") {
+        reload_table_Entidad();
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};
+const viewSupplierPhotos = (id,cotizacionCode) => {
+  containerAlmacen.empty();
+  const almacenTitle = getAlmacenViewTitle(cotizacionCode);
+  containerAlmacen.append(almacenTitle);
+  const photosContainer = getviewSupplierPhotosTemplate();
+  containerAlmacen.append(photosContainer);
+  handleFileChange("#foto1-file", "#foto1-name", ".foto1-container");
+  handleFileChange("#foto2-file", "#foto2-name", ".foto2-container");
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getSupplierPhotos",
+    type: "POST",
+    data: { 'idSupplier':id },
+    success: function (response) {
+      response = JSON.parse(response);
+      if (response.status == "success") {
+        const {almacen_foto1,almacen_foto2,idSupplier} = response.data;
+        if (almacen_foto1 != null) {
+          handleFileDisplay(almacen_foto1, "#foto1-name", ".foto1-container","#foto1-container" ,idSupplier,'foto1-file');
+        }
+        if (almacen_foto2 != null) {
+          handleFileDisplay(almacen_foto2, "#foto2-name", ".foto2-container","#foto2-container",idSupplier,'foto2-file');
+        }
+        // if(almacen_foto2){
+        //   const foto2Name=almacen_foto2.split("/").pop();
+        //   $("#foto2-name").text(foto2Name);
+        //   $(".foto2-container").addClass("filled");
+        // }
+      }
+    },
+  });
+  const actionButtons = {
+    btnSave: {
+      text: "Guardar",
+      action: `saveSupplierPhotos(${id})`,
+    },
+    btnCancel: {
+      text: "Regresar",
+      action: "hideAlmacenView()",
+    },
+}
+const buttonsTemplate = getActionButtons(actionButtons);
+containerAlmacen.append(buttonsTemplate);
+}
+const saveSupplierPhotos = (id) => {
+  const url = base_url + "AgenteCompra/PedidosPagados/saveSupplierPhotos";
+  const form = $("#form-photos");
+  const formData = new FormData(form[0]);
+  formData.append("idSupplier", id);
+  $.ajax({
+    url,
+    type: "POST",
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function (response) {
+      const { status, data } = JSON.parse(response);
+      if (status == "success") {
+        hideAlmacenView();
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error(jqXHR.responseText);
+    },
+  });
+}
+
+const getviewSupplierPhotosTemplate = () => {
+  let html = `
+  <form class="py-1 px-4" id="form-photos">
+
+    <div class="row payments-container">
+      <div class="col-12 col-md-3">    
+        <div class="payment-container">
+          <div class="upload-payment container-div not-filled foto1-container "  id="foto1-container" onclick="openFileSelector('foto1-file')">
+              
+              <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+              <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+          </div>
+          <input type="file" id="foto1-file" class="d-none" name="foto1"/>
+          <div id="foto1-name" class="payment-name container-div foto1-container">
+          Seleccionar archivo</div>
+
+        </div>
+      </div>
+      <div class="col-12 col-md-3 ">    
+        <div class="payment-container">
+          <div class="upload-payment container-div not-filled foto2-container"  id="foto2-container"onclick="openFileSelector('foto2-file')">
+              
+              <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+              <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+          </div>
+          <input type="file" id="foto2-file" class="d-none" name="foto2" />
+          <div id="foto2-name" class="payment-name container-div foto2-container">
+          Seleccionar archivo</div>
+
+        </div>
+      </div>
+    </div>
+    <div class="row" id="pagos-buttons">
+    </div>
+
+      
+  </form>
+  `;
+  return html;
+
+}
+  
+const hideAlmacenView = () => {
+  containerAlmacen.empty();
+  containerAlmacen.hide();
+  containerListar.show();
+  reload_table_Entidad();
+}
+const handleFileChange = (fileInputId, fileNameId, containerClass) => {
+  $(fileInputId).change(function () {
+    const file = $(this)[0].files[0];
+    if (file) {
+      const fileName = file.name;
+      if (fileName.length > 15) {
+        $(fileNameId).html(fileName.substring(0, 15) + "...");
+      } else {
+        $(fileNameId).html(fileName);
+      }
+      $(containerClass).removeClass("not-filled").addClass("filled");
+    } else {
+      $(fileNameId).html("Seleccionar archivo");
+      $(containerClass).removeClass("filled").addClass("not-filled");
+    }
+  });
+};
+const handleFileDisplay = (filePath, fileNameId, containerClass,containerId, idSupplier,input) => {
+  if (filePath != null) {
+    const fileName = filePath.split("/").pop();
+    if (fileName.length > 20) {
+      $(fileNameId).html(fileName.substring(0, 20) + "...");
+    } else {
+      $(fileNameId).html(fileName);
+    }
+    $(containerClass)
+      .removeClass("not-filled")
+      .addClass("filled");
+    $(containerId).append(
+      `<input type="hidden" name="file[idSupplier]" value="${idSupplier}">`
+    );
+    $(containerId).append(
+            `<span class="remove-item" onclick="openFileSelector('${input}')">${editIcon}</span>`
+          );
+    // Remove existing click handler if any
+    $(containerId).removeAttr("onclick");
+    $(containerId).off("click");
+    $(containerId).click(function () {
+      downloadFile(filePath);
+    });
+  }
 };

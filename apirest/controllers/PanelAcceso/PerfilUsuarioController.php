@@ -39,6 +39,8 @@ class PerfilUsuarioController extends CI_Controller {
 				$sNombrePrivilegioAcceso = 'Cliente';
 			} else if($row->Nu_Tipo_Privilegio_Acceso==5){
 				$sNombrePrivilegioAcceso = 'Jefe china';
+			} else if($row->Nu_Tipo_Privilegio_Acceso==6){
+				$sNombrePrivilegioAcceso = 'Almacen China';
 			}
 
             $rows[] = '<span class="badge bg-secondary">' . $sNombrePrivilegioAcceso . '</span>';

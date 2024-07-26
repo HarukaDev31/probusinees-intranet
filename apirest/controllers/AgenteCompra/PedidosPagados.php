@@ -100,7 +100,21 @@ class PedidosPagados extends CI_Controller
             $estadoChina = $this->getStatusOrdenCompraLabel($row->id_estado_orden_compra, $this->user->Nu_Tipo_Privilegio_Acceso, $row->ID_Pedido_Cabecera);
             $avance = $this->getOrderProgressLabel($this->user->Nu_Tipo_Privilegio_Acceso, $row->ID_Pedido_Cabecera);
             $rows[] = $row->No_Pais;
-
+            if($this->user->Nu_Tipo_Privilegio_Acceso == 6){
+                $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
+                $rows[] = $row->No_Contacto;
+                $rows[] = $row->No_Entidad;
+                $rows[] = $row->cotizacionCode;
+                $rows[] = "<button class='btn btn-xs btn-link' onclick='getAlmacenData(" . $row->ID_Pedido_Cabecera . ")' alt='Editar' title='Editar' href='javascript:void(0)'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
+                //select with 3 options Pendiente,Recibiendo y Completado
+                $rows[] = '<select class="form-control" id="status_' . $row->estado_almacen . '" onchange="changeStatusAlmacen(this.value,' . $row->ID_Pedido_Cabecera . ')">
+                    <option value="PENDIENTE" ' . ($row->estado_almacen == "PENDIENTE" ? 'selected' : '') . '>PENDIENTE</option>
+                    <option value="RECIBIENDO" ' . ($row->estado_almacen == "RECIBIENDO" ? 'selected' : '') . '>RECIBIENDO</option>
+                    <option value="COMPLETADO" ' . ($row->estado_almacen == "COMPLETADO" ? 'selected' : '') . '>COMPLETADO</option>
+                </select>';
+                $data[] = $rows;
+                continue;
+            }
             $rows[] = $row->cotizacionCode;
             $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
 
@@ -1905,6 +1919,16 @@ class PedidosPagados extends CI_Controller
             echo json_encode(array('error' => $e->getMessage()));
         }
     }
+    public function getAlmacenData()
+    {
+        try {
+            $idPedido = $this->input->post('idPedido');
+            $data = $this->PedidosPagadosModel->getAlmacenData($idPedido);
+            echo json_encode(array('status' => 'success', 'data' => $data,"privilegio"=>$this->user->Nu_Tipo_Privilegio_Acceso));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
     public function getStepByRole()
     {
         try {
@@ -2210,5 +2234,33 @@ class PedidosPagados extends CI_Controller
                 break;
         }
     }
-
+    public function saveAlmacenData()
+    {
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->saveAlmacenData($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function cambiarEstadoAlmacen()
+    {
+        $data = $this->input->post();
+        $id_pedido = $data['id_pedido'];
+        $estado = $data['estado'];
+        $response = $this->PedidosPagadosModel->cambiarEstadoAlmacen($id_pedido, $estado);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function saveSupplierPhotos()
+    {
+        $data = $this->input->post();
+        $idSupplier = $data['idSupplier'];
+        $files = $_FILES;
+        $response = $this->PedidosPagadosModel->saveSupplierPhotos($idSupplier, $files);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getSupplierPhotos()
+    {
+        $data = $this->input->post();
+        $idSupplier = $data['idSupplier'];
+        $response = $this->PedidosPagadosModel->getSupplierPhotos($idSupplier);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
 }
