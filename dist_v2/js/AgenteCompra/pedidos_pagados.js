@@ -7747,6 +7747,7 @@ const openRotuladofromCoordination = (id) => {
 const returnToCoordination = () => {
   hideRotuladoView();
   const container = $("#table-elegir_productos_proveedor");
+  $(".orden-compra_header").hide();
   container.hide();
   containerCoordination.show();
 };
@@ -7813,7 +7814,7 @@ const getPagosTemplate = (data = null) => {
     <div class="row payments-container">
       <div class="col-12 col-md-3">    
         <div class="payment-container">
-          <div class="upload-payment container-div not-filled pago1-container" onclick="openFileSelector('pago1-file')">
+          <div class="upload-payment container-div not-filled pago1-container" id="pago1-container" onclick="openFileSelector('pago1-file')">
               
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -7826,13 +7827,13 @@ const getPagosTemplate = (data = null) => {
           Seleccionar archivo</div>
           <div class="input-group ">
             <span class="input-group-text" >$</span>
-            <input type="text" class="form-control pago-value" name="file[1][value]" id="pago1-value">
+            <input type="text" class="form-control pago-value" name="file[1][value]" id="pago1-value" value="0">
           </div>
         </div>
       </div>
       <div class="col-12 col-md-3 ">    
         <div class="payment-container">
-          <div class="upload-payment container-div not-filled pago2-container" onclick="openFileSelector('pago2-file')">
+          <div class="upload-payment container-div not-filled pago2-container" id="pago2-container" onclick="openFileSelector('pago2-file')">
               
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -7845,7 +7846,7 @@ const getPagosTemplate = (data = null) => {
           Seleccionar archivo</div>
           <div class="input-group ">
             <span class="input-group-text" >$</span>
-            <input type="number" class="form-control pago-value" name="file[2][value]" id="pago2-value">
+            <input type="number" class="form-control pago-value" name="file[2][value]" id="pago2-value" value="0">
           </div>
         </div>
       </div>
@@ -7990,15 +7991,20 @@ const openPagos = (response) => {
       pagosL.forEach((pago, i) => {
         pagocontainer = $(`.liquidacion-container`);
         pagocontainer.empty();
-        pagocontainer.append(downloadSvg);
         $(`#liquidacion-description`).val(pago.description);
         pagocontainer
-          .parent()
           .append(
             `<span class="remove-item" onclick="openFileSelector('liquidacion-file')">${editIcon}</span>`
           );
+        if(pago.idPayment){
+          $(`.liquidacion-container`).append(
+            `<input type="hidden" name="liquidacion[id]" value="${pago.idPayment}">`
+          );
+        }
         if (pago.file_url != null) {
-          const fileName = pago.file_url.split("/").pop();
+          pagocontainer.append(downloadSvg);
+
+          const fileName = pago.file_url.split("_").pop();
           if (fileName.length > 15) {
             $(`#liquidacion-name`).html(fileName.substring(0, 15) + "...");
           } else {
@@ -8007,9 +8013,7 @@ const openPagos = (response) => {
           $(`.liquidacion-container`)
             .removeClass("not-filled")
             .addClass("filled");
-          $(`.liquidacion-container`).append(
-            `<input type="hidden" name="liquidacion[id]" value="${pago.idPayment}">`
-          );
+          
           //remove click ontag property
           $(`.liquidacion-container`).removeAttr("onclick");
           $(`.liquidacion-container`).click(function () {
@@ -8024,12 +8028,22 @@ const openPagos = (response) => {
       });
       pagosG.forEach((pago, i) => {
         pagocontainer = $(`.garantia-container`);
-        pagocontainer.empty();
-
-        pagocontainer.append(downloadSvg);
+        
+        if(pago.idPayment){
+          $(`.garantia-container`).append(
+            `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
+          );
+        }
         $(`#garantia-value`).val(pago.value);
         if (pago.file_url != null) {
-          const fileName = pago.file_url.split("/").pop();
+          pagocontainer.empty();
+          pagocontainer.append(downloadSvg);
+          if(pago.idPayment){
+            $(`.garantia-container`).append(
+              `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
+            );
+          }
+          const fileName = pago.file_url.split("_").pop();
           if (fileName.length > 15) {
             $(`#garantia-name`).html(fileName.substring(0, 15) + "...");
           } else {
@@ -8053,22 +8067,33 @@ const openPagos = (response) => {
       });
       pagosN.forEach((pago, i) => {
         const currenIndex = i + 1;
+        console.log(currenIndex);
         if (currenIndex <= 2) {
           pagocontainer = $(`.pago${currenIndex}-container`);
-          pagocontainer.empty();
-          pagocontainer
-            .parent()
-            .append(
-              `<span class="remove-item" onclick="openFileSelector('pago${currenIndex}-file')">${editIcon}</span>`
+          
+          if(pago.idPayment){
+            $(`#pago${currenIndex}-container`).append(
+              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
             );
-
-          pagocontainer.append(downloadSvg);
+          }
 
           // $(`.pago${currenIndex}-container`).val(pago.value);
           $(`#pago${currenIndex}-value`).val(pago.value);
 
           if (pago.file_url != null) {
-            const fileName = pago.file_url.split("/").pop();
+            pagocontainer.empty();
+            if(pago.idPayment){
+              $(`#pago${currenIndex}-container`).append(
+                `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
+              );
+            }
+            pagocontainer
+            .append(
+              `<span class="remove-item" onclick="openFileSelector('pago${currenIndex}-file')">${editIcon}</span>`
+            );
+
+            pagocontainer.append(downloadSvg);
+            const fileName = pago.file_url.split("_").pop();
             if (fileName.length > 15) {
               $(`#pago${currenIndex}-name`).html(
                 fileName.substring(0, 15) + "..."
@@ -8079,9 +8104,7 @@ const openPagos = (response) => {
             $(`.pago${currenIndex}-container`)
               .removeClass("not-filled")
               .addClass("filled");
-            $(`.pago${currenIndex}-container`).append(
-              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
-            );
+           
             //remove click ontag property
             $(`.pago${currenIndex}-container`).removeAttr("onclick");
             $(`.pago${currenIndex}-container`).click(function () {
@@ -8096,16 +8119,26 @@ const openPagos = (response) => {
         } else {
           addPago();
           pagocontainer = $(`.pago${currenIndex}-container`);
-          pagocontainer.empty();
-          pagocontainer.append(downloadSvg);
           $(`#pago${currenIndex}-remove`)
             .unbind("click")
             .click(function () {
               deletePago(currenIndex, pago.idPayment);
             });
           $(`#pago${currenIndex}-value`).val(pago.value);
+          if(pago.idPayment){
+            $(`.pago${currenIndex}-container`).append(
+              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
+            );
+          }
           if (pago.file_url != null) {
-            const fileName = pago.file_url.split("/").pop();
+            pagocontainer.empty();
+            if(pago.idPayment){
+              $(`.pago${currenIndex}-container`).append(
+                `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
+              );
+            }
+            pagocontainer.append(downloadSvg);
+            const fileName = pago.file_url.split("_").pop();
             if (fileName.length > 20) {
               $(`#pago${currenIndex}-name`).html(
                 fileName.substring(0, 20) + "..."
@@ -8116,10 +8149,6 @@ const openPagos = (response) => {
             $(`.pago${currenIndex}-container`)
               .removeClass("not-filled")
               .addClass("filled");
-            $(`.pago${currenIndex}-container`).append(
-              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
-            );
-            //remove click ontag property
             $(`.pago${currenIndex}-container`).removeAttr("onclick");
             $(`.pago${currenIndex}-container`).click(function () {
               const fileExtension = pago.file_url.split(".").pop();
@@ -8394,7 +8423,7 @@ const addPago = () => {
         <div class="payment-container">
           <span class="remove-item" id="pago${currentPagoIndex}-remove">X</span>
           <div class="upload-payment container-div not-filled pago${currentPagoIndex}-container" onclick="openFileSelector('pago${currentPagoIndex}-file')">
-          <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+            <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>

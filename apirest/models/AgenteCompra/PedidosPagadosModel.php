@@ -2337,8 +2337,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $this->db->where('id', $value['id']);
                 $this->db->update('payments_agente_compra_pedido', $paymentData);
             }
-            if (!isset($value['id'])) {
-                if ($fileURL || $value['value'] != "") {
+            else if(!isset($value['id'])) {
+                if ($fileURL || ($value['value'] != "" &&  $value['value']!=0)) {
                     $this->db->insert('payments_agente_compra_pedido', $paymentData);
 
                 }
@@ -2360,7 +2360,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id', $data['garantia']['id']);
             $this->db->update('payments_agente_compra_pedido', ['value' => $data['garantia']['value'], 'id_type_payment' => 1, 'id_pedido' => $data['idPedido']]);
         } else {
-            if ($garantiaURL || $data['garantia']['value'] != "") {
+            if ($garantiaURL || ($data['garantia']['value'] != "" && intval($data['garantia']['value'])  != 0)) {
                 $this->db->insert('payments_agente_compra_pedido', [
                     'file_url' => $garantiaURL, 'value' => $data['garantia']['value'], 'id_type_payment' => 1, 'id_pedido' => $data['idPedido']]);
             }
@@ -2382,11 +2382,17 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id', $data['liquidacion']['id']);
             $this->db->update('payments_agente_compra_pedido', ['value' => $data['liquidacion']['value'], 'id_type_payment' => 3, 'id_pedido' => $data['idPedido']]);
         } else {
-            if ($liquidacionURL || $data['liquidacion']['value'] != "") {
+            if ($liquidacionURL || $data['liquidacion']['value'] != "" && $data['liquidacion']['value'] != 0) {
                 $this->db->insert('payments_agente_compra_pedido', [
                     'file_url' => $liquidacionURL, 'value' => $data['liquidacion']['value'], 'id_type_payment' => 3, 'id_pedido' => $data['idPedido']]);
             }
         }
+        $total = $this->getPedidoPagos($data['idPedido'])['data'];
+            if (floatval($total['orden_total']) <= floatval($total['pago_cliente'])) {
+                $this->updateStep($data['step'], "COMPLETED");
+            } else {
+                $this->updateStep($data['step'], "PENDING");
+            }
         return ['status' => 'success', 'message' => "Pagos guardados"];
     }
         //     foreach ($data as $key => $value) {
