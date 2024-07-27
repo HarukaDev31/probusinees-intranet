@@ -512,6 +512,34 @@
   </div>
   <!-- /.modal-dialog -->
 </div>
+<div class="modal fade" id="modalsupplier-data">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Detalles de proveedor</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+        </div>
+      <div class="modal-body" id="modal-body-confirmation">
+        <div class="col-xs-12">
+          <div>
+            <label>Nombre:</label>
+            <span id="modal-supplier-name"></span>
+          </div>
+          <div>
+            <label>Phone</label>
+            <span id="modal-supplier-phone"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" id="modaldetail-close"  class="col btn btn-success btn-lg btn-block">Cerrar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
 <!-- modal ver imagen del item -->
 <div class="modal fade modal-ver_item" id="modal-default">
   <div class="modal-dialog modal-lg">
@@ -2762,7 +2790,7 @@ echo form_open('', $attributes);
 }.c-tentrega-column input{
   width: 80%;
 }
-.supplier-table-header {
+.supplier-table-header,.almacen-header{
   border: 1px solid #ccc;
   border-radius: 1em;
   -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
@@ -2784,6 +2812,31 @@ echo form_open('', $attributes);
 .supplier-table-header div:nth-child(even){
   background-color: #f2f2f2;
 
+}.almacen-header .column{
+  padding: 1em;
+}.almacen-header .column:nth-child(odd),.almacen-row .column:nth-child(even){
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 1em;
+
+}.almacen-header .column:nth-child(even),.almacen-row .column:nth-child(odd){
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  padding: 1em;
+}.form-control{
+  text-align: center;
+}
+.almacen-header{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 1em;
+  -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  margin-bottom: 1em;
 }
 .c-estado-column{
     width: 150px; /* Ajusta el ancho según tus necesidades */
@@ -2954,7 +3007,19 @@ echo form_open('', $attributes);
     justify-content: space-between;
     height: 350px;
     position: relative;
-  }.liquidacion-garantia-container{
+  }.fotos-container{
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.4em;
+    align-items: center;
+    height: 270px;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 1em;
+    margin-bottom: 1em;
+
+  }
+  .liquidacion-garantia-container{
     height:270px!important;
   }.liquidacion-container{
     height: 100%!important;
@@ -2969,6 +3034,7 @@ echo form_open('', $attributes);
     right: 2em;
     width: 30px;
     height: 30px;
+    top:0;
     display: flex;
     border-radius: 1em;
     background: #F1948A;
@@ -3088,7 +3154,7 @@ echo form_open('', $attributes);
     justify-content: center;
     flex-direction: column;
     width: 200px;
-  }.camera-not-filled,.camara-filled{
+  }.camera-not-filled,.camera-filled{
     height: 50px;
     width: 50px;
   }
@@ -3097,7 +3163,7 @@ echo form_open('', $attributes);
     
   }
   .camera-filled path{
-    stroke: #D5DBDB;
+    stroke: #D7DBDD;
     
   }
   .camera-not-filled:hover,.camera-filled:hover{

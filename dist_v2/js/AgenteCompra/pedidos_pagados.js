@@ -1,3 +1,4 @@
+
 var url, table_Entidad;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
@@ -1184,7 +1185,7 @@ $(function () {
         var term = term.toLowerCase();
         $.post(
           base_url +
-            "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
+          "AutocompleteImportacionController/globalAutocompleteItemxUnidad",
           { global_search: term },
           function (arrData) {
             response(arrData);
@@ -1292,6 +1293,7 @@ $(function () {
     info: true,
     autoWidth: false,
     responsive: false,
+    serverSide:false,
     pagingType: "full_numbers",
     oLanguage: {
       sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
@@ -1353,11 +1355,11 @@ $(function () {
     ],
   });
 
-  jQuery(document).on("keyup", ".width_full", function (ev) {
-    $("#hidden-sCorrelativoCotizacion").val("");
-    $("#hidden-ID_Pedido_Cabecera").val("");
-    reload_table_Entidad();
-  });
+  // jQuery(document).on("keyup", ".width_full", function (ev) {
+  //   $("#hidden-sCorrelativoCotizacion").val("");
+  //   $("#hidden-ID_Pedido_Cabecera").val("");
+  //   reload_table_Entidad();
+  // });
 
   $("#table-Pedidos_filter input").removeClass("form-control-sm");
   $("#table-Pedidos_filter input").addClass("form-control-md");
@@ -2642,17 +2644,17 @@ function invoiceProveedor(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -2665,9 +2667,9 @@ function invoiceProveedor(ID) {
           table_enlace_producto += "<th class='text-left'>"; //Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor si es diferente de vacio descargar
           if (
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              "" &&
+            "" &&
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              null
+            null
           ) {
             table_enlace_producto +=
               '<button class="btn btn-link" alt="Descargar Invoice y PL" title="Descargar Invoice y PL" href="javascript:void(0)" onclick="descargarInvoicePlProveedor(' +
@@ -2695,9 +2697,9 @@ function invoiceProveedor(ID) {
           table_enlace_producto += "<th class='text-center'>";
           if (
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              "" &&
+            "" &&
             detalle[i].Txt_Url_Archivo_Invoice_Pl_Recepcion_Carga_Proveedor !=
-              null
+            null
           ) {
             table_enlace_producto += "";
           } else {
@@ -2727,10 +2729,10 @@ function invoiceProveedor(ID) {
 
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -2972,17 +2974,17 @@ function recepcionCarga(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -3046,8 +3048,8 @@ function recepcionCarga(ID) {
 
         cantidad_item =
           !isNaN(cantidad_item_final_recepcion_carga) &&
-          cantidad_item_final_recepcion_carga > 0 &&
-          cantidad_item_final_recepcion_carga != ""
+            cantidad_item_final_recepcion_carga > 0 &&
+            cantidad_item_final_recepcion_carga != ""
             ? cantidad_item_final_recepcion_carga
             : cantidad_item;
 
@@ -3144,10 +3146,10 @@ function recepcionCarga(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -3385,12 +3387,12 @@ function coordinarPagosProveedor(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -3565,10 +3567,10 @@ function coordinarPagosProveedor(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -3804,12 +3806,12 @@ function verPedido(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -4028,10 +4030,10 @@ function verPedido(ID) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -4572,12 +4574,12 @@ function subirInspeccion(ID) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
@@ -5448,10 +5450,10 @@ function asignarPedido(ID_Pedido_Cabecera, Nu_Estado) {
         for (var x = 0; x < l; x++) {
           $("#cbo-guardar_personal_china-ID_Usuario").append(
             '<option value="' +
-              response.result[x].ID +
-              '">' +
-              response.result[x].Nombre +
-              "</option>"
+            response.result[x].ID +
+            '">' +
+            response.result[x].Nombre +
+            "</option>"
           );
         }
       } else {
@@ -5806,17 +5808,17 @@ function pagarProveedores(ID, tipo_pago) {
 
         var fecha_entrega_proveedor =
           detalle[i]["Fe_Entrega_Proveedor"] != "" &&
-          detalle[i]["Fe_Entrega_Proveedor"] != null
+            detalle[i]["Fe_Entrega_Proveedor"] != null
             ? ParseDateString(
-                detalle[i]["Fe_Entrega_Proveedor"],
-                "fecha_bd",
-                "-"
-              )
+              detalle[i]["Fe_Entrega_Proveedor"],
+              "fecha_bd",
+              "-"
+            )
             : "";
 
         var nota_final =
           detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != "" &&
-          detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
+            detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"] != null
             ? detalle[i]["Txt_Nota_Recepcion_Carga_Proveedor"]
             : "";
 
@@ -6044,10 +6046,10 @@ function pagarProveedores(ID, tipo_pago) {
       //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
-          (fTotalCliente -
-            (parseFloat(response.Ss_Pago_30_Cliente) +
-              parseFloat(response.Ss_Pago_100_Cliente) +
-              parseFloat(response.Ss_Pago_Servicio_Cliente)))
+        (fTotalCliente -
+          (parseFloat(response.Ss_Pago_30_Cliente) +
+            parseFloat(response.Ss_Pago_100_Cliente) +
+            parseFloat(response.Ss_Pago_Servicio_Cliente)))
       );
 
       //Date picker invoice
@@ -6265,12 +6267,12 @@ function bookingTrading(id) {
                 selected = 'selected="selected"';
               $("#cbo-shipper").append(
                 '<option value="' +
-                  responseShipper.result[x].ID +
-                  '" ' +
-                  selected +
-                  ">" +
-                  responseShipper.result[x].Nombre +
-                  "</option>"
+                responseShipper.result[x].ID +
+                '" ' +
+                selected +
+                ">" +
+                responseShipper.result[x].Nombre +
+                "</option>"
               );
             }
           } else {
@@ -6981,9 +6983,8 @@ const saveOrderProgress = () => {
 };
 const stepTemplate = (step, i) => {
   const stepHTML = `
-      <div class="step-container" onclick="openStepFunction(${i + 1},${
-    step.id
-  })"  id="step-${i}">
+      <div class="step-container" onclick="openStepFunction(${i + 1},${step.id
+    })"  id="step-${i}">
       <span class="step">${step.name}</span>
       <img src="${step.iconURL} " class="step-icon w-100" />
       </div>
@@ -7049,12 +7050,11 @@ const getItemTemplate = (i, mode, detalle) => {
             <!--Upload Icon-->
             <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
             <label>Imagen Principal</label>
-            ${
-              detalle["main_photo"] == null
-                ? ""
-                : `<span class="fw-bold  btn btn-danger"
+            ${detalle["main_photo"] == null
+      ? ""
+      : `<span class="fw-bold  btn btn-danger"
               onclick="deleteImage('${i}',1)">Eliminar</span>`
-            }  
+    }  
             </br>
             <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
             <input type="file" name="file[${i}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
@@ -7065,23 +7065,21 @@ const getItemTemplate = (i, mode, detalle) => {
           <div class="form-group" id="container-uploadimg2-${i}">
           <label>Imagen 2</label>
           <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>  
-          ${
-            detalle["secondary_photo"] == null
-              ? ""
-              : `<span class="fw-bold  btn btn-danger"
+          ${detalle["secondary_photo"] == null
+      ? ""
+      : `<span class="fw-bold  btn btn-danger"
               onclick="deleteImage('${i}',2)">Eliminar</span>`
-          }          
+    }          
           <input type="file" name="file[${i}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
           </div>
             <div class="form-group" id="container-uploadimg3-${i}">
             <label>Imagen 3</label>
             <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
-            ${
-              detalle["terciary_photo"] == null
-                ? ""
-                : `<span class="fw-bold  btn btn-danger"
+            ${detalle["terciary_photo"] == null
+      ? ""
+      : `<span class="fw-bold  btn btn-danger"
               onclick="deleteImage('${i}',3)">Eliminar</span>`
-            }
+    }
             <input type="file" name="file[${i}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
             <div class="form-group" id="container-uploadvideo1-${i}">
             <label>Video 1</label>
@@ -7288,22 +7286,19 @@ const getSupplierCoordinationTableTemplate = (data) => {
     });
     html += `
       <div class="supplier-row">
-        <div class="supplier-info supplier-column" style="height:${
-          detailsCount * defaultHeight
-        }px">
+        <div class="supplier-info supplier-column" style="height:${detailsCount * defaultHeight
+      }px">
           <div>Nombre: ${supplier.name}</div>
           <div>Teléfono: ${supplier.phone}</div>
           <div>Costo shipping:  ¥${sumDelivery}</div>
           <input type="hidden" name="id-pedido" value="${supplier.id_pedido}"/>
           <input type="hidden" name="current-step" value="${selectedStep}"/>
           <div class="btn btn-outline-secondary btn-coordinar mb-1" onclick="openSupplierItems(
-          ${supplier.id_pedido},${supplier.id_supplier},${
-      supplier.id_coordination
-    })">Cambiar</div>
+          ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination
+      })">Cambiar</div>
           <div class="btn btn-outline-secondary btn-coordinar" onclick="downloadSupplierExcel(
-          ${supplier.id_pedido},${supplier.id_supplier},${
-      supplier.id_coordination
-    })">Invoice</div>
+          ${supplier.id_pedido},${supplier.id_supplier},${supplier.id_coordination
+      })">Invoice</div>
         </div>`;
 
     detailsImgs.forEach((img) => {
@@ -7317,46 +7312,39 @@ const getSupplierCoordinationTableTemplate = (data) => {
           <span>${detail.nombre_producto} </span>
           <div class="input-group mt-3 d-flex flex-row justify-content-center align-items-center mb-1 ">
             <span class="input-group-text " id="basic-addon1"> CODE:</span>
-            <input type="text" class="form-control" name="item[${
-              detail.ID_Pedido_Detalle
-            }]['code']" aria-describedby="basic-addon1" value="${
-        detail.product_code
-      }" id="item['${detail.ID_Pedido_Detalle}']['code']">
+            <input type="text" class="form-control" name="item[${detail.ID_Pedido_Detalle
+        }]['code']" aria-describedby="basic-addon1" value="${detail.product_code
+        }" id="item['${detail.ID_Pedido_Detalle}']['code']">
           </div>
-          <div class="btn btn-success" onclick="openRotuladofromCoordination(${
-            detail.ID_Pedido_Detalle
-          })">Rotulado</div>
+          <div class="btn btn-success" onclick="openRotuladofromCoordination(${detail.ID_Pedido_Detalle
+        })">Rotulado</div>
         </div>
           <div class="c-qty-column supplier-column">
           
           <input type="number" class="form-control" value="${parseFloat(
-            detail.qty_product
-          )}" name="proveedor[${
-        detail.ID_Pedido_Detalle_Producto_Proveedor
-      }][qty_product]"/>
+          detail.qty_product
+        )}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor
+        }][qty_product]"/>
         </div>
         <div class="c-precio-column">
          <div class="input-group d-flex flex-row">
             <span class="input-group-text d-flex w-auto">¥</span>
           <input type="number" class="form-control" value="${parseFloat(
-            detail.price_product
-          )}" name="proveedor[${
-        detail.ID_Pedido_Detalle_Producto_Proveedor
-      }][price_product]"/>
+          detail.price_product
+        )}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor
+        }][price_product]"/>
       </div>
         </div>
         `;
     });
     html += `
-        <div class="c-total-column supplier-column" style="height:${
-          detailsCount * defaultHeight
-        }px">
+        <div class="c-total-column supplier-column" style="height:${detailsCount * defaultHeight
+      }px">
           <div class="input-group d-flex flex-row"><span class="input-group-text d-flex w-auto">¥</span>
-        <span id="coordination[${
-          supplier.id_coordination
-        }][total]" class="input-total form-control" value="${parseFloat(
-      total
-    ).toFixed(2)}"> ${parseFloat(total).toFixed(2)}</span>
+        <span id="coordination[${supplier.id_coordination
+      }][total]" class="input-total form-control" value="${parseFloat(
+        total
+      ).toFixed(2)}"> ${parseFloat(total).toFixed(2)}</span>
         </div>
         </div>`;
 
@@ -7366,28 +7354,20 @@ const getSupplierCoordinationTableTemplate = (data) => {
           <div class="input-group d-flex flex-row">
             <span class="input-group-text d-flex w-auto">¥</span>
 
-          <input type="number" class="form-control" value="${
-            supplier.pago_1_value
-          }" name="coordination[${supplier.id_coordination}][pago_1_value]"/>
+          <input type="number" class="form-control" value="${supplier.pago_1_value
+        }" name="coordination[${supplier.id_coordination}][pago_1_value]"/>
           </div>
-          <div class="btn mt-1 mx-auto ${
-            supplier.pago_1_URL == null ? "btn-primary" : "btn-outline-primary"
-          }" onclick='openInputFile("input-pago1-${
-        supplier.id_coordination
-      }","${supplier.pago_1_URL}")' id="btn-pago1-${
-        supplier.id_coordination
-      }">Voucher</div>
-          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago1','${
-            supplier.id_coordination
-          }')">Quitar</span>
-          <input type="hidden" id="input-pago1-url-${
-            supplier.id_coordination
-          }" name="coordination[${
-        supplier.id_coordination
-      }][pago_1_url]" value="${supplier.pago_1_URL}"/>
-          <input type="file" class="form-control d-none" id="input-pago1-${
-            supplier.id_coordination
-          }" name="coordination[${supplier.id_coordination}][pago_1_file]"/>
+          <div class="btn mt-1 mx-auto ${supplier.pago_1_URL == null ? "btn-primary" : "btn-outline-primary"
+        }" onclick='openInputFile("input-pago1-${supplier.id_coordination
+        }","${supplier.pago_1_URL}")' id="btn-pago1-${supplier.id_coordination
+        }">Voucher</div>
+          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago1','${supplier.id_coordination
+        }')">Quitar</span>
+          <input type="hidden" id="input-pago1-url-${supplier.id_coordination
+        }" name="coordination[${supplier.id_coordination
+        }][pago_1_url]" value="${supplier.pago_1_URL}"/>
+          <input type="file" class="form-control d-none" id="input-pago1-${supplier.id_coordination
+        }" name="coordination[${supplier.id_coordination}][pago_1_file]"/>
         </div>`;
     } else {
       html += `
@@ -7402,36 +7382,27 @@ const getSupplierCoordinationTableTemplate = (data) => {
       html += `<div class="c-pago2-column supplier-column">
       <div class="input-group d-flex flex-row">
             <span class="input-group-text d-flex w-auto">¥</span>
-          <input type="number" class="form-control" disabled value="${
-            parseFloat(total) - parseFloat(supplier.pago_1_value)
-          }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
-          <div class="btn mt-1 mx-auto ${
-            supplier.pago_2_URL == null ? "btn-primary" : "btn-outline-primary"
-          }" onclick='openInputFile("input-pago2-${
-        supplier.id_coordination
-      }","${supplier.pago_2_URL}")' id="btn-pago2-${
-        supplier.id_coordination
-      }">Voucher</div>
-          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago2','${
-            supplier.id_coordination
-          }')">Quitar</span>
-          <input type="file" class="form-control d-none" id="input-pago2-${
-            supplier.id_coordination
-          }" name="coordination[${supplier.id_coordination}][pago_2_file]"/>
-          <input type="hidden" id="input-pago2-url-${
-            supplier.id_coordination
-          }" name="coordination[${
-        supplier.id_coordination
-      }][pago_2_url]" value="${supplier.pago_2_URL}"/>
+          <input type="number" class="form-control" disabled value="${parseFloat(total) - parseFloat(supplier.pago_1_value)
+        }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
+          <div class="btn mt-1 mx-auto ${supplier.pago_2_URL == null ? "btn-primary" : "btn-outline-primary"
+        }" onclick='openInputFile("input-pago2-${supplier.id_coordination
+        }","${supplier.pago_2_URL}")' id="btn-pago2-${supplier.id_coordination
+        }">Voucher</div>
+          <span class="btn btn-danger mt-1 mx-auto" onclick="setInputFileToNull('pago2','${supplier.id_coordination
+        }')">Quitar</span>
+          <input type="file" class="form-control d-none" id="input-pago2-${supplier.id_coordination
+        }" name="coordination[${supplier.id_coordination}][pago_2_file]"/>
+          <input type="hidden" id="input-pago2-url-${supplier.id_coordination
+        }" name="coordination[${supplier.id_coordination
+        }][pago_2_url]" value="${supplier.pago_2_URL}"/>
         </div>
           </div>`;
     } else {
       html += `<div class="c-pago2-column supplier-column">
       <div class="input-group d-flex flex-row">
             <span class="input-group-text d-flex w-auto">¥</span>
-          <input type="number" class="form-control" disabled value="${
-            parseFloat(total) - parseFloat(supplier.pago_1_value)
-          }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
+          <input type="number" class="form-control" disabled value="${parseFloat(total) - parseFloat(supplier.pago_1_value)
+        }" name="coordination[${supplier.id_coordination}][pago_2_value]"/>
           </div>
           </div>`;
     }
@@ -7441,50 +7412,39 @@ const getSupplierCoordinationTableTemplate = (data) => {
         </div>`;
     });
     html += `
-    <div class="c-tentrega-column supplier-column"  style="height:${
-      detailsCount * defaultHeight
-    }px">
-      <input type="date" class="form-control" value="${
-        detalles[0].tentrega.split(" ")[0]
-      }" name="proveedor[${
-      detalles[0].ID_Pedido_Detalle_Producto_Proveedor
-    }][tentrega]"/>
+    <div class="c-tentrega-column supplier-column"  style="height:${detailsCount * defaultHeight
+      }px">
+      <input type="date" class="form-control" value="${detalles[0].tentrega.split(" ")[0]
+      }" name="proveedor[${detalles[0].ID_Pedido_Detalle_Producto_Proveedor
+      }][tentrega]"/>
     </div>`;
     html += `
     <div class="c-estado-column supplier-column"> 
-          <select class="form-select" aria-label="Default select example" name="coordination[${
-            supplier.id_coordination
-          }][estado]"
+          <select class="form-select" aria-label="Default select example" name="coordination[${supplier.id_coordination
+      }][estado]"
 
-          ${
-            currentPrivilege == priviligesJefeChina
-              ? "style='pointer-events:none'"
-              : ""
-          } >
-            <option value="PENDIENTE" ${
-              supplier.estado == "PENDIENTE" ? "selected" : ""
-            }>PENDIENTE</option>
-            <option value="CONFORME" ${
-              supplier.estado == "CONFORME" ? "selected" : ""
-            }>CONFORME</option>
+          ${currentPrivilege == priviligesJefeChina
+        ? "style='pointer-events:none'"
+        : ""
+      } >
+            <option value="PENDIENTE" ${supplier.estado == "PENDIENTE" ? "selected" : ""
+      }>PENDIENTE</option>
+            <option value="CONFORME" ${supplier.estado == "CONFORME" ? "selected" : ""
+      }>CONFORME</option>
           </select>
         </div>
         `;
     if (currentPrivilege == priviligesJefeChina) {
       html += `
           <div class="c-negociacion-column supplier-column">
-          <select class="form-select" aria-label="Default select example" name="coordination[${
-            supplier.id_coordination
-          }][estado_negociacion]">
-            <option value="PENDIENTE" ${
-              supplier.estado_negociacion == "PENDIENTE" ? "selected" : ""
-            }>PENDIENTE</option>
-            <option value="ADELANTADO" ${
-              supplier.estado_negociacion == "ADELANTADO" ? "selected" : ""
-            }>ADELANTADO</option>
-            <option value="PAGADO" ${
-              supplier.estado_negociacion == "PAGADO" ? "selected" : ""
-            }>PAGADO</option>
+          <select class="form-select" aria-label="Default select example" name="coordination[${supplier.id_coordination
+        }][estado_negociacion]">
+            <option value="PENDIENTE" ${supplier.estado_negociacion == "PENDIENTE" ? "selected" : ""
+        }>PENDIENTE</option>
+            <option value="ADELANTADO" ${supplier.estado_negociacion == "ADELANTADO" ? "selected" : ""
+        }>ADELANTADO</option>
+            <option value="PAGADO" ${supplier.estado_negociacion == "PAGADO" ? "selected" : ""
+        }>PAGADO</option>
           </select>
         </div>
         `;
@@ -7525,9 +7485,8 @@ const downloadSupplierExcel = (id_pedido, id_supplier, id_coordination) => {
       link.href = window.URL.createObjectURL(blob);
       const currentDate = new Date();
       //format date to dd_mm_yyyy
-      const formattedDate = `${currentDate.getDate()}_${
-        currentDate.getMonth() + 1
-      }_${currentDate.getFullYear()}`;
+      const formattedDate = `${currentDate.getDate()}_${currentDate.getMonth() + 1
+        }_${currentDate.getFullYear()}`;
       link.download = "Cotizacion_" + formattedDate + ".xlsx";
       document.body.appendChild(link);
       link.click();
@@ -7694,8 +7653,8 @@ const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
         .find(`#container-uploadvideo2-${i + 1}`)
         .append(
           "<video src='" +
-            detalles[i]["secondary_video"] +
-            "' class='img-thumbnail img-table_item img-fluid img-resize mb-2 w-100' controls></video>"
+          detalles[i]["secondary_video"] +
+          "' class='img-thumbnail img-table_item img-fluid img-resize mb-2 w-100' controls></video>"
         );
     }
   }
@@ -7897,7 +7856,7 @@ const getPagosTemplate = (data = null) => {
       
   </div>
   `;
-  
+
   return html;
 };
 const openPagos = (response) => {
@@ -7911,7 +7870,7 @@ const openPagos = (response) => {
 <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
 <path d="M12 2L12 15M12 15L9 11.5M12 15L15 11.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
- 
+
   pagosCount = 2;
   if (response.status == "success") {
     const data = response.data;
@@ -8716,36 +8675,30 @@ const getProductTemplate = (producto, index) => {
   const template = `
   <div class="row producto">
     <div class="col-12 col-lg-3">
-      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${
-    producto.Txt_Producto
-  }" class="img-cuz">
+      <img src="${producto.Txt_Url_Imagen_Producto}" alt="${producto.Txt_Producto
+    }" class="img-cuz">
     </div>
     <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
       <span>${htmlDecode(escapeHtml(producto.Txt_Producto))}</span>
-      ${
-        currentPrivilege == priviligesPersonalPeru
-          ? `<div class="btn btn-primary btn-rotulado " id="btn-rotulado-${index}"  onclick='openRotuladoView(${productoJson})'>Rotulado</div>`
-          : `
-      <span class="badge badge-success">ITEM CODE :${
-        producto.product_code ? producto.product_code : ""
+      ${currentPrivilege == priviligesPersonalPeru
+      ? `<div class="btn btn-primary btn-rotulado " id="btn-rotulado-${index}"  onclick='openRotuladoView(${productoJson})'>Rotulado</div>`
+      : `
+      <span class="badge badge-success">ITEM CODE :${producto.product_code ? producto.product_code : ""
       }</span>`
-      }
+    }
     </div>
     <div class="col-12 col-lg-2">
-      <input class="form-control text-center input-cantidad w-100" type="number"  name="addProducto[${
-        producto.ID_Pedido_Detalle
-      }][cantidad]" value="${parseInt(producto.Qt_Producto)}"/>
+      <input class="form-control text-center input-cantidad w-100" type="number"  name="addProducto[${producto.ID_Pedido_Detalle
+    }][cantidad]" value="${parseInt(producto.Qt_Producto)}"/>
     </div>
     <div class="col-12 col-lg-3 d-flex flex-column">
           <div id="quill-container-${index}" 
           class="d-block w-100" ></div>
     </div>
     <div class="col-12 col-lg-2">
-      <a href="${
-        producto.Txt_Url_Link_Pagina_Producto
-      }" target="_blank" class="btn btn-link" style="word-break: break-word;overflow:auto;max-height:200px">${
-    producto.Txt_Url_Link_Pagina_Producto
-  }</a>
+      <a href="${producto.Txt_Url_Link_Pagina_Producto
+    }" target="_blank" class="btn btn-link" style="word-break: break-word;overflow:auto;max-height:200px">${producto.Txt_Url_Link_Pagina_Producto
+    }</a>
     </div>
   </div>`;
   return template;
@@ -8798,15 +8751,13 @@ const openRotuladoView = (producto, btsconfig = null) => {
           $("#input-empaque").remove();
           empaqueDiv.append(`
             <div id="empaque_input-container">
-              <input name="empaque_URL" type="hidden" value="${
-                item.empaque_URL
-              }">
+              <input name="empaque_URL" type="hidden" value="${item.empaque_URL
+            }">
               <div class="d-flex flex-row w-100">
-              ${
-                item.empaque_URL
-                  ? `<a id="input-empaque" href="${item.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
-                  : `<input id="input-empaque" type="file" name="empaque" class="">`
-              }
+              ${item.empaque_URL
+              ? `<a id="input-empaque" href="${item.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
+              : `<input id="input-empaque" type="file" name="empaque" class="">`
+            }
               <button class="btn btn-outline-danger ml-2" id="delete-empaque"onclick="setRotuladoInputToNull('empaque')">X</button>
               </div>
             </div>
@@ -8837,15 +8788,13 @@ const openRotuladoView = (producto, btsconfig = null) => {
           $("#input-vim_motor").remove();
           vimDiv.append(`
             <div id="vim_motor_input-container">
-              <input name="vim_motor_URL" type="hidden" value="${
-                item.vim_motor_URL
-              }">
+              <input name="vim_motor_URL" type="hidden" value="${item.vim_motor_URL
+            }">
               <div class="d-flex flex-row w-100">
-              ${
-                item.vim_motor_URL
-                  ? `<a id="input-vim_motor" href="${item.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
-                  : `<input type="file" name="vim_motor" class="">`
-              }
+              ${item.vim_motor_URL
+              ? `<a id="input-vim_motor" href="${item.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
+              : `<input type="file" name="vim_motor" class="">`
+            }
               <button class="btn btn-outline-danger ml-2" id="delete-vim_motor"onclick="setRotuladoInputToNull('vim_motor')">X</button>
               </div>
             </div>
@@ -8914,16 +8863,14 @@ const getContainerRotuladoView = (producto) => {
           id="caja_master-url"
           type="hidden" value="${producto.caja_master_URL}">
           <div class="d-flex flex-row w-100">
-          ${
-            producto.caja_master_URL
-              ? `<a href="${producto.caja_master_URL}" id="input-caja_master" class="btn btn-outline-secondary  w-75 d-block text-center" target="_blank">Descargar</a>`
-              : '<input type="file" name="caja_master" class="">'
-          }
-          ${
-            producto.caja_master_URL
-              ? "<div class='btn btn-outline-danger ml-2' id='delete-caja_master' onclick='setRotuladoInputToNull(\"caja_master\")'>X</div>"
-              : ""
-          }
+          ${producto.caja_master_URL
+      ? `<a href="${producto.caja_master_URL}" id="input-caja_master" class="btn btn-outline-secondary  w-75 d-block text-center" target="_blank">Descargar</a>`
+      : '<input type="file" name="caja_master" class="">'
+    }
+          ${producto.caja_master_URL
+      ? "<div class='btn btn-outline-danger ml-2' id='delete-caja_master' onclick='setRotuladoInputToNull(\"caja_master\")'>X</div>"
+      : ""
+    }
           </div>
         </div>
         <div class="form-group" id="empaque_container">
@@ -8951,9 +8898,8 @@ const getContainerRotuladoView = (producto) => {
       </div>
       <div class="col-12 col-md-7">
           <label>Notas</label>
-          <textarea name="notas_rotulado" class="form-control" rows="5">${
-            producto.notas_rotulado ?? ""
-          }</textarea>
+          <textarea name="notas_rotulado" class="form-control" rows="5">${producto.notas_rotulado ?? ""
+    }</textarea>
       </div>
     </form>
   `;
@@ -9085,6 +9031,7 @@ const hideSteps = () => {
   reload_table_Entidad();
 };
 const openFileSelector = (id) => {
+  console.log("open file selector", id);
   $(`#${id}`).click();
 };
 const downloadFile = (url) => {
@@ -9103,7 +9050,7 @@ const getAlmacenData = (idPedido) => {
     success: function (response) {
       response = JSON.parse(response);
       if (response.status == "success") {
-        openAlmacenView(response.data);
+        openAlmacenView(response.data, idPedido);
       }
     },
   });
@@ -9112,13 +9059,12 @@ const getAlmacenData = (idPedido) => {
 
 const getAlmacenViewTitle = (cotizacionCode = "") => {
   return `
-  <h2>
+  <h2 class="mb-2">
     <strong>RECEPCION DE CARGA: 
-      ${
-        cotizacionCode
-          ? `<span class="text-primary">${cotizacionCode}</span>`
-          : ""
-      }
+      ${cotizacionCode
+      ? `<span class="text-primary">${cotizacionCode}</span>`
+      : ""
+    }
     </strong>
   </h2>
 `;
@@ -9126,22 +9072,29 @@ const getAlmacenViewTitle = (cotizacionCode = "") => {
 const getAlmacenViewHeader = () => {
   return `
   <div id="almacen_header" class="row w-100">
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-3">
       <div class="input-group mb-3">
         <span class="input-group-text" >TOTAL BOX</span>
-        <input type="text" class="form-control" id="total-box">
+        <input type="text" class="form-control" id="total-box" disabled> 
       </div>
     </div>
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-3">
       <div class="input-group mb-3">
         <span class="input-group-text" >TOTAL CBM</span>
-        <input type="text" class="form-control" id="total-cbm">
+        <input type="text" class="form-control" id="total-cbm" disabled>
       </div>
     </div>
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-3">
       <div class="input-group mb-3">
         <span class="input-group-text" >TOTAL KG</span>
-        <input type="text" class="form-control" id="total-kg">
+        <input type="text" class="form-control" id="total-kg" disabled>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" id="almacen-search" > 
+        <span class="btn btn-primary">Buscar</span>
+        
       </div>
     </div>
   </div>
@@ -9160,7 +9113,7 @@ const getAlmacenTableHeader = () => {
             <div class="estado-column column">ESTADO</div>
           </div>`;
 };
-const getAlmacenTableBody = (data,cotizacionCode) => {
+const getAlmacenTableBody = (data, cotizacionCode, idPedido) => {
   let tableBody = "";
   if (!data) return tableBody;
   let totalCBM = 0;
@@ -9172,39 +9125,41 @@ const getAlmacenTableBody = (data,cotizacionCode) => {
     if (producto.total_box) totalBox += parseFloat(producto.total_box);
     tableBody += `<div class="almacen-row d-flex flex-row">
       <div class="imagen-column column">
-        <img src="${producto.Txt_Url_Imagen_Producto}" alt="${
-      producto.Txt_Producto
-    }" class="img-cuz">
+        <img class="w-100" src="${producto.Txt_Url_Imagen_Producto}" alt="${producto.Txt_Producto
+      }" class="img-cuz">
       </div>
       <div class="nombre-column column">
-      <div>
-      <strong>${producto.Txt_Producto}</strong>
-      </div>
+        <div class="nombre-container">
+          <strong class="nombre-producto">${producto.Txt_Producto}</strong>
+        </div>
        <div class="input-group mt-3 d-flex flex-row justify-content-center align-items-center mb-1 ">
             <span class="input-group-text" > CODE:</span>
-            <input type="text" class="form-control"  value="${
-              producto.product_code
-            }">
-          </div>
+            <input type="text" class="form-control"  disabled value="${producto.product_code
+      }">
+        </div>
+        <div class="btn btn-success w-100" onclick="openSupplierDetails('${producto.name}','${producto.phone}')">
+            <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.9536 14.9458L21 21M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Proveedor</span>
+        </div>
+       
       </div>
       <div class="fentrega-column column">
-      <input type="date" class="form-control" disabled value="${
-        producto.Fe_Entrega_Proveedor.split(" ")[0]
+      <input type="date" class="form-control" disabled value="${producto.Fe_Entrega_Proveedor.split(" ")[0]
       }"/>
       </div>
       <div class="totalbox-column column">
         <input type="number" class="form-control total_box" 
         name="almacen[${producto.ID_Pedido_Detalle_Producto_Proveedor}][total_box]"
-        value="${
-          producto.total_box
-        }">
+        value="${producto.total_box
+      }">
       </div>
       <div class="totalcbm-column column">
         <input type="number" class="form-control total_cbm" 
         name="almacen[${producto.ID_Pedido_Detalle_Producto_Proveedor}][total_cbm]"
-        value="${
-          producto.total_cbm
-        }">
+        value="${producto.total_cbm
+      }">
       </div>
       <div class="totalkg-column column">
         <input type="number" class="form-control total_kg"
@@ -9213,21 +9168,19 @@ const getAlmacenTableBody = (data,cotizacionCode) => {
       </div>
       <div class="fotos-column column">
           <svg 
-          onclick="viewSupplierPhotos(${producto.ID_Pedido_Detalle_Producto_Proveedor},'${cotizacionCode}')"
-          class="${producto.estado_almacen == 2 ? "camera-filled" : "camera-not-filled"}"
+          onclick="viewSupplierPhotos(${producto.ID_Pedido_Detalle_Producto_Proveedor},'${cotizacionCode}','${idPedido}')"
+          class="${producto.almacen_estado != "PENDIENTE" ? "camera-filled" : "camera-not-filled"}"
           viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
       </div>
       <div class="estado-column column">
-        <select class="form-select" id="estado-${producto.ID_Pedido_Detalle}">
-          <option value="0" ${
-            producto.estado_almacen == 1 ? "selected" : ""
-          }>Pendiente</option>
-          <option value="1" ${
-            producto.estado_almacen == 2 ? "selected" : ""
-          }>Recibido</option>
+        <select class="form-select" disabled id="estado-${producto.ID_Pedido_Detalle}">
+          <option value="PENDIENTE" ${producto.almacen_estado == "PENDIENTE" ? "selected" : ""
+      }>PENDIENTE</option>
+          <option value="RECIBIDO" ${producto.almacen_estado == "RECIBIDO" ? "selected" : ""
+      }>RECIBIDO</option>
         </select>
       </div>
     </div>`;
@@ -9241,11 +9194,13 @@ const getAlmacenTableBody = (data,cotizacionCode) => {
  * This function opens  the almacen table view
  * @param {*} data
  */
-const openAlmacenView = (data) => {
-  const { cotizacionCode } = data || {};
+const openAlmacenView = (data, idPedido) => {
+
   let id_pedido = 0;
-  if(data){
+  let cotizacionCode = 0;
+  if (data) {
     id_pedido = data[0].id_pedido;
+    cotizacionCode = data[0].cotizacionCode;
   }
   const almacenTitle = getAlmacenViewTitle(cotizacionCode);
   const almacenHeader = getAlmacenViewHeader();
@@ -9256,7 +9211,7 @@ const openAlmacenView = (data) => {
     .append(almacenTitle)
     .append(almacenHeader)
     .append(almacenTableHeader).show();
-  const almacenTableBody = getAlmacenTableBody(data,cotizacionCode);
+  const almacenTableBody = getAlmacenTableBody(data, cotizacionCode, idPedido);
   containerAlmacen.append(almacenTableBody);
   const actionButtons = {
     btnSave: {
@@ -9265,7 +9220,7 @@ const openAlmacenView = (data) => {
     },
     btnCancel: {
       text: "Regresar",
-      action: "hideAlmacenView()",
+      action: `hideAlmacenView(${id_pedido})`,
     },
   };
   const buttonsTemplate = getActionButtons(actionButtons);
@@ -9273,6 +9228,20 @@ const openAlmacenView = (data) => {
   updateTotal(".total_box", "#total-box");
   updateTotal(".total_cbm", "#total-cbm");
   updateTotal(".total_kg", "#total-kg");
+  $('#almacen-search').on('input', function() {
+    const value = $(this).val();
+    console.log(value);
+    const rows = $('.almacen-row');
+    console.log(rows);
+    rows.each((i, row) => {
+      const text = $(row).children('.nombre-column').children('.nombre-container').children('.nombre-producto').text().toLowerCase();
+      if (text.includes(value.toLowerCase())) {
+        $(row).removeClass('d-none').addClass('d-flex');
+      } else {
+        $(row).removeClass('d-flex').addClass('d-none');
+      }
+    });
+  });
 };
 const updateTotal = (inputClass, totalId) => {
   $(document).on("input", inputClass, function () {
@@ -9287,11 +9256,11 @@ const updateTotal = (inputClass, totalId) => {
     $(totalId).val(totalSum);
   });
 };
-const saveAlmacenData = (idPedido) => {
+const saveAlmacenData = (idSupplier, idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveAlmacenData";
   const form = $(".almacen-form");
   const formData = new FormData(form[0]);
-  formData.append("idPedido", idPedido);
+  formData.append("idPedido", idSupplier);
   $.ajax({
     url,
     type: "POST",
@@ -9311,7 +9280,7 @@ const saveAlmacenData = (idPedido) => {
     },
   });
 }
-const changeStatusAlmacen= (estado, id_pedido) => {
+const changeStatusAlmacen = (estado, id_pedido) => {
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/cambiarEstadoAlmacen",
     type: "POST",
@@ -9329,7 +9298,7 @@ const changeStatusAlmacen= (estado, id_pedido) => {
     },
   });
 };
-const viewSupplierPhotos = (id,cotizacionCode) => {
+const viewSupplierPhotos = (id, cotizacionCode, idPedido) => {
   containerAlmacen.empty();
   const almacenTitle = getAlmacenViewTitle(cotizacionCode);
   containerAlmacen.append(almacenTitle);
@@ -9340,16 +9309,16 @@ const viewSupplierPhotos = (id,cotizacionCode) => {
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/getSupplierPhotos",
     type: "POST",
-    data: { 'idSupplier':id },
+    data: { 'idSupplier': id },
     success: function (response) {
       response = JSON.parse(response);
       if (response.status == "success") {
-        const {almacen_foto1,almacen_foto2,idSupplier} = response.data;
+        const { almacen_foto1, almacen_foto2, idSupplier } = response.data;
         if (almacen_foto1 != null) {
-          handleFileDisplay(almacen_foto1, "#foto1-name", ".foto1-container","#foto1-container" ,idSupplier,'foto1-file');
+          handleFileDisplay(almacen_foto1, "#foto1-name", ".foto1-container", "#foto1-container", idSupplier, 'foto1-file');
         }
         if (almacen_foto2 != null) {
-          handleFileDisplay(almacen_foto2, "#foto2-name", ".foto2-container","#foto2-container",idSupplier,'foto2-file');
+          handleFileDisplay(almacen_foto2, "#foto2-name", ".foto2-container", "#foto2-container", idSupplier, 'foto2-file');
         }
         // if(almacen_foto2){
         //   const foto2Name=almacen_foto2.split("/").pop();
@@ -9362,17 +9331,17 @@ const viewSupplierPhotos = (id,cotizacionCode) => {
   const actionButtons = {
     btnSave: {
       text: "Guardar",
-      action: `saveSupplierPhotos(${id})`,
+      action: `saveSupplierPhotos(${id},${idPedido})`,
     },
     btnCancel: {
       text: "Regresar",
-      action: "hideAlmacenView()",
+      action: `getAlmacenData(${idPedido})`,
     },
+  }
+  const buttonsTemplate = getActionButtons(actionButtons);
+  containerAlmacen.append(buttonsTemplate);
 }
-const buttonsTemplate = getActionButtons(actionButtons);
-containerAlmacen.append(buttonsTemplate);
-}
-const saveSupplierPhotos = (id) => {
+const saveSupplierPhotos = (id, idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveSupplierPhotos";
   const form = $("#form-photos");
   const formData = new FormData(form[0]);
@@ -9386,7 +9355,7 @@ const saveSupplierPhotos = (id) => {
     success: function (response) {
       const { status, data } = JSON.parse(response);
       if (status == "success") {
-        hideAlmacenView();
+        getAlmacenData(idPedido);
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -9399,9 +9368,9 @@ const getviewSupplierPhotosTemplate = () => {
   let html = `
   <form class="py-1 px-4" id="form-photos">
 
-    <div class="row payments-container">
+    <div class="row fotos-container">
       <div class="col-12 col-md-3">    
-        <div class="payment-container">
+        <div class="fotos-container">
           <div class="upload-payment container-div not-filled foto1-container "  id="foto1-container" onclick="openFileSelector('foto1-file')">
               
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
@@ -9417,7 +9386,7 @@ const getviewSupplierPhotosTemplate = () => {
         </div>
       </div>
       <div class="col-12 col-md-3 ">    
-        <div class="payment-container">
+        <div class="fotos-container">
           <div class="upload-payment container-div not-filled foto2-container"  id="foto2-container"onclick="openFileSelector('foto2-file')">
               
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
@@ -9442,7 +9411,7 @@ const getviewSupplierPhotosTemplate = () => {
   return html;
 
 }
-  
+
 const hideAlmacenView = () => {
   containerAlmacen.empty();
   containerAlmacen.hide();
@@ -9466,7 +9435,7 @@ const handleFileChange = (fileInputId, fileNameId, containerClass) => {
     }
   });
 };
-const handleFileDisplay = (filePath, fileNameId, containerClass,containerId, idSupplier,input) => {
+const handleFileDisplay = (filePath, fileNameId, containerClass, containerId, idSupplier, input) => {
   if (filePath != null) {
     const fileName = filePath.split("/").pop();
     if (fileName.length > 20) {
@@ -9481,13 +9450,26 @@ const handleFileDisplay = (filePath, fileNameId, containerClass,containerId, idS
       `<input type="hidden" name="file[idSupplier]" value="${idSupplier}">`
     );
     $(containerId).append(
-            `<span class="remove-item" onclick="openFileSelector('${input}')">${editIcon}</span>`
-          );
+      `<span class="remove-item" onclick="handleSpanClick(event, '${input}')">${editIcon}</span>`
+    );
     // Remove existing click handler if any
-    $(containerId).removeAttr("onclick");
     $(containerId).off("click");
+    $(containerId).removeAttr("onclick");
+
     $(containerId).click(function () {
       downloadFile(filePath);
     });
   }
+};
+function handleSpanClick(event, input) {
+  event.stopPropagation();
+  openFileSelector(input);
+}
+const openSupplierDetails = (name, phone) => {
+  $('#modalsupplier-data').modal('show');
+  $('#modal-supplier-name').text(name);
+  $('#modal-supplier-phone').text(phone);
+  $('#modaldetail-close').click(function () {
+    $('#modalsupplier-data').modal('hide');
+  });
 };

@@ -3014,9 +3014,10 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->select("accs.id_pedido,acpdpp.ID_Pedido_Detalle,acpdpp.ID_Pedido_Detalle_Producto_Proveedor,
             acpd.Txt_Url_Imagen_Producto,
             acpd.Txt_Producto ,
-            acpd.product_code,
+            ifnull(acpd.product_code,'') product_code,
             s.name ,
             s.phone,
+            acpc.cotizacionCode,
             IFNULL(acpdpp.fecha_entrega,'') Fe_Entrega_Proveedor,
             ifnull(acpdpp.total_box,0) total_box,
             ifnull(acpdpp.total_cbm,0) total_cbm,
@@ -3027,6 +3028,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->from('agente_compra_coordination_supplier accs');
         $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp', 'acpdpp.ID_Entidad_Proveedor = accs.id_supplier and acpdpp.ID_Pedido_Cabecera = accs.id_pedido and acpdpp.Nu_Selecciono_Proveedor =1 ', 'join');
         $this->db->join('agente_compra_pedido_detalle acpd', 'acpd.ID_Pedido_Detalle = acpdpp.ID_Pedido_Detalle', 'join');
+        $this->db->join('agente_compra_pedido_cabecera acpc', 'acpc.ID_Pedido_Cabecera = accs.id_pedido', 'join');
         $this->db->join('suppliers s', 's.id_supplier = acpdpp.ID_Entidad_Proveedor', 'join');
         $this->db->where('accs.id_pedido', $idPedido);
 
@@ -3091,6 +3093,18 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
             $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $id);
             $this->db->update('agente_compra_pedido_detalle_producto_proveedor', $dataToInsert[0]);
+            //select almacen_foto1,almacen_foto2 from agente_compra_pedido_detalle_producto_proveedor where ID_Pedido_Detalle_Producto_Proveedor=$id
+            $this->db->select('almacen_foto1,almacen_foto2');
+            $this->db->from('agente_compra_pedido_detalle_producto_proveedor');
+            $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $id);
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
+                $result = $query->row();
+                if ($result->almacen_foto1 != null || $result->almacen_foto2 != null) {
+                    $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $id);
+                    $this->db->update('agente_compra_pedido_detalle_producto_proveedor', array('almacen_estado' => 'RECIBIDO'));
+                }
+            }
             return ['status' => 'success', 'message' => 'Fotos guardadas'];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
