@@ -1,9 +1,10 @@
 <?php
 require_once APPPATH . 'traits/FileTrait.php';
 require_once APPPATH . 'traits/SupplierTraits.php';
+require_once APPPATH . 'traits/WebSocketTrait.php';
 class PedidosPagadosModel extends CI_Model
 {
-    use FileTrait, SupplierTraits;
+    use FileTrait, SupplierTraits, WebSocketTrait;
     public $table = 'agente_compra_pedido_cabecera';
     public $table_agente_compra_pedido_detalle = 'agente_compra_pedido_detalle';
     public $table_agente_compra_pedido_detalle_producto_proveedor = 'agente_compra_pedido_detalle_producto_proveedor';
@@ -3074,6 +3075,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         try {
             $this->db->where('ID_Pedido_Cabecera', $idPedido);
             $this->db->update('agente_compra_pedido_cabecera', array('estado_almacen' => $estado));
+            $this->sendEvent("waos");
             return ['status' => 'success', 'message' => 'Estado actualizado'];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
