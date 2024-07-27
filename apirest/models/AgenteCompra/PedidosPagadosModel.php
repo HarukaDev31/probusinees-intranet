@@ -34,6 +34,7 @@ class PedidosPagadosModel extends CI_Model
     private $jefeChinaPrivilegio = 5;
     private $personalChinaPrivilegio = 2;
     private $personalPeruPrivilegio = 1;
+    private $almacenPrivilegio = 6;
     public function __construct()
     {
         parent::__construct();
@@ -63,7 +64,12 @@ class PedidosPagadosModel extends CI_Model
         if (!empty($this->input->post('ID_Pedido_Cabecera'))) {
             $this->db->where($this->table . '.ID_Pedido_Cabecera', $this->input->post('ID_Pedido_Cabecera'));
         }
-
+        if($this->user->Nu_Tipo_Privilegio_Acceso == $this->almacenPrivilegio){
+            $filtroEstado=$this->input->post('Filtro_Estado');
+            if($filtroEstado!="TODOS"){
+                $this->db->where($this->table . '.estado_almacen', $filtroEstado);
+            }
+        }
         if (isset($this->order)) {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
@@ -3052,8 +3058,15 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $key);
             $this->db->update('agente_compra_pedido_detalle_producto_proveedor', $dataToInsert);
         }
-        $this->db->where('ID_Pedido_Cabecera', intval($id_pedido));
+        $checkIfAllSupplierHasStatus = $this->checkIfAllSupplierHasStatus($id_pedido);
+        if ($checkIfAllSupplierHasStatus) {
+            $this->db->where('ID_Pedido_Cabecera', intval($id_pedido));
+            $this->db->update('agente_compra_pedido_cabecera', array('estado_almacen' => 'COMPLETADO'));
+        }else{
+            $this->db->where('ID_Pedido_Cabecera', intval($id_pedido));
         $this->db->update('agente_compra_pedido_cabecera', array('estado_almacen' => 'RECIBIENDO'));
+        }
+        
         return ['status' => 'success', 'message' => 'Datos de almacen actualizados'];
     }
     public function cambiarEstadoAlmacen($idPedido, $estado)
@@ -3066,7 +3079,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             throw new Exception($e->getMessage());
         }
     }
-    public function saveSupplierPhotos($id, $files)
+    public function saveSupplierPhotos($id,$idPedido, $files)
     {
         try {
             $path = 'assets/images/almacen/' . $id;
@@ -3104,10 +3117,26 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     $this->db->update('agente_compra_pedido_detalle_producto_proveedor', array('almacen_estado' => 'RECIBIDO'));
                 }
             }
+            $checkIfAllSupplierHasStatus = $this->checkIfAllSupplierHasStatus($idPedido);
+            if ($checkIfAllSupplierHasStatus) {
+                $this->db->where('ID_Pedido_Cabecera', intval($idPedido));
+                $this->db->update('agente_compra_pedido_cabecera', array('estado_almacen' => 'COMPLETADO'));
+            }
             return ['status' => 'success', 'message' => 'Fotos guardadas'];
-        } catch (Exception $e) {
+                } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
+    }
+    public function checkIfAllSupplierHasStatus($id)
+    {
+        $this->db->select('count(*) as total,
+        SUM(almacen_estado = "RECIBIDO") as recibidos');
+        $this->db->from('agente_compra_pedido_detalle_producto_proveedor');
+        $this->db->where('ID_Pedido_Cabecera', $id);
+        $this->db->where('Nu_Selecciono_Proveedor', 1);
+        
+        $query = $this->db->get();
+        return $query->row()->total==$query->row()->recibidos;
     }
     public function getSupplierPhotos($id)
     {

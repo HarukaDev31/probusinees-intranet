@@ -2252,8 +2252,9 @@ class PedidosPagados extends CI_Controller
     {
         $data = $this->input->post();
         $idSupplier = $data['idSupplier'];
+        $idPedido = $data['idPedido'];
         $files = $_FILES;
-        $response = $this->PedidosPagadosModel->saveSupplierPhotos($idSupplier, $files);
+        $response = $this->PedidosPagadosModel->saveSupplierPhotos($idSupplier,$idPedido, $files);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
     public function getSupplierPhotos()

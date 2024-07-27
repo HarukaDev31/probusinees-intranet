@@ -1255,6 +1255,9 @@ $(function () {
   });
 
   url = base_url + "AgenteCompra/PedidosPagados/ajax_list";
+  var sort_col = $('#table-Pedidos').find("th:contains('Fecha')")[0].cellIndex;
+  console.log(sort_col);
+
   table_Entidad = $("#table-Pedidos").DataTable({
     dom:
       "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -1311,7 +1314,7 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [[2, "desc"]],
+    order: [[sort_col, "desc"]],
     ajax: {
       url: url,
       type: "POST",
@@ -1333,6 +1336,8 @@ $(function () {
             "fecha",
             "/"
           ));
+          data.Filtro_Estado = $("#txt-ID_Estado").val();
+
       },
       complete: function () {
         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
@@ -9375,6 +9380,7 @@ const saveSupplierPhotos = (id, idPedido) => {
   const form = $("#form-photos");
   const formData = new FormData(form[0]);
   formData.append("idSupplier", id);
+  formData.append("idPedido", idPedido);
   $.ajax({
     url,
     type: "POST",
