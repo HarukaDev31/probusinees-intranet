@@ -3031,7 +3031,7 @@ echo form_open('', $attributes);
   }
   .remove-item{
     position: absolute;
-    right: 2em;
+    right: -2em;
     width: 30px;
     height: 30px;
     top:0;
@@ -3054,7 +3054,7 @@ echo form_open('', $attributes);
     flex-direction:column;
     justify-content:center;
     align-items: center;
-    
+    position: relative;
   }.not-filled:hover{
     background-color: #3498DB;
     cursor:pointer;
@@ -3074,9 +3074,9 @@ echo form_open('', $attributes);
       transform: scale(1);
     }
   }
-  /* .upload-payment:hover{
-    animation: pulse 1s infinite;
-  } */
+  .upload-payment:hover{
+    cursor: pointer;
+  }
   .filled{
     background-color: #3498DB;
     color:white;

@@ -3087,7 +3087,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 if ($fileUrl) {
                     $keyIndex = 'almacen_foto' . ($pagosIndex + 1);
                     $dataToInsert[0][$keyIndex] = $fileUrl;
-
+                    $dataToInsert[0]['fecha_entrega'] = date('Y-m-d H:i:s');
                 }
                 $pagosIndex++;
             }
