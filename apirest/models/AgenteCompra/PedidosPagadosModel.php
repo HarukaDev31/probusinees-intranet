@@ -2311,20 +2311,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $pathGarantizado = "assets/images/agentecompra/garantizados/" . $data['idPedido'] . "/pagos/";
         $pathPagos = "assets/images/agentecompra/orden-compra/" . $data['idPedido'] . "/pagos/";
 
-        // Process payment files
-        // foreach ($files as $key => $file) {
-        //     if ($key === "pago-garantia") {
-        //         continue;
-        //     } else if (array_key_exists("pago-" . $index, $files)) {
-        //         $file = $files["pago-" . $index];
-        //         $fileURL = $this->uploadSingleFile($file, $pathPagos);
-        //         $pagosURLS[$key . '_URL'] = $fileURL??$data[$key."_URL"];
-        //     } else if ($data[$key . '_URL'] != "null") {
-        //         $pagosURLS[$key . '_URL'] = $data[$key . '_URL']??$data[$key."_URL"];
-
-        //     }
-        //     $index++;
-        // }
+  
         $this->allowedContentTypes = array('image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/bmp',
             'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
         $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
@@ -2401,6 +2388,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
         }
         return ['status' => 'success', 'message' => "Pagos guardados"];
+    }
         //     foreach ($data as $key => $value) {
         //         if ($key == "pago-garantia") {
         //             continue;
@@ -2471,43 +2459,43 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         //     }
         //     return ['status' => 'success', 'message' => "Pagos guardados"];
         // }
-        // public function updateStep($idStep, $status)
-        // {
-        //     $data = array('status' => $status, 'id_permision_role' => $this->user->Nu_Tipo_Privilegio_Acceso);
-        //     $this->db->where('id', $idStep);
-        //     $this->db->update('agente_compra_order_steps', $data);
-        // }
-        // public function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert)
-        // {
-        //     if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
-        //         $dataToInsert['file_url'] = null;
+        public function updateStep($idStep, $status)
+        {
+            $data = array('status' => $status, 'id_permision_role' => $this->user->Nu_Tipo_Privilegio_Acceso);
+            $this->db->where('id', $idStep);
+            $this->db->update('agente_compra_order_steps', $data);
+        }
+        public function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert)
+        {
+            if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
+                $dataToInsert['file_url'] = null;
 
-        //     }
-        //     if ((!$dataToInsert['file_url'] || $dataToInsert['file_url'] == null) && $idPayment != -1) {
-        //         //delete record if file_url is null where id=idPayment
-        //         $this->db->where('id', $idPayment);
-        //         $this->db->delete('payments_agente_compra_pedido');
-        //         return;
-        //     }
-        //     $this->db->where('id_pedido', intval($idPedido));
-        //     $this->db->where('id', intval($idPayment));
-        //     $query = $this->db->get('payments_agente_compra_pedido');
-        //     $result = $query->row();
+            }
+            if ((!$dataToInsert['file_url'] || $dataToInsert['file_url'] == null) && $idPayment != -1) {
+                //delete record if file_url is null where id=idPayment
+                $this->db->where('id', $idPayment);
+                $this->db->delete('payments_agente_compra_pedido');
+                return;
+            }
+            $this->db->where('id_pedido', intval($idPedido));
+            $this->db->where('id', intval($idPayment));
+            $query = $this->db->get('payments_agente_compra_pedido');
+            $result = $query->row();
 
-        //     if ($result) {
-        //         // Update existing record
-        //         $this->db->where('id', $result->id);
-        //         $this->db->update('payments_agente_compra_pedido', $dataToInsert);
-        //     } else {
-        //         if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
-        //             $dataToInsert['file_url'] = null;
+            if ($result) {
+                // Update existing record
+                $this->db->where('id', $result->id);
+                $this->db->update('payments_agente_compra_pedido', $dataToInsert);
+            } else {
+                if ($dataToInsert['file_url'] == '' || $dataToInsert['file_url'] == "null") {
+                    $dataToInsert['file_url'] = null;
 
-        //         }
-        //         if ($dataToInsert['value'] == 0 && $dataToInsert['file_url'] == null) {
-        //             return;
-        //         }
-        //         $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
-        //     }
+                }
+                if ($dataToInsert['value'] == 0 && $dataToInsert['file_url'] == null) {
+                    return;
+                }
+                $this->db->insert('payments_agente_compra_pedido', $dataToInsert);
+            }
     }
     public function getSupplierProducts($idPedido, $idSupplier)
     {
@@ -2533,165 +2521,170 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function saveCoordination($data, $files)
     {
-        $idPedido = $data['id-pedido'];
-        $currentStep = $data['current-step'];
-        foreach ($data['item'] as $key => $row) {
-            if ($row == "" || $row == null || $row == "null") {
-                continue;
-            }
-            $producto_detalle = [
-                'ID_Pedido_Detalle' => $key,
-                'product_code' => $row[0],
-            ];
-            $this->db->where('ID_Pedido_Detalle', $key);
-            $this->db->update('agente_compra_pedido_detalle', $producto_detalle);
-
-        }
-        foreach ($data['proveedor'] as $key => $row) {
-            $proveedor_detalle = [
-                'Ss_Precio' => $row['price_product'],
-                'Qt_Producto_Moq' => $row['qty_product'],
-                'Nu_Dias_Delivery' => $row['delivery'],
-                'fecha_entrega' => $row['tentrega'],
-
-            ];
-            //update agente_compra_pedido_detalle_producto_proveedor
-            $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $key);
-            $this->db->update('agente_compra_pedido_detalle_producto_proveedor', $proveedor_detalle);
-        }
-        foreach ($data['coordination'] as $key => $row) {
-            $path = 'assets/images/coordination/orden-compra/' . $key;
-            $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
-            $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
-            $this->maxFileSize = 20240;
-            $pago1UrlExists = null;
-            $pago2UrlExists = null;
-            if (array_key_exists('pago_1_url', $row)) {
-                if ($row['pago_1_url'] != "null" && $row['pago_1_url'] != "") {
-                    $pago1UrlExists = $row['pago_1_url'];
+        try{
+            $idPedido = $data['id-pedido'];
+            $currentStep = $data['current-step'];
+            foreach ($data['item'] as $key => $row) {
+                if ($row == "" || $row == null || $row == "null") {
+                    continue;
                 }
+                $producto_detalle = [
+                    'ID_Pedido_Detalle' => $key,
+                    'product_code' => $row[0],
+                ];
+                $this->db->where('ID_Pedido_Detalle', $key);
+                $this->db->update('agente_compra_pedido_detalle', $producto_detalle);
+    
             }
-            if (array_key_exists('pago_2_url', $row)) {
-                if ($row['pago_2_url'] != "null" && $row['pago_2_url'] != "") {
-                    $pago2UrlExists = $row['pago_2_url'];
+            foreach ($data['proveedor'] as $key => $row) {
+                $proveedor_detalle = [
+                    'Ss_Precio' => $row['price_product'],
+                    'Qt_Producto_Moq' => $row['qty_product'],
+                    'Nu_Dias_Delivery' => $row['delivery'],
+                    'fecha_entrega' => $row['tentrega'],
+    
+                ];
+                //update agente_compra_pedido_detalle_producto_proveedor
+                $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $key);
+                $this->db->update('agente_compra_pedido_detalle_producto_proveedor', $proveedor_detalle);
+            }
+            foreach ($data['coordination'] as $key => $row) {
+                $path = 'assets/images/coordination/orden-compra/' . $key;
+                $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'application', 'text', 'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf');
+                $this->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z');
+                $this->maxFileSize = 20240;
+                $pago1UrlExists = null;
+                $pago2UrlExists = null;
+                if (array_key_exists('pago_1_url', $row)) {
+                    if ($row['pago_1_url'] != "null" && $row['pago_1_url'] != "") {
+                        $pago1UrlExists = $row['pago_1_url'];
+                    }
                 }
-            }
-            $pago1Url = empty($files['coordination']['name'][$key]['pago_1_file']) == false ?
-            $this->uploadSingleFile([
-                'name' => $files['coordination']['name'][$key]['pago_1_file'],
-                'type' => $files['coordination']['type'][$key]['pago_1_file'],
-                'tmp_name' => $files['coordination']['tmp_name'][$key]['pago_1_file'],
-                'error' => $files['coordination']['error'][$key]['pago_1_file'],
-                'size' => $files['coordination']['size'][$key]['pago_1_file'],
-            ], $path) : $pago1UrlExists;
-            $pago2Url = empty($files['coordination']['name'][$key]['pago_2_file']) ==
-            false ?
-            $this->uploadSingleFile([
-                'name' => $files['coordination']['name'][$key]['pago_2_file'],
-                'type' => $files['coordination']['type'][$key]['pago_2_file'],
-                'tmp_name' => $files['c oordination']['tmp_name'][$key]['pago_2_file'],
-                'error' => $files['coordination']['error'][$key]['pago_2_file'],
-                'size' => $files['coordination']['size'][$key]['pago_2_file'],
-            ], $path) : $pago2UrlExists;
-            $producto_detalle = [
-                'id_coordination' => $key,
-                'pago_2_value' => $row['pago_2_value'],
-                'estado' => $row['estado'],
-            ];
-
-            //if pago_1_file is not null
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
-                $producto_detalle['pago_1_URL'] = $pago1Url;
-                $producto_detalle['pago_2_URL'] = $pago2Url;
-            }
-
-            $this->db->where('id_coordination', $producto_detalle['id_coordination']);
-            $this->db->update('agente_compra_coordination_supplier', $producto_detalle);
-
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio ||
-                $this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
-                $this->db->select('pago_1_value,pago_2_value,estado');
+                if (array_key_exists('pago_2_url', $row)) {
+                    if ($row['pago_2_url'] != "null" && $row['pago_2_url'] != "") {
+                        $pago2UrlExists = $row['pago_2_url'];
+                    }
+                }
+                $pago1Url = empty($files['coordination']['name'][$key]['pago_1_file']) == false ?
+                $this->uploadSingleFile([
+                    'name' => $files['coordination']['name'][$key]['pago_1_file'],
+                    'type' => $files['coordination']['type'][$key]['pago_1_file'],
+                    'tmp_name' => $files['coordination']['tmp_name'][$key]['pago_1_file'],
+                    'error' => $files['coordination']['error'][$key]['pago_1_file'],
+                    'size' => $files['coordination']['size'][$key]['pago_1_file'],
+                ], $path) : $pago1UrlExists;
+                $pago2Url = empty($files['coordination']['name'][$key]['pago_2_file']) ==
+                false ?
+                $this->uploadSingleFile([
+                    'name' => $files['coordination']['name'][$key]['pago_2_file'],
+                    'type' => $files['coordination']['type'][$key]['pago_2_file'],
+                    'tmp_name' => $files['c oordination']['tmp_name'][$key]['pago_2_file'],
+                    'error' => $files['coordination']['error'][$key]['pago_2_file'],
+                    'size' => $files['coordination']['size'][$key]['pago_2_file'],
+                ], $path) : $pago2UrlExists;
+                $producto_detalle = [
+                    'id_coordination' => $key,
+                    'pago_2_value' => $row['pago_2_value'],
+                    'estado' => $row['estado'],
+                ];
+    
+                //if pago_1_file is not null
+    
+                if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
+                    $producto_detalle['pago_1_URL'] = $pago1Url;
+                    $producto_detalle['pago_2_URL'] = $pago2Url;
+                }
+    
+                $this->db->where('id_coordination', $producto_detalle['id_coordination']);
+                $this->db->update('agente_compra_coordination_supplier', $producto_detalle);
+    
+                if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio ||
+                    $this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
+                    $this->db->select('pago_1_value,pago_2_value,estado');
+                    $this->db->from('agente_compra_coordination_supplier');
+                    $this->db->where('id_coordination', $key);
+                    $query = $this->db->get()->row();
+    
+                    if ($row['pago_1_value'] != 0 && $row['pago_1_value'] != $query->pago_1_value) {
+                        $this->db->where('id_coordination', $key);
+                        $this->db->update('agente_compra_coordination_supplier', array('estado' => 'CONFORME',
+                            'pago_1_value' => $row['pago_1_value'],
+                        ));
+                    }
+                }
+                $this->db->select('pago_1_URL,pago_2_URL,estado_negociacion');
                 $this->db->from('agente_compra_coordination_supplier');
                 $this->db->where('id_coordination', $key);
-                $query = $this->db->get()->row();
-
-                if ($row['pago_1_value'] != 0 && $row['pago_1_value'] != $query->pago_1_value) {
-                    $this->db->where('id_coordination', $key);
-                    $this->db->update('agente_compra_coordination_supplier', array('estado' => 'CONFORME',
-                        'pago_1_value' => $row['pago_1_value'],
-                    ));
-                }
-            }
-            $this->db->select('pago_1_URL,pago_2_URL,estado_negociacion');
-            $this->db->from('agente_compra_coordination_supplier');
-            $this->db->where('id_coordination', $key);
-            $result = $this->db->get()->row();
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio && $result->estado_negociacion == $row['estado_negociacion']) {
-                // return [$row['pago_1_value'], $row['pago_2_value'],$row['total']];
-                if (($result->pago_2_URL != null && $result->pago_1_URL != null) || ($result->pago_1_URL != null && floatval($row['pago_1_value']) >= floatval($row['total']))) {
-                    //update estado_negociacion to 'ADELANTADO' where id_pedido=$idPedido
-                    $this->db->where('id_pedido', $idPedido);
-                    $this->db->where('id_coordination', $key);
-                    $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PAGADO'));
-                    //update estado to 'COMPLETED' where id_pedido=$idPedido
-
-                } else if ($result->pago_1_URL != null) {
-                    $this->db->where('id_pedido', $idPedido);
-                    $this->db->where('id_coordination', $key);
-                    $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'ADELANTADO'));
+                $result = $this->db->get()->row();
+                if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio && $result->estado_negociacion == $row['estado_negociacion']) {
+                    // return [$row['pago_1_value'], $row['pago_2_value'],$row['total']];
+                    if (($result->pago_2_URL != null && $result->pago_1_URL != null) || ($result->pago_1_URL != null && floatval($row['pago_1_value']) >= floatval($row['total']))) {
+                        //update estado_negociacion to 'ADELANTADO' where id_pedido=$idPedido
+                        $this->db->where('id_pedido', $idPedido);
+                        $this->db->where('id_coordination', $key);
+                        $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PAGADO'));
+                        //update estado to 'COMPLETED' where id_pedido=$idPedido
+    
+                    } else if ($result->pago_1_URL != null) {
+                        $this->db->where('id_pedido', $idPedido);
+                        $this->db->where('id_coordination', $key);
+                        $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'ADELANTADO'));
+                    } else {
+                        $this->db->where('id_pedido', $idPedido);
+                        $this->db->where('id_coordination', $key);
+                        $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PENDIENTE'));
+                    }
+                    // $this->updateStep($currentStep, "COMPLETED");
                 } else {
                     $this->db->where('id_pedido', $idPedido);
                     $this->db->where('id_coordination', $key);
-                    $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => 'PENDIENTE'));
+                    $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => $row['estado_negociacion']));
+    
                 }
-                // $this->updateStep($currentStep, "COMPLETED");
-            } else {
+    
+            }
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
+                //get all rows with this idpedido and get all rows with estado_negociacion='PAGADO'
+                $this->db->select('count(*) as total');
+                $this->db->from('agente_compra_coordination_supplier');
                 $this->db->where('id_pedido', $idPedido);
-                $this->db->where('id_coordination', $key);
-                $this->db->update('agente_compra_coordination_supplier', array('estado_negociacion' => $row['estado_negociacion']));
-
-            }
-
-        }
-        if ($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio) {
-            //get all rows with this idpedido and get all rows with estado_negociacion='PAGADO'
-            $this->db->select('count(*) as total');
-            $this->db->from('agente_compra_coordination_supplier');
-            $this->db->where('id_pedido', $idPedido);
-
-            $query = $this->db->get();
-            $total = $query->row()->total;
-            $this->db->select('count(*) as total');
-            $this->db->from('agente_compra_coordination_supplier');
-            $this->db->where('id_pedido', $idPedido);
-            $this->db->where('estado_negociacion', 'PAGADO');
-            $query = $this->db->get();
-            $total_pagado = $query->row()->total;
-            if ($total == $total_pagado) {
-                $this->updateStep($currentStep, "COMPLETED");
+    
+                $query = $this->db->get();
+                $total = $query->row()->total;
+                $this->db->select('count(*) as total');
+                $this->db->from('agente_compra_coordination_supplier');
+                $this->db->where('id_pedido', $idPedido);
+                $this->db->where('estado_negociacion', 'PAGADO');
+                $query = $this->db->get();
+                $total_pagado = $query->row()->total;
+                if ($total == $total_pagado) {
+                    $this->updateStep($currentStep, "COMPLETED");
+                } else {
+                    $this->updateStep($currentStep, "PENDING");
+                }
             } else {
-                $this->updateStep($currentStep, "PENDING");
+                $this->db->select('count(*) as total');
+                $this->db->from('agente_compra_coordination_supplier');
+                $this->db->where('id_pedido', $idPedido);
+                $query = $this->db->get();
+                $total = $query->row()->total;
+                $this->db->select('count(*) as total');
+                $this->db->from('agente_compra_coordination_supplier');
+                $this->db->where('id_pedido', $idPedido);
+                $this->db->where('estado', 'CONFORME');
+                $query = $this->db->get();
+                $total_pagado = $query->row()->total;
+                if ($total == $total_pagado) {
+                    $this->updateStep($currentStep, "COMPLETED");
+                } else {
+                    $this->updateStep($currentStep, "PENDING");
+                }
             }
-        } else {
-            $this->db->select('count(*) as total');
-            $this->db->from('agente_compra_coordination_supplier');
-            $this->db->where('id_pedido', $idPedido);
-            $query = $this->db->get();
-            $total = $query->row()->total;
-            $this->db->select('count(*) as total');
-            $this->db->from('agente_compra_coordination_supplier');
-            $this->db->where('id_pedido', $idPedido);
-            $this->db->where('estado', 'CONFORME');
-            $query = $this->db->get();
-            $total_pagado = $query->row()->total;
-            if ($total == $total_pagado) {
-                $this->updateStep($currentStep, "COMPLETED");
-            } else {
-                $this->updateStep($currentStep, "PENDING");
-            }
+            return ['status' => 'success', 'message' => 'Coordination saved'];
+        }catch(Exception $e){
+            return ['status' => 'error', 'message' => $e->getMessage()];
         }
-        return ['status' => 'success', 'message' => 'Coordination saved'];
+        
 
     }
 
