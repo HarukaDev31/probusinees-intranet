@@ -86,14 +86,12 @@ $(function () {
       url		    : url,
       data		  : $('#form-fecha_entrega_shipper').serialize(),
       success : function( response ){
-          //$( '#modal-loader' ).modal('hide');
-          
+          //$( '#modal-loader' ).modal('hide');   
           $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
           $('#modal-message').modal('show');
           
           if (response.status == 'success'){
             $('.modal-fecha_entrega_shipper').modal('hide');
-              
             $('#moda-message-content').addClass( 'bg-' + response.status);
             $('.modal-title-message').text(response.message);
             setTimeout(function() {$('#modal-message').modal('hide');}, 2100);

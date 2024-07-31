@@ -2871,8 +2871,8 @@ echo form_open('', $attributes);?>
   text-align: center;
 }
 .c-precio-column,.c-total-column,.c-pago1-column,.c-pago2-column,.c-tproduccion-column,.c-tproducto-column{
-    width: 150px; /* Ajusta el ancho según tus necesidades */
-    padding: 1em;
+    width: 200px; /* Ajusta el ancho según tus necesidades */
+    padding: 0.5em;
     white-space: nowrap;
 }
 .c-pago1-column span,.c-pago2-column span{

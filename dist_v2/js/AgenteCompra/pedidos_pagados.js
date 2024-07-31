@@ -7331,7 +7331,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
         )}" name="proveedor[${detail.ID_Pedido_Detalle_Producto_Proveedor
         }][qty_product]"/>
         </div>
-        <div class="c-precio-column">
+        <div class="c-precio-column supplier-column">
          <div class="input-group d-flex flex-row">
             <span class="input-group-text d-flex w-auto">¥</span>
           <input type="number" class="form-control" value="${parseFloat(
@@ -7412,7 +7412,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
           </div>`;
     }
     detalles.forEach((detalle) => {
-      html += ` <div class="c-tproduccion-column">
+      html += ` <div class="c-tproduccion-column supplier-column">
           <input type="text" class="form-control" value="${detalle.delivery}" name="proveedor[${detalle.ID_Pedido_Detalle_Producto_Proveedor}][delivery]"/>
         </div>`;
     });
@@ -7880,6 +7880,7 @@ const openPagos = (response) => {
   pagosCount = 2;
   if (response.status == "success") {
     const data = response.data;
+
     $("#orden_total").html("$" + data.orden_total.toFixed(2));
     $("#pago_cliente").html("$" + data.pago_cliente.toFixed(2));
     const pagoRestante = data.orden_total - data.pago_cliente;
@@ -8417,6 +8418,8 @@ const openPagos = (response) => {
     $("#pagos-buttons").append(buttonsHTML);
     // }
   }
+  $('#liquidacion-description').val(response.data.pagos_notas);
+
 };
 const addPago = () => {
   const pagoContainer = $(".payments-container");
@@ -8773,7 +8776,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
           <div id="empaque_input-container">
             <input name="empaque_URL" type="hidden" value="${item.empaque_URL}">
             <div class="d-flex flex-row w-100">
-              <a id="input-empaque" href="${item.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>
+              <div id="input-empaque" onclick="downloadFile('${item.empaque_URL})"  class="btn btn-outline-secondary d-block text-center w-75">Descargar</div>
               <button class="btn btn-outline-danger ml-2" id="delete-empaque"onclick="setRotuladoInputToNull('empaque')">X</button>
             </div>
           </div>
@@ -8791,7 +8794,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
             }">
               <div class="d-flex flex-row w-100">
               ${item.empaque_URL
-              ? `<a id="input-empaque" href="${item.empaque_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
+              ? `<div  id="input-empaque" onclick="downloadFile('${item.empaque_URL}')"  class="btn btn-outline-secondary d-block text-center w-75">Descargar</div>`
               : `<input id="input-empaque" type="file" name="empaque" class="">`
             }
               <button class="btn btn-outline-danger ml-2" id="delete-empaque"onclick="setRotuladoInputToNull('empaque')">X</button>
@@ -8810,7 +8813,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
           <div id="vim_motor_input-container">
             <input name="vim_motor_URL" type="hidden" value="${item.vim_motor_URL}">
             <div class="d-flex flex-row w-100">
-              <a id="input-vim_motor" href="${item.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>
+              <div onclick="downloadFile('${item.vim_motor_URL}')" id="input-vim_motor" class="btn btn-outline-secondary d-block text-center w-75">Descargar</div>
               <button class="btn btn-outline-danger ml-2" id="delete-vim_motor"onclick="setRotuladoInputToNull('vim_motor')">X</button>
             </div>
           </div>
@@ -8828,7 +8831,7 @@ const openRotuladoView = (producto, btsconfig = null) => {
             }">
               <div class="d-flex flex-row w-100">
               ${item.vim_motor_URL
-              ? `<a id="input-vim_motor" href="${item.vim_motor_URL}" target="_blank" class="btn btn-outline-secondary d-block text-center w-75">Descargar</a>`
+              ? `<div onclick="downloadFile('${item.vim_motor_URL}')" id="input-vim_motor" class="btn btn-outline-secondary d-block text-center w-75">Descargar</div>`
               : `<input type="file" name="vim_motor" class="">`
             }
               <button class="btn btn-outline-danger ml-2" id="delete-vim_motor"onclick="setRotuladoInputToNull('vim_motor')">X</button>
@@ -8900,7 +8903,7 @@ const getContainerRotuladoView = (producto) => {
           type="hidden" value="${producto.caja_master_URL}">
           <div class="d-flex flex-row w-100">
           ${producto.caja_master_URL
-      ? `<a href="${producto.caja_master_URL}" id="input-caja_master" class="btn btn-outline-secondary  w-75 d-block text-center" target="_blank">Descargar</a>`
+      ? `<div onclick="downloadFile('${producto.caja_master_URL}')" id="input-caja_master" class="btn btn-outline-secondary  w-75 d-block text-center" >Descargar</div>`
       : '<input type="file" name="caja_master" class="">'
     }
           ${producto.caja_master_URL
@@ -9188,8 +9191,8 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido) => {
       <div class="totalbox-column column">
         <input type="number" class="form-control total_box" 
         name="almacen[${producto.ID_Pedido_Detalle_Producto_Proveedor}][total_box]"
-        value="${producto.total_box
-      }">
+        value="${parseInt(producto.total_box)}">
+      
       </div>
       <div class="totalcbm-column column">
         <input type="number" class="form-control total_cbm" 

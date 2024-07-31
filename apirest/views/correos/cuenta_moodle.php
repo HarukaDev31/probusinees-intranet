@@ -122,7 +122,7 @@
                                             ✅ Usuario: <?php echo $email; ?> <br>
                                             ✅ Contraseña: <?php echo $password; ?>
                                             <br>💻 Link de Nuestra plataforma: https://aulavirtualprobusiness.com/login
-                                        </td>
+                                            </td>
                                     </tr>
                                     <tr height="10">
                                         <td width="32px">

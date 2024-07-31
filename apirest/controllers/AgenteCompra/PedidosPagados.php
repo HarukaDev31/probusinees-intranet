@@ -2143,6 +2143,9 @@ class PedidosPagados extends CI_Controller
                     $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
                 }
             }
+            $objPHPExcel->getActiveSheet()->setCellValue("C" . $initialDetailrow, $detalle['Txt_Producto']);
+            //set adjust text
+            $objPHPExcel->getActiveSheet()->getStyle('C' . $initialDetailrow)->getAlignment()->setWrapText(true);
             $objPHPExcel->getActiveSheet()->setCellValue("E" . $initialDetailrow, $this->htmlToRichText($this->htmlToTextAndLineBreaks($detalle['descripcion'])));
             $objPHPExcel->getActiveSheet()->setCellValue("K" . $initialDetailrow, $detalle['qty_product']);
             $objPHPExcel->getActiveSheet()->setCellValue("L" . $initialDetailrow, $this->getUnitName($detalle['unidad_medida']));

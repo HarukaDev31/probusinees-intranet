@@ -2282,18 +2282,26 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->select('ifnull(round(sum(pacp.value),2),0) as pago_cliente');
             $this->db->from('payments_agente_compra_pedido pacp');
             $this->db->where('pacp.id_pedido', $idPedido);
+            // pagos_notas from table agente_compra_pedido_cabecera where ID_Pedido_Cabecera=$idPedido
+            
             $pago_cliente = $this->db->get()->row()->pago_cliente / $tipo_cambio;
-
+            $this->db->select('pagos_notas');
+            $this->db->from('agente_compra_pedido_cabecera');
+            $this->db->where('ID_Pedido_Cabecera', $idPedido);
+            $this->db->limit(1);
+            $pagos_notas = $this->db->get()->row()->pagos_notas;
             $queryData = array_merge((array)
                 ["orden_total" => $orden_total],
 
                 (array)
-                ["pago_cliente" => $pago_cliente]
+                ["pago_cliente" => $pago_cliente,
+                "pagos_notas" => $pagos_notas]
             );
             $pagosData = $this->getPedidosPagosDetails($idPedido);
             return [
                 "data" => $queryData,
                 "pagos" => $pagosData,
+                
             ];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -2394,12 +2402,16 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     'file_url' => $liquidacionURL, 'value' => $data['liquidacion']['value'], 'id_type_payment' => 3, 'id_pedido' => $data['idPedido']]);
             }
         }
+        $notas= $data['notas'];
+        $this->db->where('ID_Pedido_Cabecera', $data['idPedido']);
+        $this->db->update('agente_compra_pedido_cabecera', ['pagos_notas' => $notas]);
         $total = $this->getPedidoPagos($data['idPedido'])['data'];
             if (floatval($total['orden_total']) <= floatval($total['pago_cliente'])) {
                 $this->updateStep($data['step'], "COMPLETED");
             } else {
                 $this->updateStep($data['step'], "PENDING");
             }
+
         return ['status' => 'success', 'message' => "Pagos guardados"];
     }
         //     foreach ($data as $key => $value) {
