@@ -1449,7 +1449,9 @@ function verPedido(ID) {
           detalle[i]["Txt_Descripcion"] +
           '">';
         table_enlace_producto += "</tr>";
+        if(response.Nu_Tipo_Privilegio_Acceso == 1){
         table_enlace_producto +=`<tr class="tr_enlace_producto${id_item}" style="background-color: rgba(0,0,0,.05);"><td class='text-center' colspan='4'><div class='btn btn-outline-danger' id="btn-remove-item-${id_item}"  style="width:80%" >Quitar</div></td></tr>`;
+        }
         table_enlace_producto += `<tr class="tr_enlace_producto${id_item}" style="background-color: rgba(0,0,0,.05);"><td class='text-center' colspan='4'>`;
         if (
           (response.Nu_Estado_China != 3 &&
@@ -2245,7 +2247,7 @@ function addItems() {
         <span class="fw-bold">Notas </span>
         <div class="form-group">
           <input type="hidden" id="modal-notas${iCounterItems}-content" name="addProducto[${iCounterItems}][notas]" value="">
-          <div id="modal-notas${iCounterItems}" data-correlativo="${iCounterItems}"   placeholder="" value="" autocomplete="off" ></div>
+          <div id="modal-notas${iCounterItems}" data-correlativo="${iCounterItems}"   placeholder="" value="" autocomplete="off" class="w-100" ></div>
         </div>
 
       </div>
@@ -2670,7 +2672,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
           <div class="form-group">
             <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
-            <div id="modal-notas${i}" data-correlativo="${i}"   placeholder="" value="" autocomplete="off" ></div>
+            <div id="modal-notas${i}" data-correlativo="${i}"   placeholder="" value="" autocomplete="off"  class="w-100"></div>
           </div>
           
         </div>

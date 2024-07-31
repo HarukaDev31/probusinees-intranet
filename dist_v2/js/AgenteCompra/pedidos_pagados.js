@@ -7880,10 +7880,10 @@ const openPagos = (response) => {
   pagosCount = 2;
   if (response.status == "success") {
     const data = response.data;
-    $("#orden_total").html("$" + data.orden_total);
-    $("#pago_cliente").html("$" + data.pago_cliente);
+    $("#orden_total").html("$" + data.orden_total.toFixed(2));
+    $("#pago_cliente").html("$" + data.pago_cliente.toFixed(2));
     const pagoRestante = data.orden_total - data.pago_cliente;
-    $("#pago_restante").html("$" + pagoRestante);
+    $("#pago_restante").html("$" + pagoRestante.toFixed(2));
     //set font bold
     $("#pago_restante").css("font-weight", "bold");
     if (pagoRestante <= 0) {
@@ -8722,7 +8722,9 @@ const getProductTemplate = (producto, index) => {
     }
     </div>
     <div class="col-12 col-lg-2">
-      <input class="form-control text-center input-cantidad w-100" type="number"  name="addProducto[${producto.ID_Pedido_Detalle
+      <input class="form-control text-center input-cantidad w-100" type="number"
+      ${currentPrivilege == priviligesPersonalPeru ? "" : "disabled"}
+      name="addProducto[${producto.ID_Pedido_Detalle
     }][cantidad]" value="${parseInt(producto.Qt_Producto)}"/>
     </div>
     <div class="col-12 col-lg-3 d-flex flex-column">

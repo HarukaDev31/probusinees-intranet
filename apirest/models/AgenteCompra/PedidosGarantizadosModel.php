@@ -56,10 +56,10 @@ class PedidosGarantizadosModel extends CI_Model
             $this->db->where($this->table . '.ID_Usuario_Interno_China', $user->ID_Usuario);
         }
         $this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
-        if(!empty($this->input->post('Estado'))){
-            if(in_array($this->input->post('Estado'),[1,2,3])){
+        if (!empty($this->input->post('Estado'))) {
+            if (in_array($this->input->post('Estado'), [1, 2, 3])) {
                 $this->db->where_in($this->table . '.Nu_Estado_China', $this->input->post('Es   tado'));
-            }else if($this->input->post('Estado')==4){
+            } else if ($this->input->post('Estado') == 4) {
                 $this->db->where_in($this->table . '.Nu_Estado', [8]);
             }
         }
@@ -88,17 +88,33 @@ class PedidosGarantizadosModel extends CI_Model
     {
         $acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
 
-        $this->db->select('CORRE.Fe_Month, Nu_Estado_China,
-		(SELECT Ss_Venta_Oficial FROM tasa_cambio WHERE ID_Empresa=1 AND Fe_Ingreso="' . dateNow('fecha') . '" LIMIT 1) AS yuan_venta,
-		' . $this->table . '.*,
-        (select count(*) from agente_compra_pedido_detalle_producto_proveedor where ID_Pedido_Cabecera=' . $this->table . '.ID_Pedido_Cabecera) as count_proveedor,
-		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-        USR.No_Usuario,
-        USR.Txt_Email,
-		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
-        IGPD.Txt_Producto_Ingles, IGPD.Txt_Description_Ingles,
-		IGPD.ID_Pedido_Detalle, IGPD.Txt_Producto, IGPD.Txt_Descripcion, IGPD.Qt_Producto, IGPD.Txt_Url_Imagen_Producto, IGPD.Txt_Url_Link_Pagina_Producto,
-		IGPD.Nu_Envio_Mensaje_Chat_Producto, TDI.No_Tipo_Documento_Identidad_Breve, ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido');
+        $this->db->select(
+            'CORRE.Fe_Month, 
+            Nu_Estado_China, 
+            (SELECT Ss_Venta_Oficial FROM tasa_cambio WHERE ID_Empresa=1 AND Fe_Ingreso="' . dateNow('fecha') . '" LIMIT 1) AS yuan_venta, 
+            ' . $this->table . '.*, 
+            (SELECT count(*) FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Cabecera=' . $this->table . '.ID_Pedido_Cabecera 
+            AND ID_Pedido_Detalle=' . $this->table_agente_compra_pedido_detalle . '.ID_Pedido_Detalle) AS count_proveedor, 
+            CLI.No_Entidad, 
+            CLI.Nu_Documento_Identidad, 
+            USR.No_Usuario, 
+            USR.Txt_Email, 
+            CLI.No_Contacto, 
+            CLI.Nu_Celular_Contacto, 
+            CLI.Txt_Email_Contacto, 
+            IGPD.Txt_Producto_Ingles, 
+            IGPD.Txt_Description_Ingles, 
+            IGPD.ID_Pedido_Detalle, 
+            IGPD.Txt_Producto, 
+            IGPD.Txt_Descripcion, 
+            IGPD.Qt_Producto, 
+            IGPD.Txt_Url_Imagen_Producto, 
+            IGPD.Txt_Url_Link_Pagina_Producto, 
+            IGPD.Nu_Envio_Mensaje_Chat_Producto, 
+            TDI.No_Tipo_Documento_Identidad_Breve, 
+            ' . $this->table . '.Nu_Estado AS Nu_Estado_Pedido'
+        );
+        
         $this->db->from($this->table);
         $this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join');
         $this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = ' . $this->table . '.ID_Pedido_Cabecera', 'join');
@@ -106,15 +122,17 @@ class PedidosGarantizadosModel extends CI_Model
         $this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join');
         $this->db->join('usuario AS USR', 'USR.ID_Usuario = ' . $this->table . '.ID_Usuario_Interno_China', 'left');
         $this->db->where($this->table . '.ID_Pedido_Cabecera', $ID);
+        
         $query = $this->db->get();
         $query = $query->result();
+        
         $sCorrelativoCotizacion = '';
         foreach ($query as $row) {
             $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0, 3)) . str_pad($row->Nu_Correlativo, 3, "0", STR_PAD_LEFT);
             $row->sCorrelativoCotizacion = $sCorrelativoCotizacion;
             $row->Nu_Tipo_Privilegio_Acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
             $row->currentUser = $this->user->Txt_Email;
-            $row->pending_messages = $this->getPendingMessagesCount($row->ID_Pedido_Detalle,$this->user);
+            $row->pending_messages = $this->getPendingMessagesCount($row->ID_Pedido_Detalle, $this->user);
 
         }
         $sCorrelativoCotizacion = $query[0]->sCorrelativoCotizacion;
@@ -438,15 +456,15 @@ class PedidosGarantizadosModel extends CI_Model
             /**
              * select ID_Pedido_Detalle,count(ID_Pedido_Detalle) as count from agente_compra_pedido_detalle_producto_proveedor acpdpp where ID_Pedido_Cabecera =231 group by ID_Pedido_Detalle ;
              */
-            $query="SELECT 
+            $query = "SELECT
                 ID_Pedido_Detalle,
 
                 SUM(CASE WHEN Nu_Selecciono_Proveedor = 1 THEN 1 ELSE 0 END) AS suppliers_count
-            FROM 
+            FROM
                 agente_compra_pedido_detalle_producto_proveedor
-            WHERE 
+            WHERE
                 ID_Pedido_Cabecera = " . $ID . "
-            GROUP BY 
+            GROUP BY
                 ID_Pedido_Detalle;
             ";
             // $query = "SELECT ID_Pedido_Detalle,count(ID_Pedido_Detalle) as suppliers_count from agente_compra_pedido_detalle_producto_proveedor
@@ -455,16 +473,16 @@ class PedidosGarantizadosModel extends CI_Model
             //check if exists count of ID_Pedido_Detalle is greater than 1
             $isValidToContinue = true;
             foreach ($result as $row) {
-                if(!array_key_exists('suppliers_count',$row)){
+                if (!array_key_exists('suppliers_count', $row)) {
                     $isValidToContinue = false;
                     break;
                 }
-                if ($row->suppliers_count > 1 || $row->suppliers_count==0) {
+                if ($row->suppliers_count > 1 || $row->suppliers_count == 0) {
                     $isValidToContinue = false;
                     break;
                 }
             }
-            if(count($result)==0){
+            if (count($result) == 0) {
                 $isValidToContinue = false;
             }
             if (!$isValidToContinue) {
@@ -492,7 +510,41 @@ class PedidosGarantizadosModel extends CI_Model
                 "jefe_china" => $this->jefeChinaPrivilegio,
             ];
             $stepsArray = $this->generatePurchaseOrderSteps($permissionRoles, $ID);
-            $response = $this->db->insert_batch('agente_compra_order_steps', $stepsArray);
+
+            // Obtener los valores únicos para la consulta
+            $idOrder = $ID;
+            $idPermissionRoles = array_column($stepsArray, 'id_permision_role');
+            $names = array_column($stepsArray, 'name');
+
+            // Consultar los registros existentes
+            $this->db->select('id_permision_role, id_order, name');
+            $this->db->from('agente_compra_order_steps');
+            $this->db->where('id_order', $idOrder);
+            $this->db->where_in('id_permision_role', $idPermissionRoles);
+            $this->db->where_in('name', $names);
+            $query = $this->db->get();
+            $existingRecords = $query->result_array();
+
+            // Crear un mapa de registros existentes
+            $existingRecordsMap = [];
+            foreach ($existingRecords as $record) {
+                $key = $record['id_order'] . '_' . $record['id_permision_role'] . '_' . $record['name'];
+                $existingRecordsMap[$key] = true;
+            }
+
+            // Filtrar los nuevos registros
+            $newStepsArray = array_filter($stepsArray, function ($step) use ($existingRecordsMap) {
+                $key = $step['id_order'] . '_' . $step['id_permision_role'] . '_' . $step['name'];
+                return !isset($existingRecordsMap[$key]);
+            });
+
+            // Insertar los nuevos registros
+            if (!empty($newStepsArray)) {
+                $response = $this->db->insert_batch('agente_compra_order_steps', $newStepsArray);
+            } else {
+                $response = false; // O cualquier otra lógica que quieras implementar
+            }
+
             // $data_progreso = array('Nu_Estado_Proceso' => 1);
             // $this->db->update('proceso_agente_compra_pedido', $data_progreso, $where_progreso);
         }
@@ -609,15 +661,15 @@ class PedidosGarantizadosModel extends CI_Model
         if (!empty($arrProductoTable)) {
             $arrayIndex = 0;
             foreach ($arrProductoTable as $row) {
-                
+
                 //array_debug($row);
                 $arrSaleOrderDetailUPD[$arrayIndex] = array(
                     'ID_Pedido_Detalle' => $row['id_item'],
                     'Qt_Producto' => $row['cantidad'], //agergar input de cantidad
 
-                );                    
+                );
 
-                if(array_key_exists('caracteristicas',$row)){
+                if (array_key_exists('caracteristicas', $row)) {
                     $arrSaleOrderDetailUPD[$arrayIndex]['Txt_Descripcion'] = nl2br(urldecode($row['caracteristicas']));
                 }
                 if (array_key_exists('caracteristicas_ingles', $row)) {
@@ -851,26 +903,27 @@ Nu_Correlativo
         );
     }
 
-    public function addFileProveedor($file, $pedidoId){
+    public function addFileProveedor($file, $pedidoId)
+    {
         $path = "assets/images/agentecompra/garantizados/" . $pedidoId . "/";
         $fileURL = $this->uploadSingleFile($file, $path);
-        if($fileURL){
-            //check if exists file in table with this id_pedido and id_type_payment =1   
+        if ($fileURL) {
+            //check if exists file in table with this id_pedido and id_type_payment =1
             $query = "SELECT file_url AS Txt_Url_Imagen_Producto FROM " . $this->table_payments . " WHERE id_pedido = " . $pedidoId . " AND id_type_payment = 1 LIMIT 1";
             $objFile = $this->db->query($query)->row();
-            if(is_object($objFile)){
+            if (is_object($objFile)) {
                 $this->db->update('payments_agente_compra_pedido',
-                ['file_url' => $fileURL],
+                    ['file_url' => $fileURL],
                 );
-            }else{
-            $this->db->insert('payments_agente_compra_pedido',
-                ['file_url' => $fileURL, 'id_pedido' => $pedidoId
-                ,'id_type_payment' => 1]);
+            } else {
+                $this->db->insert('payments_agente_compra_pedido',
+                    ['file_url' => $fileURL, 'id_pedido' => $pedidoId
+                        , 'id_type_payment' => 1]);
             }
         }
         return $fileURL;
     }
-    
+
     public function descargarDocumentoPagoGarantizado($id)
     {
         $query = "SELECT file_url AS Txt_Url_Imagen_Producto FROM " . $this->table_payments . " WHERE id_pedido = " . $id . " LIMIT 1";
@@ -898,10 +951,10 @@ Nu_Correlativo
             $toUpdate = array('Nu_Estado' => 8); //1=SI
             $this->db->update('agente_compra_pedido_cabecera', $toUpdate, $where);
             //foreach message with   this id_pedido_detalle where ID_Remitente not this user AND ID_USUARIO_DESTINO = 0 UPDATE TO THIS USER
-            $query="
+            $query = "
             UPDATE agente_compra_pedido_detalle_chat_producto
-            SET ID_Usuario_Remitente = ".$this->user->ID_Usuario."
-            WHERE ID_Pedido_Detalle = ".$data['chat_producto-ID_Pedido_Detalle_item']." AND ID_Usuario_Remitente = 0 AND ID_Usuario_Destino != ".$this->user->ID_Usuario;
+            SET ID_Usuario_Remitente = " . $this->user->ID_Usuario . "
+            WHERE ID_Pedido_Detalle = " . $data['chat_producto-ID_Pedido_Detalle_item'] . " AND ID_Usuario_Remitente = 0 AND ID_Usuario_Destino != " . $this->user->ID_Usuario;
             $this->db->query($query);
 
         }
@@ -911,10 +964,10 @@ Nu_Correlativo
                 'ID_Usuario_Destino' => $this->user->ID_Usuario,
                 'Txt_Usuario_Destino' => nl2br($data['message_chat']),
             );
-            $query="
+            $query = "
             UPDATE agente_compra_pedido_detalle_chat_producto
-            SET ID_Usuario_Destino= ".$this->user->ID_Usuario."
-            WHERE ID_Pedido_Detalle = ".$data['chat_producto-ID_Pedido_Detalle_item']." AND ID_Usuario_Destino = 0 AND ID_Usuario_Remitente != ".$this->user->ID_Usuario;
+            SET ID_Usuario_Destino= " . $this->user->ID_Usuario . "
+            WHERE ID_Pedido_Detalle = " . $data['chat_producto-ID_Pedido_Detalle_item'] . " AND ID_Usuario_Destino = 0 AND ID_Usuario_Remitente != " . $this->user->ID_Usuario;
             $this->db->query($query);
         }
 
@@ -958,32 +1011,32 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
             if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { //1peru
                 $arrMessageUser = array(
                     'ID_Usuario_Remitente' => $this->user->ID_Usuario,
-                    
+
                 );
                 //update nu estado in agente_compra_pedido_cabecera to 8
                 $where = array('ID_Pedido_Cabecera' => $id);
                 $toUpdate = array('Nu_Estado' => 8); //1=SI
                 $this->db->update('agente_compra_pedido_cabecera', $toUpdate, $where);
                 //foreach message with   this id_pedido_detalle where ID_Remitente not this user AND ID_USUARIO_DESTINO = 0 UPDATE TO THIS USER
-                $query="
+                $query = "
                 UPDATE agente_compra_pedido_detalle_chat_producto
-                SET ID_Usuario_Remitente = ".$this->user->ID_Usuario."
-                WHERE ID_Pedido_Detalle = ".$id." AND ID_Usuario_Remitente = 0 AND ID_Usuario_Destino != ".$this->user->ID_Usuario;
+                SET ID_Usuario_Remitente = " . $this->user->ID_Usuario . "
+                WHERE ID_Pedido_Detalle = " . $id . " AND ID_Usuario_Remitente = 0 AND ID_Usuario_Destino != " . $this->user->ID_Usuario;
                 $this->db->query($query);
-    
+
             }
-    
+
             if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) { //china
                 $arrMessageUser = array(
                     'ID_Usuario_Destino' => $this->user->ID_Usuario,
                 );
-                $query="
+                $query = "
                 UPDATE agente_compra_pedido_detalle_chat_producto
-                SET ID_Usuario_Destino= ".$this->user->ID_Usuario."
-                WHERE ID_Pedido_Detalle = ".$id." AND ID_Usuario_Destino = 0 AND ID_Usuario_Remitente != ".$this->user->ID_Usuario;
+                SET ID_Usuario_Destino= " . $this->user->ID_Usuario . "
+                WHERE ID_Pedido_Detalle = " . $id . " AND ID_Usuario_Destino = 0 AND ID_Usuario_Remitente != " . $this->user->ID_Usuario;
                 $this->db->query($query);
             }
-    
+
             return array(
                 'status' => 'success',
                 'result' => $arrResponseSQL->result(),
@@ -1129,7 +1182,7 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
         $query = "SELECT id_supplier,name,phone FROM suppliers s
         join agente_compra_pedido_detalle_producto_proveedor acpdpp on acpdpp.ID_Entidad_Proveedor =s.id_supplier
 
-         WHERE 
+         WHERE
          acpdpp.ID_Pedido_Cabecera=" . $data['idPedido'] . "
          group by 1";
         return $this->db->query($query)->result();
@@ -1137,38 +1190,39 @@ WHERE ID_Pedido_Detalle = " . $id . " ORDER BY CHAT.Fe_Registro ASC";
     public function removeSupplier($data)
     {
         try {
-            $query = "DELETE FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle_Producto_Proveedor = " . $data['idProveedor'] ."";
+            $query = "DELETE FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle_Producto_Proveedor = " . $data['idProveedor'] . "";
             return $this->db->query($query);
         } catch (Exception $e) {
             return $e->getMessage();
         }
     }
-    public function getPendingMessagesCount($id_detalle,$user)
+    public function getPendingMessagesCount($id_detalle, $user)
     {
         $privilegio = $user->Nu_Tipo_Privilegio_Acceso;
         $idUsuario = $user->ID_Usuario;
-        $query="";
-        if($privilegio==1){
+        $query = "";
+        if ($privilegio == 1) {
             $query = "SELECT count(*) count FROM agente_compra_pedido_detalle_chat_producto WHERE ID_Pedido_Detalle = " . $id_detalle . " AND ID_Usuario_Destino != " . $idUsuario . " AND ID_Usuario_Remitente = 0";
 
-        }else{
+        } else {
             $query = "SELECT count(*) count FROM agente_compra_pedido_detalle_chat_producto WHERE ID_Pedido_Detalle = " . $id_detalle . " AND ID_Usuario_Remitente != " . $idUsuario . " AND ID_Usuario_Destino = 0";
         }
         return intval($this->db->query($query)->row()->count);
     }
-    public function deleteItem($id_item){
-        try{
-            //delete from proveedores 
+    public function deleteItem($id_item)
+    {
+        try {
+            //delete from proveedores
             $query = "DELETE FROM agente_compra_pedido_detalle_producto_proveedor WHERE ID_Pedido_Detalle = " . $id_item;
             $this->db->query($query);
-            //delete detalle 
+            //delete detalle
             $query = "DELETE FROM agente_compra_pedido_detalle WHERE ID_Pedido_Detalle = " . $id_item;
             $this->db->query($query);
             return [
                 'status' => 'success',
-                'message' => 'Registro eliminado'
+                'message' => 'Registro eliminado',
             ];
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return $e->getMessage();
         }
 

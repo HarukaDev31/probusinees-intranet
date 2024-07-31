@@ -356,16 +356,7 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             <div class="card-body" id="container-ver">
               <h1 class="m-0 p-0">Avances</h1>
               <div class="separator-line"></div>
-              <?php
-if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
-    ?>
-                <div class="" id="cotizacionOrdenContainer">
-                  <span>Consolidado:#</span>
-                  <input class="ml-1" style="width: 100px" id="consolidadoOrden" type="text" class="form-control" value="0" />
-                </div>
-                <?php
-}
-?>
+  
               <div id="steps" class="w-100 pt-2" style="height: 100%;">
                 <div class="spinner-border text-primary" id="loading-steps" role="status">
                 </div>

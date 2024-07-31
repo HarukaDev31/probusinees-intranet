@@ -1823,7 +1823,6 @@ class PedidosPagados extends CI_Controller
         $objPHPExcel->getActiveSheet()->setCellValue('R17', $data[0]->No_Entidad);
         $objPHPExcel->getActiveSheet()->setCellValue('R18', $data[0]->Nu_Documento_Identidad);
         $objPHPExcel->getActiveSheet()->setCellValue('R19', $data[0]->No_Pais);
-        $objPHPExcel->getActiveSheet()->setCellValue('T22', $data[0]->Ss_Tipo_Cambio);
 
         $initialRow = 28;
         $lastProductrow = 29;
