@@ -9182,7 +9182,6 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido) => {
             </svg>
             <span>Proveedor</span>
         </div>
-       
       </div>
       <div class="fentrega-column column">
       <input type="date" class="form-control" disabled value="${producto.Fe_Entrega_Proveedor.split(" ")[0]

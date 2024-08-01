@@ -2567,7 +2567,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     'Qt_Producto_Moq' => $row['qty_product'],
                     'Nu_Dias_Delivery' => $row['delivery'],
                     'fecha_entrega' => $row['tentrega'],
-    
                 ];
                 //update agente_compra_pedido_detalle_producto_proveedor
                 $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $key);

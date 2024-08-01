@@ -102,8 +102,8 @@ class PedidosPagados extends CI_Controller
             $rows[] = $row->No_Pais;
             if($this->user->Nu_Tipo_Privilegio_Acceso == 6){
                 $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
-                $rows[] = $row->No_Contacto;
-                $rows[] = $row->No_Entidad;
+                $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Contacto . "</span><span>" . $row->Nu_Celular_Contacto . "</span></div>";
+            $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Entidad . "</span><span>" . $row->Nu_Documento_Identidad . "</span></div>";
                 $rows[] = $row->cotizacionCode;
                 $rows[] = "<button class='btn btn-xs btn-link' onclick='getAlmacenData(" . $row->ID_Pedido_Cabecera . ")' alt='Editar' title='Editar' href='javascript:void(0)'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
                 //select with 3 options Pendiente,Recibiendo y Completado
@@ -117,7 +117,9 @@ class PedidosPagados extends CI_Controller
             }
             $rows[] = $row->cotizacionCode;
             $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
-
+            //CLI.No_Entidad, CLI.Nu_Documento_Identidad,CLI.No_Contacto
+            $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Contacto . "</span><span>" . $row->Nu_Celular_Contacto . "</span></div>";
+            $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Entidad . "</span><span>" . $row->Nu_Documento_Identidad . "</span></div>";
             if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 2) {
                 // $rows[] = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
                 //$rows[] = $btn_asignar_personal_china;

@@ -60,6 +60,7 @@
                   <thead class="thead-light">
                     <tr>
                       <th>País </th>
+                      
                       <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 6) {
     ?>
                           <th>Fecha</th>
@@ -70,10 +71,12 @@
                           <th>Estado</th>
                         <?php
 } else {?>
+
                       <th>N° Orden</th>
 
                       <th>Fecha</th>
-
+                      <th>Cliente</th>
+                      <th>Empresa</th>
                       <th>Servicio</th>
                       <th>Incoterms</th>
                       <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {?>
