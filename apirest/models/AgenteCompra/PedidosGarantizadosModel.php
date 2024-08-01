@@ -58,7 +58,7 @@ class PedidosGarantizadosModel extends CI_Model
         $this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
         if (!empty($this->input->post('Estado'))) {
             if (in_array($this->input->post('Estado'), [1, 2, 3])) {
-                $this->db->where_in($this->table . '.Nu_Estado_China', $this->input->post('Es   tado'));
+                $this->db->where_in($this->table . '.Nu_Estado_China', $this->input->post('Estado'));
             } else if ($this->input->post('Estado') == 4) {
                 $this->db->where_in($this->table . '.Nu_Estado', [8]);
             }
