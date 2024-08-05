@@ -167,9 +167,10 @@ class PedidosGarantizados extends CI_Controller
 
     public function ajax_edit($ID)
     {
+
         $arrReponse = $this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID));
         //get user Nu_Tipo_Privilegio_Acceso
-
+        
         echo json_encode($arrReponse);
         //echo json_encode($this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID)));
     }
