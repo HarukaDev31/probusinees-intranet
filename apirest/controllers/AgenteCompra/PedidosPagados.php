@@ -1982,6 +1982,13 @@ class PedidosPagados extends CI_Controller
 
                 // }
             }
+            if($step==3){
+                if($priviligie==$this->personalChinaPrivilegio){
+                    $dataAlmacen = $this->PedidosPagadosModel->getAlmacenData($idPedido);
+                    echo json_encode(array('status' => 'success', 'data' => $dataAlmacen, 'priviligie' => $priviligie));
+                }
+                 return 1;
+            }
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
         }

@@ -3132,10 +3132,27 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             if ($checkIfAllSupplierHasStatus) {
                 $this->db->where('ID_Pedido_Cabecera', intval($idPedido));
                 $this->db->update('agente_compra_pedido_cabecera', array('estado_almacen' => 'COMPLETADO'));
+                $this->updateRecepcionCarga($idPedido);
             }
             return ['status' => 'success', 'message' => 'Fotos guardadas'];
                 } catch (Exception $e) {
             throw new Exception($e->getMessage());
+        }
+    }
+
+    public function updateRecepcionCarga($idPedido){
+        $rolesToUpdate = [2,5];
+        $stepToUpdate = 3;
+        foreach ($rolesToUpdate as $role) {
+            $this->db->where('id_permision_role', $role);
+            $this->db->where('id_pedido', $idPedido);
+            if($role==2){
+                $this->db->where('id_order', $stepToUpdate);
+                $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
+            }else{
+                $this->db->where('id_order', $stepToUpdate);
+                $this->db->update('agente_compra_order_steps', array('status' => 'PROGRESS'));
+            }
         }
     }
     public function checkIfAllSupplierHasStatus($id)

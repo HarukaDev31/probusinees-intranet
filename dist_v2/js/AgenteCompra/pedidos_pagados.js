@@ -7156,6 +7156,11 @@ const openStepFunction = (i, stepId) => {
         openCoordination(response);
       }
     }
+    if(i==3){
+      if(currentPrivilege==2||currentPrivilege==5){
+        openAlmacenView(responseParsed.data,idPedido,currentPrivilege);
+      }
+    }
   });
 };
 const openCoordination = (response) => {
@@ -9152,7 +9157,7 @@ const getAlmacenData = (idPedido) => {
     success: function (response) {
       response = JSON.parse(response);
       if (response.status == "success") {
-        openAlmacenView(response.data, idPedido);
+        openAlmacenView(response.data, idPedido,null);
       }
     },
   });
@@ -9216,7 +9221,7 @@ const getAlmacenTableHeader = () => {
             <div class="estado-column column">ESTADO</div>
           </div>`;
 };
-const getAlmacenTableBody = (data, cotizacionCode, idPedido) => {
+const getAlmacenTableBody = (data, cotizacionCode, idPedido,permiso=null) => {
   let tableBody = "";
   if (!data) return tableBody;
   let totalCBM = 0;
@@ -9261,7 +9266,9 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido) => {
         name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_box]"
-        value="${parseInt(producto.total_box)}">
+        value="${parseInt(producto.total_box)}"
+        ${permiso?'disabled':''}
+        >
       
       </div>
       <div class="totalcbm-column column">
@@ -9269,14 +9276,17 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido) => {
         name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_cbm]"
-        value="${producto.total_cbm}">
+        
+        value="${producto.total_cbm}"
+         ${permiso?'disabled':''}>
       </div>
       <div class="totalkg-column column">
         <input type="number" class="form-control total_kg"
         name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_kg]"
-        value="${producto.total_kg}">
+        value="${producto.total_kg}"
+         ${permiso?'disabled':''}>
       </div>
       <div class="fotos-column column">
           <svg 
@@ -9316,7 +9326,9 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido) => {
  * This function opens  the almacen table view
  * @param {*} data
  */
-const openAlmacenView = (data, idPedido) => {
+const openAlmacenView = (data, idPedido,permiso=null) => {
+  $("#container_orden-compra").hide();
+
   let id_pedido = 0;
   let cotizacionCode = 0;
   if (data) {
@@ -9333,7 +9345,7 @@ const openAlmacenView = (data, idPedido) => {
     .append(almacenHeader)
     .append(almacenTableHeader)
     .show();
-  const almacenTableBody = getAlmacenTableBody(data, cotizacionCode, idPedido);
+  const almacenTableBody = getAlmacenTableBody(data, cotizacionCode, idPedido,permiso);
   containerAlmacen.append(almacenTableBody);
   const actionButtons = {
     btnSave: {
