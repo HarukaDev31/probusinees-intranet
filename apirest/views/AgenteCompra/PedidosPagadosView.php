@@ -2773,7 +2773,7 @@ echo form_open('', $attributes);?>
 }
 .c-nombre-column{
   width: 200px;
-  padding: 1em;/* Ajusta el ancho según tus necesidades */
+  /* Ajusta el ancho según tus necesidades */
 }
 .c-nombre-column div{
   width: 100%;
@@ -2824,19 +2824,19 @@ echo form_open('', $attributes);?>
     overflow: auto;
 }
 .almacen-header .column{
-  padding: 1em;
+  
 }.almacen-row,.almacen-table{
   width: 1600px;
 }
 .almacen-header .column:nth-child(odd),.almacen-row .column:nth-child(even){
   background-color: #f9f9f9;
   border: 1px solid #ccc;
-  padding: 1em;
+  
 
 }.almacen-header .column:nth-child(even),.almacen-row .column:nth-child(odd){
   background-color: #f2f2f2;
   border: 1px solid #ccc;
-  padding: 1em;
+  
 }.form-control{
   text-align: center;
 }
@@ -2875,8 +2875,10 @@ echo form_open('', $attributes);?>
 }
 .c-precio-column,.c-total-column,.c-pago1-column,.c-pago2-column,.c-tproduccion-column,.c-tproducto-column{
     width: 200px; /* Ajusta el ancho según tus necesidades */
-    padding: 0.5em;
     white-space: nowrap;
+}
+.item{
+  border-bottom: 1px solid #ccc;
 }
 .c-pago1-column span,.c-pago2-column span{
   display: block;
@@ -2896,7 +2898,7 @@ echo form_open('', $attributes);?>
 .supplier-table {
     display: block;
     overflow-x: auto;
-    width:1800px!important;
+    width:2200px!important;
 }
 
 
@@ -2973,6 +2975,8 @@ echo form_open('', $attributes);?>
       -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
       box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
       margin-bottom: 1em;
+    }.c-qty-column{
+      width: 100px;
     }
 
     /* }.detail{
@@ -2982,8 +2986,6 @@ echo form_open('', $attributes);?>
       width: 200px;
     }.c-nombre-column{
       width: 200px;
-    }.c-qty-column{
-      width: 100px;
     }.c-precio-column{
       width: 100px;
     }.c-total-column{

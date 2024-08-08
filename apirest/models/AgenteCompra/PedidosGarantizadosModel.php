@@ -87,50 +87,49 @@ class PedidosGarantizadosModel extends CI_Model
     public function get_by_id($ID)
     {
         $acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
-        
+
         $this->db->select('
-    CORRE.Fe_Month, 
-    A.Nu_Estado_China, 
-    (SELECT Ss_Venta_Oficial 
-     FROM tasa_cambio 
-     WHERE ID_Empresa = 1 AND Fe_Ingreso = "' . dateNow('fecha') . '" 
-     LIMIT 1) AS yuan_venta, 
-    A.*, 
-    (SELECT COUNT(*) 
-     FROM agente_compra_pedido_detalle_producto_proveedor 
-     WHERE ID_Pedido_Cabecera = A.ID_Pedido_Cabecera 
-     AND ID_Pedido_Detalle = IGPD.ID_Pedido_Detalle) AS count_proveedor, 
-    CLI.No_Entidad, 
-    CLI.Nu_Documento_Identidad, 
-    USR.No_Usuario, 
-    USR.Txt_Email, 
-    CLI.No_Contacto, 
-    CLI.Nu_Celular_Contacto, 
-    CLI.Txt_Email_Contacto, 
-    IGPD.Txt_Producto_Ingles, 
-    IGPD.Txt_Description_Ingles, 
-    IGPD.ID_Pedido_Detalle, 
-    IGPD.Txt_Producto, 
-    IGPD.Txt_Descripcion, 
-    IGPD.Qt_Producto, 
-    IGPD.Txt_Url_Imagen_Producto, 
-    IGPD.Txt_Url_Link_Pagina_Producto, 
-    IGPD.Nu_Envio_Mensaje_Chat_Producto, 
+    CORRE.Fe_Month,
+    A.Nu_Estado_China,
+    (SELECT Ss_Venta_Oficial
+     FROM tasa_cambio
+     WHERE ID_Empresa = 1 AND Fe_Ingreso = "' . dateNow('fecha') . '"
+     LIMIT 1) AS yuan_venta,
+    A.*,
+    (SELECT COUNT(*)
+     FROM agente_compra_pedido_detalle_producto_proveedor
+     WHERE ID_Pedido_Cabecera = A.ID_Pedido_Cabecera
+     AND ID_Pedido_Detalle = IGPD.ID_Pedido_Detalle) AS count_proveedor,
+    CLI.No_Entidad,
+    CLI.Nu_Documento_Identidad,
+    USR.No_Usuario,
+    USR.Txt_Email,
+    CLI.No_Contacto,
+    CLI.Nu_Celular_Contacto,
+    CLI.Txt_Email_Contacto,
+    IGPD.Txt_Producto_Ingles,
+    IGPD.Txt_Description_Ingles,
+    IGPD.ID_Pedido_Detalle,
+    IGPD.Txt_Producto,
+    IGPD.Txt_Descripcion,
+    IGPD.Qt_Producto,
+    IGPD.Txt_Url_Imagen_Producto,
+    IGPD.Txt_Url_Link_Pagina_Producto,
+    IGPD.Nu_Envio_Mensaje_Chat_Producto,
     TDI.No_Tipo_Documento_Identidad_Breve,
             A.Nu_Estado AS Nu_Estado_Pedido'
-);
+        );
 
-$this->db->from($this->table . ' AS A');
-$this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo', 'inner');
-$this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = A.ID_Pedido_Cabecera', 'inner');
-$this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = A.ID_Entidad', 'inner');
-$this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'inner');
-$this->db->join('usuario AS USR', 'USR.ID_Usuario = A.ID_Usuario_Interno_China', 'left');
-$this->db->where('A.ID_Pedido_Cabecera', $ID);
+        $this->db->from($this->table . ' AS A');
+        $this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo', 'inner');
+        $this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = A.ID_Pedido_Cabecera', 'inner');
+        $this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = A.ID_Entidad', 'inner');
+        $this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'inner');
+        $this->db->join('usuario AS USR', 'USR.ID_Usuario = A.ID_Usuario_Interno_China', 'left');
+        $this->db->where('A.ID_Pedido_Cabecera', $ID);
 
-$query = $this->db->get();
-$query = $query->result();
-
+        $query = $this->db->get();
+        $query = $query->result();
 
         $sCorrelativoCotizacion = '';
         foreach ($query as $row) {
@@ -151,7 +150,6 @@ $query = $query->result();
             }
         }
         return $query;
-
     }
 
     public function get_by_id_excel($ID)
@@ -741,32 +739,7 @@ $query = $query->result();
                     'message' => 'No se cargaron los archivos multimedia ',
                 );
             }
-            $existsSupplier = $this->db->get_where($this->table_suppliers, array('phone' => $row['celular_proveedor']))->row();
-            if (empty($existsSupplier)) {
-                /// generate code recursively until it does not exist in supplier table
-                $code = $this->generateSupplierCode($row['nombre_proveedor']);
-                while ($this->db->get_where($this->table_suppliers, array('code' => $code))->num_rows() > 0) {
-                    $code = $this->generateSupplierCode($row['nombre_proveedor']);
-                }
-
-                $arrSupplier = array(
-                    "name" => $row['nombre_proveedor'],
-                    "phone" => $row['celular_proveedor'],
-                    "code" => $code,
-                );
-
-                if ($this->db->insert('suppliers', $arrSupplier) > 0) {
-                    $idSupplier = $this->db->insert_id();
-                } else {
-                    $this->db->trans_rollback();
-                    return array(
-                        'status' => 'error',
-                        'message' => 'No registro proveedor',
-                    );
-                }
-            } else {
-                $idSupplier = $existsSupplier->id_supplier;
-            }
+            
             $arrDetalle[] = array(
                 'ID_Empresa' => $data['EID_Empresa_item'],
                 'ID_Organizacion' => $data['EID_Organizacion_item'],
@@ -786,18 +759,50 @@ $query = $query->result();
                 "terciary_photo" => $results['paths'][$key]['terciary_photo'],
                 "primary_video" => $results['paths'][$key]['primary_video'],
                 "secondary_video" => $results['paths'][$key]['secondary_video'],
-                'ID_Entidad_Proveedor' => $idSupplier,
+                // 'ID_Entidad_Proveedor' => $idSupplier,
                 'unidad_medida' => $row['unidad_medida'],
                 'kg_box' => $row['kgbox'],
             );
-            $this->db->insert_batch('agente_compra_pedido_detalle_producto_proveedor', $arrDetalle);
+            //insertbatch and get id
+            $this->db->insert_batch($this->table_agente_compra_pedido_detalle_producto_proveedor, $arrDetalle);
+            $id = $this->db->insert_id();
+            
+            $existsSupplier = $this->db->get_where($this->table_suppliers, array('phone' => $row['celular_proveedor'],
+
+            'agente_compra_pedido_cabecera'=>$pedidoID
+            ))->row();
+            if (empty($existsSupplier)) {
+                /// generate code recursively until it does not exist in supplier table
+                
+
+                $arrSupplier = array(
+                    "name" => $row['nombre_proveedor'],
+                    "phone" => $row['celular_proveedor'],
+                    "code" => 1,
+                    'agente_compra_producto_proveedor_id'=>$id,
+                    'agente_compra_pedido_cabecera'=>$pedidoID
+                );
+
+                if ($this->db->insert('suppliers', $arrSupplier) > 0) {
+                    $idSupplier = $this->db->insert_id();
+                } else {
+                    $this->db->trans_rollback();
+                    return array(
+                        'status' => 'error',
+                        'message' => 'No registro proveedor',
+                    );
+                }
+            } else {
+                $idSupplier = $existsSupplier->id_supplier;
+            }
             $arrDetalle = [];
+            //update supplier id 
+            $this->db->update($this->table_agente_compra_pedido_detalle_producto_proveedor, ['ID_Entidad_Proveedor' => $idSupplier], ['ID_Pedido_Detalle_Producto_Proveedor' => $id]);
             if ($this->db->trans_status() === false) {
                 $this->db->trans_rollback();
                 return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al insertar');
             } else {
                 $this->db->trans_commit();
-
                 // registrar evento de notificacion
                 $notificacion = $this->NotificacionModel->procesarNotificacion(
                     $this->user->No_Usuario,
@@ -813,22 +818,7 @@ $query = $query->result();
     }
     public function checkAllProductsWithSupplier($idPedido, $correlativo)
     {
-        /*
-        SELECT
-        acpd.ID_Pedido_Detalle,
-        (SELECT COUNT(*)
-        FROM agente_compra_pedido_detalle_producto_proveedor acpdp2
-        WHERE acpdp2.ID_Pedido_Detalle = acpd.ID_Pedido_Detalle) AS product_count
-        FROM
-        agente_compra_pedido_detalle acpd
-        LEFT JOIN
-        agente_compra_pedido_detalle_producto_proveedor acpdp
-        ON acpd.ID_Pedido_Detalle = acpdp.ID_Pedido_Detalle
-        WHERE
-        acpd.ID_Pedido_Cabecera = 222
-        group by 1
-
-         */
+        
         $this->db->select('
             acpd.ID_Pedido_Detalle,
             (SELECT COUNT(*)
@@ -887,8 +877,8 @@ $query = $query->result();
                 " . $Fe_Month . ",
                 1
                 );";
-        $this->db->query($query);
-        $ID_Agente_Compra_Correlativo = $this->db->insert_id();
+            $this->db->query($query);
+            $ID_Agente_Compra_Correlativo = $this->db->insert_id();
         }
         $Nu_Correlativo = $this->db->query("SELECT Nu_Correlativo FROM agente_compra_correlativo WHERE ID_Agente_Compra_Correlativo = " . $ID_Agente_Compra_Correlativo . " LIMIT 1")->row()->Nu_Correlativo;
         if ($Nu_Correlativo > 0) {
@@ -1169,10 +1159,7 @@ $query = $query->result();
     }
     public function getSuppliersByName($data)
     {
-        $query = "SELECT id_supplier,name,phone FROM suppliers s
-        join agente_compra_pedido_detalle_producto_proveedor acpdpp on acpdpp.ID_Entidad_Proveedor =s.id_supplier
-         WHERE
-         acpdpp.ID_Pedido_Cabecera=" . $data['idPedido'] . "
+        $query = "SELECT id_supplier,name,phone FROM suppliers s where s.agente_compra_pedido_cabecera=" . $data['idPedido'] . "
          group by 1";
         return $this->db->query($query)->result();
     }
