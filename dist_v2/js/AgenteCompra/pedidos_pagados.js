@@ -40,6 +40,7 @@ let containerSteps = null;
 let containerPagos = null;
 let containerCoordination = null;
 let containerAlmacen = null;
+let containerInspection = null;
 let currentServicio = 1;
 $(function () {
   sectionTitle = $("#section-title");
@@ -55,6 +56,9 @@ $(function () {
   containerAlmacen = $("#container_almacen");
   containerAlmacen.hide();
   containerCoordination = $("#container-coordination");
+  containerCoordination.hide();
+  containerInspection = $("#container-inspeccion");
+  containerInspection.hide();
   $(".select2").select2();
 
   $("#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China").change(function () {
@@ -6934,6 +6938,11 @@ const getOrderProgress = (id, idServicio = null) => {
               .removeClass("step-container")
               .addClass("step-container-completed");
           }
+          if (step.status == "PROGRESS") {
+            $(`#step-${i}`)
+              .removeClass("step-container")
+              .addClass("step-container-progress");
+          }
         });
         $(".steps-buttons").empty();
         const configButtons = {
@@ -7161,7 +7170,85 @@ const openStepFunction = (i, stepId) => {
         openAlmacenView(responseParsed.data, idPedido, currentPrivilege);
       }
     }
+    if (i == 4) {
+      if (currentPrivilege == 2 || currentPrivilege == 5) {
+        openInspectionView(responseParsed.data, idPedido, currentPrivilege);
+      }
+    }
   });
+};
+const openInspectionView = (data, idPedido, currentPrivilege) => {
+  $("#container_orden-compra").hide();
+  let cotizacionCode = 0;
+  if (data) {
+    cotizacionCode = data[0].cotizacionCode;
+  }
+  const inspectionTitle = getInspectionTitle(cotizacionCode);
+  const inspectionTable = getInspectionTableTemplate(data, currentPrivilege);
+  containerInspection.append(inspectionTitle).append(inspectionTable);
+  containerInspection.show();
+};
+const getInspectionTitle = (cotizacionCode) => {
+  return `
+  <div class="d-flex flex-row justify-content-between">
+    <h3>Inspección</h3>
+    <h3>Cotización: ${cotizacionCode}</h3>
+  </div>
+  `;
+};
+const getInspectionTableTemplate = (data, currentPrivilege) => {
+  html = `
+    <div class="inspection-table d-flex flex-column">`;
+  html +=
+    '<div class="inspection-table-header d-flex flex-row"><div class="inspection-column inspection-img">IMAGEN</div><div class="inspection-column inspection-name">NOMBRE PRODUCTO</div><div class="inspection-column inspection-caracteristicas">CARACTERISTICAS</div><div class="inspection-column inspection-code">ITEM</div><div class="inspection-column inspection-qty-box">QTY CAJAS</div><div class="inspection-column inspection-photos" >INSPECCION</div><div class="inspection-column inspection-estado">ESTADO</div><div class="inspection-column inspection-notas">NOTAS</div>';
+  html += "</div>";
+  data.forEach((item, i) => {
+    html += `
+        <div class="inspection-row d-flex flex-row">
+          <div class="inspection-column inspection-img">
+            <img src="${item.Txt_Url_Imagen_Producto}" 
+            
+            class="img-table_item w-100 px-2" data-id_item="${
+              item.id_item
+            }" data-url_img="${item.Txt_Url_Imagen_Producto}" />
+          </div>
+          <div class="inspection-column inspection-name">${
+            item.Txt_Producto
+          }</div>
+          <div class="inspection-column inspection-caracteristicas">
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" disabled>
+         ${htmlDecode(item.Txt_Descripcion)}
+          </textarea>
+          </div>
+          <div class="inspection-column inspection-code">${
+            item.product_code
+          }</div>
+          <div class="inspection-column inspection-qty-box" >
+          <span class="fw-bold">${
+            item.total_box ? parseInt(item.total_box) : 0
+          }</span>
+          </div>
+          <div class="inspection-column inspection-photos">Subir fotos</div>
+          <div class="inspection-column inspection-estado">
+          <select class="form-select" >
+          <option value="PENDIENTE" ${
+            item.estado == "PENDIENTE" ? "selected" : ""
+          }>PENDIENTE</option>
+          <option value="INSPECCIONADO" ${
+            item.estado == "INSPECCIONADO" ? "selected" : ""
+          }>INSPECCIONADO</option>
+          </select>
+          </div>
+          <div class="inspection-column inspection-notas">
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" value="${htmlDecode(
+            item.empleado_china_notas
+          )}"></textarea>
+          </div>
+        </div>
+        `;
+  });
+  html += "</div>";
+  return html;
 };
 const openCoordination = (response) => {
   containerOrdenCompra.hide();
@@ -9030,16 +9117,16 @@ const getActionButtons = (data) => {
       </div>`;
     } else if (data.hasOwnProperty("btnSave")) {
       buttons = `
-      <div class="row buttons">
-        <div class="col-12 col-md-6">
-          <div class="btn btn-primary  button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+      <div class="row buttons w-100 mt-2">
+        <div class="col-12 col-md-12 d-flex align-items-center justiy-content-center">
+          <div class="btn btn-primary mx-auto button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
         </div>
       </div>`;
     } else if (data.hasOwnProperty("btnCancel")) {
       buttons = `
-      <div class="row buttons">
-        <div class="col-12 col-md-6">
-          <div class="btn btn-secondary  button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+      <div class="row buttons w-100 mt-2">
+        <div class="col-12 col-md-12 d-flex align-items-center justiy-content-center">
+          <div class="btn btn-secondary mx-auto w-50 button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
         </div>
       </div>`;
     }
@@ -9302,7 +9389,8 @@ const getAlmacenTableBody = (
           <svg 
           onclick="viewSupplierPhotos(${
             producto.ID_Pedido_Detalle_Producto_Proveedor
-          },'${cotizacionCode}','${idPedido}')"
+          },'${cotizacionCode}','${idPedido}',
+          '${permiso}')"
           class="${
             producto.almacen_estado != "PENDIENTE"
               ? "camera-filled"
@@ -9326,12 +9414,12 @@ const getAlmacenTableBody = (
         </select>
       </div>
     `;
-      tableBody += `<div class="notas-column column">
+    tableBody += `<div class="notas-column column">
         <textarea class="form-control" name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][notas]" rows="3"
         ${permiso ? "disabled" : ""}
-        >${producto.almacen_notas??''}</textarea>
+        >${producto.almacen_notas ?? ""}</textarea>
       </div>`;
     // }else if(permiso==2){
     //   tableBody += `<div class="notas-column column">
@@ -9467,11 +9555,11 @@ const changeStatusAlmacen = (estado, id_pedido) => {
     },
   });
 };
-const viewSupplierPhotos = (id, cotizacionCode, idPedido) => {
+const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
   containerAlmacen.empty();
   const almacenTitle = getAlmacenViewTitle(cotizacionCode);
   containerAlmacen.append(almacenTitle);
-  const photosContainer = getviewSupplierPhotosTemplate();
+  const photosContainer = getviewSupplierPhotosTemplate(permiso);
   containerAlmacen.append(photosContainer);
   handleFileChange("#foto1-file", "#foto1-name", ".foto1-container");
   handleFileChange("#foto2-file", "#foto2-name", ".foto2-container");
@@ -9490,7 +9578,8 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido) => {
             ".foto1-container",
             "#foto1-container",
             idSupplier,
-            "foto1-file"
+            "foto1-file",
+            permiso
           );
         }
         if (almacen_foto2 != null) {
@@ -9500,8 +9589,14 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido) => {
             ".foto2-container",
             "#foto2-container",
             idSupplier,
-            "foto2-file"
+            "foto2-file",
+            permiso
           );
+        } else {
+          if (permiso != null) {
+            //set hide foto2-container parent
+            $("#foto2-container").parent().hide();
+          }
         }
         // if(almacen_foto2){
         //   const foto2Name=almacen_foto2.split("/").pop();
@@ -9511,7 +9606,7 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido) => {
       }
     },
   });
-  const actionButtons = {
+  let actionButtons = {
     btnSave: {
       text: "Guardar",
       action: `saveSupplierPhotos(${id},${idPedido})`,
@@ -9521,6 +9616,14 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido) => {
       action: `getAlmacenData(${idPedido})`,
     },
   };
+  if (permiso != null) {
+    actionButtons = {
+      btnCancel: {
+        text: "Regresar",
+        action: `openStepFunction(3,${selectedStep})`,
+      },
+    };
+  }
   const buttonsTemplate = getActionButtons(actionButtons);
   containerAlmacen.append(buttonsTemplate);
 };
@@ -9571,7 +9674,7 @@ const getviewSupplierPhotosTemplate = () => {
       </div>
       <div class="col-12 col-md-3 ">    
         <div class="fotos-container">
-          <div class="upload-payment container-div not-filled foto2-container"  id="foto2-container"onclick="openFileSelector('foto2-file')">
+          <div class="upload-payment container-div not-filled foto2-container"  id="foto2-container" onclick="openFileSelector('foto2-file')">
               
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -9624,8 +9727,10 @@ const handleFileDisplay = (
   containerClass,
   containerId,
   idSupplier,
-  input
+  input,
+  permiso
 ) => {
+  console.log("permiso", permiso, containerId, containerClass);
   if (filePath != null) {
     const fileName = filePath.split("/").pop();
     if (fileName.length > 20) {
@@ -9637,9 +9742,13 @@ const handleFileDisplay = (
     $(containerId).append(
       `<input type="hidden" name="file[idSupplier]" value="${idSupplier}">`
     );
-    $(containerId).append(
-      `<span class="remove-item" onclick="handleSpanClick(event, '${input}')">${editIcon}</span>`
-    );
+    if (!permiso) {
+      $(containerId).append(
+        `<span class="remove-item" onclick="handleSpanClick(event, '${input}')">${editIcon}</span>`
+      );
+      console.log("permiso", permiso, containerId, containerClass);
+      $(containerClass).removeAttr("onclick");
+    }
     // Remove existing click handler if any
     $(containerId).off("click");
     $(containerId).removeAttr("onclick");

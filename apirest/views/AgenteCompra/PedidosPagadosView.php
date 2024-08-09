@@ -368,6 +368,8 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             </div>
             <form class="card-body almacen-form" id="container_almacen">
             </form>
+            <form class="card-body" id="container-inspeccion">
+            </form>
             <div class="card-body" id="container_orden-compra">
               <div class="orden-compra_header_china"></div>
               <div class="orden-compra_header row">
@@ -2528,6 +2530,22 @@ echo form_open('', $attributes);?>
       opacity: 0;
       background-color: #85C1E9;
       color: white;
+    }.step-container-progress {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 1em;
+      align-items: center;
+      margin-bottom: 10px;
+      width: 200px;
+      padding: 1em 2em;
+      animation: fadeInBounce 1s forwards;
+      min-width: 200px;
+      /* Inicialmente ocultar los elementos */
+      opacity: 0;
+      background-color: #f4d03f;
+      text-align: center;
+      color: white;
     }
 
     @keyframes fadeInBounce {
@@ -2819,13 +2837,11 @@ echo form_open('', $attributes);?>
 .supplier-table-header div:nth-child(even){
   background-color: #f2f2f2;
 
-}#container_almacen{
+}#container_almacen,#container-inspeccion{
   width: auto;
-    overflow: auto;
+  overflow: auto;
 }
-.almacen-header .column{
-  
-}.almacen-row,.almacen-table{
+.almacen-row,.almacen-table{
   width: 1850px;
 }
 .almacen-header .column:nth-child(odd),.almacen-row .column:nth-child(even){
@@ -2840,10 +2856,10 @@ echo form_open('', $attributes);?>
 }.form-control{
   text-align: center;
 }
-.almacen-header{
+.almacen-header,.inspection-table-header{
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
   border: 1px solid #ccc;
   border-radius: 1em;
@@ -2851,6 +2867,27 @@ echo form_open('', $attributes);?>
   -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
   box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
   margin-bottom: 1em;
+}
+.inspection-row{
+  width: 1850px;  
+}
+.inspection-table{
+  width: 1600px;
+}
+.inspection-table-header .inspection-column:nth-child(even),.inspection-table-header .inspection-column:nth-child(odd){
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+}
+.inspection-img,.inspection-name,.inspection-caracteristicas,
+.inspection-photos,.inspection-notas{
+  width: 200px;
+  white-space: nowrap;
+}.inspection-code,.inspection-qty-box{
+  width: 100px;
+  white-space: nowrap;
+}.inspection-estado{
+  width: 150px;
+  white-space: nowrap;
 }
 .c-estado-column{
     width: 150px; /* Ajusta el ancho según tus necesidades */
