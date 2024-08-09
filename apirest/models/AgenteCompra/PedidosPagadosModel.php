@@ -2632,6 +2632,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                         $this->db->update('agente_compra_coordination_supplier', array('estado' => 'CONFORME',
                             'pago_1_value' => $row['pago_1_value'],
                         ));
+                    }else{
+                        $this->db->where('id_coordination', $key);
+                        $this->db->update('agente_compra_coordination_supplier', array('estado' => 'PENDIENTE',
+                            'pago_1_value' => $row['pago_1_value'],
+                        ));
                     }
                 }
                 $this->db->select('pago_1_URL,pago_2_URL,estado_negociacion');
