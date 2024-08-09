@@ -593,9 +593,9 @@ $(function () {
     // url = base_url + "AgenteCompra/PedidosGarantizados/downloadImage/" + id;
 
     // var popupwin = window.open(url);
-    setTimeout(function () {
-      popupwin.close();
-    }, 2000);
+    // setTimeout(function () {
+    //   popupwin.close();
+    // }, 2000);
   });
 
   $("#span-id_pedido").html("");
