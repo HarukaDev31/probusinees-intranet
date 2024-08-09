@@ -353,9 +353,7 @@ $(function () {
         sNext: ">",
       },
     },
-    order: [
-      [1,"desc"]
-    ],
+    order: [[1, "desc"]],
     ajax: {
       url: url,
       type: "POST",
@@ -377,7 +375,7 @@ $(function () {
             "fecha",
             "/"
           ));
-          data.Estado= $("#cbo-Estado").val();
+        data.Estado = $("#cbo-Estado").val();
       },
       complete: function () {
         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
@@ -532,8 +530,10 @@ $(function () {
     $(".modal-ver_item").modal("show");
     $(".img-responsive").attr("src", $(this).data("url_img"));
     $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
-    $("#a-download_image").attr("data-url_img", $(this).data("url_img") ?? $(this)[0].currentSrc);
-
+    $("#a-download_image").attr(
+      "data-url_img",
+      $(this).data("url_img") ?? $(this)[0].currentSrc
+    );
   });
 
   $("#table-elegir_productos_proveedor").on(
@@ -547,7 +547,10 @@ $(function () {
         $(this).data("url_img") ?? $(this)[0].currentSrc
       );
       $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
-      $("#a-download_image").attr("data-url_img", $(this).data("url_img") ?? $(this)[0].currentSrc);
+      $("#a-download_image").attr(
+        "data-url_img",
+        $(this).data("url_img") ?? $(this)[0].currentSrc
+      );
     }
   );
 
@@ -555,33 +558,39 @@ $(function () {
     let id = $(this).data("id_item");
     let src = $(this).data("url_img");
     filename = src.split("/").pop();
+    //create a new anchor element
+    let a = document.createElement("a");
+    a.href = src;
+    a.download = filename;
+    a.click();
+    a.remove();
 
-    if (src) {
-      $.ajax({
-        url: src,
-        method: "GET",
-        xhrFields: {
-          responseType: "blob", // Important
-        },
-        success: function (data) {
-          const blobUrl = window.URL.createObjectURL(data);
-          const link = document.createElement("a");
-          link.href = blobUrl;
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(blobUrl);
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.error("Error downloading file:", textStatus, errorThrown);
-        },
-      });
-      return;
-    }
-    url = base_url + "AgenteCompra/PedidosGarantizados/downloadImage/" + id;
+    // if (src) {
+    //   $.ajax({
+    //     url: src,
+    //     method: "GET",
+    //     xhrFields: {
+    //       responseType: "blob", // Important
+    //     },
+    //     success: function (data) {
+    //       const blobUrl = window.URL.createObjectURL(data);
+    //       const link = document.createElement("a");
+    //       link.href = blobUrl;
+    //       link.download = filename;
+    //       document.body.appendChild(link);
+    //       link.click();
+    //       document.body.removeChild(link);
+    //       window.URL.revokeObjectURL(blobUrl);
+    //     },
+    //     error: function (jqXHR, textStatus, errorThrown) {
+    //       console.error("Error downloading file:", textStatus, errorThrown);
+    //     },
+    //   });
+    //   return;
+    // }
+    // url = base_url + "AgenteCompra/PedidosGarantizados/downloadImage/" + id;
 
-    var popupwin = window.open(url);
+    // var popupwin = window.open(url);
     setTimeout(function () {
       popupwin.close();
     }, 2000);
@@ -600,7 +609,7 @@ $(function () {
     $("#div-add_item_proveedor").show();
 
     $("#modal-precio1").focus();
-  
+
     arrQuillNotas = [];
     console.log(arrQuillNotas);
     iCounterItems = 1;
@@ -824,7 +833,7 @@ $(function () {
 
   $(document).on("click", "#btn-cancel_detalle_elegir_proveedor", function (e) {
     e.preventDefault();
-  
+
     $(".div-Listar").hide();
     $(".div-AgregarEditar").show();
     $("#div-elegir_item_proveedor").hide();
@@ -1060,13 +1069,13 @@ $(function () {
     //buscar data
     viewChatItem(id_item);
   });
-// $(document).on('click','#close-modal-chat',function(){
-//   verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val()); 
-// });
-//on close modal-chat_producto
-$(document).on('hidden.bs.modal', '.modal-chat_producto', function () {
-  verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val());
-});
+  // $(document).on('click','#close-modal-chat',function(){
+  //   verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val());
+  // });
+  //on close modal-chat_producto
+  $(document).on("hidden.bs.modal", ".modal-chat_producto", function () {
+    verPedido($("#txt-chat_producto-ID_Pedido_Cabecera_item").val());
+  });
   //chat de novedades de producto
   $(document).on("click", "#btn-enviar_mensaje", function (e) {
     e.preventDefault();
@@ -1244,7 +1253,7 @@ function verPedido(ID) {
       var table_enlace_producto = "",
         ID_Entidad = 0;
       for (i = 0; i < detalle.length; i++) {
-        let index=i;
+        let index = i;
         var cantidad_item = detalle[i]["Qt_Producto"];
         var id_item = detalle[i]["ID_Pedido_Detalle"];
         var href_link =
@@ -1275,7 +1284,9 @@ function verPedido(ID) {
           id_item +
           "'>" +
           "<td style='vertical-align:middle' class='text-left td-id_item'>" +
-          "<span class='badge badge-pill badge-secondary w-100'>" +(index+1)+ "</span>" +
+          "<span class='badge badge-pill badge-secondary w-100'>" +
+          (index + 1) +
+          "</span>" +
           "</td>" +
           "<td class='text-center td-name' width='30%'>";
 
@@ -1362,8 +1373,8 @@ function verPedido(ID) {
         table_enlace_producto += "<td class='text-left td-name' width='20%'>";
         if (detalle[i]["currentUser"] == "maryam.china@probusiness.pe") {
           const text =
-            (detalle[i]["Txt_Description_Ingles"] != "" &&
-            detalle[i]["Txt_Description_Ingles"])
+            detalle[i]["Txt_Description_Ingles"] != "" &&
+            detalle[i]["Txt_Description_Ingles"]
               ? detalle[i]["Txt_Description_Ingles"]
               : detalle[i]["Txt_Descripcion"];
           table_enlace_producto += `<div id="caracteristicas-ingles${i}" name="" style="height: 200px;"> </div>`;
@@ -1450,8 +1461,8 @@ function verPedido(ID) {
           detalle[i]["Txt_Descripcion"] +
           '">';
         table_enlace_producto += "</tr>";
-        if(response.Nu_Tipo_Privilegio_Acceso == 1){
-        table_enlace_producto +=`<tr class="tr_enlace_producto${id_item}" style="background-color: rgba(0,0,0,.05);"><td class='text-center' colspan='4'><div class='btn btn-outline-danger' id="btn-remove-item-${id_item}"  style="width:80%" >Quitar</div></td></tr>`;
+        if (response.Nu_Tipo_Privilegio_Acceso == 1) {
+          table_enlace_producto += `<tr class="tr_enlace_producto${id_item}" style="background-color: rgba(0,0,0,.05);"><td class='text-center' colspan='4'><div class='btn btn-outline-danger' id="btn-remove-item-${id_item}"  style="width:80%" >Quitar</div></td></tr>`;
         }
         table_enlace_producto += `<tr class="tr_enlace_producto${id_item}" style="background-color: rgba(0,0,0,.05);"><td class='text-center' colspan='4'>`;
         if (
@@ -1480,28 +1491,28 @@ function verPedido(ID) {
             '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Agregar Proveedor</button>';
           table_enlace_producto += "</div>";
           table_enlace_producto += '<div class="col">';
-          if(parseInt(response.count_proveedor) > 0){
+          if (parseInt(response.count_proveedor) > 0) {
             table_enlace_producto +=
-            '<button type="button" id="btn-elegir_proveedor' +
-            id_item +
-            '" data-name_producto="' +
-            nombre_producto +
-            '" data-id_empresa="' +
-            response.ID_Empresa +
-            '" data-id_organizacion="' +
-            response.ID_Organizacion +
-            '" data-id_pedido_cabecera="' +
-            response.ID_Pedido_Cabecera +
-            '" data-correlativo="' +
-            response.sCorrelativoCotizacion +
-            '" data-id_pedido_detalle="' +
-            id_item +
-            '" class="btn btn-secondary btn-block btn-elegir_proveedor"><i class="far fa-edit"></i>&nbsp; Editar Proveedor</button>';
-          table_enlace_producto += "</div>";
+              '<button type="button" id="btn-elegir_proveedor' +
+              id_item +
+              '" data-name_producto="' +
+              nombre_producto +
+              '" data-id_empresa="' +
+              response.ID_Empresa +
+              '" data-id_organizacion="' +
+              response.ID_Organizacion +
+              '" data-id_pedido_cabecera="' +
+              response.ID_Pedido_Cabecera +
+              '" data-correlativo="' +
+              response.sCorrelativoCotizacion +
+              '" data-id_pedido_detalle="' +
+              id_item +
+              '" class="btn btn-secondary btn-block btn-elegir_proveedor"><i class="far fa-edit"></i>&nbsp; Editar Proveedor</button>';
+            table_enlace_producto += "</div>";
           }
           table_enlace_producto += "</div>";
         } else {
-          console.log(detalle[i].count_proveedor)
+          console.log(detalle[i].count_proveedor);
           if (parseInt(detalle[i].count_proveedor) > 0) {
             table_enlace_producto +=
               '<button type="button" id="btn-elegir_proveedor' +
@@ -1526,7 +1537,7 @@ function verPedido(ID) {
 
       $("#span-total_cantidad_items").html(i);
       $("#table-Producto_Enlace").append(table_enlace_producto);
-      
+
       const toolbarOptions = [
         ["bold", "italic", "underline"], // toggled buttons
         [{ color: [] }], // dropdown with defaults from theme
@@ -1535,12 +1546,20 @@ function verPedido(ID) {
       arrQuill = [];
       arrQuillIngles = [];
       for (let i = 0; i < detalle.length; i++) {
-        $(`#btn-remove-item-${detalle[i]["ID_Pedido_Detalle"]}`).click(function(){
-          console.log(detalle[i])
-          deleteItem(detalle[i]["ID_Pedido_Detalle"],detalle[i]["Txt_Producto"]);
-        });
-        if(detalle[i]["currentUser"] == "maryam.china@probusiness.pe" || detalle[i]["Txt_Email"] == "maryam.china@probusiness.pe"){
-          try{
+        $(`#btn-remove-item-${detalle[i]["ID_Pedido_Detalle"]}`).click(
+          function () {
+            console.log(detalle[i]);
+            deleteItem(
+              detalle[i]["ID_Pedido_Detalle"],
+              detalle[i]["Txt_Producto"]
+            );
+          }
+        );
+        if (
+          detalle[i]["currentUser"] == "maryam.china@probusiness.pe" ||
+          detalle[i]["Txt_Email"] == "maryam.china@probusiness.pe"
+        ) {
+          try {
             const quill = new Quill(`#caracteristicas-${i}`, {
               modules: {
                 toolbar: toolbarOptions,
@@ -1548,12 +1567,18 @@ function verPedido(ID) {
               theme: "snow",
             });
             arrQuill.push(quill);
-            quill.root.innerHTML = clearHTMLTextArea(detalle[i]["Txt_Descripcion"]);
-          }catch(e){
+            quill.root.innerHTML = clearHTMLTextArea(
+              detalle[i]["Txt_Descripcion"]
+            );
+          } catch (e) {
             console.log(e);
           }
-          try{
-            let textToSet = (detalle[i]["Txt_Description_Ingles"]!=null &&detalle[i]["Txt_Description_Ingles"]!="")?detalle[i]["Txt_Description_Ingles"]:detalle[i]["Txt_Descripcion"];
+          try {
+            let textToSet =
+              detalle[i]["Txt_Description_Ingles"] != null &&
+              detalle[i]["Txt_Description_Ingles"] != ""
+                ? detalle[i]["Txt_Description_Ingles"]
+                : detalle[i]["Txt_Descripcion"];
             const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
               modules: {
                 toolbar: toolbarOptions,
@@ -1562,11 +1587,11 @@ function verPedido(ID) {
             });
             arrQuillIngles.push(quillIngles);
             quillIngles.root.innerHTML = clearHTMLTextArea(textToSet);
-          }catch(e){
+          } catch (e) {
             console.log(e);
           }
-        }else{
-          try{
+        } else {
+          try {
             const quill = new Quill(`#caracteristicas-${i}`, {
               modules: {
                 toolbar: toolbarOptions,
@@ -1574,11 +1599,13 @@ function verPedido(ID) {
               theme: "snow",
             });
             arrQuill.push(quill);
-            quill.root.innerHTML = clearHTMLTextArea(detalle[i]["Txt_Descripcion"]);
-          }catch(e){
+            quill.root.innerHTML = clearHTMLTextArea(
+              detalle[i]["Txt_Descripcion"]
+            );
+          } catch (e) {
             console.log(e);
           }
-  
+
           // const quillIngles = new Quill(`#caracteristicas-ingles${i}`, {
           //   modules: {
           //     toolbar: toolbarOptions,
@@ -1588,7 +1615,6 @@ function verPedido(ID) {
           // arrQuillIngles.push(quillIngles);
           // quillIngles.root.innerHTML = detalle[i]["Txt_Description_Ingles"];
         }
-        
 
         // var delta = quill.clipboard.convert(htmlContent);
       }
@@ -2732,14 +2758,14 @@ function getItemProveedor(id_detalle) {
         let item = getItemTemplate(i + 1, "select", detalle, privilegio);
         currentPrivilegio = parseInt(privilegio);
         container.append(item);
-        
+
         const toolbarOptions = [
           ["bold", "italic", "underline"], // toggled buttons
           [{ color: [] }], // dropdown with defaults from theme
           ["clean"], // remove formatting button
         ];
 
-        const notasQuill = new Quill(`#modal-notas${i+1}`, {
+        const notasQuill = new Quill(`#modal-notas${i + 1}`, {
           modules: {
             toolbar: toolbarOptions,
           },
@@ -2912,46 +2938,45 @@ function descargarDocumentoPagoGarantizado(file_url) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  
 }
 function getFileUrlName(file_url) {
   var url = file_url;
   var filename = url.substring(url.lastIndexOf("/") + 1);
   return filename;
 }
-  // url =
-  //   base_url +
-  //   "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizadov2/" +
-  //   id;
-  // $.ajax({
-  //   url: url,
-  //   type: "GET",
-  //   dataType: "JSON",
-  //   success: function (response) {
-  //     console.log(response);
+// url =
+//   base_url +
+//   "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizadov2/" +
+//   id;
+// $.ajax({
+//   url: url,
+//   type: "GET",
+//   dataType: "JSON",
+//   success: function (response) {
+//     console.log(response);
 
-  //     if (response.status == "success") {
-  //       $(".modal-ver_pago_garantizado").modal("show");
+//     if (response.status == "success") {
+//       $(".modal-ver_pago_garantizado").modal("show");
 
-  //       $(".img-pago_garantizado").attr("src", "");
-  //       $(".img-pago_garantizado").attr("src", response.url_image);
+//       $(".img-pago_garantizado").attr("src", "");
+//       $(".img-pago_garantizado").attr("src", response.url_image);
 
-  //       url =
-  //         base_url +
-  //         "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/" +
-  //         id;
-  //       $("#a-download_image_pago_garantizado").attr(
-  //         "href",
-  //         response.url_image
-  //       );
-  //       //$("#a-download_image_pago_garantizado").attr("data-id_pago", id);
-  //     } else {
-  //       alert(response.message);
-  //     }
-  //   },
-  // });
+//       url =
+//         base_url +
+//         "AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/" +
+//         id;
+//       $("#a-download_image_pago_garantizado").attr(
+//         "href",
+//         response.url_image
+//       );
+//       //$("#a-download_image_pago_garantizado").attr("data-id_pago", id);
+//     } else {
+//       alert(response.message);
+//     }
+//   },
+// });
 
-  /*
+/*
   url = base_url + 'AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/' + id;
   
   var popupwin = window.open(url);
@@ -2969,12 +2994,12 @@ function clearHTMLTextArea(str) {
   str = str.replace(/&quot;/g, '"');
 
   // Asegúrate de reemplazar entidades especiales que puedan estar en el HTML
-  str = str.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");
+  str = str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'");
 
   // Reemplaza comillas dentro de los atributos de estilo para asegurarse de que no estén rotas
-  str = str.replace(/style="([^"]*?)"/g, function(match, p1) {
-      return `style="${p1.replace(/"/g, '&quot;')}"`;
-  });;
+  str = str.replace(/style="([^"]*?)"/g, function (match, p1) {
+    return `style="${p1.replace(/"/g, "&quot;")}"`;
+  });
 
   console.log(str);
   return str;
@@ -3530,59 +3555,67 @@ function escapeHTMLForInputValue(html) {
   if (html == null) return "";
 
   // Reemplaza las comillas dobles con la entidad &quot;
-  html = html.replace(/"/g, '&quot;');
+  html = html.replace(/"/g, "&quot;");
 
   // Reemplaza las comillas simples con la entidad &#39;
-  html = html.replace(/'/g, '&#39;');
+  html = html.replace(/'/g, "&#39;");
 
   // Reemplaza los caracteres de menor y mayor que con las entidades correspondientes
-  html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  html = html.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   return html;
 }
-const deleteItem=(id_item,nombre_item)=>{
+const deleteItem = (id_item, nombre_item) => {
   //sho modal delete
   $(".modal-eliminar-item-pedido").modal("show");
-  $("#modal-body-eliminar-item-pedido").html("<p>¿Desea eliminar el item <strong>"+nombre_item+"</strong>?</p>");
-  $("#btn-eliminar-item-pedido").off("click").on("click",()=>{
-    //delete item
-    $.ajax({
-      url: base_url + "AgenteCompra/PedidosGarantizados/deleteItem",
-      type: "POST",
-      data: {id_item},
-      dataType: "JSON",
-      success: function (response) {
-        if(response.status=="success"){
-          $(`#tr_enlace_producto${id_item}`).remove();
-          $(`.tr_enlace_producto${id_item}`).remove();
-          $(".modal-eliminar-item-pedido").modal("hide");
-          $(".modal-message").removeClass("modal-danger modal-warning modal-success");
-          $("#modal-message").modal("show");
-          $(".modal-message").addClass("modal-success");
-          $(".modal-title-message").text(response.message);
-          setTimeout(function () {
-            $("#modal-message").modal("hide");
-          }, 1100);
-          reload_table_Entidad();
-        }else{
-          $(".modal-eliminar-item-pedido").modal("hide");
-          $(".modal-message").removeClass("modal-danger modal-warning modal-success");
-          $("#modal-message").modal("show");
-          $(".modal-message").addClass("modal-danger");
-          $(".modal-title-message").text(response.message);
-          setTimeout(function () {
-            $("#modal-message").modal("hide");
-          }, 1100);
-        }
-      },
+  $("#modal-body-eliminar-item-pedido").html(
+    "<p>¿Desea eliminar el item <strong>" + nombre_item + "</strong>?</p>"
+  );
+  $("#btn-eliminar-item-pedido")
+    .off("click")
+    .on("click", () => {
+      //delete item
+      $.ajax({
+        url: base_url + "AgenteCompra/PedidosGarantizados/deleteItem",
+        type: "POST",
+        data: { id_item },
+        dataType: "JSON",
+        success: function (response) {
+          if (response.status == "success") {
+            $(`#tr_enlace_producto${id_item}`).remove();
+            $(`.tr_enlace_producto${id_item}`).remove();
+            $(".modal-eliminar-item-pedido").modal("hide");
+            $(".modal-message").removeClass(
+              "modal-danger modal-warning modal-success"
+            );
+            $("#modal-message").modal("show");
+            $(".modal-message").addClass("modal-success");
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 1100);
+            reload_table_Entidad();
+          } else {
+            $(".modal-eliminar-item-pedido").modal("hide");
+            $(".modal-message").removeClass(
+              "modal-danger modal-warning modal-success"
+            );
+            $("#modal-message").modal("show");
+            $(".modal-message").addClass("modal-danger");
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 1100);
+          }
+        },
+      });
     });
-  });
-  
-}
+};
 const sanitizeHTML = (str) => {
-  return str.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 };
