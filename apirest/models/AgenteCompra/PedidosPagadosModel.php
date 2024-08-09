@@ -3044,7 +3044,10 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             ifnull(acpdpp.total_kg,0) total_kg,
             acpdpp.almacen_foto1,
             acpdpp.almacen_foto2,
-            acpdpp.almacen_estado");
+            acpdpp.almacen_estado,
+            acpdpp.almacen_notas,
+            acpdpp.empleado_china_notas
+            ");
         $this->db->from('agente_compra_coordination_supplier accs');
         $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp', 'acpdpp.ID_Entidad_Proveedor = accs.id_supplier and acpdpp.ID_Pedido_Cabecera = accs.id_pedido and acpdpp.Nu_Selecciono_Proveedor =1 ', 'join');
         $this->db->join('agente_compra_pedido_detalle acpd', 'acpd.ID_Pedido_Detalle = acpdpp.ID_Pedido_Detalle', 'join');
@@ -3069,6 +3072,9 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
             if (array_key_exists('total_kg', $row)) {
                 $dataToInsert['total_kg'] = $row['total_kg'];
+            }
+            if(array_key_exists('notas',$row)){
+                $dataToInsert['almacen_notas'] = $row['notas'];
             }
             $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $key);
             $this->db->update('agente_compra_pedido_detalle_producto_proveedor', $dataToInsert);

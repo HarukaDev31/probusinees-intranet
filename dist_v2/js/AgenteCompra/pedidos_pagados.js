@@ -7156,9 +7156,9 @@ const openStepFunction = (i, stepId) => {
         openCoordination(response);
       }
     }
-    if(i==3){
-      if(currentPrivilege==2||currentPrivilege==5){
-        openAlmacenView(responseParsed.data,idPedido,currentPrivilege);
+    if (i == 3) {
+      if (currentPrivilege == 2 || currentPrivilege == 5) {
+        openAlmacenView(responseParsed.data, idPedido, currentPrivilege);
       }
     }
   });
@@ -7285,11 +7285,11 @@ const getSupplierCoordinationTableTemplate = (data) => {
       (acc, detail) => acc + parseFloat(detail.shipping_cost),
       0
     );
-    let  total = detalles.reduce(
+    let total = detalles.reduce(
       (acc, detail) => acc + detail.qty_product * detail.price_product,
       0
     );
-    total=total+sumDelivery;
+    total = total + sumDelivery;
     const detailsCount = detalles.length;
     const detailsImgs = detalles.map((detail) => {
       return detail.imagenURL;
@@ -7732,7 +7732,8 @@ const getSupplierCoordinationHeader = (data) => {
     console.log(supplier.detalles);
     const detalles = JSON.parse(supplier.detalles);
     detalles.forEach((detail) => {
-      montoTotal += parseFloat(detail.total_producto)+parseFloat(detail.shipping_cost);
+      montoTotal +=
+        parseFloat(detail.total_producto) + parseFloat(detail.shipping_cost);
     });
     primerPago += parseFloat(supplier.pago_1_value);
   });
@@ -9158,7 +9159,7 @@ const getAlmacenData = (idPedido) => {
     success: function (response) {
       response = JSON.parse(response);
       if (response.status == "success") {
-        openAlmacenView(response.data, idPedido,null);
+        openAlmacenView(response.data, idPedido, null);
       }
     },
   });
@@ -9209,8 +9210,9 @@ const getAlmacenViewHeader = () => {
   </div>
   `;
 };
-const getAlmacenTableHeader = () => {
-  return `<div class="almacen-table d-flex flex-column">
+const getAlmacenTableHeader = (permiso) => {
+  console.log("permiso", permiso);
+  let html = `<div class="almacen-table d-flex flex-column">
           <div class="almacen-header d-flex flex-row">
             <div class="imagen-column column">IMAGEN</div>
             <div class="nombre-column column">NOMBRE PRODUCTO</div>
@@ -9220,9 +9222,16 @@ const getAlmacenTableHeader = () => {
             <div class="totalkg-column column">TOTAL KG</div>
             <div class="fotos-column column">FOTOS</div>
             <div class="estado-column column">ESTADO</div>
-          </div>`;
+            <div class="notas-column column">NOTAS</div>
+            `;
+  return html;
 };
-const getAlmacenTableBody = (data, cotizacionCode, idPedido,permiso=null) => {
+const getAlmacenTableBody = (
+  data,
+  cotizacionCode,
+  idPedido,
+  permiso = null
+) => {
   let tableBody = "";
   if (!data) return tableBody;
   let totalCBM = 0;
@@ -9268,7 +9277,7 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido,permiso=null) => {
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_box]"
         value="${parseInt(producto.total_box)}"
-        ${permiso?'disabled':''}
+        ${permiso ? "disabled" : ""}
         >
       
       </div>
@@ -9279,7 +9288,7 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido,permiso=null) => {
         }][total_cbm]"
         
         value="${producto.total_cbm}"
-         ${permiso?'disabled':''}>
+         ${permiso ? "disabled" : ""}>
       </div>
       <div class="totalkg-column column">
         <input type="number" class="form-control total_kg"
@@ -9287,7 +9296,7 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido,permiso=null) => {
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_kg]"
         value="${producto.total_kg}"
-         ${permiso?'disabled':''}>
+         ${permiso ? "disabled" : ""}>
       </div>
       <div class="fotos-column column">
           <svg 
@@ -9316,7 +9325,22 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido,permiso=null) => {
           }>RECIBIDO</option>
         </select>
       </div>
-    </div>`;
+    `;
+      tableBody += `<div class="notas-column column">
+        <textarea class="form-control" name="almacen[${
+          producto.ID_Pedido_Detalle_Producto_Proveedor
+        }][notas]" rows="3"
+        ${permiso ? "disabled" : ""}
+        >${producto.almacen_notas??''}</textarea>
+      </div>`;
+    // }else if(permiso==2){
+    //   tableBody += `<div class="notas-column column">
+    //     <textarea class="form-control" name="almacen[${
+    //       producto.ID_Pedido_Detalle_Producto_Proveedor
+    //     }][personal_notas]" rows="3">${producto.almacen_notas??''}</textarea>
+    //   </div>`;
+    // }
+    tableBody += `</div>`;
   });
   $("#total-box").val(totalBox);
   $("#total-cbm").val(totalCBM);
@@ -9327,7 +9351,7 @@ const getAlmacenTableBody = (data, cotizacionCode, idPedido,permiso=null) => {
  * This function opens  the almacen table view
  * @param {*} data
  */
-const openAlmacenView = (data, idPedido,permiso=null) => {
+const openAlmacenView = (data, idPedido, permiso = null) => {
   $("#container_orden-compra").hide();
 
   let id_pedido = 0;
@@ -9338,7 +9362,7 @@ const openAlmacenView = (data, idPedido,permiso=null) => {
   }
   const almacenTitle = getAlmacenViewTitle(cotizacionCode);
   const almacenHeader = getAlmacenViewHeader();
-  const almacenTableHeader = getAlmacenTableHeader();
+  const almacenTableHeader = getAlmacenTableHeader(permiso);
   containerListar.hide();
   containerAlmacen
     .empty()
@@ -9346,7 +9370,12 @@ const openAlmacenView = (data, idPedido,permiso=null) => {
     .append(almacenHeader)
     .append(almacenTableHeader)
     .show();
-  const almacenTableBody = getAlmacenTableBody(data, cotizacionCode, idPedido,permiso);
+  const almacenTableBody = getAlmacenTableBody(
+    data,
+    cotizacionCode,
+    idPedido,
+    permiso
+  );
   containerAlmacen.append(almacenTableBody);
   const actionButtons = {
     btnSave: {

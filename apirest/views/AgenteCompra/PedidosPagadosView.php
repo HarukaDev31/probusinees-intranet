@@ -2826,7 +2826,7 @@ echo form_open('', $attributes);?>
 .almacen-header .column{
   
 }.almacen-row,.almacen-table{
-  width: 1600px;
+  width: 1850px;
 }
 .almacen-header .column:nth-child(odd),.almacen-row .column:nth-child(even){
   background-color: #f9f9f9;
@@ -3147,7 +3147,7 @@ echo form_open('', $attributes);?>
     box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
   }
   .almacen-table{
-
+    width: 1850px;
   }.almacen-header .column{
     text-align: center;
 
@@ -3171,6 +3171,15 @@ echo form_open('', $attributes);?>
     flex-direction: column;
     width: 200px;
   }.camera-not-filled,.camera-filled{
+    height: 50px;
+    width: 50px;
+  }.notas-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 300px;
+  }.camera-not-filled svg, .camera-filled svg{
     height: 50px;
     width: 50px;
   }

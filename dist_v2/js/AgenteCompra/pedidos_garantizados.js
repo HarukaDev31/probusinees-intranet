@@ -532,6 +532,8 @@ $(function () {
     $(".modal-ver_item").modal("show");
     $(".img-responsive").attr("src", $(this).data("url_img"));
     $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
+    $("#a-download_image").attr("data-url_img", $(this).data("url_img") ?? $(this)[0].currentSrc);
+
   });
 
   $("#table-elegir_productos_proveedor").on(
@@ -540,19 +542,18 @@ $(function () {
     function () {
       $(".img-responsive").attr("src", "");
       $(".modal-ver_item").modal("show");
-      console.log($(this));
       $(".img-responsive").attr(
         "src",
-        $(this).data("url_img") || $(this)[0].currentSrc
+        $(this).data("url_img") ?? $(this)[0].currentSrc
       );
       $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
-      $("#a-download_image").attr("data-src", $(this)[0].currentSrc);
+      $("#a-download_image").attr("data-url_img", $(this).data("url_img") ?? $(this)[0].currentSrc);
     }
   );
 
   $("#a-download_image").click(function () {
-    id = $(this).data("id_item");
-    src = $(this).data("src");
+    let id = $(this).data("id_item");
+    let src = $(this).data("url_img");
     filename = src.split("/").pop();
 
     if (src) {
@@ -1500,6 +1501,7 @@ function verPedido(ID) {
           }
           table_enlace_producto += "</div>";
         } else {
+          console.log(detalle[i].count_proveedor)
           if (parseInt(detalle[i].count_proveedor) > 0) {
             table_enlace_producto +=
               '<button type="button" id="btn-elegir_proveedor' +
