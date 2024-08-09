@@ -532,7 +532,7 @@ $(function () {
     $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
     $("#a-download_image").attr(
       "data-url_img",
-      $(this).data("url_img") ?? $(this)[0].currentSrc
+      $(this).data("url_img")
     );
   });
 
@@ -540,16 +540,16 @@ $(function () {
     "click",
     ".img-table_item",
     function () {
-      $(".img-responsive").attr("src", "");
+      console.log($(this).data("url_img"));
       $(".modal-ver_item").modal("show");
       $(".img-responsive").attr(
         "src",
-        $(this).data("url_img") ?? $(this)[0].currentSrc
+        $(this).data("url_img") 
       );
       $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
       $("#a-download_image").attr(
         "data-url_img",
-        $(this).data("url_img") ?? $(this)[0].currentSrc
+        $(this).data("url_img") 
       );
     }
   );
@@ -557,6 +557,8 @@ $(function () {
   $("#a-download_image").click(function () {
     let id = $(this).data("id_item");
     let src = $(this).data("url_img");
+
+    
     filename = src.split("/").pop();
     //create a new anchor element
     let a = document.createElement("a");
@@ -2831,6 +2833,8 @@ function getItemProveedor(id_detalle) {
           container
             .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
             .val(detalle[i]["main_photo"]);
+            //set attr img_url
+          
           container.find(`#btn-uploadprimaryimg-${i + 1}`).hide();
           // container
           //   .find(`#container-uploadprimaryimg-${i + 1}`)
@@ -2842,7 +2846,9 @@ function getItemProveedor(id_detalle) {
             .find(`#container-uploadprimaryimg-${i + 1}`)
             .find("label")
             .after(
-              `<img src="${detalle[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
+              `<img src="${detalle[i]["main_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2"
+              data-url_img="${detalle[i]["main_photo"]}"
+              >`
             );
           if (detalle[i]["secondary_photo"] != null) {
             container
@@ -2855,6 +2861,7 @@ function getItemProveedor(id_detalle) {
               .after(
                 `<img src="${detalle[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
               );
+            
             if (detalle[i]["terciary_photo"] != null) {
               container
                 .find(`#btn-uploadimg3-URL-${i + 1}`)
