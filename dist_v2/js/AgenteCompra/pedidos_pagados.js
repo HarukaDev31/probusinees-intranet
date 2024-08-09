@@ -7285,10 +7285,11 @@ const getSupplierCoordinationTableTemplate = (data) => {
       (acc, detail) => acc + parseFloat(detail.shipping_cost),
       0
     );
-    const total = detalles.reduce(
+    let  total = detalles.reduce(
       (acc, detail) => acc + detail.qty_product * detail.price_product,
       0
     );
+    total=total+sumDelivery;
     const detailsCount = detalles.length;
     const detailsImgs = detalles.map((detail) => {
       return detail.imagenURL;
@@ -7731,7 +7732,7 @@ const getSupplierCoordinationHeader = (data) => {
     console.log(supplier.detalles);
     const detalles = JSON.parse(supplier.detalles);
     detalles.forEach((detail) => {
-      montoTotal += parseFloat(detail.total_producto);
+      montoTotal += parseFloat(detail.total_producto)+parseFloat(detail.shipping_cost);
     });
     primerPago += parseFloat(supplier.pago_1_value);
   });

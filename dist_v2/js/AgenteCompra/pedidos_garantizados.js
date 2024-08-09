@@ -1500,7 +1500,7 @@ function verPedido(ID) {
           }
           table_enlace_producto += "</div>";
         } else {
-          if (parseInt(response.count_proveedor) > 0) {
+          if (parseInt(detalle[i].count_proveedor) > 0) {
             table_enlace_producto +=
               '<button type="button" id="btn-elegir_proveedor' +
               id_item +
