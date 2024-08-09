@@ -561,38 +561,38 @@ $(function () {
     
     filename = src.split("/").pop();
     //create a new anchor element
-    let a = document.createElement("a");
+    // let a = document.createElement("a");
 
-    a.href = src;
-    a.target = "_blank";
-    a.download = filename;
-    a.click();
-    a.remove();
+    // a.href = src;
+    // a.target = "_blank";
+    // a.download = filename;
+    // a.click();
+    // a.remove();
 
-    // if (src) {
-    //   $.ajax({
-    //     url: src,
-    //     method: "GET",
-    //     xhrFields: {
-    //       responseType: "blob", // Important
-    //     },
-    //     success: function (data) {
-    //       const blobUrl = window.URL.createObjectURL(data);
-    //       const link = document.createElement("a");
-    //       link.href = blobUrl;
-    //       link.download = filename;
-    //       document.body.appendChild(link);
-    //       link.click();
-    //       document.body.removeChild(link);
-    //       window.URL.revokeObjectURL(blobUrl);
-    //     },
-    //     error: function (jqXHR, textStatus, errorThrown) {
-    //       console.error("Error downloading file:", textStatus, errorThrown);
-    //     },
-    //   });
-    //   return;
-    // }
-    // url = base_url + "AgenteCompra/PedidosGarantizados/downloadImage/" + id;
+    if (src) {
+      $.ajax({
+        url: src,
+        method: "GET",
+        xhrFields: {
+          responseType: "blob", // Important
+        },
+        success: function (data) {
+          const blobUrl = window.URL.createObjectURL(data);
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(blobUrl);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error downloading file:", textStatus, errorThrown);
+        },
+      });
+      return;
+    }
+    url = base_url + "AgenteCompra/PedidosGarantizados/downloadImage/" + id;
 
     // var popupwin = window.open(url);
     // setTimeout(function () {
