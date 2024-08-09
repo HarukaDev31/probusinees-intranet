@@ -560,7 +560,9 @@ $(function () {
     filename = src.split("/").pop();
     //create a new anchor element
     let a = document.createElement("a");
+
     a.href = src;
+    a.target = "_blank";
     a.download = filename;
     a.click();
     a.remove();
