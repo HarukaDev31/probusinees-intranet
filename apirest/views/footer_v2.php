@@ -47,9 +47,13 @@ socket.onmessage = function(event) {
     console.log('Message from server:', event.data);
 };
 
-// Ejemplo de uso
-subscribeToChannels('project1', 'admin', 'user123');
-publishToChannels('project1', 'admin', 'user123', 'Hello everyone!');
+//on connect to socket
+socket.onopen = function(event) {
+    console.log('Connected to the server');
+    // Ejemplo de uso
+    subscribeToChannels('project1', 'admin', 'user123');
+    publishToChannels('project1', 'admin', 'user123', 'Hello everyone!');
+};
 </script>
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
