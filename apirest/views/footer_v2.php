@@ -44,7 +44,7 @@ function publishToChannels(project, role, user, message) {
 
 // Manejar mensajes recibidos del servidor
 socket.onmessage = function(event) {
-    const message = JSON.parse(event.data);
+    const message = event.data;
     console.log('Received message:', message);
     // Aquí puedes manejar los mensajes recibidos del servidor
     try{
@@ -53,7 +53,7 @@ socket.onmessage = function(event) {
     catch(e){
       console.log(e);
     }
-    
+
 };
 
 //on connect to socket
