@@ -45,11 +45,11 @@ function publishToChannels(project, role, user, message) {
 // Manejar mensajes recibidos del servidor
 socket.onmessage = function(event) {
   console.log(event);
-    const message = event;
+    const message = event.data;
     console.log('Received message:', message);
     // Aquí puedes manejar los mensajes recibidos del servidor
     try{
-      alert(message.message);
+      alert(message);
     }
     catch(e){
       console.log(e);
@@ -60,7 +60,7 @@ socket.onmessage = function(event) {
 //on connect to socket
 socket.onopen = function(event) {
     subscribeToChannels('project1', 'admin', 'user123');
-    publishToChannels('project1', 'admin', 'user123', 'Hello everyone!');
+    publishToChannels('project1', 'admin', 'user123', 'Servicio de notificaciones activo');
 };
 </script>
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
