@@ -17,7 +17,7 @@
 
 <!-- jQuery -->
 <script>
-const socket = new WebSocket('ws://localhost:8080');
+const socket = new WebSocket('ws://localhost:8081');
 
 // Suscribirse a múltiples canales
 function subscribeToChannels(project, role, user) {
