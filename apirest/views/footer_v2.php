@@ -59,7 +59,7 @@ socket.onmessage = function(event) {
 
 //on connect to socket
 socket.onopen = function(event) {
-    subscribeToChannels('project1', 'admin', 'user123');
+    subscribeToChannels('project1', null,null);
     publishToChannels('project1', 'admin', 'user123', 'Servicio de notificaciones activo');
 };
 </script>
