@@ -44,13 +44,20 @@ function publishToChannels(project, role, user, message) {
 
 // Manejar mensajes recibidos del servidor
 socket.onmessage = function(event) {
-    console.log('Message from server:', event.data);
+    const message = JSON.parse(event.data);
+    console.log('Received message:', message);
+    // Aquí puedes manejar los mensajes recibidos del servidor
+    try{
+      alert(message.message);
+    }
+    catch(e){
+      console.log(e);
+    }
+    
 };
 
 //on connect to socket
 socket.onopen = function(event) {
-    console.log('Connected to the server');
-    // Ejemplo de uso
     subscribeToChannels('project1', 'admin', 'user123');
     publishToChannels('project1', 'admin', 'user123', 'Hello everyone!');
 };
