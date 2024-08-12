@@ -3269,7 +3269,7 @@ echo form_open('', $attributes);?>
         }
 
         .preview {
-            max-width: 100%;
+            max-width: 80%;
             max-height: 100%;
             border-radius: 10px;
         }

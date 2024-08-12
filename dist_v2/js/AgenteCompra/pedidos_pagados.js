@@ -7268,101 +7268,139 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
   html += "</div>";
   return html;
 };
+
 const viewInspeccionPhotos = (
   idItem,
   cotizacionCode,
   idPedido,
   currentPrivilege
 ) => {
+  const containerInspection = $("#container-inspeccion");
   containerInspection.empty();
-  const content = getInspectionPhotosTemplate(idItem);
+  const content = getInspectionPhotosTemplate();
   containerInspection.append(content);
-  // Evento para abrir el file input al hacer clic en el label
-  $(document).ready(function () {
-    const maxFileSize = 20 * 1024 * 1024; // 10 MB en bytes
 
-    // Evento para abrir el file input al hacer clic en el label
-    $(".image-large, .image-small").on("click", function (e) {
-      e.stopPropagation();
+  const maxFileSize = 20 * 1024 * 1024; // 20 MB en bytes
 
-      const fileInput = $(this).find('input[type="file"]');
-      if (!fileInput.data("isOpening")) {
-        fileInput.data("isOpening", true);
-        fileInput.trigger("click");
-      }
-    });
-
-    // Evento para mostrar la previsualización del archivo seleccionado
-    $('input[type="file"]').on("change", function () {
-      const file = this.files[0];
-      const preview = $(this).siblings(".preview");
-      const spinner = $(this).siblings(".spinner-border");
-      const errorContainer = $(this).siblings(".error-message");
-      const reader = new FileReader();
-      const fileInput = $(this);
-
-      if (file) {
-        // Validar el tamaño del archivo
-        if (file.size > maxFileSize) {
-          errorContainer
-            .text(
-              "El archivo es demasiado grande. El tamaño máximo permitido es 20 MB."
-            )
-            .show();
-          fileInput.val(""); // Limpiar el input de archivo
-          preview.hide(); // Asegurarse de que no se muestre la previsualización
-          spinner.hide(); // Asegurarse de que el spinner esté oculto
-          $(this).siblings("span").show();
-          //wait 2 seconds and hide error message
-          setTimeout(() => {
-            errorContainer.hide();
-          }, 1000);
-
-          return; // Salir si el archivo supera el límite
-        } else {
-          errorContainer.hide(); // Ocultar el mensaje de error si el tamaño es válido
+  // Cargar archivos existentes
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getInspectionPhotos",
+    type: "POST",
+    data: { idItem },
+    success: function (response) {
+      try {
+        response = JSON.parse(response);
+        if (response.status === "success") {
+          const data = response.data;
+          ["foto1", "foto2", "foto3", "video1", "video2"].forEach((key) => {
+            if (data[`inspeccion_${key}`]) {
+              const input = $(`input[name="${key}"]`);
+              const preview = input.siblings(".preview");
+              preview.attr("src", data[`inspeccion_${key}`]).show();
+              input.siblings("span").hide();
+              input
+                .closest("label")
+                .append(
+                  '<div class="reupload-text btn btn-outline-secondary">Volver a subir</div>'
+                );
+            }
+          });
         }
-
-        // Mostrar el spinner y deshabilitar la interacción
-        spinner.show();
-        preview.hide();
-        $(this).siblings("span").hide(); // Ocultar el texto "Imagen" o "Video"
-        fileInput.prop("disabled", true); // Deshabilitar el input temporalmente
-
-        reader.onload = function (e) {
-          setTimeout(() => {
-            preview.attr("src", e.target.result).show();
-            spinner.hide(); // Ocultar el spinner una vez que la imagen/video esté listo
-            fileInput.prop("disabled", false); // Rehabilitar el input después de cargar
-          }, 100); // Ajusta este tiempo según sea necesario
-        };
-
-        if (file.type.startsWith("image/")) {
-          preview.prop("tagName") === "IMG" && reader.readAsDataURL(file);
-        } else if (file.type.startsWith("video/")) {
-          preview.prop("tagName") === "VIDEO" && reader.readAsDataURL(file);
-        }
-      } else {
-        fileInput.prop("disabled", false); // Asegúrate de reactivar si no hay archivo seleccionado
+      } catch (e) {
+        console.log(e);
       }
-    });
+    },
+  });
 
-    // Evento para eliminar el archivo seleccionado
-    $(".close-button").on("click", function (e) {
+  // Limpiar eventos previos
+  containerInspection.off("click", ".image-large, .image-small");
+  containerInspection.off("change", 'input[type="file"]');
+  containerInspection.off("click", ".close-button");
+
+  // Manejar clic en el contenedor para abrir el input
+  containerInspection.on("click", ".image-large, .image-small", function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    $(this).off('click');
+    console.log("click container ");
+    const input = $(this).find('input[type="file"]');
+    if (input.length) {
+      con
+      setTimeout(() => {
+        input.trigger("click");
+      }, 100); // Agregar un pequeño retraso
+    }
+    $(this).on('click', function(e) {
       e.stopPropagation();
-      const label = $(this).closest("label");
-      const fileInput = label.find('input[type="file"]');
-      const spinner = label.find(".spinner-border");
-      const errorContainer = label.find(".error-message");
-      fileInput.val(""); // Limpiar el input de archivo
-      label.find(".preview").hide(); // Ocultar la previsualización
-      label.find("span").show(); // Mostrar el texto original
-      spinner.hide(); // Asegurar que el spinner esté oculto
-      errorContainer.hide();
-      fileInput.prop("disabled", false); // Rehabilitar el input después de cerrar
-      fileInput.data("isOpening", false); // Restablecer flag
+      e.preventDefault();
     });
   });
+
+  // Manejar cambio en los inputs de archivo
+  containerInspection.on("change", 'input[type="file"]', function (e) {
+    console.log("change");
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    e.preventDefault();
+    const file = this.files[0];
+    const label = $(this).closest("label");
+    const preview = label.find(".preview");
+    const spinner = label.find(".spinner-border");
+    const errorContainer = label.find(".error-message");
+
+    if (file) {
+      if (file.size > maxFileSize) {
+        errorContainer
+          .text(
+            "El archivo es demasiado grande. El tamaño máximo permitido es 20 MB."
+          )
+          .show();
+        $(this).val("");
+        setTimeout(() => {
+          errorContainer.hide();
+        }, 3000);
+        return;
+      }
+
+      spinner.show();
+      preview.hide();
+      label.find("span:not(.reupload-text)").hide();
+      $(this).prop("disabled", true);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.attr("src", e.target.result).show();
+        spinner.hide();
+        $(this).prop("disabled", false);
+      };
+
+      if (file.type.startsWith("image/")) {
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith("video/")) {
+        reader.readAsDataURL(file);
+      }
+    }
+  });
+
+  // Manejar clic en el botón de cerrar
+  containerInspection.on("click", ".close-button", function (e) {
+    console.log("click");
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    e.preventDefault();
+
+    const label = $(this).closest("label");
+    const fileInput = label.find('input[type="file"]');
+    const preview = label.find(".preview");
+
+    fileInput.val("");
+    preview.hide().attr("src", "");
+    label.find("span").show();
+    label.find(".reupload-text").remove();
+  });
+
+  // Agregar botones de acción
   const btns = {
     btnCancel: {
       text: "Regresar",
@@ -7376,72 +7414,71 @@ const viewInspeccionPhotos = (
   const actionButtons = getActionButtons(btns);
   $("#inspection-buttons").append(actionButtons);
 };
-const getInspectionPhotosTemplate = (idItem) => {
-  const html = `
-      <div class="container mt-5" id="inspection-photos">
-        <div id="inspectionForm" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-8">
-                    <label class="image-large position-relative" data-index="0" data-type="image">
-                        <button class="close-button" type="button">×</button>
-                        <span>Imagen</span>
-                        
-                        <div class="error-message" style="color:red; display:none;"></div>
-                        <div class="spinner-border" role="status" style="display:none;">
-                        <span class="sr-only">Cargando...</span>
-                      </div>
-                        <input type="file" name="foto1" accept="image/*">
-                        <img class="preview" src="" alt="" style="display: none;">
-                    </label>
-                </div>
-                <div class="col-md-4">
-                    <label class="image-small position-relative" data-index="1" data-type="image">
-                        <button class="close-button" type="button">×</button>
-                        <span>Imagen</span>
-                        <div class="error-message" style="color:red; display:none;"></div>
-                        <div class="spinner-border" role="status" style="display:none;">
-            <span class="sr-only">Cargando...</span>
+
+const getInspectionPhotosTemplate = () => {
+  return `
+    <div class="container mt-5" id="inspection-photos">
+      <div id="inspectionForm" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-md-8">
+            <label class="image-large position-relative">
+              <div class="close-button">×</div>
+              <span>Imagen</span>
+              <div class="error-message" style="color:red; display:none;"></div>
+              <div class="spinner-border" role="status" style="display:none;">
+                <span class="sr-only">Cargando...</span>
+              </div>
+              <input type="file" name="foto1" accept="image/*" style="display:none;">
+              <img class="preview" src="" alt="" style="display: none;">
+            </label>
+          </div>
+          <div class="col-md-4">
+            <label class="image-small position-relative">
+              <div class="close-button">×</div>
+              <span>Imagen</span>
+              <div class="error-message" style="color:red; display:none;"></div>
+              <div class="spinner-border" role="status" style="display:none;">
+                <span class="sr-only">Cargando...</span>
+              </div>
+              <input type="file" name="foto2" accept="image/*" style="display:none;">
+              <img class="preview" src="" alt="" style="display: none;">
+            </label>
+            <label class="image-small position-relative">
+              <div class="close-button">×</div>
+              <span>Imagen</span>
+              <div class="error-message" style="color:red; display:none;"></div>
+              <div class="spinner-border" role="status" style="display:none;">
+                <span class="sr-only">Cargando...</span>
+              </div>
+              <input type="file" name="foto3" accept="image/*" style="display:none;">
+              <img class="preview" src="" alt="" style="display: none;">
+            </label>
+            <label class="image-small position-relative">
+              <div class="close-button">×</div>
+              <span>Video</span>
+              <div class="error-message" style="color:red; display:none;"></div>
+              <div class="spinner-border" role="status" style="display:none;">
+                <span class="sr-only">Cargando...</span>
+              </div>
+              <input type="file" name="video1" accept="video/*" style="display:none;">
+              <video class="preview" controls style="display: none;"></video>
+            </label>
+            <label class="image-small position-relative">
+              <div class="close-button">×</div>
+              <span>Video</span>
+              <div class="error-message" style="color:red; display:none;"></div>
+              <div class="spinner-border" role="status" style="display:none;">
+                <span class="sr-only">Cargando...</span>
+              </div>
+              <input type="file" name="video2" accept="video/*" style="display:none;">
+              <video class="preview" controls style="display: none;"></video>
+            </label>
+          </div>
         </div>
-                        <input type="file" name="foto2" accept="image/*">
-                        <img class="preview" src="" alt="" style="display: none;">
-                    </label>
-                    <label class="image-small position-relative" data-index="2" data-type="image">
-                        <button class="close-button" type="button">×</button>
-                        <span>Imagen</span>
-                        <div class="error-message" style="color:red; display:none;"></div>
-                        <div class="spinner-border" role="status" style="display:none;">
-            <span class="sr-only">Cargando...</span>
-        </div>
-                        <input type="file" name="foto3" accept="image/*">
-                        <img class="preview" src="" alt="" style="display: none;">
-                    </label>
-                    <label class="image-small position-relative" data-index="3" data-type="video">
-                        <button class="close-button" type="button">×</button>
-                        <span>Video</span>
-                        <div class="error-message" style="color:red; display:none;"></div>
-                        <div class="spinner-border" role="status" style="display:none;">
-                           <span class="sr-only">Cargando...</span>
-                        </div>
-                        <input type="file" name="video1" accept="video/*">
-                        <video class="preview" controls style="display: none;"></video>
-                    </label>
-                    <label class="image-small position-relative" data-index="4" data-type="video">
-                        <button class="close-button" type="button">×</button>
-                        <span>Video</span>
-                        <div class="error-message" style="color:red; display:none;"></div>
-                        <div class="spinner-border" role="status" style="display:none;">
-                           <span class="sr-only">Cargando...</span>
-                        </div>
-                        <input type="file" name="video2" accept="video/*">
-                        <video class="preview" controls style="display: none;"></video>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="d-flex justify-content-center mt-3" id="inspection-buttons">
-        </div>
+      </div>
+      <div class="d-flex justify-content-center mt-3" id="inspection-buttons">
+      </div>
     </div>`;
-  return html;
 };
 
 const saveInspectionPhotos = (
@@ -7467,7 +7504,7 @@ const saveInspectionPhotos = (
     }
   }
   url = base_url + "AgenteCompra/PedidosPagados/saveInspectionPhotos";
-  
+
   $.ajax({
     url: url,
     type: "POST",
@@ -10011,4 +10048,3 @@ const openSupplierDetails = (name, phone) => {
     $("#modalsupplier-data").modal("hide");
   });
 };
-

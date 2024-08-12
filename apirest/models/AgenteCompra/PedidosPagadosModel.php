@@ -3207,6 +3207,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             'inspeccion_video1' => $data['video1'],
             'inspeccion_video2' => $data['video2'],
         ]);
+    }       
+    public function getInspectionPhotos($idItem){
+        $this->db->select('inspeccion_foto1,inspeccion_foto2,inspeccion_foto3,inspeccion_video1,inspeccion_video2');
+        $this->db->from('agente_compra_pedido_detalle_producto_proveedor');
+        $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
+        return $this->db->get()->row();
     }
-
 }
