@@ -49,7 +49,17 @@ class PedidosGarantizados extends CI_Controller
 
             $sCorrelativoCotizacion = strtoupper(substr(getNameMonth($row->Fe_Month), 0, 3)) . str_pad($row->Nu_Correlativo, 3, "0", STR_PAD_LEFT);
             $rows[] = $row->No_Pais;
-            $rows[] = $row->cotizacionCode;
+            $rows[] = //input with value $row->cotizacionCode; disabled and with a button to edit 
+                '<div class="row" id="container-cotizacionCode_' . $row->ID_Pedido_Cabecera . '">
+                <input 
+                id="cotizacionCode_' . $row->ID_Pedido_Cabecera . '"
+                type="text" class="form-control w-100" value="' . $row->cotizacionCode . '" disabled>
+                <div class="btn btn-xs btn-link"
+                id="btn_edit_cotizacionCode_' . $row->ID_Pedido_Cabecera . '"
+                alt="Editar" title="Editar" href="javascript:void(0)" onclick="editarCotizacionCode(\'' . $row->ID_Pedido_Cabecera . '\')">
+                <i class="fas fa-edit fa-2x" aria-hidden="true"></i></div>
+                </div>';
+                
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto; //quitar para el chino
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad; //quitar para el chino
@@ -886,5 +896,11 @@ class PedidosGarantizados extends CI_Controller
         $id_item = $this->input->post('id_item');
         $response = $this->PedidosGarantizadosModel->deleteItem($id_item);  
         echo json_encode($response);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+    }
+    public function editCotizacionCode(){
+        $id_cabecera = $this->input->post('idPedido');
+        $cotizacion_code = $this->input->post('value');
+        $response = $this->PedidosGarantizadosModel->editCotizacionCode($id_cabecera,$cotizacion_code);  
+        echo json_encode($response);
     }
 }

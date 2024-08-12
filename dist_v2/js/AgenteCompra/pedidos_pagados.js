@@ -7148,6 +7148,7 @@ const deleteImage = (i, imgIndex) => {
 
 const openStepFunction = (i, stepId) => {
   $("#container-ver").hide();
+  $("#inspection-photos").hide();
   containerOrdenCompra.show();
   selectedStep = stepId;
   url = base_url + "AgenteCompra/PedidosPagados/getStepByRole";
@@ -7184,7 +7185,11 @@ const openInspectionView = (data, idPedido, currentPrivilege) => {
     cotizacionCode = data[0].cotizacionCode;
   }
   const inspectionTitle = getInspectionTitle(cotizacionCode);
-  const inspectionTable = getInspectionTableTemplate(data, currentPrivilege);
+  const inspectionTable = getInspectionTableTemplate(
+    data,
+    currentPrivilege,
+    cotizacionCode
+  );
   containerInspection.append(inspectionTitle).append(inspectionTable);
   containerInspection.show();
 };
@@ -7196,7 +7201,7 @@ const getInspectionTitle = (cotizacionCode) => {
   </div>
   `;
 };
-const getInspectionTableTemplate = (data, currentPrivilege) => {
+const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
   html = `
     <div class="inspection-table d-flex flex-column">`;
   html +=
@@ -7228,7 +7233,20 @@ const getInspectionTableTemplate = (data, currentPrivilege) => {
             item.total_box ? parseInt(item.total_box) : 0
           }</span>
           </div>
-          <div class="inspection-column inspection-photos">Subir fotos</div>
+          <div class="inspection-column inspection-photos"><svg 
+          onclick="viewInspeccionPhotos(${
+            item.ID_Pedido_Detalle_Producto_Proveedor
+          },'${cotizacionCode}','${item.ID_Pedido_Cabecera}',
+          '${currentPrivilege}')"
+          class="${
+            item.personal_china_inspeccion_estado != "PENDIENTE"
+              ? "camera-filled"
+              : "camera-not-filled"
+          }"
+          viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg></div>
           <div class="inspection-column inspection-estado">
           <select class="form-select" >
           <option value="PENDIENTE" ${
@@ -7250,6 +7268,228 @@ const getInspectionTableTemplate = (data, currentPrivilege) => {
   html += "</div>";
   return html;
 };
+const viewInspeccionPhotos = (
+  idItem,
+  cotizacionCode,
+  idPedido,
+  currentPrivilege
+) => {
+  containerInspection.empty();
+  const content = getInspectionPhotosTemplate(idItem);
+  containerInspection.append(content);
+  // Evento para abrir el file input al hacer clic en el label
+  $(document).ready(function () {
+    const maxFileSize = 20 * 1024 * 1024; // 10 MB en bytes
+
+    // Evento para abrir el file input al hacer clic en el label
+    $(".image-large, .image-small").on("click", function (e) {
+      e.stopPropagation();
+
+      const fileInput = $(this).find('input[type="file"]');
+      if (!fileInput.data("isOpening")) {
+        fileInput.data("isOpening", true);
+        fileInput.trigger("click");
+      }
+    });
+
+    // Evento para mostrar la previsualización del archivo seleccionado
+    $('input[type="file"]').on("change", function () {
+      const file = this.files[0];
+      const preview = $(this).siblings(".preview");
+      const spinner = $(this).siblings(".spinner-border");
+      const errorContainer = $(this).siblings(".error-message");
+      const reader = new FileReader();
+      const fileInput = $(this);
+
+      if (file) {
+        // Validar el tamaño del archivo
+        if (file.size > maxFileSize) {
+          errorContainer
+            .text(
+              "El archivo es demasiado grande. El tamaño máximo permitido es 20 MB."
+            )
+            .show();
+          fileInput.val(""); // Limpiar el input de archivo
+          preview.hide(); // Asegurarse de que no se muestre la previsualización
+          spinner.hide(); // Asegurarse de que el spinner esté oculto
+          $(this).siblings("span").show();
+          //wait 2 seconds and hide error message
+          setTimeout(() => {
+            errorContainer.hide();
+          }, 1000);
+
+          return; // Salir si el archivo supera el límite
+        } else {
+          errorContainer.hide(); // Ocultar el mensaje de error si el tamaño es válido
+        }
+
+        // Mostrar el spinner y deshabilitar la interacción
+        spinner.show();
+        preview.hide();
+        $(this).siblings("span").hide(); // Ocultar el texto "Imagen" o "Video"
+        fileInput.prop("disabled", true); // Deshabilitar el input temporalmente
+
+        reader.onload = function (e) {
+          setTimeout(() => {
+            preview.attr("src", e.target.result).show();
+            spinner.hide(); // Ocultar el spinner una vez que la imagen/video esté listo
+            fileInput.prop("disabled", false); // Rehabilitar el input después de cargar
+          }, 100); // Ajusta este tiempo según sea necesario
+        };
+
+        if (file.type.startsWith("image/")) {
+          preview.prop("tagName") === "IMG" && reader.readAsDataURL(file);
+        } else if (file.type.startsWith("video/")) {
+          preview.prop("tagName") === "VIDEO" && reader.readAsDataURL(file);
+        }
+      } else {
+        fileInput.prop("disabled", false); // Asegúrate de reactivar si no hay archivo seleccionado
+      }
+    });
+
+    // Evento para eliminar el archivo seleccionado
+    $(".close-button").on("click", function (e) {
+      e.stopPropagation();
+      const label = $(this).closest("label");
+      const fileInput = label.find('input[type="file"]');
+      const spinner = label.find(".spinner-border");
+      const errorContainer = label.find(".error-message");
+      fileInput.val(""); // Limpiar el input de archivo
+      label.find(".preview").hide(); // Ocultar la previsualización
+      label.find("span").show(); // Mostrar el texto original
+      spinner.hide(); // Asegurar que el spinner esté oculto
+      errorContainer.hide();
+      fileInput.prop("disabled", false); // Rehabilitar el input después de cerrar
+      fileInput.data("isOpening", false); // Restablecer flag
+    });
+  });
+  const btns = {
+    btnCancel: {
+      text: "Regresar",
+      action: `openStepFunction(4,${selectedStep})`,
+    },
+    btnSave: {
+      text: "Guardar",
+      action: `saveInspectionPhotos(${idItem},${cotizacionCode},${idPedido},${currentPrivilege})`,
+    },
+  };
+  const actionButtons = getActionButtons(btns);
+  $("#inspection-buttons").append(actionButtons);
+};
+const getInspectionPhotosTemplate = (idItem) => {
+  const html = `
+      <div class="container mt-5" id="inspection-photos">
+        <div id="inspectionForm" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-8">
+                    <label class="image-large position-relative" data-index="0" data-type="image">
+                        <button class="close-button" type="button">×</button>
+                        <span>Imagen</span>
+                        
+                        <div class="error-message" style="color:red; display:none;"></div>
+                        <div class="spinner-border" role="status" style="display:none;">
+                        <span class="sr-only">Cargando...</span>
+                      </div>
+                        <input type="file" name="foto1" accept="image/*">
+                        <img class="preview" src="" alt="" style="display: none;">
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <label class="image-small position-relative" data-index="1" data-type="image">
+                        <button class="close-button" type="button">×</button>
+                        <span>Imagen</span>
+                        <div class="error-message" style="color:red; display:none;"></div>
+                        <div class="spinner-border" role="status" style="display:none;">
+            <span class="sr-only">Cargando...</span>
+        </div>
+                        <input type="file" name="foto2" accept="image/*">
+                        <img class="preview" src="" alt="" style="display: none;">
+                    </label>
+                    <label class="image-small position-relative" data-index="2" data-type="image">
+                        <button class="close-button" type="button">×</button>
+                        <span>Imagen</span>
+                        <div class="error-message" style="color:red; display:none;"></div>
+                        <div class="spinner-border" role="status" style="display:none;">
+            <span class="sr-only">Cargando...</span>
+        </div>
+                        <input type="file" name="foto3" accept="image/*">
+                        <img class="preview" src="" alt="" style="display: none;">
+                    </label>
+                    <label class="image-small position-relative" data-index="3" data-type="video">
+                        <button class="close-button" type="button">×</button>
+                        <span>Video</span>
+                        <div class="error-message" style="color:red; display:none;"></div>
+                        <div class="spinner-border" role="status" style="display:none;">
+                           <span class="sr-only">Cargando...</span>
+                        </div>
+                        <input type="file" name="video1" accept="video/*">
+                        <video class="preview" controls style="display: none;"></video>
+                    </label>
+                    <label class="image-small position-relative" data-index="4" data-type="video">
+                        <button class="close-button" type="button">×</button>
+                        <span>Video</span>
+                        <div class="error-message" style="color:red; display:none;"></div>
+                        <div class="spinner-border" role="status" style="display:none;">
+                           <span class="sr-only">Cargando...</span>
+                        </div>
+                        <input type="file" name="video2" accept="video/*">
+                        <video class="preview" controls style="display: none;"></video>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mt-3" id="inspection-buttons">
+        </div>
+    </div>`;
+  return html;
+};
+
+const saveInspectionPhotos = (
+  idItem,
+  cotizacionCode,
+  idPedido,
+  currentPrivilege
+) => {
+  const form = $("#container-inspeccion");
+  const formData = new FormData(form[0]);
+  formData.append("idItem", idItem);
+  formData.append("cotizacionCode", cotizacionCode);
+  formData.append("idPedido", idPedido);
+  formData.append("currentPrivilege", currentPrivilege);
+  for (let pair of formData.entries()) {
+    if (pair[1] instanceof File) {
+      console.log(`File field: ${pair[0]}`);
+      console.log(`File name: ${pair[1].name}`);
+      console.log(`File size: ${pair[1].size}`);
+      console.log(`File type: ${pair[1].type}`);
+    } else {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+  }
+  url = base_url + "AgenteCompra/PedidosPagados/saveInspectionPhotos";
+  
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      console.log(response);
+      const responseParsed = JSON.parse(response);
+      if (responseParsed.status == "success") {
+        containerInspection.empty();
+        $(".step-container").remove();
+        $(".step-container-completed").remove();
+        getOrderProgress(idPedido);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseText);
+    },
+  });
+};
+
 const openCoordination = (response) => {
   containerOrdenCompra.hide();
   let data = JSON.parse(response).data;
@@ -9771,3 +10011,4 @@ const openSupplierDetails = (name, phone) => {
     $("#modalsupplier-data").modal("hide");
   });
 };
+

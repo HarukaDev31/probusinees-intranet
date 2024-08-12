@@ -1202,4 +1202,13 @@ class PedidosGarantizadosModel extends CI_Model
         }
 
     }
+    public function editCotizacionCode($id_pedido, $cotizacionCode)
+    {
+        $where = array('ID_Pedido_Cabecera' => $id_pedido);
+        $data = array('cotizacionCode' => $cotizacionCode);
+        if ($this->db->update($this->table, $data, $where) > 0) {
+            return array('status' => 'success', 'message' => 'Registro modificado');
+        }
+        return array('status' => 'error', 'message' => 'Error al modificar');
+    }
 }

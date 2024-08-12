@@ -544,12 +544,12 @@ $(function () {
       $(".modal-ver_item").modal("show");
       $(".img-responsive").attr(
         "src",
-        $(this).data("url_img") 
+        $(this).data("url_img")
       );
       $("#a-download_image").attr("data-id_item", $(this).data("id_item"));
       $("#a-download_image").attr(
         "data-url_img",
-        $(this).data("url_img") 
+        $(this).data("url_img")
       );
     }
   );
@@ -558,7 +558,7 @@ $(function () {
     let id = $(this).data("id_item");
     let src = $(this).data("url_img");
 
-    
+
     filename = src.split("/").pop();
     //create a new anchor element
     // let a = document.createElement("a");
@@ -2267,18 +2267,18 @@ function addItems() {
           <div class="col-12 col-md-6 col-lg-6 d-flex flex-column justify-content-center">
             <!--Upload Icon-->
             <label>Imagen Principal</label>
-            
+
             <input type="file" name="file[${iCounterItems}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/>
           </div>
           <div class="col-12 col-md-6 col-lg-6 d-flex flex-column justify-content-center">
             <label>Imagen 2</label>
-            <input type="file" name="file[${iCounterItems}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/> 
+            <input type="file" name="file[${iCounterItems}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/>
             <label>Imagen 3</label>
-            <input type="file" name="file[${iCounterItems}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/> 
+            <input type="file" name="file[${iCounterItems}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/>
             <label>Video 1</label>
-            <input type="file" name="file[${iCounterItems}][primary_video]"class=" btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="video/*"/>            
+            <input type="file" name="file[${iCounterItems}][primary_video]"class=" btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="video/*"/>
             <label>Video 2</label>
-            <input type="file" name="file[${iCounterItems}][secondary_video]"class=" btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="video/*"/> 
+            <input type="file" name="file[${iCounterItems}][secondary_video]"class=" btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="video/*"/>
           </div>
         </div>
       </div>
@@ -2423,7 +2423,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
- 
+
 
       <div class = "row" >
         <div class="col-6 col-md-3 col-lg-2">
@@ -2496,37 +2496,37 @@ function getItemTemplate(i, mode, detalle, privilegio) {
               <!--Upload Icon-->
               <div class="form-group mx-auto d-flex flex-column " id="container-uploadprimaryimg-${i}">
               <label class="text-center">Imagen Principal</label>
-             
+
               </br>
               <input disabled type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
               <input disabled type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
-                
+
               </div>
             </div>
             <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
             <div class="form-group" id="container-uploadimg2-${i}">
             <label>Imagen 2</label>
-            
-            <input disabled type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
+
+            <input disabled type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>
             <input disabled type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
-             
+
             </div>
               <div class="form-group" id="container-uploadimg3-${i}">
               <label>Imagen 3</label>
-               
+
               <input disabled type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
               <input disabled type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
-               
+
               </div>
               <div class="form-group" id="container-uploadvideo1-${i}">
               <label>Video 1</label>
-                
+
 
               <input disabled type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
               <input disabled type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
               <div class="form-group"  id="container-uploadvideo2-${i}">
               <label>Video 2</label>
-              
+
               <input disabled type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
               <input disabled type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
 
@@ -2553,7 +2553,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
             <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
             <div id="modal-notas${i}" data-correlativo="${i}"  placeholder="" value="" autocomplete="off" style="pointer-events:none"></div>
           </div>
-          
+
         </div>
       </div>
       `;
@@ -2642,7 +2642,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
               <!--Upload Icon-->
               <div class="form-group mx-auto d-flex flex-column " id="container-uploadprimaryimg-${i}">
               <label class="text-center">Imagen Principal</label>
-             
+
               </br>
               <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
               <input type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
@@ -2651,25 +2651,25 @@ function getItemTemplate(i, mode, detalle, privilegio) {
                    ? ""
                    : `<span class="fw-bold  btn btn-danger d-block"
               onclick="deleteImage('${i}',1)">Eliminar</span>`
-               }  
+               }
               </div>
             </div>
             <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
             <div class="form-group" id="container-uploadimg2-${i}">
             <label>Imagen 2</label>
-            
-            <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>            
+
+            <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>
             <input type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
              ${
                detalle[i - 1]["secondary_photo"] == null
                  ? ""
                  : `<span class="fw-bold  btn btn-danger d-block"
               onclick="deleteImage('${i}',2)">Eliminar</span>`
-             }  
+             }
             </div>
               <div class="form-group" id="container-uploadimg3-${i}">
               <label>Imagen 3</label>
-               
+
               <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
               <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
                ${
@@ -2711,7 +2711,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
             <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
                               <button type="button" class="btn btn-outline-secondary" id="btn-open-supplier${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-supplier${i}"><i class="fas fa-search"></i></button>
 
-            </div>    
+            </div>
             <ul class="supplier-list supplier-list${i}" style="position:absolute">
                 </ul>
             </li>
@@ -2728,7 +2728,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
             <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
             <div id="modal-notas${i}" data-correlativo="${i}"   placeholder="" value="" autocomplete="off"  class="w-100"></div>
           </div>
-          
+
         </div>
       </div>
       `;
@@ -2740,23 +2740,23 @@ function getItemTemplate(i, mode, detalle, privilegio) {
   if (privilegio == 1) {
     if (detalle[i - 1]["Nu_Selecciono_Proveedor"] == 0) {
       div_items += `
-            <button type="button" id="btn-seleccionar_proveedor${id_item}" 
-              data-id_detalle="${id_detalle}" 
-              data-id="${id_item}" 
-              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}" 
-              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}" 
+            <button type="button" id="btn-seleccionar_proveedor${id_item}"
+              data-id_detalle="${id_detalle}"
+              data-id="${id_item}"
+              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}"
+              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}"
               data-id_supplier="${id_supplier}"
               class="btn btn-danger btn-block btn-seleccionar_proveedor">
               <i class="fas fa-check"></i>&nbsp; Seleccionar proveedor
             </button>`;
     } else {
       div_items += `
-            <button type="button" id="btn-desmarcar_proveedor${id_item}" 
-              data-id_detalle="${id_detalle}" 
-              data-id="${id_item}" 
+            <button type="button" id="btn-desmarcar_proveedor${id_item}"
+              data-id_detalle="${id_detalle}"
+              data-id="${id_item}"
               data-id_supplier="${id_supplier}"
-              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}" 
-              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}" 
+              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}"
+              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}"
               class="btn btn-secondary btn-block btn-desmarcar_proveedor">
               <i class="fas fa-times"></i>&nbsp; Deseleccionar proveedor
             </button>`;
@@ -2856,7 +2856,7 @@ function getItemProveedor(id_detalle) {
             .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
             .val(detalle[i]["main_photo"]);
             //set attr img_url
-          
+
           container.find(`#btn-uploadprimaryimg-${i + 1}`).hide();
           // container
           //   .find(`#container-uploadprimaryimg-${i + 1}`)
@@ -2883,7 +2883,7 @@ function getItemProveedor(id_detalle) {
               .after(
                 `<img src="${detalle[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
               );
-            
+
             if (detalle[i]["terciary_photo"] != null) {
               container
                 .find(`#btn-uploadimg3-URL-${i + 1}`)
@@ -3009,7 +3009,7 @@ function getFileUrlName(file_url) {
 
 /*
   url = base_url + 'AgenteCompra/PedidosGarantizados/descargarDocumentoPagoGarantizado/' + id;
-  
+
   var popupwin = window.open(url);
   setTimeout(function() { popupwin.close();}, 2000);
   */
@@ -3650,3 +3650,73 @@ const sanitizeHTML = (str) => {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 };
+const editarCotizacionCode  = (idPedido) => {
+  //set next input to editable
+  const input = $(`#cotizacionCode_${idPedido}`);
+  input.removeAttr("disabled");
+  input.focus();
+  input.select();
+  const container= $(`#container-cotizacionCode_${idPedido}`);
+  const button = $(`#btn_edit_cotizacionCode_${idPedido}`);
+  const icon = button.find("i");
+  icon.removeClass("fa-edit");
+  icon.addClass("fa-save");
+  //add icon cancel
+  container.append(`<button type="button" class="btn btn-danger btn-sm" id="btn_cancel_edit_cotizacionCode_${idPedido}" onclick="cancelEditCotizacionCode(${idPedido})"><i class="fas fa-times"></i></button>`);
+  //change function to save
+  button.attr("onclick", `saveCotizacionCode(${idPedido})`);
+
+
+
+  }
+const cancelEditCotizacionCode = (idPedido) => {
+  const input = $(`#cotizacionCode_${idPedido}`);
+  input.attr("disabled", true);
+  const container= $(`#container-cotizacionCode_${idPedido}`);
+  const button = $(`#btn_edit_cotizacionCode_${idPedido}`);
+  const icon = button.find("i");
+  icon.removeClass("fa-save");
+  icon.addClass("fa-edit");
+  $(`#btn_cancel_edit_cotizacionCode_${idPedido}`).remove();
+  button.attr("onclick", `editarCotizacionCode(${idPedido})`);
+ 
+}
+const saveCotizacionCode = (idPedido) => {  
+  const input = $(`#cotizacionCode_${idPedido}`);
+  const value = input.val();
+  const container= $(`#container-cotizacionCode_${idPedido}`);
+  const button = $(`#btn_edit_cotizacionCode_${idPedido}`);
+  const icon = button.find("i");
+  const url = base_url + "AgenteCompra/PedidosGarantizados/editCotizacionCode";
+  $.ajax({
+    url,
+    type: "POST",
+    data: {idPedido, value},
+    dataType: "JSON",
+    success: function(response) {
+      if (response.status == "success") {
+        input.attr("disabled", true);
+        icon.removeClass("fa-save");
+        icon.addClass("fa-edit");
+        $(`#btn_cancel_edit_cotizacionCode_${idPedido}`).remove();
+        button.attr("onclick", `editarCotizacionCode(${idPedido})`);
+        $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+        $("#modal-message").modal("show");
+        $(".modal-message").addClass("modal-success");
+        $(".modal-title-message").text(response.message);
+        setTimeout(function () {
+          $("#modal-message").modal("hide");
+        }, 1100);
+        reload_table_Entidad();
+      } else {
+        $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+        $("#modal-message").modal("show");
+        $(".modal-message").addClass("modal-danger");
+        $(".modal-title-message").text(response.message);
+        setTimeout(function () {
+          $("#modal-message").modal("hide");
+        }, 1100);
+      }
+    },
+  });
+}

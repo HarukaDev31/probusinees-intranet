@@ -3230,6 +3230,52 @@ echo form_open('', $attributes);?>
   }
   .camera-not-filled:hover,.camera-filled:hover{
     cursor: pointer;
-  }
+  }.image-large,
+        .image-small {
+            border-radius: 15px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dee2e6;
+            position: relative;
+            cursor: pointer;
+            flex-direction: column;
+        }
+
+        .image-large {
+            height: 400px;
+        }
+
+        .image-small {
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #f8d7da;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+            color: #721c24;
+            cursor: pointer;
+        }
+
+        .preview {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
   </style>
   <?php echo form_close(); ?>
