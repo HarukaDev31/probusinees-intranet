@@ -7270,6 +7270,7 @@ const openCoordination = (response) => {
     },
   };
   containerCoordination.append(getActionButtons(configButtons));
+  containerCoordination.show();
 };
 const hideCoordination = () => {
   containerCoordination.empty();
