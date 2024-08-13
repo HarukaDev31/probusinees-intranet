@@ -1496,6 +1496,7 @@ $(function () {
     $(".modal-ver_item").modal("show");
     $(".img-responsive").attr("src", $(this).data("url_img"));
     $("#a-download_image").attr("data-id_item", $(this).data("id"));
+    $("#a-download_image").attr("data-src", $(this).data("url_img"));
   });
 
   $("#a-download_image").click(function () {
@@ -7068,23 +7069,23 @@ const getItemTemplate = (i, mode, detalle) => {
                 ? ""
                 : `<span class="fw-bold  btn btn-danger"
               onclick="deleteImage('${i}',1)">Eliminar</span>`
-            }  
+            }
             </br>
             <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
             <input type="file" name="file[${i}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
-               
+
             </div>
           </div>
           <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
           <div class="form-group" id="container-uploadimg2-${i}">
           <label>Imagen 2</label>
-          <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>  
+          <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>
           ${
             detalle["secondary_photo"] == null
               ? ""
               : `<span class="fw-bold  btn btn-danger"
               onclick="deleteImage('${i}',2)">Eliminar</span>`
-          }          
+          }
           <input type="file" name="file[${i}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
           </div>
             <div class="form-group" id="container-uploadimg3-${i}">
@@ -7148,7 +7149,7 @@ const deleteImage = (i, imgIndex) => {
 
 const openStepFunction = (i, stepId) => {
   $("#container-ver").hide();
-  $("#inspection-photos").hide();
+  $(".container-photo-inspection").hide();
   containerOrdenCompra.show();
   selectedStep = stepId;
   url = base_url + "AgenteCompra/PedidosPagados/getStepByRole";
@@ -7211,8 +7212,8 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
     html += `
         <div class="inspection-row d-flex flex-row">
           <div class="inspection-column inspection-img">
-            <img src="${item.Txt_Url_Imagen_Producto}" 
-            
+            <img src="${item.Txt_Url_Imagen_Producto}"
+
             class="img-table_item w-100 px-2" data-id_item="${
               item.id_item
             }" data-url_img="${item.Txt_Url_Imagen_Producto}" />
@@ -7233,7 +7234,7 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
             item.total_box ? parseInt(item.total_box) : 0
           }</span>
           </div>
-          <div class="inspection-column inspection-photos"><svg 
+          <div class="inspection-column inspection-photos"><svg
           onclick="viewInspeccionPhotos(${
             item.ID_Pedido_Detalle_Producto_Proveedor
           },'${cotizacionCode}','${item.ID_Pedido_Cabecera}',
@@ -7294,15 +7295,26 @@ const viewInspeccionPhotos = (
           const data = response.data;
           ["foto1", "foto2", "foto3", "video1", "video2"].forEach((key) => {
             if (data[`inspeccion_${key}`]) {
-              const input = $(`input[name="${key}"]`);
-              const preview = input.siblings(".preview");
-              preview.attr("src", data[`inspeccion_${key}`]).show();
-              input.siblings("span").hide();
-              input
-                .closest("label")
-                .append(
-                  '<div class="reupload-text btn btn-outline-secondary">Volver a subir</div>'
-                );
+              $(`#preview-${key}`).attr("src", data[`inspeccion_${key}`]);
+              $(`#preview-${key}`).show();
+              $(`#span-${key}`).hide();
+              $(`#spinner-${key}`).hide();
+              if (!key.includes("video")) {
+                $(`#${key}-container`).find(".view-container").addClass("btn-ver_pago_proveedor").attr("data-url_img", data[`inspeccion_${key}`])
+              }
+              $(`#${key}-container`).append('<span class="close-button">X</span>');
+              $(`#${key}-container`).find(".close-button").on("click", () => {
+                $(`#preview-${key}`).hide();
+                $(`#span-${key}`).show();
+                $(`#spinner-${key}`).hide();
+                $(`#${key}`).val("");
+              });
+              $(`#${key}-container`).append('<span class="replace-button btn btn-outline-secondary">Reemplazar</span>');
+              $(`#${key}-container`).find(".replace-button").on("click", () => {
+                $(`#${key}`).click();
+              });
+              
+
             }
           });
         }
@@ -7312,95 +7324,57 @@ const viewInspeccionPhotos = (
     },
   });
 
-  // Limpiar eventos previos
-  containerInspection.off("click", ".image-large, .image-small");
-  containerInspection.off("change", 'input[type="file"]');
-  containerInspection.off("click", ".close-button");
+  ["foto1", "foto2", "foto3", "video1", "video2"].forEach((key)=> {
+    $(`#${key}`).on("change", function () {
+      const file = $(this)[0].files[0];
+      const fileSize = file.size;
+      const fileType = file.type;
+      const validTypes = ["image/jpeg", "image/png", "video/mp4"];
+      if (!validTypes.includes(fileType)) {
+        $(`#${key}-container`).append('<span class="error-message">Tipo de archivo no valido</span>');
 
-  // Manejar clic en el contenedor para abrir el input
-  containerInspection.on("click", ".image-large, .image-small", function (e) {
-    e.stopPropagation();
-    e.preventDefault();
-    $(this).off('click');
-    console.log("click container ");
-    const input = $(this).find('input[type="file"]');
-    if (input.length) {
-      con
-      setTimeout(() => {
-        input.trigger("click");
-      }, 100); // Agregar un pequeño retraso
-    }
-    $(this).on('click', function(e) {
-      e.stopPropagation();
-      e.preventDefault();
-    });
-  });
-
-  // Manejar cambio en los inputs de archivo
-  containerInspection.on("change", 'input[type="file"]', function (e) {
-    console.log("change");
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-
-    e.preventDefault();
-    const file = this.files[0];
-    const label = $(this).closest("label");
-    const preview = label.find(".preview");
-    const spinner = label.find(".spinner-border");
-    const errorContainer = label.find(".error-message");
-
-    if (file) {
-      if (file.size > maxFileSize) {
-        errorContainer
-          .text(
-            "El archivo es demasiado grande. El tamaño máximo permitido es 20 MB."
-          )
-          .show();
+        setTimeout(function() {
+            $(`#${key}-container .error-message`).fadeOut('slow', function() {
+                $(this).remove(); // Remover el elemento del DOM después de que desaparezca
+            });
+        }, 1000); 
         $(this).val("");
-        setTimeout(() => {
-          errorContainer.hide();
-        }, 3000);
         return;
       }
+      if (fileSize > maxFileSize) {
+        $(`#${key}-container`).append('<span class="error-message">Tamaño de archivo excede el límite permitido(20MB)</span>');
 
-      spinner.show();
-      preview.hide();
-      label.find("span:not(.reupload-text)").hide();
-      $(this).prop("disabled", true);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        preview.attr("src", e.target.result).show();
-        spinner.hide();
-        $(this).prop("disabled", false);
-      };
-
-      if (file.type.startsWith("image/")) {
-        reader.readAsDataURL(file);
-      } else if (file.type.startsWith("video/")) {
-        reader.readAsDataURL(file);
+        setTimeout(function() {
+            $(`#${key}-container .error-message`).fadeOut('slow', function() {
+                $(this).remove(); // Remover el elemento del DOM después de que desaparezca
+            });
+        }, 1000); 
+        $(this).val("");
+        return;
       }
-    }
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        $(`#preview-${key}`).attr("src", e.target.result);
+        $(`#preview-${key}`).show();
+        $(`#span-${key}`).hide();
+        $(`#spinner-${key}`).hide();
+        $(`#${key}-container`).find(".view-container").addClass("btn-ver_pago_proveedor").attr("data-url_img", e.target.result)
+        $(`#${key}-container`).append('<span class="close-button">X</span>');
+        $(`#${key}-container`).find(".close-button").on("click", () => {
+          $(`#preview-${key}`).hide();
+          $(`#span-${key}`).show();
+          $(`#spinner-${key}`).hide();
+          $(`#${key}`).val("");
+        });
+        // $(`#${key}-container`).append('<span class="replace-button btn btn-outline-secondary">Reemplazar</span>');
+        // $(`#${key}-container`).find(".replace-button").on("click", () => {
+        //   $(`#${key}`).click();
+        // });
+      };
+      reader.readAsDataURL(file);
+    });
+
   });
-
-  // Manejar clic en el botón de cerrar
-  containerInspection.on("click", ".close-button", function (e) {
-    console.log("click");
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-    e.preventDefault();
-
-    const label = $(this).closest("label");
-    const fileInput = label.find('input[type="file"]');
-    const preview = label.find(".preview");
-
-    fileInput.val("");
-    preview.hide().attr("src", "");
-    label.find("span").show();
-    label.find(".reupload-text").remove();
-  });
-
-  // Agregar botones de acción
   const btns = {
     btnCancel: {
       text: "Regresar",
@@ -7412,73 +7386,60 @@ const viewInspeccionPhotos = (
     },
   };
   const actionButtons = getActionButtons(btns);
-  $("#inspection-buttons").append(actionButtons);
+  $(".container-photo-inspection").append(actionButtons);
 };
 
 const getInspectionPhotosTemplate = () => {
-  return `
-    <div class="container mt-5" id="inspection-photos">
-      <div id="inspectionForm" enctype="multipart/form-data">
-        <div class="row">
-          <div class="col-md-8">
-            <label class="image-large position-relative">
-              <div class="close-button">×</div>
-              <span>Imagen</span>
-              <div class="error-message" style="color:red; display:none;"></div>
-              <div class="spinner-border" role="status" style="display:none;">
-                <span class="sr-only">Cargando...</span>
-              </div>
-              <input type="file" name="foto1" accept="image/*" style="display:none;">
-              <img class="preview" src="" alt="" style="display: none;">
-            </label>
-          </div>
-          <div class="col-md-4">
-            <label class="image-small position-relative">
-              <div class="close-button">×</div>
-              <span>Imagen</span>
-              <div class="error-message" style="color:red; display:none;"></div>
-              <div class="spinner-border" role="status" style="display:none;">
-                <span class="sr-only">Cargando...</span>
-              </div>
-              <input type="file" name="foto2" accept="image/*" style="display:none;">
-              <img class="preview" src="" alt="" style="display: none;">
-            </label>
-            <label class="image-small position-relative">
-              <div class="close-button">×</div>
-              <span>Imagen</span>
-              <div class="error-message" style="color:red; display:none;"></div>
-              <div class="spinner-border" role="status" style="display:none;">
-                <span class="sr-only">Cargando...</span>
-              </div>
-              <input type="file" name="foto3" accept="image/*" style="display:none;">
-              <img class="preview" src="" alt="" style="display: none;">
-            </label>
-            <label class="image-small position-relative">
-              <div class="close-button">×</div>
-              <span>Video</span>
-              <div class="error-message" style="color:red; display:none;"></div>
-              <div class="spinner-border" role="status" style="display:none;">
-                <span class="sr-only">Cargando...</span>
-              </div>
-              <input type="file" name="video1" accept="video/*" style="display:none;">
-              <video class="preview" controls style="display: none;"></video>
-            </label>
-            <label class="image-small position-relative">
-              <div class="close-button">×</div>
-              <span>Video</span>
-              <div class="error-message" style="color:red; display:none;"></div>
-              <div class="spinner-border" role="status" style="display:none;">
-                <span class="sr-only">Cargando...</span>
-              </div>
-              <input type="file" name="video2" accept="video/*" style="display:none;">
-              <video class="preview" controls style="display: none;"></video>
-            </label>
-          </div>
-        </div>
+  html = `
+  <div class="container-photo-inspection">
+    <div class="file-container" id="foto1-container">
+      <div class="view-container">
+      <img id="preview-foto1" class="preview" style="display:none;" />
+      <span id="span-foto1" class="span-text">Subir foto 1</span>
+      <div id="spinner-foto1" class="spinner-border" role="status"  ></div>
       </div>
-      <div class="d-flex justify-content-center mt-3" id="inspection-buttons">
+      <input type="file" id="foto1" name="foto1" accept="image/*" style="display:none;" />
+
+    </div>
+    <div class="file-container" id="foto2-container">
+      <div class="view-container">
+      <img id="preview-foto2" class="preview" style="display:none;" />
+      <span id="span-foto2" class="span-text">Subir foto 2</span>
+      <div id="spinner-foto2" class="spinner-border" role="status"  ></div>
       </div>
-    </div>`;
+
+      <input type="file" id="foto2" name="foto2" accept="image/*" style="display:none;" />
+    </div>
+    <div class="file-container" id="foto3-container">
+      <div class="view-container">
+      <img id="preview-foto3" class="preview" style="display:none;" />
+      <span id="span-foto3" class="span-text">Subir foto 3</span>
+      <div id="spinner-foto3" class="spinner-border" role="status"  ></div>
+      </div>
+      <input type="file" id="foto3" name="foto3" accept="image/*" style="display:none;" />
+    </div>
+    <div class="file-container" id="video1-container">
+      <div class="view-container">
+      <video id="preview-video1" class="preview" style="display:none;" /></video>
+      <span id="span-video1" class="span-text">Subir video 1</span>
+      <div id="spinner-video1" class="spinner-border" role="status"  ></div>
+      </div>
+      <input type="file" id="video1" name="video1" accept="video/*" style="display:none;" />
+    </div>
+    <div class="file-container" id="video2-container">
+      <div class="view-container">
+      <video id="preview-video2" class="preview" style="display:none;"
+      controls
+      
+      /></video>
+      <span id="span-video2" class="span-text">Subir video 2</span>
+      <div id="spinner-video2" class="spinner-border" role="status"></div>
+      </div>
+      <input type="file" id="video2" name="video2" accept="video/*" style="display:none;" />
+    </div>
+  </div>
+  `;
+  return html;
 };
 
 const saveInspectionPhotos = (
@@ -7600,12 +7561,12 @@ const getSupplierCoordinationTableHeader = () => {
           <div class="coordination-qty-column c-qty-column ">QTY</div>
           <div class="coordination-precio-column c-precio-column">PRECIO</div>
           <div class="coordination-total-column c-total-column">TOTAL</div>
-          
+
           <div class="coordination-pago1-column c-pago1-column">PAGO 1</div>
           <div class="coordination-pago2-column c-pago2-column">PAGO 2</div>
           <div class="coordination-tproducto-column c-tproducto-column">DELIVERY</div>
           <div class="coordination-tentrega-column c-tentrega-column">F.ENTREGA</div>
-  
+
   `;
   if (currentPrivilege == priviligesJefeChina) {
     template += `<div class="coordination-estado-column c-estado-column">NEGOCIACION</div>`;
@@ -7627,7 +7588,6 @@ $("#table-elegir_productos_proveedor").on(
   function () {
     $(".img-responsive").attr("src", "");
     $(".modal-ver_item").modal("show");
-    console.log($(this));
     $(".img-responsive").attr(
       "src",
       $(this).data("url_img") || $(this)[0].currentSrc
@@ -7699,7 +7659,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
             </div>
             <div class="btn btn-success" onclick="openRotuladofromCoordination(${detail.ID_Pedido_Detalle})">Rotulado
             </div>
-           
+
           </div>`;
     });
     html += `</div>`;
@@ -7719,7 +7679,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
     //precio container
     html += `<div class="c-precio-container c-precio-column supplier-column">`;
     detalles.forEach((detail) => {
-      html += ` 
+      html += `
        <div class="h-100 item px-2">
               <div class="input-group d-flex flex-row">
                 <span class="input-group-text d-flex w-auto">¥</span>
@@ -7839,7 +7799,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
     }][tentrega]"/>
     </div>`;
     html += `
-    <div class="c-estado-column supplier-column"> 
+    <div class="c-estado-column supplier-column">
           <select class="form-select" aria-label="Default select example" name="coordination[${
             supplier.id_coordination
           }][estado]"
@@ -8200,7 +8160,7 @@ const getPagosTemplate = (data = null) => {
 
           <div class="payment-container" style="height:100%!important">
             <div class="garantia-container  upload-payment  container-div not-filled garantia-container" onclick="openFileSelector('garantia-file')">
-                
+
                 <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
                 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -8220,7 +8180,7 @@ const getPagosTemplate = (data = null) => {
 
           <div class="payment-container" style="height:100%!important">
             <div class="liquidacion-container  upload-payment  container-div not-filled liquidacion-container" onclick="openFileSelector('liquidacion-file')">
-                
+
                 <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
                 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -8242,10 +8202,10 @@ const getPagosTemplate = (data = null) => {
           </span>
         </div>
     <div class="row payments-container">
-      <div class="col-12 col-md-3">    
+      <div class="col-12 col-md-3">
         <div class="payment-container">
           <div class="upload-payment container-div not-filled pago1-container" id="pago1-container" onclick="openFileSelector('pago1-file')">
-              
+
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -8261,10 +8221,10 @@ const getPagosTemplate = (data = null) => {
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-3 ">    
+      <div class="col-12 col-md-3 ">
         <div class="payment-container">
           <div class="upload-payment container-div not-filled pago2-container" id="pago2-container" onclick="openFileSelector('pago2-file')">
-              
+
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -8284,7 +8244,7 @@ const getPagosTemplate = (data = null) => {
     <div class="row" id="pagos-buttons">
     </div>
 
-      
+
   </div>
   `;
 
@@ -9157,7 +9117,7 @@ const getProductTemplate = (producto, index) => {
       }][cantidad]" value="${parseInt(producto.Qt_Producto)}"/>
     </div>
     <div class="col-12 col-lg-3 d-flex flex-column">
-          <div id="quill-container-${index}" 
+          <div id="quill-container-${index}"
           class="d-block w-100" ></div>
     </div>
     <div class="col-12 col-lg-2">
@@ -9330,7 +9290,7 @@ const getContainerRotuladoView = (producto) => {
       <div class="col-12 col-md-5">
         <div class="form-group" id="caja_master_container">
           <label>CAJA MASTER:</label>
-          <input name="caja_master_URL" 
+          <input name="caja_master_URL"
           id="caja_master-url"
           type="hidden" value="${producto.caja_master_URL}">
           <div class="d-flex flex-row w-100">
@@ -9358,7 +9318,7 @@ const getContainerRotuladoView = (producto) => {
         <div class="form-group" id="vim_motor_container">
           <div class="conditional-field">
             <label>VIM/MOTOR</label>
-            
+
             <label class="switch">
               <input type="checkbox" id="vim_motor_URL_switch" >
               <span class="slider"></span>
@@ -9367,7 +9327,7 @@ const getContainerRotuladoView = (producto) => {
         </div>
         <div class="form-group" id="btns-section">
         </div>
-        
+
       </div>
       <div class="col-12 col-md-7">
           <label>Notas</label>
@@ -9534,7 +9494,7 @@ const getAlmacenData = (idPedido) => {
 const getAlmacenViewTitle = (cotizacionCode = "") => {
   return `
   <h2 class="mb-2">
-    <strong>RECEPCION DE CARGA: 
+    <strong>RECEPCION DE CARGA:
       ${
         cotizacionCode
           ? `<span class="text-primary">${cotizacionCode}</span>`
@@ -9550,7 +9510,7 @@ const getAlmacenViewHeader = () => {
     <div class="col-12 col-md-3">
       <div class="input-group mb-3">
         <span class="input-group-text" >TOTAL BOX</span>
-        <input type="text" class="form-control" id="total-box" disabled> 
+        <input type="text" class="form-control" id="total-box" disabled>
       </div>
     </div>
     <div class="col-12 col-md-3">
@@ -9567,9 +9527,9 @@ const getAlmacenViewHeader = () => {
     </div>
     <div class="col-12 col-md-3">
       <div class="input-group mb-3">
-        <input type="text" class="form-control" id="almacen-search" > 
+        <input type="text" class="form-control" id="almacen-search" >
         <span class="btn btn-primary">Buscar</span>
-        
+
       </div>
     </div>
   </div>
@@ -9637,21 +9597,21 @@ const getAlmacenTableBody = (
       }"/>
       </div>
       <div class="totalbox-column column">
-        <input type="number" class="form-control total_box" 
+        <input type="number" class="form-control total_box"
         name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_box]"
         value="${parseInt(producto.total_box)}"
         ${permiso ? "disabled" : ""}
         >
-      
+
       </div>
       <div class="totalcbm-column column">
-        <input type="number" class="form-control total_cbm" 
+        <input type="number" class="form-control total_cbm"
         name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_cbm]"
-        
+
         value="${producto.total_cbm}"
          ${permiso ? "disabled" : ""}>
       </div>
@@ -9664,7 +9624,7 @@ const getAlmacenTableBody = (
          ${permiso ? "disabled" : ""}>
       </div>
       <div class="fotos-column column">
-          <svg 
+          <svg
           onclick="viewSupplierPhotos(${
             producto.ID_Pedido_Detalle_Producto_Proveedor
           },'${cotizacionCode}','${idPedido}',
@@ -9934,10 +9894,10 @@ const getviewSupplierPhotosTemplate = () => {
   <form class="py-1 px-4" id="form-photos">
 
     <div class="row fotos-container">
-      <div class="col-12 col-md-3">    
+      <div class="col-12 col-md-3">
         <div class="fotos-container">
           <div class="upload-payment container-div not-filled foto1-container "  id="foto1-container" onclick="openFileSelector('foto1-file')">
-              
+
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -9950,10 +9910,10 @@ const getviewSupplierPhotosTemplate = () => {
 
         </div>
       </div>
-      <div class="col-12 col-md-3 ">    
+      <div class="col-12 col-md-3 ">
         <div class="fotos-container">
           <div class="upload-payment container-div not-filled foto2-container"  id="foto2-container" onclick="openFileSelector('foto2-file')">
-              
+
               <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
               <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -9970,7 +9930,7 @@ const getviewSupplierPhotosTemplate = () => {
     <div class="row" id="pagos-buttons">
     </div>
 
-      
+
   </form>
   `;
   return html;

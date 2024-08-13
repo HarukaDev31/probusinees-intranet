@@ -38,7 +38,7 @@
                   </div>
                 </div>
                 <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 6) {
-                  ?>
+    ?>
                   <div class="col-6 col-sm-3">
                   <label>Estado</label>
                   <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
@@ -48,7 +48,11 @@
                     <option value="COMPLETADO">COMPLETADO</option>
                   </select>
                 </div>
-                <?php } else ?>
+                <?php
+} else {
+    ;
+}
+?>
                 <div class="col-6 col-sm-3">
                   <label>&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
@@ -60,7 +64,7 @@
                   <thead class="thead-light">
                     <tr>
                       <th>País </th>
-                      
+
                       <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 6) {
     ?>
                           <th>Fecha</th>
@@ -110,9 +114,9 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-$attributes = array('id' => 'form-pedido');
-echo form_open('', $attributes);
-?>
+              $attributes = array('id' => 'form-pedido');
+              echo form_open('', $attributes);
+              ?>
                 <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
                 <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
                 <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
@@ -359,7 +363,7 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             <div class="card-body" id="container-ver">
               <h1 class="m-0 p-0">Avances</h1>
               <div class="separator-line"></div>
-  
+
               <div id="steps" class="w-100 pt-2" style="height: 100%;">
                 <div class="spinner-border text-primary" id="loading-steps" role="status">
                 </div>
@@ -2847,12 +2851,12 @@ echo form_open('', $attributes);?>
 .almacen-header .column:nth-child(odd),.almacen-row .column:nth-child(even){
   background-color: #f9f9f9;
   border: 1px solid #ccc;
-  
+
 
 }.almacen-header .column:nth-child(even),.almacen-row .column:nth-child(odd){
   background-color: #f2f2f2;
   border: 1px solid #ccc;
-  
+
 }.form-control{
   text-align: center;
 }
@@ -2869,7 +2873,7 @@ echo form_open('', $attributes);?>
   margin-bottom: 1em;
 }
 .inspection-row{
-  width: 1850px;  
+  width: 1850px;
 }
 .inspection-table{
   width: 1600px;
@@ -3243,13 +3247,21 @@ echo form_open('', $attributes);?>
             flex-direction: column;
         }
 
-        .image-large {
+        #foto1-container {
             height: 400px;
-        }
+            width: 100%;
+            position: relative;
 
+        }
+        .file-container label{
+          width: 100%;
+          height: 400px;
+        }
         .image-small {
             height: 120px;
             margin-bottom: 10px;
+            width: 100%
+
         }
 
         .close-button {
@@ -3269,13 +3281,79 @@ echo form_open('', $attributes);?>
         }
 
         .preview {
-            max-width: 80%;
-            max-height: 100%;
+            width: 80%;
+            height: 75%;
             border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 1em;
+
+        }.preview:hover{
+          cursor: pointer;
         }
 
         input[type="file"] {
             display: none;
+        }.container-photo-inspection{
+          display:grid;
+          grid-template-columns: 2fr 1fr;
+          grid-template-rows: 1fr 1fr 1fr 1fr;
+         
+        }#foto1-container{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: auto;
+          grid-column: 1/2;
+          grid-row: 1/5;
+          height: 350px;
+          align-self: center;
+        }#foto2-container,#foto3-container,#video1-container,#video2-container{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          height:200px;
+          grid-column: 2/3;
+        }#foto2-container{
+          grid-row: 1/2;
+        }#foto3-container{
+          grid-row: 2/3;
+        }#video1-container{
+          grid-row: 3/4;
+        }#video2-container{
+          grid-row: 4/5;
+        }.file-container{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+        }.view-container{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 80%;
+          height: 80%;
+          position: relative;
+        }
+        .file-container{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+        }
+        .container-photo-inspection div{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }.error-message{
+          color: red;
+          font-size: 0.8em;
         }
   </style>
   <?php echo form_close(); ?>

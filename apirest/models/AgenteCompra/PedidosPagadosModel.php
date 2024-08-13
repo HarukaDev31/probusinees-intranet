@@ -3187,7 +3187,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 
         foreach ($files as $key => $file) {
             if (!empty($file['name'])) {
-                $this->setAllowedExtensionsImagesOfficeFiles();
+                $this->setAllowedExtensionsImagesOfficeFilesVideos();
                 $this->maxFileSize = 20240;
                 $fileUrl = $this->uploadSingleFile([
                     'name' => $file['name'],
@@ -3199,14 +3199,25 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $data[$key] = $fileUrl;
             }
         }
+    
+        if(array_key_exists('foto1',$data)){
+            $dataToInsert['inspeccion_foto1']=$data['foto1'];
+        }
+        if(array_key_exists('foto2',$data)){
+            $dataToInsert['inspeccion_foto2']=$data['foto2'];
+        }
+        if(array_key_exists('foto3',$data)){
+            $dataToInsert['inspeccion_foto3']=$data['foto3'];
+        }
+        if(array_key_exists('video1',$data)){
+            $dataToInsert['inspeccion_video1']=$data['video1'];
+        }
+        if(array_key_exists('video2',$data)){
+            $dataToInsert['inspeccion_video2']=$data['video2'];
+        }
+
         $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
-        $this->db->update('agente_compra_pedido_detalle_producto_proveedor', [
-            'inspeccion_foto1' => $data['foto1'],
-            'inspeccion_foto2' => $data['foto2'],
-            'inspeccion_foto3' => $data['foto3'],
-            'inspeccion_video1' => $data['video1'],
-            'inspeccion_video2' => $data['video2'],
-        ]);
+        $this->db->update('agente_compra_pedido_detalle_producto_proveedor',$dataToInsert);
     }       
     public function getInspectionPhotos($idItem){
         $this->db->select('inspeccion_foto1,inspeccion_foto2,inspeccion_foto3,inspeccion_video1,inspeccion_video2');
