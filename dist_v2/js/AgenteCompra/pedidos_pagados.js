@@ -7193,7 +7193,27 @@ const openInspectionView = (data, idPedido, currentPrivilege) => {
   );
   containerInspection.append(inspectionTitle).append(inspectionTable);
   containerInspection.show();
+  const btns = {
+    btnCancel: {
+      text: "Regresar",
+      action: "hideInspection()",
+    },
+    btnSave: {
+      text: "Guardar",
+      action: `saveInspection(${idPedido})`,
+    },
+  }
+  const actionButtons = getActionButtons(btns);
+  containerInspection.append(actionButtons);
+
 };
+const saveInspection = () => {
+  const url = base_url + "AgenteCompra/PedidosPagados/saveInspection";
+  const data = {
+    idPedido,
+    cotizacionCode: $("#cotizacionOrden").val(),
+  };
+
 const getInspectionTitle = (cotizacionCode) => {
   return `
   <div class="d-flex flex-row justify-content-between">
@@ -7420,7 +7440,7 @@ const getInspectionPhotosTemplate = () => {
     </div>
     <div class="file-container" id="video1-container">
       <div class="view-container">
-      <video id="preview-video1" class="preview" style="display:none;" /></video>
+      <video id="preview-video1" class="preview" style="display:none;" controls /></video>
       <span id="span-video1" class="span-text">Subir video 1</span>
       <div id="spinner-video1" class="spinner-border" role="status"  ></div>
       </div>
@@ -10007,4 +10027,5 @@ const openSupplierDetails = (name, phone) => {
   $("#modaldetail-close").click(function () {
     $("#modalsupplier-data").modal("hide");
   });
-};
+}
+}

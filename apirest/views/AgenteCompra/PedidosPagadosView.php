@@ -114,9 +114,9 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-              $attributes = array('id' => 'form-pedido');
-              echo form_open('', $attributes);
-              ?>
+$attributes = array('id' => 'form-pedido');
+echo form_open('', $attributes);
+?>
                 <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
                 <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
                 <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
@@ -3248,10 +3248,13 @@ echo form_open('', $attributes);?>
         }
 
         #foto1-container {
-            height: 400px;
+            height: 450px;
             width: 100%;
             position: relative;
 
+        }#foto1-container .view-container {
+        height: 100%;
+        width: 60%;
         }
         .file-container label{
           width: 100%;
@@ -3297,7 +3300,7 @@ echo form_open('', $attributes);?>
           display:grid;
           grid-template-columns: 2fr 1fr;
           grid-template-rows: 1fr 1fr 1fr 1fr;
-         
+
         }#foto1-container{
           display: flex;
           flex-direction: column;

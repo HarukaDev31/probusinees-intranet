@@ -27,51 +27,79 @@ Trait CommonTrait{
         return $decodedText;
     }
 
-    function htmlToRichText($html) {
-   
+    function htmlToRichText($html, $inputEncoding = 'UTF-8') {
         $richText = new PHPExcel_RichText();
-        $paragraphs = preg_split('/<\/p>\s*<p[^>]*>/', $html, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-
-        foreach ($paragraphs as $index => $p) {
-            if (!preg_match('/^<p/i', $p)) {
-                $p = '<p>' . $p;
-            }
-            if (!preg_match('/<\/p>$/i', $p)) {
-                $p .= '</p>';
-            }
-
-            $dom = new DOMDocument();
-            @$dom->loadHTML(mb_convert_encoding($p, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-            foreach ($dom->getElementsByTagName('p') as $pElement) {
-                foreach ($pElement->childNodes as $node) {
-                    if ($node->nodeType === XML_TEXT_NODE) {
-                        $text = new PHPExcel_RichText_TextElement($node->textContent);
-                    } elseif ($node->nodeType === XML_ELEMENT_NODE) {
-                        $style = $node->getAttribute('style');
         
-                        $text = new PHPExcel_RichText_Run($node->textContent);
+        // Limpiar y preparar el HTML
+        $html = preg_replace('/\s+/', ' ', $html);
+        $html = strip_tags($html, '<ol><ul><li><span><strong><em><u>');
         
-                        // Handle color
-                        if (strpos($style, 'color:') !== false) {
-                            preg_match('/color:\s*rgb\((\d+),\s*(\d+),\s*(\d+)\)/', $style, $matches);
-                            if ($matches) {
-                                $text->getFont()->getColor()->setRGB(sprintf('%02X%02X%02X', $matches[1], $matches[2], $matches[3]));
-                            }
-                        }
-        
-                        // Handle bold
-                        if ($node->nodeName === 'strong') {
-                            $text->getFont()->setBold(true);
-                        }
-                    }
-                    $richText->addText($text);
-                }
-            }
-            $richText->addText(new PHPExcel_RichText_Run("\n"));
-
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', $inputEncoding), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+    
+        $xpath = new DOMXPath($dom);
+        $listItems = $xpath->query('//li');
+    
+        foreach ($listItems as $index => $li) {
+            // Añadir un bullet point o número de lista
+            $prefix = new PHPExcel_RichText_Run('• ');
+            $richText->addText($prefix);
+    
+            $this->processNode($li, $richText);
             
+            // Añadir un salto de línea después de cada elemento de la lista
+            if ($index < $listItems->length - 1) {
+                $richText->addText(new PHPExcel_RichText_Run("\n"));
+            }
         }
     
         return $richText;
+    }
+    
+    private function processNode($node, $richText) {
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType === XML_TEXT_NODE) {
+                $richText->addText(new PHPExcel_RichText_TextElement($child->textContent));
+            } elseif ($child->nodeType === XML_ELEMENT_NODE) {
+                if ($child->nodeName === 'span' && $child->hasAttribute('class') && $child->getAttribute('class') === 'ql-ui') {
+                    // Ignorar los spans con clase ql-ui
+                    continue;
+                }
+                $text = new PHPExcel_RichText_Run($child->textContent);
+                $this->applyStyles($child, $text);
+                $richText->addText($text);
+            }
+        }
+    }
+    
+    private function applyStyles($node, $text) {
+        $style = $node->getAttribute('style');
+        
+        // Color
+        if (preg_match('/color:\s*rgb\((\d+),\s*(\d+),\s*(\d+)\)/', $style, $matches)) {
+            $text->getFont()->getColor()->setRGB(sprintf('%02X%02X%02X', $matches[1], $matches[2], $matches[3]));
+        }
+        
+        // Bold
+        if ($node->nodeName === 'strong' || strpos($style, 'font-weight: bold') !== false) {
+            $text->getFont()->setBold(true);
+        }
+        
+        // Italic
+        if ($node->nodeName === 'em' || strpos($style, 'font-style: italic') !== false) {
+            $text->getFont()->setItalic(true);
+        }
+        
+        // Underline
+        if ($node->nodeName === 'u' || strpos($style, 'text-decoration: underline') !== false) {
+            $text->getFont()->setUnderline(true);
+        }
+        
+        // Font size
+        if (preg_match('/font-size:\s*(\d+)pt/', $style, $matches)) {
+            $text->getFont()->setSize($matches[1]);
+        }
     }
 }

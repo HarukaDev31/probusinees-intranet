@@ -3225,4 +3225,14 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
         return $this->db->get()->row();
     }
+    public function cambiarEstadoInspeccion($idPedido,$idItem){
+        $item=$this->getInspectionPhotos($idItem);
+        if($item->inspeccion_foto1!=null || $item->inspeccion_foto2!=null || $item->inspeccion_foto3!=null || $item->inspeccion_video1!=null || $item->inspeccion_video2!=null){
+            $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
+            $this->db->update('agente_compra_pedido_detalle_producto_proveedor',array('personal_china_inspeccion_estado'=>'INSPECCIONADO'));
+        }else{
+            $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
+            $this->db->update('agente_compra_pedido_detalle_producto_proveedor',array('personal_china_inspeccion_estado'=>'PENDIENTE'));
+        }
+    }
 }
