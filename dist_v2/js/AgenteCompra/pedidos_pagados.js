@@ -7207,12 +7207,10 @@ const openInspectionView = (data, idPedido, currentPrivilege) => {
   containerInspection.append(actionButtons);
 
 };
+
 const saveInspection = () => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveInspection";
-  const data = {
-    idPedido,
-    cotizacionCode: $("#cotizacionOrden").val(),
-  };
+}
 
 const getInspectionTitle = (cotizacionCode) => {
   return `
@@ -10027,5 +10025,4 @@ const openSupplierDetails = (name, phone) => {
   $("#modaldetail-close").click(function () {
     $("#modalsupplier-data").modal("hide");
   });
-}
-}
+};
