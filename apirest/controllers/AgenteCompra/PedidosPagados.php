@@ -1983,14 +1983,18 @@ class PedidosPagados extends CI_Controller
                 // }
             }
             if($step==3){
-                if($priviligie==$this->personalChinaPrivilegio|| $priviligie==$this->jefeChinaPrivilegio){
+                if($priviligie==$this->personalChinaPrivilegio){
                     $dataAlmacen = $this->PedidosPagadosModel->getAlmacenData($idPedido);
                     echo json_encode(array('status' => 'success', 'data' => $dataAlmacen, 'priviligie' => $priviligie));
+                }
+                if($priviligie==$this->jefeChinaPrivilegio){
+                    $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
+                    echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
                 }
                 
             }
             if($step==4){
-                if($priviligie==$this->personalChinaPrivilegio|| $priviligie==$this->jefeChinaPrivilegio){
+                if($priviligie==$this->personalChinaPrivilegio || $priviligie==$this->personalPeruPrivilegio){
                     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
                     echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
                 }   
@@ -2294,5 +2298,10 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->getInspectionPhotos($idPedido);
         echo json_encode(array('status' => 'success', 'data' => $response));
 
+    }
+    public function saveInspection(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->saveInspection($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }

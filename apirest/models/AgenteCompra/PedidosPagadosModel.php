@@ -2485,6 +2485,10 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $data = array('status' => $status, 'id_permision_role' => $this->user->Nu_Tipo_Privilegio_Acceso);
         $this->db->where('id', $idStep);
         $this->db->update('agente_compra_order_steps', $data);
+        //check if update was successful
+        if ($this->db->affected_rows() > 0) {
+            return true;
+        }
     }
     public function updateOrInsertPayment($idPedido, $idPayment, $dataToInsert)
     {
@@ -3164,6 +3168,21 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
         }
     }
+    public function updateInpeccion($idPedido){
+        $rolesToUpdate = [1,5];
+        $stepToUpdate = 4;
+        foreach ($rolesToUpdate as $role) {
+            $this->db->where('id_permision_role', $role);
+            $this->db->where('id_pedido', $idPedido);
+            if ($role == 1) {
+                $this->db->where('id_order',$stepToUpdate);
+                $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
+            } else {
+                $this->db->where('id_order',3);
+                $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
+            }
+        }
+    }
     public function checkIfAllSupplierHasStatus($id)
     {
         $this->db->select('count(*) as total,
@@ -3184,7 +3203,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }public function saveInspectionPhotos($data, $files)
     {
         $idItem = $data['idItem'];
-
+        $idStep = $data['idStep'];
+        $idPedido = $data['idPedido'];
         foreach ($files as $key => $file) {
             if (!empty($file['name'])) {
                 $this->setAllowedExtensionsImagesOfficeFilesVideos();
@@ -3218,6 +3238,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 
         $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
         $this->db->update('agente_compra_pedido_detalle_producto_proveedor',$dataToInsert);
+        if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio)return;
+        
+        $allInspetioned=$this->cambiarEstadoInspeccion($idPedido,$idItem,$idStep);
+        return ['status' => 'success', 'message' => 'Fotos guardadas',"rol"=> $this->user->Nu_Tipo_Privilegio_Acceso,
+        'allInspeccionados'=>$allInspetioned];
     }       
     public function getInspectionPhotos($idItem){
         $this->db->select('inspeccion_foto1,inspeccion_foto2,inspeccion_foto3,inspeccion_video1,inspeccion_video2');
@@ -3225,7 +3250,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
         return $this->db->get()->row();
     }
-    public function cambiarEstadoInspeccion($idPedido,$idItem){
+    public function cambiarEstadoInspeccion($idPedido,$idItem,$idStep){
         $item=$this->getInspectionPhotos($idItem);
         if($item->inspeccion_foto1!=null || $item->inspeccion_foto2!=null || $item->inspeccion_foto3!=null || $item->inspeccion_video1!=null || $item->inspeccion_video2!=null){
             $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
@@ -3234,5 +3259,33 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $idItem);
             $this->db->update('agente_compra_pedido_detalle_producto_proveedor',array('personal_china_inspeccion_estado'=>'PENDIENTE'));
         }
+        $productosPedido=$this->getPedidoProductos($idPedido);
+        $allInspeccionados=true;
+        foreach($productosPedido as $producto){
+            if($producto->personal_china_inspeccion_estado=='PENDIENTE'){
+                $allInspeccionados=false;
+                break;
+            }
+        }
+        if($allInspeccionados){
+            //select id from agente_compra_order_steps where id_pedido=$idPedido and id=$idStep
+            $this->db->close();
+            $this->db->initialize();    
+            $this->db->where('id_pedido', $idPedido);
+            $this->db->where('id', $idStep);  
+            $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+            $this->updateInpeccion($idPedido);
+        }else{
+            $this->db->close();
+            $this->db->initialize(); 
+            $this->updateStep($idStep,"PENDING");
+        }
+        return $allInspeccionados;
+    }public function saveInspection($data){
+        foreach($data['item'] as $key=>$row){
+            $this->db->where('ID_Pedido_Detalle_Producto_Proveedor', $key);
+            $this->db->update('agente_compra_pedido_detalle_producto_proveedor',array('empleado_china_notas'=>$row['notas']));
+        }
+        return ['status' => 'success', 'message' => 'Notas guardadas'];
     }
 }

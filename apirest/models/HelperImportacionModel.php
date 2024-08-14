@@ -23,8 +23,8 @@ class HelperImportacionModel extends CI_Model{
 		$this->defaultJefeChina=array(
 			["name"=>"ORDEN DE COMPRA","iconURL"=>base_url()."assets/icons/orden.png"],
 			["name"=>"PAGOS Y COORDINACION","iconURL"=>base_url()."assets/icons/coordinacion.png"],
-			["name"=>"RECEPCION DE CARGA","iconURL"=>base_url()."assets/icons/recepcion.png"],
-			["name"=>"INSPECCIÓN","iconURL"=>base_url()."assets/icons/inspeccion.png"],
+			["name"=>"RECEPCION E INSPECCION","iconURL"=>base_url()."assets/icons/recepcion.png"],
+			["name"=>"BOOKING","iconURL"=>base_url()."assets/icons/inspeccion.png"],
 			["name"=>"DOCUMENTACIÓN","iconURL"=>base_url()."assets/icons/documentacion.png"]);
 	}
 

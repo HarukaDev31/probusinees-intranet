@@ -6905,6 +6905,7 @@ function _generarConsolidaTrading($modal_delete, ID) {
 //get order progress section
 const getOrderProgress = (id, idServicio = null) => {
   currentServicio = idServicio;
+  $("#steps").empty();
   if (idServicio != 2) {
     $("#cotizacionOrdenContainer").hide();
   } else {
@@ -7150,6 +7151,7 @@ const deleteImage = (i, imgIndex) => {
 const openStepFunction = (i, stepId) => {
   $("#container-ver").hide();
   $(".container-photo-inspection").hide();
+  $("#container-inspeccion").empty();
   containerOrdenCompra.show();
   selectedStep = stepId;
   url = base_url + "AgenteCompra/PedidosPagados/getStepByRole";
@@ -7168,12 +7170,16 @@ const openStepFunction = (i, stepId) => {
       }
     }
     if (i == 3) {
-      if (currentPrivilege == 2 || currentPrivilege == 5) {
+      if (currentPrivilege == 2 ) {
         openAlmacenView(responseParsed.data, idPedido, currentPrivilege);
+      }
+      if (currentPrivilege == 5){
+        openInspectionView(responseParsed.data, idPedido, currentPrivilege);
+
       }
     }
     if (i == 4) {
-      if (currentPrivilege == 2 || currentPrivilege == 5) {
+      if (currentPrivilege == 2 || currentPrivilege==1) {
         openInspectionView(responseParsed.data, idPedido, currentPrivilege);
       }
     }
@@ -7196,7 +7202,7 @@ const openInspectionView = (data, idPedido, currentPrivilege) => {
   const btns = {
     btnCancel: {
       text: "Regresar",
-      action: "hideInspection()",
+      action: `hideInspection(${idPedido})`,
     },
     btnSave: {
       text: "Guardar",
@@ -7208,10 +7214,35 @@ const openInspectionView = (data, idPedido, currentPrivilege) => {
 
 };
 
-const saveInspection = () => {
+const saveInspection = (idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveInspection";
+  const form = $("#container-inspeccion");
+  let formData = new FormData(form[0]);
+  formData.append("idPedido", idPedido);
+  formData.append("step", selectedStep);
+  $.ajax({
+    url,
+    type: "POST",
+    data:formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      try {
+        response = JSON.parse(response);
+        if (response.status == "success") {
+          hideInspection(idPedido);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
 }
-
+const hideInspection = (idPedido) => {
+  containerInspection.empty();
+  containerInspection.hide();
+  getOrderProgress(idPedido);
+};
 const getInspectionTitle = (cotizacionCode) => {
   return `
   <div class="d-flex flex-row justify-content-between">
@@ -7224,7 +7255,16 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
   html = `
     <div class="inspection-table d-flex flex-column">`;
   html +=
-    '<div class="inspection-table-header d-flex flex-row"><div class="inspection-column inspection-img">IMAGEN</div><div class="inspection-column inspection-name">NOMBRE PRODUCTO</div><div class="inspection-column inspection-caracteristicas">CARACTERISTICAS</div><div class="inspection-column inspection-code">ITEM</div><div class="inspection-column inspection-qty-box">QTY CAJAS</div><div class="inspection-column inspection-photos" >INSPECCION</div><div class="inspection-column inspection-estado">ESTADO</div><div class="inspection-column inspection-notas">NOTAS</div>';
+    `<div class="inspection-table-header d-flex flex-row">
+    <div class="inspection-column inspection-img">IMAGEN</div>
+    <div class="inspection-column inspection-name">NOMBRE PRODUCTO</div>
+    <div class="inspection-column inspection-caracteristicas">CARACTERISTICAS</div>
+    <div class="inspection-column inspection-code">ITEM</div>
+    <div class="inspection-column inspection-qty-box">QTY CAJAS</div>
+    ${currentPrivilege == 5 ? `<div class="inspection-column inspection-photos">RECEPCION</div>` : ""}
+    <div class="inspection-column inspection-photos" >INSPECCION</div>
+    <div class="inspection-column inspection-estado">ESTADO</div>
+    <div class="inspection-column inspection-notas">NOTAS</div>`;
   html += "</div>";
   data.forEach((item, i) => {
     html += `
@@ -7240,7 +7280,7 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
             item.Txt_Producto
           }</div>
           <div class="inspection-column inspection-caracteristicas">
-          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" disabled>
+          <textarea class="form-control" rows="3" disabled>
          ${htmlDecode(item.Txt_Descripcion)}
           </textarea>
           </div>
@@ -7252,6 +7292,22 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
             item.total_box ? parseInt(item.total_box) : 0
           }</span>
           </div>
+          ${currentPrivilege==5?`<div class="inspection-column  inspection-photos">
+            <svg
+          onclick="viewSupplierPhotos(${
+            item.ID_Pedido_Detalle_Producto_Proveedor
+          },'${cotizacionCode}','${idPedido}',
+          '${currentPrivilege}')"
+          class="${
+            item.almacen_estado != "PENDIENTE"
+              ? "camera-filled"
+              : "camera-not-filled"
+          }"
+          viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          </div>`:``}
           <div class="inspection-column inspection-photos"><svg
           onclick="viewInspeccionPhotos(${
             item.ID_Pedido_Detalle_Producto_Proveedor
@@ -7267,19 +7323,26 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
               <path d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg></div>
           <div class="inspection-column inspection-estado">
-          <select class="form-select" >
+          <select class="form-select"
+                    ${currentPrivilege!=2?"disabled":""}
+
+          >
           <option value="PENDIENTE" ${
-            item.estado == "PENDIENTE" ? "selected" : ""
+            item.personal_china_inspeccion_estado == "PENDIENTE" ? "selected" : ""
           }>PENDIENTE</option>
           <option value="INSPECCIONADO" ${
-            item.estado == "INSPECCIONADO" ? "selected" : ""
+            item.personal_china_inspeccion_estado == "INSPECCIONADO" ? "selected" : ""
           }>INSPECCIONADO</option>
           </select>
           </div>
           <div class="inspection-column inspection-notas">
-          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" value="${htmlDecode(
+          <textarea class="form-control"
+          ${currentPrivilege!=2?"disabled":""}
+          name="item[${item.ID_Pedido_Detalle_Producto_Proveedor}][notas]"
+          rows="3" >
+         ${htmlDecode(
             item.empleado_china_notas
-          )}"></textarea>
+          )}</textarea>
           </div>
         </div>
         `;
@@ -7333,6 +7396,13 @@ const viewInspeccionPhotos = (
               });
               
 
+            }else{
+              $(`#preview-${key}`).hide();
+              $(`#span-${key}`).show();
+              $(`#spinner-${key}`).hide();
+              $(`#${key}-container .view-container`).on("click", () => {
+                $(`#${key}`).click();
+              });
             }
           });
         }
@@ -7396,7 +7466,7 @@ const viewInspeccionPhotos = (
   const btns = {
     btnCancel: {
       text: "Regresar",
-      action: `openStepFunction(4,${selectedStep})`,
+      action: `openStepFunction(${currentPrivilege==5?3:4},${selectedStep})`,
     },
     btnSave: {
       text: "Guardar",
@@ -7472,6 +7542,7 @@ const saveInspectionPhotos = (
   formData.append("cotizacionCode", cotizacionCode);
   formData.append("idPedido", idPedido);
   formData.append("currentPrivilege", currentPrivilege);
+  formData.append("idStep", selectedStep);
   for (let pair of formData.entries()) {
     if (pair[1] instanceof File) {
       console.log(`File field: ${pair[0]}`);
@@ -9812,11 +9883,42 @@ const changeStatusAlmacen = (estado, id_pedido) => {
   });
 };
 const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
+  permiso=permiso=='null'?null:permiso;
+  let actionButtons = {
+    btnSave: {
+      text: "Guardar",
+      action: `saveSupplierPhotos(${id},${idPedido})`,
+    },
+    btnCancel: {
+      text: "Regresar",
+      action: `getAlmacenData(${idPedido})`,
+    },
+  };
+  if (permiso != null) {
+    actionButtons = {
+      btnCancel: {
+        text: "Regresar",
+        action: `openStepFunction(3,${selectedStep})`,
+      },
+    };
+  }
+  const buttonsTemplate = getActionButtons(actionButtons);
+  if(permiso==5){
+    containerInspection.empty();
+    const inspectionTitle = getAlmacenViewTitle(cotizacionCode);
+    containerInspection.append(inspectionTitle);
+    const photosContainer = getviewSupplierPhotosTemplate(permiso);
+    containerInspection.append(photosContainer);
+    containerInspection.append(buttonsTemplate);
+  }else if(permiso==2){
   containerAlmacen.empty();
   const almacenTitle = getAlmacenViewTitle(cotizacionCode);
   containerAlmacen.append(almacenTitle);
   const photosContainer = getviewSupplierPhotosTemplate(permiso);
   containerAlmacen.append(photosContainer);
+  containerAlmacen.append(buttonsTemplate);
+
+  }
   handleFileChange("#foto1-file", "#foto1-name", ".foto1-container");
   handleFileChange("#foto2-file", "#foto2-name", ".foto2-container");
   $.ajax({
@@ -9838,7 +9940,7 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
             permiso
           );
         }
-        if (almacen_foto2 != null) {
+        if (almacen_foto2 != null ) {
           handleFileDisplay(
             almacen_foto2,
             "#foto2-name",
@@ -9862,26 +9964,7 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
       }
     },
   });
-  let actionButtons = {
-    btnSave: {
-      text: "Guardar",
-      action: `saveSupplierPhotos(${id},${idPedido})`,
-    },
-    btnCancel: {
-      text: "Regresar",
-      action: `getAlmacenData(${idPedido})`,
-    },
-  };
-  if (permiso != null) {
-    actionButtons = {
-      btnCancel: {
-        text: "Regresar",
-        action: `openStepFunction(3,${selectedStep})`,
-      },
-    };
-  }
-  const buttonsTemplate = getActionButtons(actionButtons);
-  containerAlmacen.append(buttonsTemplate);
+ 
 };
 const saveSupplierPhotos = (id, idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveSupplierPhotos";
