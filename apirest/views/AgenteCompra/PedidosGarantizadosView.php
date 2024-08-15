@@ -624,6 +624,9 @@ input[type=number] {
 .ql-container{
   width: 300px;
 }
+.ql-container.ql-snow {
+    width: 100%!important
+  }
 </style>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>

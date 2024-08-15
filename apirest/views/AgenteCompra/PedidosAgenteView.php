@@ -233,5 +233,8 @@
   .ql-toolbar {
     width: 250px;
   }
+  .ql-container.ql-snow {
+    width: 100%!important
+  }
   </style>
 <!-- /.modal imagen del item -->
