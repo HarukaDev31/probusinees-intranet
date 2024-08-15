@@ -51,7 +51,7 @@ Trait CommonTrait{
             
             // Añadir un salto de línea después de cada elemento de la lista
             if ($index < $listItems->length - 1) {
-                $richText->addText(new PHPExcel_RichText_Run("\n"));
+                // $richText->addText(new PHPExcel_RichText_Run("\n"));
             }
         }
         $paragraphs = $xpath->query('//p');
