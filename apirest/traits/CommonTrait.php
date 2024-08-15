@@ -54,19 +54,47 @@ Trait CommonTrait{
                 $richText->addText(new PHPExcel_RichText_Run("\n"));
             }
         }
-    
+        $paragraphs = $xpath->query('//p');
+        foreach ($paragraphs as $index => $p) {
+            $this->processNode($p, $richText);
+            $richText->addText(new PHPExcel_RichText_Run("\n"));
+        }
+  
         return $richText;
     }
     
     private function processNode($node, $richText) {
         foreach ($node->childNodes as $child) {
-            if ($child->nodeType === XML_TEXT_NODE) {
+            if ($child->nodeType === XML_TEXT_NODE
+            ) {
                 $richText->addText(new PHPExcel_RichText_TextElement($child->textContent));
-            } elseif ($child->nodeType === XML_ELEMENT_NODE) {
+                $richText->addText(new PHPExcel_RichText_Run("\n"));
+
+            }
+            else if($child->nodeName==="strong" ){
+                $text = new PHPExcel_RichText_Run($child->textContent);
+                $text->getFont()->setBold(true);
+                $richText->addText($text);
+                $richText->addText(new PHPExcel_RichText_Run("\n"));
+
+            }
+            else if($child->nodeName==="em" ){
+                $text = new PHPExcel_RichText_Run($child->textContent);
+                $text->getFont()->setItalic(true);
+                $richText->addText($text);
+            }
+            else if($child->nodeName==="u" ){
+                $text = new PHPExcel_RichText_Run($child->textContent);
+                $text->getFont()->setUnderline(true);
+                $richText->addText($text);
+            }//manage br
+            
+             elseif ($child->nodeType === XML_ELEMENT_NODE) {
                 if ($child->nodeName === 'span' && $child->hasAttribute('class') && $child->getAttribute('class') === 'ql-ui') {
                     // Ignorar los spans con clase ql-ui
                     continue;
                 }
+
                 $text = new PHPExcel_RichText_Run($child->textContent);
                 $this->applyStyles($child, $text);
                 $richText->addText($text);
@@ -101,5 +129,5 @@ Trait CommonTrait{
         if (preg_match('/font-size:\s*(\d+)pt/', $style, $matches)) {
             $text->getFont()->setSize($matches[1]);
         }
-    }
+    }   
 }
