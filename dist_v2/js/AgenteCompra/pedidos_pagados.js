@@ -7149,6 +7149,7 @@ const deleteImage = (i, imgIndex) => {
 };
 
 const openStepFunction = (i, stepId) => {
+  console.log('llego')
   $("#container-ver").hide();
   $(".container-photo-inspection").hide();
   $("#container-inspeccion").empty();
@@ -7170,16 +7171,15 @@ const openStepFunction = (i, stepId) => {
       }
     }
     if (i == 3) {
-      if (currentPrivilege == 2 ) {
+      if (currentPrivilege == 2 || currentPrivilege == 1) {
         openAlmacenView(responseParsed.data, idPedido, currentPrivilege);
       }
-      if (currentPrivilege == 5){
+      if (currentPrivilege == 5) {
         openInspectionView(responseParsed.data, idPedido, currentPrivilege);
-
       }
     }
     if (i == 4) {
-      if (currentPrivilege == 2 || currentPrivilege==1) {
+      if (currentPrivilege == 2 || currentPrivilege == 1) {
         openInspectionView(responseParsed.data, idPedido, currentPrivilege);
       }
     }
@@ -7208,10 +7208,9 @@ const openInspectionView = (data, idPedido, currentPrivilege) => {
       text: "Guardar",
       action: `saveInspection(${idPedido})`,
     },
-  }
+  };
   const actionButtons = getActionButtons(btns);
   containerInspection.append(actionButtons);
-
 };
 
 const saveInspection = (idPedido) => {
@@ -7223,7 +7222,7 @@ const saveInspection = (idPedido) => {
   $.ajax({
     url,
     type: "POST",
-    data:formData,
+    data: formData,
     processData: false,
     contentType: false,
     success: function (response) {
@@ -7235,9 +7234,9 @@ const saveInspection = (idPedido) => {
       } catch (e) {
         console.log(e);
       }
-    }
+    },
   });
-}
+};
 const hideInspection = (idPedido) => {
   containerInspection.empty();
   containerInspection.hide();
@@ -7254,14 +7253,17 @@ const getInspectionTitle = (cotizacionCode) => {
 const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
   html = `
     <div class="inspection-table d-flex flex-column">`;
-  html +=
-    `<div class="inspection-table-header d-flex flex-row">
+  html += `<div class="inspection-table-header d-flex flex-row">
     <div class="inspection-column inspection-img">IMAGEN</div>
     <div class="inspection-column inspection-name">NOMBRE PRODUCTO</div>
     <div class="inspection-column inspection-caracteristicas">CARACTERISTICAS</div>
     <div class="inspection-column inspection-code">ITEM</div>
     <div class="inspection-column inspection-qty-box">QTY CAJAS</div>
-    ${currentPrivilege == 5 ? `<div class="inspection-column inspection-photos">RECEPCION</div>` : ""}
+    ${
+      currentPrivilege == 5
+        ? `<div class="inspection-column inspection-photos">RECEPCION</div>`
+        : ""
+    }
     <div class="inspection-column inspection-photos" >INSPECCION</div>
     <div class="inspection-column inspection-estado">ESTADO</div>
     <div class="inspection-column inspection-notas">NOTAS</div>`;
@@ -7292,7 +7294,9 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
             item.total_box ? parseInt(item.total_box) : 0
           }</span>
           </div>
-          ${currentPrivilege==5?`<div class="inspection-column  inspection-photos">
+          ${
+            currentPrivilege == 5
+              ? `<div class="inspection-column  inspection-photos">
             <svg
           onclick="viewSupplierPhotos(${
             item.ID_Pedido_Detalle_Producto_Proveedor
@@ -7307,7 +7311,9 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
             <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          </div>`:``}
+          </div>`
+              : ``
+          }
           <div class="inspection-column inspection-photos"><svg
           onclick="viewInspeccionPhotos(${
             item.ID_Pedido_Detalle_Producto_Proveedor
@@ -7324,25 +7330,27 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
           </svg></div>
           <div class="inspection-column inspection-estado">
           <select class="form-select"
-                    ${currentPrivilege!=2?"disabled":""}
+                    ${currentPrivilege != 2 ? "disabled" : ""}
 
           >
           <option value="PENDIENTE" ${
-            item.personal_china_inspeccion_estado == "PENDIENTE" ? "selected" : ""
+            item.personal_china_inspeccion_estado == "PENDIENTE"
+              ? "selected"
+              : ""
           }>PENDIENTE</option>
           <option value="INSPECCIONADO" ${
-            item.personal_china_inspeccion_estado == "INSPECCIONADO" ? "selected" : ""
+            item.personal_china_inspeccion_estado == "INSPECCIONADO"
+              ? "selected"
+              : ""
           }>INSPECCIONADO</option>
           </select>
           </div>
           <div class="inspection-column inspection-notas">
           <textarea class="form-control"
-          ${currentPrivilege!=2?"disabled":""}
+          ${currentPrivilege != 2 ? "disabled" : ""}
           name="item[${item.ID_Pedido_Detalle_Producto_Proveedor}][notas]"
           rows="3" >
-         ${htmlDecode(
-            item.empleado_china_notas
-          )}</textarea>
+         ${htmlDecode(item.empleado_china_notas)}</textarea>
           </div>
         </div>
         `;
@@ -7381,22 +7389,31 @@ const viewInspeccionPhotos = (
               $(`#span-${key}`).hide();
               $(`#spinner-${key}`).hide();
               if (!key.includes("video")) {
-                $(`#${key}-container`).find(".view-container").addClass("btn-ver_pago_proveedor").attr("data-url_img", data[`inspeccion_${key}`])
+                $(`#${key}-container`)
+                  .find(".view-container")
+                  .addClass("btn-ver_pago_proveedor")
+                  .attr("data-url_img", data[`inspeccion_${key}`]);
               }
-              $(`#${key}-container`).append('<span class="close-button">X</span>');
-              $(`#${key}-container`).find(".close-button").on("click", () => {
-                $(`#preview-${key}`).hide();
-                $(`#span-${key}`).show();
-                $(`#spinner-${key}`).hide();
-                $(`#${key}`).val("");
-              });
-              $(`#${key}-container`).append('<span class="replace-button btn btn-outline-secondary">Reemplazar</span>');
-              $(`#${key}-container`).find(".replace-button").on("click", () => {
-                $(`#${key}`).click();
-              });
-              
-
-            }else{
+              $(`#${key}-container`).append(
+                '<span class="close-button">X</span>'
+              );
+              $(`#${key}-container`)
+                .find(".close-button")
+                .on("click", () => {
+                  $(`#preview-${key}`).hide();
+                  $(`#span-${key}`).show();
+                  $(`#spinner-${key}`).hide();
+                  $(`#${key}`).val("");
+                });
+              $(`#${key}-container`).append(
+                '<span class="replace-button btn btn-outline-secondary">Reemplazar</span>'
+              );
+              $(`#${key}-container`)
+                .find(".replace-button")
+                .on("click", () => {
+                  $(`#${key}`).click();
+                });
+            } else {
               $(`#preview-${key}`).hide();
               $(`#span-${key}`).show();
               $(`#spinner-${key}`).hide();
@@ -7412,31 +7429,35 @@ const viewInspeccionPhotos = (
     },
   });
 
-  ["foto1", "foto2", "foto3", "video1", "video2"].forEach((key)=> {
+  ["foto1", "foto2", "foto3", "video1", "video2"].forEach((key) => {
     $(`#${key}`).on("change", function () {
       const file = $(this)[0].files[0];
       const fileSize = file.size;
       const fileType = file.type;
       const validTypes = ["image/jpeg", "image/png", "video/mp4"];
       if (!validTypes.includes(fileType)) {
-        $(`#${key}-container`).append('<span class="error-message">Tipo de archivo no valido</span>');
+        $(`#${key}-container`).append(
+          '<span class="error-message">Tipo de archivo no valido</span>'
+        );
 
-        setTimeout(function() {
-            $(`#${key}-container .error-message`).fadeOut('slow', function() {
-                $(this).remove(); // Remover el elemento del DOM después de que desaparezca
-            });
-        }, 1000); 
+        setTimeout(function () {
+          $(`#${key}-container .error-message`).fadeOut("slow", function () {
+            $(this).remove(); // Remover el elemento del DOM después de que desaparezca
+          });
+        }, 1000);
         $(this).val("");
         return;
       }
       if (fileSize > maxFileSize) {
-        $(`#${key}-container`).append('<span class="error-message">Tamaño de archivo excede el límite permitido(20MB)</span>');
+        $(`#${key}-container`).append(
+          '<span class="error-message">Tamaño de archivo excede el límite permitido(20MB)</span>'
+        );
 
-        setTimeout(function() {
-            $(`#${key}-container .error-message`).fadeOut('slow', function() {
-                $(this).remove(); // Remover el elemento del DOM después de que desaparezca
-            });
-        }, 1000); 
+        setTimeout(function () {
+          $(`#${key}-container .error-message`).fadeOut("slow", function () {
+            $(this).remove(); // Remover el elemento del DOM después de que desaparezca
+          });
+        }, 1000);
         $(this).val("");
         return;
       }
@@ -7446,14 +7467,19 @@ const viewInspeccionPhotos = (
         $(`#preview-${key}`).show();
         $(`#span-${key}`).hide();
         $(`#spinner-${key}`).hide();
-        $(`#${key}-container`).find(".view-container").addClass("btn-ver_pago_proveedor").attr("data-url_img", e.target.result)
+        $(`#${key}-container`)
+          .find(".view-container")
+          .addClass("btn-ver_pago_proveedor")
+          .attr("data-url_img", e.target.result);
         $(`#${key}-container`).append('<span class="close-button">X</span>');
-        $(`#${key}-container`).find(".close-button").on("click", () => {
-          $(`#preview-${key}`).hide();
-          $(`#span-${key}`).show();
-          $(`#spinner-${key}`).hide();
-          $(`#${key}`).val("");
-        });
+        $(`#${key}-container`)
+          .find(".close-button")
+          .on("click", () => {
+            $(`#preview-${key}`).hide();
+            $(`#span-${key}`).show();
+            $(`#spinner-${key}`).hide();
+            $(`#${key}`).val("");
+          });
         // $(`#${key}-container`).append('<span class="replace-button btn btn-outline-secondary">Reemplazar</span>');
         // $(`#${key}-container`).find(".replace-button").on("click", () => {
         //   $(`#${key}`).click();
@@ -7461,12 +7487,13 @@ const viewInspeccionPhotos = (
       };
       reader.readAsDataURL(file);
     });
-
   });
   const btns = {
     btnCancel: {
       text: "Regresar",
-      action: `openStepFunction(${currentPrivilege==5?3:4},${selectedStep})`,
+      action: `openStepFunction(${
+        currentPrivilege == 5 ? 3 : 4
+      },${selectedStep})`,
     },
     btnSave: {
       text: "Guardar",
@@ -9573,7 +9600,9 @@ const getAlmacenData = (idPedido) => {
     success: function (response) {
       response = JSON.parse(response);
       if (response.status == "success") {
+        currentPrivilege=response.privilegio;
         openAlmacenView(response.data, idPedido, null);
+        
       }
     },
   });
@@ -9625,19 +9654,25 @@ const getAlmacenViewHeader = () => {
   `;
 };
 const getAlmacenTableHeader = (permiso) => {
-  console.log("permiso", permiso);
   let html = `<div class="almacen-table d-flex flex-column">
           <div class="almacen-header d-flex flex-row">
             <div class="imagen-column column">IMAGEN</div>
             <div class="nombre-column column">NOMBRE PRODUCTO</div>
-            <div class="fentrega-column column">F.ENTREGA</div>
-            <div class="totalbox-column column">TOTAL BOX</div>
-            <div class="totalcbm-column column">TOTAL CBM</div>
-            <div class="totalkg-column column">TOTAL KG</div>
+            <div class="fentrega-column column">F.ENTREGA</div>`;
+      html+=`<div class="totalbox-column column">TOTAL BOX</div>`;
+  if (currentPrivilege == priviligesAlmacen) {
+    html += `<div class="totalcbm-column column">TOTAL CBM</div>
+            <div class="totalkg-column column">TOTAL KG</div>`;
+  }
+  html += `
             <div class="fotos-column column">FOTOS</div>
-            <div class="estado-column column">ESTADO</div>
-            <div class="notas-column column">NOTAS</div>
+            <div class="estado-column column">ESTADO</div>`;
+
+  if (currentPrivilege == priviligesAlmacen || currentPrivilege == priviligesPersonalChina) {
+    html += `<div class="notas-column column">NOTAS</div>
             `;
+  }
+  html += `</div>`;
   return html;
 };
 const getAlmacenTableBody = (
@@ -9695,7 +9730,9 @@ const getAlmacenTableBody = (
         >
 
       </div>
-      <div class="totalcbm-column column">
+      ${
+        currentPrivilege == priviligesAlmacen
+          ? `<div class="totalcbm-column column">
         <input type="number" class="form-control total_cbm"
         name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
@@ -9703,15 +9740,21 @@ const getAlmacenTableBody = (
 
         value="${producto.total_cbm}"
          ${permiso ? "disabled" : ""}>
-      </div>
-      <div class="totalkg-column column">
+      </div>`
+          : ``
+      }
+      ${
+        currentPrivilege == priviligesAlmacen
+          ? `<div class="totalkg-column column">
         <input type="number" class="form-control total_kg"
         name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][total_kg]"
         value="${producto.total_kg}"
          ${permiso ? "disabled" : ""}>
-      </div>
+      </div>`
+          : ``
+      }
       <div class="fotos-column column">
           <svg
           onclick="viewSupplierPhotos(${
@@ -9741,13 +9784,18 @@ const getAlmacenTableBody = (
         </select>
       </div>
     `;
-    tableBody += `<div class="notas-column column">
+    tableBody += `
+    ${
+      currentPrivilege == priviligesAlmacen || currentPrivilege == priviligesPersonalChina
+        ? `<div class="notas-column column">
         <textarea class="form-control" name="almacen[${
           producto.ID_Pedido_Detalle_Producto_Proveedor
         }][notas]" rows="3"
         ${permiso ? "disabled" : ""}
         >${producto.almacen_notas ?? ""}</textarea>
-      </div>`;
+      </div>`
+        : ``
+    }`;
     // }else if(permiso==2){
     //   tableBody += `<div class="notas-column column">
     //     <textarea class="form-control" name="almacen[${
@@ -9767,6 +9815,7 @@ const getAlmacenTableBody = (
  * @param {*} data
  */
 const openAlmacenView = (data, idPedido, permiso = null) => {
+  console.log(data);
   $("#container_orden-compra").hide();
 
   let id_pedido = 0;
@@ -9779,19 +9828,20 @@ const openAlmacenView = (data, idPedido, permiso = null) => {
   const almacenHeader = getAlmacenViewHeader();
   const almacenTableHeader = getAlmacenTableHeader(permiso);
   containerListar.hide();
-  containerAlmacen
-    .empty()
-    .append(almacenTitle)
-    .append(almacenHeader)
-    .append(almacenTableHeader)
-    .show();
+  containerAlmacen.empty().append(almacenTitle);
+  console.log(currentPrivilege, permiso);
+  if (currentPrivilege == priviligesAlmacen) {
+    containerAlmacen.append(almacenHeader);
+  }
+
   const almacenTableBody = getAlmacenTableBody(
     data,
     cotizacionCode,
     idPedido,
     permiso
   );
-  containerAlmacen.append(almacenTableBody);
+
+  containerAlmacen.append(almacenTableHeader+almacenTableBody).show();
   const actionButtons = {
     btnSave: {
       text: "Guardar",
@@ -9883,7 +9933,8 @@ const changeStatusAlmacen = (estado, id_pedido) => {
   });
 };
 const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
-  permiso=permiso=='null'?null:permiso;
+  permiso = permiso == "null" ? null : permiso;
+  console.log(currentPrivilege,permiso)
   let actionButtons = {
     btnSave: {
       text: "Guardar",
@@ -9894,7 +9945,7 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
       action: `getAlmacenData(${idPedido})`,
     },
   };
-  if (permiso != null) {
+  if (permiso != null  ) {
     actionButtons = {
       btnCancel: {
         text: "Regresar",
@@ -9902,22 +9953,37 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
       },
     };
   }
+  if(currentPrivilege==priviligesJefeChina){
+    actionButtons = {
+      btnSave: {
+        text: "Guardar",
+        action: `saveSupplierPhotos(${id},${idPedido})`,
+      },
+      btnCancel: {
+        text: "Regresar",
+        action: `openStepFunction(3,${selectedStep})`,
+      },
+    };
+  }
   const buttonsTemplate = getActionButtons(actionButtons);
-  if(permiso==5){
+  if (permiso == 5) {
     containerInspection.empty();
     const inspectionTitle = getAlmacenViewTitle(cotizacionCode);
     containerInspection.append(inspectionTitle);
     const photosContainer = getviewSupplierPhotosTemplate(permiso);
     containerInspection.append(photosContainer);
     containerInspection.append(buttonsTemplate);
-  }else if(permiso==2){
-  containerAlmacen.empty();
-  const almacenTitle = getAlmacenViewTitle(cotizacionCode);
-  containerAlmacen.append(almacenTitle);
-  const photosContainer = getviewSupplierPhotosTemplate(permiso);
-  containerAlmacen.append(photosContainer);
-  containerAlmacen.append(buttonsTemplate);
-
+  } else if (
+    permiso == priviligesPersonalChina ||
+    permiso == priviligesPersonalPeru || currentPrivilege==priviligesAlmacen
+  ) {
+    console.log("permiso", permiso);
+    containerAlmacen.empty();
+    const almacenTitle = getAlmacenViewTitle(cotizacionCode);
+    containerAlmacen.append(almacenTitle);
+    const photosContainer = getviewSupplierPhotosTemplate(permiso);
+    containerAlmacen.append(photosContainer);
+    containerAlmacen.append(buttonsTemplate);
   }
   handleFileChange("#foto1-file", "#foto1-name", ".foto1-container");
   handleFileChange("#foto2-file", "#foto2-name", ".foto2-container");
@@ -9940,7 +10006,7 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
             permiso
           );
         }
-        if (almacen_foto2 != null ) {
+        if (almacen_foto2 != null) {
           handleFileDisplay(
             almacen_foto2,
             "#foto2-name",
@@ -9964,7 +10030,6 @@ const viewSupplierPhotos = (id, cotizacionCode, idPedido, permiso = null) => {
       }
     },
   });
- 
 };
 const saveSupplierPhotos = (id, idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/saveSupplierPhotos";
@@ -9981,7 +10046,12 @@ const saveSupplierPhotos = (id, idPedido) => {
     success: function (response) {
       const { status, data } = JSON.parse(response);
       if (status == "success") {
+        if (currentPrivilege==priviligesJefeChina) {
+          openStepFunction(3, selectedStep);
+          return;
+        }
         getAlmacenData(idPedido);
+
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -10040,6 +10110,10 @@ const getviewSupplierPhotosTemplate = () => {
 const hideAlmacenView = () => {
   containerAlmacen.empty();
   containerAlmacen.hide();
+  if(currentPrivilege!=priviligesAlmacen){
+    getOrderProgress(idPedido, currentServicio);
+    return;
+  }
   containerListar.show();
   reload_table_Entidad();
 };
@@ -10081,7 +10155,7 @@ const handleFileDisplay = (
     $(containerId).append(
       `<input type="hidden" name="file[idSupplier]" value="${idSupplier}">`
     );
-    if (!permiso) {
+    if (!permiso || currentPrivilege==priviligesJefeChina) {
       $(containerId).append(
         `<span class="remove-item" onclick="handleSpanClick(event, '${input}')">${editIcon}</span>`
       );

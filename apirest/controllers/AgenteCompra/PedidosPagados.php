@@ -1983,11 +1983,11 @@ class PedidosPagados extends CI_Controller
                 // }
             }
             if($step==3){
-                if($priviligie==$this->personalChinaPrivilegio){
+                if($priviligie==$this->personalChinaPrivilegio || $priviligie==$this->personalPeruPrivilegio){
                     $dataAlmacen = $this->PedidosPagadosModel->getAlmacenData($idPedido);
                     echo json_encode(array('status' => 'success', 'data' => $dataAlmacen, 'priviligie' => $priviligie));
                 }
-                if($priviligie==$this->jefeChinaPrivilegio){
+                if($priviligie==$this->jefeChinaPrivilegio ){
                     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
                     echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
                 }

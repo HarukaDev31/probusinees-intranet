@@ -2842,11 +2842,11 @@ echo form_open('', $attributes);?>
   background-color: #f2f2f2;
 
 }#container_almacen,#container-inspeccion{
-  width: auto;
-  overflow: auto;
+
 }
 .almacen-row,.almacen-table{
-  width: 1850px;
+  width: auto;
+  overflow: auto;
 }
 .almacen-header .column:nth-child(odd),.almacen-row .column:nth-child(even){
   background-color: #f9f9f9;
@@ -2859,6 +2859,8 @@ echo form_open('', $attributes);?>
 
 }.form-control{
   text-align: center;
+}.almacen-header,.almacen-row {
+  width: 90vw;
 }
 .almacen-header,.inspection-table-header{
   display: flex;
@@ -3210,7 +3212,8 @@ echo form_open('', $attributes);?>
     box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
   }
   .almacen-table{
-    width: 1850px;
+    width: auto;
+    overflow: auto;
   }.almacen-header .column{
     text-align: center;
 
@@ -3269,7 +3272,7 @@ echo form_open('', $attributes);?>
             flex-direction: column;
         }
 
-        #foto1-container {
+        .container-photo-inspection #foto1-container {
             height: 450px;
             width: 100%;
             position: relative;
@@ -3309,7 +3312,6 @@ echo form_open('', $attributes);?>
             width: 80%;
             height: 75%;
             border-radius: 10px;
-            border: 1px solid #ccc;
             padding: 1em;
 
         }.preview:hover{
@@ -3366,6 +3368,14 @@ echo form_open('', $attributes);?>
           width: 80%;
           height: 80%;
           position: relative;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+
+        }.view-container:hover{
+          cursor: pointer;
+        }.error-message{
+          color: red;
+          font-size: 0.8em;
         }
         .file-container{
           display: flex;

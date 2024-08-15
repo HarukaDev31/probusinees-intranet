@@ -3154,15 +3154,18 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 
     public function updateRecepcionCarga($idPedido)
     {
-        $rolesToUpdate = [2, 5];
+        if($this->user->Nu_Tipo_Privilegio_Acceso==$this->jefeChinaPrivilegio)return;
+        $rolesToUpdate = [1,2, 5];
         $stepToUpdate = 3;
         foreach ($rolesToUpdate as $role) {
             $this->db->where('id_permision_role', $role);
             $this->db->where('id_pedido', $idPedido);
-            if ($role == 2) {
+            if ($role == 2||$role == 1) {
                 $this->db->where('id_order', $stepToUpdate);
                 $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
-            } else {
+            } else 
+            
+            {
                 $this->db->where('id_order', $stepToUpdate);
                 $this->db->update('agente_compra_order_steps', array('status' => 'PROGRESS'));
             }
