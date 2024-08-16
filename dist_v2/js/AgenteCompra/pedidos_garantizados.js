@@ -2279,7 +2279,7 @@ function addItems() {
         </div>
       </div>
       <div class="col-12 col-md-6 col-lg-6">
-        <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
+        <span class="fw-bold">Nombre Proveedor o Link<span class="label-advertencia text-danger"> *</span><span/>
         <div class="form-group" style="position:relative">
                   <div class="input-group">
                   <input type="text" id="modal-nombre_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
@@ -2294,10 +2294,7 @@ function addItems() {
           <input type="text" id="modal-celular_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
         </div>
-        <span class="fw-bold">Link<span class="label-advertencia text-danger"> </span><span/>
-        <div class="form-group">  
-          <input type="text" id="modal-link${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][link]" class="arrProducto form-control link" placeholder="" value="" autocomplete="off" />
-        </div>
+      
           <span class="fw-bold">Notas </span>
         <div class="form-group">
           <input type="hidden" id="modal-notas${iCounterItems}-content" name="addProducto[${iCounterItems}][notas]" value="">
@@ -2534,7 +2531,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           </div>
         </div>
         <div class="col-12 col-md-6 col-lg-6">
-          <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
+          <span class="fw-bold">Nombre Proveedor o Link<span class="label-advertencia text-danger"> *</span><span/>
           <div class="form-group" style="position:relative">
             <input disabled type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
                 <ul class="supplier-list supplier-list${i}" style="position:absolute">
@@ -2705,7 +2702,7 @@ function getItemTemplate(i, mode, detalle, privilegio) {
           </div>
         </div>
         <div class="col-12 col-md-6 col-lg-6">
-          <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
+          <span class="fw-bold">Nombre Proveedor o Link<span class="label-advertencia text-danger"> *</span><span/>
           <div class="form-group" style="position:relative">
           <div class="input-group">
             <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
