@@ -100,6 +100,11 @@ class PedidosGarantizadosModel extends CI_Model
      FROM agente_compra_pedido_detalle_producto_proveedor
      WHERE ID_Pedido_Cabecera = A.ID_Pedido_Cabecera
      AND ID_Pedido_Detalle = IGPD.ID_Pedido_Detalle) AS count_proveedor,
+     (SELECT COUNT(*)
+     FROM agente_compra_pedido_detalle_producto_proveedor
+     WHERE ID_Pedido_Cabecera = A.ID_Pedido_Cabecera
+     AND ID_Pedido_Detalle = IGPD.ID_Pedido_Detalle
+     AND Nu_Selecciono_Proveedor = 1) AS selected_proveedor,
     CLI.No_Entidad,
     CLI.Nu_Documento_Identidad,
     USR.No_Usuario,
@@ -240,7 +245,7 @@ class PedidosGarantizadosModel extends CI_Model
 		');
         $this->db->from($this->table_agente_compra_pedido_detalle_producto_proveedor . ' AS ACPDPP');
         $this->db->join($this->table . ' AS ACPC', 'ACPC.ID_Pedido_Cabecera = ACPDPP.ID_Pedido_Cabecera', 'join');
-        $this->db->join($this->table_suppliers . ' AS S', 'S.id_supplier = ACPDPP.ID_Entidad_Proveedor', 'join');
+        $this->db->join($this->table_suppliers . ' AS S', 'S.id_supplier = ACPDPP.ID_Entidad_Proveedor', 'left');
         $this->db->where('ACPDPP.ID_Pedido_Detalle', $ID);
         $query = $this->db->get();
         return $query->result();
@@ -343,7 +348,7 @@ class PedidosGarantizadosModel extends CI_Model
 
                     $arrSupplier = array(
                         "name" => $row['nombre_proveedor'],
-                        "phone" => $row['celular_proveedor'],
+                        "phone" => $row['celular_proveedor']==""?$code:$row['celular_proveedor'],
                         "code" => $code,
                     );
 
@@ -773,12 +778,18 @@ class PedidosGarantizadosModel extends CI_Model
             ))->row();
             if (empty($existsSupplier)) {
                 /// generate code recursively until it does not exist in supplier table
-                
+              
+                    /// generate code recursively until it does not exist in supplier table
+                    $code = $this->generateSupplierCode($row['nombre_proveedor']);
+                    while ($this->db->get_where($this->table_suppliers, array('code' => $code))->num_rows() > 0) {
+                        $code = $this->generateSupplierCode($row['nombre_proveedor']);
+                    }
 
                 $arrSupplier = array(
                     "name" => $row['nombre_proveedor'],
-                    "phone" => $row['celular_proveedor'],
-                    "code" => 1,
+                    "phone" => $row['celular_proveedor']==""?$code:$row['celular_proveedor'],   
+                    "code" => $code,
+                    
                     'agente_compra_producto_proveedor_id'=>$id,
                     'agente_compra_pedido_cabecera'=>$pedidoID
                 );

@@ -22,7 +22,7 @@ var fToday = new Date(),
   fYear = fToday.getFullYear(),
   fMonth = fToday.getMonth() + 1,
   fDay = fToday.getDate();
-
+let currentPedidoID=null;
 //cancelar agregar productos, add onclick on btn-cancelar
 $(document).on("click", "#btn-cancelar", function (e) {
   e.preventDefault();
@@ -861,7 +861,7 @@ $(function () {
     e.preventDefault();
 
     $(".div-Listar").hide();
-    $(".div-AgregarEditar").show();
+    verPedido(currentPedidoID);
     $("#div-elegir_item_proveedor").hide();
   });
 
@@ -870,7 +870,8 @@ $(function () {
 
     if (currentPrivilegio == 1) {
       $(".div-Listar").hide();
-      $(".div-AgregarEditar").show();
+      verPedido(currentPedidoID);
+
       $("#div-elegir_item_proveedor").hide();
       return;
     }
@@ -904,9 +905,9 @@ $(function () {
 
         if (response.status == "success") {
           $(".div-Listar").hide();
-          $(".div-AgregarEditar").show();
+          // $(".div-AgregarEditar").show();
           $("#div-elegir_item_proveedor").hide();
-
+          verPedido(currentPedidoID);
           $("#moda-message-content").addClass("bg-" + response.status);
           $(".modal-title-message").text(response.message);
           setTimeout(function () {
@@ -972,16 +973,16 @@ $(function () {
                     elemento.classList[3] == "moq" ||
                     elemento.classList[3] == "qty_caja" ||
                     elemento.classList[3] == "cbm" ||
-                    // elemento.classList[3] == "delivery" ||
+                    elemento.classList[3] == "delivery" ||
                     elemento.classList[3] == "shipping_cost" ||
-                    elemento.classList[3] == "kgbox" ||
-                    elemento.classList[3] == "celular_proveedor") &&
+                    elemento.classList[3] == "kgbox") &&
                     (isNaN(parseFloat($("#" + elemento.id).val())) ||
                       parseFloat($("#" + elemento.id).val()) < 0.0)) ||
                   (elemento.classList[3] == "nombre_proveedor" &&
-                    $("#" + elemento.id).val().length == 0)
+                    $("#" + elemento.id).val().length == 0) 
                 ) {
-                  console.log(elemento);
+                  console.log(("#" + elemento.id));
+                  console.log($("#" + elemento.id).val());
                   $("#" + elemento.id)
                     .closest(".form-group")
                     .find(".help-block")
@@ -1051,7 +1052,7 @@ $(function () {
           $(".modal-title-message").text(response.message);
 
           $(".div-Listar").hide();
-          $(".div-AgregarEditar").show();
+          verPedido(currentPedidoID);
           $("#div-add_item_proveedor").hide();
         } else {
           $("#moda-message-content").addClass("bg-danger");
@@ -1198,19 +1199,14 @@ function reload_table_Entidad() {
 
 function verPedido(ID) {
   $(".div-Listar").hide();
-
+  currentPedidoID = ID;
   $("#form-pedido")[0].reset();
   $(".form-group").removeClass("has-error");
   $(".form-group").removeClass("has-success");
   $(".help-block").empty();
-
   $("#table-Producto_Enlace tbody").empty();
   $("#table-Producto_Enlace").show();
-
   $("#div-arrItemsPedidos").html("");
-
-  //$('#span-id_pedido').html('Nro. ' + ID);
-
   $("#span-id_pedido").html("");
 
   url = base_url + "AgenteCompra/PedidosGarantizados/ajax_edit/" + ID;
@@ -1517,7 +1513,7 @@ function verPedido(ID) {
             '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Agregar Proveedor</button>';
           table_enlace_producto += "</div>";
           table_enlace_producto += '<div class="col">';
-          if (parseInt(response.count_proveedor) > 0) {
+          if (parseInt(detalle[i].count_proveedor) > 0) {
             table_enlace_producto +=
               '<button type="button" id="btn-elegir_proveedor' +
               id_item +
@@ -1555,7 +1551,7 @@ function verPedido(ID) {
               response.sCorrelativoCotizacion +
               '" data-id_pedido_detalle="' +
               id_item +
-              '" class="btn btn-danger btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
+              '" class="btn' +(detalle[i].selected_proveedor>0?' btn-outline-secondary ':' btn-danger ' )+'btn-block btn-elegir_proveedor"><i class="fas fa-check"></i>&nbsp; Elegir proveedor</button>';
           }
         }
         table_enlace_producto += "</td></tr>";
@@ -2298,7 +2294,11 @@ function addItems() {
           <input type="text" id="modal-celular_proveedor${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
           <span class="help-block text-danger" id="error"></span>
         </div>
-        <span class="fw-bold">Notas </span>
+        <span class="fw-bold">Link<span class="label-advertencia text-danger"> </span><span/>
+        <div class="form-group">  
+          <input type="text" id="modal-link${iCounterItems}" data-correlativo="${iCounterItems}" name="addProducto[${iCounterItems}][link]" class="arrProducto form-control link" placeholder="" value="" autocomplete="off" />
+        </div>
+          <span class="fw-bold">Notas </span>
         <div class="form-group">
           <input type="hidden" id="modal-notas${iCounterItems}-content" name="addProducto[${iCounterItems}][notas]" value="">
           <div id="modal-notas${iCounterItems}" data-correlativo="${iCounterItems}"   placeholder="" value="" autocomplete="off" class="w-100" ></div>
