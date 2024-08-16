@@ -54,11 +54,13 @@ class PedidosGarantizados extends CI_Controller
                 <input 
                 id="cotizacionCode_' . $row->ID_Pedido_Cabecera . '"
                 type="text" class="form-control w-100" value="' . $row->cotizacionCode . '" disabled>
+                '.(($this->user->Nu_Tipo_Privilegio_Acceso==5||$this->user->Nu_Tipo_Privilegio_Acceso==1)?
+                '
                 <div class="btn btn-xs btn-link"
                 id="btn_edit_cotizacionCode_' . $row->ID_Pedido_Cabecera . '"
                 alt="Editar" title="Editar" href="javascript:void(0)" onclick="editarCotizacionCode(\'' . $row->ID_Pedido_Cabecera . '\')">
                 <i class="fas fa-edit fa-2x" aria-hidden="true"></i></div>
-                </div>';
+                </div>':'</div>');
                 
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto; //quitar para el chino
