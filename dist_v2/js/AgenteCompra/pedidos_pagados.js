@@ -7074,6 +7074,8 @@ function getItemTemplate(i, mode, detalle, privilegio) {
       <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
+      <input type="hidden" class="modal_coordination_id" id="modal_coordination_id${i}" value="${detalle.id_pedido}"
+      name="addProducto[${i}][modal_coordination_id]"/>
 
 
       <div class = "row" >
@@ -7211,11 +7213,11 @@ function getItemTemplate(i, mode, detalle, privilegio) {
   } else {
     div_items = `
     <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
-      <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+         <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
       <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-      <input type="hidden" id="modal_proveedor-id-${i}" value="${
-      detalle.id_pedido
-    }"/>
+      <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
+      <input type="hidden" class="modal_coordination_id" id="modal_coordination_id${i}" value="${detalle.id_pedido}"
+      name="addProducto[${i}][modal_coordination_id]"/>
   <button type="button" class="btn btn-outline-danger" style="width:200px;align-self:end" onclick="removeItemsEdit(${
     detalle.ID_Pedido_Detalle_Producto_Proveedor
   },${i})">
@@ -8623,7 +8625,9 @@ const returnToCoordination = () => {
   const container = $("#table-elegir_productos_proveedor");
   $(".orden-compra_header").hide();
   container.hide();
-  containerCoordination.show();
+  containerCoordination.empty();
+
+  openStepFunction( 2,idPedido);
 };
 const getPagosTemplate = (data = null) => {
   let html = `

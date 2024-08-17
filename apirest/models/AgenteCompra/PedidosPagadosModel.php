@@ -2873,8 +2873,10 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 
                     $arrSupplier = array(
                         "name" => $row['nombre_proveedor'],
-                        "phone" => $row['celular_proveedor'],
+                        "phone" => $row['celular_proveedor']==""?$this->generateSupplierCode($row['nombre_proveedor']):$row['celular_proveedor'],
                         "code" => $code,
+                        'agente_compra_producto_proveedor_id'=>$row['id_detalle'],
+                        'agente_compra_pedido_cabecera'=>$row['pedido-cabecera']
                     );
 
                     if ($this->db->insert('suppliers', $arrSupplier) > 0) {
@@ -2888,6 +2890,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     }
                 } else {
                     $idSupplier = $existsSupplier->id_supplier;
+                    
                 }
                 $arrActualizar[] = array(
                     'ID_Pedido_Detalle_Producto_Proveedor' => intval($row['id_detalle']),
@@ -2909,7 +2912,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     'ID_Entidad_Proveedor' => $idSupplier,
                     'kg_box' => $row['kgbox'],
                 );
-                $cordinationID = $arrPost['modal_coordination_id'];
+                $cordinationID = $row['modal_coordination_id'];
                 if ($cordinationID != 0) {
                     $existsSupplierCoordination = $this->db->get_where('agente_compra_coordination_supplier', array('id_coordination' => $cordinationID, 'id_supplier' => $idSupplier))->row();
                     //if not exists insert

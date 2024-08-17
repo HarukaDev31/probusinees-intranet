@@ -350,6 +350,8 @@ class PedidosGarantizadosModel extends CI_Model
                         "name" => $row['nombre_proveedor'],
                         "phone" => $row['celular_proveedor']==""?$code:$row['celular_proveedor'],
                         "code" => $code,
+                        'agente_compra_producto_proveedor_id'=>$row['id_detalle'],
+                        'agente_compra_pedido_cabecera'=>$arrPost['ID_Pedido_Cabecera'],
                     );
 
                     if ($this->db->insert('suppliers', $arrSupplier) > 0) {
