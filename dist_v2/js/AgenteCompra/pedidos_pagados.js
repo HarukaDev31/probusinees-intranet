@@ -14,6 +14,9 @@ let priviligesJefeChina = 5;
 let priviligesAlmacen = 6;
 let currentPrivilege = null;
 let pagosCount = 2;
+let arrQuillNotas = [];
+let isSelectingOption = false;
+
 const editIcon = `<?xml version="1.0" encoding="utf-8"?>
 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Edit / Edit_Pencil_02">
@@ -4971,14 +4974,25 @@ function cambiarTipoServicio(
 
 function clearHTMLTextArea(str) {
   if (str == null) return "";
-  str = str.replace(/<br>/gi, "");
-  str = str.replace(/<br\s\/>/gi, "");
-  str = str.replace(/<br\/>/gi, "");
-  str = str.replace(/<\/button>/gi, "");
-  str = str.replace(/<br >/gi, "");
-  str = str.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+  // Reemplaza todas las variantes de <br> con una cadena vacía
+  str = str.replace(/<br\s*\/?>/gi, "");
+
+  // Reemplaza todas las entidades &quot; con comillas dobles normales
+  str = str.replace(/&quot;/g, '"');
+
+  // Asegúrate de reemplazar entidades especiales que puedan estar en el HTML
+  str = str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'");
+
+  // Reemplaza comillas dentro de los atributos de estilo para asegurarse de que no estén rotas
+  str = str.replace(/style="([^"]*?)"/g, function (match, p1) {
+    return `style="${p1.replace(/"/g, "&quot;")}"`;
+  });
+
+  console.log(str);
   return str;
 }
+
 const changeStatusOrden = (estado, id_pedido) => {
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/cambiarEstadoOrden",
@@ -7006,135 +7020,402 @@ const stepTemplate = (step, i) => {
   `;
   return stepHTML;
 };
+const deleteItem = (id_item, nombre_item) => {
+  //sho modal delete
+  $(".modal-eliminar-item-pedido").modal("show");
+  $("#modal-body-eliminar-item-pedido").html(
+    "<p>¿Desea eliminar el item?</p>"
+  );
+  $("#btn-eliminar-item-pedido")
+    .off("click")
+    .on("click", () => {
+      //delete item
+      $.ajax({
+        url: base_url + "AgenteCompra/PedidosGarantizados/deleteItem",
+        type: "POST",
+        data: { id_item },
+        dataType: "JSON",
+        success: function (response) {
+          if (response.status == "success") {
+            $(`#tr_enlace_producto${id_item}`).remove();
+            $(`.tr_enlace_producto${id_item}`).remove();
+            $(".modal-eliminar-item-pedido").modal("hide");
+            $(".modal-message").removeClass(
+              "modal-danger modal-warning modal-success"
+            );
+            $("#modal-message").modal("show");
+            $(".modal-message").addClass("modal-success");
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 1100);
+            reload_table_Entidad();
+          } else {
+            $(".modal-eliminar-item-pedido").modal("hide");
+            $(".modal-message").removeClass(
+              "modal-danger modal-warning modal-success"
+            );
+            $("#modal-message").modal("show");
+            $(".modal-message").addClass("modal-danger");
+            $(".modal-title-message").text(response.message);
+            setTimeout(function () {
+              $("#modal-message").modal("hide");
+            }, 1100);
+          }
+        },
+      });
+    });
+};
+function getItemTemplate(i, mode, detalle, privilegio) {
+  console.log(detalle,i)
+  if (privilegio == 1) {
+    div_items = `
+    <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
+      <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+      <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+      <input type="hidden" id="modal_proveedor-id-${i}" value="${detalle.id_pedido}"/>
 
-const getItemTemplate = (i, mode, detalle) => {
-  div_items = `
-  <div id="card"${i}" class="card border-0 rounded shadow-sm mt-3">
-    <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][proovedor-id]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-    <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-    <input type="hidden" id="modal_proveedor-id-${i}" name="addProducto[${i}][detalle-id]" />
-    <input type="hidden" class="modal_coordination_id" name="modal_coordination_id"/>
-    <div class = "row" >
-      <div class="col-6 col-md-3 col-lg-2">
-        <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-precio${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
-        <span class="help-block text-danger" id="error"></span>
+
+      <div class = "row" >
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-precio${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+          </div>
         </div>
-      </div>
-      <div class="col-6 col-md-3 col-lg-2">
-        <span class="fw-bold">Moq<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-moq${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Moq<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-moq${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Pcs/Caja<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-qty_caja${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Cbm<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-cbm${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-delivery${i}" data-correlativo="${i}"  name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery " placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Shipping Cost<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-costo_delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+         <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Kg / box <span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-kgbox${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][kgbox]" class="arrProducto form-control required kgbox input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Unidad Medida<span class="label-advertencia text-danger"> *</span><span/>
+          <select disabled id="modal-unidad_medida${i}" data-correlativo="${i}" name="addProducto[${i}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
+            <option value="un">Unidades</option>
+            <option value="mt">Metros</option>
+            <option value="mt2">Metro Cuadrado</option>
+            <option value="pc">Piezas</option>
+            <option value="kg">Kilogramos</option>
+            <option value="pa">Pares</option>
+            <option value="lt">Litros</option>
+            </select>
           <span class="help-block text-danger" id="error"></span>
         </div>
       </div>
-      <div class="col-6 col-md-3 col-lg-2">
-        <span class="fw-bold">Qty_caja<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-qty_caja${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
-          <span class="help-block text-danger" id="error"></span>
-        </div>
-      </div>
-      <div class="col-6 col-md-3 col-lg-2">
-        <span class="fw-bold">Cbm<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-cbm${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
-          <span class="help-block text-danger" id="error"></span>
-        </div>
-      </div>
-      <div class="col-6 col-md-3 col-lg-2">
-        <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery input-decimal" placeholder="" value="" autocomplete="off" />
-          <span class="help-block text-danger" id="error"></span>
-        </div>
-      </div>
-      <div class="col-6 col-md-3 col-lg-2">
-        <span class="fw-bold">Shipping Cost<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-costo_delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
-          <span class="help-block text-danger" id="error"></span>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12 col-md-6 col-lg-6">
-        <div class="row h-100">
-          <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
-            <!--Upload Icon-->
-            <div class="form-group mx-auto " id="container-uploadprimaryimg-${i}">
-            <label>Imagen Principal</label>
-            ${
-              detalle["main_photo"] == null
-                ? ""
-                : `<span class="fw-bold  btn btn-danger"
-              onclick="deleteImage('${i}',1)">Eliminar</span>`
-            }
-            </br>
-            <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
-            <input type="file" name="file[${i}][main_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-6">
+          <div class="row h-100">
+            <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
+              <!--Upload Icon-->
+              <div class="form-group mx-auto d-flex flex-column " id="container-uploadprimaryimg-${i}">
+              <label class="text-center">Imagen Principal</label>
+
+              </br>
+              <input disabled type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+
+              </div>
+            </div>
+            <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+            <div class="form-group" id="container-uploadimg2-${i}">
+            <label>Imagen 2</label>
+
+            <input disabled type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>
+            <input disabled type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+
+            </div>
+              <div class="form-group" id="container-uploadimg3-${i}">
+              <label>Imagen 3</label>
+
+              <input disabled type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+
+              </div>
+              <div class="form-group" id="container-uploadvideo1-${i}">
+              <label>Video 1</label>
+
+
+              <input disabled type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
+              <div class="form-group"  id="container-uploadvideo2-${i}">
+              <label>Video 2</label>
+
+              <input disabled type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
+              <input disabled type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
 
             </div>
           </div>
-          <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
-          <div class="form-group" id="container-uploadimg2-${i}">
-          <label>Imagen 2</label>
-          <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>
-          ${
-            detalle["secondary_photo"] == null
-              ? ""
-              : `<span class="fw-bold  btn btn-danger"
+        </div>
+        <div class="col-12 col-md-6 col-lg-6">
+          <span class="fw-bold">Nombre Proveedor o Link<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group" style="position:relative">
+            <input disabled type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+                <ul class="supplier-list supplier-list${i}" style="position:absolute">
+                </ul>
+            </li>
+            </ul>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input disabled type="text" id="modal-celular_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
+          <div class="form-group">
+            <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
+            <div id="modal-notas${i}" data-correlativo="${i}"  placeholder="" value="" autocomplete="off" style="pointer-events:none"></div>
+          </div>
+
+        </div>
+      </div>
+      `;
+  } else {
+    div_items = `
+    <div id="card${i}" class="card-cuz  border-0 rounded shadow-sm mt-3" style="display: flex;flex-direction: column;">
+      <input type="hidden" id="modal-detalle${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][id_detalle]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+      <input type="hidden" id="modal-pedido-cabecera${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][pedido-cabecera]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+      <input type="hidden" id="modal_proveedor-id-${i}" value="${
+      detalle.id_pedido
+    }"/>
+  <button type="button" class="btn btn-outline-danger" style="width:200px;align-self:end" onclick="removeItemsEdit(${
+    detalle.ID_Pedido_Detalle_Producto_Proveedor
+  },${i})">
+  Eliminar Opcion
+  </button>
+
+      <div class = "row" >
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Precio ¥<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-precio${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][precio]" class="arrProducto form-control required precio input-decimal" placeholder="" value="" autocomplete="off" />
+          <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Moq<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-moq${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][moq]" class="arrProducto form-control required moq input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Pcs/Caja<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-qty_caja${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][qty_caja]" class="arrProducto form-control required qty_caja input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Cbm<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-cbm${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][cbm]" class="arrProducto form-control required cbm input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Delivery<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-delivery${i}" data-correlativo="${i}"  name="addProducto[${i}][delivery]" class="arrProducto form-control required delivery " placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Shipping Cost<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-costo_delivery${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][shipping_cost]" class="arrProducto form-control required shipping_cost input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+         <div class="col-6 col-md-3 col-lg-2">
+        <span class="fw-bold">Kg / box <span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-kgbox${i}" data-correlativo="${i}" inputmode="decimal" name="addProducto[${i}][kgbox]" class="arrProducto form-control required kgbox input-decimal" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <span class="fw-bold">Unidad Medida<span class="label-advertencia text-danger"> *</span><span/>
+          <select id="modal-unidad_medida${i}" data-correlativo="${i}" name="addProducto[${i}][unidad_medida]" class="arrProducto form-control required unidad_medida" placeholder="" value="" autocomplete="off">
+            <option value="un">Unidades</option>
+            <option value="mt">Metros</option>
+            <option value="mt2">Metro Cuadrado</option>
+            <option value="pc">Piezas</option>
+            <option value="kg">Kilogramos</option>
+            <option value="pa">Pares</option>
+            <option value="lt">Litros</option>
+            </select>
+          <span class="help-block text-danger" id="error"></span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-6">
+          <div class="row h-100">
+            <div class="col-12 col-md-8 col-lg-8 d-flex flex-column justify-content-center">
+              <!--Upload Icon-->
+              <div class="form-group mx-auto d-flex flex-column " id="container-uploadprimaryimg-${i}">
+              <label class="text-center">Imagen Principal</label>
+
+              </br>
+              <input type="hidden" name="addProducto[${i}][main_photo]" id="btn-uploadprimaryimg-URL-${i}"/>
+              <input type="file" name="file[${i}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+               ${
+                 detalle["main_photo"] == null
+                   ? ""
+                   : `<span class="fw-bold  btn btn-danger d-block"
+              onclick="deleteImage('${i}',1)">Eliminar</span>`
+               }
+              </div>
+            </div>
+            <div class="col-12 col-md-4 col-lg-4 d-flex flex-column justify-content-center">
+            <div class="form-group" id="container-uploadimg2-${i}">
+            <label>Imagen 2</label>
+
+            <input type="hidden" name="addProducto[${i}][secondary_photo]" id="btn-uploadimg2-URL-${i}"/>
+            <input type="file" name="file[${i}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+             ${
+               detalle["secondary_photo"] == null
+                 ? ""
+                 : `<span class="fw-bold  btn btn-danger d-block"
               onclick="deleteImage('${i}',2)">Eliminar</span>`
-          }
-          <input type="file" name="file[${i}][secondary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input>
-          </div>
-            <div class="form-group" id="container-uploadimg3-${i}">
-            <label>Imagen 3</label>
-            <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
-            ${
-              detalle["terciary_photo"] == null
-                ? ""
-                : `<span class="fw-bold  btn btn-danger"
+             }
+            </div>
+              <div class="form-group" id="container-uploadimg3-${i}">
+              <label>Imagen 3</label>
+
+              <input type="hidden" name="addProducto[${i}][terciary_photo]" id="btn-uploadimg3-URL-${i}"/>
+              <input type="file" name="file[${i}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="image/*"></input>
+               ${
+                 detalle["terciary_photo"] == null
+                   ? ""
+                   : `<span class="fw-bold  btn btn-danger d-block"
               onclick="deleteImage('${i}',3)">Eliminar</span>`
-            }
-            <input type="file" name="file[${i}][terciary_photo]" class="btn btn-outline-primary btn-block" id="btn-uploadimg3-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
-            <div class="form-group" id="container-uploadvideo1-${i}">
-            <label>Video 1</label>
-            <input type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
-            <input type="file" name="file[${i}][primary_video]" class="btn btn-outline-primary btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
-            <div class="form-group"  id="container-uploadvideo2-${i}">
-            <label>Video 2</label>
-            <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
-            <input type="file" name="file[${i}][secondary_video]" class="btn btn-outline-primary btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}"></input></div>
+               }
+              </div>
+              <div class="form-group" id="container-uploadvideo1-${i}">
+              <label>Video 1</label>
+                  ${
+                    detalle["primary_video"] == null
+                      ? ""
+                      : `<span class="fw-bold  d-block btn btn-danger"
+              onclick="deleteVideo('${i}',1)">Eliminar</span>`
+                  }
 
+              <input type="hidden" name="addProducto[${i}][primary_video]" id="btn-uploadvideo1-URL-${i}"/>
+              <input type="file" name="file[${i}][primary_video]" class=" btn-block" id="btn-uploadvideo1-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
+              <div class="form-group"  id="container-uploadvideo2-${i}">
+              <label>Video 2</label>
+              ${
+                detalle["secondary_video"] == null
+                  ? ""
+                  : `<span class="fw-bold  btn btn-danger d-block"
+              onclick="deleteVideo('${i}',2)">Eliminar</span>`
+              }
+              <input type="hidden" name="addProducto[${i}][secondary_video]"  id="btn-uploadvideo2-URL-${i}"/>
+              <input type="file" name="file[${i}][secondary_video]" class=" btn-block" id="btn-uploadvideo2-${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-upload${i}" accept="video/*"></input></div>
+
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-12 col-md-6 col-lg-6">
-        <span class="fw-bold">Nombre Proveedor<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
-          <span class="help-block text-danger" id="error"></span>
-        </div>
-        <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
-        <div class="form-group">
-          <input type="text" id="modal-celular_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
-          <span class="help-block text-danger" id="error"></span>
-        </div>
-        <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
-        <div class="form-group">
-          <textarea id="modal-notas${i}" data-correlativo="${i}" name="addProducto[${i}][notas]" class="arrProducto form-control required notas" placeholder="" value="" autocomplete="off" ></textarea>
-        </div>
+        <div class="col-12 col-md-6 col-lg-6">
+          <span class="fw-bold">Nombre Proveedor o Link<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group" style="position:relative">
+          <div class="input-group">
+            <input type="text" id="modal-nombre_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][nombre_proveedor]" class="arrProducto form-control required nombre_proveedor" placeholder="" value="" autocomplete="off" />
+                              <button type="button" class="btn btn-outline-secondary" id="btn-open-supplier${i}" data-correlativo="${i}" data-toggle="modal" data-target="#modal-supplier${i}"><i class="fas fa-search"></i></button>
 
+            </div>
+            <ul class="supplier-list supplier-list${i}" style="position:absolute">
+                </ul>
+            </li>
+            </ul>
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">N° Celular<span class="label-advertencia text-danger"> *</span><span/>
+          <div class="form-group">
+            <input type="text" id="modal-celular_proveedor${i}" data-correlativo="${i}" name="addProducto[${i}][celular_proveedor]" class="arrProducto form-control required celular_proveedor" placeholder="" value="" autocomplete="off" />
+            <span class="help-block text-danger" id="error"></span>
+          </div>
+          <span class="fw-bold">Notas <span class="label-advertencia text-danger"> </span><span/>
+          <div class="form-group">
+            <input type="hidden" id="modal-notas${i}-content" name="addProducto[${i}][notas]" value="">
+            <div id="modal-notas${i}" data-correlativo="${i}"   placeholder="" value="" autocomplete="off"  class="w-100"></div>
+          </div>
+
+        </div>
       </div>
-    </div>
-    `;
-  // var id_detalle = detalle["ID_Pedido_Detalle"];
-  // var id_item = detalle["ID_Pedido_Detalle_Producto_Proveedor"];
-  // var id_supplier = detalle["id_supplier"];
+      `;
+  }
+
+  var id_detalle = detalle["ID_Pedido_Detalle"];
+  var id_item = detalle["ID_Pedido_Detalle_Producto_Proveedor"];
+  var id_supplier = detalle["id_supplier"];
+  if (privilegio == 1) {
+    if (detalle["Nu_Selecciono_Proveedor"] == 0) {
+      div_items += `
+            <button type="button" id="btn-seleccionar_proveedor${id_item}"
+              data-id_detalle="${id_detalle}"
+              data-id="${id_item}"
+              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}"
+              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}"
+              data-id_supplier="${id_supplier}"
+              class="btn btn-danger btn-block btn-seleccionar_proveedor">
+              <i class="fas fa-check"></i>&nbsp; Seleccionar proveedor
+            </button>`;
+    } else {
+      div_items += `
+            <button type="button" id="btn-desmarcar_proveedor${id_item}"
+              data-id_detalle="${id_detalle}"
+              data-id="${id_item}"
+              data-id_supplier="${id_supplier}"
+              data-correlativo="${$("#txt-Item_ECorrelativo_Editar").val()}"
+              data-name_item="${$("#txt-Item_Ename_producto_Editar").val()}"
+              class="btn btn-secondary btn-block btn-desmarcar_proveedor">
+              <i class="fas fa-times"></i>&nbsp; Deseleccionar proveedor
+            </button>`;
+    }
+  }
+  div_items += `</div>`;
   return div_items;
-};
+}
 const deleteImage = (i, imgIndex) => {
   if (imgIndex == 1) {
     $(`#container-uploadprimaryimg-${i}`).find("img").remove();
@@ -8039,6 +8320,14 @@ const openSupplierItems = (id_pedido, id_supplier, id_coordination) => {
 };
 const saveSupplierItems = (id_pedido, id_supplier, id_coordination) => {
   const form = $("#table-elegir_productos_proveedor");
+  console.log(arrQuillNotas)
+  arrQuillNotas.forEach(function (item, index) {
+    const content = item.root.innerHTML;
+    //escapar caracteres especiales
+    const escapedContent = encodeURIComponent(content);
+    console.log(escapedContent);
+    $(`#modal-notas${index + 1}-content`).val(escapedContent);
+  });
   const formData = new FormData(form[0]);
   url = base_url + "AgenteCompra/PedidosPagados/saveSupplierItems";
   $.ajax({
@@ -8058,15 +8347,82 @@ const saveSupplierItems = (id_pedido, id_supplier, id_coordination) => {
     },
   });
 };
+const getSuppliersByName = (index, container) => {
+  const component = container.find(`#modal-nombre_proveedor${index}`);
+  console.log(component,"component",container,"container",index)
+  const list = container.find(`.supplier-list${index}`);
+  const btnOpenSupplier = container.find(`#btn-open-supplier${index}`);
+  btnOpenSupplier.off("focusout").on("focusout", () => {
+    setTimeout(() => {
+      if (!isSelectingOption) {
+        list.html("");
+      }
+    }, 150); // Ajusta el tiempo si es necesario
+  });
+  if (list.children().length > 0) {
+    list.html("");
+    return;
+  }
+
+ 
+  const name = component.val();
+
+  // if (name.length < 1) return list.html("");
+  // if (findTimeOut) clearTimeout(findTimeOut);
+  console.log(index);
+  findTimeOut = setTimeout(() => {
+    $.ajax({
+      url: base_url + "AgenteCompra/PedidosGarantizados/getSuppliersByName",
+      type: "POST",
+      data: { name, idPedido },
+      dataType: "JSON",
+      success: function (response) {
+        list.html("");
+        console.log(response,list)
+        response.forEach((supplier, i) => {
+          list.append(
+            `<option value="${supplier.name}" id="option-${index}-${i}">${supplier.name}</option>`
+          );
+          $(`#option-${index}-${i}`)
+            .on("mousedown", () => {
+              isSelectingOption = true;
+            })
+            .on("click", () => {
+              component.val(supplier.name);
+              $(`#modal-celular_proveedor${index}`).val(supplier.phone);
+              list.html("");
+              isSelectingOption = false;
+            });
+        });
+      },
+    });
+  }, 100);
+};
 const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
   console.log(detalles, "openSupplierItemsView", idCoordination);
   const container = $("#table-elegir_productos_proveedor");
   container.empty();
   container.show();
   $(".orden-compra_header").hide();
-  for (i = 0; i < detalles.length; i++) {
+  arrQuillNotas = [];
+  for (let i = 0; i < detalles.length; i++) {
     let item = getItemTemplate(i + 1, "select", detalles[i], idCoordination);
     container.append(item);
+    const toolbarOptions = [
+      ["bold", "italic", "underline"], // toggled buttons
+      [{ color: [] }], // dropdown with defaults from theme
+      ["clean"], // remove formatting button
+    ];
+
+    const notasQuill = new Quill(`#modal-notas${i + 1}`, {
+      modules: {
+        toolbar: toolbarOptions,
+      },
+      theme: "snow",
+    });
+    // notasQuill.root.innerHTML=detalle[i]["Txt_Notas"];
+    notasQuill.root.innerHTML = clearHTMLTextArea(detalles[i]["Txt_Nota"]);
+    arrQuillNotas.push(notasQuill);
     container.find(`#modal-precio${i + 1}`).val(detalles[i]["Ss_Precio"]);
     container.find(`#modal-moq${i + 1}`).val(detalles[i]["Qt_Producto_Moq"]);
     container.find(".modal_coordination_id").val(idCoordination);
@@ -8101,10 +8457,22 @@ const openSupplierItemsView = (detalles, btnsConfig, idCoordination) => {
     container
       .find(`#modal-celular_proveedor${i + 1}`)
       .val(detalles[i]["celular_proveedor"]);
-
+    container.find(`#modal-kgbox${i + 1}`).val(detalles[i]["kg_box"]);
     container
       .find(`#btn-uploadprimaryimg-URL-${i + 1}`)
       .val(detalles[i]["main_photo"]);
+      container.find(`#modal-notas${i + 1}`).val(detalles[i]["Txt_Nota"]);
+      container.find(`#btn-open-supplier${i + 1}`).on("click", () => {
+        getSuppliersByName(i+1, $("#table-elegir_productos_proveedor"));
+      });
+
+      //modal nombre proveedor on focus out
+      container.find(`#btn-open-supplier${i + 1}`).on("focusout", () => {
+        console.log("focusout");
+        setTimeout(() => {
+          $(".supplier-list" + (i + 1)).html("");
+        }, 200);
+      });
     if (detalles[i]["main_photo"] != null) {
       container
         .find(`#btn-uploadprimaryimg-URL-${i + 1}`)

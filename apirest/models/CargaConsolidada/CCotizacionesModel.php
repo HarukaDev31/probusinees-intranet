@@ -1799,8 +1799,8 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
         $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objPHPExcel->getActiveSheet()->setCellValue('C8', $data['cliente']['nombre']);
-        $objPHPExcel->getActiveSheet()->setCellValue('C10', "74645561");
-        $objPHPExcel->getActiveSheet()->setCellValue('C11', "912705923");
+        $objPHPExcel->getActiveSheet()->setCellValue('C10',$data['cliente']['dni']);
+        $objPHPExcel->getActiveSheet()->setCellValue('C11',$data['cliente']['telefono']);
         $objPHPExcel->getActiveSheet()->setCellValue('J9', $pesoTotal >= 1000 ? $pesoTotal / 1000 . " Tn" : $pesoTotal . " Kg");
         $objPHPExcel->getActiveSheet()->setCellValue('J11', $cbmTotal . " m3");
         //   $objPHPExcel->getActiveSheet()->setCellValue('I10', "QTY PROVEEDORES");

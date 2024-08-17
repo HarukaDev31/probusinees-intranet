@@ -1459,7 +1459,27 @@ echo form_open('', $attributes);?>
   <?php echo form_close(); ?>
 </div>
 <!-- /.modal agregar fecha_entrega_shipper -->
+<div class="modal fade modal-eliminar-item-pedido" id="modal-default">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Eliminar Item</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body-eliminar-item-pedido">
 
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="col btn btn-outline-danger btn-lg btn-block pull-center" data-dismiss="modal">Salir</button>
+        <button type="button" id="btn-eliminar-item-pedido" class="col btn btn-outline-success btn-lg btn-block pull-center" >Aceptar</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
 <!-- modal cambio_item_proveedor -->
 <div class="modal fade modal-cambio_item_proveedor" id="modal-cambio_item_proveedor">
   <?php $attributes = array('id' => 'form-cambio_item_proveedor');
@@ -3318,9 +3338,7 @@ echo form_open('', $attributes);?>
           cursor: pointer;
         }
 
-        input[type="file"] {
-            display: none;
-        }.container-photo-inspection{
+        .container-photo-inspection{
           display:grid;
           grid-template-columns: 2fr 1fr;
           grid-template-rows: 1fr 1fr 1fr 1fr;
@@ -3392,6 +3410,20 @@ echo form_open('', $attributes);?>
         }.error-message{
           color: red;
           font-size: 0.8em;
-        }
+        }.supplier-list{
+  background: white;
+    padding: 0;
+    border: 1px solid #BFC9CA;
+    width: 100%;
+}
+.supplier-list option{
+  list-style: none;
+  padding: 10px;
+  border-bottom: 1px solid #BFC9CA;
+  cursor: pointer;
+}
+.supplier-list option:hover{
+  background: #BFC9CA;
+}
   </style>
   <?php echo form_close(); ?>

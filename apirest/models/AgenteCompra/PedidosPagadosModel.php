@@ -2732,6 +2732,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
 		ACPDPP.Nu_Selecciono_Proveedor,
 		ACPDPP.Qt_Producto_Caja_Final,
 		ACPDPP.Txt_Nota_Final,
+        ACPDPP.kg_box,
         S.id_supplier,
 		S.name as nombre_proveedor,
         S.phone as celular_proveedor,
@@ -2888,18 +2889,17 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 } else {
                     $idSupplier = $existsSupplier->id_supplier;
                 }
-
                 $arrActualizar[] = array(
-                    'ID_Pedido_Detalle_Producto_Proveedor' => intval($row['proovedor-id']),
+                    'ID_Pedido_Detalle_Producto_Proveedor' => intval($row['id_detalle']),
                     'Qt_Producto_Caja_Final' => $cantidad,
                     'Txt_Nota_Final' => $nota,
+                    'Txt_Nota' => urldecode($row['notas']),
                     'Ss_Precio' => $precio,
                     'Qt_Producto_Moq' => $moq,
                     'Qt_Producto_Caja' => $caja,
                     'Qt_Cbm' => $cbm,
                     'Nu_Dias_Delivery' => $delivery,
                     'Ss_Costo_Delivery' => $costo_delivery,
-                    'Txt_Nota' => nl2br($nota_historica),
                     'No_Contacto_Proveedor' => $contacto_proveedor,
                     'main_photo' => $results['paths'][$key]['main_photo'],
                     'secondary_photo' => $results['paths'][$key]['secondary_photo'],
@@ -2907,6 +2907,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                     'primary_video' => $results['paths'][$key]['primary_video'],
                     'secondary_video' => $results['paths'][$key]['secondary_video'],
                     'ID_Entidad_Proveedor' => $idSupplier,
+                    'kg_box' => $row['kgbox'],
                 );
                 $cordinationID = $arrPost['modal_coordination_id'];
                 if ($cordinationID != 0) {
