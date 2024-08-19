@@ -1763,6 +1763,8 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("M" . $initialRow, "=K" . $initialRow . "*H" . $initialRow);
 
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
+            $objPHPExcel->getActiveSheet()->setCellValue("O" . $initialRow, "=H" . $initialRow . "/N" . $initialRow);
+
             $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, $val->Qt_Cbm);
 
             $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=O" . $initialRow . "*P" . $initialRow);
@@ -1861,6 +1863,8 @@ class PedidosPagados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("I" . $initialRow, $this->getUnitName($val->unidad_medida));
             $objPHPExcel->getActiveSheet()->setCellValue("J" . $initialRow, $val->Ss_Precio);
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
+            $objPHPExcel->getActiveSheet()->setCellValue("O" . $initialRow, "=H" . $initialRow . "/N" . $initialRow);
+
             $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=P" . $initialRow . "*O" . $initialRow);
             $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, $val->Qt_Cbm);
             $objPHPExcel->getActiveSheet()->setCellValue("R" . $initialRow, $val->kg_box);

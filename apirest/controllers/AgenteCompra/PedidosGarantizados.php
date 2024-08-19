@@ -240,12 +240,14 @@ class PedidosGarantizados extends CI_Controller
         $data = array(
             'ID_Empresa' => $this->input->post('EID_Empresa'),
             'ID_Organizacion' => $this->input->post('EID_Organizacion'),
-            'Ss_Tipo_Cambio' => $this->input->post('Ss_Tipo_Cambio'),
+            
             'Txt_Observaciones_Garantizado' => $this->input->post('Txt_Observaciones_Garantizado'),
             'file_cotizacion' => $_FILES['file_cotizacion'],
         );
-
-
+        //IF $THIS->USER->NU_TIPO_PRIVILEGIO_ACCESO==5 || $THIS->USER->NU_TIPO_PRIVILEGIO_ACCESO==2
+        if($this->user->Nu_Tipo_Privilegio_Acceso==5 || $this->user->Nu_Tipo_Privilegio_Acceso==2){
+            $data['Ss_Tipo_Cambio'] = $this->input->post('Ss_Tipo_Cambio');
+        }
         echo json_encode($this->PedidosGarantizadosModel->actualizarPedido(
             array(
                 'ID_Pedido_Cabecera' => $this->input->post('EID_Pedido_Cabecera'),
@@ -367,6 +369,7 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("L{$initialRow}", "=MAX(H{$initialRow},F{$startRow})*J{$initialRow}");
             $objPHPExcel->getActiveSheet()->setCellValue("M{$initialRow}", "=MAX(H{$initialRow},F{$startRow})*K{$initialRow}");
             $objPHPExcel->getActiveSheet()->setCellValue("N{$initialRow}", $val->Qt_Producto_Caja);
+            $objPHPExcel->getActiveSheet()->setCellValue("O{$initialRow}", "=H{$initialRow}/N{$initialRow}");
             $objPHPExcel->getActiveSheet()->setCellValue("P{$initialRow}", $val->Qt_Cbm);
 
             $objPHPExcel->getActiveSheet()->setCellValue("Q{$initialRow}", "=O{$initialRow}*P{$initialRow}");
@@ -542,6 +545,8 @@ class PedidosGarantizados extends CI_Controller
                 $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow,"=MAX(G{$initialRow},I{$startRow})*L{$initialRow}");
 
                 $objPHPExcel->getActiveSheet()->setCellValue("O" . $initialRow, $val->Qt_Producto_Caja);
+                $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, "=I{$initialRow}/O{$initialRow}");
+
                 $objPHPExcel->getActiveSheet()->setCellValue("T" . $initialRow, "=P" . $initialRow . "*S" . $initialRow);
                 $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, $val->Qt_Cbm);
                 $objPHPExcel->getActiveSheet()->setCellValue("S" . $initialRow, $val->kg_box);
@@ -708,6 +713,7 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue("L{$initialRow}", "=MAX(H{$initialRow},F{$startRow})*J{$initialRow}");
             $objPHPExcel->getActiveSheet()->setCellValue("M" . $initialRow, "=MAX(H{$initialRow},F{$startRow})*K{$initialRow}");
             $objPHPExcel->getActiveSheet()->setCellValue("N" . $initialRow, $val->Qt_Producto_Caja);
+            $objPHPExcel->getActiveSheet()->setCellValue("O" . $initialRow, "=H" . $initialRow . "/N" . $initialRow);
             $objPHPExcel->getActiveSheet()->setCellValue("P" . $initialRow, $val->Qt_Cbm);
             // $objPHPExcel->getActiveSheet()->setCellValue("Q" . $initialRow, "=P" . $initialRow . "*O" . $initialRow);
 
