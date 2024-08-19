@@ -2862,7 +2862,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 if (empty($row['contacto_proveedor'])) {
                     $contacto_proveedor = $row['contacto_proveedor'];
                 }
-                $existsSupplier = $this->db->get_where($this->table_suppliers, array('phone' => $row['celular_proveedor']))->row();
+                $existsSupplier = $this->db->get_where($this->table_suppliers, array('phone' => $row['celular_proveedor'],'agente_compra_pedido_cabecera'=>
+                $row['pedido-cabecera']))->row();
                 $idSupplier = 0;
                 if (empty($existsSupplier)) {
                     /// generate code recursively until it does not exist in supplier table
