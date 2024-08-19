@@ -627,6 +627,13 @@ input[type=number] {
 .ql-container.ql-snow {
     width: 100%!important
   }
+  .preview img, .preview video {
+    max-width: 100%;
+    max-height: 150px;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+}
+
 </style>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>

@@ -2265,16 +2265,23 @@ function addItems() {
             <label>Imagen Principal</label>
 
             <input type="file" name="file[${iCounterItems}][main_photo]" class=" btn-block" id="btn-uploadprimaryimg-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/>
-          </div>
+            <!--if file input not empty show preview-->
+            <div class="preview" id="preview-main_photo-${iCounterItems}"></div>
+            
+            </div>
           <div class="col-12 col-md-6 col-lg-6 d-flex flex-column justify-content-center">
             <label>Imagen 2</label>
             <input type="file" name="file[${iCounterItems}][secondary_photo]" class=" btn-block" id="btn-uploadimg2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/>
+            <div class="preview" id="preview-secondary_photo-${iCounterItems}"></div>
             <label>Imagen 3</label>
             <input type="file" name="file[${iCounterItems}][terciary_photo]" class=" btn-block" id="btn-uploadimg3-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="image/*"/>
+            <div class="preview" id="preview-terciary_photo-${iCounterItems}"></div>
             <label>Video 1</label>
             <input type="file" name="file[${iCounterItems}][primary_video]"class=" btn-block" id="btn-uploadvideo1-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="video/*"/>
+            <div class="preview" id="preview-primary_video-${iCounterItems}"></div>
             <label>Video 2</label>
             <input type="file" name="file[${iCounterItems}][secondary_video]"class=" btn-block" id="btn-uploadvideo2-${iCounterItems}" data-correlativo="${iCounterItems}" data-toggle="modal" data-target="#modal-upload${iCounterItems}" accept="video/*"/>
+            <div class="preview" id="preview-secondary_video-${iCounterItems}"></div>
           </div>
         </div>
       </div>
@@ -2343,6 +2350,28 @@ function addItems() {
       $(`#modal-celular_proveedor${1}`).val()
     );
   }
+  //on input change change preview
+  $(`#btn-uploadprimaryimg-${i}`).on("change", function (e) {
+    previewFile(this, `#preview-main_photo-${i}`);
+});
+
+$(`#btn-uploadimg2-${i}`).on("change", function (e) {
+    previewFile(this, `#preview-secondary_photo-${i}`);
+});
+
+$(`#btn-uploadimg3-${i}`).on("change", function (e) {
+    previewFile(this, `#preview-terciary_photo-${i}`);
+});
+
+$(`#btn-uploadvideo1-${i}`).on("change", function (e) {
+    previewFile(this, `#preview-primary_video-${i}`, 'video');
+});
+
+$(`#btn-uploadvideo2-${i}`).on("change", function (e) {
+    previewFile(this, `#preview-secondary_video-${i}`, 'video');
+});
+
+  
   validateNumberLetter();
   validateDecimal();
   validateNumber();
@@ -3716,4 +3745,25 @@ const saveCotizacionCode = (idPedido) => {
       }
     },
   });
+}
+const previewFile=(input, previewSelector, type = 'image') =>{
+  const previewElement = document.querySelector(previewSelector);
+  const file = input.files[0];
+
+  if (file) {
+      const fileUrl = URL.createObjectURL(file);
+
+      if (type === 'image') {
+          previewElement.innerHTML = `<img src="${fileUrl}" style="max-width: 100%; max-height: 150px;" />`;
+      } else if (type === 'video') {
+          previewElement.innerHTML = `
+              <video controls style="max-width: 100%; max-height: 150px;">
+                  <source src="${fileUrl}" type="${file.type}">
+                  Tu navegador no soporta la reproducción de videos.
+              </video>
+          `;
+      }
+  } else {
+      previewElement.innerHTML = ''; // Clear preview if no file is selected
+  }
 }
