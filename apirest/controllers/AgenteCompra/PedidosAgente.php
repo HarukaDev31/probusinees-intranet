@@ -523,6 +523,7 @@ class PedidosAgente extends CI_Controller
             $fila = 17;
             $iCounter = 1;
             foreach ($data as $row) {
+
                 $objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':G' . $fila)->applyFromArray($style_align_center);
                 $objPHPExcel->getActiveSheet()->getStyle('I' . $fila . ':P' . $fila)->applyFromArray($style_align_center);
 
@@ -541,6 +542,7 @@ class PedidosAgente extends CI_Controller
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($styleArrayAllborder);
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($styleArrayAllborder);
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($styleArrayAllborder);
+                $objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getAlignment()->setWrapText(true);
 
                 $html_data = array("&nbsp;");
                 $row->Txt_Descripcion = str_replace($html_data, " ", $row->Txt_Descripcion);
@@ -910,7 +912,7 @@ class PedidosAgente extends CI_Controller
                 ->setCellValue('E' . $fila, 'CANTIDAD')
                 ->setCellValue('F' . $fila, 'LINK')
             ;
-
+                //SET ADJUST TEXT IN COLUMN D
             $objPHPExcel->getActiveSheet()
                 ->getStyle('A' . $fila . ':' . 'F' . $fila)
                 ->applyFromArray(

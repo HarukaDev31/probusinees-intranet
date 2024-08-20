@@ -3767,3 +3767,20 @@ const previewFile=(input, previewSelector, type = 'image') =>{
       previewElement.innerHTML = ''; // Clear preview if no file is selected
   }
 }
+$('#btn-cotizacion').on('click', function () {  
+$('#modal-cotizacion').modal('show');
+});
+$(document).ready(function() {
+  $('#addProductBtn').on('click', function() {
+    let productItem = $('.product-item').first().clone();
+    productItem.find('input').val('');
+    productItem.find('textarea').val('');
+    productItem.appendTo('#productsContainer');
+  });
+
+  $(document).on('click', '.remove-product-btn', function() {
+    if ($('.product-item').length > 1) {
+      $(this).closest('.product-item').remove();
+    }
+  });
+});

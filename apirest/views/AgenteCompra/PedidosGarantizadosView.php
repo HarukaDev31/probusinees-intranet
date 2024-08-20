@@ -29,14 +29,14 @@
                     <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
-                <div class="col-4 col-sm-3">
+                <div class="col-12 col-md-3">
                   <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
                     <input type="text" id="txt-Fe_Fin" class="form-control input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
                     <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
-                <div class="col-4 col-sm-3">
+                <div class="col-12 col-md-3">
                   <label>Estado<span class="label-advertencia text-danger"> </span></label>
                   <select id="cbo-Estado" name="cbo-Estado" class="form-control select2">
                     <option value="0" selected>Todos</option>
@@ -46,11 +46,17 @@
                     <option value="4">Observado</option>
                   </select>
                 </div>
-                <div class="col-3 col-sm-3">
+                <div class="col-12 col-md-3">
                   <label class="d-none d-sm-block">&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
-              </div>
+                <div class="col-12 col-md-2 my-2">
+                  <button
+                  id="btn-cotizacion"
+                  type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
+                    Agregar Producto
+                  </button>              
+                </div>
 
               <div class="table-responsive div-Listar">
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
@@ -142,8 +148,8 @@ echo form_open('', $attributes);
                     <div class="col-12 col-sm-4 col-md-2">
                       <label>T.C.</label>
                       <div class="form-group">
-                        <input type="text" name="Ss_Tipo_Cambio" <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 1 ? 'min="0.01" ' : ''; ?> class="form-control required" placeholder="Ingresar" autocomplete="off"> 
-                        
+                        <input type="text" name="Ss_Tipo_Cambio" <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 1 ? 'min="0.01" ' : ''; ?> class="form-control required" placeholder="Ingresar" autocomplete="off">
+
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
@@ -332,8 +338,102 @@ echo form_open('', $attributes);
   </section>
   <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
+<!-- Estructura del Modal -->
+<div class="modal fade" id="modal-cotizacion" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productModalLabel">Nueva Cotización</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Datos del Cliente -->
+        <div class="container">
+        <h5 class="text-center">Datos de Cliente</h5>
 
+          <div class="row">
+
+            <div class="col-md-6">
+
+              <div class="mb-3">
+                <label for="clientName" class="form-label">Nombres y Apellidos *</label>
+                <input type="text" class="form-control" id="clientName">
+              </div>
+              <div class="mb-3">
+                <label for="clientWhatsapp" class="form-label">WhatsApp *</label>
+                <input type="text" class="form-control" id="clientWhatsapp">
+              </div>
+              <div class="mb-3">
+                <label for="clientEmail" class="form-label">Email *</label>
+                <input type="email" class="form-control" id="clientEmail">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="clientCountry" class="form-label">País *</label>
+                <input type="text" class="form-control" id="clientCountry">
+              </div>
+              <div class="mb-3">
+                <label for="clientRUC" class="form-label">RUC</label>
+                <input type="text" class="form-control" id="clientRUC">
+              </div>
+              <div class="mb-3">
+                <label for="clientCompany" class="form-label">Empresa</label>
+                <input type="text" class="form-control" id="clientCompany">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos -->
+        <div id="productsContainer">
+          <h5 class="text-center">Productos</h5>
+          <div class="product-item">
+            <div class="row">
+              <div class="col-12 col-md-12">
+                <div class="mb-3">
+                  <label for="productImage" class="form-label">Imagen</label>
+                  <input type="file" class="form-control" id="productImage">
+                </div>
+              </div>
+              <div class="col-12 col-md-12">
+                <div class="mb-3">
+                  <label for="productName" class="form-label">Nombre Comercial</label>
+                  <input type="text" class="form-control" id="productName">
+                </div>
+              </div>
+              <div class="col-12 col-md-12">
+                <div class="mb-3">
+                  <label for="productFeatures" class="form-label">Características</label>
+                  <textarea class="form-control" id="productFeatures" rows="3"></textarea>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="productQuantity" class="form-label">Cantidad</label>
+                  <input type="number" class="form-control" id="productQuantity">
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="productLink" class="form-label">Link</label>
+                  <input type="url" class="form-control" id="productLink">
+                </div>
+              </div>
+            </div>
+            <button  type="button" class="btn btn-danger remove-product-btn col-12 col-md-12">Quitar</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-outline-secondary col-12 col-md-12 my-2" id="addProductBtn">Agregar Más Productos</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- modal ver imagen del item -->
 <div class="modal fade modal-ver_item" id="modal-default">
   <div class="modal-dialog modal-lg">
