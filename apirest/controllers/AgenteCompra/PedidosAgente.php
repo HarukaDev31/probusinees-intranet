@@ -579,6 +579,8 @@ class PedidosAgente extends CI_Controller
                         ->setCellValue('C' . $fila, '');
                 }
                 $row->Txt_Descripcion=$this->htmlToRichText($row->Txt_Descripcion);
+                //set wrap text
+                $objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getAlignment()->setWrapText(true);
                 
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)
                     ->setCellValue('D' . $fila, $row->Txt_Producto)
