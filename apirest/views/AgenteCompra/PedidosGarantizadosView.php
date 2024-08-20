@@ -57,7 +57,7 @@
                     Agregar Producto
                   </button>              
                 </div>
-
+              </div>
               <div class="table-responsive div-Listar">
                 <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
                   <thead class="thead-light">
@@ -408,18 +408,7 @@ echo form_open('', $attributes);
                   <textarea class="form-control" id="productFeatures" rows="3"></textarea>
                 </div>
               </div>
-              <div class="col-12 col-md-6">
-                <div class="mb-3">
-                  <label for="productQuantity" class="form-label">Cantidad</label>
-                  <input type="number" class="form-control" id="productQuantity">
-                </div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="mb-3">
-                  <label for="productLink" class="form-label">Link</label>
-                  <input type="url" class="form-control" id="productLink">
-                </div>
-              </div>
+            
             </div>
             <button  type="button" class="btn btn-danger remove-product-btn col-12 col-md-12">Quitar</button>
           </div>
