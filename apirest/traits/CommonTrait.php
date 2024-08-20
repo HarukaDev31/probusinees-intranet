@@ -19,7 +19,7 @@ Trait CommonTrait{
         $replacedText = str_replace(['&amp;lt;', '&amp;gt;'], ['<', '>'], $html);
         
         // Reemplazar <br /> y variantes con saltos de línea \n
-        $textWithLineBreaks = preg_replace('/<br\s*\/?>/i', "", $replacedText);
+        $textWithLineBreaks = preg_replace('/<br\s*\/?>/i', "\n", $replacedText);
         
         // Decodificar entidades HTML
         $decodedText = html_entity_decode($textWithLineBreaks, ENT_QUOTES | ENT_HTML5);
@@ -60,6 +60,7 @@ Trait CommonTrait{
             $richText->addText(new PHPExcel_RichText_Run("\n"));
         }
   
+        
         return $richText;
     }
     
@@ -77,6 +78,9 @@ Trait CommonTrait{
                 $richText->addText($text);
                 $richText->addText(new PHPExcel_RichText_Run("\n"));
 
+            }
+            else if($child->nodeName==="br" ){
+                $richText->addText(new PHPExcel_RichText_Run("\n"));
             }
             else if($child->nodeName==="em" ){
                 $text = new PHPExcel_RichText_Run($child->textContent);

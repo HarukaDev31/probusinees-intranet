@@ -1,9 +1,10 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+require_once APPPATH . 'traits/CommonTrait.php';
 
 class PedidosAgente extends CI_Controller
 {
-
+    use CommonTrait;
     private $upload_path = '../assets/images/clientes/';
     private $file_path = '../assets/images/logos/';
     private $logo_cliente_path = '../assets/images/logos/';
@@ -523,7 +524,6 @@ class PedidosAgente extends CI_Controller
             $fila = 17;
             $iCounter = 1;
             foreach ($data as $row) {
-
                 $objPHPExcel->getActiveSheet()->getStyle('B' . $fila . ':G' . $fila)->applyFromArray($style_align_center);
                 $objPHPExcel->getActiveSheet()->getStyle('I' . $fila . ':P' . $fila)->applyFromArray($style_align_center);
 
@@ -542,15 +542,14 @@ class PedidosAgente extends CI_Controller
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('N' . $fila)->applyFromArray($styleArrayAllborder);
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('O' . $fila)->applyFromArray($styleArrayAllborder);
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)->getStyle('P' . $fila)->applyFromArray($styleArrayAllborder);
-                $objPHPExcel->getActiveSheet()->getStyle('D' . $fila)->getAlignment()->setWrapText(true);
 
-                $html_data = array("&nbsp;");
-                $row->Txt_Descripcion = str_replace($html_data, " ", $row->Txt_Descripcion);
+                // $html_data = array("&nbsp;");
+                // $row->Txt_Descripcion = str_replace($html_data, " ", $row->Txt_Descripcion);
 
                 $html_data = array("<br>", "<p>", "<br/>");
-                $row->Txt_Descripcion = str_replace($html_data, "\n", $row->Txt_Descripcion);
 
-                $row->Txt_Descripcion = strip_tags($row->Txt_Descripcion);
+
+                // $row->Txt_Descripcion = strip_tags($row->Txt_Descripcion);
 
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)
                     ->setCellValue('B' . $fila, $iCounter);
@@ -579,10 +578,11 @@ class PedidosAgente extends CI_Controller
                     $objPHPExcel->setActiveSheetIndex($hoja_activa)
                         ->setCellValue('C' . $fila, '');
                 }
-
+                $row->Txt_Descripcion=$this->htmlToRichText($row->Txt_Descripcion);
+                
                 $objPHPExcel->setActiveSheetIndex($hoja_activa)
                     ->setCellValue('D' . $fila, $row->Txt_Producto)
-                    ->setCellValue('E' . $fila, $row->Txt_Descripcion)
+                    ->setCellValue('E' . $fila,$row->Txt_Descripcion )
                     ->setCellValue('F' . $fila, $row->Qt_Producto);
 				//center vertical and horizontal 
 				$objPHPExcel->getActiveSheet()->getStyle('E' . $fila)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
@@ -912,7 +912,7 @@ class PedidosAgente extends CI_Controller
                 ->setCellValue('E' . $fila, 'CANTIDAD')
                 ->setCellValue('F' . $fila, 'LINK')
             ;
-                //SET ADJUST TEXT IN COLUMN D
+
             $objPHPExcel->getActiveSheet()
                 ->getStyle('A' . $fila . ':' . 'F' . $fila)
                 ->applyFromArray(
