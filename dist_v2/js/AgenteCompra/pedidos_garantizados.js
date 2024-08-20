@@ -3771,16 +3771,240 @@ $('#btn-cotizacion').on('click', function () {
 $('#modal-cotizacion').modal('show');
 });
 $(document).ready(function() {
-  $('#addProductBtn').on('click', function() {
-    let productItem = $('.product-item').first().clone();
-    productItem.find('input').val('');
-    productItem.find('textarea').val('');
-    productItem.appendTo('#productsContainer');
+  var productIndex = 0;
+
+  // Función para agregar un nuevo producto
+  function addProduct() {
+    var isFirstProduct = productIndex === 0;
+
+    var productHtml = `
+        <div class="product-item" data-index="${productIndex}">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link product-btn" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${productIndex}" aria-expanded="false" aria-controls="product-collapse-${productIndex}">
+                            Producto ${productIndex + 1}
+                        </button>
+                    </h5>
+                </div>
+                <div class="collapse" id="product-collapse-${productIndex}">
+                    <div class="card-body">
+              <div class="row">
+                <div class="col-12 col-md-12">
+                  <div class="mb-3">
+                    <label for="productImage" class="form-label">Imagen</label>
+                    <input type="file" class="form-control" id="productImage" name="productImage[]">
+                  </div>
+                </div>
+                <div class="col-12 col-md-12">
+                  <div class="mb-3">
+                    <label for="productName" class="form-label">Nombre Comercial</label>
+                    <input type="text" class="form-control" id="productName" name="productName[]">
+                  </div>
+                </div>
+                <div class="col-12 col-md-12">
+                  <div class="mb-3">
+                    <label for="productFeatures" class="form-label">Características</label>
+                    <textarea class="form-control" id="productFeatures" rows="3" name="productFeatures[]"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div id="providersContainer-${productIndex}" class="col-12 col-md-12">
+                <h6>Proveedores</h6>
+                <button type="button" class="btn btn-outline-secondary col-12 col-md-12 my-2 add-provider-btn">Agregar Más Proveedores</button>
+                <div class="providers-collapse" id="providers-collapse-${productIndex}">
+                  <!-- Aquí se agregarán los proveedores -->
+                </div>
+              </div>
+              <button type="button" class="btn btn-danger remove-product-btn col-12 col-md-12">Quitar Producto</button>
+            </div>
+          </div>
+                </div>
+            </div>
+        </div>
+    `;
+    $('#productsContainer').append(productHtml);
+    productIndex++;
+}
+
+$(document).on('click', '.add-provider-btn', function() {
+    var productIndex = $(this).data('product-index');
+    addProvider(productIndex);
+});
+
+function addProvider(productIndex) {
+  var providerIndex = $(`#providers-collapse-${productIndex} .provider-item`).length;
+  var providerHtml = `
+      <div class="provider-item">
+          <div class="card">
+              <div class="card-header">
+                  <h5 class="mb-0">
+                      <button class="btn btn-link provider-btn" type="button" data-bs-toggle="collapse" data-bs-target="#provider-collapse-${productIndex}-${providerIndex}" aria-expanded="false" aria-controls="provider-collapse-${productIndex}-${providerIndex}">
+                          Proveedor ${providerIndex + 1}
+                      </button>
+                  </h5>
+              </div>
+              <div class="collapse" id="provider-collapse-${productIndex}-${providerIndex}">
+                  <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="precio" class="form-label">Precio ¥ *</label>
+                    <input type="text" class="form-control" id="precio" name="precio[]" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="moq" class="form-label">Moq *</label>
+                    <input type="text" class="form-control" id="moq" name="moq[]" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="pcsCaja" class="form-label">Pcs/Caja *</label>
+                    <input type="text" class="form-control" id="pcsCaja" name="pcsCaja[]" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="cbm" class="form-label">Cbm *</label>
+                    <input type="text" class="form-control" id="cbm" name="cbm[]" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="delivery" class="form-label">Delivery *</label>
+                    <input type="text" class="form-control" id="delivery" name="delivery[]" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="shippingCost" class="form-label">Shipping Cost *</label>
+                    <input type="text" class="form-control" id="shippingCost" name="shippingCost[]" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="kgBox" class="form-label">Kg / box *</label>
+                    <input type="text" class="form-control" id="kgBox" name="kgBox[]" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="unidadMedida" class="form-label">Unidad Medida *</label>
+                    <input type="text" class="form-control" id="unidadMedida" name="unidadMedida[]" required>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="imagen1" class="form-label">Imagen 1</label>
+                    <input type="file" class="form-control" id="imagen1" name="imagen1[]">
+                  </div>
+                  <div class="mb-3">
+                    <label for="imagen2" class="form-label">Imagen 2</label>
+                    <input type="file" class="form-control" id="imagen2" name="imagen2[]">
+                  </div>
+                  <div class="mb-3">
+                    <label for="imagen3" class="form-label">Imagen 3</label>
+                    <input type="file" class="form-control" id="imagen3" name="imagen3[]">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="video1" class="form-label">Video 1</label>
+                    <input type="file" class="form-control" id="video1" name="video1[]">
+                  </div>
+                  <div class="mb-3">
+                    <label for="video2" class="form-label">Video 2</label>
+                    <input type="file" class="form-control" id="video2" name="video2[]">
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="providerName" class="form-label">Nombre Proveedor o Link *</label>
+                      <input type="text" class="form-control" name="providerName[]">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="providerPhone" class="form-label">Nº Celular *</label>
+                      <input type="text" class="form-control" name="providerPhone[]">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label for="providerNotes" class="form-label">Notas</label>
+                      <textarea class="form-control" name="providerNotes[]"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-12">
+                    <button type="button" class="btn btn-danger remove-provider-btn">Quitar Proveedor</button>
+                  </div>
+                </div>
+              </div>
+          </div>
+      </div>
+  `;
+  $(`#providers-collapse-${productIndex}`).append(providerHtml);
+}
+
+  // Evento para agregar un nuevo producto
+  $('#addProductBtn').click(function() {
+    addProduct();
   });
 
-  $(document).on('click', '.remove-product-btn', function() {
-    if ($('.product-item').length > 1) {
-      $(this).closest('.product-item').remove();
-    }
+  // Evento para agregar un nuevo proveedor
+  $(document).on('click', '.add-provider-btn', function() {
+    var productIndex = $(this).closest('.product-item').data('index');
+    addProvider(productIndex);
   });
-});
+
+  // Evento para eliminar un producto
+  $(document).on('click', '.remove-product-btn', function() {
+    $(this).closest('.product-item').remove();
+  });
+
+  // Evento para eliminar un proveedor
+  $(document).on('click', '.remove-provider-btn', function() {
+    $(this).closest('.provider-item').remove();
+  });
+  $('#saveBtn').click(function() {
+    let formData = new FormData();
+
+    // Datos del cliente
+    formData.append('clientName', $('#clientName').val());
+    formData.append('clientWhatsapp', $('#clientWhatsapp').val());
+    formData.append('clientEmail', $('#clientEmail').val());
+    formData.append('clientCountry', $('#clientCountry').val());
+    formData.append('clientRUC', $('#clientRUC').val());
+    formData.append('clientCompany', $('#clientCompany').val());
+
+    // Productos
+    $('.product-item').each(function() {
+      let productIndex = $(this).data('index');
+      formData.append(`productImage[${productIndex}]`, $(`#productImage`)[0].files[0]);
+      formData.append(`productName[${productIndex}]`, $(`#productName`).val());
+      formData.append(`productFeatures[${productIndex}]`, $(`#productFeatures`).val());
+
+      // Proveedores
+      $(`#providersContainer-${productIndex} .provider-item`).each(function(providerIndex) {
+        formData.append(`precio[${productIndex}][${providerIndex}]`, $(`#precio`).val());
+        formData.append(`moq[${productIndex}][${providerIndex}]`, $(`#moq`).val());
+        formData.append(`pcsCaja[${productIndex}][${providerIndex}]`, $(`#pcsCaja`).val());
+        formData.append(`cbm[${productIndex}][${providerIndex}]`, $(`#cbm`).val());
+        formData.append(`delivery[${productIndex}][${providerIndex}]`, $(`#delivery`).val());
+        formData.append(`shippingCost[${productIndex}][${providerIndex}]`, $(`#shippingCost`).val());
+        formData.append(`kgBox[${productIndex}][${providerIndex}]`, $(`#kgBox`).val());
+        formData.append(`unidadMedida[${productIndex}][${providerIndex}]`, $(`#unidadMedida`).val());
+        formData.append(`imagen1[${productIndex}][${providerIndex}]`, $(`#imagen1`)[0].files[0]);
+        formData.append(`imagen2[${productIndex}][${providerIndex}]`, $(`#imagen2`)[0].files[0]);
+        formData.append(`imagen3[${productIndex}][${providerIndex}]`, $(`#imagen3`)[0].files[0]);
+        formData.append(`video1[${productIndex}][${providerIndex}]`, $(`#video1`)[0].files[0]);
+        formData.append(`video2[${productIndex}][${providerIndex}]`, $(`#video2`)[0].files[0]);
+        formData.append(`providerName[${productIndex}][${providerIndex}]`, $(`[name="providerName[]"]`).eq(providerIndex).val());
+        formData.append(`providerPhone[${productIndex}][${providerIndex}]`, $(`[name="providerPhone[]"]`).eq(providerIndex).val());
+        formData.append(`providerNotes[${productIndex}][${providerIndex}]`, $(`[name="providerNotes[]"]`).eq(providerIndex).val());
+      });
+    });
+    $.ajax({
+      url: base_url + "AgenteCompra/PedidosGarantizados/saveCotizacionxd",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        console.log(response);
+      }
+    });
+  })
+}
+);

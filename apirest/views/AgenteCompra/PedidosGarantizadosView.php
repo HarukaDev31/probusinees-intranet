@@ -55,7 +55,7 @@
                   id="btn-cotizacion"
                   type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
                     Agregar Producto
-                  </button>              
+                  </button>
                 </div>
               </div>
               <div class="table-responsive div-Listar">
@@ -340,7 +340,7 @@ echo form_open('', $attributes);
 </div>
 <!-- Estructura del Modal -->
 <div class="modal fade" id="modal-cotizacion" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-dialog-scrollable modal-lg">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="productModalLabel">Nueva Cotización</h5>
@@ -349,37 +349,34 @@ echo form_open('', $attributes);
       <div class="modal-body">
         <!-- Datos del Cliente -->
         <div class="container">
-        <h5 class="text-center">Datos de Cliente</h5>
-
+          <h5 class="text-center">Datos de Cliente</h5>
           <div class="row">
-
             <div class="col-md-6">
-
               <div class="mb-3">
                 <label for="clientName" class="form-label">Nombres y Apellidos *</label>
-                <input type="text" class="form-control" id="clientName">
+                <input type="text" class="form-control" id="clientName" name="clientName">
               </div>
               <div class="mb-3">
                 <label for="clientWhatsapp" class="form-label">WhatsApp *</label>
-                <input type="text" class="form-control" id="clientWhatsapp">
+                <input type="text" class="form-control" id="clientWhatsapp" name="clientWhatsapp">
               </div>
               <div class="mb-3">
                 <label for="clientEmail" class="form-label">Email *</label>
-                <input type="email" class="form-control" id="clientEmail">
+                <input type="email" class="form-control" id="clientEmail" name="clientEmail">
               </div>
             </div>
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="clientCountry" class="form-label">País *</label>
-                <input type="text" class="form-control" id="clientCountry">
+                <input type="text" class="form-control" id="clientCountry" name="clientCountry">
               </div>
               <div class="mb-3">
                 <label for="clientRUC" class="form-label">RUC</label>
-                <input type="text" class="form-control" id="clientRUC">
+                <input type="text" class="form-control" id="clientRUC" name="clientRUC">
               </div>
               <div class="mb-3">
                 <label for="clientCompany" class="form-label">Empresa</label>
-                <input type="text" class="form-control" id="clientCompany">
+                <input type="text" class="form-control" id="clientCompany" name="clientCompany">
               </div>
             </div>
           </div>
@@ -388,37 +385,15 @@ echo form_open('', $attributes);
         <!-- Productos -->
         <div id="productsContainer">
           <h5 class="text-center">Productos</h5>
-          <div class="product-item">
-            <div class="row">
-              <div class="col-12 col-md-12">
-                <div class="mb-3">
-                  <label for="productImage" class="form-label">Imagen</label>
-                  <input type="file" class="form-control" id="productImage">
-                </div>
-              </div>
-              <div class="col-12 col-md-12">
-                <div class="mb-3">
-                  <label for="productName" class="form-label">Nombre Comercial</label>
-                  <input type="text" class="form-control" id="productName">
-                </div>
-              </div>
-              <div class="col-12 col-md-12">
-                <div class="mb-3">
-                  <label for="productFeatures" class="form-label">Características</label>
-                  <textarea class="form-control" id="productFeatures" rows="3"></textarea>
-                </div>
-              </div>
-            
-            </div>
-            <button  type="button" class="btn btn-danger remove-product-btn col-12 col-md-12">Quitar</button>
-          </div>
+          <!-- Aquí se agregarán los productos -->
         </div>
 
+        <!-- Botón para agregar más productos -->
         <button type="button" class="btn btn-outline-secondary col-12 col-md-12 my-2" id="addProductBtn">Agregar Más Productos</button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-primary" id="saveBtn">Guardar</button>
       </div>
     </div>
   </div>
