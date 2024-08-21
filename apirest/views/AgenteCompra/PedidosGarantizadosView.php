@@ -54,7 +54,7 @@
                   <button
                   id="btn-cotizacion"
                   type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
-                    Agregar Producto
+                    Nueva Cotización
                   </button>
                 </div>
               </div>
@@ -368,7 +368,8 @@ echo form_open('', $attributes);
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="clientCountry" class="form-label">País *</label>
-                <input type="text" class="form-control" id="clientCountry" name="clientCountry">
+                <select class="custom-select" id="clientCountry" name="clientCountry">
+                </select>
               </div>
               <div class="mb-3">
                 <label for="clientRUC" class="form-label">RUC</label>
@@ -382,14 +383,12 @@ echo form_open('', $attributes);
           </div>
         </div>
 
-        <!-- Productos -->
-        <div id="productsContainer">
-          <h5 class="text-center">Productos</h5>
-          <!-- Aquí se agregarán los productos -->
-        </div>
-
-        <!-- Botón para agregar más productos -->
-        <button type="button" class="btn btn-outline-secondary col-12 col-md-12 my-2" id="addProductBtn">Agregar Más Productos</button>
+        <div class="product-container position-relative">
+  <div id="productsContainer">
+    <!-- Productos -->
+  </div>
+  <button type="button" class="btn btn-outline-secondary col-12 col-md-12 my-2 position-absolute bottom-0" id="addProductBtn">Agregar Más Productos</button>
+</div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

@@ -911,4 +911,11 @@ class PedidosGarantizados extends CI_Controller
         $response = $this->PedidosGarantizadosModel->editCotizacionCode($id_cabecera,$cotizacion_code);  
         echo json_encode($response);
     }
+    public function saveCotizacion(){
+        $data=$this->input->post();
+        $files = $_FILES; // Obtener los archivos del formulario
+
+        $response = $this->PedidosGarantizadosModel->saveCotizacion($data,$files);
+        echo json_encode($response);
+    }
 }

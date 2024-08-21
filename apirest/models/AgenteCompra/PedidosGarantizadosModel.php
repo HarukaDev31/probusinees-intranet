@@ -47,7 +47,7 @@ class PedidosGarantizadosModel extends CI_Model
             ->from($this->table)
             ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
             ->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
-            ->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'join')
+            ->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'left')
             ->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
             ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
@@ -126,7 +126,7 @@ class PedidosGarantizadosModel extends CI_Model
         );
 
         $this->db->from($this->table . ' AS A');
-        $this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo', 'inner');
+        $this->db->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo', 'left');
         $this->db->join($this->table_agente_compra_pedido_detalle . ' AS IGPD', 'IGPD.ID_Pedido_Cabecera = A.ID_Pedido_Cabecera', 'inner');
         $this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = A.ID_Entidad', 'inner');
         $this->db->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'inner');
@@ -1224,4 +1224,169 @@ class PedidosGarantizadosModel extends CI_Model
         }
         return array('status' => 'error', 'message' => 'Error al modificar');
     }
+    public function saveCotizacion($data,$files)
+    {   
+        $user = $this->user;
+        $ID_Entidad = 0;
+        $query = "SELECT ID_Entidad FROM entidad WHERE ID_Empresa = 1 AND Nu_Tipo_Entidad = 0 AND ID_Tipo_Documento_Identidad = " . "4" .
+         " AND Nu_Documento_Identidad = '" . $data['clientRUC']
+          . "' AND Nu_Documento_Identidad IS NOT NULL  AND Nu_Documento_Identidad!='' AND No_Entidad = '" . 
+          limpiarCaracteresEspeciales($data['clientName'])
+          . "' LIMIT 1";
+        $objVerificarCliente = $this->db->query($query)->row();
+        if (is_object($objVerificarCliente)) {
+            $ID_Entidad = $objVerificarCliente->ID_Entidad;
+        } else {
+            $arrCliente = array(
+                'ID_Empresa' => 1,
+                'ID_Organizacion' => 1,
+                'Nu_Tipo_Entidad' => 0, //0=Cliente
+                'ID_Tipo_Documento_Identidad' => '4',
+                'Nu_Documento_Identidad' => $data['clientRUC'],     
+                'No_Entidad' =>  $data['clientName'],
+                'Nu_Estado' => 1,
+                'ID_Pais' => 1,
+                'Nu_Celular_Entidad' => $data['clientWhatsapp'],
+                'Txt_Email_Entidad' => $data['clientEmail'],
+                'No_Contacto' =>$data['clientCompany'],
+                'Nu_Celular_Contacto' => $data['clientWhatsapp'],
+                'Txt_Email_Contacto' => $data['clientEmail'],
+                'Nu_Agente_Compra' => 1,
+            );
+
+            if ($this->db->insert('entidad', $arrCliente) > 0) {
+                $ID_Entidad = $this->db->insert_id();
+            } else {
+                $this->db->trans_rollback();
+                return array(
+                    'status' => 'error',
+                    'message' => 'No registro cliente',
+                );
+            }
+        }
+        $cotizationCode=$this->generateCotizationCode();
+
+            // Guardar el producto en la base de datos
+            $this->db->insert('agente_compra_pedido_cabecera', [
+                'ID_Empresa' => $user->ID_Empresa,
+                'ID_Organizacion' => $user->ID_Organizacion,
+                'Fe_Emision' => date('Y-m-d'),
+                'ID_Entidad' => $ID_Entidad,
+                'ID_Pais' => $data['clientCountry'],
+                'Nu_Estado' => 2,
+                'Fe_Registro' => date('Y-m-d H:i:s'),
+                'No_Usuario' => $user->No_Usuario,
+                'cotizacionCode' => $cotizationCode,
+                'Fe_Emision_Cotizacion' => date('Y-m-d'),
+                'Fe_Registro_Hora_Cotizacion' => date('Y-m-d H:i:s'),
+
+            ]);
+            $pedidoId = $this->db->insert_id();
+
+        foreach ($data['item'] as $productIndex => $productData) {
+            $path = "assets/images/agentecompra/garantizados/" ;
+
+            $productImage = $this->uploadSingleFile([
+                'name' => $files['item']['name'][$productIndex]['productImage'],
+                'type' => $files['item']['type'][$productIndex]['productImage'],
+                'size' => $files['item']['size'][$productIndex]['productImage'],
+                'tmp_name' => $files['item']['tmp_name'][$productIndex]['productImage'],
+            ], $path);
+            $productName = $productData['productName'];
+            $productFeatures = $productData['productFeatures'];
+            $productDataInsert=[
+                'ID_Empresa' => $user->ID_Empresa,  
+                'ID_Organizacion' => $user->ID_Organizacion,
+                'ID_Pedido_Cabecera' => $pedidoId,
+                'Txt_Producto' => $productName,
+                'Txt_Descripcion' => $productFeatures,
+                'Txt_Url_Imagen_Producto' => $productImage,
+                
+            ];
+            $this->db->close();
+            $this->db->initialize();    
+
+            $this->db->insert('agente_compra_pedido_detalle',$productDataInsert );
+            $productId = $this->db->insert_id();
+            // Procesar los datos de los proveedores
+            foreach ($productData['supplier'] as $providerIndex => $providerData) {
+                $imagen1=$this->uploadSingleFile([
+                    'name' => $files['item']['name'][$productIndex]['supplier'][$providerIndex]['imagen1'],
+                    'type' => $files['item']['type'][$productIndex]['supplier'][$providerIndex]['imagen1'],
+                    'size' => $files['item']['size'][$productIndex]['supplier'][$providerIndex]['imagen1'],
+                    'tmp_name' => $files['item']['tmp_name'][$productIndex]['supplier'][$providerIndex]['imagen1'],
+                ], $path);
+                $imagen2=$this->uploadSingleFile([
+                    'name' => $files['item']['name'][$productIndex]['supplier'][$providerIndex]['imagen2'],
+                    'type' => $files['item']['type'][$productIndex]['supplier'][$providerIndex]['imagen2'],
+                    'size' => $files['item']['size'][$productIndex]['supplier'][$providerIndex]['imagen2'],
+                    'tmp_name' => $files['item']['tmp_name'][$productIndex]['supplier'][$providerIndex]['imagen2'],
+                ], $path);
+                $imagen3=$this->uploadSingleFile([
+                    'name' => $files['item']['name'][$productIndex]['supplier'][$providerIndex]['imagen3'],
+                    'type' => $files['item']['type'][$productIndex]['supplier'][$providerIndex]['imagen3'],
+                    'size' => $files['item']['size'][$productIndex]['supplier'][$providerIndex]['imagen3'],
+                    'tmp_name' => $files['item']['tmp_name'][$productIndex]['supplier'][$providerIndex]['imagen3'],
+                ], $path);
+                $video1=$this->uploadSingleFile([
+                    'name' => $files['item']['name'][$productIndex]['supplier'][$providerIndex]['video1'],
+                    'type' => $files['item']['type'][$productIndex]['supplier'][$providerIndex]['video1'],
+                    'size' => $files['item']['size'][$productIndex]['supplier'][$providerIndex]['video1'],
+                    'tmp_name' => $files['item']['tmp_name'][$productIndex]['supplier'][$providerIndex]['video1'],
+                ], $path);
+                $video2=$this->uploadSingleFile([
+                    'name' => $files['item']['name'][$productIndex]['supplier'][$providerIndex]['video2'],
+                    'type' => $files['item']['type'][$productIndex]['supplier'][$providerIndex]['video2'],
+                    'size' => $files['item']['size'][$productIndex]['supplier'][$providerIndex]['video2'],
+                    'tmp_name' => $files['item']['tmp_name'][$productIndex]['supplier'][$providerIndex]['video2'],
+                ], $path);
+                $precio = $providerData['precio'];
+                $moq = $providerData['moq'];
+                $pcsCaja = $providerData['pcsCaja'];
+                $cbm = $providerData['cbm'];
+                $deliveryDays = $providerData['delivery'];
+                $shippingCost = $providerData['shippingCost'];
+                $kgBox = $providerData['kgBox'];
+                $unidadMedida = $providerData['unidadMedida'];
+                $this->db->close();
+                $this->db->initialize();  
+                $supplierToInsert=[
+                    'ID_Empresa' => $user->ID_Empresa,
+                    'ID_Organizacion' => $user->ID_Organizacion,
+                    'ID_Pedido_Cabecera' => $pedidoId,
+                    'ID_Pedido_Detalle' => $productId,
+                    'Ss_Precio' => $precio,
+                    'Qt_Producto_Moq' => $moq,
+                    'Qt_Producto_Caja' => $pcsCaja,
+                    'Qt_Cbm' => $cbm,
+                    'main_photo' => $imagen1,
+                    'secondary_photo' => $imagen2,
+                    'terciary_photo' => $imagen3,
+                    'primary_video' => $video1,
+                    'secondary_video' => $video2,   
+
+                    'Nu_Dias_Delivery' => $deliveryDays,
+                    'Ss_Costo_Delivery' => $shippingCost,
+                    'kg_box' => floatval($kgBox),
+                    'unidad_medida' => $unidadMedida,
+                    
+
+                    // Insertar el resto de los campos del proveedor
+                ];
+                $this->db->insert('agente_compra_pedido_detalle_producto_proveedor',$supplierToInsert);
+            }
+        }
+    
+        // Devolver una respuesta al controlador
+        return ['message' => 'Cotización guardada exitosamente'];
+    }
+    
+    public function generateCotizationCode(){
+		$Fe_Month = strtoupper(substr(date('F', strtotime(dateNow('fecha'))), 0, 3));
+		$query = "SELECT COUNT(*) AS count FROM agente_compra_pedido_cabecera WHERE Nu_Estado>=2 AND MONTH(Fe_Registro_Hora_Cotizacion) = MONTH(NOW())";
+		$Nu_Correlativo = $this->db->query($query)->row()->count + 1;
+		$Nu_Correlativo = str_pad($Nu_Correlativo, 4, '0', STR_PAD_LEFT);
+		return $Fe_Month . $Nu_Correlativo;
+	}   
+    
 }

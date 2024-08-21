@@ -3770,42 +3770,64 @@ const previewFile=(input, previewSelector, type = 'image') =>{
 $('#btn-cotizacion').on('click', function () {  
 $('#modal-cotizacion').modal('show');
 });
+//on modal show clientCountry select fill with client country
+$('#modal-cotizacion').on('show.bs.modal', function (e) {
+  url = base_url + 'HelperController/getPaises';
+  $.ajax({
+    url,
+    type: 'GET',
+    dataType: 'JSON',
+    success: function (response) {
+      console.log(response);
+      $('#modal-pais').html('<option value="0" selected="selected">- Seleccionar -</option>');
+      response.forEach((pais) => {
+        $("#clientCountry").append(
+          `<option value="${pais.ID_Pais}">${pais.No_Pais}</option>`
+        );
+      });
+    },
+  });
+});
+    
 $(document).ready(function() {
   var productIndex = 0;
 
   // Función para agregar un nuevo producto
   function addProduct() {
     var isFirstProduct = productIndex === 0;
-
+  
     var productHtml = `
-        <div class="product-item" data-index="${productIndex}">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link product-btn" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${productIndex}" aria-expanded="false" aria-controls="product-collapse-${productIndex}">
-                            Producto ${productIndex + 1}
-                        </button>
-                    </h5>
-                </div>
-                <div class="collapse" id="product-collapse-${productIndex}">
-                    <div class="card-body">
+    <div class="product-item bg-light border border-primary rounded p-3 mb-3" data-index="${productIndex}">
+        <div class="card">
+          <div class="card-header" id="heading-${productIndex}">
+
+            <h5 class="mb-0">
+              <button class="btn btn-link product-btn text-success" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${productIndex}" aria-expanded="${isFirstProduct ? 'true' : 'false'}" aria-controls="product-collapse-${productIndex}">
+              <i class="fas fa-box-open me-2"></i> Producto ${productIndex + 1}
+              </button>
+            </h5>
+           <h6 class="text-end"></h6>
+
+          </div>
+          <div class="collapse ${isFirstProduct ? 'show' : ''}" id="product-collapse-${productIndex}">
+              <div class="card-body">
               <div class="row">
                 <div class="col-12 col-md-12">
                   <div class="mb-3">
                     <label for="productImage" class="form-label">Imagen</label>
-                    <input type="file" class="form-control" id="productImage" name="productImage[]">
+                    <input type="file" class="form-control" id="productImage-${productIndex}" name="productImage[]">
                   </div>
                 </div>
                 <div class="col-12 col-md-12">
                   <div class="mb-3">
                     <label for="productName" class="form-label">Nombre Comercial</label>
-                    <input type="text" class="form-control" id="productName" name="productName[]">
+                    <input type="text" class="form-control" id="productName-${productIndex}" name="productName[]">
                   </div>
                 </div>
                 <div class="col-12 col-md-12">
                   <div class="mb-3">
                     <label for="productFeatures" class="form-label">Características</label>
-                    <textarea class="form-control" id="productFeatures" rows="3" name="productFeatures[]"></textarea>
+                    <textarea class="form-control" id="productFeatures-${productIndex}" rows="3" name="productFeatures[]"></textarea>
                   </div>
                 </div>
               </div>
@@ -3819,68 +3841,87 @@ $(document).ready(function() {
               <button type="button" class="btn btn-danger remove-product-btn col-12 col-md-12">Quitar Producto</button>
             </div>
           </div>
-                </div>
-            </div>
         </div>
+      </div>
     `;
     $('#productsContainer').append(productHtml);
+    collapseAllExcept(`#product-collapse-${productIndex}`, '.product-item .collapse');
+    let modalBody = $('.modal-body');
+  modalBody.animate({
+    scrollTop: $(`#product-collapse-${productIndex}`).offset().top - modalBody.offset().top + modalBody.scrollTop()
+  }, 500);
     productIndex++;
-}
+  }
+  
+  $(document).on('click', '.product-btn', function() {
+    var productIndex = $(this).closest('.product-item').data('index');
+    $(`#product-collapse-${productIndex}`).collapse('toggle');
+  });
 
-$(document).on('click', '.add-provider-btn', function() {
-    var productIndex = $(this).data('product-index');
-    addProvider(productIndex);
-});
+  $(document).on('click', '.provider-btn', function() {
+    var productIndex = $(this).closest('.product-item').data('index');
+    var providerIndex = $(this).closest('.provider-item').index();
+    $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('toggle');
+  });
 
 function addProvider(productIndex) {
   var providerIndex = $(`#providers-collapse-${productIndex} .provider-item`).length;
+  var isFirstProvider = providerIndex === 0;
   var providerHtml = `
       <div class="provider-item">
           <div class="card">
               <div class="card-header">
                   <h5 class="mb-0">
-                      <button class="btn btn-link provider-btn" type="button" data-bs-toggle="collapse" data-bs-target="#provider-collapse-${productIndex}-${providerIndex}" aria-expanded="false" aria-controls="provider-collapse-${productIndex}-${providerIndex}">
-                          Proveedor ${providerIndex + 1}
-                      </button>
+                      <button class="btn btn-link provider-btn text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#provider-collapse-${productIndex}-${providerIndex}" aria-expanded="${isFirstProvider ? 'true' : 'false'}" aria-controls="provider-collapse-${productIndex}-${providerIndex}">
+              <i class="fas fa-user-tie me-2"></i> Proveedor ${providerIndex + 1}
+            </button>
                   </h5>
               </div>
-              <div class="collapse" id="provider-collapse-${productIndex}-${providerIndex}">
+             <div class="collapse ${isFirstProvider ? 'show' : ''}" id="provider-collapse-${productIndex}-${providerIndex}">
                   <div class="card-body">
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="precio" class="form-label">Precio ¥ *</label>
-                    <input type="text" class="form-control" id="precio" name="precio[]" required>
+                    <input type="text" class="form-control" id="precio-${productIndex}-${providerIndex}" name="precio[]" required>
                   </div>
                   <div class="mb-3">
                     <label for="moq" class="form-label">Moq *</label>
-                    <input type="text" class="form-control" id="moq" name="moq[]" required>
+                    <input type="text" class="form-control" id="moq-${productIndex}-${providerIndex}" name="moq[]" required>
                   </div>
                   <div class="mb-3">
                     <label for="pcsCaja" class="form-label">Pcs/Caja *</label>
-                    <input type="text" class="form-control" id="pcsCaja" name="pcsCaja[]" required>
+                    <input type="text" class="form-control" id="pcsCaja-${productIndex}-${providerIndex}" name="pcsCaja[]" required>
                   </div>
                   <div class="mb-3">
                     <label for="cbm" class="form-label">Cbm *</label>
-                    <input type="text" class="form-control" id="cbm" name="cbm[]" required>
+                    <input type="text" class="form-control" id="cbm-${productIndex}-${providerIndex}" name="cbm[]" required>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="delivery" class="form-label">Delivery *</label>
-                    <input type="text" class="form-control" id="delivery" name="delivery[]" required>
+                    <input type="text" class="form-control" id="delivery-${productIndex}-${providerIndex}" name="delivery[]" required>
                   </div>
                   <div class="mb-3">
                     <label for="shippingCost" class="form-label">Shipping Cost *</label>
-                    <input type="text" class="form-control" id="shippingCost" name="shippingCost[]" required>
+                    <input type="text" class="form-control" id="shippingCost-${productIndex}-${providerIndex}" name="shippingCost[]" required>
                   </div>
                   <div class="mb-3">
                     <label for="kgBox" class="form-label">Kg / box *</label>
-                    <input type="text" class="form-control" id="kgBox" name="kgBox[]" required>
+                    <input type="text" class="form-control" id="kgBox-${productIndex}-${providerIndex}" name="kgBox[]" required>
                   </div>
                   <div class="mb-3">
                     <label for="unidadMedida" class="form-label">Unidad Medida *</label>
-                    <input type="text" class="form-control" id="unidadMedida" name="unidadMedida[]" required>
+                    <select  class="custom-select" id="unidadMedida-${productIndex}-${providerIndex}" name="unidadMedida[]" required>
+                    <option value="un">Unidades</option>
+                    <option value="mt">Metros</option>
+                    <option value="mt2">Metro Cuadrado</option>
+                    <option value="pc">Piezas</option>
+                    <option value="kg">Kilogramos</option>
+                    <option value="pa">Pares</option>
+                    <option value="lt">Litros</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -3888,53 +3929,65 @@ function addProvider(productIndex) {
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="imagen1" class="form-label">Imagen 1</label>
-                    <input type="file" class="form-control" id="imagen1" name="imagen1[]">
+                    <input type="file" class="form-control" id="imagen1-${productIndex}-${providerIndex}" name="imagen1[]">
                   </div>
                   <div class="mb-3">
                     <label for="imagen2" class="form-label">Imagen 2</label>
-                    <input type="file" class="form-control" id="imagen2" name="imagen2[]">
+                    <input type="file" class="form-control" id="imagen2-${productIndex}-${providerIndex}" name="imagen2[]">
                   </div>
                   <div class="mb-3">
                     <label for="imagen3" class="form-label">Imagen 3</label>
-                    <input type="file" class="form-control" id="imagen3" name="imagen3[]">
+                    <input type="file" class="form-control" id="imagen3-${productIndex}-${providerIndex}" name="imagen3[]">
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="video1" class="form-label">Video 1</label>
-                    <input type="file" class="form-control" id="video1" name="video1[]">
+                    <input type="file" class="form-control" id="video1-${productIndex}-${providerIndex}" name="video1[]">
                   </div>
+                  
+                  <div class="col-12 col-md-12">
                   <div class="mb-3">
                     <label for="video2" class="form-label">Video 2</label>
-                    <input type="file" class="form-control" id="video2" name="video2[]">
+                    <input type="file" class="form-control" id="video2-${productIndex}-${providerIndex}" name="video2[]">
                   </div>
-                  <div class="col-md-4">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                  
+                  <div class="col-12">
                     <div class="mb-3">
                       <label for="providerName" class="form-label">Nombre Proveedor o Link *</label>
                       <input type="text" class="form-control" name="providerName[]">
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-12">
                     <div class="mb-3">
                       <label for="providerPhone" class="form-label">Nº Celular *</label>
                       <input type="text" class="form-control" name="providerPhone[]">
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-12">
                     <div class="mb-3">
                       <label for="providerNotes" class="form-label">Notas</label>
                       <textarea class="form-control" name="providerNotes[]"></textarea>
                     </div>
                   </div>
-                  <div class="col-12 col-md-12">
-                    <button type="button" class="btn btn-danger remove-provider-btn">Quitar Proveedor</button>
-                  </div>
-                </div>
               </div>
+            <button type="button" class="btn btn-danger remove-provider-btn">Quitar Proveedor</button>
+
           </div>
       </div>
   `;
   $(`#providers-collapse-${productIndex}`).append(providerHtml);
+  collapseAllExcept(`#provider-collapse-${productIndex}-${providerIndex}`, `#providers-collapse-${productIndex} .provider-item .collapse`);
+  let modalBody = $('.modal-body');
+  modalBody.animate({
+    scrollTop: $(`#provider-collapse-${productIndex}-${providerIndex}`).offset().top - modalBody.offset().top + modalBody.scrollTop()
+  }, 500);
+  let providerSummary = $(`#providersContainer-${productIndex} .provider-item`).length;
+  $(`#heading-${productIndex} h6`).text(`Proveedores (${providerSummary})`);
 }
 
   // Evento para agregar un nuevo producto
@@ -3958,6 +4011,119 @@ function addProvider(productIndex) {
     $(this).closest('.provider-item').remove();
   });
   $('#saveBtn').click(function() {
+    let formValid = true;
+
+    // Validar datos del cliente
+    if ($('#clientName').val().trim() === '') {
+      showFieldError('#clientName', 'Este campo es requerido');
+      formValid = false;
+    } else {
+      hideFieldError('#clientName');
+    }
+  
+    if ($('#clientWhatsapp').val().trim() === '') {
+      showFieldError('#clientWhatsapp', 'Este campo es requerido');
+      formValid = false;
+    } else {
+      hideFieldError('#clientWhatsapp');
+    }
+  
+    if ($('#clientEmail').val().trim() === '') {
+      showFieldError('#clientEmail', 'Este campo es requerido');
+      formValid = false;
+    } else {
+      hideFieldError('#clientEmail');
+    }
+  
+    // Validar productos
+    $('.product-item').each(function() {
+      let productIndex = $(this).data('index');
+  
+      if ($(`#productName-${productIndex}`).val().trim() === '') {
+        showFieldError(`#productName-${productIndex}`, 'Este campo es requerido');
+        $(`#product-collapse-${productIndex}`).collapse('show');
+        formValid = false;
+      } else {
+        hideFieldError(`#productName-${productIndex}`);
+      }
+  
+      // Validar proveedores
+      $(`#providersContainer-${productIndex} .provider-item`).each(function(providerIndex) {
+        if ($(`#precio-${productIndex}-${providerIndex}`).val().trim() === '') {
+          showFieldError(`#precio-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }if ($(`#moq-${productIndex}-${providerIndex}`).val().trim() === '') {
+          showFieldError(`#moq-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }
+        if ($(`#pcsCaja-${productIndex}-${providerIndex}`).val().trim() === '') {
+          showFieldError(`#pcsCaja-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }
+        if ($(`#cbm-${productIndex}-${providerIndex}`).val().trim() === '') {
+          showFieldError(`#cbm-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }
+        if ($(`#delivery-${productIndex}-${providerIndex}`).val().trim() === '') {
+          showFieldError(`#delivery-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }
+        if ($(`#shippingCost-${productIndex}-${providerIndex}`).val().trim() === '') {
+          showFieldError(`#shippingCost-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }
+        if ($(`#kgBox-${productIndex}-${providerIndex}`).val().trim() === '') {
+          showFieldError(`#kgBox-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }
+        // if ($(`#unidadMedida-${productIndex}-${providerIndex}`).val().trim() === '') {
+        //   showFieldError(`#unidadMedida-${productIndex}-${providerIndex}`, 'Este campo es requerido');
+        //             $(`#product-collapse-${productIndex}`).collapse('show');
+
+        //   $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+        //   formValid = false;
+        // } 
+        
+        else {
+          hideFieldError(`#precio-${productIndex}-${providerIndex}`);
+          hideFieldError(`#moq-${productIndex}-${providerIndex}`);
+          hideFieldError(`#pcsCaja-${productIndex}-${providerIndex}`);
+          hideFieldError(`#cbm-${productIndex}-${providerIndex}`);
+          hideFieldError(`#delivery-${productIndex}-${providerIndex}`);
+          hideFieldError(`#shippingCost-${productIndex}-${providerIndex}`);
+          hideFieldError(`#kgBox-${productIndex}-${providerIndex}`);
+          hideFieldError(`#unidadMedida-${productIndex}-${providerIndex}`);
+
+        }
+      });
+    });
+  
+    if (!formValid) {
+      scrollToFirstError();
+      return;
+    }
+  
     let formData = new FormData();
 
     // Datos del cliente
@@ -3971,40 +4137,70 @@ function addProvider(productIndex) {
     // Productos
     $('.product-item').each(function() {
       let productIndex = $(this).data('index');
-      formData.append(`productImage[${productIndex}]`, $(`#productImage`)[0].files[0]);
-      formData.append(`productName[${productIndex}]`, $(`#productName`).val());
-      formData.append(`productFeatures[${productIndex}]`, $(`#productFeatures`).val());
+      formData.append(`item[${productIndex}][productImage]`, $(`#productImage-${productIndex}`)[0].files[0]);
+      formData.append(`item[${productIndex}][productName]`, $(`#productName-${productIndex}`).val());
+      formData.append(`item[${productIndex}][productFeatures]`, $(`#productFeatures-${productIndex}`).val());
 
       // Proveedores
       $(`#providersContainer-${productIndex} .provider-item`).each(function(providerIndex) {
-        formData.append(`precio[${productIndex}][${providerIndex}]`, $(`#precio`).val());
-        formData.append(`moq[${productIndex}][${providerIndex}]`, $(`#moq`).val());
-        formData.append(`pcsCaja[${productIndex}][${providerIndex}]`, $(`#pcsCaja`).val());
-        formData.append(`cbm[${productIndex}][${providerIndex}]`, $(`#cbm`).val());
-        formData.append(`delivery[${productIndex}][${providerIndex}]`, $(`#delivery`).val());
-        formData.append(`shippingCost[${productIndex}][${providerIndex}]`, $(`#shippingCost`).val());
-        formData.append(`kgBox[${productIndex}][${providerIndex}]`, $(`#kgBox`).val());
-        formData.append(`unidadMedida[${productIndex}][${providerIndex}]`, $(`#unidadMedida`).val());
-        formData.append(`imagen1[${productIndex}][${providerIndex}]`, $(`#imagen1`)[0].files[0]);
-        formData.append(`imagen2[${productIndex}][${providerIndex}]`, $(`#imagen2`)[0].files[0]);
-        formData.append(`imagen3[${productIndex}][${providerIndex}]`, $(`#imagen3`)[0].files[0]);
-        formData.append(`video1[${productIndex}][${providerIndex}]`, $(`#video1`)[0].files[0]);
-        formData.append(`video2[${productIndex}][${providerIndex}]`, $(`#video2`)[0].files[0]);
-        formData.append(`providerName[${productIndex}][${providerIndex}]`, $(`[name="providerName[]"]`).eq(providerIndex).val());
-        formData.append(`providerPhone[${productIndex}][${providerIndex}]`, $(`[name="providerPhone[]"]`).eq(providerIndex).val());
-        formData.append(`providerNotes[${productIndex}][${providerIndex}]`, $(`[name="providerNotes[]"]`).eq(providerIndex).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][precio]`, $(`#precio-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][moq]`, $(`#moq-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][pcsCaja]`, $(`#pcsCaja-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][cbm]`, $(`#cbm-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][delivery]`, $(`#delivery-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][shippingCost]`, $(`#shippingCost-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][kgBox]`, $(`#kgBox-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][unidadMedida]`, $(`#unidadMedida-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][imagen1]`, $(`#imagen1-${productIndex}-${providerIndex}`)[0].files[0]);
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][imagen2]`, $(`#imagen2-${productIndex}-${providerIndex}`)[0].files[0]);
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][imagen3]`, $(`#imagen3-${productIndex}-${providerIndex}`)[0].files[0]);
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][video1]`, $(`#video1-${productIndex}-${providerIndex}`)[0].files[0]);
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][video2]`, $(`#video2-${productIndex}-${providerIndex}`)[0].files[0]);
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerName]`, $(`#providerName-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerPhone]`, $(`#providerPhone-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerNotes]`, $(`#providerNotes-${productIndex}-${providerIndex}`).val());
       });
     });
     $.ajax({
-      url: base_url + "AgenteCompra/PedidosGarantizados/saveCotizacionxd",
+      url: base_url + "AgenteCompra/PedidosGarantizados/saveCotizacion",
       type: "POST",
       data: formData,
       contentType: false,
       processData: false,
       success: function(response) {
-        console.log(response);
+        $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+        $("#modal-message").modal("show");
+        $('#modal-cotizacion').modal('hide');
       }
     });
   })
 }
 );
+function collapseAllExcept(elementToKeepOpen, selector) {
+  $(selector).each(function() {
+    if ($(this).attr('id') !== $(elementToKeepOpen).attr('id')) {
+      $(this).collapse('hide');
+    } else {
+      $(this).collapse('show');
+    }
+  });
+}
+function showFieldError(fieldSelector, errorMessage) {
+  $(fieldSelector).addClass('is-invalid');
+  $(fieldSelector).parent().find('.invalid-feedback').text(errorMessage);
+}
+
+function hideFieldError(fieldSelector) {
+  $(fieldSelector).removeClass('is-invalid');
+  $(fieldSelector).parent().find('.invalid-feedback').text('');
+}
+
+function scrollToFirstError() {
+  let firstErrorElement = $('.is-invalid').first();
+  if (firstErrorElement.length > 0) {
+    let modalBody = $('.modal-body');
+    modalBody.animate({
+      scrollTop: firstErrorElement.offset().top - modalBody.offset().top + modalBody.scrollTop()
+    }, 500);
+  }
+}
