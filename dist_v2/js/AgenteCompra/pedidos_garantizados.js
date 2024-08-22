@@ -2898,6 +2898,7 @@ function getItemProveedor(id_detalle) {
               data-url_img="${detalle[i]["main_photo"]}"
               >`
             );
+          }
           if (detalle[i]["secondary_photo"] != null) {
             container
               .find(`#btn-uploadimg2-URL-${i + 1}`)
@@ -2909,7 +2910,7 @@ function getItemProveedor(id_detalle) {
               .after(
                 `<img src="${detalle[i]["secondary_photo"]}" class="img-thumbnail img-table_item img-fluid img-resize mb-2">`
               );
-
+            }
             if (detalle[i]["terciary_photo"] != null) {
               container
                 .find(`#btn-uploadimg3-URL-${i + 1}`)
@@ -2956,8 +2957,8 @@ function getItemProveedor(id_detalle) {
             }
 
             // container.find(`btn-uploadprimaryimg-${i}`).val(detalle[i]["main_photo"]);
-          }
-        }
+          
+        
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {

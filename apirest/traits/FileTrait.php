@@ -45,8 +45,8 @@ trait FileTrait
         $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/pdf');
     }
     public function setAllowedExtensionsImagesOfficeFilesVideos(){
-        $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf','mp4','MP4','avi','AVI','mov','MOV','flv','FLV','wmv','WMV','3gp','3GP','mkv','MKV','webm','WEBM');
-        $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/pdf','video/mp4','video/avi','video/mov','video/flv','video/wmv','video/3gp','video/mkv','video/webm');
+        $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf','mp4','MP4','avi','AVI','mov','MOV','flv','FLV','wmv','WMV','3gp','3GP','mkv','MKV','webm','WEBM','avif','AVIF','heif','HEIF','heic','HEIC');
+        $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/pdf','video/mp4','video/avi','video/mov','video/flv','video/wmv','video/3gp','video/mkv','video/webm','image/avif','image/heif','image/heic');
     }
     /*
     * This function is used to upload a single file
