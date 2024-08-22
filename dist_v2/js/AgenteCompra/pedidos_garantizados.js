@@ -4215,7 +4215,14 @@ function addProvider(productIndex) {
         $(".modal-title-message").text(JSON.parse(response).message);
         $("#modal-message").modal("show");
         $('#modal-cotizacion').modal('hide');
-        
+        //set empty all fields
+        $('#clientName').val('');
+        $('#clientWhatsapp').val('');
+        $('#clientEmail').val('');
+        $('#clientCountry').val('0');
+        $('#clientRUC').val('');
+        $('#clientCompany').val('');
+        $('#productsContainer').html('');
         reload_table_Entidad();
 
       }
