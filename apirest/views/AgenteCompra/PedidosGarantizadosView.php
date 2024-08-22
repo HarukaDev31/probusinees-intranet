@@ -54,7 +54,7 @@
                   <button
                   id="btn-cotizacion"
                   type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
-                    Nueva Cotización
+                    Nuevo Pedido
                   </button>
                 </div>
               </div>

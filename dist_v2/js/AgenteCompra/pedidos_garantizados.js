@@ -4212,9 +4212,10 @@ function addProvider(productIndex) {
       processData: false,
       success: function(response) {
         $(".modal-message").removeClass("modal-danger modal-warning modal-success");
-        $(".modal-title-message").text(response)
+        $(".modal-title-message").text(JSON.parse(response).message);
         $("#modal-message").modal("show");
         $('#modal-cotizacion').modal('hide');
+        
         reload_table_Entidad();
 
       }
