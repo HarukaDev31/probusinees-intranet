@@ -1310,6 +1310,9 @@ class PedidosGarantizadosModel extends CI_Model
             $productId = $this->db->insert_id();
             // Procesar los datos de los proveedores
             foreach ($productData['supplier'] as $providerIndex => $providerData) {
+               
+                $this->maxFileSize = 1000000;
+                $this->setAllowedExtensionsImagesOfficeFilesVideos();
                 $imagen1=$this->uploadSingleFile([
                     'name' => $files['item']['name'][$productIndex]['supplier'][$providerIndex]['imagen1'],
                     'type' => $files['item']['type'][$productIndex]['supplier'][$providerIndex]['imagen1'],
@@ -1364,7 +1367,7 @@ class PedidosGarantizadosModel extends CI_Model
                     'terciary_photo' => $imagen3,
                     'primary_video' => $video1,
                     'secondary_video' => $video2,   
-
+                    'Txt_Nota' => $providerData['providerNotes'],
                     'Nu_Dias_Delivery' => $deliveryDays,
                     'Ss_Costo_Delivery' => $shippingCost,
                     'kg_box' => floatval($kgBox),
@@ -1374,6 +1377,39 @@ class PedidosGarantizadosModel extends CI_Model
                     // Insertar el resto de los campos del proveedor
                 ];
                 $this->db->insert('agente_compra_pedido_detalle_producto_proveedor',$supplierToInsert);
+                $idProveedor = $this->db->insert_id();
+                $idSupplier = 0;
+                $existsSupplier = $this->db->get_where($this->table_suppliers, array('phone' => $providerData['providerPhone'],
+
+                'agente_compra_pedido_cabecera'=>$pedidoId
+                ))->row();
+                if (empty($existsSupplier)) {                     
+                        $code = $this->generateSupplierCode($providerData['providerName']);
+                        while ($this->db->get_where($this->table_suppliers, array('code' => $code))->num_rows() > 0) {
+                            $code = $this->generateSupplierCode($providerData['providerName']);
+                        }
+    
+                    $arrSupplier = array(
+                        "name" => $providerData['providerName'],
+                        "phone" => $providerData['providerPhone']==""?$code:$providerData['providerPhone'],   
+                        "code" => $code,
+                        'agente_compra_producto_proveedor_id'=>$idProveedor,
+                        'agente_compra_pedido_cabecera'=>$pedidoId
+                    );
+    
+                    if ($this->db->insert('suppliers', $arrSupplier) > 0) {
+                        $idSupplier = $this->db->insert_id();
+                    } else {
+                        $this->db->trans_rollback();
+                        return array(
+                            'status' => 'error',
+                            'message' => 'No registro proveedor',
+                        );
+                    }
+                } else {
+                    $idSupplier = $existsSupplier->id_supplier;
+                }
+                $this->db->update('agente_compra_pedido_detalle_producto_proveedor', array('ID_Entidad_Proveedor' => $idSupplier), array('ID_Pedido_Detalle_Producto_Proveedor' => $idProveedor));
             }
         }
     

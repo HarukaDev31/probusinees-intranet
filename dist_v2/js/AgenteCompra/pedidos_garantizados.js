@@ -3815,7 +3815,8 @@ $(document).ready(function() {
                 <div class="col-12 col-md-12">
                   <div class="mb-3">
                     <label for="productImage" class="form-label">Imagen</label>
-                    <input type="file" class="form-control" id="productImage-${productIndex}" name="productImage[]">
+                    <input type="file" class="form-control" id="productImage-${productIndex}" name="productImage[]" accept="image/*">
+                    <div id="productImage-preview-${productIndex}" class="mt-2"></div>
                   </div>
                 </div>
                 <div class="col-12 col-md-12">
@@ -3845,6 +3846,12 @@ $(document).ready(function() {
       </div>
     `;
     $('#productsContainer').append(productHtml);
+    //add change event to productImage 
+
+    $(`#productImage-${productIndex}`).on('change', function() {
+      let currentProductIndex = $(this).closest('.product-item').data('index');
+      previewFile(this, `#productImage-preview-${currentProductIndex}`);
+    });
     collapseAllExcept(`#product-collapse-${productIndex}`, '.product-item .collapse');
     let modalBody = $('.modal-body');
   modalBody.animate({
@@ -3929,27 +3936,32 @@ function addProvider(productIndex) {
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="imagen1" class="form-label">Imagen 1</label>
-                    <input type="file" class="form-control" id="imagen1-${productIndex}-${providerIndex}" name="imagen1[]">
+                    <input type="file" class="form-control" id="imagen1-${productIndex}-${providerIndex}" name="imagen1[]" accept="image/*">
+                    <div id="preview-imagen1-${productIndex}-${providerIndex}" class="mt-2"></div>
                   </div>
                   <div class="mb-3">
                     <label for="imagen2" class="form-label">Imagen 2</label>
-                    <input type="file" class="form-control" id="imagen2-${productIndex}-${providerIndex}" name="imagen2[]">
+                    <input type="file" class="form-control" id="imagen2-${productIndex}-${providerIndex}" name="imagen2[]" accept="image/*">
+                    <div id="preview-imagen2-${productIndex}-${providerIndex}" class="mt-2"></div>
                   </div>
                   <div class="mb-3">
                     <label for="imagen3" class="form-label">Imagen 3</label>
-                    <input type="file" class="form-control" id="imagen3-${productIndex}-${providerIndex}" name="imagen3[]">
+                    <input type="file" class="form-control" id="imagen3-${productIndex}-${providerIndex}" name="imagen3[]" accept="image/*">
+                    <div id="preview-imagen3-${productIndex}-${providerIndex}" class="mt-2"></div>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="video1" class="form-label">Video 1</label>
-                    <input type="file" class="form-control" id="video1-${productIndex}-${providerIndex}" name="video1[]">
+                    <input type="file" class="form-control" id="video1-${productIndex}-${providerIndex}" name="video1[]" accept="video/*">
+                    <div id="preview-video1-${productIndex}-${providerIndex}" class="mt-2"></div>
                   </div>
                   
                   <div class="col-12 col-md-12">
                   <div class="mb-3">
                     <label for="video2" class="form-label">Video 2</label>
-                    <input type="file" class="form-control" id="video2-${productIndex}-${providerIndex}" name="video2[]">
+                    <input type="file" class="form-control" id="video2-${productIndex}-${providerIndex}" name="video2[]" accept="video/*">
+                    <div id="preview-video2-${productIndex}-${providerIndex}" class="mt-2"></div>
                   </div>
                   </div>
                 </div>
@@ -3959,19 +3971,22 @@ function addProvider(productIndex) {
                   <div class="col-12">
                     <div class="mb-3">
                       <label for="providerName" class="form-label">Nombre Proveedor o Link *</label>
-                      <input type="text" class="form-control" name="providerName[]">
+                      <input type="text" class="form-control"
+                      id="nombre_proveedor${productIndex}-${providerIndex}" name="providerName[]" >
                     </div>
                   </div>
                   <div class="col-12">
                     <div class="mb-3">
                       <label for="providerPhone" class="form-label">Nº Celular *</label>
-                      <input type="text" class="form-control" name="providerPhone[]">
+                      <input type="text" class="form-control" 
+                      id="celular_proveedor${productIndex}-${providerIndex}" name="providerPhone[]">
                     </div>
                   </div>
                   <div class="col-12">
                     <div class="mb-3">
                       <label for="providerNotes" class="form-label">Notas</label>
-                      <textarea class="form-control" name="providerNotes[]"></textarea>
+                      <textarea class="form-control" 
+                      id="providerNotes${productIndex}-${providerIndex}" name="providerNotes[]"></textarea>
                     </div>
                   </div>
               </div>
@@ -3986,6 +4001,27 @@ function addProvider(productIndex) {
   modalBody.animate({
     scrollTop: $(`#provider-collapse-${productIndex}-${providerIndex}`).offset().top - modalBody.offset().top + modalBody.scrollTop()
   }, 500);
+  $(`#imagen1-${productIndex}-${providerIndex}`).on('change', function() {
+    let currentProductIndex = $(this).closest('.product-item').data('index');
+    previewFile(this, `#preview-imagen1-${currentProductIndex}-${providerIndex}`, 'image');
+  });
+  $(`#imagen2-${productIndex}-${providerIndex}`).on('change', function() {
+    let currentProductIndex = $(this).closest('.product-item').data('index');
+    previewFile(this, `#preview-imagen2-${currentProductIndex}-${providerIndex}`, 'image');
+  });
+  $(`#imagen3-${productIndex}-${providerIndex}`).on('change', function() {
+    let currentProductIndex = $(this).closest('.product-item').data('index');
+    previewFile(this, `#preview-imagen3-${currentProductIndex}-${providerIndex}`, 'image');
+  }
+  );
+  $(`#video1-${productIndex}-${providerIndex}`).on('change', function() {
+    let currentProductIndex = $(this).closest('.product-item').data('index');
+    previewFile(this, `#preview-video1-${currentProductIndex}-${providerIndex}`, 'video');
+  });
+  $(`#video2-${productIndex}-${providerIndex}`).on('change', function() {
+    let currentProductIndex = $(this).closest('.product-item').data('index');
+    previewFile(this, `#preview-video2-${currentProductIndex}-${providerIndex}`, 'video');
+  }); 
   let providerSummary = $(`#providersContainer-${productIndex} .provider-item`).length;
   $(`#heading-${productIndex} h6`).text(`Proveedores (${providerSummary})`);
 }
@@ -4097,6 +4133,13 @@ function addProvider(productIndex) {
           $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
           formValid = false;
         }
+        if($(`#nombre_proveedor${productIndex}-${providerIndex}`).val().trim() === ''){
+          showFieldError(`#nombre_proveedor${productIndex}-${providerIndex}`, 'Este campo es requerido');
+          $(`#product-collapse-${productIndex}`).collapse('show');
+
+          $(`#provider-collapse-${productIndex}-${providerIndex}`).collapse('show');
+          formValid = false;
+        }
         // if ($(`#unidadMedida-${productIndex}-${providerIndex}`).val().trim() === '') {
         //   showFieldError(`#unidadMedida-${productIndex}-${providerIndex}`, 'Este campo es requerido');
         //             $(`#product-collapse-${productIndex}`).collapse('show');
@@ -4156,9 +4199,9 @@ function addProvider(productIndex) {
         formData.append(`item[${productIndex}][supplier][${providerIndex}][imagen3]`, $(`#imagen3-${productIndex}-${providerIndex}`)[0].files[0]);
         formData.append(`item[${productIndex}][supplier][${providerIndex}][video1]`, $(`#video1-${productIndex}-${providerIndex}`)[0].files[0]);
         formData.append(`item[${productIndex}][supplier][${providerIndex}][video2]`, $(`#video2-${productIndex}-${providerIndex}`)[0].files[0]);
-        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerName]`, $(`#providerName-${productIndex}-${providerIndex}`).val());
-        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerPhone]`, $(`#providerPhone-${productIndex}-${providerIndex}`).val());
-        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerNotes]`, $(`#providerNotes-${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerName]`, $(`#nombre_proveedor${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerPhone]`, $(`#celular_proveedor${productIndex}-${providerIndex}`).val());
+        formData.append(`item[${productIndex}][supplier][${providerIndex}][providerNotes]`, $(`#providerNotes${productIndex}-${providerIndex}`).val());
       });
     });
     $.ajax({
@@ -4169,8 +4212,11 @@ function addProvider(productIndex) {
       processData: false,
       success: function(response) {
         $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+        $(".modal-title-message").text(response)
         $("#modal-message").modal("show");
         $('#modal-cotizacion').modal('hide');
+        reload_table_Entidad();
+
       }
     });
   })
