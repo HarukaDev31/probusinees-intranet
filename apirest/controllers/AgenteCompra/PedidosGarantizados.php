@@ -282,6 +282,7 @@ class PedidosGarantizados extends CI_Controller
         header('Cache-Control: max-age=0');
         //set D10     = $data[0]->No_Contacto
         $objPHPExcel->getActiveSheet()->setCellValue('B8', "COTIZACION:    " . $data[0]->cotizacionCode);
+        $userMail=$this->user->No_Usuario;
 
         $objPHPExcel->getActiveSheet()->setCellValue('D10', $data[0]->No_Contacto);
         $objPHPExcel->getActiveSheet()->setCellValue('D11', $data[0]->Nu_Celular_Contacto);
@@ -292,6 +293,24 @@ class PedidosGarantizados extends CI_Controller
         $objPHPExcel->getActiveSheet()->setCellValue('M12', $data[0]->No_Pais);
         $objPHPExcel->getActiveSheet()->setCellValue('V10', $data[0]->Ss_Tipo_Cambio);
         // $objPHPExcel->getActiveSheet()->setCellValue('E35', "=K32");
+        if($userMail=="maryam.china@probusiness.pe"){
+            $objPHPExcel->getActiveSheet()->setCellValue('C16', "IMAGE PRODUCT");
+            $objPHPExcel->getActiveSheet()->setCellValue('D16', "NAME PRODUCT");
+            $objPHPExcel->getActiveSheet()->setCellValue('E16', "CHARACTERISTICS");
+            $objPHPExcel->getActiveSheet()->setCellValue('F16', "QTY/CUSTOMER");
+            $objPHPExcel->getActiveSheet()->setCellValue('I16', "COMMERCIAL UNIT");
+            $objPHPExcel->getActiveSheet()->setCellValue('J16', "PRICE EXW RMB");
+            $objPHPExcel->getActiveSheet()->setCellValue('K16', "PRICE EXW USD");
+            $objPHPExcel->getActiveSheet()->setCellValue('N16', "QTY/BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('O16', "TOTAL BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('P16', "CBM/BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('Q16', "CBM TOTAL");
+            $objPHPExcel->getActiveSheet()->setCellValue('R16', "KG/BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('S16', "KG TOTAL");
+            $objPHPExcel->getActiveSheet()->setCellValue('T16', "SHIPPING YIWU");
+            $objPHPExcel->getActiveSheet()->setCellValue('U16', "DELIVERY");
+            $objPHPExcel->getActiveSheet()->setCellValue('V16', "NOTE");
+        }
         $initialRow = 17;
         $lastProductrow = 18;
         $tempUrl = array();
@@ -324,11 +343,12 @@ class PedidosGarantizados extends CI_Controller
                 // Set merged cells values
                 $objPHPExcel->getActiveSheet()->setCellValue("B{$initialRow}", $i);
                 // $objPHPExcel->getActiveSheet()->setCellValue("C{$initialRow}", $val->Txt_Producto);
-                $objPHPExcel->getActiveSheet()->setCellValue("D{$initialRow}", $val->Txt_Producto);
+                $txtProducto=$userMail=="maryam.china@probusiness.pe"?$val->Txt_Producto_Ingles:$val->Txt_Producto;
+                $objPHPExcel->getActiveSheet()->setCellValue("D{$initialRow}",$txtProducto);
                 //ajuastar texto  in column D}
 
                 // $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToTextAndLineBreaks ($val->Txt_Descripcion));}
-                $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToRichText($this->htmlToTextAndLineBreaks($val->Txt_Descripcion)));
+                $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToRichText($this->htmlToTextAndLineBreaks($userMail=="maryam.china@probusiness.pe"?$val->Txt_Description_Ingles:$val->Txt_Descripcion)));
                 if (!empty($val->Txt_Url_Imagen_Producto)) {
                     $objDrawing = new PHPExcel_Worksheet_Drawing();
                     $image = file_get_contents($val->Txt_Url_Imagen_Producto);
