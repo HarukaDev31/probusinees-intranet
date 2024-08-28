@@ -1,6 +1,6 @@
 <?php
 trait WebSocketTrait {
-    private $url='http://localhost:8080/send';
+    private $url='http://localhost:8081/send';
     public function sendEvent($message) {
         $data = array(' ' => $message);
 

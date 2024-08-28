@@ -32,7 +32,7 @@ Trait CommonTrait{
         
         // Limpiar y preparar el HTML
         $html = preg_replace('/\s+/', ' ', $html);
-        $html = strip_tags($html, '<ol><ul><li><span><strong><em><u>');
+        $html = strip_tags($html, '<ol><ul><li><span><strong><em><u><p>');
         
         $dom = new DOMDocument();
         libxml_use_internal_errors(true);
@@ -57,7 +57,6 @@ Trait CommonTrait{
         $paragraphs = $xpath->query('//p');
         foreach ($paragraphs as $index => $p) {
             $this->processNode($p, $richText);
-            $richText->addText(new PHPExcel_RichText_Run("\n"));
         }
   
         
@@ -66,13 +65,23 @@ Trait CommonTrait{
     
     private function processNode($node, $richText) {
         foreach ($node->childNodes as $child) {
-            if ($child->nodeType === XML_TEXT_NODE
-            ) {
-                $richText->addText(new PHPExcel_RichText_TextElement($child->textContent));
+            if ($child->nodeName === '#text') {
+                if ($child->nodeType === XML_ELEMENT_NODE){
+                    $text = new PHPExcel_RichText_Run($child->nodeName);
+                    $this->applyStyles($child, $text);
+                    $richText->addText($text);
+                    continue;
+                }
+                $text = new PHPExcel_RichText_Run($child->textContent);
+                // $this->applyStyles($child, $text);
+                // $text = new PHPExcel_RichText_Run($child->textContent);
+                $richText->addText($text);
                 $richText->addText(new PHPExcel_RichText_Run("\n"));
 
+                
+                
             }
-            else if($child->nodeName==="strong" ){
+            else if($child->nodeName ==="strong" ){
                 $text = new PHPExcel_RichText_Run($child->textContent);
                 $text->getFont()->setBold(true);
                 $richText->addText($text);
@@ -92,17 +101,18 @@ Trait CommonTrait{
                 $text->getFont()->setUnderline(true);
                 $richText->addText($text);
             }//manage br
-            
-             elseif ($child->nodeType === XML_ELEMENT_NODE) {
-                if ($child->nodeName === 'span' && $child->hasAttribute('class') && $child->getAttribute('class') === 'ql-ui') {
-                    // Ignorar los spans con clase ql-ui
-                    continue;
-                }
+            // else if ($child->nodeType === XML_ELEMENT_NODE) {
+            //     if ($child->nodeName === 'span' && $child->hasAttribute('class') && $child->getAttribute('class') === 'ql-ui') {
+            //         // Ignorar los spans con clase ql-ui
+            //         continue;
+            //     }else{
+            //         $text = new PHPExcel_RichText_Run($child->nodeName);
+            //         $this->applyStyles($child, $text);
+            //         $richText->addText($text);
+            //     }
 
-                $text = new PHPExcel_RichText_Run($child->textContent);
-                $this->applyStyles($child, $text);
-                $richText->addText($text);
-            }
+               
+            // }
         }
     }
     
