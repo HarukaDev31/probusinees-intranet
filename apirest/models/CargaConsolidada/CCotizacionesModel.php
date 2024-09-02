@@ -1379,6 +1379,7 @@ class CCotizacionesModel extends CI_Model
         $initialRow++;
         //create remaining zones and apply styles
         $InitialColumnLetter = chr(ord($InitialColumn) - 1);
+        $LastColumnLetter = chr(ord($InitialColumn));
         $objPHPExcel->getActiveSheet()->getStyle('B5:' . $InitialColumn . '19')->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle('B28:' . $InitialColumn . '32')->applyFromArray($borders);
 
@@ -1436,7 +1437,7 @@ class CCotizacionesModel extends CI_Model
             //set currency format with dollar symbol
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '17')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             //IF COBROCELL IS GREATER THAN 5000 SET THE VALUE TO $initialcolumn17  TO roundup100/ distroCell ELSE SET roundup50/distroCell
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $CobroCell . ">5000,ROUND(100*" . $distroCell . ",2),ROUND(50*" . $distroCell . ",2))");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,ROUND(100*" . $distroCell . ",2),ROUND(50*" . $distroCell . ",2))");
             //initial18 is roundup($cfrCell+$seguroCell,2)
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', "=ROUNDUP(" . $cfrCell . '+' . $seguroCell . ",2)");
             //initial19 is roundup($cfrvCell+$seguroCell,2)

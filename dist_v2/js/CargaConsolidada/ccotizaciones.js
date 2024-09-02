@@ -10,7 +10,7 @@ $(function () {
   });
   $("#button-save").hide();
   $("#button-save-excel").hide();
-
+  $("#button-save-pdf").hide();
   $("#loading-spinner").hide();
   jQuery.extend(jQuery.fn.dataTableExt.oSort, {
     "date-dd-mm-yyyy-pre": function (date) {
@@ -172,6 +172,7 @@ function verCotizacion(ID, CID) {
   $(".div-AgregarEditar").show();
   $("#button-save").show();
   $("#button-save-excel").show();
+  $("#button-save-pdf").show();
   urlCabecera =
     base_url + "CargaConsolidada/CCotizaciones/ajax_edit_header/" + ID;
   $.ajax({
@@ -706,9 +707,15 @@ $("#exampleModal").on("show.bs.modal", function (event) {
     },
   });
 });
-const guardarCotizacionYDescargar =async () => {
+const guardarCotizacionYDescargar =async (tipo) => {
   await guardarCotizacion();
-  await descargarReporte(CotizacionID, CCotizacion);
+  if(tipo=='pdf'){
+    await descargarBoletaPDF(CotizacionID, CCotizacion);  
+  }
+  else {
+    await descargarReporte(CotizacionID, CCotizacion);
+
+  }
 };
 const guardarYSalir = async() => {
   await guardarCotizacion();
@@ -719,6 +726,7 @@ const guardarYSalir = async() => {
   table_Entidad.ajax.reload();
   $("#button-save").hide();
   $("#button-save-excel").hide();
+  $("#button-save-pdf").hide();
 };
 const guardarCotizacion = async () => {
   const cotizacion = [];
