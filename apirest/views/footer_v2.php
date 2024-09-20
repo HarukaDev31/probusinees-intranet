@@ -238,7 +238,6 @@
 <?php if (isset($js_tarifas_cotizaciones) && $js_tarifas_cotizaciones==true) : ?>
 <script src="<?php echo base_url() . 'dist/js/Configuracion/tarifas_cotizaciones.js'?>"></script>
 <?php endif;
-echo $this->user;
 ?>
 
 <script src="<?php echo base_url("dist_v2/js/sockets.js"); ?>"></script>
