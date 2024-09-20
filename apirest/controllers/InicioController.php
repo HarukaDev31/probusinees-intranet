@@ -33,6 +33,8 @@ class InicioController extends CI_Controller {
 				'countCotizacionPedidosPendientes' => $arrResponseCotizacionPedidoSinAsignar->count	
 			));
 			$this->load->view('footer_v2', array("js_inicio" => true));
+			$this->load->view('footer_v2', array("sockets" => true));
+
 		} else {
 			$this->load->view('Login/LoginView');
 		}
