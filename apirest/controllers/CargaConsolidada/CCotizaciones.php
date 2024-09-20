@@ -10,7 +10,6 @@ class CCotizaciones extends CI_Controller
     {
         parent::__construct();
         $this->load->library('session');
-        $this->load->view('footer_v2', array("sockets" => true));
         
         $this->load->model('CargaConsolidada/CCotizacionesModel');
 
