@@ -1,4 +1,4 @@
-const socket = new WebSocket('wss://localhost:8081');
+const socket = new WebSocket('wss://websockets.probusiness.pe');
 socket.onopen = function(event) {
     console.log('Connected to the server');
     // Ejemplo de uso
