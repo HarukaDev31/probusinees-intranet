@@ -241,8 +241,7 @@
 ?>
 <?php if (isset($sockets) && $sockets==true) : ?>
 <script>
-const user='<?php echo $this->user ?>';
-console.log(user);
+
 const socket = new WebSocket('wss://websockets.probusiness.pe');
 // Suscribirse a múltiples canales
 function subscribeToChannels(project, role, user) {
