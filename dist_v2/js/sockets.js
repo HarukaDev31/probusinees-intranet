@@ -36,4 +36,7 @@ socket.onmessage = function(event) {
   //   }
 
 };
-subscribeToChannels('project', 'role', 'user');
+socket.onopen = function(event) {
+    console.log('Socket connected');
+    subscribeToChannels('project', 'role', 'user');
+};
