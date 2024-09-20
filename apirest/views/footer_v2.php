@@ -270,16 +270,15 @@ function publishToChannels(project, role, user, message) {
 // Manejar mensajes recibidos del servidor
 socket.onmessage = function(event) {
   console.log(event);
-  // console.log(event);
-  //   const message = event.data;
-  //   console.log('Received message:', message);
-  //   // Aquí puedes manejar los mensajes recibidos del servidor
-  //   try{
-  //     alert(message);
-  //   }
-  //   catch(e){
-  //     console.log(e);
-  //   }
+    const message = event.data;
+    console.log('Received message:', message);
+    // Aquí puedes manejar los mensajes recibidos del servidor
+    try{
+      alert(message);
+    }
+    catch(e){
+      console.log(e);
+    }
 
 };
 socket.onopen = function(event) {
