@@ -10,18 +10,16 @@ class CCotizaciones extends CI_Controller
     {
         parent::__construct();
         $this->load->library('session');
-
+        $this->load->view('footer_v2', array("sockets" => true));
+        
         $this->load->model('CargaConsolidada/CCotizacionesModel');
 
-        if (isset($this->session->userdata['usuario'])) {
-            redirect('CCotizaciones/index');
+        if (!isset($this->session->userdata['usuario'])) {
+            redirect('');
         }
 
     }
-    public function index(){
-        $this->load->view('footer_v2', array("sockets" => true));
 
-    }
     public function listar()
     {
         if (!$this->MenuModel->verificarAccesoMenu()) {
