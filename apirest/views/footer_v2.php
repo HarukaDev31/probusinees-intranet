@@ -282,7 +282,7 @@ socket.onmessage = function(event) {
 
 };
 socket.onopen = function(event) {
-    subscribeToChannels('project-intranet', 'role-'+user.ID_Grupo, 'user-'+user.ID_Usuario);
+    subscribeToChannels('intranet', user.ID_Grupo, user.ID_Usuario);
 };
 </script>
 <?php endif; ?>
