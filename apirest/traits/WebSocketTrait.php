@@ -1,6 +1,6 @@
 <?php
 trait WebSocketTrait {
-    private $url='http://localhost:8081/send';
+    private $url='https://websockets.probusiness.pe/api/send-message';
     public function sendEvent($message) {
         $data = array(' ' => $message);
 
