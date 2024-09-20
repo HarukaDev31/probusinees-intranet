@@ -242,7 +242,7 @@
 <?php if (isset($sockets) && $sockets==true) : ?>
 <script>
 const user=JSON.parse('<?php echo json_encode($this->user) ?>');
-console.log(user);
+
 const socket = new WebSocket('wss://websockets.probusiness.pe');
 // Suscribirse a múltiples canales
 function subscribeToChannels(project, role, user) {
@@ -282,8 +282,7 @@ socket.onmessage = function(event) {
 
 };
 socket.onopen = function(event) {
-    console.log('Socket connected');
-    subscribeToChannels('project', 'role', 'user');
+    subscribeToChannels('intranet', user.ID_Grupo, user.ID_Usuario);
 };
 </script>
 <?php endif; ?>
