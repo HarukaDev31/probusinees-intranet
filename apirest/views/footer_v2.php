@@ -238,7 +238,7 @@
 <?php if (isset($js_tarifas_cotizaciones) && $js_tarifas_cotizaciones==true) : ?>
 <script src="<?php echo base_url() . 'dist/js/Configuracion/tarifas_cotizaciones.js'?>"></script>
 <?php endif; ?>
-<script src="<?php echo base_url("assets/js/sockets.js"); ?>"></script>
+<script src="<?php echo base_url("dist_v2/js/sockets.js"); ?>"></script>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-dialog-loader">
