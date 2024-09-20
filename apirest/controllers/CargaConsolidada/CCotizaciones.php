@@ -13,7 +13,7 @@ class CCotizaciones extends CI_Controller
 
         $this->load->model('CargaConsolidada/CCotizacionesModel');
 
-        if (!isset($this->session->userdata['usuario'])) {
+        if (isset($this->session->userdata['usuario'])) {
             redirect('CCotizaciones/index');
         }
 
