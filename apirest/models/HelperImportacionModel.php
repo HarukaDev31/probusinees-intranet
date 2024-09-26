@@ -185,7 +185,9 @@ FROM
 usuario AS USR
 JOIN grupo_usuario AS GRPUSR ON(USR.ID_Usuario = GRPUSR.ID_Usuario)
 JOIN grupo AS GRP ON(GRP.ID_Grupo = GRPUSR.ID_Grupo)
-WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegio_Acceso=2 AND USR.Nu_Estado=1";//2=china
+WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegio_Acceso=2 AND USR.Nu_Estado=1
+and ID_Grupo =1204
+";//2=china
 		if ( !$this->db->simple_query($query) ){
 			$error = $this->db->error();
 			return array(
