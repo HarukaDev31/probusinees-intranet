@@ -50,12 +50,30 @@
                   <label class="d-none d-sm-block">&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
-                <div class="col-12 col-md-2 my-2">
+                <div class="col-12 d-flex flex-row justify-content-between">
                   <button
                   id="btn-cotizacion"
                   type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
                     Nuevo Pedido
                   </button>
+                  <div>
+                    <span>T.C GENERAL</span>
+                    <input type="text" id="txt-Tc_General" class="form-control " 
+                    <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
+                    onchange="updateTCambio(1, this.value)"/>
+                  </div>
+                  <div>
+                    <span>T.C CONS</span>
+                    <input type="text" id="txt-Tc_Consolidado" class="form-control " 
+                    <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
+                    onchange="updateTCambio(2, this.value)"/>
+                  </div>
+                  <div>
+                    <span>T.C TRADING</span>
+                    <input type="text" id="txt-Tc_Trading" class="form-control " 
+                    <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
+                    onchange="updateTCambio(3, this.value)"/>
+                  </div>
                 </div>
               </div>
               <div class="table-responsive div-Listar">
@@ -67,14 +85,14 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
-                      <th class="no-sort">Garantía</th>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso ==1) {?>
+                      <th>Pagos</th>
                       <?php }?>
-                      <th>Perú</th>
+
                       <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
                       <th class="no-sort">Encargado</th>
                       <?php }?>
-                      <th>China</th>
+                      <th>Estado</th>
                       <th class="no-sort">Ver</th>
 
                       <th class="no-sort">Proforma</th>
@@ -145,13 +163,16 @@ echo form_open('', $attributes);
                       </div>
                     </div>
 
-                    <div class="col-12 col-sm-4 col-md-2">
-                      <label>T.C.</label>
-                      <div class="form-group">
-                        <input type="text" name="Ss_Tipo_Cambio" <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 1 ? 'min="0.01" ' : ''; ?> class="form-control required" placeholder="Ingresar" autocomplete="off">
-
-                        <span class="help-block text-danger" id="error"></span>
+                    
+                    <div class="col-12 col-sm-4 col-md-4 align-items-center d-flex">
+                      <div id="agregarCotizaciones" class="btn btn-primary w-100">Agregar cotizaciones</div>
+                    </div>
+                    <div class="col-12" >
+                      <div id="cotizacionExcelContainer"  class="cotizacion-container">
+                        
                       </div>
+
+                      
                     </div>
 
                     <!-- <div class="col-12 col-sm-4 col-md-4">
@@ -161,7 +182,7 @@ echo form_open('', $attributes);
                       </div>
                     </div> -->
                   </div>
-
+                   
                   <div class="row">
                     <div class="col-12 col-sm-8 col-md-8 d-none">
                       <label>Producto</label>
@@ -201,8 +222,10 @@ echo form_open('', $attributes);
                       <div id="div-arrItemsPedidos"></div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos <button type="button" id="btn-add_item" class="btn btn-danger shadow">Agregar</button></h3>
+                    <div class="col-xs-12 col-sm-12 col-md-12 div-items-garantizado">
+                      <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos 
+                      <!--<button type="button" id="btn-add_item" class="btn btn-danger shadow">Agregar</button>-->
+                    </h3>
 
                       <div class="table-responsive div-Compuesto">
                         <table id="table-Producto_Enlace" class="table table-bordered table-hover table-striped">
@@ -333,6 +356,101 @@ echo form_open('', $attributes);
         </div>
       </div>
       <!-- /.row -->
+      <div  id="container-pagos">
+              <div class="row w-100 d-flex justify-content-between" id="pagos-header">
+                <div class="col-12 col-md-2 d-flex align-items-center">
+                  <label>ORDEN TOTAL</label>
+                </div>
+                <div class="col-12 col-md-2">
+                  <span class="pagos-header-input" id="orden_total">$0</span>
+                </div>
+
+                <div class="col-12 col-md-2 d-flex align-items-center">
+                  <label>PAGO CLIENTE:</label>
+                </div>
+                <div class="col-12 col-md-2">
+                  <span class="pagos-header-input" id="pago_cliente">$0</span>
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-center">
+                  <label>PAGO RESTANTE:</label>
+                </div>
+                <div class="col-12 col-md-2">
+                  <span class="pagos-header-input" id="pago_restante">$0</span>
+                </div>
+              </div>
+              <div class="row separator-line"></div>
+              <div class="w-100 row" id="pagos-body">
+                <form class="col-12 w-100" id="pagos-form">
+                  <!-- <div class="first-column col-12 col-md-6">
+                    <div class="pago row" id="pago-garantia-container">
+                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+                        <label>PAGO GARANTIA</label>
+
+                        <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL" />
+                      </div>
+                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-garantia-div">
+                        <input type="file" name="pago-garantia" id="pago-garantia" class="" />
+                        <input type="number" name="pago-garantia-value" id="pago-garantia-value" class="form-control" />
+                      </div>
+                    </div>
+                    <div class="pago row" id="pago-1-container">
+                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+                        <label>PAGO 1:</label>
+                        <input type="hidden" name="pago-1_URL" id="pago-1_URL" />
+                      </div>
+                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-1-div">
+                        <input type="file" name="pago-1" id="pago-1" class="" />
+                        <input type="number" name="pago-1-value" id="pago-1-value" class="form-control" />
+                      </div>
+                    </div>
+                    <div class="pago row" id="pago-2-container">
+                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
+                        <label>PAGO 2:</label>
+                        <input type="hidden" name="pago-2_URL" id="pago-2_URL" >
+
+                      </div>
+                      <div class="col-12 col-md-10 d-flex flex-row align-items-center " id="pago-2-div">
+                        <input type="file" name="pago-2" id="pago-2" class="" />
+                        <input type="number" name="pago-2-value" id="pago-2-value" class="form-control"/ />
+                      </div>
+                    </div>
+                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-3-div">
+                      <div class="conditional-field">
+                        <label>PAGO 3:</label>
+                        <label class="switch">
+                          <input type="checkbox" id="pago3_URL_switch">
+                          <span class="slider"></span>
+                        </label>
+                        </div>
+                      </div>
+                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-4-div">
+                      <div class="conditional-field">
+                        <label>PAGO 4:</label>
+                        <label class="switch">
+                          <input type="checkbox" id="pago4_URL_switch">
+                          <span class="slider"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="form-group" id="liquidacion-container">
+                      <label>LIQUIDACION:</label>
+                      <input type="hidden" name="liquidacion_URL" id="liquidacion_URL" />
+                      <input type="file" name="liquidacion" id="liquidacion" />
+                    </div>
+                    <div class="form-group">
+                      <label>NOTAS:</label>
+                      <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
+                    </div>
+                  </div> -->
+
+                </form>
+
+              </div>
+              <div class="row" id="pagos-buttons"></div>
+
+            </div>
     </div>
     <!-- /.container-fluid -->
   </section>
@@ -542,7 +660,29 @@ echo form_open('', $attributes);
     </div>
   </div>
 </div>
-
+<div class="modal fade" id="uploadCotizacionModal" tabindex="-1" aria-labelledby="uploadCotizacionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadCotizacionModalLabel">Subir Cotización</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadCotizacionForm">
+          <div class="mb-3">
+            <label for="cotizacionFile" class="form-label">Selecciona un archivo de cotización (Excel)</label>
+            <input type="file" class="form-control" id="cotizacionFile" accept=".xlsx, .xls" required>
+          </div>
+          <div class="mb-3">
+            <label for="cotizacionDescription" class="form-label">Descripción (opcional)</label>
+            <input type="text" class="form-control" id="cotizacionDescription" placeholder="Descripción del archivo">
+          </div>
+          <button type="submit" class="btn btn-primary">Subir</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- asignar pedido personal de china -->
 <?php
 $attributes = array('id' => 'form-guardar_personal_china');
@@ -589,6 +729,7 @@ echo form_open('', $attributes);
   </div>
   <!-- /.modal-dialog -->
 </div>
+
 <style scoped>
   input[type="file"] {
   position: relative;
@@ -696,7 +837,127 @@ input[type=number] {
     border: 1px solid #ddd;
     margin-top: 10px;
 }
+    .cotizacion-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .cotizacion-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .cotizacion-button {
+            margin-top: 10px;
+        }
+        .empty-message {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+        }
+        .upload-payment{
+    width: 180px;
+    height: 180px!important;
+    border-radius: 50%;
+    padding: 0.5em;
+    display: flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items: center;
+    position: relative;
+  }.not-filled:hover{
+    background-color: #3498DB;
+    cursor:pointer;
+  }
 
+  .not-filled:hover svg path{
+    stroke: white;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .upload-payment:hover{
+    cursor: pointer;
+  }
+  .filled{
+    background-color: #3498DB;
+    color:white;
+  }
+  .filled svg path{
+    stroke: white;
+  }.add-payments-container{
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+  }.add-payments-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 1em;
+    -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  }.add-payments-button:hover{
+    background-color: #3498DB;
+    color:white;
+    cursor: pointer;
+  }
+
+  .payment-name{
+    font-size: 1.2em;
+    font-weight: bold;
+    padding:1em 0.5em;
+    -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    border-radius: 3em;
+    width: 250px;
+    height: 70px!important;
+    text-align: center;
+    word-wrap: break-word;
+    word-break: break-all;
+    align-self: center;
+  }
+
+  .upload-payment svg{
+    width: 120px;
+    height: 120px;
+  }.container-div{
+    -webkit-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    -moz-box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+    box-shadow: 5px 5px 3px 0px rgba(209, 209, 209, 1);
+  }
+  
+  .remove-item{
+    position: absolute;
+    right: -2em;
+    width: 30px;
+    height: 30px;
+    top:0;
+    display: flex;
+    border-radius: 1em;
+    background: #F1948A;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }.remove-item:hover{
+    cursor: pointer;
+    background-color: #E74C3C;
+  }
 </style>
 <!-- ./ asignar pedido personal de china -->
 <?php echo form_close(); ?>

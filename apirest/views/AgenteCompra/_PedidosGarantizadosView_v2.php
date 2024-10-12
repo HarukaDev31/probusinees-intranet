@@ -110,6 +110,19 @@
                         <span class="help-block text-danger" id="error"></span>
                       </div>
                     </div>
+                    <!--add button to upload file !-->
+                    <div class="col-12 col
+                    -sm-4 col-md-4">
+                      <label>Archivo</label>
+                      <div class="form-group
+                      ">
+                        <input type="file" name="file" class="form-control required" placeholder="Ingresar" autocomplete="off">
+                        <span class="help-block
+                        text-danger" id="error"></span>
+                        <button type="button" id="btn-upload" class="btn btn-success btn-lg btn-block">Subir</button>
+                        <span class="help-block text-danger" id="error"></span>
+                        </div>
+                      </div>
                   </div>
                     
                   <div class="row">

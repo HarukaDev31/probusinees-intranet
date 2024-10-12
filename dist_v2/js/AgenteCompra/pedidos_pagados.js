@@ -9404,11 +9404,7 @@ const deletePago = (currentPagoIndex, idPayment = null) => {
   }
 };
 
-const hidePagos2 = () => {
-  hidePagos();
 
-  getOrderProgress(idPedido, currentServicio);
-};
 const savePagos = () => {
   const form = $("#pagos-form");
   const formData = new FormData(form[0]);
@@ -9433,7 +9429,11 @@ const savePagos = () => {
     },
   });
 };
+const hidePagos2 = () => {
+  hidePagos();
 
+  getOrderProgress(idPedido, currentServicio);
+};
 const openOrdenCompra = (response) => {
   const { status, data, priviligie, pedidoData } = JSON.parse(response);
 

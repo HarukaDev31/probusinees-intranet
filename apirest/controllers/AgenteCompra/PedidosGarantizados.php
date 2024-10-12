@@ -65,41 +65,45 @@ class PedidosGarantizados extends CI_Controller
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto; //quitar para el chino
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad; //quitar para el chino
-
-            //pago garantizado
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {
-                $btn_pago_garantizado_peru = '';
-                if ($row->Nu_Estado == 2) {
-                    $btn_pago_garantizado_peru = '<button class="btn btn-xs btn-link" alt="Subir pago" title="Subir pago" href="javascript:void(0)" onclick="documentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button><br>';
-                }
-
-                if (!empty($row->file_url)) {
-                    $btn_pago_garantizado_peru .= '<button class="btn btn-xs btn-link" alt="Descargar pago" title="Descargar pago" href="javascript:void(0)" onclick="descargarDocumentoPagoGarantizado(\'' . $row->file_url . '\')">Descargar</button>';
-                }
-
-                $rows[] = $btn_pago_garantizado_peru;
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
+                //add pagos icon and set onclic getPedidoPagos($row->ID_Pedido_Cabecera)
+                $rows[] = '<button class="btn btn-xs btn-link" alt="Pagos" title="Pagos" href="javascript:void(0)" onclick="getPedidoPagos(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
             }
+            //pago garantizado
+            // if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {
+            //     $btn_pago_garantizado_peru = '';
+            //     if ($row->Nu_Estado == 2) {
+            //         $btn_pago_garantizado_peru = '<button class="btn btn-xs btn-link" alt="Subir pago" title="Subir pago" href="javascript:void(0)" onclick="documentoPagoGarantizado(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $sCorrelativoCotizacion . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button><br>';
+            //     }
+
+            //     if (!empty($row->file_url)) {
+            //         $btn_pago_garantizado_peru .= '<button class="btn btn-xs btn-link" alt="Descargar pago" title="Descargar pago" href="javascript:void(0)" onclick="descargarDocumentoPagoGarantizado(\'' . $row->file_url . '\')">Descargar</button>';
+            //     }
+
+            //     $rows[] = $btn_pago_garantizado_peru;
+            // }
             //jefe china 5, personal probusiness 1 personal china 2
             //estado peru
-            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($row->Nu_Estado);
-            $dropdown_estado = '<div class="dropdown">';
-            $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
-            $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
-            $dropdown_estado .= '<span class="caret"></span></button>';
-            $dropdown_estado .= '<ul class="dropdown-menu">';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Garantizado" title="Garantizado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Usuario_Interno_China . '\');">Esperando</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Enviado" title="Enviado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $row->ID_Usuario_Interno_China . '\');">Enviado</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Rechazado" title="Rechazado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Usuario_Interno_China . '\');">Rechazado</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Aprobado" title="Aprobado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $row->ID_Usuario_Interno_China . '\');">Aprobado</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Observado" title="Observado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',8, \'' . $row->ID_Usuario_Interno_China . '\');">Observado</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Recibido" title="Recibido" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',10, \'' . $row->ID_Usuario_Interno_China . '\');">Recibido</a></li>';
-            $dropdown_estado .= '</ul>';
-            $dropdown_estado .= '</div>';
+            // $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraArray($row->Nu_Estado);
+            // $dropdown_estado = '<div class="dropdown">';
+            // $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+            // $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+            // $dropdown_estado .= '<span class="caret"></span></button>';
+            // $dropdown_estado .= '<ul class="dropdown-menu">';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Garantizado" title="Garantizado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Usuario_Interno_China . '\');"
+            // >Esperando</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Enviado" title="Enviado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $row->ID_Usuario_Interno_China . '\');">Enviado</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Rechazado" title="Rechazado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Usuario_Interno_China . '\');">Rechazado</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Aprobado" title="Aprobado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $row->ID_Usuario_Interno_China . '\');">Aprobado</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Observado" title="Observado" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',8, \'' . $row->ID_Usuario_Interno_China . '\');">Observado</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Recibido" title="Recibido" href="javascript:void(0)" onclick="cambiarEstado(\'' . $row->ID_Pedido_Cabecera . '\',10, \'' . $row->ID_Usuario_Interno_China . '\');">Recibido</a></li>';
+            // $dropdown_estado .= '</ul>';
+            // $dropdown_estado .= '</div>';
 
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) { //no tiene acceso a cambiar status de Perú
-                $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-            }
-            $rows[] = $dropdown_estado;
+            // if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) { //no tiene acceso a cambiar status de Perú
+            //     $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+            // }
+            // $rows[] = $dropdown_estado;
 
             //asignar personal de china desde perú
             if ($this->user->Nu_Tipo_Privilegio_Acceso == 5 || $this->user->Nu_Tipo_Privilegio_Acceso == 1) {
@@ -120,29 +124,43 @@ class PedidosGarantizados extends CI_Controller
             }
 
             //estado de china
-            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoAgenteCompraChinaArray($row->Nu_Estado_China);
+            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoPedidoGlobal($row->Nu_Estado_General);
             $dropdown_estado_china = '<div class="dropdown">';
             $dropdown_estado_china .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
             $dropdown_estado_china .= $arrEstadoRegistro['No_Estado'];
             $dropdown_estado_china .= '<span class="caret"></span></button>';
             $dropdown_estado_china .= '<ul class="dropdown-menu">';
-            $dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $sCorrelativoCotizacion . '\');">Pendiente</a></li>';
-            $dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="En proceso" title="En proceso" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $sCorrelativoCotizacion . '\');">En proceso</a></li>';
-            $dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Cotizado" title="Cotizado" href="javascript:void(0)" onclick="cambiarEstadoChina(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $sCorrelativoCotizacion . '\');">Cotizado</a></li>';
+
+            // Opción 1 (Pendiente)
+            $disabled = ($this->user->Nu_Tipo_Privilegio_Acceso == 1) ? 'disabled' : '';
+            $dropdown_estado_china .= '<li class="dropdown-item p-0 ' . $disabled . '"><a class="px-3 py-1 btn-block" alt="Pendiente" title="Pendiente" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $sCorrelativoCotizacion . '\');">Pendiente</a></li>';
+
+            // Opción 2 (En proceso)
+            $disabled = ($this->user->Nu_Tipo_Privilegio_Acceso == 1) ? 'disabled' : '';
+            $dropdown_estado_china .= '<li class="dropdown-item p-0 ' . $disabled . '"><a class="px-3 py-1 btn-block" alt="En proceso" title="En proceso" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $sCorrelativoCotizacion . '\');">En proceso</a></li>';
+
+            // Opción 3 (Cotizado)
+            $disabled = ($this->user->Nu_Tipo_Privilegio_Acceso == 1) ? 'disabled' : '';
+            $dropdown_estado_china .= '<li class="dropdown-item p-0 ' . $disabled . '"><a class="px-3 py-1 btn-block" alt="Cotizado" title="Cotizado" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $sCorrelativoCotizacion . '\');">Cotizado</a></li>';
+
+            // Opción 4 (Rechazado)
+            $dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Rechazado" title="Rechazado" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $sCorrelativoCotizacion . '\');">Aprobado</a></li>';
+
+            // Opción 5 (Aprobado)
+            $dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Aprobado" title="Aprobado" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $sCorrelativoCotizacion . '\');">Rechazado</a></li>';
+
             $dropdown_estado_china .= '</ul>';
             $dropdown_estado_china .= '</div>';
 
             //comentado temporal
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) { //no tiene acceso a cambiar status de China
-                $dropdown_estado_china = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-            }
+           
             $rows[] = $dropdown_estado_china;
 
             //confirmar cotización
             $rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
 
             // //EXCEL cliente de pedido
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == 10) {
                 $excel_agente_compra = '<button class="btn" alt="Proforma Trading" title="Proforma Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
                 $excel_consolida_trading = '<button class="btn" alt="Proforma C. Trading" title="Proforma C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
                 $rows[] = $excel_agente_compra . '<br>' . $excel_consolida_trading;
@@ -181,8 +199,15 @@ class PedidosGarantizados extends CI_Controller
     {
 
         $arrReponse = $this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID));
-        //get user Nu_Tipo_Privilegio_Acceso
         
+        //get user Nu_Tipo_Privilegio_Acceso
+        $Nu_Tipo_Privilegio_Acceso = $this->user->Nu_Tipo_Privilegio_Acceso;
+        $current_status =$this->PedidosGarantizadosModel->getEstadoPedido($this->security->xss_clean($ID));
+        if ( $Nu_Tipo_Privilegio_Acceso == 2 
+        && $current_status==1
+        ) {
+            $this->PedidosGarantizadosModel->cambiarEstadoPedido($ID, 2);
+        }
         echo json_encode($arrReponse);
         //echo json_encode($this->PedidosGarantizadosModel->get_by_id($this->security->xss_clean($ID)));
     }
@@ -275,7 +300,7 @@ class PedidosGarantizados extends CI_Controller
         $data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));
         $this->load->library('PHPExcel');
         // echo json_encode($data);
-        $templatePath = 'assets/downloads/agente_compra/COTIZACION-CHINA.xls';
+        $templatePath = 'assets/downloads/agente_compra/COTIZACION-CHINA.xlsx';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename=TRADING_CHINA_' . $data[0]->cotizacionCode . '_Garantizado.xlsx');
@@ -297,19 +322,20 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->setCellValue('C16', "IMAGE PRODUCT");
             $objPHPExcel->getActiveSheet()->setCellValue('D16', "NAME PRODUCT");
             $objPHPExcel->getActiveSheet()->setCellValue('E16', "CHARACTERISTICS");
-            $objPHPExcel->getActiveSheet()->setCellValue('F16', "QTY/CUSTOMER");
-            $objPHPExcel->getActiveSheet()->setCellValue('I16', "COMMERCIAL UNIT");
-            $objPHPExcel->getActiveSheet()->setCellValue('J16', "PRICE EXW RMB");
-            $objPHPExcel->getActiveSheet()->setCellValue('K16', "PRICE EXW USD");
-            $objPHPExcel->getActiveSheet()->setCellValue('N16', "QTY/BOX");
-            $objPHPExcel->getActiveSheet()->setCellValue('O16', "TOTAL BOX");
-            $objPHPExcel->getActiveSheet()->setCellValue('P16', "CBM/BOX");
-            $objPHPExcel->getActiveSheet()->setCellValue('Q16', "CBM TOTAL");
-            $objPHPExcel->getActiveSheet()->setCellValue('R16', "KG/BOX");
-            $objPHPExcel->getActiveSheet()->setCellValue('S16', "KG TOTAL");
-            $objPHPExcel->getActiveSheet()->setCellValue('T16', "SHIPPING YIWU");
-            $objPHPExcel->getActiveSheet()->setCellValue('U16', "DELIVERY");
-            $objPHPExcel->getActiveSheet()->setCellValue('V16', "NOTE");
+            $objPHPExcel->getActiveSheet()->setCellValue('F16', "NOTE");
+
+            $objPHPExcel->getActiveSheet()->setCellValue('G16', "QTY/CUSTOMER");
+            $objPHPExcel->getActiveSheet()->setCellValue('J16', "COMMERCIAL UNIT");
+            $objPHPExcel->getActiveSheet()->setCellValue('K16', "PRICE EXW RMB");
+            $objPHPExcel->getActiveSheet()->setCellValue('L16', "PRICE EXW USD");
+            $objPHPExcel->getActiveSheet()->setCellValue('O16', "QTY/BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('P16', "TOTAL BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('Q16', "CBM/BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('R16', "CBM TOTAL");
+            $objPHPExcel->getActiveSheet()->setCellValue('S16', "KG/BOX");
+            $objPHPExcel->getActiveSheet()->setCellValue('T16', "KG TOTAL");
+            $objPHPExcel->getActiveSheet()->setCellValue('U16', "SHIPPING YIWU");
+            $objPHPExcel->getActiveSheet()->setCellValue('V16', "DELIVERY");
         }
         $initialRow = 17;
         $lastProductrow = 18;
@@ -333,7 +359,9 @@ class PedidosGarantizados extends CI_Controller
                     $objPHPExcel->getActiveSheet()->mergeCells("C{$startRow}:C" . ($initialRow - 1));
                     $objPHPExcel->getActiveSheet()->mergeCells("D{$startRow}:D" . ($initialRow - 1));
                     $objPHPExcel->getActiveSheet()->mergeCells("E{$startRow}:E" . ($initialRow - 1));
-                    $objPHPExcel->getActiveSheet()->mergeCells("F{$startRow}:F" . ($initialRow - 1));
+                    $objPHPExcel->getActiveSheet()->mergeCells("F{$startRow}:F" . ($initialRow - 1)); 
+                    $objPHPExcel->getActiveSheet()->mergeCells("G{$startRow}:G" . ($initialRow - 1)); 
+
 
                 }
                 // Update startRow for new ID_Pedido_Detalle
@@ -343,7 +371,7 @@ class PedidosGarantizados extends CI_Controller
                 // Set merged cells values
                 $objPHPExcel->getActiveSheet()->setCellValue("B{$initialRow}", $i);
                 // $objPHPExcel->getActiveSheet()->setCellValue("C{$initialRow}", $val->Txt_Producto);
-                $txtProducto=$userMail=="maryam.china@probusiness.pe"?$val->Txt_Producto_Ingles:$val->Txt_Producto;
+                $txtProducto=$userMail=="maryam.china@probusiness.pe"?$val->Txt_Producto_Ingles?$val->Txt_Producto_Ingles:$val->Txt_Producto:$val->Txt_Producto;
                 $objPHPExcel->getActiveSheet()->setCellValue("D{$initialRow}",$txtProducto);
                 //ajuastar texto  in column D}
 
@@ -381,23 +409,23 @@ class PedidosGarantizados extends CI_Controller
                 
 
             }
-            $objPHPExcel->getActiveSheet()->setCellValue("F{$initialRow}", $val->Qt_Producto);
-            $objPHPExcel->getActiveSheet()->setCellValue("H{$initialRow}", $val->Qt_Producto_Moq);
-            $objPHPExcel->getActiveSheet()->setCellValue("I{$initialRow}", $this->getUnitName($val->unidad_medida));
-            $objPHPExcel->getActiveSheet()->setCellValue("J{$initialRow}", $val->Ss_Precio);
-            $objPHPExcel->getActiveSheet()->setCellValue("K{$initialRow}", "=J{$initialRow}/V10");
-            $objPHPExcel->getActiveSheet()->setCellValue("L{$initialRow}", "=MAX(H{$initialRow},F{$startRow})*J{$initialRow}");
-            $objPHPExcel->getActiveSheet()->setCellValue("M{$initialRow}", "=MAX(H{$initialRow},F{$startRow})*K{$initialRow}");
-            $objPHPExcel->getActiveSheet()->setCellValue("N{$initialRow}", $val->Qt_Producto_Caja);
-            $objPHPExcel->getActiveSheet()->setCellValue("O{$initialRow}", "=H{$initialRow}/N{$initialRow}");
-            $objPHPExcel->getActiveSheet()->setCellValue("P{$initialRow}", $val->Qt_Cbm);
+            $objPHPExcel->getActiveSheet()->setCellValue("G{$initialRow}", $val->Qt_Producto);
+            $objPHPExcel->getActiveSheet()->setCellValue("I{$initialRow}", $val->Qt_Producto_Moq);
+            $objPHPExcel->getActiveSheet()->setCellValue("J{$initialRow}", $this->getUnitName($val->unidad_medida));
+            $objPHPExcel->getActiveSheet()->setCellValue("K{$initialRow}", $val->Ss_Precio);
+            $objPHPExcel->getActiveSheet()->setCellValue("L{$initialRow}", "=J{$initialRow}/V10");
+            $objPHPExcel->getActiveSheet()->setCellValue("M{$initialRow}", "=MAX(H{$initialRow},F{$startRow})*J{$initialRow}");
+            $objPHPExcel->getActiveSheet()->setCellValue("N{$initialRow}", "=MAX(H{$initialRow},F{$startRow})*K{$initialRow}");
+            $objPHPExcel->getActiveSheet()->setCellValue("O{$initialRow}", $val->Qt_Producto_Caja);
+            $objPHPExcel->getActiveSheet()->setCellValue("P{$initialRow}", "=H{$initialRow}/N{$initialRow}");
+            $objPHPExcel->getActiveSheet()->setCellValue("Q{$initialRow}", $val->Qt_Cbm);
 
-            $objPHPExcel->getActiveSheet()->setCellValue("Q{$initialRow}", "=O{$initialRow}*P{$initialRow}");
-            $objPHPExcel->getActiveSheet()->setCellValue("R{$initialRow}", $val->kg_box);
-            $objPHPExcel->getActiveSheet()->setCellValue("S{$initialRow}", "=O{$initialRow}*R{$initialRow}");
-            $objPHPExcel->getActiveSheet()->setCellValue("T{$initialRow}", $val->Ss_Costo_Delivery);
-            $objPHPExcel->getActiveSheet()->setCellValue("U{$initialRow}", $val->Nu_Dias_Delivery);
-            $objPHPExcel->getActiveSheet()->setCellValue("V{$initialRow}", $this->htmlToRichText($this->htmlToTextAndLineBreaks(($val->Txt_Nota))));
+            $objPHPExcel->getActiveSheet()->setCellValue("R{$initialRow}", "=O{$initialRow}*P{$initialRow}");
+            $objPHPExcel->getActiveSheet()->setCellValue("S{$initialRow}", $val->kg_box);
+            $objPHPExcel->getActiveSheet()->setCellValue("T{$initialRow}", "=O{$initialRow}*R{$initialRow}");
+            $objPHPExcel->getActiveSheet()->setCellValue("U{$initialRow}", $val->Ss_Costo_Delivery);
+            $objPHPExcel->getActiveSheet()->setCellValue("V{$initialRow}", $val->Nu_Dias_Delivery);
+            $objPHPExcel->getActiveSheet()->setCellValue("F{$initialRow}", $this->htmlToRichText($this->htmlToTextAndLineBreaks(($val->Txt_Nota))));
             $initialRow++;
 
         }
@@ -410,6 +438,8 @@ class PedidosGarantizados extends CI_Controller
             $objPHPExcel->getActiveSheet()->mergeCells("D{$startRow}:D" . ($initialRow - 1));
             $objPHPExcel->getActiveSheet()->mergeCells("E{$startRow}:E" . ($initialRow - 1));
             $objPHPExcel->getActiveSheet()->mergeCells("F{$startRow}:F" . ($initialRow - 1));
+            $objPHPExcel->getActiveSheet()->mergeCells("G{$startRow}:G" . ($initialRow - 1)); 
+
         }
         if ($initialRow <= $lastProductrow) {
             $objPHPExcel->getActiveSheet()->removeRow($initialRow, $lastProductrow - $initialRow + 1);
@@ -938,4 +968,58 @@ class PedidosGarantizados extends CI_Controller
         $response = $this->PedidosGarantizadosModel->saveCotizacion($data,$files);
         echo json_encode($response);
     }
+    public function cambiarEstadoPedido(){
+        $id_cabecera = $this->input->post('idPedido');
+        $estado = $this->input->post('estado');
+        $response = $this->PedidosGarantizadosModel->cambiarEstadoPedido($id_cabecera,$estado);  
+        echo json_encode($response);
+    }
+    public function getCotizacionesExcel($idPedido){
+        $data = $this->PedidosGarantizadosModel->getCotizacionesExcel($idPedido);
+        echo json_encode($data);
+
+    }
+    public function uploadExcelCotizacion(){
+        $files=$_FILES;
+        $description=$this->input->post('description');
+        $idPedido=$this->input->post('idPedido');
+        $response = $this->PedidosGarantizadosModel->uploadExcelCotizacion($files,$description,$idPedido);
+        echo json_encode($response);
+    }
+    public function deleteCotizacionExcel($idExcel){
+        $response=$this->PedidosGarantizadosModel->deleteCotizacionExcel($idExcel);
+        echo json_encode($response);
+    }
+    public function updateTCambio(){
+        $type = $this->input->post('type');
+        $value = $this->input->post('value');
+        $response = $this->PedidosGarantizadosModel->updateTCambio($type,$value);
+        echo json_encode($response);
+    }
+    public function getTCambio(){
+        $response = $this->PedidosGarantizadosModel->getTCambio();
+        echo json_encode($response);
+    }
+    public function getPedidoPagos(){
+        $idPedido = $this->input->post('idPedido');
+        $priviligie = $this->user->Nu_Tipo_Privilegio_Acceso;
+        $data = $this->PedidosGarantizadosModel->getPedidoPagos($idPedido);
+                    
+        echo json_encode(array(
+                        'status' => 'success', 'data' => $data['data'],
+                        'pagosData' => $data['pagos'], 'priviligie' => $priviligie,
+                    ));
+    }
+    public function savePagos()
+    {
+        try {
+            $data = $this->input->post();
+            $files = $_FILES;
+            $response = $this->PedidosGarantizadosModel->savePagos($data, $files);
+            echo json_encode(array('status' => 'success', 'data' => $response));
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
+        
 }

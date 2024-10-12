@@ -5,6 +5,12 @@ var url,
   iCounter = 0,
   iCounterItems = 1;
 currentPrivilegio = 1;
+const editIcon = `<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Edit / Edit_Pencil_02">
+<path id="Vector" d="M4 16.0001V20.0001L8 20.0001L18.8686 9.13146L18.8695 9.13061C19.265 8.73516 19.4628 8.53736 19.5369 8.3092C19.6021 8.10835 19.6022 7.89201 19.5369 7.69117C19.4627 7.46284 19.2646 7.26474 18.8686 6.86872L17.1288 5.12892C16.7345 4.7346 16.5369 4.53704 16.3091 4.46301C16.1082 4.39775 15.8919 4.39775 15.691 4.46301C15.463 4.53709 15.2652 4.73488 14.8704 5.12976L14.8686 5.13146L4 16.0001Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>`;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
 // Se puede crear un arreglo a partir de la cadena
@@ -23,11 +29,17 @@ var fToday = new Date(),
   fMonth = fToday.getMonth() + 1,
   fDay = fToday.getDate();
 let currentPedidoID=null;
+let containerPagos = null;
+containerPagos = $("#container-pagos");
+containerPagos.hide();
 //cancelar agregar productos, add onclick on btn-cancelar
 $(document).on("click", "#btn-cancelar", function (e) {
+
+
   e.preventDefault();
   $(".div-Listar").show();
   $(".div-AgregarEditar").hide();
+  $("#cotizacionExcelContainer").hide();
   //remove btn-file_cotizacion
   $("#btn-file_cotizacion").remove();
 });
@@ -409,7 +421,6 @@ $(function () {
   //   $("#hidden-ID_Pedido_Cabecera").val("");
   //   reload_table_Entidad();
   // });
-
   $("#table-Pedidos_filter input").removeClass("form-control-sm");
   $("#table-Pedidos_filter input").addClass("form-control-md");
   $("#table-Pedidos_filter input").addClass("width_full");
@@ -951,10 +962,11 @@ $(function () {
 
   $("#form-arrItems").on("submit", function (e) {
     e.preventDefault();
+    console.log('waos')
 
     $(".help-block").empty();
     $(".form-group").removeClass("has-error");
-
+    $('#cotizacionExcelContainer').hide();
     //validacion de articulos
     var sEstadoArticulos = true;
     var firstError = null;
@@ -1199,6 +1211,8 @@ function reload_table_Entidad() {
 
 function verPedido(ID) {
   $(".div-Listar").hide();
+  $(".div-items-garantizado").show();
+  $("#cotizacionExcelContainer").hide();
   currentPedidoID = ID;
   $("#form-pedido")[0].reset();
   $(".form-group").removeClass("has-error");
@@ -1959,6 +1973,7 @@ function isExistTableTemporalProducto($id) {
 }
 
 function form_pedido() {
+  
   if ($("#table-Producto_Enlace >tbody >tr").length == 0) {
     $("#txt-ANombre")
       .closest(".form-group")
@@ -3791,6 +3806,133 @@ $('#modal-cotizacion').on('show.bs.modal', function (e) {
 });
     
 $(document).ready(function() {
+  getTcambio();
+  $("#agregarCotizaciones").click(function() {
+    $("#cotizacionExcelContainer").hide();
+    containerPagos.hide();
+    $(".div-items-garantizado").hide();
+    $("#div-Compuesto").hide();
+    // Verificar si el contenedor ya está cargado
+        // Realizar una solicitud AJAX a la API
+        $.ajax({
+            url: base_url + 'AgenteCompra/PedidosGarantizados/getCotizacionesExcel/' + currentPedidoID,
+            method: 'GET',
+            success: function(data) {
+                // Limpiar el contenedor y el mensaje vacío
+                $("#cotizacionExcelContainer").empty();
+                const dataParsed=JSON.parse(data);
+                // Verificar si hay cotizaciones
+                $("#cotizacionExcelContainer").show();
+                if (dataParsed.length === 0) {
+                  const emptyListMessage = `
+                  <div class="text-center">
+                      <h5
+                      class="text-primary">No hay cotizaciones disponibles.</h5>
+                      <p "text-primary">Por favor, sube un archivo de cotización.</p>
+                      <div class="btn btn-primary" id="uploadCotizacionBtn"
+                      >Subir Cotización</div>
+                  </div>
+              `;
+              
+              $("#cotizacionExcelContainer").append(emptyListMessage);
+                } else {
+                    // Agregar cotizaciones
+                    dataParsed.forEach(function(cotizacion, index) {
+                        var cotizacionHtml = `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="cotizacion-header">Cotización ${index + 1}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                      Fecha: ${cotizacion.created_at}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a class="btn btn-success"
+                                        href="${cotizacion.file_url}"
+                                        target="_blank">${cotizacion.file_original_name}</a>
+                                        ${cotizacion.priviege==2 || cotizacion.priviege==5 ? `<button class="btn btn-danger" id="deleteCotizacionBtn" data-id="${cotizacion.id}">Eliminar</button>` : ''}
+
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $("#cotizacionExcelContainer").append(cotizacionHtml);
+                    });
+                    const button='<div class="btn btn-primary" id="uploadCotizacionBtn">Subir Cotización</div>'
+                    $("#cotizacionExcelContainer").append(button)
+                    // Mostrar el contenedor de cotizaciones
+                    $("#cotizacionExcelContainer").show();
+                }
+            },
+            error: function() {
+                alert('Error al cargar las cotizaciones.');
+            }
+        });
+      });
+        // Abrir el modal al hacer clic en el botón
+    $(document).on('click', '#uploadCotizacionBtn', function() {
+      $('#uploadCotizacionModal').modal('show');
+  });
+    $(document).on('click', '#deleteCotizacionBtn', function() {
+      const cotizacionID = $(this).data('id');
+      const confirmation = confirm('¿Estás seguro de que deseas eliminar esta cotización?');
+      if (confirmation) {
+          $.ajax({
+              url: base_url + 'AgenteCompra/PedidosGarantizados/deleteCotizacionExcel/' + cotizacionID,
+              method: 'GET',
+              success: function(response) {
+                  alert('Cotización eliminada con éxito.');
+                  // Recargar las cotizaciones
+                  $("#agregarCotizaciones").click();
+              },
+              error: function() {
+                  alert('Error al eliminar la cotización.');
+              }
+          });
+      }
+  });
+});
+
+  // Manejar la subida del archivo
+  $("#uploadCotizacionForm").on("submit", function(e) {
+      e.preventDefault();
+      
+      // Crear un FormData para enviar el archivo
+      const formData = new FormData();
+      const fileInput = $("#cotizacionFile")[0];
+      const description = $("#cotizacionDescription").val();
+
+      if (fileInput.files.length > 0) {
+          formData.append("cotizacionFile", fileInput.files[0]);
+          formData.append("description", description);
+          formData.append("idPedido", currentPedidoID);
+
+          // Aquí deberías enviar el archivo a tu servidor
+          $.ajax({
+              url: 'uploadExcelCotizacion', // Reemplaza con la URL para subir el archivo
+              type: 'POST',
+              data: formData,
+              contentType: false,
+              processData: false,
+              success: function(response) {
+                  // Maneja la respuesta del servidor aquí
+                  // Cerrar el modal
+                  $("#uploadCotizacionModal").modal("hide");
+                  // Recargar las cotizaciones
+                  $("#agregarCotizaciones").click();
+
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                  // Maneja el error aquí
+                  alert("Error al subir el archivo");
+              }
+          });
+      }
+  });
+
+
+
+
   var productIndex = 0;
 
   // Función para agregar un nuevo producto
@@ -4229,8 +4371,7 @@ function addProvider(productIndex) {
       }
     });
   })
-}
-);
+
 function collapseAllExcept(elementToKeepOpen, selector) {
   $(selector).each(function() {
     if ($(this).attr('id') !== $(elementToKeepOpen).attr('id')) {
@@ -4259,3 +4400,720 @@ function scrollToFirstError() {
     }, 500);
   }
 }
+function cambiarEstadoPedido  (idPedido,estado){
+  console.log(idPedido, estado);
+$.ajax({
+  url: base_url + "AgenteCompra/PedidosGarantizados/cambiarEstadoPedido",
+  type: "POST",
+  data: {idPedido, estado},
+  dataType: "JSON",
+  success: function(response) {
+    if (response.status == "success") {
+      $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+      $("#modal-message").modal("show");
+      $(".modal-message").addClass("modal-success");
+      $(".modal-title-message").text(response.message);
+      setTimeout(function () {
+        $("#modal-message").modal("hide");
+      }, 1100);
+      reload_table_Entidad();
+    } else {
+      $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+      $("#modal-message").modal("show");
+      $(".modal-message").addClass("modal-danger");
+      $(".modal-title-message").text(response.message);
+      setTimeout(function () {
+        $("#modal-message").modal("hide");
+      }, 1100);
+    }
+  }, 
+});
+}
+
+const updateTCambio = (type,value) => {
+  //wait for 1 sec before do a request
+  setTimeout(() => {
+    const url = base_url + "AgenteCompra/PedidosGarantizados/updateTCambio";
+    $.ajax({
+      url,
+      type: "POST",
+      data: {type,value},
+      dataType: "JSON",
+      success: function(response) {
+        if (response.status == "success") {
+          $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+          $("#modal-message").modal("show");
+          $(".modal-message").addClass("modal-success");
+          $(".modal-title-message").text(response.message);
+          setTimeout(function () {
+            $("#modal-message").modal("hide");
+          }, 1100);
+          reload_table_Entidad();
+        } else {
+          $(".modal-message").removeClass("modal-danger modal-warning modal-success");
+          $("#modal-message").modal("show");
+          $(".modal-message").addClass("modal-danger");
+          $(".modal-title-message").text(response.message);
+          setTimeout(function () {
+            $("#modal-message").modal("hide");
+          }, 1100);
+        }
+      },
+    })
+  }, 100);
+}
+const getTcambio = () => {
+  const url = base_url + "AgenteCompra/PedidosGarantizados/getTCambio";
+  $.ajax({
+    url,
+    type: "GET",
+    dataType: "JSON",
+    success: function(response) {
+      //tc general is row with type 1
+      const Tc_General=response.find(row=>row.tipo==1);
+      $('#txt-Tc_General').val(Tc_General.valor);
+      const Tc_Consolidado=response.find(row=>row.tipo==2);
+      $('#txt-Tc_Consolidado').val(Tc_Consolidado.valor);
+      const Tc_Trading=response.find(row=>row.tipo==3);
+      $('#txt-Tc_Trading').val(Tc_Trading.valor);
+    },
+  });
+}
+
+const openPagos = (response) => {
+  $("#container_orden-compra").hide();
+  $("#pago-garantia-container").hide();
+  response = JSON.parse(response);
+  containerPagos.show();
+  $("#pagos-form").append(getPagosTemplate());
+  const downloadSvg = `<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="120px" height="120px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+<path d="M12 2L12 15M12 15L9 11.5M12 15L15 11.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+  pagosCount = 2;
+  if (response.status == "success") {
+    const data = response.data;
+
+    $("#orden_total").html("$" + data.orden_total.toFixed(2));
+    $("#pago_cliente").html("$" + data.pago_cliente.toFixed(2));
+    const pagoRestante = data.orden_total - data.pago_cliente;
+    $("#pago_restante").html("$" + pagoRestante.toFixed(2));
+    //set font bold
+    $("#pago_restante").css("font-weight", "bold");
+    if (pagoRestante <= 0) {
+      //add class text success
+      $("#pago_restante").addClass("text-success");
+    } else {
+      $("#pago_restante").removeClass("text-success");
+      $("#pago_restante").addClass("text-danger");
+    }
+    const ordenTotal = data.orden_total;
+    //on input file change set filename to div
+    $(".pago-value").each(function () {
+      $(this).on("input", function () {
+        const value = $(this).val();
+        if (value == "") value = 0;
+        let pagoClienteSum = 0;
+        //if is number
+        if (!isNaN(value)) {
+          $(".pago-value").each(function () {
+            const value = $(this).val();
+            if (!isNaN(value)) {
+              pagoClienteSum += parseFloat(value);
+              $("#pago_cliente").html("$" + pagoClienteSum);
+              const restante = ordenTotal - pagoClienteSum;
+              if (restante <= 0) {
+                $("#pago_restante").removeClass("text-danger");
+                $("#pago_restante").addClass("text-success");
+              } else {
+                $("#pago_restante").removeClass("text-success");
+                $("#pago_restante").addClass("text-danger");
+              }
+              $("#pago_restante").html("$" + restante);
+            }
+          });
+        }
+      });
+    });
+    $("#liquidacion-file").change(function () {
+      const file = $(this)[0].files[0];
+      if (file) {
+        const fileName = file.name;
+        if (fileName.length > 15) {
+          $("#liquidacion-name").html(fileName.substring(0, 15) + "...");
+        } else {
+          $("#liquidacion-name").html(fileName);
+        }
+        $(".liquidacion-container")
+          .removeClass("not-filled")
+          .addClass("filled");
+      } else {
+        $("#liquidacion-name").html("Seleccionar archivo");
+        $(".liquidacion-container")
+          .removeClass("filled")
+          .addClass("not-filled");
+      }
+    });
+    $("#garantia-file").change(function () {
+      const file = $(this)[0].files[0];
+      if (file) {
+        const fileName = file.name;
+        if (fileName.length > 15) {
+          $("#garantia-name").html(fileName.substring(0, 15) + "...");
+        } else {
+          $("#garantia-name").html(fileName);
+        }
+        $(".garantia-container").removeClass("not-filled").addClass("filled");
+      } else {
+        $("#garantia-name").html("Seleccionar archivo");
+        $(".garantia-container").removeClass("filled").addClass("not-filled");
+      }
+    });
+    $("#pago1-file").change(function () {
+      const file = $(this)[0].files[0];
+      if (file) {
+        const fileName = file.name;
+        if (fileName.length > 15) {
+          $("#pago1-name").html(fileName.substring(0, 15) + "...");
+        } else {
+          $("#pago1-name").html(fileName);
+        }
+        $(".pago1-container").removeClass("not-filled").addClass("filled");
+      } else {
+        $("#pago1-name").html("Seleccionar archivo");
+        $(".pago1-container").removeClass("filled").addClass("not-filled");
+      }
+    });
+    $("#pago2-file").change(function () {
+      const file = $(this)[0].files[0];
+      if (file) {
+        const fileName = file.name;
+        if (fileName.length > 15) {
+          $("#pago2-name").html(fileName.substring(0, 15) + "...");
+        } else {
+          $("#pago2-name").html(fileName);
+        }
+        $(".pago2-container").removeClass("not-filled").addClass("filled");
+      } else {
+        $("#pago2-name").html("Seleccionar archivo");
+        $(".pago2-container").removeClass("filled").addClass("not-filled");
+      }
+    });
+    //pagosData iterate
+
+    if (response.pagosData) {
+      const pagosData = response.pagosData;
+      let pagocontainer;
+      let pagosN = pagosData.filter((pago) => pago.name == "normal");
+      let pagosG = pagosData.filter((pago) => pago.name == "garantia");
+      let pagosL = pagosData.filter((pago) => pago.name == "liquidacion");
+      pagosL.forEach((pago, i) => {
+        pagocontainer = $(`.liquidacion-container`);
+        pagocontainer.empty();
+        $(`#liquidacion-description`).val(pago.description);
+        pagocontainer.append(
+          `<span class="remove-item" onclick="openFileSelector('liquidacion-file')">${editIcon}</span>`
+        );
+        if (pago.idPayment) {
+          $(`.liquidacion-container`).append(
+            `<input type="hidden" name="liquidacion[id]" value="${pago.idPayment}">`
+          );
+        }
+        if (pago.file_url != null) {
+          pagocontainer.append(downloadSvg);
+
+          const fileName = pago.file_url.split("_").pop();
+          if (fileName.length > 15) {
+            $(`#liquidacion-name`).html(fileName.substring(0, 15) + "...");
+          } else {
+            $(`#liquidacion-name`).html(fileName);
+          }
+          $(`.liquidacion-container`)
+            .removeClass("not-filled")
+            .addClass("filled");
+
+          //remove click ontag property
+          $(`.liquidacion-container`).removeAttr("onclick");
+          $(`.liquidacion-container`).click(function () {
+            const fileExtension = pago.file_url.split(".").pop();
+            if (fileExtension == "pdf") {
+              downloadFile(pago.file_url);
+              return;
+            }
+            openInputFile(`liquidacion-file`, pago.file_url);
+          });
+        }
+      });
+      pagosG.forEach((pago, i) => {
+        pagocontainer = $(`.garantia-container`);
+
+        if (pago.idPayment) {
+          $(`.garantia-container`).append(
+            `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
+          );
+        }
+        $(`#garantia-value`).val(pago.value);
+        if (pago.file_url != null) {
+          pagocontainer.empty();
+          pagocontainer.append(downloadSvg);
+          if (pago.idPayment) {
+            $(`.garantia-container`).append(
+              `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
+            );
+          }
+          const fileName = pago.file_url.split("_").pop();
+          if (fileName.length > 15) {
+            $(`#garantia-name`).html(fileName.substring(0, 15) + "...");
+          } else {
+            $(`#garantia-name`).html(fileName);
+          }
+          $(`.garantia-container`).removeClass("not-filled").addClass("filled");
+          $(`.garantia-container`).append(
+            `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
+          );
+          //remove click ontag property
+          $(`.garantia-container`).removeAttr("onclick");
+          $(`.garantia-container`).click(function () {
+            const fileExtension = pago.file_url.split(".").pop();
+            if (fileExtension == "pdf") {
+              downloadFile(pago.file_url);
+              return;
+            }
+            openInputFile(`garantia-file`, pago.file_url);
+          });
+        }
+      });
+      pagosN.forEach((pago, i) => {
+        const currenIndex = i + 1;
+        console.log(currenIndex);
+        if (currenIndex <= 2) {
+          pagocontainer = $(`.pago${currenIndex}-container`);
+
+          if (pago.idPayment) {
+            $(`#pago${currenIndex}-container`).append(
+              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
+            );
+          }
+
+          // $(`.pago${currenIndex}-container`).val(pago.value);
+          $(`#pago${currenIndex}-value`).val(pago.value);
+
+          if (pago.file_url != null) {
+            pagocontainer.empty();
+            if (pago.idPayment) {
+              $(`#pago${currenIndex}-container`).append(
+                `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
+              );
+            }
+            pagocontainer.append(
+              `<span class="remove-item" onclick="openFileSelector('pago${currenIndex}-file')">${editIcon}</span>`
+            );
+
+            pagocontainer.append(downloadSvg);
+            const fileName = pago.file_url.split("_").pop();
+            if (fileName.length > 15) {
+              $(`#pago${currenIndex}-name`).html(
+                fileName.substring(0, 15) + "..."
+              );
+            } else {
+              $(`#pago${currenIndex}-name`).html(fileName);
+            }
+            $(`.pago${currenIndex}-container`)
+              .removeClass("not-filled")
+              .addClass("filled");
+
+            //remove click ontag property
+            $(`.pago${currenIndex}-container`).removeAttr("onclick");
+            $(`.pago${currenIndex}-container`).click(function () {
+              const fileExtension = pago.file_url.split(".").pop();
+              if (fileExtension == "pdf") {
+                downloadFile(pago.file_url);
+                return;
+              }
+              openInputFile(`pago${currenIndex}-file`, pago.file_url);
+            });
+          }
+        } else {
+          addPago();
+          pagocontainer = $(`.pago${currenIndex}-container`);
+          $(`#pago${currenIndex}-remove`)
+            .unbind("click")
+            .click(function () {
+              deletePago(currenIndex, pago.idPayment);
+            });
+          $(`#pago${currenIndex}-value`).val(pago.value);
+          if (pago.idPayment) {
+            $(`.pago${currenIndex}-container`).append(
+              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
+            );
+          }
+          if (pago.file_url != null) {
+            pagocontainer.empty();
+            if (pago.idPayment) {
+              $(`.pago${currenIndex}-container`).append(
+                `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
+              );
+            }
+            pagocontainer.append(downloadSvg);
+            const fileName = pago.file_url.split("_").pop();
+            if (fileName.length > 20) {
+              $(`#pago${currenIndex}-name`).html(
+                fileName.substring(0, 20) + "..."
+              );
+            } else {
+              $(`#pago${currenIndex}-name`).html(fileName);
+            }
+            $(`.pago${currenIndex}-container`)
+              .removeClass("not-filled")
+              .addClass("filled");
+            $(`.pago${currenIndex}-container`).removeAttr("onclick");
+            $(`.pago${currenIndex}-container`).click(function () {
+              const fileExtension = pago.file_url.split(".").pop();
+              if (fileExtension == "pdf") {
+                downloadFile(pago.file_url);
+                return;
+              }
+              openInputFile(`pago${currenIndex}-file`, pago.file_url);
+            });
+          }
+        }
+      });
+    }
+
+    const buttonsConfig = {
+      btnSave: {
+        text: "Guardar",
+        action: "savePagos()",
+      },
+      btnCancel: {
+        text: "Regresar",
+        action: "hidePagos()",
+      },
+    };
+    const buttonsHTML = getActionButtons(buttonsConfig);
+    $("#pagos-buttons").append(buttonsHTML);
+    // }
+  }
+  $("#liquidacion-description").val(response.data.pagos_notas);
+};
+const addPago = () => {
+  const pagoContainer = $(".payments-container");
+  if (pagosCount < 4) {
+    let currentPagoIndex = pagosCount + 1;
+    const pagoTemplate = `<div class="col-12 col-md-3 "
+  id="pago${currentPagoIndex}-container" >
+
+        <div class="payment-container">
+          <span class="remove-item" id="pago${currentPagoIndex}-remove">X</span>
+          <div class="upload-payment container-div not-filled pago${currentPagoIndex}-container" onclick="openFileSelector('pago${currentPagoIndex}-file')">
+            <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+              <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+          </div>
+          <input type="file" id="pago${currentPagoIndex}-file" class="d-none" name="file[${currentPagoIndex}][file]" />
+          <div id="pago${currentPagoIndex}-name" class="payment-name pago${currentPagoIndex}-container" >
+          Seleccionar archivo
+          </div>
+          <div class="input-group">
+            <span class="input-group-text" >$</span>
+            <input type="text"id="pago${currentPagoIndex}-value" class="form-control pago-value" name="file[${currentPagoIndex}][value]">
+          </div>
+        </div>
+      </div>`;
+    pagoContainer.append(pagoTemplate);
+
+    const ordenTotal = parseFloat($("#orden_total").html().replace("$", ""));
+    $(`#pago${currentPagoIndex}-file`).change(function () {
+      const file = $(this)[0].files[0];
+      if (file) {
+        const fileName = file.name;
+        if (fileName.length > 20) {
+          $(`#pago${currentPagoIndex}-name`).html(
+            fileName.substring(0, 20) + "..."
+          );
+        } else {
+          $(`#pago${currentPagoIndex}-name`).html(fileName);
+        }
+        $(`.pago${currentPagoIndex}-container`)
+          .removeClass("not-filled")
+          .addClass("filled");
+      } else {
+        $(`#pago${currentPagoIndex}-name`).html("Seleccionar archivo");
+        $(`.pago${currentPagoIndex}-container`)
+          .removeClass("filled")
+          .addClass("not-filled");
+      }
+    });
+    $(".pago-value").each(function () {
+      $(this).on("input", function () {
+        const value = $(this).val();
+        if (value == "") value = 0;
+        let pagoClienteSum = 0;
+        //if is number
+        if (!isNaN(value)) {
+          $(".pago-value").each(function () {
+            const value = $(this).val();
+            if (!isNaN(value)) {
+              pagoClienteSum += parseFloat(value);
+              $("#pago_cliente").html("$" + pagoClienteSum);
+              const restante = ordenTotal - pagoClienteSum;
+              if (restante <= 0) {
+                $("#pago_restante").removeClass("text-danger");
+                $("#pago_restante").addClass("text-success");
+              } else {
+                $("#pago_restante").removeClass("text-success");
+                $("#pago_restante").addClass("text-danger");
+              }
+              $("#pago_restante").html("$" + restante);
+            }
+          });
+        }
+      });
+    });
+    $(`#pago${currentPagoIndex}-remove`).on("click", function () {
+      deletePago(currentPagoIndex, null);
+    });
+    pagosCount++;
+  }
+};
+const deletePago = (currentPagoIndex, idPayment = null) => {
+  if (pagosCount > 2) {
+    if (idPayment == null) {
+      const pagoContainer = $("#pago" + currentPagoIndex + "-container");
+      pagoContainer.remove();
+      pagosCount--;
+      return;
+    }
+    $(`#modal-confirmation`).modal("show");
+    $(`#btn-confirmation`).html("Eliminar");
+    $(`#btn-confirmation`).on("click", function () {
+      $.ajax({
+        url: base_url + "AgenteCompra/PedidosGarantizados/deletePago",
+        type: "POST",
+        data: {
+          idPayment: idPayment,
+        },
+        success: function (response) {
+          response = JSON.parse(response);
+          if (response.status == "success") {
+            const pagoContainer = $("#pago" + currentPagoIndex + "-container");
+            pagoContainer.remove();
+            pagosCount--;
+            $(`#modal-confirmation`).modal("hide");
+          }
+        },
+      });
+    });
+  }
+};
+
+
+const savePagos = () => {
+  const form = $("#pagos-form");
+  const formData = new FormData(form[0]);
+  formData.append("idPedido", currentPedidoID);
+  const url = base_url + "AgenteCompra/PedidosGarantizados/savePagos";
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      response = JSON.parse(response);
+      if (response.status == "success") {
+        hidePagos();
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error(jqXHR.responseText);
+    },
+  });
+};
+const getPedidoPagos = (idPedido) => {
+  currentPedidoID = idPedido;
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosGarantizados/getPedidoPagos",
+    type: "POST",
+    data: { idPedido },
+    success: function (response) {
+      $(".div-Listar").hide()
+      $(".card-body").hide()
+      $("#pagos-form").empty();
+      openPagos(response);
+    }
+  });
+};
+const getPagosTemplate = (data = null) => {
+  let html = `
+  <div class="py-1 px-4">
+      <div class="row ">
+      <div class="col-12 col-md-3">
+        <h2 class="add-payments-container">Garantia</h2>
+        </div>
+        <div class="col-12 col-md-3">
+        <h2 class="add-payments-container">Liquidacion</h2>
+        </div>
+        <div class="col-12 col-md-3">
+        <h2 class="add-payments-container">Notas</h2>
+        </div>
+      </div>
+      <div class="row liquidacion-garantia-container mb-2">
+        <div class="col-12 col-md-3">
+
+          <div class="payment-container" style="height:100%!important">
+            <div class="garantia-container  upload-payment  container-div not-filled garantia-container" onclick="openFileSelector('garantia-file')">
+
+                <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+                <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <input type="file" id="garantia-file" class="d-none" name="garantia[file]"/>
+            <div id="garantia-name" class="payment-name container-div garantia-container">
+            Seleccionar archivo</div>
+            <div class="input-group ">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control " name="garantia[value]" id="garantia-value">
+          </div>
+          </div>
+          </div>
+        <div class="col-12 col-md-3">
+
+          <div class="payment-container" style="height:100%!important">
+            <div class="liquidacion-container  upload-payment  container-div not-filled liquidacion-container" onclick="openFileSelector('liquidacion-file')">
+
+                <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+                <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <input type="file" id="liquidacion-file" class="d-none" name="liquidacion[file]"/>
+            <div id="liquidacion-name" class="payment-name container-div liquidacion-container">
+            Seleccionar archivo</div>
+            <input type="hidden" id="liquidacion-value" name="liquidacion[value]" value="0">
+          </div>
+        </div>
+         <div class="col-12 col-md-6">
+         <textarea class="form-control" name="notas" id="liquidacion-description" rows="3" style="height:100%"></textarea>
+         </div>
+        </div>
+          <div class="row mt-5">
+          <h2 class="add-payments-container">Pagos <span class="add-payments-button" onclick="addPago()">+</h2>
+          </span>
+        </div>
+    <div class="row payments-container">
+      <div class="col-12 col-md-3">
+        <div class="payment-container">
+          <div class="upload-payment container-div not-filled pago1-container" id="pago1-container" onclick="openFileSelector('pago1-file')">
+
+              <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+              <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+          </div>
+          <input type="file" id="pago1-file" class="d-none" name="file[1][file]"/>
+          <div id="pago1-name" class="payment-name container-div pago1-container">
+          Seleccionar archivo</div>
+          <div class="input-group ">
+            <span class="input-group-text" >$</span>
+            <input type="text" class="form-control pago-value" name="file[1][value]" id="pago1-value" value="0">
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-3 ">
+        <div class="payment-container">
+          <div class="upload-payment container-div not-filled pago2-container" id="pago2-container" onclick="openFileSelector('pago2-file')">
+
+              <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+              <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+          </div>
+          <input type="file" id="pago2-file" class="d-none" name="file[2][file]" />
+          <div id="pago2-name" class="payment-name container-div pago2-container">
+          Seleccionar archivo</div>
+          <div class="input-group ">
+            <span class="input-group-text" >$</span>
+            <input type="number" class="form-control pago-value" name="file[2][value]" id="pago2-value" value="0">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" id="pagos-buttons">
+    </div>
+
+
+  </div>
+  `;
+
+  return html;
+};
+const getActionButtons = (data) => {
+  try {
+    let buttons = "";
+
+    if (data.hasOwnProperty("btnSave") && data.hasOwnProperty("btnCancel")) {
+      buttons = `
+      <div class="row buttons mt-2" style="row-gap:1em">
+        <div class="col-12 col-md-6 d-flex">
+          <div class="btn mx-auto btn-primary button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+        </div>
+        <div class="col-12 col-md-6 d-flex">
+          <div class="btn mx-auto btn-secondary button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+        </div>
+      </div>`;
+    } else if (data.hasOwnProperty("btnSave")) {
+      buttons = `
+      <div class="row buttons w-100 mt-2">
+        <div class="col-12 col-md-12 d-flex align-items-center justiy-content-center">
+          <div class="btn btn-primary mx-auto button-save" onclick='${data.btnSave.action}'>${data.btnSave.text}</div>
+        </div>
+      </div>`;
+    } else if (data.hasOwnProperty("btnCancel")) {
+      buttons = `
+      <div class="row buttons w-100 mt-2">
+        <div class="col-12 col-md-12 d-flex align-items-center justiy-content-center">
+          <div class="btn btn-secondary mx-auto w-50 button-cancel" onclick='${data.btnCancel.action}'>${data.btnCancel.text}</div>
+        </div>
+      </div>`;
+    }
+    return buttons;
+  } catch (e) {
+    console.error(e);
+    return "";
+  }
+};
+const openFileSelector = (id) => {
+  console.log("open file selector", id);
+  $(`#${id}`).click();
+};
+const hidePagos = () => {
+  containerPagos.hide();
+  $(".div-Listar").show()
+  $(".card-body").show()
+
+};
+const openInputFile = (idInput, fileURL) => {
+  if (fileURL != null && fileURL != "" && fileURL != "null") {
+    //open in new tab
+    window.open(fileURL);
+  } else {
+    $(`#${idInput}`).click();
+    //remove change event and add new one if file is selected change class of button btn-primary to btn-outline-primary
+
+    $(`#${idInput}`).change(function () {
+      const idButton = idInput.replace("input", "btn");
+      $(`#${idButton}`).removeClass("btn-primary");
+      $(`#${idButton}`).addClass("btn-outline-primary");
+    });
+  }
+};

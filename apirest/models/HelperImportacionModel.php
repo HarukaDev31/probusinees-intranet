@@ -140,6 +140,72 @@ class HelperImportacionModel extends CI_Model{
 		else if( $iEstado == 6 )
 			return array('No_Estado' => 'Entregado','No_Class_Estado' => 'success');
 	}
+	function obtenerEstadoPedidoGlobal($iEstado){
+		if( $iEstado == 1 )
+			return array('No_Estado' => 'Pendiente','No_Class_Estado' => 'secondary');
+		else if( $iEstado == 2 )
+			return array('No_Estado' => 'En Proceso','No_Class_Estado' => 'light');
+		else if( $iEstado == 3 )
+			return array('No_Estado' => 'Cotizado','No_Class_Estado' => 'success');
+		else if( $iEstado == 4 )
+			return array('No_Estado' => 'Aprobado','No_Class_Estado' => 'primary');
+		else if( $iEstado == 5 )
+			return array('No_Estado' => 'Rechazado','No_Class_Estado' => 'danger');
+	}
+	function generarDropdownEstadoPedido($iEstado, $privilegio, $idPedido){ 
+		$estados = [
+			1 => ['nombre' => 'Pendiente', 'clase' => 'text-secondary',
+				'btn-class' => 'btn-secondary',
+				'fn' => 'cambiarEstadoPedido(1, '.$idPedido.')'
+			],
+			2 => ['nombre' => 'En Proceso', 'clase' => 'text-primary',
+				'btn-class' => 'btn-primary',
+				'fn' => 'cambiarEstadoPedido(2, '.$idPedido.')'
+			],
+			3 => ['nombre' => 'Cotizado', 'clase' => 'text-success',
+				'btn-class' => 'btn-success',
+				'fn' => 'cambiarEstadoPedido(3, '.$idPedido.')'],
+			4 => ['nombre' => 'Aprobado', 'clase' => 'text-warning',
+				'btn-class' => 'btn-warning',
+				'fn' => 'cambiarEstadoPedido(4, '.$idPedido.')'],
+			5 => ['nombre' => 'Rechazado', 'clase' => 'text-secondary',    
+				'btn-class' => 'btn-secondary',
+				'fn' => 'cambiarEstadoPedido(5, '.$idPedido.')'],
+		];
+	
+		// Inicia el dropdown con el botón
+		$dropdown = '
+		<div class="dropdown">
+		  <div class="btn '.$estados[$iEstado]['btn-class'].' dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+		  . $estados[$iEstado]['nombre'] .'
+		  </div>
+		  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+		';
+	
+		foreach ($estados as $estadoId => $estadoInfo) {
+			// Determine si la opción debería ser seleccionable o no
+			$selectable = ($privilegio == 5) || ($privilegio == 1 && ($estadoId == 4 || $estadoId == 5));
+	
+			// Si no es seleccionable, aplicamos estilos de deshabilitado
+			$disabled = $selectable ? '' : 'style="pointer-events: none; opacity: 0.5;"';
+	
+			// Genera cada opción del menú con la clase de color y las restricciones de selección
+			$dropdown .= sprintf(
+				'<a class="dropdown-item %s" href="#" %s onclick="%s">%s</a>',
+				$estadoInfo['clase'],  // Aplicar la clase Bootstrap
+				$disabled,  // Hacer que no sea seleccionable si aplica
+				$estadoInfo['fn'],  // Función de JavaScript al hacer clic
+				$estadoInfo['nombre']  // Nombre del estado
+			);
+		}
+	
+		// Cierra el dropdown
+		$dropdown .= '</div></div>';
+	
+		return $dropdown;
+	}
+	
+	
 
 	function obtenerTipoCanal($iEstado){
 		if( $iEstado == 0 )
