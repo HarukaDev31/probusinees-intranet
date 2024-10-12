@@ -1509,22 +1509,22 @@ function verPedido(ID) {
           //cotizacio china
           table_enlace_producto += '<div class="row">';
           table_enlace_producto += '<div class="col">';
-          table_enlace_producto +=
-            '<button type="button" id="btn-add_proveedor' +
-            id_item +
-            '" data-name_producto="' +
-            nombre_producto +
-            '" data-id_empresa="' +
-            response.ID_Empresa +
-            '" data-id_organizacion="' +
-            response.ID_Organizacion +
-            '" data-id_pedido_cabecera="' +
-            response.ID_Pedido_Cabecera +
-            '" data-correlativo="' +
-            response.sCorrelativoCotizacion +
-            '" data-id_pedido_detalle="' +
-            id_item +
-            '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Agregar Proveedor</button>';
+          // table_enlace_producto +=
+          //   '<button type="button" id="btn-add_proveedor' +
+          //   id_item +
+          //   '" data-name_producto="' +
+          //   nombre_producto +
+          //   '" data-id_empresa="' +
+          //   response.ID_Empresa +
+          //   '" data-id_organizacion="' +
+          //   response.ID_Organizacion +
+          //   '" data-id_pedido_cabecera="' +
+          //   response.ID_Pedido_Cabecera +
+          //   '" data-correlativo="' +
+          //   response.sCorrelativoCotizacion +
+          //   '" data-id_pedido_detalle="' +
+          //   id_item +
+          //   '" class="btn btn-danger btn-block btn-add_proveedor"><i class="fas fa-plus-square"></i>&nbsp; Agregar Proveedor</button>';
           table_enlace_producto += "</div>";
           table_enlace_producto += '<div class="col">';
           if (parseInt(detalle[i].count_proveedor) > 0) {
