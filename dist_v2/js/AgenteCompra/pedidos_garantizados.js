@@ -3850,7 +3850,7 @@ $(document).ready(function() {
                                         <a class="btn btn-success"
                                         href="${cotizacion.file_url}"
                                         target="_blank">${cotizacion.file_original_name}</a>
-                                        ${cotizacion.priviege==2 || cotizacion.priviege==5 ? `<button class="btn btn-danger" id="deleteCotizacionBtn" data-id="${cotizacion.id}">Eliminar</button>` : ''}
+                                        ${cotizacion.privilege==2 || cotizacion.privilege==5 ? `<button class="btn btn-danger" id="deleteCotizacionBtn" data-id="${cotizacion.id}">Eliminar</button>` : ''}
 
                                     </div>
                                 </div>
