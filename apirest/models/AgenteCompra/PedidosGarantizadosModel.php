@@ -42,7 +42,6 @@ class PedidosGarantizadosModel extends CI_Model
     public function _get_datatables_query($user)
     {
         $this->db->select($this->table . '.*, P.No_Pais,
-        PAY.file_url,
 		CLI.No_Entidad, CLI.Nu_Documento_Identidad,
 		CLI.No_Contacto, CLI.Nu_Celular_Contacto, CLI.Txt_Email_Contacto,
 		CORRE.Fe_Month, USRCHINA.No_Nombres_Apellidos AS No_Usuario')
@@ -51,7 +50,6 @@ class PedidosGarantizadosModel extends CI_Model
             ->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
             ->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'left')
             ->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
-            ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
             ->where_in($this->table . '.Nu_Estado', array(2, 3, 4, 8));
         if ($user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio) {

@@ -52,27 +52,30 @@
                 </div>
                 <div class="col-12 d-flex flex-row justify-content-between">
                   <button
+                    
                   id="btn-cotizacion"
                   type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
                     Nuevo Pedido
                   </button>
-                  <div>
-                    <span>T.C GENERAL</span>
-                    <input type="text" id="txt-Tc_General" class="form-control " 
-                    <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
-                    onchange="updateTCambio(1, this.value)"/>
-                  </div>
-                  <div>
-                    <span>T.C CONS</span>
-                    <input type="text" id="txt-Tc_Consolidado" class="form-control " 
-                    <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
-                    onchange="updateTCambio(2, this.value)"/>
-                  </div>
-                  <div>
-                    <span>T.C TRADING</span>
-                    <input type="text" id="txt-Tc_Trading" class="form-control " 
-                    <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
-                    onchange="updateTCambio(3, this.value)"/>
+                  <div class="row align-items-end justify-content-end">
+                    <div class="col-12 col-md-2">
+                      <span>T.C GENERAL</span>
+                      <input type="text" id="txt-Tc_General" class="form-control " 
+                      <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
+                      onchange="updateTCambio(1, this.value)"/>
+                    </div>
+                    <div class="col-12 col-md-2">
+                      <span>T.C CONS</span>
+                      <input type="text" id="txt-Tc_Consolidado" class="form-control " 
+                      <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
+                      onchange="updateTCambio(2, this.value)"/>
+                    </div>
+                    <div class="col-12 col-md-2">
+                      <span>T.C TRADING</span>
+                      <input type="text" id="txt-Tc_Trading" class="form-control " 
+                      <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
+                      onchange="updateTCambio(3, this.value)"/>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -85,7 +88,7 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso ==1) {?>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso ==1 || $this->user->Nu_Tipo_Privilegio_Acceso ==5) {?>
                       <th>Pagos</th>
                       <?php }?>
 
@@ -164,8 +167,11 @@ echo form_open('', $attributes);
                     </div>
 
                     
-                    <div class="col-12 col-sm-4 col-md-4 align-items-center d-flex">
-                      <div id="agregarCotizaciones" class="btn btn-primary w-100">Agregar cotizaciones</div>
+                    <div class="col-12 col-sm-2 col-md-2  d-flex flex-column">
+                      <label> Agregar Cotización</label>
+                      <div id="agregarCotizaciones" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-plus"></i>
+                      </div>
                     </div>
                     <div class="col-12" >
                       <div id="cotizacionExcelContainer"  class="cotizacion-container">
@@ -957,6 +963,11 @@ input[type=number] {
   }.remove-item:hover{
     cursor: pointer;
     background-color: #E74C3C;
+  }.payment-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 1em;
   }
 </style>
 <!-- ./ asignar pedido personal de china -->

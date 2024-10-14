@@ -65,7 +65,7 @@ class PedidosGarantizados extends CI_Controller
             $rows[] = ToDateBD($row->Fe_Emision_Cotizacion);
             $rows[] = $row->No_Contacto . "<br>" . $row->Nu_Celular_Contacto; //quitar para el chino
             $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad; //quitar para el chino
-            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
+            if ($this->user->Nu_Tipo_Privilegio_Acceso == 1 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) {
                 //add pagos icon and set onclic getPedidoPagos($row->ID_Pedido_Cabecera)
                 $rows[] = '<button class="btn btn-xs btn-link" alt="Pagos" title="Pagos" href="javascript:void(0)" onclick="getPedidoPagos(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i></button>';
             }
@@ -142,13 +142,13 @@ class PedidosGarantizados extends CI_Controller
             // Opción 3 (Cotizado)
             $disabled = ($this->user->Nu_Tipo_Privilegio_Acceso == 1) ? 'disabled' : '';
             $dropdown_estado_china .= '<li class="dropdown-item p-0 ' . $disabled . '"><a class="px-3 py-1 btn-block" alt="Cotizado" title="Cotizado" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $sCorrelativoCotizacion . '\');">Cotizado</a></li>';
-
+            if($this->user->Nu_Tipo_Privilegio_Acceso !=2){
             // Opción 4 (Rechazado)
             $dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Rechazado" title="Rechazado" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $sCorrelativoCotizacion . '\');">Aprobado</a></li>';
 
             // Opción 5 (Aprobado)
             $dropdown_estado_china .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Aprobado" title="Aprobado" href="javascript:void(0)" onclick="cambiarEstadoPedido(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $sCorrelativoCotizacion . '\');">Rechazado</a></li>';
-
+            }
             $dropdown_estado_china .= '</ul>';
             $dropdown_estado_china .= '</div>';
 
