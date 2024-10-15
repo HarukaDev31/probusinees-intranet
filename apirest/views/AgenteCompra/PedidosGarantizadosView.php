@@ -230,7 +230,7 @@ echo form_open('', $attributes);
 
                     <div class="col-xs-12 col-sm-12 col-md-12 div-items-garantizado">
                       <h3><span id="span-total_cantidad_items" class="badge badge-danger"></span> Productos 
-                      <!--<button type="button" id="btn-add_item" class="btn btn-danger shadow">Agregar</button>-->
+                      <button type="button" id="btn-add_item" class="btn btn-danger shadow">Agregar</button>
                     </h3>
 
                       <div class="table-responsive div-Compuesto">
