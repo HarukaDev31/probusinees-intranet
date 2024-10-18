@@ -3850,7 +3850,9 @@ $(document).ready(function() {
                                         <a class="btn btn-success"
                                         href="${cotizacion.file_url}"
                                         target="_blank">${cotizacion.file_original_name}</a>
-                                        ${cotizacion.privilege==2 || cotizacion.privilege==5 ? `<button class="btn btn-danger" id="deleteCotizacionBtn" data-id="${cotizacion.id}">Eliminar</button>` : ''}
+                                        ${cotizacion.privilege==2 || cotizacion.privilege==5 ? `<div class="btn btn-danger" id="deleteCotizacionBtn" data-id="${cotizacion.id}"
+                                          data-pedido-id="${cotizacion.ID_Pedido_Cabecera}"
+                                          >Eliminar</div>` : ''}
 
                                     </div>
                                 </div>
@@ -3873,12 +3875,16 @@ $(document).ready(function() {
     $(document).on('click', '#uploadCotizacionBtn', function() {
       $('#uploadCotizacionModal').modal('show');
   });
+    $(document).on('click', '.btn-close-upload-cotizacion', function() {
+      $('#uploadCotizacionModal').modal('hide');
+    });
     $(document).on('click', '#deleteCotizacionBtn', function() {
       const cotizacionID = $(this).data('id');
+      const pedidoID = $(this).data('pedido-id');
       const confirmation = confirm('¿Estás seguro de que deseas eliminar esta cotización?');
       if (confirmation) {
           $.ajax({
-              url: base_url + 'AgenteCompra/PedidosGarantizados/deleteCotizacionExcel/' + cotizacionID,
+              url: base_url + 'AgenteCompra/PedidosGarantizados/deleteCotizacionExcel/' + cotizacionID+'/'+pedidoID,
               method: 'GET',
               success: function(response) {
                   alert('Cotización eliminada con éxito.');

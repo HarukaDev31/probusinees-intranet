@@ -58,23 +58,36 @@
                     Nuevo Pedido
                   </button>
                   <div class="row align-items-end justify-content-end">
-                    <div class="col-12 col-md-2">
+                    <div class="col-12 col-md-3 ">
+                      <div class="d-flex flex-row align-items-center">
                       <span>T.C GENERAL</span>
+                      <i class="fas fa-save ml-1" onclick="updateTCambio(1, $('#txt-Tc_General').val())"></i>
+                      </div>
+
                       <input type="text" id="txt-Tc_General" class="form-control " 
-                      <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
-                      onchange="updateTCambio(1, this.value)"/>
+                      <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>/>
+                     <!--check to save-->
+
                     </div>
-                    <div class="col-12 col-md-2">
+                    <div class="col-12 col-md-3">
+                      <div class="d-flex flex-row align-items-center">
                       <span>T.C CONS</span>
+                      <i class="fas fa-save ml-1" onclick="updateTCambio(2, $('#txt-Tc_Consolidado').val())"></i>
+                      </div>
+
                       <input type="text" id="txt-Tc_Consolidado" class="form-control " 
                       <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
-                      onchange="updateTCambio(2, this.value)"/>
+                      />
                     </div>
-                    <div class="col-12 col-md-2">
-                      <span>T.C TRADING</span>
+                    <div class="col-12 col-md-3">
+                      <div class="d-flex flex-row align-items-center">
+                        <span>T.C TRADING</span>
+                        <i class="fas fa-save ml-1" onclick="updateTCambio(3, $('#txt-Tc_Consolidado').val())"></i>
+                      </div>
+
                       <input type="text" id="txt-Tc_Trading" class="form-control " 
                       <?php echo $this->user->Nu_Tipo_Privilegio_Acceso != 5 ? 'disabled ' : ''; ?>
-                      onchange="updateTCambio(3, this.value)"/>
+                      />
                     </div>
                   </div>
                 </div>
@@ -671,7 +684,7 @@ echo form_open('', $attributes);
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="uploadCotizacionModalLabel">Subir Cotización</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close-upload-cotizacion" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="uploadCotizacionForm">

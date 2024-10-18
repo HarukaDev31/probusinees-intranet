@@ -1484,10 +1484,21 @@ class PedidosGarantizadosModel extends CI_Model
         }
         return false;
     }
-    public function deleteCotizacionExcel($id){
+    public function deleteCotizacionExcel($id,$idPedido){
         $userID = $this->user->ID_Usuario;
         $this->db->where('id', $id);
         $this->db->update($this->table_excel_cotizations, ['deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $userID]);
+        //check if exists row with id_pedido=$idPedido and deleted_at=null if not change estado_general to 2 in table agente_compra_pedido_cabecera
+        $this->db->select('count(*) as count');
+        $this->db->from($this->table_excel_cotizations);
+        $this->db->where('ID_Pedido_Cabecera', $idPedido);
+        $this->db->where('deleted_at', null);
+        $query = $this->db->get();
+        $count = $query->row()->count;
+        if ($count == 0) {
+            $this->cambiarEstadoPedido($idPedido, 2);
+        }
+        
         return true;
     }
     public function updateTCambio($type,$tcambio){
