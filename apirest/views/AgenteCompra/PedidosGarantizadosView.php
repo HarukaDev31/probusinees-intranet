@@ -82,7 +82,7 @@
                     <div class="col-12 col-md-3">
                       <div class="d-flex flex-row align-items-center">
                         <span>T.C TRADING</span>
-                        <i class="fas fa-save ml-1" onclick="updateTCambio(3, $('#txt-Tc_Consolidado').val())"></i>
+                        <i class="fas fa-save ml-1" onclick="updateTCambio(3, $('#txt-Tc_Trading').val())"></i>
                       </div>
 
                       <input type="text" id="txt-Tc_Trading" class="form-control " 
