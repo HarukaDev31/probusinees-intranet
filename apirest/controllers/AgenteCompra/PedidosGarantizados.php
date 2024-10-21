@@ -377,11 +377,13 @@ class PedidosGarantizados extends CI_Controller
 
                 // $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToTextAndLineBreaks ($val->Txt_Descripcion));}
                 $objPHPExcel->getActiveSheet()->setCellValue("E{$initialRow}",$this->htmlToRichText($this->htmlToTextAndLineBreaks($userMail=="maryam.china@probusiness.pe"?$val->Txt_Description_Ingles:$val->Txt_Descripcion)));
-                if (!empty($val->Txt_Url_Imagen_Producto)) {
+                
+                if (!empty($val->Txt_Url_Imagen_Producto) && $val->Txt_Url_Imagen_Producto!="null" || $val->Txt_Url_Imagen_Producto=="" && $val->Txt_Url_Imagen_Producto!=null) {
                     $objDrawing = new PHPExcel_Worksheet_Drawing();
-                    $image = file_get_contents($val->Txt_Url_Imagen_Producto);
-                  
+                    $imageUrl = str_replace(' ', '_', $val->Txt_Url_Imagen_Producto);
+                    $image = file_get_contents($imageUrl);                    
                     if ($image !== false) {
+
                         $path = 'assets/img/';
                         $filename = $path . uniqid() . '.jpg';
                         file_put_contents($filename, $image);
