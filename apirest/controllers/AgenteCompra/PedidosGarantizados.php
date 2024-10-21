@@ -298,8 +298,8 @@ class PedidosGarantizados extends CI_Controller
     {   
         
         $data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));
+
         $this->load->library('PHPExcel');
-        // echo json_encode($data);
         $templatePath = 'assets/downloads/agente_compra/COTIZACION-CHINA.xlsx';
         $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

@@ -190,7 +190,7 @@ class PedidosGarantizadosModel extends CI_Model
         IGPD.Txt_Description_Ingles,
     ');
         $this->db->from('agente_compra_pedido_cabecera A');
-        $this->db->join('agente_compra_correlativo CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo');
+        $this->db->join('agente_compra_correlativo CORRE', 'CORRE.ID_Agente_Compra_Correlativo = A.ID_Agente_Compra_Correlativo', 'left');
         $this->db->join('agente_compra_pedido_detalle IGPD', 'IGPD.ID_Pedido_Cabecera = A.ID_Pedido_Cabecera');
         $this->db->join('entidad CLI', 'CLI.ID_Entidad = A.ID_Entidad');
         $this->db->join('pais P', 'P.ID_Pais = A.ID_Pais');
