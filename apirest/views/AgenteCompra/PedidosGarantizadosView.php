@@ -112,6 +112,10 @@
                       <th class="no-sort">Ver</th>
 
                       <th class="no-sort">Proforma</th>
+                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {?>
+                      <th class="no-sort">Acciones</th>
+                      <?php }?>
+                      <th class="no-sort">Cotizacion Code</th>
                       <!-- <th class="no-sort">Vencimiento</th> -->
                       <!-- <th class="no-sort">Importación Integral</th> -->
                     </tr>

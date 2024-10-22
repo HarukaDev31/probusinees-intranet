@@ -51,7 +51,8 @@ class PedidosGarantizadosModel extends CI_Model
             ->join($this->table_agente_compra_correlativo . ' AS CORRE', 'CORRE.ID_Agente_Compra_Correlativo = ' . $this->table . '.ID_Agente_Compra_Correlativo', 'left')
             ->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
-            ->where_in($this->table . '.Nu_Estado', array(2, 3, 4, 8));
+            ->where_in($this->table . '.Nu_Estado', array(2, 3, 4, 8))
+            ->where($this->table . '.deleted_at', null);
         if ($user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio) {
             $this->db->where($this->table . '.ID_Usuario_Interno_China', $user->ID_Usuario);
         }
@@ -1656,5 +1657,11 @@ class PedidosGarantizadosModel extends CI_Model
         
 
         return ['status' => 'success', 'message' => "Pagos guardados"];
+    }
+    public function eliminarPedido($idPedido){
+        //soft delete all from agente_compra_pedido_cabecera where ID_Pedido_Cabecera=$idPedido
+        $this->db->where('ID_Pedido_Cabecera', $idPedido);
+        $this->db->update('agente_compra_pedido_cabecera', ['deleted_at' => date('Y-m-d H:i:s')]);
+        return ['status' => 'success', 'message' => 'Pedido eliminado'];
     }
 }

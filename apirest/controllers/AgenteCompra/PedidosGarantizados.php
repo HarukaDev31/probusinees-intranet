@@ -158,7 +158,7 @@ class PedidosGarantizados extends CI_Controller
 
             //confirmar cotización
             $rows[] = '<button class="btn btn-xs btn-link" alt="Ver pedido" title="Ver pedido" href="javascript:void(0)"  onclick="verPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="far fa-edit fa-2x" aria-hidden="true"></i></button>';
-
+            
             // //EXCEL cliente de pedido
             if ($this->user->Nu_Tipo_Privilegio_Acceso == 10) {
                 $excel_agente_compra = '<button class="btn" alt="Proforma Trading" title="Proforma Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
@@ -186,7 +186,10 @@ class PedidosGarantizados extends CI_Controller
             //     $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
             // }
             // $rows[] = $dropdown_estado;
-
+            if($this->user->Nu_Tipo_Privilegio_Acceso==5 || $this->user->Nu_Tipo_Privilegio_Acceso==1){
+                $rows[] = '<button class="btn btn-xs btn-link" alt="Eliminar" title="Eliminar" href="javascript:void(0)" onclick="eliminarPedido(\'' . $row->ID_Pedido_Cabecera . '\')"><i class="fas fa-trash-alt fa-2x" aria-hidden="true"></i></button>';
+            }
+            $rows[] = $row->cotizacionCode;
             $data[] = $rows;
         }
         $output = array(
@@ -1024,5 +1027,9 @@ class PedidosGarantizados extends CI_Controller
             echo json_encode(array('error' => $e->getMessage()));
         }
     }
-        
+    public function eliminarPedido(){
+        $idPedido = $this->input->post('idPedido');
+        $response = $this->PedidosGarantizadosModel->eliminarPedido($idPedido);
+        echo json_encode($response);
+    }
 }

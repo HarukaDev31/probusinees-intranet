@@ -371,7 +371,7 @@ $(function () {
       type: "POST",
       dataType: "JSON",
       data: function (data) {
-        (data.sCorrelativoCotizacion = $(
+        (data.cotizacionCode = $(
           "#hidden-sCorrelativoCotizacion"
         ).val()),
           (data.ID_Pedido_Cabecera = $("#hidden-ID_Pedido_Cabecera").val()),
@@ -403,7 +403,14 @@ $(function () {
         targets: "no-sort",
         orderable: false,
       },
+      {
+        targets: [-1], // Target the 10th (index 9) column
+        visible: false,
+        searchable: true,
+      },
+    
     ],
+  
     lengthMenu: [
       [10, 100, 1000, -1],
       [10, 100, 1000, "Todos"],
@@ -5123,3 +5130,22 @@ const openInputFile = (idInput, fileURL) => {
     });
   }
 };
+const eliminarPedido = (idPedido) => {
+  $(`#modal-confirmation`).modal("show");
+  $(`#btn-confirmation`).html("Eliminar");
+  $(`#btn-confirmation`).on("click", function () {
+    $.ajax({
+      url: base_url + "AgenteCompra/PedidosGarantizados/eliminarPedido",
+      type: "POST",
+      data: {
+        idPedido,
+      },
+      success: function (response) {
+        response = JSON.parse(response);
+        if (response.status == "success") {
+          location.reload();
+        }
+      },
+    });
+  });
+}
