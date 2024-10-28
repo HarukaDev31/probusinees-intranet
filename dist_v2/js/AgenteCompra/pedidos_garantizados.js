@@ -3987,6 +3987,12 @@ $(document).ready(function() {
                     <textarea class="form-control" id="productFeatures-${productIndex}" rows="3" name="productFeatures[]"></textarea>
                   </div>
                 </div>
+                <div class="col-12 col-md-12">
+                  <div class="mb-3">
+                    <label for="productQuantity" class="form-label">Cantidad</label>
+                    <input type="text" class="form-control" id="productQuantity-${productIndex}" name="productQuantity[]">
+                  </div>
+                </div>
               </div>
               <div id="providersContainer-${productIndex}" class="col-12 col-md-12">
                 <h6>Proveedores</h6>
@@ -4339,7 +4345,7 @@ function addProvider(productIndex) {
       formData.append(`item[${productIndex}][productImage]`, $(`#productImage-${productIndex}`)[0].files[0]);
       formData.append(`item[${productIndex}][productName]`, $(`#productName-${productIndex}`).val());
       formData.append(`item[${productIndex}][productFeatures]`, $(`#productFeatures-${productIndex}`).val());
-
+      formData.append(`item[${productIndex}][productQuantity]`, $(`#productQuantity-${productIndex}`).val());
       // Proveedores
       $(`#providersContainer-${productIndex} .provider-item`).each(function(providerIndex) {
         formData.append(`item[${productIndex}][supplier][${providerIndex}][precio]`, $(`#precio-${productIndex}-${providerIndex}`).val());
@@ -4384,7 +4390,16 @@ function addProvider(productIndex) {
       }
     });
   })
-
+$('.btn-close-save-cotizacion').click(function() {
+  $('#modal-cotizacion').modal('hide');
+  $('#clientName').val('');
+  $('#clientWhatsapp').val('');
+  $('#clientEmail').val('');
+  $('#clientCountry').val('0');
+  $('#clientRUC').val('');
+  $('#clientCompany').val('');
+  $('#productsContainer').html('');
+});
 function collapseAllExcept(elementToKeepOpen, selector) {
   $(selector).each(function() {
     if ($(this).attr('id') !== $(elementToKeepOpen).attr('id')) {

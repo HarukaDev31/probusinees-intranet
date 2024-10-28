@@ -485,7 +485,7 @@ echo form_open('', $attributes);
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="productModalLabel">Nueva Cotización</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-save-cotizacion" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <!-- Datos del Cliente -->
@@ -532,7 +532,7 @@ echo form_open('', $attributes);
 </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-secondary btn-close-save-cotizacion" data-bs-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" id="saveBtn">Guardar</button>
       </div>
     </div>

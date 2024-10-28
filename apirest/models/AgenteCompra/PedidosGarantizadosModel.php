@@ -1298,6 +1298,7 @@ class PedidosGarantizadosModel extends CI_Model
             ], $path);
             $productName = $productData['productName'];
             $productFeatures = $productData['productFeatures'];
+            $productQuantity = $productData['productQuantity'];
             $productDataInsert=[
                 'ID_Empresa' => $user->ID_Empresa,  
                 'ID_Organizacion' => $user->ID_Organizacion,
@@ -1305,7 +1306,7 @@ class PedidosGarantizadosModel extends CI_Model
                 'Txt_Producto' => $productName,
                 'Txt_Descripcion' => $productFeatures,
                 'Txt_Url_Imagen_Producto' => $productImage,
-                
+                'Qt_Producto'=> $productQuantity,
             ];
             $this->db->close();
             $this->db->initialize();    
