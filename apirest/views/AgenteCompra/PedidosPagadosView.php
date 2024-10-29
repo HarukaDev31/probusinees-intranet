@@ -376,6 +376,17 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             </form>
             <div class="card-body" id="container_orden-compra">
               <div class="orden-compra_header_china"></div>
+              <div class="orden-compra-header-excel">
+                <div class="row">
+                  <div class="col-12 col-md-3">
+                  <label class="custom-file-upload" data-toggle="modal" data-target="#uploadModal">
+                    <i class="fas fa-upload"></i> Choose File
+                </label>
+                  </div>
+                  <div class="col-12 orden-compra-header-excel-container">
+
+                  </div>
+              </div>
               <div class="orden-compra_header row">
                 <div class="col-12 col-md-3">
                   Imagen
@@ -389,9 +400,7 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                 <div class="col-12 col-md-3">
                   Caracteristicas
                 </div>
-                <div class="col-12 col-md-2">
-                  Link
-                </div>
+
               </div>
             </div>
             <div class="card-body" id="container-rotulado">
@@ -524,6 +533,25 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
     <!-- /.modal-content -->
   </div>
   <!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload Excel File</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="file" class="form-control-file" id="file-input" accept=".xlsx">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary upload-btn" disabled>Upload</button>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="modal fade" id="modalsupplier-data">
   <div class="modal-dialog">
@@ -3425,5 +3453,57 @@ echo form_open('', $attributes);?>
 .supplier-list option:hover{
   background: #BFC9CA;
 }
+        .card-custom {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            width: 300px;
+        }
+        .status-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        .orden-compra-header-excel-container{
+          max-width: 100vw;
+          overflow-x: auto;
+          height: auto;
+          display: flex;
+          flex-direction: row;
+          column-gap: 1em;
+        }
+        @media (max-width: 768px) {
+          .orden-compra-header-excel-container{
+            flex-direction: column;
+            row-gap: 1em;
+            align-items: center;
+            justify-content: center;
+          }
+          .card-custom {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+        }
+        }
+      .card-custom.selected {
+          background-color: black;
+          color: white;
+      }
+        .custom-file-upload {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .custom-file-upload i {
+            margin-right: 6px;
+        }
+        
   </style>
   <?php echo form_close(); ?>

@@ -52,6 +52,7 @@ class PedidosGarantizadosModel extends CI_Model
             ->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_China', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
             ->where_in($this->table . '.Nu_Estado', array(2, 3, 4, 8))
+            ->where_in($this->table . '.Nu_Estado_General', array(1, 2,3,5))
             ->where($this->table . '.deleted_at', null);
         if ($user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio) {
             $this->db->where($this->table . '.ID_Usuario_Interno_China', $user->ID_Usuario);
@@ -1433,9 +1434,53 @@ class PedidosGarantizadosModel extends CI_Model
     {
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array('Nu_Estado_General' => $Nu_Estado);
+        if($Nu_Estado==4){
+            $data['Fe_Emision_OC_Aprobada'] = date('Y-m-d');
+            $permissionRoles = [
+                "agente" => $this->personalPeruPrivilegio,
+                "agente_china" => $this->personalChinaPrivilegio,
+                "jefe_china" => $this->jefeChinaPrivilegio,
+            ];
+            $stepsArray = $this->generatePurchaseOrderSteps($permissionRoles, $ID);
+
+            // Obtener los valores únicos para la consulta
+            $idOrder = $ID;
+            $idPermissionRoles = array_column($stepsArray, 'id_permision_role');
+            $names = array_column($stepsArray, 'name');
+
+            // Consultar los registros existentes
+            $this->db->select('id_permision_role, id_order, name');
+            $this->db->from('agente_compra_order_steps');
+            $this->db->where('id_order', $idOrder);
+            $this->db->where_in('id_permision_role', $idPermissionRoles);
+            $this->db->where_in('name', $names);
+            $query = $this->db->get();
+            $existingRecords = $query->result_array();
+
+            // Crear un mapa de registros existentes
+            $existingRecordsMap = [];
+            foreach ($existingRecords as $record) {
+                $key = $record['id_order'] . '_' . $record['id_permision_role'] . '_' . $record['name'];
+                $existingRecordsMap[$key] = true;
+            }
+
+            // Filtrar los nuevos registros
+            $newStepsArray = array_filter($stepsArray, function ($step) use ($existingRecordsMap) {
+                $key = $step['id_order'] . '_' . $step['id_permision_role'] . '_' . $step['name'];
+                return !isset($existingRecordsMap[$key]);
+            });
+
+            // Insertar los nuevos registros
+            if (!empty($newStepsArray)) {
+                $response = $this->db->insert_batch('agente_compra_order_steps', $newStepsArray);
+            } else {
+                $response = false; // O cualquier otra lógica que quieras implementar
+            }
+        }
         if ($this->db->update($this->table, $data, $where) > 0) {
             return array('status' => 'success', 'message' => 'Actualizado');
         }
+        
         return array('status' => 'error', 'message' => 'Error al cambiar estado');
     }
     public function getEstadoPedido($ID)

@@ -9510,6 +9510,22 @@ const openOrdenCompra = (response) => {
       containerOrdenCompra.append(btnsTemplate);
     }
   }
+  const listItems=[1,2,3,4,5,6,7,8];
+  listItems.forEach((item)=>{
+      const itemTest=getExcelOrderItem();
+
+      $(".orden-compra-header-excel-container").append(itemTest);
+
+  });
+  $('.card-custom').click(function(){
+    //if hasnot class selected add it and remove it from the other elements else add it
+    if(!$(this).hasClass('selected')){
+      $('.card-custom').removeClass('selected');
+      $(this).addClass('selected');
+    }else{
+      $(this).removeClass('selected');
+    }
+  });
 };
 function clearHTMLTextArea(str) {
   if (str == null) return "";
@@ -9588,14 +9604,7 @@ const getProductTemplate = (producto, index) => {
     </div>
     <div class="col-12 col-lg-2 d-flex flex-column justify-content-center">
       <span>${htmlDecode(escapeHtml(producto.Txt_Producto))}</span>
-      ${
-        currentPrivilege == priviligesPersonalPeru
-          ? `<div class="btn btn-primary btn-rotulado " id="btn-rotulado-${index}"  onclick='openRotuladoView(${productoJson})'>Rotulado</div>`
-          : `
-      <span class="badge badge-success">ITEM CODE :${
-        producto.product_code ? producto.product_code : ""
-      }</span>`
-      }
+     
     </div>
     <div class="col-12 col-lg-2">
       <input class="form-control text-center input-cantidad w-100" type="number"
@@ -9608,13 +9617,7 @@ const getProductTemplate = (producto, index) => {
           <div id="quill-container-${index}"
           class="d-block w-100" ></div>
     </div>
-    <div class="col-12 col-lg-2">
-      <a href="${
-        producto.Txt_Url_Link_Pagina_Producto
-      }" target="_blank" class="btn btn-link" style="word-break: break-word;overflow:auto;max-height:200px">${
-    producto.Txt_Url_Link_Pagina_Producto
-  }</a>
-    </div>
+   
   </div>`;
   return template;
 };
@@ -10555,3 +10558,69 @@ const openSupplierDetails = (name, phone) => {
     $("#modalsupplier-data").modal("hide");
   });
 };
+const getExcelOrderItem=()=>{
+  const item={
+    "name":"Orden de compra",
+    "uploadDate":new Date().toLocaleDateString(),
+    "url":"https://www.google.com",
+    "isSelected":false,
+    "id":1,
+    "idPedido":1
+
+  }
+  const html=`
+  <div class="container mt-5">
+    <div class="card-custom">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-file-excel"></i> <strong>Order_001.xlsx</strong>
+            </div>
+            <span class="status-badge">Active</span>
+        </div>
+        <p class="text-muted mb-1"><small>Last modified: 2023-10-28</small></p>
+        <button class="btn btn-outline-primary btn-sm update-btn">Update</button>
+        <button class="btn btn-link btn-sm options-btn" data-toggle="dropdown">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="#">Option 1</a>
+            <a class="dropdown-item" href="#">Option 2</a>
+        </div>
+    </div>
+</div>`
+return html;
+}
+
+$(document).ready(function() {
+  $('#file-input').on('change', function() {
+      if ($(this).val()) {
+          $('.upload-btn').prop('disabled', false);
+      } else {
+          $('.upload-btn').prop('disabled', true);
+      }
+  });
+
+  $('.upload-btn').on('click', function() {
+      const url=base_url+"AgenteCompra/PedidosPagados/uploadExcelPurchaseOrder";
+      const formData = new FormData();
+      formData.append('file', $('#file-input')[0].files[0]);
+      formData.append('idPedido', idPedido);
+      $.ajax({
+          url,
+          type: 'POST',
+          data: formData,
+          contentType: false,
+          processData: false,
+          success: function(response) {
+              console.log(response);
+              $('#file-input').val('');
+              $('.upload-btn').prop('disabled', true);
+              $('#uploadModal').modal('hide');
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+              console.error(jqXHR.responseText);
+
+          }
+      });
+  });
+});

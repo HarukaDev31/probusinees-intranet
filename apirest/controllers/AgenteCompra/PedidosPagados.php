@@ -2,6 +2,7 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 require_once APPPATH . 'third_party/PHPExcel.php';
 require_once APPPATH . 'traits/CommonTrait.php';
+require_once APPPATH . 'third_party/PHPExcel.php';
 
 class PedidosPagados extends CI_Controller
 {
@@ -1806,7 +1807,7 @@ class PedidosPagados extends CI_Controller
         exit();
     }
 
-    //generar cotización PDF para pedido de cliente
+    //generar cotización PDF para pedido de clllgiente
     public function generarConsolidaTrading($ID)
     {
         $data = $this->PedidosPagadosModel->get_by_id_excel($this->security->xss_clean($ID));
@@ -2306,6 +2307,15 @@ class PedidosPagados extends CI_Controller
     public function saveInspection(){
         $data = $this->input->post();
         $response = $this->PedidosPagadosModel->saveInspection($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function uploadExcelPurchaseOrder(){
+        $data = $this->input->post();
+        $files = $_FILES;
+        $tmpUrl = $files['file']['tmp_name'];
+        $objPHPExcel = PHPExcel_IOFactory::load($tmpUrl);
+        
+        $response = $this->PedidosPagadosModel->uploadExcelPurchaseOrder($data, $objPHPExcel);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }

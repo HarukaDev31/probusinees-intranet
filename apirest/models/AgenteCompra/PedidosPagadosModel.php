@@ -2,6 +2,8 @@
 require_once APPPATH . 'traits/FileTrait.php';
 require_once APPPATH . 'traits/SupplierTraits.php';
 require_once APPPATH . 'traits/WebSocketTrait.php';
+require_once APPPATH . 'third_party/PHPExcel.php';
+
 class PedidosPagadosModel extends CI_Model
 {
     use FileTrait, SupplierTraits, WebSocketTrait;
@@ -55,7 +57,7 @@ class PedidosPagadosModel extends CI_Model
         // ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
         //->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
-            ->where_in($this->table . '.Nu_Estado', array(5, 6, 7, 9));
+            ->where_in($this->table . '.Nu_Estado_General', array(4));
 
         //$this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
         $this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
@@ -3296,4 +3298,140 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
         return ['status' => 'success', 'message' => 'Notas guardadas'];
     }
+    public function uploadExcelPurchaseOrder($data,$objPHPExcel){
+
+        $idPedido=$data['idPedido'];
+        $excelData=$this->proccessPurchaseOrder($objPHPExcel,$data);
+        return ['status' => 'success', 'message' => 'Excel guardado',"data"=>$excelData];
+        return ['status' => 'success', 'message' => 'Excel guardado'];
+    }
+    public function proccessPurchaseOrder($objPHPExcel,$request){
+
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+        $data = [];
+        $initialRow=28;
+        $imageColumn="E";
+        $nameColumn="F";
+        $qtyColumn="H";
+        $characteristicsColumn="G";
+        $totalColumn="H";
+        $unidadColumn="I";
+        $precioEwbColumn="J";
+        $precioEwbUsdColumn="K";
+        $totalUsdColumn="L";
+        $qtyCajaColumn="M";
+        $totalCajasColumn="N";
+        $cbmCajaColumn="O";
+        $cbmTotalColumn="P";
+        $kgCajaColumn="Q";
+        $kgTotalColumn="R";
+        $envioYiwuColumn="S";
+        $tiempoProduccionColumn="T";
+        $maxRow=1000;
+        $drawings = $sheet->getDrawingCollection();
+        $uploadPath = 'assets/images/purchase_order/';
+            // Asegurar que el directorio existe
+        $totalExcel=0;
+
+        $dataOrder=[
+            'order_id'=>$request['idPedido'],
+            'name'=>$_FILES['file']['name'],
+            'created_at'=>date('Y-m-d H:i:s'),
+            'created_by'=>$this->user->ID_Usuario
+        ];
+        $dataOrder = [
+            'order_id' => $request['idPedido'],
+            'name' => $_FILES['file']['name'],
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => $this->user->ID_Usuario
+        ];
+        
+        $this->db->insert('agente_compra_order_excel', $dataOrder);
+        $idOrderExcel = $this->db->insert_id();
+
+        for ($row = 28; $row <= $maxRow; ++$row) {
+            if($sheet->getCell($nameColumn . $row)->getValue()==null
+            ||$sheet->getCell($nameColumn . $row)->getValue()==""
+            ){
+                break;
+            }
+            $imageURL = '';
+
+            $imageData=$this->getImageFromExcelCell($objPHPExcel,0,$imageColumn.$row);
+            if ($imageData) {
+                // Generar nombre único para la imagen
+                $uniqueName = uniqid('product_') . '_' . time() . '.' . $imageData['extension'];
+                $fullPath = $uploadPath . $uniqueName;
+                
+                // Guardar la imagen
+                if (file_put_contents($fullPath, $imageData['contents'])) {
+                    // Generar URL relatikva para la base de datos
+                    $imageURL = 'assets/images/purchase_order/' . $uniqueName;
+                }
+            }
+            $data[] = [
+                'order_excel_id'=>$idOrderExcel,
+                'image_url' =>base_url().$imageURL,
+                'name' => $sheet->getCell($nameColumn . $row)->getValue(),
+                'quantity' => $sheet->getCell($qtyColumn . $row)->getValue(),
+                'features' => $sheet->getCell($characteristicsColumn . $row)->getValue(),
+                'commercial_unit' => $sheet->getCell($unidadColumn . $row)->getValue(),
+                'price_exw_rmb' => $sheet->getCell($precioEwbColumn . $row)->getValue(),
+                'price_exw_usd' => $sheet->getCell($precioEwbUsdColumn . $row)->getValue(),
+                'total_usd' => $sheet->getCell($totalUsdColumn . $row)->getValue(),
+                'qty_box' => $sheet->getCell($qtyCajaColumn . $row)->getValue(),
+                'total_boxes' => $sheet->getCell($totalCajasColumn . $row)->getValue(),
+                'cbm_boxes' => $sheet->getCell($cbmCajaColumn . $row)->getValue(),
+                'total_cbm' => $sheet->getCell($cbmTotalColumn . $row)->getValue(),
+                'kg_box' => $sheet->getCell($kgCajaColumn . $row)->getValue(),
+                'yiwu_shipping' => $sheet->getCell($envioYiwuColumn . $row)->getValue(),
+                'production_time' => $sheet->getCell($tiempoProduccionColumn . $row)->getValue(),
+            ];
+        }
+        $this->db->insert_batch('agente_compra_order_excel_detail',$data);
+    }
+    function getImageFromExcelCell($spreadsheet, $worksheet, $cell) {
+        $sheet = $spreadsheet->getSheet($worksheet);
+        $drawings = $sheet->getDrawingCollection();
+        foreach ($drawings as $drawing) {
+            if ($drawing->getCoordinates() == $cell) {
+                try {
+                    // Obtener datos de la imagen
+                    $zipReader = fopen($drawing->getPath(), 'r');
+                    if (!$zipReader) {
+                        continue;
+                    }
+                    
+                    $imageContents = '';
+                    while (!feof($zipReader)) {
+                        $imageContents .= fread($zipReader, 1024);
+                    }
+                    fclose($zipReader);
+                    
+                    // Obtener información de la imagen
+                    $extension = $drawing->getExtension();
+                    if (empty($extension)) {
+                        // Si no se puede determinar la extensión, intentar con 'png'
+                        $extension = 'png';
+                    }
+                    
+                    return [
+                        'contents' => $imageContents,
+                        'extension' => $extension,
+                        'filename' => $drawing->getName() ?: 'image'
+                    ];
+                } catch (Exception $e) {
+                    // Log el error si es necesario
+                    \Log::error('Error processing Excel image: ' . $e->getMessage());
+                    continue;
+                }
+            }
+        }
+        return null;
+    }
+    
+    
 }

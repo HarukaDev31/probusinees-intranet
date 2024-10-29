@@ -4405,7 +4405,7 @@ function collapseAllExcept(elementToKeepOpen, selector) {
     if ($(this).attr('id') !== $(elementToKeepOpen).attr('id')) {
       $(this).collapse('hide');
     } else {
-      $(this).collapse('show');
+    $(this).collapse('show');
     }
   });
 }
