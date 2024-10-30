@@ -61,7 +61,11 @@ class PedidosPagadosModel extends CI_Model
 
         //$this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
         $this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
-
+        if (!empty($this->input->post('Filtro_Estado')) &&
+            $this->input->post('Filtro_Estado') != '0') {
+            $this->db->where($this->table . '.ID_Estado_Orden', $this->input->post('Filtro_Estado'));
+        }
+       
         if (!empty($this->input->post('ID_Pedido_Cabecera'))) {
             $this->db->where($this->table . '.ID_Pedido_Cabecera', $this->input->post('ID_Pedido_Cabecera'));
         }
@@ -3298,14 +3302,17 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
         return ['status' => 'success', 'message' => 'Notas guardadas'];
     }
-    public function uploadExcelPurchaseOrder($data,$objPHPExcel){
+    public function uploadExcelPurchaseOrder($data,$objPHPExcel,$zipPath,$fileUrl){
 
         $idPedido=$data['idPedido'];
-        $excelData=$this->proccessPurchaseOrder($objPHPExcel,$data);
-        return ['status' => 'success', 'message' => 'Excel guardado',"data"=>$excelData];
-        return ['status' => 'success', 'message' => 'Excel guardado'];
+        $step=$data['step'];
+        $excelData=$this->proccessPurchaseOrder($objPHPExcel,$data,$zipPath,$fileUrl);
+        //update steps table 
+        $this->updateStep($step,"COMPLETED");
+        return $excelData;
+        
     }
-    public function proccessPurchaseOrder($objPHPExcel,$request){
+    public function proccessPurchaseOrder($objPHPExcel,$request,$zipPath,$fileUrl){
 
         $sheet = $objPHPExcel->getSheet(0);
         $highestRow = $sheet->getHighestRow();
@@ -3335,42 +3342,56 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $uploadPath = 'assets/images/purchase_order/';
             // Asegurar que el directorio existe
         $totalExcel=0;
-
-        $dataOrder=[
-            'order_id'=>$request['idPedido'],
-            'name'=>$_FILES['file']['name'],
-            'created_at'=>date('Y-m-d H:i:s'),
-            'created_by'=>$this->user->ID_Usuario
-        ];
+        
         $dataOrder = [
             'order_id' => $request['idPedido'],
             'name' => $_FILES['file']['name'],
             'created_at' => date('Y-m-d H:i:s'),
-            'created_by' => $this->user->ID_Usuario
+            'created_by' => $this->user->ID_Usuario,
+            'file_url'=>$fileUrl
         ];
-        
+   
         $this->db->insert('agente_compra_order_excel', $dataOrder);
         $idOrderExcel = $this->db->insert_id();
+        $newFolder = 'assets/uploads/'; // Folder to extract to
 
-        for ($row = 28; $row <= $maxRow; ++$row) {
+        $currentRow=28;
+        for ($row = 28; $row <= $maxRow;$row++) {
             if($sheet->getCell($nameColumn . $row)->getValue()==null
             ||$sheet->getCell($nameColumn . $row)->getValue()==""
             ){
                 break;
             }
             $imageURL = '';
-
-            $imageData=$this->getImageFromExcelCell($objPHPExcel,0,$imageColumn.$row);
-            if ($imageData) {
-                // Generar nombre único para la imagen
-                $uniqueName = uniqid('product_') . '_' . time() . '.' . $imageData['extension'];
-                $fullPath = $uploadPath . $uniqueName;
-                
-                // Guardar la imagen
-                if (file_put_contents($fullPath, $imageData['contents'])) {
-                    // Generar URL relatikva para la base de datos
-                    $imageURL = 'assets/images/purchase_order/' . $uniqueName;
+            //get image from excel
+            foreach ($drawings as $drawing) {
+                $coordinates = $drawing->getCoordinates();
+                if($coordinates==$imageColumn.$row){
+                   $drawingPath=$drawing->getPath();
+                   $hashPosition = strpos($drawingPath, '#');
+                    if ($hashPosition !== false) {
+                        // Extract the part after the '#' character
+                        $extractedPart = substr($drawingPath, $hashPosition + 1);
+                        $imagePath = $newFolder .$extractedPart; // Replace with your actual image name and extension
+                        // Check if the image file exists and read its contents
+                        if (file_exists($imagePath)) {
+                            $imageData = file_get_contents($imagePath);
+                            //save 
+                            $path = 'assets/img/';
+                            $filename = $path . uniqid() . '.jpg';
+                            file_put_contents($filename, $imageData);
+                            $imageURL=$filename;
+                            unlink($zipPath);
+                            // Optionally, you can do something with the image data, e.g., display it or save it
+                        } else {
+                            echo 'Image file not found.';
+                        }
+                    } else {
+                        echo 'The specified path does not contain a fragment.';
+                    }
                 }
+             
+
             }
             $data[] = [
                 'order_excel_id'=>$idOrderExcel,
@@ -3390,48 +3411,46 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 'yiwu_shipping' => $sheet->getCell($envioYiwuColumn . $row)->getValue(),
                 'production_time' => $sheet->getCell($tiempoProduccionColumn . $row)->getValue(),
             ];
+            $currentRow++;
         }
         $this->db->insert_batch('agente_compra_order_excel_detail',$data);
+        $totalValue=$sheet->getCell('F'.($currentRow+10))->getCalculatedValue();
+        $this->db->where('id',$idOrderExcel);
+        $this->db->update('agente_compra_order_excel',array('total'=>$totalValue));
     }
-    function getImageFromExcelCell($spreadsheet, $worksheet, $cell) {
-        $sheet = $spreadsheet->getSheet($worksheet);
-        $drawings = $sheet->getDrawingCollection();
-        foreach ($drawings as $drawing) {
-            if ($drawing->getCoordinates() == $cell) {
-                try {
-                    // Obtener datos de la imagen
-                    $zipReader = fopen($drawing->getPath(), 'r');
-                    if (!$zipReader) {
-                        continue;
-                    }
-                    
-                    $imageContents = '';
-                    while (!feof($zipReader)) {
-                        $imageContents .= fread($zipReader, 1024);
-                    }
-                    fclose($zipReader);
-                    
-                    // Obtener información de la imagen
-                    $extension = $drawing->getExtension();
-                    if (empty($extension)) {
-                        // Si no se puede determinar la extensión, intentar con 'png'
-                        $extension = 'png';
-                    }
-                    
-                    return [
-                        'contents' => $imageContents,
-                        'extension' => $extension,
-                        'filename' => $drawing->getName() ?: 'image'
-                    ];
-                } catch (Exception $e) {
-                    // Log el error si es necesario
-                    \Log::error('Error processing Excel image: ' . $e->getMessage());
-                    continue;
-                }
-            }
+    public function getExcelOrdersList($idPedido){
+        $this->db->select('id,order_id,name,created_at,file_url,total');
+        $this->db->from('agente_compra_order_excel');
+        $this->db->where('order_id',$idPedido);
+        return $this->db->get()->result();
+    }
+    public function getExcelOrderDetails($id){
+        $this->db->select('image_url,name,quantity,features,commercial_unit,price_exw_rmb,price_exw_usd,total_usd,qty_box,total_boxes,cbm_boxes,total_cbm,kg_box,yiwu_shipping,production_time');
+        $this->db->from('agente_compra_order_excel_detail');
+        $this->db->where('order_excel_id',$id);
+        return $this->db->get()->result();
+    }
+    public function deleteExcelOrder($id,$step,$idPedido){
+        //SET FOREIGN_KEY_CHECKS=0;
+        
+        $this->db->where('order_excel_id',$id);
+        $this->db->delete('agente_compra_order_excel_detail');
+        $this->db->where('id',$id);
+        $this->db->delete('agente_compra_order_excel');
+        //check if exist  agente_compra_order_steps with id_pedido=$idPedido 
+        $this->db->where('order_id',$idPedido);
+        $this->db->from('agente_compra_order_excel');
+        $query=$this->db->get();
+        if($query->num_rows()==0){
+            $this->updateStep($step,"PENDING");
         }
-        return null;
+        return ['status' => 'success', 'message' => 'Orden eliminada'];
     }
-    
-    
+    public function cambiarEstadoOrdenCompra($data){
+        $idPedido=$data['id_pedido'];
+        $estado=$data['estado'];
+        $this->db->where('ID_Pedido_Cabecera',$idPedido);
+        $this->db->update('agente_compra_pedido_cabecera',array('ID_Estado_Orden'=>$estado));
+        return ['status' => 'success', 'message' => 'Estado actualizado'];
+    }
 }

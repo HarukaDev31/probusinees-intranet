@@ -37,6 +37,16 @@
                     <span class="help-block text-danger" id="error"></span>
                   </div>
                 </div>
+                <div class="col-6 col-sm-3">
+                  <label>Estado</label>
+                  <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
+                    <option value="0" selected>Todos</option>
+                    <option value="1">En Produccion</option>
+                    <option value="2">Inspeccionado</option>
+                    <option value="3">Entregado</option>
+                    <option value="4">Completado</option>
+                  </select>
+                </div>
                 <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 6) {
     ?>
                   <div class="col-6 col-sm-3">
@@ -81,28 +91,8 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Empresa</th>
-                      <th>Servicio</th>
-                      <th>Incoterms</th>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {?>
-                        <th>Pagos</th><!--peru-->
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 5) {?>
-                        <th>Peru</th><!--peru-->
-                      <?php }?>
-
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {?>
-                        <th>China</th>
-
-                      <?php }?>
-                      <?php if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) {?>
-                        <th class="no-sort">Estado Orden </th>
-
-                      <?php }?>
-
+                      <th class="no-sort">Estado  </th>
                       <th>Ver</th>
-
-                        <th class="no-sort">Descarga</th>
-
                       <th>Avance</th>
                       <?php }?>
 
@@ -377,12 +367,20 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             <div class="card-body" id="container_orden-compra">
               <div class="orden-compra_header_china"></div>
               <div class="orden-compra-header-excel">
-                <div class="row">
-                  <div class="col-12 col-md-3">
-                  <label class="custom-file-upload" data-toggle="modal" data-target="#uploadModal">
-                    <i class="fas fa-upload"></i> Choose File
-                </label>
+                <div class="row ">
+                  <div class="col-12 col-md-6 d-flex align-items-center">
+                    <label class="custom-file-upload" data-toggle="modal" data-target="#uploadModal">
+                    <i class="fas fa-upload"></i> Subir Orden
+                    </label>
                   </div>
+                  <!--Valor total del excel selecionado-->
+                  <div class="col-12 col-md-6 text-right px-5 my-3">
+                    <div class="p-3 rounded shadow">
+                        <label class="h6 font-weight-bold">Valor Total:</label>
+                        <span id="valor-total-excel" class="d-block h4 font-weight-bold">$0</span>
+                    </div>
+                </div>
+                  
                   <div class="col-12 orden-compra-header-excel-container">
 
                   </div>
@@ -538,7 +536,7 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadModalLabel">Upload Excel File</h5>
+                <h5 class="modal-title" id="uploadModalLabel">Subir Orden</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -3473,6 +3471,7 @@ echo form_open('', $attributes);?>
           display: flex;
           flex-direction: row;
           column-gap: 1em;
+          margin-bottom: 1em;
         }
         @media (max-width: 768px) {
           .orden-compra-header-excel-container{

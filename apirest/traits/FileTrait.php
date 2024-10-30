@@ -74,31 +74,30 @@ trait FileTrait
         }
     }
     public function uploadFile($file, $name, $path)
-    {
-        try {
-            $path = rtrim(str_replace('\\', '/', $path), '/') . '/';
+{
+    try {
+        $path = rtrim(str_replace('\\', '/', $path), '/') . '/';
 
-            if (!is_dir($path)) {
-                if (!mkdir($path, 0777, true)) {
-                    throw new Exception("Failed to create directory: $path");
-                }
+        if (!is_dir($path)) {
+            if (!mkdir($path, 0777, true)) {
+                throw new Exception("Failed to create directory: $path");
             }
-            $name = time() . '_' . $name;
-            $destination = $path . $name;
-            //concat current time in format _Y_m_d_H_i_s
-
-            // Attempt to move the uploaded file
-            if (move_uploaded_file($file, $destination)) {
-                return $destination;
-            } else {
-                // Handle the error appropriately
-                throw new Exception("Failed to move uploaded file to $destination");
-                return "Failed to move uploaded file to $destination";
-            }
-        } catch (Exception $e) {
-            return $e->getMessage();
         }
+
+        // Concatenar el tiempo actual al nombre del archivo
+        $name = time() . '_' . $name;
+        $destination = $path . $name;
+
+        // Crear una copia del archivo en la ubicación de destino
+        if (copy($file, $destination)) {
+            return $destination; // Retorna la ruta del archivo copiado
+        } else {
+            throw new Exception("Failed to copy uploaded file to $destination");
+        }
+    } catch (Exception $e) {
+        return $e->getMessage();
     }
+}
     /**
      * This function is used to process the files uploaded by the user in pedidos garantizados
      * @param $data_files - The files data

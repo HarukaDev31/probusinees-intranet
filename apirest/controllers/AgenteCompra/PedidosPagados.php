@@ -3,10 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 require_once APPPATH . 'third_party/PHPExcel.php';
 require_once APPPATH . 'traits/CommonTrait.php';
 require_once APPPATH . 'third_party/PHPExcel.php';
+require_once APPPATH . 'traits/FileTrait.php';
 
 class PedidosPagados extends CI_Controller
 {
-    use CommonTrait;
+    use CommonTrait, FileTrait;
     private $jefeChinaPrivilegio = 5;
     private $personalChinaPrivilegio = 2;
     private $personalPeruPrivilegio = 1;
@@ -81,6 +82,31 @@ class PedidosPagados extends CI_Controller
         }
         return $HTML;
     }
+    public function getStatusOrdenCompraGeneral($id){
+        $HTML = "";
+        switch ($id) {
+            case 0:
+                $HTML = '<span class="badge bg-secondary">Pendiente</span>';
+                break;
+            case 1:
+                $HTML = '<span class="badge bg-success">En Produccion</span>';
+                break;
+            case 2:
+                $HTML = '<span class="badge bg-danger">Recepcionado</span>';
+                break;
+            case 3:
+                $HTML = '<span class="badge bg-warning">Inspeccionado</span>';
+                break;
+            case 4:
+                $HTML = '<span class="badge bg-info">Entregado</span>';
+                break;
+            default:
+                $HTML = '<span class="badge bg-secondary">Pendiente</span>';
+                break;
+        }
+        return $HTML;
+        
+    }
     public function ajax_list()
     {
         $arrData = $this->PedidosPagadosModel->get_datatables();
@@ -114,56 +140,55 @@ class PedidosPagados extends CI_Controller
                     <option value="COMPLETADO" ' . ($row->estado_almacen == "COMPLETADO" ? 'selected' : '') . '>COMPLETADO</option>
                 </select>';
                 $data[] = $rows;
-                continue;
             }
             $rows[] = $row->cotizacionCode;
             $rows[] = ToDateBD($row->Fe_Emision_OC_Aprobada);
             //CLI.No_Entidad, CLI.Nu_Documento_Identidad,CLI.No_Contacto
             $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Contacto . "</span><span>" . $row->Nu_Celular_Contacto . "</span></div>";
             $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Entidad . "</span><span>" . $row->Nu_Documento_Identidad . "</span></div>";
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 2) {
-                // $rows[] = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
-                //$rows[] = $btn_asignar_personal_china;
-            } else if ($this->user->Nu_Tipo_Privilegio_Acceso == 5) {
-                // $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
+            // if ($this->user->Nu_Tipo_Privilegio_Acceso != 5 && $this->user->Nu_Tipo_Privilegio_Acceso != 2) {
+            //     // $rows[] = '<span class="badge bg-secondary">' . $row->No_Usuario . '</span>';
+            //     //$rows[] = $btn_asignar_personal_china;
+            // } else if ($this->user->Nu_Tipo_Privilegio_Acceso == 5) {
+            //     // $rows[] = $row->No_Entidad . "<br>" . $row->Nu_Documento_Identidad;
 
-                $sNombreExportador = '';
-                if ($row->Nu_Tipo_Exportador == 1) {
-                    $sNombreExportador = 'INTERNATIONAL PRO TRADING CO., LIMITED';
-                } else if ($row->Nu_Tipo_Exportador == 2) {
-                    $sNombreExportador = 'CHRIS FACTORY LIMITED';
-                }
+            //     $sNombreExportador = '';
+            //     if ($row->Nu_Tipo_Exportador == 1) {
+            //         $sNombreExportador = 'INTERNATIONAL PRO TRADING CO., LIMITED';
+            //     } else if ($row->Nu_Tipo_Exportador == 2) {
+            //         $sNombreExportador = 'CHRIS FACTORY LIMITED';
+            //     }
 
-                $iIdTareaPedido = 0; //ninguno
-                if ($row->Nu_Tipo_Servicio == 1) { //trading
-                    $iIdTareaPedido = 18;
-                } else if ($row->Nu_Tipo_Servicio == 2) { //consolida trading
-                    $iIdTareaPedido = 11;
-                }
+            //     $iIdTareaPedido = 0; //ninguno
+            //     if ($row->Nu_Tipo_Servicio == 1) { //trading
+            //         $iIdTareaPedido = 18;
+            //     } else if ($row->Nu_Tipo_Servicio == 2) { //consolida trading
+            //         $iIdTareaPedido = 11;
+            //     }
 
-                //verificar si completo o no
-                $btn_completar_verificacion_oc = '';
-                //$arrResponsePaso1 = $this->PedidosPagadosModel->verificarTarea($iIdTareaPedido, $row->ID_Pedido_Cabecera);
-                //if(is_object($arrResponsePaso1) && $arrResponsePaso1->Nu_Estado_Proceso==0)
-                //$btn_completar_verificacion_oc = '<br><button class="btn btn-primary" alt="Completado" title="Completado" href="javascript:void(0)"  onclick="completarVerificacionOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')">Verificar</button>';
+            //     //verificar si completo o no
+            //     $btn_completar_verificacion_oc = '';
+            //     //$arrResponsePaso1 = $this->PedidosPagadosModel->verificarTarea($iIdTareaPedido, $row->ID_Pedido_Cabecera);
+            //     //if(is_object($arrResponsePaso1) && $arrResponsePaso1->Nu_Estado_Proceso==0)
+            //     //$btn_completar_verificacion_oc = '<br><button class="btn btn-primary" alt="Completado" title="Completado" href="javascript:void(0)"  onclick="completarVerificacionOC(\'' . $row->ID_Pedido_Cabecera . '\', \'' . $iIdTareaPedido . '\')">Verificar</button>';
 
-                // $rows[] = $sNombreExportador . $btn_completar_verificacion_oc;
-            }
+            //     // $rows[] = $sNombreExportador . $btn_completar_verificacion_oc;
+            // }
 
-            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerTipoServicioArray($row->Nu_Tipo_Servicio);
-            $dropdown_estado = '<div class="dropdown">';
-            $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
-            $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
-            $dropdown_estado .= '<span class="caret"></span></button>';
-            $dropdown_estado .= '<ul class="dropdown-menu">';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Trading" title="Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Usuario_Interno_Jefe_China . '\');">Trading</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="C. Trading" title="C. Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Usuario_Interno_Jefe_China . '\');">C. Trading</a></li>';
-            $dropdown_estado .= '</ul>';
-            $dropdown_estado .= '</div>';
+            // $arrEstadoRegistro = $this->HelperImportacionModel->obtenerTipoServicioArray($row->Nu_Tipo_Servicio);
+            // $dropdown_estado = '<div class="dropdown">';
+            // $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+            // $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+            // $dropdown_estado .= '<span class="caret"></span></button>';
+            // $dropdown_estado .= '<ul class="dropdown-menu">';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="Trading" title="Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Usuario_Interno_Jefe_China . '\');">Trading</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="C. Trading" title="C. Trading" href="javascript:void(0)" onclick="cambiarTipoServicio(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Usuario_Interno_Jefe_China . '\');">C. Trading</a></li>';
+            // $dropdown_estado .= '</ul>';
+            // $dropdown_estado .= '</div>';
 
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) { //no tiene acceso a cambiar status de Perú
-                $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-            }
+            // if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) { //no tiene acceso a cambiar status de Perú
+            //     $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+            // }
 
             // $btn_comision_trading = '';
             // if ($this->user->Nu_Tipo_Privilegio_Acceso != 2) {
@@ -173,44 +198,60 @@ class PedidosPagados extends CI_Controller
             //     }
             // }
 
-            $rows[] = $dropdown_estado;
+            // $rows[] = $dropdown_estado;
 
-            $arrEstadoRegistro = $this->HelperImportacionModel->obtenerIncoterms($row->Nu_Tipo_Incoterms);
-            $dropdown_estado = '<div class="dropdown">';
-            $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
-            $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
-            $dropdown_estado .= '<span class="caret"></span></button>';
-            $dropdown_estado .= '<ul class="dropdown-menu">';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="EXW" title="EXW" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">EXW</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="FOB" title="FOB" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">FCA</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="FOB" title="FOB" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">FOB</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="CIF" title="CIF" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">CFR</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="CIF" title="CIF" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">CIF</a></li>';
-            $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="DDP" title="DDP" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">DAP</a></li>';
-            $dropdown_estado .= '</ul>';
-            $dropdown_estado .= '</div>';
+            // $arrEstadoRegistro = $this->HelperImportacionModel->obtenerIncoterms($row->Nu_Tipo_Incoterms);
+            // $dropdown_estado = '<div class="dropdown">';
+            // $dropdown_estado .= '<button class="btn btn-' . $arrEstadoRegistro['No_Class_Estado'] . ' dropdown-toggle" type="button" data-toggle="dropdown">';
+            // $dropdown_estado .= $arrEstadoRegistro['No_Estado'];
+            // $dropdown_estado .= '<span class="caret"></span></button>';
+            // $dropdown_estado .= '<ul class="dropdown-menu">';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="EXW" title="EXW" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',1, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">EXW</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="FOB" title="FOB" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',5, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">FCA</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="FOB" title="FOB" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',2, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">FOB</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="CIF" title="CIF" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',6, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">CFR</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="CIF" title="CIF" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',3, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">CIF</a></li>';
+            // $dropdown_estado .= '<li class="dropdown-item p-0"><a class="px-3 py-1 btn-block" alt="DDP" title="DDP" href="javascript:void(0)" onclick="cambiarIncoterms(\'' . $row->ID_Pedido_Cabecera . '\',4, \'' . $row->ID_Agente_Compra_Correlativo . '\', \'' . $sCorrelativoCotizacion . '\');">DAP</a></li>';
+            // $dropdown_estado .= '</ul>';
+            // $dropdown_estado .= '</div>';
 
-            if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) { //no tiene acceso a cambiar status de Perú
-                $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
-            }
+            // if ($this->user->Nu_Tipo_Privilegio_Acceso != 1) { //no tiene acceso a cambiar status de Perú
+            //     $dropdown_estado = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+            // }
 
-            $rows[] = $dropdown_estado; //incoterms
-            if($this->user->Nu_Tipo_Privilegio_Acceso != 2){
-                $rows[] = $divPagosEstado;
-            }
-            $rows[] = $estadoChina;
+            // $rows[] = $dropdown_estado; //incoterms
+            // if($this->user->Nu_Tipo_Privilegio_Acceso != 2){
+            //     $rows[] = $divPagosEstado;
+            // }
+            // $rows[] = $estadoChina;
+            if($this->user->Nu_Tipo_Privilegio_Acceso == $this->jefeChinaPrivilegio || $this->user->Nu_Tipo_Privilegio_Acceso == $this->personalChinaPrivilegio){
+
+                //select with 3 options Pendiente,Recibiendo y Completado
+                $rows[] = '<select class="form-control" id="status_' . $row->ID_Estado_Orden . '" onchange="cambiarEstadoOrdenCompra(this.value,' . $row->ID_Pedido_Cabecera . ')">
+                    <option value="1" ' . ($row->ID_Estado_Orden == 1 ? 'selected' : '') . '>En Produccion</option>
+                    <option value="2" ' . ($row->ID_Estado_Orden == 2 ? 'selected' : '') . '>Inspeccionado</option>
+                    <option value="3" ' . ($row->ID_Estado_Orden == 3 ? 'selected' : '') . '>Entregado</option>
+                    <option value="4" ' . ($row->ID_Estado_Orden == 4? 'selected' : '') . '>Completado</option>
+                </select>';
+                
+            }else{
+                //span with status of almacen
+                $rows[] = $this->getStatusOrdenCompraGeneral($row->ID_Estado_Orden,);
+
+            
+            }   
             $rows[] = "<button class='btn btn-xs btn-link' alt='Editar' title='Editar' href='javascript:void(0)'
 			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ",".$row->Nu_Tipo_Servicio.")'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
             // if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
                 //no tiene acceso a cambiar status de Perú
-                $excel_orden_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
-                if ($row->Nu_Tipo_Servicio == 2) {
-                    $excel_orden_compra = '<button class="btn" alt="Orden Compra C. Trading" title="Orden Compra C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
-                }
-                $rows[] = $excel_orden_compra;
+                // $excel_orden_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+                // if ($row->Nu_Tipo_Servicio == 2) {
+                //     $excel_orden_compra = '<button class="btn" alt="Orden Compra C. Trading" title="Orden Compra C. Trading" href="javascript:void(0)" onclick="generarConsolidaTrading(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2">C. Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';
+                // }
+                // $rows[] = $excel_orden_compra;
             //}
             $rows[] = $avance;
-
+            
             $data[] = $rows;
         }
         $output = array(
@@ -2313,9 +2354,61 @@ class PedidosPagados extends CI_Controller
         $data = $this->input->post();
         $files = $_FILES;
         $tmpUrl = $files['file']['tmp_name'];
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $this->maxFileSize = 200240;
+        $fileUrl = $this->uploadSingleFile([
+            'name' => $_FILES['file']['name'],
+            'type' => $_FILES['file']['type'],
+            'tmp_name' => $tmpUrl,
+            'error' => $_FILES['file']['error'],
+            'size' => $_FILES['file']['size'],
+        ], 'assets/agente_compra/purchase_order/');
+
         $objPHPExcel = PHPExcel_IOFactory::load($tmpUrl);
+
         
-        $response = $this->PedidosPagadosModel->uploadExcelPurchaseOrder($data, $objPHPExcel);
+        $yourName = 'YOURNAME'; // Replace with the desired name
+        $newFolder = 'assets/uploads/'; // Folder to extract to
+        $zipPath = $newFolder .$yourName. '.zip'; // Path for the renamed zip file
+        
+        // Rename the uploaded file to YOURNAME.zip
+        if (!rename($tmpUrl, $zipPath)) {
+            echo 'Failed to rename the file.';
+            exit;
+        }
+
+        $zip = new ZipArchive;
+        $res = $zip->open($zipPath);
+        if ($res === TRUE) {
+            $zip->extractTo($newFolder);
+            $zip->close();
+        } else {
+            echo 'Failed to open the zip file.';
+            exit;
+        }
+        $response = $this->PedidosPagadosModel->uploadExcelPurchaseOrder($data, $objPHPExcel,$zipPath,$fileUrl);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getExcelOrdersList(){
+        $idPedido = $this->input->post('idPedido');
+        $response = $this->PedidosPagadosModel->getExcelOrdersList($idPedido);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getExcelOrderDetails(){
+        $idOrder = $this->input->post('idOrder');
+        $response = $this->PedidosPagadosModel->getExcelOrderDetails($idOrder);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function deleteExcelOrder(){
+        $id = $this->input->post('id');
+        $step=$this->input->post('step');
+        $idPedido = $this->input->post('idPedido');
+        $response = $this->PedidosPagadosModel->deleteExcelOrder($id,$step,$idPedido);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function cambiarEstadoOrdenCompra(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->cambiarEstadoOrdenCompra($data);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }
