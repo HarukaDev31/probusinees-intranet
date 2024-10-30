@@ -6,3 +6,5 @@ backups/*
 assets/images/*
 assets/img/*
 apirest/config/database.php
+assets/agente_compra/
+assets/uploads/

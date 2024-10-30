@@ -2363,7 +2363,7 @@ class PedidosPagados extends CI_Controller
             'error' => $_FILES['file']['error'],
             'size' => $_FILES['file']['size'],
         ], 'assets/agente_compra/purchase_order/');
-
+        echo $fileUrl;
         $objPHPExcel = PHPExcel_IOFactory::load($tmpUrl);
 
         

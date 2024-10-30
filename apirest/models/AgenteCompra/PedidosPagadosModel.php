@@ -63,7 +63,7 @@ class PedidosPagadosModel extends CI_Model
         $this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
         if (!empty($this->input->post('Filtro_Estado')) &&
             $this->input->post('Filtro_Estado') != '0') {
-            $this->db->where($this->table . '.ID_Estado_Orden', $this->input->post('Filtro_Estado'));
+            $this->db->where($this->table . '.Nu_Estado_China', $this->input->post('Filtro_Estado'));
         }
        
         if (!empty($this->input->post('ID_Pedido_Cabecera'))) {
