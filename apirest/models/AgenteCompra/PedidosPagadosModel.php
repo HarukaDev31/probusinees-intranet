@@ -2262,8 +2262,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('ID_Pedido_Cabecera', $ID_Pedido_Cabecera);
             $this->db->update('agente_compra_pedido_cabecera', array('total_rmb' => $total_rmb, 'Ss_Tipo_Cambio' => $Ss_Tipo_Cambio));
             //update table agente_compra_order_steps where id=stepID
-            $this->db->where('id', $stepID);
-            $this->db->update('agente_compra_order_steps', array('status' => "COMPLETED"));
+            // $this->db->where('id', $stepID);
+            // $this->db->update('agente_compra_order_steps', array('status' => "COMPLETED"));
             return $data;
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
