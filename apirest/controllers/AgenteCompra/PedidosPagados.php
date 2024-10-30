@@ -2363,14 +2363,16 @@ class PedidosPagados extends CI_Controller
             'error' => $_FILES['file']['error'],
             'size' => $_FILES['file']['size'],
         ], 'assets/agente_compra/purchase_order/');
-        echo $fileUrl;
         $objPHPExcel = PHPExcel_IOFactory::load($tmpUrl);
 
         
         $yourName = 'YOURNAME'; // Replace with the desired name
         $newFolder = 'assets/uploads/'; // Folder to extract to
         $zipPath = $newFolder .$yourName. '.zip'; // Path for the renamed zip file
-        
+        //create the folder if it doesn't exist
+        if (!file_exists($newFolder)) {
+            mkdir($newFolder, 0777, true);
+        }
         // Rename the uploaded file to YOURNAME.zip
         if (!rename($tmpUrl, $zipPath)) {
             echo 'Failed to rename the file.';
