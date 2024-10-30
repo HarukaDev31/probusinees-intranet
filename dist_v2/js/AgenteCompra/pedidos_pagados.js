@@ -9487,7 +9487,7 @@ const openOrdenCompra = async (response) => {
       $("#btn-rotulado").hide();
       buttonsData = {
         btnSave: {
-          text: "Verificar",
+          text: "Guardar",
           action: `saveOrdenCompra()`,
         },
         btnCancel: {
@@ -10676,7 +10676,7 @@ const addEventsToExcelItems = () => {
       $("#btn-rotulado").hide();
       buttonsData = {
         btnSave: {
-          text: "Verificar",
+          text: "Guardar",
           action: `saveOrdenCompra()`,
         },
         btnCancel: {
