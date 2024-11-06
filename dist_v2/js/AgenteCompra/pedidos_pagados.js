@@ -8878,7 +8878,7 @@ const openOrdenCompra = async (response) => {
     }
     let index = 0;
     excelData.forEach((item) => {
-      const itemTest = getExcelOrderItem(item, index);
+      const itemTest = getExcelOrderItem(item, index,excelData.length);
       index++;
 
       $(".orden-compra-header-excel-container").append(itemTest);
@@ -9998,7 +9998,7 @@ const openSupplierDetails = (name, phone) => {
     $("#modalsupplier-data").modal("hide");
   });
 };
-const getExcelOrderItem = (itemData, index) => {
+const getExcelOrderItem = (itemData, index,count) => {
   const item = {
     "name": itemData.name,
     "uploadDate": itemData.created_at,
@@ -10027,7 +10027,7 @@ const getExcelOrderItem = (itemData, index) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalChina) || index != 0 ? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalChina) &&(index==count-1 &&index!=0) ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrder(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10112,7 +10112,7 @@ $(document).ready(function () {
           $(".orden-compra-header-excel-container").empty();
           let index = 0;
           excelData.forEach((item) => {
-            const itemTest = getExcelOrderItem(item, index);
+            const itemTest = getExcelOrderItem(item, index,excelData.length);
 
             $(".orden-compra-header-excel-container").append(itemTest);
           });
@@ -10484,13 +10484,13 @@ const getExcelOrderPaymentsSeekingDetailsTemplate = (producto, show = true) => {
     ${producto.fecha_entrega}
     </div>
     <div class="total-invoice-column">
-    ${producto.total_invoice}
+    ¥${producto.total_invoice}
     </div>
     <div class="adelanto-column">
-    ${producto.adelanto}
+    ¥${producto.adelanto}
     </div>
     <div class="restante-column">
-    ${producto.restante}
+    ¥${producto.restante}
     </div>
     <div class="pagos-column d-flex flex-column"">
       
