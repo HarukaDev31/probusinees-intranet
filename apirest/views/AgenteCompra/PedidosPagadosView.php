@@ -364,13 +364,12 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             </form>
             <form class="card-body" id="container-inspeccion">
             </form>
-            <div class="card-body" id="container_orden-compra">
-              <div class="orden-compra_header_china"></div>
-              <div class="orden-compra-header-excel">
+            <div class="card-body" id="container_orden-compra-pagos">
+              <div class="orden-compra-header-pagos-excel">
                 <div class="row ">
                   <div class="col-12 col-md-6 d-flex align-items-center">
-                    <label class="custom-file-upload" data-toggle="modal" data-target="#uploadModal">
-                    <i class="fas fa-upload"></i> Subir Orden
+                    <label class="custom-file-upload"  data-toggle="modal" data-target="#uploadModal">
+                    <i class="fas fa-upload"></i> Subir Seguimiento
                     </label>
                   </div>
                   <!--Valor total del excel selecionado-->
@@ -381,9 +380,105 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                     </div>
                 </div>
                   
-                  <div class="col-12 orden-compra-header-excel-container">
+                  <div class="col-12 orden-compra-header-pagos-excel-container">
 
                   </div>
+              </div>
+              
+              <div class="orden-compra_header" id="orden-compra_header-pagos">
+                <div class="proveedor-column">
+                  Proveedor
+                </div>
+                <div class="producto-column">
+                  # Producto
+                </div>
+                <div class="fecha-entrega-column">
+                  F. Entrega
+                </div>
+                <div class="total-invoice-column">
+                  Total Invoice
+                </div>
+                <div class="adelanto-column">
+                  Adelanto
+                </div>
+                <div class="restante-column">
+                  Restante
+                </div>
+                <div class="pagos-column">
+                  Pagos
+                </div>
+              </div>
+              <div id="orden-compra_body-pagos">
+              </div>
+              </div>
+            </div>  
+            <div class="card-body" id="container_orden-compra-pagos-detalle">
+              <div class="orden-compra-header-pagos-detalle-excel">
+                <div class="row ">
+                  <div class="col-12 col-md-6 d-flex align-items-center">
+                    <label class="custom-file-upload" data-toggle="modal" data-target="#uploadModal">
+                    <i class="fas fa-upload"></i> Subir Pagos
+                    </label>
+                  </div>
+                  <!--Valor total del excel selecionado-->
+                  <div class="col-12 col-md-6 text-right px-5 my-3">
+                    <div class="p-3 rounded shadow">
+                        <label class="h6 font-weight-bold">Valor Total:</label>
+                        <span id="valor-total-excel-pagos" class="d-block h4 font-weight-bold">$0</span>
+                    </div>
+                </div>
+                  
+                  <div class="col-12 orden-compra-header-detalle-pagos-excel-container" id="orden-compra-header-detalle-pagos-excel-container">
+
+                  </div>
+                </div>
+              </div>
+                <div class="orden-compra_header-detalle-excel orden-compra_header">
+                  <div class="proveedor-column">
+                    Proveedor
+                  </div>
+                  <div class="producto-column">
+                    # Producto
+                  </div>
+                  <div class="fecha-entrega-column">
+                    F. Entrega
+                  </div>
+                  <div class="total-invoice-column">
+                    Total Invoice
+                  </div>
+                  <div class="adelanto-column">
+                    Adelanto
+                  </div>
+                  <div class="restante-column">
+                    Restante
+                  </div>
+                  <div class="pagos-column">
+                    Datos de Pago
+                  </div>
+                  <div class="pagos-column">
+                    QR de Pago
+                  </div>
+                </div>
+                <div id="orden-compra_body-detalle-excel">
+                </div>
+            </div>
+            <div class="card-body" id="container_orden-compra">
+              <div class="orden-compra-header-excel">
+                <div class="row ">
+                  <div class="col-12 col-md-6 d-flex align-items-center">
+                    <label class="custom-file-upload" id="custom-file-upload-pagos-detalle" data-toggle="modal" data-target="#uploadModal">
+                    <i class="fas fa-upload"></i> Subir Orden
+                    </label>
+                  </div>
+                  <!--Valor total del excel selecionado-->
+                  <div class="col-12 col-md-6 text-right px-5 my-3">
+                    <div class="p-3 rounded shadow">
+                        <label class="h6 font-weight-bold">Valor Total:</label>
+                        <span id="valor-total-excel" class="d-block h4 font-weight-bold">$0</span>
+                    </div>
+                </div>
+                <div class="col-12 orden-compra-header-excel-container">
+                </div>
               </div>
               <div class="orden-compra_header row">
                 <div class="col-12 col-md-3">
@@ -400,6 +495,9 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                 </div>
 
               </div>
+            </div>
+            </div>
+            <div class="pagos-buttons">
             </div>
             <div class="card-body" id="container-rotulado">
             </div>
@@ -541,7 +639,7 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="upload-body">
                 <input type="file" class="form-control-file" id="file-input" accept=".xlsx">
             </div>
             <div class="modal-footer">
@@ -3464,8 +3562,9 @@ echo form_open('', $attributes);?>
             border-radius: 12px;
             font-size: 0.8rem;
         }
-        .orden-compra-header-excel-container{
+        .orden-compra-header-excel-container,.orden-compra-header-pagos-excel-container, .orden-compra-header-detalle-pagos-excel-container{
           max-width: 100vw;
+          width: 100%;
           overflow-x: auto;
           height: auto;
           display: flex;
@@ -3474,7 +3573,8 @@ echo form_open('', $attributes);?>
           margin-bottom: 1em;
         }
         @media (max-width: 768px) {
-          .orden-compra-header-excel-container{
+          .orden-compra-header-excel-container,.orden-compra-header-pagos-excel-container,
+          .orden-compra-header-detalle-pagos-excel-container{
             flex-direction: column;
             row-gap: 1em;
             align-items: center;
@@ -3503,6 +3603,39 @@ echo form_open('', $attributes);?>
         .custom-file-upload i {
             margin-right: 6px;
         }
+        #orden-compra_header-pagos,.orden-compra_header-detalle-excel{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          max-width: 100vw;
+          width:100%;
+          overflow-x: auto;
+          text-align: center;
+        }
+        #orden-compra_body-pagos{
+          display: flex;
+          flex-direction: column;
+          min-width: 100%;
+          overflow-x: auto;
+        }
+        .producto{
+          display: flex!important;
+          flex-direction: row!important;
+          width: 100%;
+          border-radius: 1em;
+          padding:1em 0;
+        }
+        .proveedor-column,.producto-column,
+        .fecha-entrega-column,.total-invoice-column,
+        .adelanto-column,.restante-column,
+        .pagos-column
+        {
+
+          width: 150px;
+        }
         
+    
+        
+       
   </style>
   <?php echo form_close(); ?>

@@ -2001,27 +2001,25 @@ class PedidosPagados extends CI_Controller
                 }
             }
             if ($step == 2) {
-                //if peru personal
-                if ($priviligie == $this->personalPeruPrivilegio) {
                     $data = $this->PedidosPagadosModel->getPedidoPagos($idPedido);
+                    echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
+                // if ($priviligie == $this->personalPeruPrivilegio) {
+                //     $data = $this->PedidosPagadosModel->getPedidoPagos($idPedido);
                     
-                    echo json_encode(array(
-                        'status' => 'success', 'data' => $data['data'],
-                        'pagosData' => $data['pagos'], 'priviligie' => $priviligie,
-                    ));
-                    return;
-                } else if ($priviligie == $this->personalChinaPrivilegio || $priviligie == $this->jefeChinaPrivilegio) {
-                    $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, null);
-                    echo json_encode(array(
-                        'status' => 'success',
-                        'data' => $data,
-                        'priviligie' => $priviligie,
-                    ));
-                    return;
-                } else {
-                    echo json_encode(array('status' => 'error', 'data' => [], 'priviligie' => $priviligie));
-                    return;
-                }
+                //     echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
+                //     return;
+                // } else if ($priviligie == $this->personalChinaPrivilegio || $priviligie == $this->jefeChinaPrivilegio) {
+                //     $data = $this->PedidosPagadosModel->getSupplierProducts($idPedido, null);
+                //     echo json_encode(array(
+                //         'status' => 'success',
+                //         'data' => $data,
+                //         'priviligie' => $priviligie,
+                //     ));
+                //     return;
+                // } else {
+                //     echo json_encode(array('status' => 'error', 'data' => [], 'priviligie' => $priviligie));
+                //     return;
+                // }
                 // }else{
                 //     echo json_encode(array('status' => 'error', 'data' => [],'priviligie'=>$priviligie));
                 //     return;
@@ -2396,6 +2394,16 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->getExcelOrdersList($idPedido);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    public function getExcelOrderPaymentsSeekingList(){
+        $idPedido = $this->input->post('idPedido');
+        $response = $this->PedidosPagadosModel->getExcelOrderPaymentsSeekingList($idPedido);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getExcelOrderPaymentsSeekingDetails(){
+        $idOrder = $this->input->post('idOrder');
+        $response = $this->PedidosPagadosModel->getExcelOrderPaymentsSeekingDetails($idOrder);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
     public function getExcelOrderDetails(){
         $idOrder = $this->input->post('idOrder');
         $response = $this->PedidosPagadosModel->getExcelOrderDetails($idOrder);
@@ -2411,6 +2419,69 @@ class PedidosPagados extends CI_Controller
     public function cambiarEstadoOrdenCompra(){
         $data = $this->input->post();
         $response = $this->PedidosPagadosModel->cambiarEstadoOrdenCompra($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function uploadExcelSeekingPagos(){
+        $data = $this->input->post();
+        $files = $_FILES;
+        $tmpUrl = $files['file']['tmp_name'];
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $this->maxFileSize = 200240;
+        $fileUrl = $this->uploadSingleFile([
+            'name' => $_FILES['file']['name'],
+            'type' => $_FILES['file']['type'],
+            'tmp_name' => $tmpUrl,
+            'error' => $_FILES['file']['error'],
+            'size' => $_FILES['file']['size'],
+        ], 'assets/agente_compra/purchase_order/');
+        $objPHPExcel = PHPExcel_IOFactory::load($tmpUrl);
+
+        
+        $yourName = 'SeekingPagos'; // Replace with the desired name
+        $newFolder = 'assets/uploads/'; // Folder to extract to
+        $zipPath = $newFolder .$yourName. '.zip'; // Path for the renamed zip file
+        //create the folder if it doesn't exist
+        if (!file_exists($newFolder)) {
+            mkdir($newFolder, 0777, true);
+        }
+        // Rename the uploaded file to YOURNAME.zip
+        if (!rename($tmpUrl, $zipPath)) {
+            echo 'Failed to rename the file.';
+            exit;
+        }
+
+        $zip = new ZipArchive;
+        $res = $zip->open($zipPath);
+        if ($res === TRUE) {
+            $zip->extractTo($newFolder);
+            $zip->close();
+        } else {
+            echo 'Failed to open the zip file.';
+            exit;
+        }
+        $response = $this->PedidosPagadosModel->uploadExcelSeekingPagos($data, $objPHPExcel,$zipPath,$fileUrl);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getExcelOrderPaymentsSeekingDetailDocument(){
+        $idDetail = $this->input->post('id');
+        $response = $this->PedidosPagadosModel->getExcelOrderPaymentsSeekingDetailDocument($idDetail);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function uploadExcelSeekingPagosDocument(){
+        $data = $this->input->post();
+        $files = $_FILES;
+        
+        $response = $this->PedidosPagadosModel->uploadExcelSeekingPagosDocument($data, $files);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function deleteExcelOrderPagos(){
+        $id = $this->input->post('id');
+        $response = $this->PedidosPagadosModel->deleteExcelOrderPagos($id);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function deleteExcelOrderPagosDocuments(){
+        $id = $this->input->post('id');
+        $response = $this->PedidosPagadosModel->deleteExcelOrderPagosDocuments($id);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }

@@ -1,3 +1,4 @@
+
 var url, table_Entidad;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
@@ -15,8 +16,10 @@ let priviligesAlmacen = 6;
 let currentPrivilege = null;
 let pagosCount = 2;
 let arrQuillNotas = [];
+let selectedStepid = 0;
 let isSelectingOption = false;
-
+let showPagosDocuments = false;
+let selectedOrderPagoId=0;
 const editIcon = `<?xml version="1.0" encoding="utf-8"?>
 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Edit / Edit_Pencil_02">
@@ -45,6 +48,12 @@ let containerCoordination = null;
 let containerAlmacen = null;
 let containerInspection = null;
 let currentServicio = 1;
+let containerExcelPagos = null;
+let containerExcelPagosDetalle = null;
+let containerExcelHeaderPagosDetalle = null;
+let containerExcelHeaderPagos = null;
+let idPedidoDetalle = null;
+let pagosButtons = null;
 $(function () {
   sectionTitle = $("#section-title");
   containerVer = $("#container-ver");
@@ -62,6 +71,14 @@ $(function () {
   containerCoordination.hide();
   containerInspection = $("#container-inspeccion");
   containerInspection.hide();
+  containerExcelPagos = $("#container_orden-compra-pagos");
+  containerExcelPagosDetalle = $("#container_orden-compra-pagos-detalle");
+  containerExcelPagos.hide();
+  containerExcelPagosDetalle.hide();
+  containerExcelHeaderPagosDetalle = $("#orden-compra-header-detalle-pagos-excel-container");
+  containerExcelHeaderPagos = $(".orden-compra-header-pagos-excel-container");
+  pagosButtons = $(".pagos-buttons");
+  pagosButtons.hide();
   $(".select2").select2();
 
   $("#cbo-proveedor-Nu_Tipo_Pay_Proveedor_China").change(function () {
@@ -7431,20 +7448,23 @@ const openStepFunction = async (i, stepId) => {
   $("#container-inspeccion").empty();
   containerOrdenCompra.show();
   selectedStep = stepId;
+  selectedStepid = i;
   url = base_url + "AgenteCompra/PedidosPagados/getStepByRole";
   //ajax post
-  $.post(url, { idPedido: idPedido, step: i }, async function  (response) {
+  $.post(url, { idPedido: idPedido, step: i }, async function (response) {
     const responseParsed = JSON.parse(response);
     currentPrivilege = responseParsed.priviligie;
     if (i == 1) {
       await openOrdenCompra(response);
     }
     if (i == 2) {
-      if (currentPrivilege == 1) {
-        openPagos(response);
-      } else {
-        openCoordination(response);
-      }
+      openPagos(response);
+      // if (currentPrivilege == 1) {
+      //   openPagos(response);
+        
+      // } else {
+      //   openCoordination(response);
+      // }
     }
     if (i == 3) {
       if (currentPrivilege == 2 || currentPrivilege == 1) {
@@ -8683,557 +8703,19 @@ const getPagosTemplate = (data = null) => {
   return html;
 };
 const openPagos = (response) => {
-  $("#container_orden-compra").hide();
-  $("#pago-garantia-container").hide();
-  response = JSON.parse(response);
-  containerPagos.show();
-  $("#pagos-form").append(getPagosTemplate());
-  const downloadSvg = `<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="120px" height="120px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-<path d="M12 2L12 15M12 15L9 11.5M12 15L15 11.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`;
+  const data = JSON.parse(response).data;
+  containerExcelPagos.show();
+  containerOrdenCompra.hide();
 
-  pagosCount = 2;
-  if (response.status == "success") {
-    const data = response.data;
+  fillExcelOrderPaymentsSeeking(
+    containerExcelHeaderPagos,
+    data);
+    addEventToOrdenPagosExcel();
 
-    $("#orden_total").html("$" + data.orden_total.toFixed(2));
-    $("#pago_cliente").html("$" + data.pago_cliente.toFixed(2));
-    const pagoRestante = data.orden_total - data.pago_cliente;
-    $("#pago_restante").html("$" + pagoRestante.toFixed(2));
-    //set font bold
-    $("#pago_restante").css("font-weight", "bold");
-    if (pagoRestante <= 0) {
-      //add class text success
-      $("#pago_restante").addClass("text-success");
-    } else {
-      $("#pago_restante").removeClass("text-success");
-      $("#pago_restante").addClass("text-danger");
-    }
-    const ordenTotal = data.orden_total;
-    //on input file change set filename to div
-    $(".pago-value").each(function () {
-      $(this).on("input", function () {
-        const value = $(this).val();
-        if (value == "") value = 0;
-        let pagoClienteSum = 0;
-        //if is number
-        if (!isNaN(value)) {
-          $(".pago-value").each(function () {
-            const value = $(this).val();
-            if (!isNaN(value)) {
-              pagoClienteSum += parseFloat(value);
-              $("#pago_cliente").html("$" + pagoClienteSum);
-              const restante = ordenTotal - pagoClienteSum;
-              if (restante <= 0) {
-                $("#pago_restante").removeClass("text-danger");
-                $("#pago_restante").addClass("text-success");
-              } else {
-                $("#pago_restante").removeClass("text-success");
-                $("#pago_restante").addClass("text-danger");
-              }
-              $("#pago_restante").html("$" + restante);
-            }
-          });
-        }
-      });
-    });
-    $("#liquidacion-file").change(function () {
-      const file = $(this)[0].files[0];
-      if (file) {
-        const fileName = file.name;
-        if (fileName.length > 15) {
-          $("#liquidacion-name").html(fileName.substring(0, 15) + "...");
-        } else {
-          $("#liquidacion-name").html(fileName);
-        }
-        $(".liquidacion-container")
-          .removeClass("not-filled")
-          .addClass("filled");
-      } else {
-        $("#liquidacion-name").html("Seleccionar archivo");
-        $(".liquidacion-container")
-          .removeClass("filled")
-          .addClass("not-filled");
-      }
-    });
-    $("#garantia-file").change(function () {
-      const file = $(this)[0].files[0];
-      if (file) {
-        const fileName = file.name;
-        if (fileName.length > 15) {
-          $("#garantia-name").html(fileName.substring(0, 15) + "...");
-        } else {
-          $("#garantia-name").html(fileName);
-        }
-        $(".garantia-container").removeClass("not-filled").addClass("filled");
-      } else {
-        $("#garantia-name").html("Seleccionar archivo");
-        $(".garantia-container").removeClass("filled").addClass("not-filled");
-      }
-    });
-    $("#pago1-file").change(function () {
-      const file = $(this)[0].files[0];
-      if (file) {
-        const fileName = file.name;
-        if (fileName.length > 15) {
-          $("#pago1-name").html(fileName.substring(0, 15) + "...");
-        } else {
-          $("#pago1-name").html(fileName);
-        }
-        $(".pago1-container").removeClass("not-filled").addClass("filled");
-      } else {
-        $("#pago1-name").html("Seleccionar archivo");
-        $(".pago1-container").removeClass("filled").addClass("not-filled");
-      }
-    });
-    $("#pago2-file").change(function () {
-      const file = $(this)[0].files[0];
-      if (file) {
-        const fileName = file.name;
-        if (fileName.length > 15) {
-          $("#pago2-name").html(fileName.substring(0, 15) + "...");
-        } else {
-          $("#pago2-name").html(fileName);
-        }
-        $(".pago2-container").removeClass("not-filled").addClass("filled");
-      } else {
-        $("#pago2-name").html("Seleccionar archivo");
-        $(".pago2-container").removeClass("filled").addClass("not-filled");
-      }
-    });
-    //pagosData iterate
-
-    if (response.pagosData) {
-      const pagosData = response.pagosData;
-      let pagocontainer;
-      let pagosN = pagosData.filter((pago) => pago.name == "normal");
-      let pagosG = pagosData.filter((pago) => pago.name == "garantia");
-      let pagosL = pagosData.filter((pago) => pago.name == "liquidacion");
-      pagosL.forEach((pago, i) => {
-        pagocontainer = $(`.liquidacion-container`);
-        pagocontainer.empty();
-        $(`#liquidacion-description`).val(pago.description);
-        pagocontainer.append(
-          `<span class="remove-item" onclick="openFileSelector('liquidacion-file')">${editIcon}</span>`
-        );
-        if (pago.idPayment) {
-          $(`.liquidacion-container`).append(
-            `<input type="hidden" name="liquidacion[id]" value="${pago.idPayment}">`
-          );
-        }
-        if (pago.file_url != null) {
-          pagocontainer.append(downloadSvg);
-
-          const fileName = pago.file_url.split("_").pop();
-          if (fileName.length > 15) {
-            $(`#liquidacion-name`).html(fileName.substring(0, 15) + "...");
-          } else {
-            $(`#liquidacion-name`).html(fileName);
-          }
-          $(`.liquidacion-container`)
-            .removeClass("not-filled")
-            .addClass("filled");
-
-          //remove click ontag property
-          $(`.liquidacion-container`).removeAttr("onclick");
-          $(`.liquidacion-container`).click(function () {
-            const fileExtension = pago.file_url.split(".").pop();
-            if (fileExtension == "pdf") {
-              downloadFile(pago.file_url);
-              return;
-            }
-            openInputFile(`liquidacion-file`, pago.file_url);
-          });
-        }
-      });
-      pagosG.forEach((pago, i) => {
-        pagocontainer = $(`.garantia-container`);
-
-        if (pago.idPayment) {
-          $(`.garantia-container`).append(
-            `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
-          );
-        }
-        $(`#garantia-value`).val(pago.value);
-        if (pago.file_url != null) {
-          pagocontainer.empty();
-          pagocontainer.append(downloadSvg);
-          if (pago.idPayment) {
-            $(`.garantia-container`).append(
-              `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
-            );
-          }
-          const fileName = pago.file_url.split("_").pop();
-          if (fileName.length > 15) {
-            $(`#garantia-name`).html(fileName.substring(0, 15) + "...");
-          } else {
-            $(`#garantia-name`).html(fileName);
-          }
-          $(`.garantia-container`).removeClass("not-filled").addClass("filled");
-          $(`.garantia-container`).append(
-            `<input type="hidden" name="garantia[id]" value="${pago.idPayment}">`
-          );
-          //remove click ontag property
-          $(`.garantia-container`).removeAttr("onclick");
-          $(`.garantia-container`).click(function () {
-            const fileExtension = pago.file_url.split(".").pop();
-            if (fileExtension == "pdf") {
-              downloadFile(pago.file_url);
-              return;
-            }
-            openInputFile(`garantia-file`, pago.file_url);
-          });
-        }
-      });
-      pagosN.forEach((pago, i) => {
-        const currenIndex = i + 1;
-        console.log(currenIndex);
-        if (currenIndex <= 2) {
-          pagocontainer = $(`.pago${currenIndex}-container`);
-
-          if (pago.idPayment) {
-            $(`#pago${currenIndex}-container`).append(
-              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
-            );
-          }
-
-          // $(`.pago${currenIndex}-container`).val(pago.value);
-          $(`#pago${currenIndex}-value`).val(pago.value);
-
-          if (pago.file_url != null) {
-            pagocontainer.empty();
-            if (pago.idPayment) {
-              $(`#pago${currenIndex}-container`).append(
-                `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
-              );
-            }
-            pagocontainer.append(
-              `<span class="remove-item" onclick="openFileSelector('pago${currenIndex}-file')">${editIcon}</span>`
-            );
-
-            pagocontainer.append(downloadSvg);
-            const fileName = pago.file_url.split("_").pop();
-            if (fileName.length > 15) {
-              $(`#pago${currenIndex}-name`).html(
-                fileName.substring(0, 15) + "..."
-              );
-            } else {
-              $(`#pago${currenIndex}-name`).html(fileName);
-            }
-            $(`.pago${currenIndex}-container`)
-              .removeClass("not-filled")
-              .addClass("filled");
-
-            //remove click ontag property
-            $(`.pago${currenIndex}-container`).removeAttr("onclick");
-            $(`.pago${currenIndex}-container`).click(function () {
-              const fileExtension = pago.file_url.split(".").pop();
-              if (fileExtension == "pdf") {
-                downloadFile(pago.file_url);
-                return;
-              }
-              openInputFile(`pago${currenIndex}-file`, pago.file_url);
-            });
-          }
-        } else {
-          addPago();
-          pagocontainer = $(`.pago${currenIndex}-container`);
-          $(`#pago${currenIndex}-remove`)
-            .unbind("click")
-            .click(function () {
-              deletePago(currenIndex, pago.idPayment);
-            });
-          $(`#pago${currenIndex}-value`).val(pago.value);
-          if (pago.idPayment) {
-            $(`.pago${currenIndex}-container`).append(
-              `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
-            );
-          }
-          if (pago.file_url != null) {
-            pagocontainer.empty();
-            if (pago.idPayment) {
-              $(`.pago${currenIndex}-container`).append(
-                `<input type="hidden" name="file[${currenIndex}][id]" value="${pago.idPayment}">`
-              );
-            }
-            pagocontainer.append(downloadSvg);
-            const fileName = pago.file_url.split("_").pop();
-            if (fileName.length > 20) {
-              $(`#pago${currenIndex}-name`).html(
-                fileName.substring(0, 20) + "..."
-              );
-            } else {
-              $(`#pago${currenIndex}-name`).html(fileName);
-            }
-            $(`.pago${currenIndex}-container`)
-              .removeClass("not-filled")
-              .addClass("filled");
-            $(`.pago${currenIndex}-container`).removeAttr("onclick");
-            $(`.pago${currenIndex}-container`).click(function () {
-              const fileExtension = pago.file_url.split(".").pop();
-              if (fileExtension == "pdf") {
-                downloadFile(pago.file_url);
-                return;
-              }
-              openInputFile(`pago${currenIndex}-file`, pago.file_url);
-            });
-          }
-        }
-      });
-    }
-    //   const pagosData = response.pagosData;
-    //   const existsGarantia = pagosData.some((pago) => pago.name == "garantia");
-    //   let indexPagos = 1;
-    //   $("#pago-1-value").val(0);
-    //   $("#pago-1_ID").remove();
-    //   $("#pago-1-btnlink").remove();
-    //   // $('#pago-1-div').append('<input type="file" name="pago-1" id="pago-1" class="">');
-    //   $("#pago-2-value").val(0);
-    //   $("#pago-2-btnlink").remove();
-    //   $("#pago-2_ID").remove();
-    //   // $('#pago-2-div').append('<input type="file" name="pago-2" id="pago-2" class="">');
-    //   pagosData.forEach((pago, i) => {
-    //     if (pago.name == "garantia") {
-    //       $("#pago-garantia").hide();
-    //       $("#pago-garantia_ID").remove();
-    //       $("#pago-garantia-container").append(
-    //         `<input type="hidden" name="pago-garantia_ID" id="pago-garantia_ID" value="${pago.idPayment}">`
-    //       );
-    //       $("#pago-garantia_URL").val(pago.file_url);
-    //       $("#pago-garantia-div").append(`
-    //         <a href="${pago.file_url}" id="pago-garantia-btnlink" class="btn btn-primary btn-ver-pago" target="_blank">Ver Garantia</a>`);
-    //       $("#pago-garantia-value").val(pago.value);
-    //       $(`#pago-${indexPagos}-btnlink`).remove();
-
-    //       $(`#pago-${indexPagos}-div`).append(`
-    //         <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //     } else if (pago.name == "normal") {
-    //       $(`#pago-${indexPagos}`).show();
-    //       if (pago.file_url != null && indexPagos <= 2) {
-    //         $(`#pago-${indexPagos}_URL`).val(pago.file_url);
-    //         $(`#pago-${indexPagos}`).hide();
-    //         $(`#pago-${indexPagos}-div`).append(
-    //           `<input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`
-    //         );
-    //         $(`#pago-${indexPagos}-div`).append(`
-    //           <a href="${pago.file_url}" id="pago-${indexPagos}-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //         $(`#pago-${indexPagos}-div`).append(`
-    //         <input type="hidden" name="pago-${indexPagos}_ID" id="pago-${indexPagos}_ID" value="${pago.idPayment}">`);
-    //       }
-
-    //       if (indexPagos > 2) {
-    //         if (!$(`#pago-${indexPagos}-div`)) {
-    //           $(`#pago-${indexPagos}-div`).append(
-    //             `<input type="number" name="pago-${indexPagos}-value" id="pago-${indexPagos}-value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
-    //           );
-    //         }
-    //       }
-    //       $(`#pago-${indexPagos}-value`).val(pago.value);
-
-    //       indexPagos++;
-    //     } else if (pago.name == "liquidacion") {
-    //       $(`#liquidacion_URL`).val(pago.file_url);
-    //       $(`#liquidacion`).hide();
-    //       $(`#liquidacion_ID`).remove();
-    //       $(`#liquidacion-container`).append(
-    //         `<input type="hidden" name="liquidacion_ID" id="liquidacion_ID" value="${pago.idPayment}">`
-    //       );
-    //       $("#liquidacion_btnlink").remove();
-    //       $(`#liquidacion-container`).append(`
-    //         <a href="${pago.file_url}" id="liquidacion_btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Liquidacion</a>`);
-    //     }
-    //   });
-    //   const pago_switch_3 = $(`#pago3_URL_switch`);
-    //   const pago3Div = $(`#pago-3-div`);
-    //   const pago_switch_4 = $(`#pago4_URL_switch`);
-    //   const pago4Div = $(`#pago-4-div`);
-    //   console.log(indexPagos);
-    //   if (indexPagos > 3) {
-    //     pago_switch_3.prop("checked", true);
-    //     if (pagosData[2].file_url != null) {
-    //       //append input hide with pago_ID
-    //       if ($("#pago-3_ID").length == 0) {
-    //         pago3Div.append(
-    //           `<input type="hidden" name="pago-3_ID" id="pago-3_ID" value="${pagosData[2].idPayment}">`
-    //         );
-    //       }
-    //       if ($("#pago-3_value").length == 0) {
-    //         pago3Div.append(
-    //           `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
-    //         );
-    //       }
-    //       if ($(`#pago-3-btnlink`).length == 0) {
-    //         $(`#pago-3-div`).append(`
-    //             <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //       }
-    //       if ($("#pago-3_URL").length == 0) {
-    //         $(`#pago-3-div`).append(`
-    //         <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
-    //       }
-    //     } else {
-    //       if ($("#pago3-file").length == 0) {
-    //         pago3Div.append(
-    //           '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
-    //         );
-    //       }
-    //       if ($("#pago-3_value").length == 0) {
-    //         pago3Div.append(
-    //           `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="${pagosData[2].value}" autocomplete="off" />`
-    //         );
-    //       }
-    //     }
-    //   } else {
-    //     pago_switch_3.prop("checked", false);
-    //     $("pago3-file").remove();
-    //     $("#pago-3-btnlink").remove();
-    //   }
-    //   pago_switch_3.change(function () {
-    //     if ($(this).is(":checked")) {
-    //       if (indexPagos > 3) {
-    //         if (pagosData[2].file_url) {
-
-    //           if ($("#pago-3_value").length == 0) {
-    //             pago3Div.append(
-    //               `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
-    //             );
-    //           }
-    //           if ($(`#pago-3-btnlink`).length == 0) {
-    //             $(`#pago-3-div`).append(`
-    //               <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //           }
-    //           if ($("#pago-3_URL").length == 0) {
-    //             $(`#pago-3-div`).append(`
-    //             <input type="hidden" name="pago-3_URL" id="pago-3_URL" value="${pagosData[2].file_url}">`);
-    //           }
-    //         } else {
-    //           if ($("#pago3-file").length == 0) {
-    //             pago3Div.append(
-    //               '<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off"></input>'
-    //             );
-    //           }
-    //           if ($("#pago-3_value").length == 0) {
-    //             pago3Div.append(
-    //               `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" value="${pagosData[2].value}"/>`
-    //             );
-    //           }
-    //         }
-    //       } else {
-    //         if ($("#pago3-file").length == 0) {
-    //           pago3Div.append(
-    //             `<input type="file" name="pago-3" id="pago3-file" class="" placeholder="" value="" autocomplete="off" />`
-    //           );
-    //         }
-    //         if ($("#pago-3_value").length == 0) {
-    //           pago3Div.append(
-    //             `<input type="number" name="pago-3-value" id="pago-3_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
-    //           );
-    //         }
-    //         if ($(`#pago-3-btnlink`).length == 0) {
-    //           $(`#pago-3-div`).append(`
-    //             <a href="${pagosData[2].file_url}" id="pago-3-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //         }
-    //       }
-    //     } else {
-    //       pago3Div.find("#pago-3-btnlink").remove();
-    //       pago3Div.find("#pago3-file").remove();
-    //       pago3Div.find("#pago-3_value").remove();
-    //       pago3Div.find(`#pago-3-btnlink`).remove();
-    //     }
-    //   });
-    //   ///append an a tag with the link to the file
-
-    //   if (indexPagos > 4) {
-    //     pago_switch_4.prop("checked", false);
-
-    //     if (pagosData[3].file_url != null) {
-    //       pago_switch_4.prop("checked", true);
-    //       if ($("#pago-4_ID").length == 0) {
-    //         pago4Div.append(
-    //           `<input type="hidden" name="pago-4_ID" id="pago-4_ID" value="${pagosData[3].idPayment}">`
-    //         );
-    //       }
-    //       if ($("#pago-4_value").length == 0) {
-    //         pago4Div.append(
-    //           `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="${pagosData[3].value}" autocomplete="off" />`
-    //         );
-    //       }
-    //       if ($(`#pago-4-btnlink`).length == 0) {
-    //         $(`#pago-4-div`).append(`
-    //           <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //       }
-    //       if ($("#pago-4_URL").length == 0) {
-    //         $(`#pago-4-div`).append(`
-    //         <input type="hidden" name="pago-4_URL" id="pago-4_URL" value="${pagosData[2].file_url}">`);
-    //       }
-    //     } else {
-    //       pago_switch_4.prop("checked", false);
-    //       $("pago4-file").remove();
-    //       $("#pago-4-btnlink").remove();
-    //     }
-    //   }
-    //   pago_switch_4.change(function () {
-    //     if ($(this).is(":checked")) {
-    //       if (indexPagos > 4) {
-    //         if (pagosData[3].file_url) {
-    //           pago4Div.append(
-    //             `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off"
-    //             value="${pagosData[3].value}"/>`
-    //           );
-    //           pago4Div.append(
-    //             `<a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank" name="pago-4_URL">Ver Pago</a>`
-    //           );
-
-    //           if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
-    //             $(`#pago-4-div`).append(`
-    //               <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //           }
-    //         }
-    //       } else {
-    //         console.log("append", pago4Div);
-    //         if ($("#pago4-file").length == 0) {
-    //           pago4Div.append(
-    //             `<input type="file" name="pago-4" id="pago4-file" class="" placeholder="" value="" autocomplete="off" />`
-    //           );
-    //         }
-    //         //append input type number
-    //         if ($("#pago-4_value").length == 0) {
-    //           pago4Div.append(
-    //             `<input type="number" name="pago-4-value" id="pago-4_value" class="form-control w-25" placeholder="Valor" value="" autocomplete="off" />`
-    //           );
-    //         }
-    //         if ($(`#pago-4-btnlink`).length == 0 && indexPagos > 4) {
-    //           $(`#pago-4-div`).append(`
-    //             <a href="${pagosData[3].file_url}" id="pago-4-btnlink" class="btn btn-outline-secondary btn-ver-pago" target="_blank">Ver Pago</a>`);
-    //         }
-    //       }
-    //     } else {
-    //       pago4Div.find("#pago-4-btnlink").remove();
-    //       pago4Div.find("#pago4-file").remove();
-    //       pago4Div.find("#pago-4_value").remove();
-    //       pago4Div.find(`#pago-4-btnlink`).remove();
-    //     }
-    //   });
-    //   //append a with
-    //   if (!existsGarantia) {
-    //     $("#pago-garantia-container").html("<div></div>");
-    //   }
-    const buttonsConfig = {
-      btnSave: {
-        text: "Guardar",
-        action: "savePagos()",
-      },
-      btnCancel: {
-        text: "Regresar",
-        action: "hidePagos2()",
-      },
-    };
-    const buttonsHTML = getActionButtons(buttonsConfig);
-    $("#pagos-buttons").append(buttonsHTML);
-    // }
+  if (data.length > 0) {
+    const lastItem = $(".card-custom").last();
+    lastItem.click();
   }
-  $("#liquidacion-description").val(response.data.pagos_notas);
 };
 const addPago = () => {
   const pagoContainer = $(".payments-container");
@@ -9388,50 +8870,49 @@ const openOrdenCompra = async (response) => {
     $(".row.buttons").remove();
     $(".orden-compra_header").show();
     currentPrivilege = parseInt(priviligie);
-    const excelData= await getExcelOrdersList(idPedido);
+    const excelData = await getExcelOrdersList(idPedido);
     $(".orden-compra-header-excel-container").empty();
-    if(excelData.length==0 && currentPrivilege==priviligesPersonalChina){
-    //set backgroun color to gray and remove onclick event
-    $(".custom-file-upload").removeAttr("data-target");
+    if (excelData.length == 0 && currentPrivilege == priviligesPersonalChina) {
+      //set backgroun color to gray and remove onclick event
+      $(".custom-file-upload").removeAttr("data-target");
     }
     let index = 0;
     excelData.forEach((item) => {
-    const itemTest = getExcelOrderItem(item, index);
-    index++;
+      const itemTest = getExcelOrderItem(item, index);
+      index++;
 
-    $(".orden-compra-header-excel-container").append(itemTest);
-  });
-  addEventsToExcelItems();
+      $(".orden-compra-header-excel-container").append(itemTest);
+    });
+    addEventsToExcelItems();
 
     const firstProduct = excelData[0];
-    console.log(firstProduct,"woa");
-    if( typeof firstProduct !="undefined"){
-      const firstId=firstProduct.id;
-      $("#valor-total-excel").text("$"+firstProduct.total);
-      const detailsData=await getExcelOrderDetails(firstId);
+    if (typeof firstProduct != "undefined") {
+      const firstId = firstProduct.id;
+      $("#valor-total-excel").text("$" + firstProduct.total);
+      const detailsData = await getExcelOrderDetails(firstId);
       //set selected element with class card-custom and data-id = firstId
       $(`.card-custom[data-id=${firstId}]`).addClass("selected");
-      detailsData.forEach((producto, index) => {  
-      containerOrdenCompra.append(getProductTemplate(producto, index));
-      const toolbarOptions = [
-        [], // toggled buttons
-        // remove formatting button
-      ];
-      const quill = new Quill(`#quill-container-${index}`, {
-        theme: "snow",
-        readOnly: true,
-        modules: {
-          toolbar: null,
-        },
+      detailsData.forEach((producto, index) => {
+        containerOrdenCompra.append(getProductTemplate(producto, index));
+        const toolbarOptions = [
+          [], // toggled buttons
+          // remove formatting button
+        ];
+        const quill = new Quill(`#quill-container-${index}`, {
+          theme: "snow",
+          readOnly: true,
+          modules: {
+            toolbar: null,
+          },
+        });
+        quill.root.innerHTML = clearHTMLTextArea(producto.features);
+        // if (producto.caja_master_URL) {
+        //   $(`#btn-rotulado-${index}`)
+        //     .removeClass("btn-primary")
+        //     .addClass("btn-outline-secondary");
+        // }
       });
-      quill.root.innerHTML = clearHTMLTextArea(producto.features);
-      // if (producto.caja_master_URL) {
-      //   $(`#btn-rotulado-${index}`)
-      //     .removeClass("btn-primary")
-      //     .addClass("btn-outline-secondary");
-      // }
-    });
-    }else{
+    } else {
 
     }
     // containerOrdenCompra.append(getProductTemplate(firstProduct, 0));
@@ -9512,7 +8993,7 @@ const openOrdenCompra = async (response) => {
       containerOrdenCompra.append(btnsTemplate);
     }
   }
-  
+
 
 };
 function clearHTMLTextArea(str) {
@@ -10517,7 +9998,7 @@ const openSupplierDetails = (name, phone) => {
     $("#modalsupplier-data").modal("hide");
   });
 };
-const getExcelOrderItem = (itemData,index) => {
+const getExcelOrderItem = (itemData, index) => {
   const item = {
     "name": itemData.name,
     "uploadDate": itemData.created_at,
@@ -10546,11 +10027,11 @@ const getExcelOrderItem = (itemData,index) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalChina) || index!=0?`<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalChina) || index != 0 ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrder(${item.id})"
             >
             <i class="fas fa-trash"></i>
-            Eliminar</button>`:''}
+            Eliminar</button>`: ''}
 
             
         
@@ -10558,6 +10039,48 @@ const getExcelOrderItem = (itemData,index) => {
 </div>`
   return html;
 }
+const getExcelOrderItemPagos = (itemData, index,length) => {
+  const item = {
+    "name": itemData.name,
+    "uploadDate": itemData.created_at,
+    "url": itemData.file_url,
+    "isSelected": false,
+    "id": itemData.id,
+    "idPedido": itemData.order_id,
+    "total": itemData.total,
+  }
+  const html = `
+  <div class="">
+    <div class="card-custom"
+    data-id="${item.id}"
+    data-total="${item.total}"
+    >
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-file-excel"></i> <strong>${item.name}</strong>
+            </div>
+        </div>
+        <p class="text-muted mb-1"><small>Last modified:${item.uploadDate}</small></p>
+        <div class="d-flex justify-content-between align-items-center">
+            <a class="btn btn-item-actions btn-outline-primary"
+            href="${item.url}" target="_blank"
+            >
+            <i class="fas fa-download"></i>
+            Descargar</a>
+
+            ${(currentPrivilege != priviligesPersonalPeru) && index !=0 && index==length-1 ? `<button class="btn btn-item-actions  btn-outline-danger"
+            onclick="deleteExcelOrderPagos(${item.id})"
+            >
+            <i class="fas fa-trash"></i>
+            Eliminar</button>`: ''}
+
+            
+        
+    </div>
+</div>`
+  return html;
+}
+
 
 $(document).ready(function () {
   $('#file-input').on('change', function () {
@@ -10567,47 +10090,113 @@ $(document).ready(function () {
       $('.upload-btn').prop('disabled', true);
     }
   });
-  
+
   $('.upload-btn').on('click', function () {
-    const url = base_url + "AgenteCompra/PedidosPagados/uploadExcelPurchaseOrder";
-    const formData = new FormData();
-    formData.append('file', $('#file-input')[0].files[0]);
-    formData.append('idPedido', idPedido);
-    formData.append('step', selectedStep);
-    $.ajax({
-      url,
-      type: 'POST',
-      data: formData,
-      contentType: false,
-      processData: false,
-      success:async function (response) {
-        console.log(response);
-        $('#file-input').val('');
-        $('.upload-btn').prop('disabled', true);
-        $('#uploadModal').modal('hide');
-        const excelData= await getExcelOrdersList(idPedido);
-        $(".orden-compra-header-excel-container").empty();
-        let index=0;
-        excelData.forEach((item) => {
-        const itemTest = getExcelOrderItem(item,index);
+    if (selectedStepid == 1) {
+      const url = base_url + "AgenteCompra/PedidosPagados/uploadExcelPurchaseOrder";
+      const formData = new FormData();
+      formData.append('file', $('#file-input')[0].files[0]);
+      formData.append('idPedido', idPedido);
+      formData.append('step', selectedStep);
+      $.ajax({
+        url,
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: async function (response) {
+          $('#file-input').val('');
+          $('.upload-btn').prop('disabled', true);
+          $('#uploadModal').modal('hide');
+          const excelData = await getExcelOrdersList(idPedido);
+          $(".orden-compra-header-excel-container").empty();
+          let index = 0;
+          excelData.forEach((item) => {
+            const itemTest = getExcelOrderItem(item, index);
 
-        $(".orden-compra-header-excel-container").append(itemTest);
-        });
-        addEventsToExcelItems();
-        //SELECT LAST ITEM and auto scroll container to right
-        const lastItem = excelData[excelData.length - 1];
-        if (lastItem) {
-          $(`.card-custom[data-id=${lastItem.id}]`).click();
-          $(".orden-compra-header-excel-container").scrollLeft(1000);
-          $("#valor-total-excel").text(`$${lastItem.total}`);
-        } 
+            $(".orden-compra-header-excel-container").append(itemTest);
+          });
+          addEventsToExcelItems();
+          //SELECT LAST ITEM and auto scroll container to right
+          const lastItem = excelData[excelData.length - 1];
+          if (lastItem) {
+            $(`.card-custom[data-id=${lastItem.id}]`).click();
+            $(".orden-compra-header-excel-container").scrollLeft(1000);
+            $("#valor-total-excel").text(`$${lastItem.total}`);
+          }
 
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.error(jqXHR.responseText);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error(jqXHR.responseText);
 
-      }
-    });
+        }
+      });
+    } else if (selectedStepid == 2 && showPagosDocuments) {
+      const url = base_url + "AgenteCompra/PedidosPagados/uploadExcelSeekingPagosDocument";
+      const formData = new FormData();
+      formData.append('file', $('#file-input')[0].files[0]);
+      formData.append('idPedido', idPedido);
+      formData.append('step', selectedStep);
+      formData.append('idPagoDetalle', idPedidoDetalle);
+      formData.append('pagoValue', $('#pago-value').val());
+      formData.append('idPagoId',selectedOrderPagoId);
+      $.ajax({
+        url,
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: async function (response) {
+          console.log(response);
+          $('#file-input').val('');
+          $('.upload-btn').prop('disabled', true);
+          $('#uploadModal').modal('hide');
+          //append input to .modal-body in #uploadModal
+          $("#pago-value").remove();
+
+
+          const excelData = await openPagosSeekingDetailDocuments(idPedidoDetalle);
+          //get data-total from all items with card-custom class
+
+          // await fillPagosSeekingDetailDocuments(
+          //   containerExcelHeaderPagosDetalle,
+          //   excelData);
+        }
+      });
+    }
+    else if (selectedStepid == 2) {
+      const url = base_url + "AgenteCompra/PedidosPagados/uploadExcelSeekingPagos";
+      const formData = new FormData();
+      formData.append('file', $('#file-input')[0].files[0]);
+      formData.append('idPedido', idPedido);
+      formData.append('step', selectedStep);
+      $.ajax({
+        url,
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: async function (response) {
+          console.log(response);
+          $('#file-input').val('');
+          $('.upload-btn').prop('disabled', true);
+          $('#uploadModal').modal('hide');
+          const excelData = await getExcelOrderPaymentsSeekingList(idPedido);
+          fillExcelOrderPaymentsSeeking(
+            containerExcelHeaderPagos,
+            excelData);
+          addEventToOrdenPagosExcel();
+          if (excelData.length > 0) {
+            const lastItem = $(".card-custom").last();
+            lastItem.click();
+          }
+        }
+      });
+
+    }
+    else {
+
+    }
   });
 });
 const getExcelOrdersList = async ($idPedido) => {
@@ -10625,15 +10214,72 @@ const getExcelOrdersList = async ($idPedido) => {
     return [];
   }
 };
+const getExcelOrderPaymentsSeekingList = async ($idPedido) => {
+  const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingList";
+  try {
+    const response = await $.ajax({
+      url,
+      type: 'POST',
+      data: { idPedido: $idPedido },
+    });
+    const dataExcel = JSON.parse(response).data;
+    return dataExcel;
+  } catch (error) {
+    console.error(error.responseText);
+    return [];
+  }
+};
+const fillExcelOrderPaymentsSeeking = (container, data) => {
+  $(".card-custom").remove();
+  let index=0;
+  data.forEach((item) => {
+    const itemTest = getExcelOrderItemPagos(item,index,data.length);
+    container.append(itemTest);
+    index++;
+  });
+  if (currentPrivilege == priviligesPersonalPeru) {
+    //set backgroun color to gray and remove onclick event
+    $(".custom-file-upload").removeAttr("data-target");
+  }
+  pagosButtons.empty();
+
+  let actionButtons = {
+    btnSave: {
+      text: "Guardar",
+      action: `closePagosSeekingList()`,
+    },
+    btnCancel: {
+      text: "Regresar",
+      action: `closePagosSeekingList()`,
+    }
+  }
+  pagosButtons.append(getActionButtons(actionButtons));
+  pagosButtons.show();
+}
+const getExcelOrderPaymentsSeekingDetails = async (id) => {
+  const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingDetails";
+  try {
+    const response = await $.ajax({
+      url,
+      type: 'POST',
+      data: { idOrder: id },
+    });
+    return JSON.parse(response).data;
+  }
+  catch (error) {
+    console.error(error.responseText);
+  }
+}
+
 const getExcelOrderDetails = async (id) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderDetails";
   try {
     const response = await $.ajax({
       url,
       type: 'POST',
-      data: { idOrder:id },
+      data: { idOrder: id },
     });
-   return JSON.parse(response).data;
+    return JSON.parse(response).data;
   }
   catch (error) {
     console.error(error.responseText);
@@ -10642,73 +10288,71 @@ const getExcelOrderDetails = async (id) => {
 const addEventsToExcelItems = () => {
   $('.card-custom').click(async function () {
 
-    //if hasnot class selected add it and remove it from the other elements else add it
     if (!$(this).hasClass('selected')) {
       $('.card-custom').removeClass('selected');
       $(this).addClass('selected');
       const id = $(this).attr('data-id');
       const total = $(this).attr('data-total');
-      $("#valor-total-excel").text("$"+total);
+      $("#valor-total-excel").text("$" + total);
 
-      const detailsData= await getExcelOrderDetails(id);
+      const detailsData = await getExcelOrderDetails(id);
       $(".row.producto").remove();
       $(".row.buttons").remove();
-      detailsData.forEach((producto, index) => {  
-      //detailsData special chars product.Txt_Descripcion
+      detailsData.forEach((producto, index) => {
 
-      containerOrdenCompra.append(getProductTemplate(producto, index));
-      const toolbarOptions = [
-        [], // toggled buttons
-        // remove formatting button
-      ];
-      const quill = new Quill(`#quill-container-${index}`, {
-        theme: "snow",
-        readOnly: true,
-        modules: {
-          toolbar: null,
-        },
+        containerOrdenCompra.append(getProductTemplate(producto, index));
+        const toolbarOptions = [
+          [], // toggled buttons
+          // remove formatting button
+        ];
+        const quill = new Quill(`#quill-container-${index}`, {
+          theme: "snow",
+          readOnly: true,
+          modules: {
+            toolbar: null,
+          },
+        });
+        quill.root.innerHTML = clearHTMLTextArea(producto.features);
+        let buttonsData = {};
+        if (
+          [priviligesPersonalChina, priviligesJefeChina].includes(currentPrivilege)
+        ) {
+          $("#btn-rotulado").hide();
+          buttonsData = {
+            btnSave: {
+              text: "Guardar",
+              action: `saveOrdenCompra()`,
+            },
+            btnCancel: {
+              text: "Regresar",
+              action: "hideOrdenCompra()",
+            },
+          };
+          const butttonsTemplate = getActionButtons(buttonsData);
+          $(".row.buttons").remove();
+          containerOrdenCompra.append(butttonsTemplate);
+        } else {
+          buttonsData = {
+            btnSave: {
+              text: "Guardar",
+              action: "saveOrdenCompra()",
+            },
+            btnCancel: {
+              text: "Regresar",
+              action: "hideOrdenCompra()",
+            },
+          };
+          const btnsTemplate = getActionButtons(buttonsData);
+          $(".row.buttons").remove();
+
+          containerOrdenCompra.append(btnsTemplate);
+        }
+        // if (producto.caja_master_URL) {
+        //   $(`#btn-rotulado-${index}`)
+        //     .removeClass("btn-primary")
+        //     .addClass("btn-outline-secondary");
+        // }
       });
-      quill.root.innerHTML = clearHTMLTextArea(producto.features);
-      let buttonsData = {};
-    if (
-      [priviligesPersonalChina, priviligesJefeChina].includes(currentPrivilege)
-    ) {
-      $("#btn-rotulado").hide();
-      buttonsData = {
-        btnSave: {
-          text: "Guardar",
-          action: `saveOrdenCompra()`,
-        },
-        btnCancel: {
-          text: "Regresar",
-          action: "hideOrdenCompra()",
-        },
-      };
-      const butttonsTemplate = getActionButtons(buttonsData);
-      $(".row.buttons").remove();
-      containerOrdenCompra.append(butttonsTemplate);
-    } else {
-      buttonsData = {
-        btnSave: {
-          text: "Guardar",
-          action: "saveOrdenCompra()",
-        },
-        btnCancel: {
-          text: "Regresar",
-          action: "hideOrdenCompra()",
-        },
-      };
-      const btnsTemplate = getActionButtons(buttonsData);
-      $(".row.buttons").remove();
-
-      containerOrdenCompra.append(btnsTemplate);
-    }
-      // if (producto.caja_master_URL) {
-      //   $(`#btn-rotulado-${index}`)
-      //     .removeClass("btn-primary")
-      //     .addClass("btn-outline-secondary");
-      // }
-    });
     } else {
       $(this).removeClass('selected');
       //check if no item is selected
@@ -10717,28 +10361,29 @@ const addEventsToExcelItems = () => {
       }
     }
   });
-  $('.btn-item-actions').on('click', function(e) {
+  $('.btn-item-actions').on('click', function (e) {
     e.stopPropagation();
     // Activar manualmente el dropdown
     $(this).dropdown('toggle');
-});
+  });
 
-$('.dropdown-menu').on('click', function(e) {
+  $('.dropdown-menu').on('click', function (e) {
     e.stopPropagation();
     $(this).dropdown('toggle');
-});
-$('.update-btn').on('click', function(e) {
-  e.stopPropagation();
-  // Activar manualmente el dropdown
-  $(this).dropdown('toggle');
-});
+  });
+  $('.update-btn').on('click', function (e) {
+    e.stopPropagation();
+    // Activar manualmente el dropdown
+    $(this).dropdown('toggle');
+  });
 }
 const deleteExcelOrder = (id) => {
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/deleteExcelOrder",
     type: 'POST',
-    data: { id,
-      step:selectedStep,
+    data: {
+      id,
+      step: selectedStep,
       idPedido
     },
     success: function (response) {
@@ -10786,3 +10431,243 @@ const cambiarEstadoOrdenCompra = (estado, id_pedido) => {
     },
   });
 };
+const addEventToOrdenPagosExcel = () => {
+  $('.card-custom').click(async function () {
+
+    if (!$(this).hasClass('selected')) {
+      $('.card-custom').removeClass('selected');
+      $(this).addClass('selected');
+      const id = $(this).attr('data-id');
+      selectedOrderPagoId=id;
+      const total = $(this).attr('data-total');
+      $("#valor-total-excel").text("$" + total);
+
+      const detailsData = await getExcelOrderPaymentsSeekingDetails(id);
+      $(".producto").remove();
+      $(".buttons").remove();
+      detailsData.forEach((producto, index) => {
+        $('#orden-compra_body-pagos').append(getExcelOrderPaymentsSeekingDetailsTemplate(producto));
+      }
+     
+      
+
+      );
+      
+      pagosButtons.empty();
+
+      let actionButtons = {
+        btnSave: {
+          text: "Guardar",
+          action: `closePagosSeekingList()`,
+        },
+        btnCancel: {
+          text: "Regresar",
+          action: `closePagosSeekingList()`,
+        }
+      }
+      pagosButtons.append(getActionButtons(actionButtons));
+      pagosButtons.show();
+
+    }
+  });
+}
+const getExcelOrderPaymentsSeekingDetailsTemplate = (producto, show = true) => {
+  let html = `
+  <div class="producto">
+    <div class="proveedor-column">
+      ${producto.proveedor}
+    </div>
+    <div class="producto-column">
+    ${producto.product_name}
+    </div>
+    <div class="fecha-entrega-column">
+    ${producto.fecha_entrega}
+    </div>
+    <div class="total-invoice-column">
+    ${producto.total_invoice}
+    </div>
+    <div class="adelanto-column">
+    ${producto.adelanto}
+    </div>
+    <div class="restante-column">
+    ${producto.restante}
+    </div>
+    <div class="pagos-column d-flex flex-column"">
+      
+      ${show ? `
+        <h5><strong>¥${producto.total_documentos??0}</strong></h5>
+        <span class="" onclick="openPagosSeekingDetailDocuments(${producto.id})">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-cash" viewBox="0 0 16 16">
+        <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+        <path d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2z"/>
+      </svg>
+      </span>`: `${producto.datos_de_pago}`}
+    </div>
+    ${showPagosDocuments
+      ?`<div class="pagos-column d-flex flex-column"">
+          <img width=100 height=100 src="${producto.qr_pago_url}" alt="">
+        </div>
+      `:``
+    }
+  </div>`
+  return html;
+}
+//on uploadModal open
+$('#uploadModal').on('show.bs.modal', function (e) {
+  if (!showPagosDocuments) {
+    $("#pago-value").remove();
+  }
+});
+const openPagosSeekingDetailDocuments = async (id) => {
+  $('#upload-body').append(`<input type="number" id="pago-value"
+    class="form-control mt-3" placeholder="Ingrese el monto del pago" required>`);
+  containerExcelPagos.hide();
+  containerExcelPagosDetalle.show();
+  idPedidoDetalle = id;
+  const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingDetailDocument";
+  try {
+    const response = await $.ajax({
+      url,
+      type: 'POST',
+      data: {
+        id
+      },
+    });
+    showPagosDocuments = true;
+    const data = JSON.parse(response).data;
+    await fillPagosSeekingDetailDocuments(containerExcelHeaderPagosDetalle, data.data);
+    const productoRow = getExcelOrderPaymentsSeekingDetailsTemplate(data.excelDetail, false);
+    $("#orden-compra_body-detalle-excel").empty();
+    $("#orden-compra_body-detalle-excel").append(productoRow);
+    const total = $(".card-custom").map(function () {
+      return $(this).attr("data-total");
+    }).get();
+    //sum all values in total array
+    const totalSum = total.reduce((acc, item) => {
+      return acc + parseFloat(item);
+    }, 0);
+    console.log(totalSum, total);
+    //set total value to #valor-total-excel
+    $("#valor-total-excel-pagos").text(`$${totalSum.toFixed(2)}`);
+
+  }
+  catch (error) {
+    console.error(error.responseText);
+  }
+  pagosButtons.empty();
+  let actionButtons = {
+    btnSave: {
+      text: "Guardar",
+      action: `closePagosSeekingListDocuments()`,
+    },
+    btnCancel: {
+      text: "Regresar",
+      action: `closePagosSeekingListDocuments()`,
+    }
+  }
+  pagosButtons.append(getActionButtons(actionButtons));
+}
+const fillPagosSeekingDetailDocuments = async (container, data) => {
+  containerExcelPagos.hide();
+  $(".card-custom").remove();
+  data.forEach(async (item, index) => {
+    const itemTest = await getExcelOrderPagosDocumentsItem(item, index,data.length);
+    container.append(itemTest);
+  }
+  );
+
+}
+const getExcelOrderPagosDocumentsItem = async (itemData, index,length) => {
+  const item = {
+    "name": itemData.name,
+    "uploadDate": itemData.created_at,
+    "url": itemData.file_url,
+    "isSelected": false,
+    "id": itemData.id,
+    "idPedido": itemData.pagos_excel_id,
+    "total": itemData.value,
+  }
+  const html = `
+  <div class="">
+    <div class="card-custom"
+    data-id="${item.id}"
+    data-total="${item.total}"
+    >
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                 <h4><strong> ¥${item.total}</strong></h4>
+            </div>
+        </div>
+        <p class="text-muted mb-1"><small>${item.uploadDate}</small></p>
+        <div class="d-flex justify-content-between align-items-center">
+            <a class="btn btn-item-actions btn-outline-primary"
+            href="${item.url}" target="_blank"
+            >
+            <i class="fas fa-download"></i>
+            Descargar</a>
+
+            ${(currentPrivilege != priviligesPersonalPeru && index != 0 && index==length-1)? `<button class="btn btn-item-actions  btn-outline-danger"
+            onclick="deleteExcelOrderPagosDocuments(${item.id})"
+            >
+            <i class="fas fa-trash"></i>
+            Eliminar</button>`: ''}
+
+            
+        
+    </div>
+</div>`
+  return html;
+}
+const closePagosSeekingList=()=>{
+  containerOrdenCompra.hide();
+  containerExcelPagos.hide()
+  containerListar.show()
+  pagosButtons.empty()
+  $(".orden-compra-header-pagos-excel-container").empty();
+}
+const closePagosSeekingListDocuments=()=>{
+  pagosButtons.empty()
+  containerExcelPagosDetalle.hide();
+  $(".orden-compra-header-pagos-excel-container").empty();
+  $(".orden-compra-header-detalle-pagos-excel-container").empty();
+  $("#pago-value").remove();
+  openStepFunction(selectedStepid,selectedStep)
+  showPagosDocuments=false;
+}
+const deleteExcelOrderPagos=(id)=>{
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/deleteExcelOrderPagos",
+    type: 'POST',
+    data: {
+      id,
+      step: selectedStep,
+      idPedido
+    },
+    success: function (response) {
+      const { status, message } = JSON.parse(response);
+      if (status == "success") {
+        $(`.card-custom[data-id=${id}]`).remove();
+        $(".producto").remove();
+        openStepFunction(selectedStepid,selectedStep)
+      }
+    }
+  });
+}
+const deleteExcelOrderPagosDocuments=(id)=>{
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/deleteExcelOrderPagosDocuments",
+    type: 'POST',
+    data: {
+      id,
+      step: selectedStep,
+      idPedido
+    },
+    success: function (response) {
+      const { status, message } = JSON.parse(response);
+      if (status == "success") {
+        $(`.card-custom[data-id=${id}]`).remove();
+        // $(".producto").remove();
+      }        
+    }
+  });
+}

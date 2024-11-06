@@ -88,6 +88,7 @@ trait FileTrait
         $name = time() . '_' . $name;
         $destination = $path . $name;
 
+
         // Crear una copia del archivo en la ubicación de destino
         if (copy($file, $destination)) {
             return $destination; // Retorna la ruta del archivo copiado

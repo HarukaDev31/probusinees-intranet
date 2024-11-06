@@ -38,6 +38,9 @@ class PedidosPagadosModel extends CI_Model
     private $personalChinaPrivilegio = 2;
     private $personalPeruPrivilegio = 1;
     private $almacenPrivilegio = 6;
+    private $tableOrdenExcelPagos="agente_compra_pago_excel";
+    private $tableOrdenExcelPagosDetalle="agente_compra_pago_excel_detail";
+    private $tableOrdenExcelPagosDocumentos="agente_compra_pago_documento";
     public function __construct()
     {
         parent::__construct();
@@ -2268,41 +2271,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     public function getPedidoPagos($idPedido)
     {
         try {
-            $tipo_cambio = $this->db->select('Ss_Tipo_Cambio')->from('agente_compra_pedido_cabecera')->where('ID_Pedido_Cabecera', $idPedido)->get()->row()->Ss_Tipo_Cambio;
-            $tipo_cambio = $tipo_cambio == 0 ? 1 : $tipo_cambio;
-            $this->db->select('ifnull(round(sum(acpdpp.Ss_Precio*acpd.Qt_Producto),2),0) as orden_total');
-            $this->db->from('agente_compra_pedido_detalle acpd');
-            $this->db->join('agente_compra_pedido_detalle_producto_proveedor acpdpp', 'acpdpp.ID_Pedido_Detalle =acpd.ID_Pedido_Detalle', 'left');
-            $this->db->where('acpd.ID_Pedido_Cabecera', $idPedido);
-            $this->db->where('acpdpp.Nu_Selecciono_Proveedor', 1);
-            $orden_total = $this->db->get()->row()->orden_total / $tipo_cambio;
-            // $tipo_cambio = $this->db->get()->row()->Ss_Tipo_Cambio==0?1:$this->db->get()->row()->Ss_Tipo_Cambio;
-
-            //select sum of all payments_agente_compra_pedido.value with id_pedido=$idPedido
-            $this->db->select('ifnull(round(sum(pacp.value),2),0) as pago_cliente');
-            $this->db->from('payments_agente_compra_pedido pacp');
-            $this->db->where('pacp.id_pedido', $idPedido);
-            // pagos_notas from table agente_compra_pedido_cabecera where ID_Pedido_Cabecera=$idPedido
-
-            $pago_cliente = $this->db->get()->row()->pago_cliente / $tipo_cambio;
-            $this->db->select('pagos_notas');
-            $this->db->from('agente_compra_pedido_cabecera');
-            $this->db->where('ID_Pedido_Cabecera', $idPedido);
-            $this->db->limit(1);
-            $pagos_notas = $this->db->get()->row()->pagos_notas;
-            $queryData = array_merge((array)
-                ["orden_total" => $orden_total],
-
-                (array)
-                ["pago_cliente" => $pago_cliente,
-                    "pagos_notas" => $pagos_notas]
-            );
-            $pagosData = $this->getPedidosPagosDetails($idPedido);
-            return [
-                "data" => $queryData,
-                "pagos" => $pagosData,
-
-            ];
+            $this->db->select("*");
+            $this->db->from($this->tableOrdenExcelPagos);
+            $this->db->where('order_id', $idPedido);
+            $query = $this->db->get();
+            return $query->result();
+            
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -3303,7 +3277,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $idPedido=$data['idPedido'];
         $step=$data['step'];
         $excelData=$this->proccessPurchaseOrder($objPHPExcel,$data,$zipPath,$fileUrl);
-        //update all steps in table agente_compra_order_steps where id_pedido=$idPedido
         $this->db->where('id_pedido', $idPedido);
         $this->db->where('id_order',1);
         $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
@@ -3311,14 +3284,22 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         return $excelData;
         
     }
-    public function proccessPurchaseOrder($objPHPExcel,$request,$zipPath,$fileUrl){
+    public function uploadExcelSeekingPagos($data,$objPHPExcel,$zipPath,$fileUrl){
+        $idPedido=$data['idPedido'];
+        $step=$data['step'];
+        $excelData=$this->proccessSeekingPagos($objPHPExcel,$data,$zipPath,$fileUrl);
+        $this->db->where('id_pedido', $idPedido);
+        $this->db->where('id_order',2);
+        $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
+        return $excelData;
+    }
 
+    public function proccessPurchaseOrder($objPHPExcel,$request,$zipPath,$fileUrl){
         $sheet = $objPHPExcel->getSheet(0);
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
         $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
         $data = [];
-        $initialRow=28;
         $imageColumn="E";
         $nameColumn="F";
         $qtyColumn="H";
@@ -3339,9 +3320,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $maxRow=1000;
         $drawings = $sheet->getDrawingCollection();
         $uploadPath = 'assets/images/purchase_order/';
-            // Asegurar que el directorio existe
-        $totalExcel=0;
-        
+        $totalExcel=0;  
         $dataOrder = [
             'order_id' => $request['idPedido'],
             'name' => $_FILES['file']['name'],
@@ -3417,10 +3396,109 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->where('id',$idOrderExcel);
         $this->db->update('agente_compra_order_excel',array('total'=>$totalValue));
     }
+    public function proccessSeekingPagos($objPHPExcel,$request,$zipPath,$fileUrl){
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+        $data = [];
+        $initialRow=15;
+        $proveedorColumn="B";
+        $nameProductColumn="D";
+        $fechaEntregaColumn="E";
+        $totalColumn="F";
+        $adelantoColumn="G";
+        $restanteColumn="H";
+        $datosColumn="I";
+        $qrPagoColumn="J";
+        $maxRow=1000;
+        $drawings = $sheet->getDrawingCollection();
+        $uploadPath = 'assets/images/purchase_order_pagos/';
+        $totalExcel=0;
+        $dataOrder = [
+            'order_id' => $request['idPedido'],
+            'name' => $_FILES['file']['name'],
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => $this->user->ID_Usuario,
+            'file_url'=>$fileUrl
+        ];
+        $this->db->insert($this->tableOrdenExcelPagos, $dataOrder);
+        $idOrderExcel = $this->db->insert_id();
+        $newFolder = 'assets/uploads/';
+        $currentRow=$initialRow;
+        for ($row = $initialRow; $row <= $maxRow;$row++) {
+            if($sheet->getCell($proveedorColumn . $row)->getValue()==null
+            ||$sheet->getCell($proveedorColumn . $row)->getValue()==""
+            ){
+                break;
+            }
+            $imageURL = '';
+            //get image from excel
+            foreach ($drawings as $drawing) {
+                $coordinates = $drawing->getCoordinates();
+                if($coordinates==$qrPagoColumn.$row){
+                   $drawingPath=$drawing->getPath();
+                   $hashPosition = strpos($drawingPath, '#');
+                    if ($hashPosition !== false) {
+                        // Extract the part after the '#' character
+                        $extractedPart = substr($drawingPath, $hashPosition + 1);
+                        $imagePath = $newFolder .$extractedPart; // Replace with your actual image name and extension
+                        // Check if the image file exists and read its contents
+                        if (file_exists($imagePath)) {
+                            $imageData = file_get_contents($imagePath);
+                            //save 
+                            $path = 'assets/img/';
+                            $filename = $path . uniqid() . '.jpg';
+                            file_put_contents($filename, $imageData);
+                            $imageURL=$filename;
+                            unlink($zipPath);
+                            // Optionally, you can do something with the image data, e.g., display it or save it
+                        } else {
+                            echo 'Image file not found.';
+                        }
+                    } else {
+                        echo 'The specified path does not contain a fragment.';
+                    }
+                }
+             
+
+            }
+            $data[] = [
+                'pagos_excel_id'=>$idOrderExcel,
+                'proveedor' => $sheet->getCell($proveedorColumn . $row)->getValue(),
+                'product_name' => $sheet->getCell($nameProductColumn . $row)->getValue(),
+                'fecha_entrega' => $sheet->getCell($fechaEntregaColumn . $row)->getValue(),
+                'total_invoice' => $sheet->getCell($totalColumn . $row)->getValue(),
+                'adelanto' => $sheet->getCell($adelantoColumn . $row)->getValue(),
+                'restante' => $sheet->getCell($restanteColumn . $row)->getCalculatedValue(),
+                'datos_de_pago' => $sheet->getCell($datosColumn . $row)->getValue(),
+                'qr_pago_url' => base_url().$imageURL,
+            ];
+            $currentRow++;
+        }
+        $this->db->insert_batch($this->tableOrdenExcelPagosDetalle,$data);
+        $totalValue=$sheet->getCell('F'.($currentRow))->getCalculatedValue();
+        $this->db->where('id',$idOrderExcel);
+        $this->db->update($this->tableOrdenExcelPagos,array('total'=>$totalValue));
+    }
     public function getExcelOrdersList($idPedido){
         $this->db->select('id,order_id,name,created_at,file_url,total');
         $this->db->from('agente_compra_order_excel');
         $this->db->where('order_id',$idPedido);
+        return $this->db->get()->result();
+    }
+    public function getExcelOrderPaymentsSeekingList($idPedido){
+        $this->db->select('id,order_id,name,created_at,file_url,total');
+        $this->db->from($this->tableOrdenExcelPagos);
+        $this->db->where('order_id',$idPedido);
+        return $this->db->get()->result();
+    }
+    public function getExcelOrderPaymentsSeekingDetails($id){
+        $this->db->select('id,proveedor,product_name,fecha_entrega,total_invoice,adelanto,restante,datos_de_pago,qr_pago_url,
+        (select sum(value) from '.$this->tableOrdenExcelPagosDocumentos.' where pagos_excel_id='.$this->tableOrdenExcelPagosDetalle.'.id) as total_documentos');
+
+        $this->db->from($this->tableOrdenExcelPagosDetalle);
+        $this->db->where('pagos_excel_id',$id);
         return $this->db->get()->result();
     }
     public function getExcelOrderDetails($id){
@@ -3451,5 +3529,92 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->where('ID_Pedido_Cabecera',$idPedido);
         $this->db->update('agente_compra_pedido_cabecera',array('ID_Estado_Orden'=>$estado));
         return ['status' => 'success', 'message' => 'Estado actualizado'];
+    }
+    public function getExcelOrderPaymentsSeekingDetailDocument($idDetail){
+        $this->db->select('*');
+        $this->db->from($this->tableOrdenExcelPagosDocumentos);
+        $this->db->where('pagos_excel_id',$idDetail);
+        $data = $this->db->get()->result();
+        $excelDetail=$this->db->select("*")->from($this->tableOrdenExcelPagosDetalle)->where('id',$idDetail)->get()->row();
+        return ['data'=>$data,'excelDetail'=>$excelDetail];
+    }
+    public function uploadExcelSeekingPagosDocument($data,$files){
+        $idPedido=$data['idPedido'];
+        $idPagoDetalle=$data['idPagoDetalle'];
+        $pagoValue=$data['pagoValue'];
+        $idPagoId=$data['idPagoId'];
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $this->maxFileSize = 200240;
+        $fileUrl = $this->uploadSingleFile([
+            'name' => $_FILES['file']['name'],
+            'type' => $_FILES['file']['type'],
+            'tmp_name' => $_FILES['file']['tmp_name'],
+            'error' => $_FILES['file']['error'],
+            'size' => $_FILES['file']['size'],
+        ], 'assets/images/');
+        $dataToInsert = [
+            'pagos_excel_id' =>intval($idPagoDetalle),
+            'order_id' => intval($idPedido),
+            'pagos_excel_id_cabecera'=>intval($idPagoId),
+            'name' => $_FILES['file']['name'],
+            'value' => floatval($pagoValue??0),
+            'file_url' => $fileUrl,
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => $this->user->ID_Usuario,
+        ];
+        $this->db->insert($this->tableOrdenExcelPagosDocumentos, $dataToInsert);
+        //select last row from tableOrdenExcelPagos where order_id=$idPedido
+        $this->db->select('total');
+        $this->db->from($this->tableOrdenExcelPagos);
+        $this->db->where('order_id',$idPedido);
+        $this->db->order_by('id','desc');
+        //get first row
+        $query=$this->db->get(); 
+        $total=0;
+        if($query->num_rows()>0){
+            $total=$query->row()->total;
+        }
+        //sum values from tableOrdenExcelPagosDocumentos where pagos_excel_id_cabecera=$idPagoId  
+        $this->db->select('sum(value) as total');
+        $this->db->from($this->tableOrdenExcelPagosDocumentos);
+        $this->db->where('pagos_excel_id_cabecera',$idPagoId);
+        $query=$this->db->get();
+        $totalDocumentos=0;
+        if($query->num_rows()>0){
+            $totalDocumentos=$query->row()->total;
+        }
+        if($totalDocumentos>=$total){
+            //update all steps with id_order 2 and id_pedido=$idPedido
+            $this->db->where('id_order',2);
+            $this->db->where('id_pedido',$idPedido);
+            $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+        }else{
+            $this->db->where('id_order',2);
+            $this->db->where('id_pedido',$idPedido);
+            $this->db->update('agente_compra_order_steps',array('status'=>'PENDING'));
+        }
+       return ['status' => 'success', 'message' => 'Documento guardado'];
+    }
+    public function deleteExcelOrderPagos($id){
+            //get all ids from table tableOrdenExcelPagosDocumentos where pagos_excel_id=$id
+            $this->db->select('id');
+            $this->db->from($this->tableOrdenExcelPagosDetalle);
+            $this->db->where('pagos_excel_id',$id);
+            $query=$this->db->get();
+            //for each id delete files in tableOrdenExcelPagosDocumentos where pagos_excel_id=$id
+            foreach($query->result() as $row){
+                $this->db->where('pagos_excel_id',$row->id);
+                $this->db->delete($this->tableOrdenExcelPagosDocumentos);
+            }
+            $this->db->where('pagos_excel_id',$id);
+            $this->db->delete($this->tableOrdenExcelPagosDetalle);
+            $this->db->where('id',$id);
+            $this->db->delete($this->tableOrdenExcelPagos);
+        return ['status' => 'success', 'message' => 'Orden eliminada'];
+    }
+    public function deleteExcelOrderPagosDocuments($id){
+        $this->db->where('id',$id);
+        $this->db->delete($this->tableOrdenExcelPagosDocumentos);
+        return ['status' => 'success', 'message' => 'Documento eliminado'];
     }
 }
