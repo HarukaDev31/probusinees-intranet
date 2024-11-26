@@ -2484,4 +2484,14 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->deleteExcelOrderPagosDocuments($id);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    public function updateVoucherData(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->updateVoucherData($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function updateExcelOrderPagos(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->updateExcelOrderPagos($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
 }

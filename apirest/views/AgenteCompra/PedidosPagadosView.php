@@ -375,8 +375,12 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                   <!--Valor total del excel selecionado-->
                   <div class="col-12 col-md-6 text-right px-5 my-3">
                     <div class="p-3 rounded shadow">
-                        <label class="h6 font-weight-bold">Valor Total:</label>
+                        <label class="h6 font-weight-bold">Total Invoice</label>
                         <span id="valor-total-excel" class="d-block h4 font-weight-bold">$0</span>
+                    </div>
+                    <div class="p-3 rounded shadow">
+                        <label class="h6 font-weight-bold">Total Pagado</label>
+                        <span id="valor-total-excel-pagado" class="d-block h4 font-weight-bold">$0</span>
                     </div>
                 </div>
                   
@@ -415,17 +419,17 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             <div class="card-body" id="container_orden-compra-pagos-detalle">
               <div class="orden-compra-header-pagos-detalle-excel">
                 <div class="row ">
-                  <div class="col-12 col-md-6 d-flex align-items-center">
+                  <!-- <div class="col-12 col-md-6 d-flex align-items-center">
                     <label class="custom-file-upload" data-toggle="modal" data-target="#uploadModal">
                     <i class="fas fa-upload"></i> Subir Pagos
                     </label>
-                  </div>
+                  </div> -->
                   <!--Valor total del excel selecionado-->
                   <div class="col-12 col-md-6 text-right px-5 my-3">
-                    <div class="p-3 rounded shadow">
+                    <!-- <div class="p-3 rounded shadow">
                         <label class="h6 font-weight-bold">Valor Total:</label>
                         <span id="valor-total-excel-pagos" class="d-block h4 font-weight-bold">$0</span>
-                    </div>
+                    </div> -->
                 </div>
                   
                   <div class="col-12 orden-compra-header-detalle-pagos-excel-container" id="orden-compra-header-detalle-pagos-excel-container">
@@ -440,23 +444,20 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
                   <div class="producto-column">
                     # Producto
                   </div>
-                  <div class="fecha-entrega-column">
-                    F. Entrega
-                  </div>
                   <div class="total-invoice-column">
                     Total Invoice
                   </div>
                   <div class="adelanto-column">
-                    Adelanto
-                  </div>
-                  <div class="restante-column">
-                    Restante
+                    Pagados
                   </div>
                   <div class="pagos-column">
-                    Datos de Pago
+                    Voucher #1
                   </div>
                   <div class="pagos-column">
-                    QR de Pago
+                    Voucher #2
+                  </div>
+                  <div class="pagos-column">
+                    Voucher #3
                   </div>
                 </div>
                 <div id="orden-compra_body-detalle-excel">
@@ -612,6 +613,19 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
   </section>
   <!-- /.content -->
 </div>
+<div class="modal fade" id="imagePreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Voucher Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="previewImage" src="" alt="Voucher preview" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
 <!-- /.content-wrapper -->
 <div class="modal fade modal-confirmation" id="modal-confirmation">
   <div class="modal-dialog">
@@ -2370,7 +2384,7 @@ echo form_open('', $attributes);?>
 <!-- Modal pagos_logisticos -->
 <div class="modal fade modal-pagos_logisticos" id="modal-default">
   <?php $attributes = array('id' => 'form-pagos_logisticos');
-echo form_open('', $attributes);?>
+    echo form_open('', $attributes);?>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -3633,7 +3647,12 @@ echo form_open('', $attributes);?>
 
           width: 150px;
         }
-        
+        .voucher-thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
     
         
        

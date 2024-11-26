@@ -3495,7 +3495,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function getExcelOrderPaymentsSeekingDetails($id){
         $this->db->select('id,proveedor,product_name,fecha_entrega,total_invoice,adelanto,restante,datos_de_pago,qr_pago_url,
-        (select sum(value) from '.$this->tableOrdenExcelPagosDocumentos.' where pagos_excel_id='.$this->tableOrdenExcelPagosDetalle.'.id) as total_documentos');
+        (select sum(total) from '.$this->tableOrdenExcelPagosDocumentos.' where pagos_excel_id='.$this->tableOrdenExcelPagosDetalle.'.id) as total_documentos');
 
         $this->db->from($this->tableOrdenExcelPagosDetalle);
         $this->db->where('pagos_excel_id',$id);
@@ -3617,4 +3617,138 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->delete($this->tableOrdenExcelPagosDocumentos);
         return ['status' => 'success', 'message' => 'Documento eliminado'];
     }
+    public function updateVoucherData($data) {
+        $detallePagoId = $data['detallePagoId'];
+        $keys = ['voucherKey-0', 'voucherKey-1', 'voucherKey-2'];
+        $dataToInsert = [];
+    
+        foreach ($keys as $index => $key) {
+            if (array_key_exists($key, $data)) {
+                if($data[$key]==null||$data[$key]=="" || $data[$key]=="null"){
+                    $dataToInsert[] = [
+                        'voucher_'.($index+1).'_url_link' => null,
+                        'voucher_'.($index+1).'_original_name' => null,
+                    ];
+                    continue;
+                }
+                $base64Image = $data[$key];
+                // Validar que sea una imagen base64
+                if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)) {
+                    // Eliminar el prefijo base64
+                    $base64Image = substr($base64Image, strpos($base64Image, ',') + 1);
+                    // Decodificar la imagen
+                    $imageData = base64_decode($base64Image);
+                    // Generar un nombre de archivo único
+                    $fileName = 'voucher_' . $detallePagoId . '_' . $index . '_' . uniqid() . '.png';
+                    // Definir la ruta de almacenamiento
+                    $uploadDir = 'assets/uploads/vouchers/'; // Asegúrate de que este directorio exista y tenga permisos de escritura
+                    $uploadPath = $uploadDir . $fileName;
+
+                    // Crear el directorio si no existe
+                    if (!file_exists($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
+                    }
+
+                    // Guardar la imagen
+                    if (file_put_contents($uploadPath, $imageData)) {
+                        // Preparar datos para insertar en la base de datos
+                        $dataToInsert[] = [
+                            'voucher_'.($index+1).'_url_link' => base_url() . $uploadPath,
+                            'voucher_'.($index+1).'_original_name' => $fileName
+                        ];
+                    } else {
+                        // Manejar error de guardado
+                        throw new Exception("No se pudo guardar la imagen para la clave $key");
+                    }
+                }
+            }
+        }
+    
+        // Si necesitas guardar en base de datos
+        if (!empty($dataToInsert)) {
+            //check if exists row with same pagos_excel_id = $detallePagoId in tableOrdenExcelPagosDocumentos
+            $this->db->select('id');
+            $this->db->from($this->tableOrdenExcelPagosDocumentos);
+            $this->db->where('pagos_excel_id',$detallePagoId);
+            $query=$this->db->get();
+            if($query->num_rows()>0){
+                //update row in tableOrdenExcelPagosDocumentos
+                $this->db->where('pagos_excel_id',$detallePagoId);
+                $this->db->update($this->tableOrdenExcelPagosDocumentos,$dataToInsert[0]);
+            }else{
+                //insert row in tableOrdenExcelPagosDocumentos
+                $dataToInsert[0]['pagos_excel_id']=$detallePagoId;
+                $this->db->insert($this->tableOrdenExcelPagosDocumentos,$dataToInsert[0]);
+            }
+        }
+    
+        return $dataToInsert;
+    }
+    public function updateExcelOrderPagos($data){
+     try{
+        $detallePagoId=$data['idPedidoDetalle'];
+        $pagoValue=$data['pagoValue'];
+        $idOrder=$data['idOrderPago'];
+        $this->db->select('id');
+        $this->db->from($this->tableOrdenExcelPagosDocumentos);
+        $this->db->where('pagos_excel_id',$detallePagoId);
+        $query=$this->db->get();
+        if($query->num_rows()>0){
+            //update row in tableOrdenExcelPagosDocumentos
+
+            $this->db->where('pagos_excel_id',$detallePagoId);
+            $this->db->update($this->tableOrdenExcelPagosDocumentos,['total'=>$pagoValue]);
+        }else{
+            //insert row in tableOrdenExcelPagosDocumentos
+            $this->db->insert($this->tableOrdenExcelPagosDocumentos,['total'=>$pagoValue,
+            'pagos_excel_id'=>$detallePagoId
+        ]);
+        
+        
+    }
+        //select pagos_excel_id from tableOrdenExcelPagosDocumentos where pagos_excel_id=$detallePagoId
+        $this->db->select('pagos_excel_id');
+        $this->db->from($this->tableOrdenExcelPagosDetalle);
+        $this->db->where('id',$detallePagoId);
+        $query=$this->db->get();
+        $id=$query->row()->pagos_excel_id;
+        //get total from tableOrdenExcelPagos where id=$id
+        $this->db->select('total,order_id');
+        $this->db->from($this->tableOrdenExcelPagos);
+        $this->db->where('id',$id);
+        $query=$this->db->get();
+        $total=$query->row()->total;
+        $order_id=$query->row()->order_id;
+        //from each row in  agente_compra_pago_excel_detail with pagos_excel_id=$id get total from each row in agente_compra_pago_documento with pagos_excel_id=agente_compra_pago_excel_detail.id
+        $result = $this->db->select('detail.id AS excel_detail_id, COALESCE(SUM(documento.total), 0) AS total_documentos')
+        ->from('agente_compra_pago_excel_detail detail')
+        ->join('agente_compra_pago_documento documento', 'documento.pagos_excel_id = detail.id', 'left')
+        ->where('detail.pagos_excel_id', $id)
+        ->group_by('detail.id')
+        ->get()
+        ->result();
+        //sum total_documentos
+        $totalDocumentos=0;
+        foreach($result as $row){
+            $totalDocumentos+=$row->total_documentos;
+        }
+       
+        if($totalDocumentos>=$total){
+            //update all steps with id_order 2 and id_pedido=$idPedido
+            $this->db->where('id_order',2);
+            $this->db->where('id_pedido',$order_id);
+            $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+        }else{
+            
+            $this->db->where('id_order',2);
+            $this->db->where('id_pedido',$order_id);
+            $this->db->update('agente_compra_order_steps',array('status'=>'PENDING'));
+        }
+        return ['status' => 'success', 'message' => 'Total Actualizado'];
+    }
+     
+     catch(Exception $e){
+        return $e->getMessage();
+     }
+    }  
 }

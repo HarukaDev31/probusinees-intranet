@@ -19,7 +19,7 @@ let arrQuillNotas = [];
 let selectedStepid = 0;
 let isSelectingOption = false;
 let showPagosDocuments = false;
-let selectedOrderPagoId=0;
+let selectedOrderPagoId = 0;
 const editIcon = `<?xml version="1.0" encoding="utf-8"?>
 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Edit / Edit_Pencil_02">
@@ -7461,7 +7461,7 @@ const openStepFunction = async (i, stepId) => {
       openPagos(response);
       // if (currentPrivilege == 1) {
       //   openPagos(response);
-        
+
       // } else {
       //   openCoordination(response);
       // }
@@ -8710,7 +8710,7 @@ const openPagos = (response) => {
   fillExcelOrderPaymentsSeeking(
     containerExcelHeaderPagos,
     data);
-    addEventToOrdenPagosExcel();
+  addEventToOrdenPagosExcel();
 
   if (data.length > 0) {
     const lastItem = $(".card-custom").last();
@@ -8878,7 +8878,7 @@ const openOrdenCompra = async (response) => {
     }
     let index = 0;
     excelData.forEach((item) => {
-      const itemTest = getExcelOrderItem(item, index,excelData.length);
+      const itemTest = getExcelOrderItem(item, index, excelData.length);
       index++;
 
       $(".orden-compra-header-excel-container").append(itemTest);
@@ -9998,7 +9998,7 @@ const openSupplierDetails = (name, phone) => {
     $("#modalsupplier-data").modal("hide");
   });
 };
-const getExcelOrderItem = (itemData, index,count) => {
+const getExcelOrderItem = (itemData, index, count) => {
   const item = {
     "name": itemData.name,
     "uploadDate": itemData.created_at,
@@ -10027,7 +10027,7 @@ const getExcelOrderItem = (itemData, index,count) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalChina) &&(index==count-1 &&index!=0) ? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalChina) && (index == count - 1 && index != 0) ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrder(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10039,7 +10039,7 @@ const getExcelOrderItem = (itemData, index,count) => {
 </div>`
   return html;
 }
-const getExcelOrderItemPagos = (itemData, index,length) => {
+const getExcelOrderItemPagos = (itemData, index, length) => {
   const item = {
     "name": itemData.name,
     "uploadDate": itemData.created_at,
@@ -10068,7 +10068,7 @@ const getExcelOrderItemPagos = (itemData, index,length) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalPeru) && index !=0 && index==length-1 ? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalPeru) && index != 0 && index == length - 1 ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrderPagos(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10112,7 +10112,7 @@ $(document).ready(function () {
           $(".orden-compra-header-excel-container").empty();
           let index = 0;
           excelData.forEach((item) => {
-            const itemTest = getExcelOrderItem(item, index,excelData.length);
+            const itemTest = getExcelOrderItem(item, index, excelData.length);
 
             $(".orden-compra-header-excel-container").append(itemTest);
           });
@@ -10139,7 +10139,7 @@ $(document).ready(function () {
       formData.append('step', selectedStep);
       formData.append('idPagoDetalle', idPedidoDetalle);
       formData.append('pagoValue', $('#pago-value').val());
-      formData.append('idPagoId',selectedOrderPagoId);
+      formData.append('idPagoId', selectedOrderPagoId);
       $.ajax({
         url,
         type: 'POST',
@@ -10231,9 +10231,9 @@ const getExcelOrderPaymentsSeekingList = async ($idPedido) => {
 };
 const fillExcelOrderPaymentsSeeking = (container, data) => {
   $(".card-custom").remove();
-  let index=0;
+  let index = 0;
   data.forEach((item) => {
-    const itemTest = getExcelOrderItemPagos(item,index,data.length);
+    const itemTest = getExcelOrderItemPagos(item, index, data.length);
     container.append(itemTest);
     index++;
   });
@@ -10438,21 +10438,25 @@ const addEventToOrdenPagosExcel = () => {
       $('.card-custom').removeClass('selected');
       $(this).addClass('selected');
       const id = $(this).attr('data-id');
-      selectedOrderPagoId=id;
+      selectedOrderPagoId = id;
       const total = $(this).attr('data-total');
-      $("#valor-total-excel").text("$" + total);
+      $("#valor-total-excel").text("¥" + total);
 
       const detailsData = await getExcelOrderPaymentsSeekingDetails(id);
       $(".producto").remove();
       $(".buttons").remove();
+   
+      let totalPagado=0;
       detailsData.forEach((producto, index) => {
         $('#orden-compra_body-pagos').append(getExcelOrderPaymentsSeekingDetailsTemplate(producto));
+        totalPagado+=
+        parseFloat(producto.total_documentos);
+        console.log(totalPagado)
       }
-     
-      
-
       );
-      
+      $('#valor-total-excel-pagado').text("¥" + (isNaN(totalPagado)?0:totalPagado));
+
+
       pagosButtons.empty();
 
       let actionButtons = {
@@ -10495,7 +10499,7 @@ const getExcelOrderPaymentsSeekingDetailsTemplate = (producto, show = true) => {
     <div class="pagos-column d-flex flex-column"">
       
       ${show ? `
-        <h5><strong>¥${producto.total_documentos??0}</strong></h5>
+        <h5><strong>¥${producto.total_documentos ?? 0}</strong></h5>
         <span class="" onclick="openPagosSeekingDetailDocuments(${producto.id})">
       <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-cash" viewBox="0 0 16 16">
         <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
@@ -10504,15 +10508,272 @@ const getExcelOrderPaymentsSeekingDetailsTemplate = (producto, show = true) => {
       </span>`: `${producto.datos_de_pago}`}
     </div>
     ${showPagosDocuments
-      ?`<div class="pagos-column d-flex flex-column"">
+      ? `<div class="pagos-column d-flex flex-column"">
           <img width=100 height=100 src="${producto.qr_pago_url}" alt="">
         </div>
-      `:``
+      `: ``
     }
   </div>`
   return html;
 }
-//on uploadModal open
+const getExcelOrderPaymentsSeekingFilesTemplate = (data) => {
+
+  const producto = data.excelDetail;
+  const voucher = data.data;
+
+  const voucher1 = voucher.length > 0 ? voucher[0].voucher_1_url_link : null;
+  const voucher2 = voucher.length > 0 ? voucher[0].voucher_2_url_link : null;
+  const voucher3 = voucher.length > 0 ? voucher[0].voucher_3_url_link : null;
+  const total=voucher.length > 0 ?voucher[0].total:0;
+  console.log(voucher1, voucher2, voucher3);
+  let html = `
+  <div class="producto">
+    <div class="proveedor-column">
+      ${producto.proveedor}
+    </div>
+    <div class="producto-column">
+    ${producto.product_name}
+    </div>
+    <div class="fecha-entrega-column">
+    ¥${producto.total_invoice}
+    </div>
+    <div class="total-invoice-column">
+    ¥<input type="number" id="pagodoc-value"
+    class="form-control input-decimal w-75"
+    value="${total}"
+    />
+    </div>
+    <div class="pagos-column voucher-1">
+    ${generateVoucherTemplate(voucher1, 0)}
+    </div>
+    <div class="pagos-column voucher-2">
+    ${generateVoucherTemplate(voucher2, 1)}
+    </div>
+    <div class="pagos-column voucher-3">
+    ${generateVoucherTemplate(voucher3, 2)}
+    </div>
+  </div>`
+  return html;
+}
+const handleFileUpload = (event, voucherKey) => {
+  const file = event.target.files[0];
+  console.log(event, voucherKey)
+  if (file) {
+    // Validar tipo de archivo (opcional)
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Por favor, selecciona un archivo de imagen válido');
+      return;
+    }
+
+    // Crear un FileReader para leer el contenido del archivo
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      // Obtener la URL de la imagen
+      const imageUrl = e.target.result;
+
+      // Actualizar el template del voucher
+      const voucherContainer = document.querySelector(
+        `.voucher-${voucherKey + 1}`
+      );
+      console.log(voucherContainer)
+      if (voucherContainer) {
+        // Generar el nuevo HTML para el voucher con la imagen
+        voucherContainer.innerHTML = generateVoucherTemplate(imageUrl, voucherKey);
+
+        // Opcional: Guardar la imagen en tu estructura de datos
+        updateVoucherData(voucherKey, imageUrl);
+      }
+    };
+
+    // Leer el archivo como una URL de datos
+    reader.readAsDataURL(file);
+  }
+};
+
+const updateVoucherData = (voucherKey, imageUrl) => {
+  //create form data and append image and voucherKey post to server
+  const formData = new FormData();
+  formData.append(`voucherKey-${voucherKey}`, imageUrl);
+  formData.append('detallePagoId', idPedidoDetalle);
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/updateVoucherData",
+    type: 'POST',
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function (response) {
+      console.log(response);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error(jqXHR.responseText);
+    }
+  });
+};
+
+// Función para generar el template de voucher
+const generateVoucherTemplate = (voucher_link, voucher_key) => {
+  try {
+    if (voucher_link) {
+      return `
+        <div class="d-flex align-items-center gap-2 flex-column">
+          <img src="${voucher_link}" 
+               class="voucher-thumbnail" 
+               alt="Voucher ${voucher_key + 1}"
+               style="max-width: 100px; max-height: 100px; object-fit: cover;"
+          >
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                    type="button" 
+                    aria-expanded="false"
+                    data-toggle="dropdown">
+              Acciones
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item view-voucher" 
+                   href="#" 
+                   data-voucher="${voucher_link}">
+                  <i class="bi bi-eye"></i> Ver
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item download-voucher" 
+                   href="#" 
+                   data-voucher="${voucher_link}">
+                  <i class="bi bi-download"></i> Descargar
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item delete-voucher" 
+                   href="#" 
+                   data-row-id="${voucher_key}" 
+                   data-voucher-index="${voucher_key}">
+                  <i class="bi bi-trash"></i> Eliminar
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="upload-container">
+          <input type="file" 
+                 id="voucher-upload-${voucher_key}" 
+                 class="voucher-upload-input" 
+                 data-voucher-index="${voucher_key}" 
+                 accept="image/*" 
+                 style="display: none;"
+          >
+          <button class="btn btn-sm btn-outline-primary upload-voucher" 
+                  onclick="document.getElementById('voucher-upload-${voucher_key}').click()">
+            <i class="bi bi-upload"></i> Subir
+          </button>
+        </div>
+      `;
+    }
+  }
+  catch (error) {
+    console.error(error);
+    return '';
+  }
+};
+
+// Event Delegation para manejar la subida de archivos
+document.addEventListener('change', (event) => {
+  if (event.target.classList.contains('voucher-upload-input')) {
+    const voucherKey = event.target.dataset.voucherIndex;
+    handleFileUpload(event, parseInt(voucherKey));
+  }
+});
+
+// Eventos para acciones de voucher
+document.addEventListener('click', (event) => {
+  // Evento para ver imagen
+  if (event.target.closest('.view-voucher')) {
+    event.preventDefault();
+    console.log(event.target.closest('.view-voucher').dataset.voucher)
+    const voucherSrc = event.target.closest('.view-voucher').dataset.voucher;
+    showImageModal(voucherSrc);
+  }
+
+  // Evento para descargar imagen
+  if (event.target.closest('.download-voucher')) {
+    event.preventDefault();
+    const voucherSrc = event.target.closest('.download-voucher').dataset.voucher;
+    downloadImage(voucherSrc);
+  }
+
+  // Evento para eliminar voucher
+  if (event.target.closest('.delete-voucher')) {
+    event.preventDefault();
+    const voucherKey = event.target.closest('.delete-voucher').dataset.voucherIndex;
+    deleteVoucher(voucherKey);
+  }
+});
+
+// Función para mostrar imagen en modal
+const showImageModal = (imageSrc) => {
+  console.log(imageSrc)
+  const modalHtml = `
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Vista Previa de Voucher</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="${imageSrc}" class="img-fluid"
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Crear y mostrar el modal
+  const modalContainer = document.createElement('div');
+  modalContainer.innerHTML = modalHtml;
+  document.body.appendChild(modalContainer);
+
+  const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+  // set modal container to show
+  $("#previewImage").attr("src", imageSrc);
+  modal.show();
+
+  // Limpiar el modal después de cerrarlo
+  document.getElementById('imagePreviewModal').addEventListener('hidden.bs.modal', () => {
+    modalContainer.remove();
+  });
+};
+
+// Función para descargar imagen
+const downloadImage = (imageSrc) => {
+  const link = document.createElement('a');
+  link.href = imageSrc;
+  link.download = `voucher_${Date.now()}.png`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// Función para eliminar voucher
+const deleteVoucher = (voucherKey) => {
+  console.log( `.voucher-${parseInt(voucherKey) + 1}`)
+  const voucherContainer = document.querySelector(
+    `.voucher-${parseInt(voucherKey) + 1}`
+  );
+  console.log(voucherContainer)
+  if (voucherContainer) {
+    // Restaurar a estado de upload
+    voucherContainer.innerHTML = generateVoucherTemplate(null, voucherKey);
+
+    // Opcional: Limpiar el dato en tu estructura
+    updateVoucherData(voucherKey, null);
+  }
+};
 $('#uploadModal').on('show.bs.modal', function (e) {
   if (!showPagosDocuments) {
     $("#pago-value").remove();
@@ -10535,8 +10796,8 @@ const openPagosSeekingDetailDocuments = async (id) => {
     });
     showPagosDocuments = true;
     const data = JSON.parse(response).data;
-    await fillPagosSeekingDetailDocuments(containerExcelHeaderPagosDetalle, data.data);
-    const productoRow = getExcelOrderPaymentsSeekingDetailsTemplate(data.excelDetail, false);
+    // await fillPagosSeekingDetailDocuments(containerExcelHeaderPagosDetalle, data.data);
+    const productoRow = getExcelOrderPaymentsSeekingFilesTemplate(data);
     $("#orden-compra_body-detalle-excel").empty();
     $("#orden-compra_body-detalle-excel").append(productoRow);
     const total = $(".card-custom").map(function () {
@@ -10546,7 +10807,6 @@ const openPagosSeekingDetailDocuments = async (id) => {
     const totalSum = total.reduce((acc, item) => {
       return acc + parseFloat(item);
     }, 0);
-    console.log(totalSum, total);
     //set total value to #valor-total-excel
     $("#valor-total-excel-pagos").text(`$${totalSum.toFixed(2)}`);
 
@@ -10571,13 +10831,13 @@ const fillPagosSeekingDetailDocuments = async (container, data) => {
   containerExcelPagos.hide();
   $(".card-custom").remove();
   data.forEach(async (item, index) => {
-    const itemTest = await getExcelOrderPagosDocumentsItem(item, index,data.length);
+    const itemTest = await getExcelOrderPagosDocumentsItem(item, index, data.length);
     container.append(itemTest);
   }
   );
 
 }
-const getExcelOrderPagosDocumentsItem = async (itemData, index,length) => {
+const getExcelOrderPagosDocumentsItem = async (itemData, index, length) => {
   const item = {
     "name": itemData.name,
     "uploadDate": itemData.created_at,
@@ -10606,7 +10866,7 @@ const getExcelOrderPagosDocumentsItem = async (itemData, index,length) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalPeru && index != 0 && index==length-1)? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalPeru && index != 0 && index == length - 1) ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrderPagosDocuments(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10618,23 +10878,42 @@ const getExcelOrderPagosDocumentsItem = async (itemData, index,length) => {
 </div>`
   return html;
 }
-const closePagosSeekingList=()=>{
+const closePagosSeekingList = () => {
   containerOrdenCompra.hide();
   containerExcelPagos.hide()
   containerListar.show()
   pagosButtons.empty()
   $(".orden-compra-header-pagos-excel-container").empty();
 }
-const closePagosSeekingListDocuments=()=>{
+const closePagosSeekingListDocuments = () => {
+  const pagoValue=$("#pagodoc-value").val()
+
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/updateExcelOrderPagos",
+    type: 'POST',
+    data: {
+      pagoValue,
+      idPedidoDetalle,
+      idOrderPago:selectedOrderPagoId
+    },
+    success: function (response) {
+      const { status, message } = JSON.parse(response);
+      if (status == "success") {
+        $(`.card-custom[data-id=${id}]`).remove();
+        $(".producto").remove();
+        openStepFunction(selectedStepid, selectedStep)
+      }
+    }
+  });
   pagosButtons.empty()
   containerExcelPagosDetalle.hide();
   $(".orden-compra-header-pagos-excel-container").empty();
   $(".orden-compra-header-detalle-pagos-excel-container").empty();
   $("#pago-value").remove();
-  openStepFunction(selectedStepid,selectedStep)
-  showPagosDocuments=false;
+  openStepFunction(selectedStepid, selectedStep)
+  showPagosDocuments = false;
 }
-const deleteExcelOrderPagos=(id)=>{
+const deleteExcelOrderPagos = (id) => {
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/deleteExcelOrderPagos",
     type: 'POST',
@@ -10648,12 +10927,12 @@ const deleteExcelOrderPagos=(id)=>{
       if (status == "success") {
         $(`.card-custom[data-id=${id}]`).remove();
         $(".producto").remove();
-        openStepFunction(selectedStepid,selectedStep)
+        openStepFunction(selectedStepid, selectedStep)
       }
     }
   });
 }
-const deleteExcelOrderPagosDocuments=(id)=>{
+const deleteExcelOrderPagosDocuments = (id) => {
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/deleteExcelOrderPagosDocuments",
     type: 'POST',
@@ -10667,7 +10946,7 @@ const deleteExcelOrderPagosDocuments=(id)=>{
       if (status == "success") {
         $(`.card-custom[data-id=${id}]`).remove();
         // $(".producto").remove();
-      }        
+      }
     }
   });
 }
