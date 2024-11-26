@@ -10950,3 +10950,7 @@ const deleteExcelOrderPagosDocuments = (id) => {
     }
   });
 }
+//on click custom-file-upload open modal upload uploadModal
+$(".custom-file-upload").click(function () {
+  $('#uploadModal').modal('show');
+});
