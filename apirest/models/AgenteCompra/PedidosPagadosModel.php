@@ -3402,15 +3402,13 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $highestColumn = $sheet->getHighestColumn();
         $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
         $data = [];
-        $initialRow=15;
+        $initialRow=18;
         $proveedorColumn="B";
         $nameProductColumn="D";
         $fechaEntregaColumn="E";
         $totalColumn="F";
         $adelantoColumn="G";
         $restanteColumn="H";
-        $datosColumn="I";
-        $qrPagoColumn="J";
         $maxRow=1000;
         $drawings = $sheet->getDrawingCollection();
         $uploadPath = 'assets/images/purchase_order_pagos/';
@@ -3432,37 +3430,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             ){
                 break;
             }
-            $imageURL = '';
             //get image from excel
-            foreach ($drawings as $drawing) {
-                $coordinates = $drawing->getCoordinates();
-                if($coordinates==$qrPagoColumn.$row){
-                   $drawingPath=$drawing->getPath();
-                   $hashPosition = strpos($drawingPath, '#');
-                    if ($hashPosition !== false) {
-                        // Extract the part after the '#' character
-                        $extractedPart = substr($drawingPath, $hashPosition + 1);
-                        $imagePath = $newFolder .$extractedPart; // Replace with your actual image name and extension
-                        // Check if the image file exists and read its contents
-                        if (file_exists($imagePath)) {
-                            $imageData = file_get_contents($imagePath);
-                            //save 
-                            $path = 'assets/img/';
-                            $filename = $path . uniqid() . '.jpg';
-                            file_put_contents($filename, $imageData);
-                            $imageURL=$filename;
-                            unlink($zipPath);
-                            // Optionally, you can do something with the image data, e.g., display it or save it
-                        } else {
-                            echo 'Image file not found.';
-                        }
-                    } else {
-                        echo 'The specified path does not contain a fragment.';
-                    }
-                }
-             
-
-            }
+           
             $data[] = [
                 'pagos_excel_id'=>$idOrderExcel,
                 'proveedor' => $sheet->getCell($proveedorColumn . $row)->getValue(),
@@ -3471,8 +3440,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 'total_invoice' => $sheet->getCell($totalColumn . $row)->getValue(),
                 'adelanto' => $sheet->getCell($adelantoColumn . $row)->getValue(),
                 'restante' => $sheet->getCell($restanteColumn . $row)->getCalculatedValue(),
-                'datos_de_pago' => $sheet->getCell($datosColumn . $row)->getValue(),
-                'qr_pago_url' => base_url().$imageURL,
+
             ];
             $currentRow++;
         }
@@ -3495,7 +3463,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     }
     public function getExcelOrderPaymentsSeekingDetails($id){
         $this->db->select('id,proveedor,product_name,fecha_entrega,total_invoice,adelanto,restante,datos_de_pago,qr_pago_url,
-        (select sum(total) from '.$this->tableOrdenExcelPagosDocumentos.' where pagos_excel_id='.$this->tableOrdenExcelPagosDetalle.'.id) as total_documentos');
+        (select ifnull(sum(total),0) from '.$this->tableOrdenExcelPagosDocumentos.' where pagos_excel_id='.$this->tableOrdenExcelPagosDetalle.'.id) as total_documentos');
 
         $this->db->from($this->tableOrdenExcelPagosDetalle);
         $this->db->where('pagos_excel_id',$id);

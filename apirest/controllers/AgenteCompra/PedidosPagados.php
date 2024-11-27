@@ -241,7 +241,7 @@ class PedidosPagados extends CI_Controller
             
             }   
             $rows[] = "<button class='btn btn-xs btn-link' alt='Editar' title='Editar' href='javascript:void(0)'
-			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ",".$row->Nu_Tipo_Servicio.")'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>";
+			onclick='getOrderProgress(" . $row->ID_Pedido_Cabecera . ",".$row->Nu_Tipo_Servicio.")'><i class='fas fa-eye fa-2x' aria-hidden='true'></i></button>";
             // if ($this->user->Nu_Tipo_Privilegio_Acceso == 1) {
                 //no tiene acceso a cambiar status de Perú
                 // $excel_orden_compra = '<button class="btn" alt="Orden Compra Trading" title="Orden Compra Trading" href="javascript:void(0)" onclick="generarAgenteCompra(\'' . $row->ID_Pedido_Cabecera . '\')"><span class="badge bg-success p-2"> Trading &nbsp;<i class="fa fa-file-excel text-white"></i></span></button>';

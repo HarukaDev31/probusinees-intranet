@@ -10068,7 +10068,7 @@ const getExcelOrderItemPagos = (itemData, index, length) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalPeru) && index != 0 && index == length - 1 ? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalPeru)  && index == length - 1 ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrderPagos(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10445,20 +10445,42 @@ const addEventToOrdenPagosExcel = () => {
       const detailsData = await getExcelOrderPaymentsSeekingDetails(id);
       $(".producto").remove();
       $(".buttons").remove();
-   
+  
       let totalPagado=0;
+      let totalAdelanto=0;
+      let totalRestante=0;
       detailsData.forEach((producto, index) => {
         $('#orden-compra_body-pagos').append(getExcelOrderPaymentsSeekingDetailsTemplate(producto));
         totalPagado+=
         parseFloat(producto.total_documentos);
-        console.log(totalPagado)
+        totalAdelanto+=parseFloat(producto.adelanto);
+        totalRestante+=parseFloat(producto.restante);
+        //add total adelanto,restante y total pagado sum as last row
+        if (index == detailsData.length - 1) {
+          $('#orden-compra_body-pagos').append(`
+          <div class="producto">
+            <div class="proveedor-column">
+            </div>
+            <div class="producto-column">
+            </div>
+            <div class="fecha-entrega-column">
+            </div>
+            <div class="total-invoice-column">
+            Totales
+            </div>
+            <div class="adelanto-column">
+            ¥${totalAdelanto}
+            </div>
+            <div class="restante-column">
+            ¥${totalRestante}
+            </div>
+            <div class="pagos-column">
+            <h5><strong>¥${totalPagado}</strong></h5>
+            </div>`);
       }
-      );
+      });
       $('#valor-total-excel-pagado').text("¥" + (isNaN(totalPagado)?0:totalPagado));
-
-
       pagosButtons.empty();
-
       let actionButtons = {
         btnSave: {
           text: "Guardar",
@@ -10471,7 +10493,6 @@ const addEventToOrdenPagosExcel = () => {
       }
       pagosButtons.append(getActionButtons(actionButtons));
       pagosButtons.show();
-
     }
   });
 }
@@ -10501,10 +10522,7 @@ const getExcelOrderPaymentsSeekingDetailsTemplate = (producto, show = true) => {
       ${show ? `
         <h5><strong>¥${producto.total_documentos ?? 0}</strong></h5>
         <span class="" onclick="openPagosSeekingDetailDocuments(${producto.id})">
-      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-cash" viewBox="0 0 16 16">
-        <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-        <path d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2z"/>
-      </svg>
+        <i class="fas fa-eye"></i>
       </span>`: `${producto.datos_de_pago}`}
     </div>
     ${showPagosDocuments
@@ -10517,10 +10535,8 @@ const getExcelOrderPaymentsSeekingDetailsTemplate = (producto, show = true) => {
   return html;
 }
 const getExcelOrderPaymentsSeekingFilesTemplate = (data) => {
-
   const producto = data.excelDetail;
   const voucher = data.data;
-
   const voucher1 = voucher.length > 0 ? voucher[0].voucher_1_url_link : null;
   const voucher2 = voucher.length > 0 ? voucher[0].voucher_2_url_link : null;
   const voucher3 = voucher.length > 0 ? voucher[0].voucher_3_url_link : null;
@@ -10565,35 +10581,23 @@ const handleFileUpload = (event, voucherKey) => {
       alert('Por favor, selecciona un archivo de imagen válido');
       return;
     }
-
-    // Crear un FileReader para leer el contenido del archivo
     const reader = new FileReader();
-
     reader.onload = (e) => {
-      // Obtener la URL de la imagen
       const imageUrl = e.target.result;
-
-      // Actualizar el template del voucher
       const voucherContainer = document.querySelector(
         `.voucher-${voucherKey + 1}`
       );
       console.log(voucherContainer)
       if (voucherContainer) {
-        // Generar el nuevo HTML para el voucher con la imagen
         voucherContainer.innerHTML = generateVoucherTemplate(imageUrl, voucherKey);
-
-        // Opcional: Guardar la imagen en tu estructura de datos
         updateVoucherData(voucherKey, imageUrl);
       }
     };
-
-    // Leer el archivo como una URL de datos
     reader.readAsDataURL(file);
   }
 };
 
 const updateVoucherData = (voucherKey, imageUrl) => {
-  //create form data and append image and voucherKey post to server
   const formData = new FormData();
   formData.append(`voucherKey-${voucherKey}`, imageUrl);
   formData.append('detallePagoId', idPedidoDetalle);
@@ -10611,8 +10615,6 @@ const updateVoucherData = (voucherKey, imageUrl) => {
     }
   });
 };
-
-// Función para generar el template de voucher
 const generateVoucherTemplate = (voucher_link, voucher_key) => {
   try {
     if (voucher_link) {
@@ -10680,8 +10682,6 @@ const generateVoucherTemplate = (voucher_link, voucher_key) => {
     return '';
   }
 };
-
-// Event Delegation para manejar la subida de archivos
 document.addEventListener('change', (event) => {
   if (event.target.classList.contains('voucher-upload-input')) {
     const voucherKey = event.target.dataset.voucherIndex;
@@ -10880,6 +10880,7 @@ const getExcelOrderPagosDocumentsItem = async (itemData, index, length) => {
 }
 const closePagosSeekingList = () => {
   containerOrdenCompra.hide();
+  $("#valor-total-excel").text("¥0.00");
   containerExcelPagos.hide()
   containerListar.show()
   pagosButtons.empty()
@@ -10897,12 +10898,7 @@ const closePagosSeekingListDocuments = () => {
       idOrderPago:selectedOrderPagoId
     },
     success: function (response) {
-      const { status, message } = JSON.parse(response);
-      if (status == "success") {
-        $(`.card-custom[data-id=${id}]`).remove();
-        $(".producto").remove();
-        openStepFunction(selectedStepid, selectedStep)
-      }
+      
     }
   });
   pagosButtons.empty()
@@ -10945,12 +10941,10 @@ const deleteExcelOrderPagosDocuments = (id) => {
       const { status, message } = JSON.parse(response);
       if (status == "success") {
         $(`.card-custom[data-id=${id}]`).remove();
-        // $(".producto").remove();
       }
     }
   });
 }
-//on click custom-file-upload open modal upload uploadModal
 $(".custom-file-upload").click(function () {
   $('#uploadModal').modal('show');
 });
