@@ -10881,6 +10881,7 @@ const getExcelOrderPagosDocumentsItem = async (itemData, index, length) => {
 const closePagosSeekingList = () => {
   containerOrdenCompra.hide();
   $("#valor-total-excel").text("¥0.00");
+  $("#orden-compra_body-pagos").empty();
   containerExcelPagos.hide()
   containerListar.show()
   pagosButtons.empty()
