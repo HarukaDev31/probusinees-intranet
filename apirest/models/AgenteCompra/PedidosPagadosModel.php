@@ -242,7 +242,8 @@ class PedidosPagadosModel extends CI_Model
                 $config['encrypt_name'] = true;
                 $config['max_filename'] = '255';
 
-                $this->load->library('upload', $config);
+                $this->load->library('
+                ', $config);
 
                 if (!$this->upload->do_upload('voucher_proveedor')) {
                     $this->db->trans_rollback();
