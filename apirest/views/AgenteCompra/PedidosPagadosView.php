@@ -3654,7 +3654,10 @@ echo form_open('', $attributes);?>
             border-radius: 4px;
         }
     
-        
+        i:hover {
+            cursor: pointer;
+            color: #007bff;
+        }
        
   </style>
   <?php echo form_close(); ?>

@@ -10414,7 +10414,7 @@ const getExcelOrderPaymentsSeekingDetailsTemplate = (producto, show = true) => {
       ${show ? `
         <h5><strong>¥${producto.total_documentos ?? 0}</strong></h5>
         <span class="" onclick="openPagosSeekingDetailDocuments(${producto.id})">
-        <i class="fas fa-eye"></i>
+        <i class="fas fa-eye" style="font-size: 1.8rem;"></i>
       </span>`: `${producto.datos_de_pago}`}
     </div>
     ${showPagosDocuments
