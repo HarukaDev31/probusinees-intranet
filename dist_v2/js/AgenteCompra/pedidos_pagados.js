@@ -10341,6 +10341,8 @@ const addEventToOrdenPagosExcel = () => {
         $('#orden-compra_body-pagos').append(getExcelOrderPaymentsSeekingDetailsTemplate(producto));
         totalPagado+=
         parseFloat(producto.total_documentos);
+        console.log(totalPagado);
+        console.log("waos")
         totalAdelanto+=parseFloat(producto.adelanto);
         totalRestante+=parseFloat(producto.restante);
         //add total adelanto,restante y total pagado sum as last row
