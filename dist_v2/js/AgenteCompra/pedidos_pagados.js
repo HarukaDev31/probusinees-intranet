@@ -10337,12 +10337,13 @@ const addEventToOrdenPagosExcel = () => {
       let totalPagado=0;
       let totalAdelanto=0;
       let totalRestante=0;
+      let totalInvoice=0;
       detailsData.forEach((producto, index) => {
         $('#orden-compra_body-pagos').append(getExcelOrderPaymentsSeekingDetailsTemplate(producto));
         totalPagado+=
         parseFloat(producto.total_documentos);
-        console.log(totalPagado);
-        console.log("waos")
+        totalInvoice+=parseFloat(producto.total_invoice);
+
         totalAdelanto+=parseFloat(producto.adelanto);
         totalRestante+=parseFloat(producto.restante);
         //add total adelanto,restante y total pagado sum as last row
@@ -10370,6 +10371,7 @@ const addEventToOrdenPagosExcel = () => {
       }
       });
       $('#valor-total-excel-pagado').text("¥" + (isNaN(totalPagado)?0:totalPagado));
+      $('#valor-total-excel').text("¥" + (isNaN(totalInvoice)?0:totalInvoice));
       pagosButtons.empty();
       let actionButtons = {
         btnSave: {
