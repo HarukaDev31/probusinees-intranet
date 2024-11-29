@@ -1,14 +1,9 @@
 
 var url, table_Entidad;
-//AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
-// Se puede crear un arreglo a partir de la cadena
 let search_global_autocomplete =
   caractes_no_validos_global_autocomplete.split("");
-// Solo tomé algunos caracteres, completa el arreglo
 let replace_global_autocomplete = ["", "", "", "", "", "", "", "", ""];
-//28 caracteres
-// FIN AUTOCOMPLETE
 let priviligesPersonalPeru = 1;
 let priviligesPersonalChina = 2;
 let priviligesJefeChina = 5;
@@ -5945,7 +5940,6 @@ function pagarProveedores(ID, tipo_pago) {
                 response.sCorrelativoCotizacion +
                 '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor (Deposit_#2)</button>';
             } else {
-              //table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + detalle[i].Ss_Pago_Importe_2 + ' (Deposit_#2)</button>';
               table_enlace_producto +=
                 '<button type="button" id="btn-ver_pago_proveedor' +
                 id_item +
@@ -5972,117 +5966,11 @@ function pagarProveedores(ID, tipo_pago) {
           ++iCounterSupplier;
         }
       }
-
-      /*
-      var table_enlace_producto = "", iDiasVencimiento = 0, sClassColorTr = "", fTotalCliente = 0, ID_Entidad = 0;
-      for (i = 0; i < detalle.length; i++) {
-        var cantidad_item = parseFloat(detalle[i]['Qt_Producto']);
-        var precio_china = parseFloat(detalle[i]['Ss_Precio']);
-
-        fTotalCliente += (cantidad_item * (precio_china * parseFloat(response.Ss_Tipo_Cambio)));
-
-        var id_item = detalle[i]['ID_Pedido_Detalle_Producto_Proveedor'];
-        var voucher_1 = detalle[i]['Txt_Url_Archivo_Pago_1_Proveedor'];
-        var voucher_2 = detalle[i]['Txt_Url_Archivo_Pago_2_Proveedor'];
-        //max-height: 350px;width: 100%; cursor:pointer
-
-        var fTotal = (cantidad_item * precio_china);
-        var Ss_Pago_1_Proveedor = parseFloat(detalle[i]['Ss_Pago_1_Proveedor']);
-        var Ss_Pago_2_Proveedor = parseFloat(detalle[i]['Ss_Pago_2_Proveedor']);
-
-        sClassColorTr = '';
-        iDiasVencimiento = 0;
-        if((detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null)){
-          var fechaInicio = new Date(fYear + '-' + fMonth + '-' + fDay).getTime();
-          var fechaFin    = new Date(detalle[i]['Fe_Entrega_Proveedor']).getTime();
-
-          var diff = fechaFin - fechaInicio;
-          iDiasVencimiento = (diff / (1000*60*60*24));// --> milisegundos -> segundos -> minutos -> horas -> días
-          if(iDiasVencimiento<5)
-            sClassColorTr = 'table-warning';
-        }
-
-        var fecha_entrega_proveedor = ( (detalle[i]['Fe_Entrega_Proveedor'] != '' && detalle[i]['Fe_Entrega_Proveedor'] != null) ? ParseDateString(detalle[i]['Fe_Entrega_Proveedor'], 'fecha_bd', '-') : '');
-
-        if (ID_Entidad != detalle[i].ID_Entidad_Proveedor) {
-          table_enlace_producto +=
-          "<tr>"
-            +"<th class='text-right'>Supplier </th>"
-            +"<th class='text-left' colspan='14'>" + detalle[i].No_Contacto_Proveedor + "</th>"
-          +"</tr>";
-          ID_Entidad = detalle[i].ID_Entidad_Proveedor;
-        }
-
-        table_enlace_producto +=
-        "<tr id='tr_enlace_producto" + id_item + "'>"
-          + "<td style='display:none;' class='text-left td-id_item'>" + id_item + "</td>"
-          + "<td class='text-center td-name' width='50%'>"
-            + "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' src='" + detalle[i]['Txt_Url_Imagen_Producto'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
-
-          table_enlace_producto += "</td>"
-          + "<td class='text-left td-name'>" + detalle[i]['Txt_Producto'] + "</td>"
-          + "<td class='text-right td-qty'>" + Math.round10(cantidad_item, -2) + "</td>"
-          + "<td class='text-right td-price'>" + Math.round10(precio_china, -2) + "</td>"
-          +"<td class='text-right td-amount'>" + Math.round10(fTotal, -2) + "</td>"
-          +"<td class='text-right td-pay1'>" + Math.round10(Ss_Pago_1_Proveedor, -2) + "</td>"
-          +"<td class='text-right td-balance'>" + Math.round10(fTotal - Ss_Pago_1_Proveedor, -2) + "</td>"
-          +"<td class='text-right td-pay2'>" + Math.round10(Ss_Pago_2_Proveedor, -2) + "</td>"
-          +"<td class='text-left td-delivery_date'>" + detalle[i]['Nu_Dias_Delivery'] + "</td>"
-          +"<td class='text-left td-costo_delivery'>" + detalle[i]['Ss_Costo_Delivery'] + "</td>";
-
-          table_enlace_producto += "<td class='text-left td-supplier'>";
-            table_enlace_producto += '<div class="input-group date" style="width:100%">';
-              table_enlace_producto += '<input type="text" id="txt-fecha_entrega_proveedor'+i+'" name="addProducto[' + id_item + '][fecha_entrega_proveedor]" class="form-control input-datepicker-today-to-more required" value="' + fecha_entrega_proveedor + '">';
-            table_enlace_producto += '</div>';
-          table_enlace_producto += "</td>";
-
-          table_enlace_producto += "<td class='text-left td-supplier'>" + detalle[i]['No_Contacto_Proveedor'] + "</td>"
-          +"<td class='text-left td-phone'>";
-          if(detalle[i]['Txt_Url_Imagen_Proveedor'] != '' && detalle[i]['Txt_Url_Imagen_Proveedor'] != null){
-            table_enlace_producto += "<img style='' data-id_item='" + id_item + "' data-url_img='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' src='" + detalle[i]['Txt_Url_Imagen_Proveedor'] + "' alt='" + detalle[i]['Txt_Producto'] + "' class='img-thumbnail img-table_item img-fluid img-resize mb-2'>";
-          }
-          table_enlace_producto += "</td>";
-
-          table_enlace_producto += "<td class='text-left td-eliminar'>";
-            table_enlace_producto += '<button type="button" id="btn-eliminar_item_proveedor' + id_item + '" data-name_item="' + detalle[i]['Txt_Producto'] + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id="' + id_item + '" data-correlativo="' + response.sCorrelativoCotizacion + '" class="text-left btn btn-danger btn-block btn-eliminar_item_proveedor"> X </button>';
-          table_enlace_producto += "</td>";
-
-          table_enlace_producto += '<input type="hidden" name="addProducto[' + id_item + '][id_item]" value="' + id_item + '">';
-        table_enlace_producto += "</tr>";
-
-        table_enlace_producto +=
-        "<tr><td class='text-left' colspan='14'>"
-          if( voucher_1 == '' || voucher_1 == null ){
-            table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="1" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
-          } else {
-            table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_1 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_1_Proveedor +  ' (Deposit_#1)</button>';
-            if( voucher_2 == '' || voucher_2 == null ){
-              table_enlace_producto += '<button type="button" id="btn-agregar_pago_proveedor' + id_item + '" data-tipo_pago="2" data-id="' + id_item + '" class="text-left btn btn-primary btn-block btn-agregar_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pagar Proveedor</button>';
-            } else {
-              table_enlace_producto += '<button type="button" id="btn-ver_pago_proveedor' + id_item + '" data-url_img="' + voucher_2 + '" data-id="' + id_item + '" class="text-left btn btn-secondary btn-block btn-ver_pago_proveedor" data-id_empresa="' + response.ID_Empresa + '" data-id_organizacion="' + response.ID_Organizacion + '" data-id_pedido_cabecera="' + response.ID_Pedido_Cabecera + '" data-id_pedido_detalle="' + response.ID_Pedido_Detalle + '" data-correlativo="' + response.sCorrelativoCotizacion + '"><i class="fas fa-money-bill-alt"></i>&nbsp; Pago ¥ ' + Ss_Pago_2_Proveedor + ' (Deposit_#2)</button>';
-            }
-          }
-        table_enlace_producto +=
-        "</td></tr>";
-      }
-      */
-
       $("#span-total_cantidad_items").html(i);
       $("#table-Pago_Proveedor").append(table_enlace_producto);
 
       $("#span-total_cliente").html("$ " + fTotalCliente.toFixed(2));
 
-      //PAGOS
-      //Ss_Pago_30_Cliente
-      //Ss_Pago_100_Cliente
-      //Ss_Pago_Servicio_Cliente
-
-      //OTROS
-      //Ss_Pago_Otros_Flete
-      //Ss_Pago_Otros_Costo_Origen
-      //Ss_Pago_Otros_Costo_Fta
-      //Ss_Pago_Otros_Cuadrilla
-      //Ss_Pago_Otros_Costos
       $("#span-saldo_cliente").html(
         "$ " +
         (fTotalCliente -
@@ -10716,7 +10604,6 @@ document.addEventListener('click', (event) => {
 
 // Función para mostrar imagen en modal
 const showImageModal = (imageSrc) => {
-  console.log(imageSrc)
   const modalHtml = `
     <div class="modal fade" id="imagePreviewModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
@@ -10808,6 +10695,7 @@ const openPagosSeekingDetailDocuments = async (id) => {
       return acc + parseFloat(item);
     }, 0);
     //set total value to #valor-total-excel
+    console.log(totalSum);
     $("#valor-total-excel-pagos").text(`$${totalSum.toFixed(2)}`);
 
   }
@@ -10848,11 +10736,11 @@ const getExcelOrderPagosDocumentsItem = async (itemData, index, length) => {
     "total": itemData.value,
   }
   const html = `
-  <div class="">
-    <div class="card-custom"
-    data-id="${item.id}"
-    data-total="${item.total}"
-    >
+    <div class="">
+      <div class="card-custom"
+      data-id="${item.id}"
+      data-total="${item.total}"
+      >
         <div class="d-flex justify-content-between align-items-center">
             <div>
                  <h4><strong> ¥${item.total}</strong></h4>
@@ -10865,17 +10753,13 @@ const getExcelOrderPagosDocumentsItem = async (itemData, index, length) => {
             >
             <i class="fas fa-download"></i>
             Descargar</a>
-
             ${(currentPrivilege != priviligesPersonalPeru && index != 0 && index == length - 1) ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrderPagosDocuments(${item.id})"
             >
             <i class="fas fa-trash"></i>
             Eliminar</button>`: ''}
-
-            
-        
-    </div>
-</div>`
+      </div>
+  </div>`
   return html;
 }
 const closePagosSeekingList = () => {
@@ -10899,7 +10783,7 @@ const closePagosSeekingListDocuments = () => {
       idOrderPago:selectedOrderPagoId
     },
     success: function (response) {
-      
+
     }
   });
   pagosButtons.empty()
