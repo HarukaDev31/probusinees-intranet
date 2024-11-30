@@ -519,94 +519,101 @@ function getAlmacenData(idO) {
   url = base_url + "Almacen/Trading/getInspeccion";
   containerInspection.show();
   containerAlmacen.hide();
-  tableInspection = tableInspection.DataTable({
-    dom:
-      "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-      "<'row'<'col-sm-12'tr>>" +
-      "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-    buttons: [
-      {
-        extend: "excel",
-        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-        titleAttr: "Excel",
-        exportOptions: {
-          columns: ":visible",
-        },
-      },
-      {
-        extend: "pdf",
-        text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-        titleAttr: "PDF",
-        exportOptions: {
-          columns: ":visible",
-        },
-      },
-      {
-        extend: "colvis",
-        text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-        titleAttr: "Columnas",
-        exportOptions: {
-          columns: ":visible",
-        },
-      },
-    ],
-    paging: true,
-    lengthChange: true,
-    searching: true,
-    ordering: true,
-    info: true,
-    autoWidth: false,
-    responsive: false,
-    serverSide: false,
-    pagingType: "full_numbers",
-    oLanguage: {
-      sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-      sLengthMenu: "_MENU_",
-      sSearch: "Buscar por: ",
-      sSearchPlaceholder: "",
-      sZeroRecords: "No se encontraron registros",
-      sInfoEmpty: "No hay registros",
-      sLoadingRecords: "Cargando...",
-      sProcessing: "Procesando...",
-      oPaginate: {
-        sFirst: "<<",
-        sLast: ">>",
-        sPrevious: "<",
-        sNext: ">",
-      },
-    },
-    order: [[sort_col, "desc"]],
-    ajax: {
-      url: url,
-      type: "POST",
-      dataType: "JSON",
 
-      data: function (data) {
-        data.idOrder = idOrder;
+  // Verificar si la tabla ya está inicializada
+  if ($.fn.DataTable.isDataTable("#table-inspection")) {
+    console.log("Table is already initialized");
+    reload_table_inspection(); 
+  }else{
+    tableInspection=tableInspection.DataTable({
+      dom:
+          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      buttons: [
+          {
+              extend: "excel",
+              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+              titleAttr: "Excel",
+              exportOptions: {
+                  columns: ":visible",
+              },
+          },
+          {
+              extend: "pdf",
+              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+              titleAttr: "PDF",
+              exportOptions: {
+                  columns: ":visible",
+              },
+          },
+          {
+              extend: "colvis",
+              text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+              titleAttr: "Columnas",
+              exportOptions: {
+                  columns: ":visible",
+              },
+          },
+      ],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+          sLengthMenu: "_MENU_",
+          sSearch: "Buscar por: ",
+          sSearchPlaceholder: "",
+          sZeroRecords: "No se encontraron registros",
+          sInfoEmpty: "No hay registros",
+          sLoadingRecords: "Cargando...",
+          sProcessing: "Procesando...",
+          oPaginate: {
+              sFirst: "<<",
+              sLast: ">>",
+              sPrevious: "<",
+              sNext: ">",
+          },
       },
-      complete: function () {
-        $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-        calcTotales();
+      order: [[sort_col, "desc"]],
+      ajax: {
+          url: url,
+          type: "POST",
+          dataType: "JSON",
+          data: function (data) {
+              data.idOrder = idOrder;
+          },
+          complete: function () {
+              $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+              calcTotales();
+          },
       },
-    },
-    columnDefs: [
-      {
-        targets: "no-hidden",
-        visible: false,
-      },
-      {
-        className: "text-center",
-        targets: "no-sort",
-        orderable: false,
-      },
-    ],
-    lengthMenu: [
-      [10, 100, 1000, -1],
-      [10, 100, 1000, "Todos"],
-    ],
-  })
-  addEventsToInspection();
+      columnDefs: [
+          {
+              targets: "no-hidden",
+              visible: false,
+          },
+          {
+              className: "text-center",
+              targets: "no-sort",
+              orderable: false,
+          },
+      ],
+      lengthMenu: [
+          [10, 100, 1000, -1],
+          [10, 100, 1000, "Todos"],
+      ],
+  });
+  }
   
+
+  addEventsToInspection();
 }
 function getFotos(idEx,idD) {
   removeEventInspection();

@@ -7389,6 +7389,10 @@ function getAlmacenData(idO) {
   containerVer.hide();
   containerAlmacen.hide();
   $("#table-elegir_productos_proveedor").hide();
+  if ($.fn.DataTable.isDataTable("#table-inspection")) {
+    console.log("Table is already initialized");
+    reload_table_inspection(); 
+  }else{
   tableInspection = tableInspection.DataTable({
     dom:
       "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -7475,6 +7479,7 @@ function getAlmacenData(idO) {
       [10, 100, 1000, "Todos"],
     ],
   })
+}
   addEventsToInspection();
   
 }
