@@ -11029,7 +11029,9 @@ function deleteInspeccionFiles(id){
     url: base_url + "Almacen/Trading/deleteInspeccionFiles",
     type: "POST",
     dataType: "JSON",
-    data: { idFile: id },
+    data: { idFile: id,
+      idDetalle: idDetalle 
+     },
     success: function (data) {
       
     },

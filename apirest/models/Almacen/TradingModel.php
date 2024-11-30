@@ -114,11 +114,17 @@ class TradingModel extends CI_Model{
 		];
 		return $dataToReturn;
 	}
-	public function deleteInspeccionFiles($id){
+	public function deleteInspeccionFiles($id,$idDetalle){
 		$file=$this->db->select("file_path")->from($this->table_agente_compra_excel_files)->where("id",$id)->get()->row();
 		if($file){
 			$this->deleteFile($file->file_path);
 			$this->db->where("id",$id)->delete($this->table_agente_compra_excel_files);
+			
+			//check if there are more files for thid excel_detail
+			$files=$this->db->select("id")->from($this->table_agente_compra_excel_files)->where("id_order_excel_detail",$idDetalle)->get()->result();
+			if(count($files)==0){
+				$this->db->where("id",$idDetalle)->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"PENDIENTE"]);
+			}
 			return true;
 		}
 		return false;

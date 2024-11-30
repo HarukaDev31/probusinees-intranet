@@ -132,7 +132,8 @@ class Trading extends CI_Controller
     }
     public function deleteInspeccionFiles(){
         $idFile = $this->input->post("idFile");
-        $data=$this->TradingModel->deleteInspeccionFiles($idFile);
+        $idDetalle=$this->input->post("idDetalle");
+        $data=$this->TradingModel->deleteInspeccionFiles($idFile,$idDetalle);
         echo json_encode($data);
     }
     public function saveInspection(){
