@@ -13,8 +13,10 @@
     </div><!-- /.container-fluid -->
   </section>
    <section class="content ">
+    
+    <div class="container-fluid table-almacen">
     <div class="row">
-    <div class="col-6 col-sm-3">
+      <div class="col-6 col-sm-3">
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
                     <input type="text" id="txt-Fe_Inicio" class="form-control input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
@@ -42,7 +44,6 @@
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
       </div>
-    <div class="container-fluid table-almacen">
       <div class="table-responsive div-Listar">
         <table id="table-almacen" class="table table-bordered table-hover table-striped">
           <thead class="thead-light">

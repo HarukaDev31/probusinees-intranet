@@ -113,7 +113,8 @@ class Trading extends CI_Controller
     }
     public function getInspeccionFiles(){
         $idExcel = $this->input->post("idExcel");
-        $arrData = $this->TradingModel->getInspeccionFiles($idExcel);
+        $idDetalle = $this->input->post("idDetalle");
+        $arrData = $this->TradingModel->getInspeccionFiles($idDetalle);
 
         $output = array(
             "data" => $arrData

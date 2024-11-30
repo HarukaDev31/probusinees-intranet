@@ -11046,6 +11046,7 @@ function getFotos(idEx,idD) {
     type: "POST",
     dataType: "JSON",
     data: { idExcel: idExcel,
+      idDetalle: idDetalle
      },
     success: function (data) {
       driveFiles = data.data;

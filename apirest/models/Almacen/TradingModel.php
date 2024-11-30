@@ -56,21 +56,26 @@ class TradingModel extends CI_Model{
 		
 	}
 	public function getInspeccion($idOrder){
+		$subquery = $this->db->select("MAX(id) as last_id")
+                     ->from($this->table_agente_compra_excel)
+                     ->where("order_id", $idOrder)
+                     ->get_compiled_select();
+
 		$query = $this->db->select("*")
-		->from($this->table_agente_compra_excel)
-		->join($this->table_agente_compra_excel_detalle, " agente_compra_order_excel.id = agente_compra_order_excel_detail.order_excel_id ", "join")
-		->join ($this->table," agente_compra_order_excel.order_id = agente_compra_pedido_cabecera.ID_Pedido_Cabecera","join")
-		->where("order_id", $idOrder)
-		->order_by("agente_compra_order_excel.id", "desc");
+			->from($this->table_agente_compra_excel)
+			->join($this->table_agente_compra_excel_detalle, "agente_compra_order_excel.id = agente_compra_order_excel_detail.order_excel_id", "join")
+			->join($this->table, "agente_compra_order_excel.order_id = agente_compra_pedido_cabecera.ID_Pedido_Cabecera", "join")
+			->where("agente_compra_order_excel.id = ($subquery)", null, false)
+			->order_by("agente_compra_order_excel_detail.id", "desc"); // Ordena los detalles si es necesario
 
 		// Para depuración, imprime la consulta SQL generada
 
 		return $query->get()->result();
 	}
-	public function getInspeccionFiles($idExcel){
+	public function getInspeccionFiles($idDetalle){
 		$query = $this->db->select("id,id_order_excel,file_name as name, file_path as path,file_type as type,file_size as size,created_at,file_path thumbnail")
 		->from($this->table_agente_compra_excel_files)
-		->where("id_order_excel", $idExcel)
+		->where("id_order_excel_detail", $idDetalle)
 		->order_by("id", "desc");
 		return $query->get()->result();
 	}
@@ -86,6 +91,7 @@ class TradingModel extends CI_Model{
 		],"assets/images/");
 		$data=[
 			"id_order_excel"=>$idExcel,
+			"id_order_excel_detail"=>$idDetalle,
 			"file_name"=>$file["name"],
 			"file_path"=>$fileUrl,
 			"file_type"=>$file["type"],
