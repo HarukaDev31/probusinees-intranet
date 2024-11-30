@@ -149,6 +149,11 @@
 <?php endif; ?>
 
 <?php if (isset($js_almacen) && $js_almacen==true) : ?>
+  <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+
+  <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+  <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+
 <script src="<?php echo base_url() . 'dist_v2/js/Almacen/almacen.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 

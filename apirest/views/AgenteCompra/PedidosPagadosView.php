@@ -104,29 +104,29 @@
 
               <div class="box-body div-AgregarEditar">
                 <?php
-$attributes = array('id' => 'form-pedido');
-echo form_open('', $attributes);
-?>
-                <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
-                <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
-                <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
-                <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
+              $attributes = array('id' => 'form-pedido');
+              echo form_open('', $attributes);
+              ?>
+                              <input type="hidden" id="txt-EID_Pedido_Cabecera" name="EID_Pedido_Cabecera" class="form-control">
+                              <input type="hidden" id="txt-EID_Entidad" name="EID_Entidad" class="form-control">
+                              <input type="hidden" id="txt-EID_Empresa" name="EID_Empresa" class="form-control">
+                              <input type="hidden" id="txt-EID_Organizacion" name="EID_Organizacion" class="form-control">
 
-                <div class="row">
-                  <div class="col-12 col-sm-12 col-md-12 d-none">
-                    <label>Estado</label>
-                    <div class="form-group">
-                      <div id="div-estado" style="font-size: 1.4rem;"></div>
-                    </div>
-                  </div>
+                              <div class="row">
+                                <div class="col-12 col-sm-12 col-md-12 d-none">
+                                  <label>Estado</label>
+                                  <div class="form-group">
+                                    <div id="div-estado" style="font-size: 1.4rem;"></div>
+                                  </div>
+                                </div>
 
-                  <?php
-$sClassOcultar = '';
-if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) {
-    $sClassOcultar = 'd-none';
-}
+                                <?php
+              $sClassOcultar = '';
+              if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privilegio_Acceso == 5) {
+                  $sClassOcultar = 'd-none';
+              }
 
-?>
+              ?>
                   <div class="col-6 col-sm-6 col-md-6 <?php echo $sClassOcultar; ?>">
                     <label>Cliente</label>
                     <div class="form-group">
@@ -602,6 +602,108 @@ if ($this->user->Nu_Tipo_Privilegio_Acceso == 2 || $this->user->Nu_Tipo_Privileg
             </div>
             <form class="card-body" id="table-elegir_productos_proveedor">
             </form>
+
+            <section class="content table-inspection">
+      <div class="container-fluid">
+        <div class="row mb-3">
+          <div class="col-sm-12 col-md-3">
+            <div class="input-group mb-3">
+              <span class="input-group-text">Total Box</span>
+              <input type="text" id="total-box"
+              class="form-control" disabled aria-label="Dollar amount (with dot and two decimal places)">
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="input-group mb-3">
+              <span class="input-group-text">Total CBM</span>
+              <input type="text"
+              id="total-cbm"
+              class="form-control"  disabled aria-label="Dollar amount (with dot and two decimal places)">
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="input-group mb-3">
+              <span class="input-group-text">Total KG</span>
+              <input type="text" class="form-control" 
+              id="total-kg"
+              disabled
+              aria-label="Dollar amount (with dot and two decimal places)">
+            </div>
+        </div>
+        <div class="table-responsive div-Listar">
+          <table id="table-inspection" class="table table-bordered table-hover table-striped">
+            <thead class="thead-light">
+              <tr>
+                <th>Imagen </th>
+                <th>Nombre Producto</th>
+                <th>Cantidad Total</th>
+                <th>Total Box</th>
+                <th>Total CBM</th>
+                <th>Total KG</th>
+                <th>Fotos</th>
+                <th>Estado</th>
+                <th>Notas</th>
+              
+              </tr>
+            </thead>
+          </table>
+          <div class="row mt-3 action-buttons">
+            <div class="col-sm-12 col-md-6 d-flex flex-row align-items-center justify-content-center">
+              <button class="btn btn-primary" id="btn-save-inspection">Guardar</button>
+            </div>
+            <div class="col-sm-12 col-md-6 d-flex flex-row align-items-center justify-content-center">
+              <button class="btn btn-success" id="btn-back-inspection">Atras</button>
+            </div>
+        </div>
+      </div>
+    </section>
+    <section class="min-h-screen bg-white main-container" id="drive-container">
+      <header class="sticky top-0 z-10 bg-white border-b">
+          <div class="container mx-auto px-4 py-2 flex items-center justify-between ">
+              <h1 class="text-xl font-semibold text-gray-800">Archivos</h1>
+              <div class="flex items-center space-x-4">
+                  <div class="relative">
+                      <input type="text" placeholder="Buscar en Archivos" id="search-input"
+                          class="pl-8 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  </div>
+                  <button class="p-2 rounded-full hover:bg-gray-100"
+                  id="back-btn"
+                  >
+                      <!-- icon to back to previous folder -->
+                      <i class="fas fa-arrow-left text-gray-500"></i>
+                  </button>
+              </div>
+          </div>
+      </header>
+
+      <div class="container mx-auto px-4 py-8 file-section-container">
+          <div id="drag-drop-container"
+              class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden">
+              <div id="drop-message">
+                  <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
+                  <p class="text-gray-600">
+                      Arrastra y suelta archivos aquí
+                  </p>
+                  <p class="text-xs text-gray-500 mt-2">
+                      Soporta: PDF, JPG, PNG, DOCX (Máximo 10MB)
+                  </p>
+              </div>
+
+          </div>
+
+          <div id="file-grid" class="grid grid-cols-4 gap-4">
+
+              <!-- Existing and uploaded files will appear here -->
+          </div>
+          <div id="pending-files" class="mb-4">
+              <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
+              <div id="pending-file-list" class="space-y-2">
+                  <!-- Los archivos pendientes aparecerán aquí -->
+              </div>
+          </div>
+      </div>
+    </section>
           </div>
 
 
@@ -3658,6 +3760,141 @@ echo form_open('', $attributes);?>
             cursor: pointer;
             color: #007bff;
         }
-       
+        .drag-drop-area {
+            transition: all 0.3s ease;
+        }
+
+        .drag-over {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+        }
+
+        .context-menu {
+            position: absolute;
+            z-index: 50;
+            min-width: 150px;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            top: 2rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .main-container {
+            height: 100%;
+            position: relative;
+        }
+
+        .file-list {
+            position: absolute;
+            bottom: 0;
+            max-height: 100px;
+            height: 100px;
+            width: 500px;
+            right: 1em;
+            border-top-left-radius: 1em;
+            border-top-right-radius: 1em;
+            overflow-y: auto;
+        }
+
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5em 1em;
+            background-color: #f9f9f9;
+            border-top-left-radius: 1em;
+            border-top-right-radius: 1em;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #76c7c0;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        i {
+            align-self: center;
+            align-items: center;
+
+        }
+        i:hover {
+            cursor: pointer;
+            color:#5dade2;
+        }
+
+        #pending-files {
+            background-color: #fff8e1;
+            border: 1px solid #ffe082;
+            padding: 1em;
+            border-radius: 0.5em;
+            position: absolute;
+            bottom: 0;
+            right: 1em;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .progress-circle circle {
+            transition: stroke-dashoffset 0.3s ease;
+        }
+
+        #pending-file-list .file-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        #pending-file-list .file-name {
+            flex-grow: 1;
+            padding-left: 10px;
+            font-weight: 600;
+        }
+
+        #pending-file-list .text-sm {
+            color: #666;
+        }
+        .file-section-container{
+          width: 100vw;
+          height: 100vh;
+        }#file-grid{
+          height: 100%;
+          width: 100%;
+          gap: 1rem;
+          overflow-y: auto;
+        }
+        .group {
+          height: 350px;
+        }
   </style>
   <?php echo form_close(); ?>

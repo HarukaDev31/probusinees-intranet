@@ -4,7 +4,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Trading extends CI_Controller
 {
-  
+    private $jefeChinaPrivilegio = 5;
+    private $personalChinaPrivilegio = 2;
+    private $personalPeruPrivilegio = 1;
+    private $almacenPrivilegio = 6;
     public function __construct()
     {
         parent::__construct();
@@ -58,21 +61,49 @@ class Trading extends CI_Controller
         $idOrder = $this->input->post("idOrder");
         $arrData = $this->TradingModel->getInspeccion($idOrder);
         $data = array();
+
+        $privilegio = $this->user->Nu_Tipo_Privilegio_Acceso;
+        $disabled = ($privilegio != $almacen_privilegio) ? 'disabled' : '';
+
         foreach ($arrData as $row) {
+            $span_estado = "";
+            if ($row->almacen_estado == "PENDIENTE") {
+                $span_estado = "<span class='badge badge-warning'>" . $row->almacen_estado . "</span>";
+            } else if ($row->almacen_estado == "RECIBIDO") {
+                $span_estado = "<span class='badge badge-info'>" . $row->almacen_estado . "</span>";
+            } else if ($row->almacen_estado == "COMPLETADO") {
+                $span_estado = "<span class='badge badge-success'>" . $row->almacen_estado . "</span>";
+            }
             $data[] = array(
                 "<img src='" . $row->image_url . "' class='img-fluid' alt='imagen' style='width: 100px; height: 100px;'>",
                 $row->name,
                 $row->quantity,
-                $row->total_boxes,
-                $row->total_cbm,
-                $row->kg_box,
-                "<button class='btn btn-xs btn-link' onclick='getFotos(" . $row->order_excel_id . ")' alt='Fotos' title='Fotos' href='javascript:void(0)'><i class='fas fa-images fa-2x' aria-hidden='true'></i></button>",
-               $rows[]='<select class="form-control" id="status_' . $row->estado_almacen . '" onchange="changeStatusAlmacen(this.value,' . $row->ID_Pedido_Cabecera . ')">
-                <option value="PENDIENTE" ' . ($row->estado_almacen == "PENDIENTE" ? 'selected' : '') . '>PENDIENTE</option>
-                <option value="RECIBIENDO" ' . ($row->estado_almacen == "RECIBIENDO" ? 'selected' : '') . '>RECIBIENDO</option>
-                <option value="COMPLETADO" ' . ($row->estado_almacen == "COMPLETADO" ? 'selected' : '') . '>COMPLETADO</option>
-                    </select>',
-                $row->notas,
+                "<input type='number'
+                data-id='" . $row->id . "'
+                class='form-control box_value'
+                value='" . $row->total_box_almacen . "'
+                id='total_cbm_" . $row->id . "'
+                $disabled>",
+                "<input type='number'
+                data-id='" . $row->id . "'
+                class='form-control cbm_value'
+                value='" . $row->total_cbm_almacen . "'
+                id='total_cbm_" . $row->id . "'
+                $disabled>",
+              "
+                <input type='number'
+                    data-id='" . $row->id . "'
+                    class='form-control kg_value'
+                    value='" . $row->total_kg_almacen . "'
+                    id='total_kg_" . $row->id . "'
+                    $disabled>",
+                "<button class='btn btn-xs btn-link' onclick='getFotos(" . $row->order_excel_id ." ,".$row->id.
+                 ")'.
+                alt='Fotos' title='Fotos' href='javascript:void(0)'><i class='fas fa-images fa-2x' aria-hidden='true'></i></button>",
+                $span_estado,
+                "<textarea 
+                data-id='".$row->id ."'
+                class='form-control almacen_notas' id='notas_" . $row->order_excel_id . "'>" . $row->nota_almacen . "</textarea>",
             );
         }
         $output = array(
@@ -83,15 +114,7 @@ class Trading extends CI_Controller
     public function getInspeccionFiles(){
         $idExcel = $this->input->post("idExcel");
         $arrData = $this->TradingModel->getInspeccionFiles($idExcel);
-        $data = array();
-        foreach ($arrData as $row) {
-            $data[] = array(
-                $row->name,
-                $row->size,
-                $row->created_at,
-                "<a href='" . base_url() . "uploads/" . $row->path . "' target='_blank' class='btn btn-xs btn-link' alt='Descargar' title='Descargar'><i class='fas fa-download fa-2x' aria-hidden='true'></i></a>",
-            );
-        }
+
         $output = array(
             "data" => $arrData
         );
@@ -101,7 +124,20 @@ class Trading extends CI_Controller
    
         $file = $_FILES['file'];
         $idExcel = $this->input->post("idExcel");
-        $data=$this->TradingModel->uploadInspeccionFiles($idExcel,$file);
+        $idDetalle=$this->input->post("idDetalle");
+        $idOrder=$this->input->post("idOrder");
+        $data=$this->TradingModel->uploadInspeccionFiles($idExcel,$idDetalle,$idOrder,$file);
         echo json_encode($data);
+    }
+    public function deleteInspeccionFiles(){
+        $idFile = $this->input->post("idFile");
+        $data=$this->TradingModel->deleteInspeccionFiles($idFile);
+        echo json_encode($data);
+    }
+    public function saveInspection(){
+        $data = $this->input->post('data');
+        $idOrder=$this->input->post('idOrder');
+        $response = $this->TradingModel->saveInspection($data,$idOrder);
+        echo json_encode($response);
     }
 }

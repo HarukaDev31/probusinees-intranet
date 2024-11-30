@@ -6,6 +6,8 @@ let tableInspection = $("#table-inspection");
 let driveContainer = $("#drive-container");
 let driveFiles = [];
 let idExcel = 0;
+let idDetalle = 0;
+let idOrder = 0;
 $(function () {
   containerInspection.hide();
   driveContainer.hide();
@@ -72,7 +74,18 @@ $(function () {
       type: "POST",
       dataType: "JSON",
       data: function (data) {
-
+        (data.Filtro_Fe_Inicio = ParseDateString(
+          $("#txt-Fe_Inicio").val(),
+          "fecha",
+          "/"
+        )),
+        (data.Filtro_Fe_Fin = ParseDateString(
+          $("#txt-Fe_Fin").val(),
+          "fecha",
+          "/"
+        ));
+      data.Filtro_Estado = $("#txt-ID_Estado").val();
+    
       },
       complete: function () {
         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
@@ -98,7 +111,16 @@ $(function () {
 
 });
 
-
+$(".input-report").datepicker({
+  autoclose: true,
+  startDate: new Date("2023", "10", "01"),
+  todayHighlight: true,
+  dateFormat: "dd/mm/yyyy",
+  format: "dd/mm/yyyy",
+});
+$('#btn-html_reporte').on('click', function () {
+  reload_table_almacen();
+});
   /**GDrive functions  */
   const $dragDropContainer = $('#drag-drop-container');
   const $fileInput = $('#file-input');
@@ -106,6 +128,7 @@ $(function () {
   const $fileGrid = $('#file-grid');
   const $searchInput = $('#search-input');
   const $fileList = $('#file-list');
+  const $backBtn = $('#back-btn');
   const iconMap = {
     'application/pdf': '<i class="fas fa-file-pdf w-12 h-12 text-red-400"></i>',
     'image/jpeg': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
@@ -173,7 +196,10 @@ $(function () {
     );
     renderFileGrid(filteredFiles);
   });
+  $backBtn.on('click', function () {
+    closePagos();
 
+  });
   // Handle file processing
   function handleFiles(newFiles) {
     // Convert FileList to Array and filter
@@ -236,13 +262,8 @@ $(function () {
       reader.readAsDataURL(file);
     } else {
       //add to file list and wait 3 seconds to simulate upload
-
-
       driveFiles.push(newFile);
       renderFileGrid(driveFiles);
-
-
-
     }
   }
 
@@ -266,7 +287,7 @@ $(function () {
   // Create file item for grid
   function createFileItem(file) {
     const $fileItem = $('<div>', {
-      class: 'group relative aspect-square border rounded-lg overflow-hidden hover:shadow-md transition-shadow'
+      class: 'group relative aspect-square border py-5 rounded-lg overflow-hidden hover:shadow-md transition-shadow'
     });
 
     // More options button
@@ -284,14 +305,7 @@ $(function () {
     const $contextMenu = $('<div>', {
       class: 'context-menu  right-0  mt-2 bg-white border rounded shadow-lg text-sm hidden z-20'
     }).append(
-      $('<button>', {
-        class: 'block w-full text-left px-4 py-2 hover:bg-gray-100',
-        text: 'Renombrar',
-        click: function (e) {
-          e.stopPropagation();
-          alert(`Renombrar archivo: ${file.name}`);
-        }
-      }),
+      
       $('<button>', {
         class: 'block w-full text-left px-4 py-2 hover:bg-gray-100',
         text: 'Descargar',
@@ -300,7 +314,7 @@ $(function () {
           //downloadFile(file);
           const a = document.createElement('a');
           a.target = '_blank';
-          a.href = file.thumbnail || 'https://via.placeholder.com/150';
+          a.href = file.path || 'https://via.placeholder.com/150';
           a.download = file.name;
           a.click();
         }
@@ -310,7 +324,9 @@ $(function () {
         text: 'Eliminar',
         click: function (e) {
           e.stopPropagation();
-          alert(`Eliminar archivo: ${file.name}`);
+          deleteInspeccionFiles(file.id);
+          driveFiles = driveFiles.filter(f => f.id !== file.id);
+          renderFileGrid(driveFiles);
         }
       })
     );
@@ -328,9 +344,11 @@ $(function () {
       $contextMenu.hide();
     });
     let $fileContent;
-    if (file.thumbnail) {
+    if (file.thumbnail
+&& file.type.startsWith('image/')
+    ) {
       $fileContent = $('<img>', {
-        src: file.thumbnail,
+        src: file.path,
         alt: file.name,
         class: 'w-full h-full object-cover'
       });
@@ -338,10 +356,6 @@ $(function () {
       $fileContent = $('<div>', {
         class: 'w-full h-full flex items-center justify-center bg-gray-100'
       });
-
-      // Add appropriate icon based on file type
-
-
       $fileContent.append(iconMap[file.type] || '<i class="fas fa-file w-12 h-12 text-gray-400"></i>');
     }
 
@@ -452,7 +466,6 @@ $(function () {
         progress += 1;
         const offset = 94.25 - (94.25 * progress / 100); // Calculamos el progreso en base a porcentaje
         $progressCircle.attr('stroke-dashoffset', offset);
-        console.log(progress)
         // Si el progreso alcanza el 100%, limpiamos el intervalo
         if (progress >= 100) {
           clearInterval(progressInterval);
@@ -473,6 +486,8 @@ function uploadFile(file) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('idExcel', idExcel);
+  formData.append('idDetalle', idDetalle);
+  formData.append('idOrder', idOrder);
   let url=base_url + "Almacen/Trading/uploadInspeccionFiles";
   fetch(url, {
     method: 'POST',
@@ -481,7 +496,15 @@ function uploadFile(file) {
     .then(response => response.json())
     .then(data => {
       console.log('Archivo subido:', data);
-      driveFiles.push(file);
+      driveFiles.push({
+        id: data.id,
+        name: data.name,
+        type: data.type,
+        path: data.path,
+        thumbnail: data.thumbnail,
+        size: `${(data.size / 1024 / 1024).toFixed(1)} MB`,
+        lastModified: data.lastModified
+      });
     })
     .catch(error => {
       console.error('Error al subir archivo:', error);
@@ -491,7 +514,8 @@ function uploadFile(file) {
 
 
 
-function getAlmacenData(idOrder) {
+function getAlmacenData(idO) {
+  idOrder = idO;
   url = base_url + "Almacen/Trading/getInspeccion";
   containerInspection.show();
   containerAlmacen.hide();
@@ -562,6 +586,7 @@ function getAlmacenData(idOrder) {
       },
       complete: function () {
         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+        calcTotales();
       },
     },
     columnDefs: [
@@ -580,21 +605,140 @@ function getAlmacenData(idOrder) {
       [10, 100, 1000, "Todos"],
     ],
   })
-
+  addEventsToInspection();
+  
 }
-function getFotos(idEx) {
-  console.log(idEx,"WAOS");
+function getFotos(idEx,idD) {
+  removeEventInspection();
   idExcel = idEx;
+  idDetalle = idD;
   containerInspection.hide();
   driveContainer.show();
   $.ajax({
     url: base_url + "Almacen/Trading/getInspeccionFiles",
     type: "POST",
     dataType: "JSON",
-    data: { idExcel: idExcel },
+    data: { idExcel: idExcel,
+     },
     success: function (data) {
       driveFiles = data.data;
       renderFileGrid(driveFiles);
     },
   });
+}
+function deleteInspeccionFiles(id){
+  $.ajax({
+    url: base_url + "Almacen/Trading/deleteInspeccionFiles",
+    type: "POST",
+    dataType: "JSON",
+    data: { idFile: id },
+    success: function (data) {
+      
+    },
+  });
+}
+function closePagos(){
+  containerInspection.show();
+  driveContainer.hide();
+  reload_table_inspection();
+  
+}
+function removeEventInspection(){
+  $(document).off("change", ".box_value");
+  $(document).off("change", ".cbm_value");
+  $(document).off("change", ".kg_value");
+}
+function calcTotales(){
+  let total = 0;
+  $(".box_value").each(function () {
+    total += +$(this).val();
+  });
+  $("#total-box").val(total);
+  total = 0;
+  $(".cbm_value").each(function () {
+    total += +$(this).val();
+  }
+  );
+  $("#total-cbm").val(total);
+  total = 0;
+  $(".kg_value").each(function () {
+    total += +$(this).val();
+  }
+  );
+  $("#total-kg").val(total);
+
+}
+function addEventsToInspection(){
+  // Add event listener to file input with class box_value on change sum all 
+  // values of all inputs with class box_value and set the result to the input with id total-box
+  $(document).on("input", ".box_value", function () {
+    console.log("input");
+    let total = 0;
+    $(".box_value").each(function () {
+      total += +$(this).val();
+    });
+    $("#total-box").val(total);
+  });
+  $(document).on("input", ".cbm_value", function () {
+    let total = 0;
+    $(".cbm_value").each(function () {
+      total += +$(this).val();
+    });
+    $("#total-cbm").val(total);
+  });
+  $(document).on("input", ".kg_value", function () {
+    let total = 0;
+    $(".kg_value").each(function () {
+      total += +$(this).val();
+    });
+    $("#total-kg").val(total);
+  });
+  $("#btn-save-inspection").on("click", function () {
+  saveInspection()
+  });
+  $("#btn-back-inspection").on("click", function () {
+    closeInspection();
+  });
+}
+function saveInspection(){
+  //get all values of inputs with class box_value, cbm_value and kg_value
+  let data = [];
+  $(".box_value").each(function () {
+    data.push({ id: $(this).data("id"), value: !isNaN($(this).val()) ? $(this).val() : 0, key:'total_box_almacen' 
+     });
+  });
+  $(".cbm_value").each(function () {
+    data.push({ id: $(this).data("id"), value: !isNaN($(this).val()) ? $(this).val() : 0 , key:'total_cbm_almacen'});
+  });
+  $(".kg_value").each(function () {
+    data.push({ id: $(this).data("id"), value: !isNaN($(this).val()) ? $(this).val() : 0 , key:'total_kg_almacen'});
+  });
+  $(".almacen_notas").each(function () {
+    data.push({ id: $(this).data("id"), value: $(this).val() , key:'nota_almacen'});
+  });
+  console.log(data);
+  $.ajax({
+    url: base_url + "Almacen/Trading/saveInspection",
+    type: "POST",
+    dataType: "JSON",
+    data: { 
+      data: data,
+      idOrder: idOrder,
+     },
+    success: function (data) {
+      reload_table_inspection();
+      //show toast
+    },
+  });
+}
+function closeInspection(){
+  containerInspection.hide();
+  containerAlmacen.show();
+  reload_table_almacen();
+}
+function reload_table_inspection(){
+  tableInspection.ajax.reload(null, false);
+}
+function reload_table_almacen(){
+  tableAlmacen.ajax.reload(null, false);
 }
