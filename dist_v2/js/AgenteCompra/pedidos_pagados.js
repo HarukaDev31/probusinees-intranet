@@ -10927,6 +10927,8 @@ $(".custom-file-upload").click(function () {
 });
 function closeInspection(){
   containerInspection.hide();
+  hideSteps();
+
   getOrderProgress(idOrder);
 }
 function reload_table_inspection(){
