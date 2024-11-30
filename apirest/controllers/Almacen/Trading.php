@@ -63,7 +63,7 @@ class Trading extends CI_Controller
         $data = array();
 
         $privilegio = $this->user->Nu_Tipo_Privilegio_Acceso;
-        $disabled = ($privilegio != $almacen_privilegio) ? 'disabled' : '';
+        $disabled = ($privilegio != $this->almacenPrivilegio) ? 'disabled' : '';
 
         foreach ($arrData as $row) {
             $span_estado = "";
