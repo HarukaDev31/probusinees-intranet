@@ -61,8 +61,7 @@ class TradingModel extends CI_Model{
 		->join($this->table_agente_compra_excel_detalle, " agente_compra_order_excel.id = agente_compra_order_excel_detail.order_excel_id ", "join")
 		->join ($this->table," agente_compra_order_excel.order_id = agente_compra_pedido_cabecera.ID_Pedido_Cabecera","join")
 		->where("order_id", $idOrder)
-		->order_by("agente_compra_order_excel.id", "desc")
-		->limit(1);
+		->order_by("agente_compra_order_excel.id", "desc");
 
 		// Para depuración, imprime la consulta SQL generada
 
