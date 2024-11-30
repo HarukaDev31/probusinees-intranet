@@ -202,12 +202,12 @@
         }
 
         .main-container {
-            height: 100%;
+            height: 85vh;
             position: relative;
         }
 
         .file-list {
-            position: absolute;
+            position: sticky;
             bottom: 0;
             max-height: 100px;
             height: 100px;
@@ -264,7 +264,7 @@
             padding: 1em;
             border-radius: 0.5em;
             position: absolute;
-            bottom: 0;
+            bottom: 1em;
             right: 1em;
             max-height: 80%;
             overflow-y: auto;
@@ -291,7 +291,8 @@
         }
         .file-section-container{
           width: 100vw;
-          height: 100vh;
+          height: 85vh;
+          position: relative;
         }#file-grid{
           height: 100%;
           width: 100%;
@@ -300,7 +301,7 @@
         }
         .group {
           height: 350px;
-        }
+        } 
 
 
 </style>
