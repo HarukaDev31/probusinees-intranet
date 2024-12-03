@@ -475,7 +475,7 @@
                   <div class="col-12 col-md-6 text-right px-5 my-3">
                     <div class="p-3 rounded shadow">
                         <label class="h6 font-weight-bold">Valor Total:</label>
-                        <span id="valor-total-excel" class="d-block h4 font-weight-bold">$0</span>
+                        <span id="valor-total-excel-orden" class="d-block h4 font-weight-bold">$0</span>
                     </div>
                 </div>
                 <div class="col-12 orden-compra-header-excel-container">
@@ -658,7 +658,9 @@
       </div>
     </section>
     <section class="min-h-screen bg-white main-container" id="drive-container">
+
       <header class="sticky top-0 z-10 bg-white border-b">
+          
           <div class="container mx-auto px-4 py-2 flex items-center justify-between ">
               <h1 class="text-xl font-semibold text-gray-800">Archivos</h1>
               <div class="flex items-center space-x-4">

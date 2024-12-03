@@ -8862,9 +8862,11 @@ const openOrdenCompra = async (response) => {
     addEventsToExcelItems();
 
     const firstProduct = excelData[0];
+    console.log("firstProduct", firstProduct);
     if (typeof firstProduct != "undefined") {
       const firstId = firstProduct.id;
-      $("#valor-total-excel").text("$" + firstProduct.total);
+      console.log(firstProduct.total);
+      $("#valor-total-excel-orden").text("$" + firstProduct.total);
       const detailsData = await getExcelOrderDetails(firstId);
       //set selected element with class card-custom and data-id = firstId
       $(`.card-custom[data-id=${firstId}]`).addClass("selected");
@@ -10098,7 +10100,7 @@ $(document).ready(function () {
           if (lastItem) {
             $(`.card-custom[data-id=${lastItem.id}]`).click();
             $(".orden-compra-header-excel-container").scrollLeft(1000);
-            $("#valor-total-excel").text(`$${lastItem.total}`);
+            $("#valor-total-excel-orden").text(`$${lastItem.total}`);
           }
 
         },
@@ -10262,6 +10264,7 @@ const getExcelOrderDetails = async (id) => {
   }
 }
 const addEventsToExcelItems = () => {
+  console.log("waos")
   $('.card-custom').click(async function () {
 
     if (!$(this).hasClass('selected')) {
@@ -10856,12 +10859,14 @@ const getExcelOrderPagosDocumentsItem = async (itemData, index, length) => {
 }
 const closePagosSeekingList = () => {
   containerOrdenCompra.hide();
+  console.log("waos")
   $("#valor-total-excel").text("¥0.00");
   $("#orden-compra_body-pagos").empty();
   containerExcelPagos.hide()
   containerListar.show()
   pagosButtons.empty()
   $(".orden-compra-header-pagos-excel-container").empty();
+  getOrderProgress(idPedido);
 }
 const closePagosSeekingListDocuments = () => {
   const pagoValue=$("#pagodoc-value").val()
@@ -10878,6 +10883,7 @@ const closePagosSeekingListDocuments = () => {
 
     }
   });
+  console.log("waos")
   pagosButtons.empty()
   containerExcelPagosDetalle.hide();
   $(".orden-compra-header-pagos-excel-container").empty();
