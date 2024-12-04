@@ -138,25 +138,29 @@ class TradingModel extends CI_Model{
 	}
     public function saveInspection($data,$idOrder){
 		$isChange=false;
+		$index=0;
 		foreach($data as $row){
-			if($row[0]['value']!=0|| $row[1]['value']!=0|| $row[2]['value']!=0){
+			echo json_encode($row);
+			if($row[$index]['total_box_almacen']!=0|| $row[$index]['total_cbm_almacen']!=0|| $row[$index]['total_kg_almacen']!=0){
 				$isChange=true;
 			
 			}
 			$dataToUpdate=[
-				$row[0]['key']=>$row[0]['value'],
-				$row[1]['key']=>$row[1]['value'],
-				$row[2]['key']=>$row[2]['value'],
-				$row[3]['key']=>$row[3]['value'],
+				"total_box_almacen"=>$row['total_box_almacen'],
+				"total_cbm_almacen"=>$row['total_cbm_almacen'],
+				"total_kg_almacen"=>$row['total_kg_almacen'],
+				"nota_almacen"=>$row['nota_almacen'],
 			];
-			$this->db->where("id",$row[0]['id'])->update($this->table_agente_compra_excel_detalle,$dataToUpdate);
+			echo json_encode($dataToUpdate);
+			$this->db->where("id",$row['id'])->update($this->table_agente_compra_excel_detalle,$dataToUpdate);
 			if($isChange){
 				//get current almacen estado
-				$almacenEstado=$this->db->select("almacen_estado")->from($this->table_agente_compra_excel_detalle)->where("id",$row[0]['id'])->get()->row();
+				$almacenEstado=$this->db->select("almacen_estado")->from($this->table_agente_compra_excel_detalle)->where("id",$row['id'])->get()->row();
 				if($almacenEstado->almacen_estado=="PENDIENTE"){
-					$this->db->where("id",$row[0]['id'])->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"RECIBIDO"]);
+					$this->db->where("id",$row['id'])->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"RECIBIDO"]);
 				}
 			}
+			$index++;
 		}
 		//get current estado almacen
 		$estadoAlmacen=$this->db->select("estado_almacen")->from($this->table)->where("ID_Pedido_Cabecera",$idOrder)->get()->row();

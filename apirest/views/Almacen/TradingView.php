@@ -118,6 +118,25 @@
     </section>
     <section class="min-h-screen bg-white main-container" id="drive-container">
       <header class="sticky top-0 z-10 bg-white border-b">
+      <div class="container mx-auto px-4 py-2 w-100 flex items-center justify-between ">
+          <!--subir archivo y retroceder-->
+              <div class="flex items-center space-x-4">
+                  <div class="p-2 btn btn-dark"
+                  id="upload-btn"
+                  >
+                      <!-- icon to upload files -->
+                      <i class="fas fa-cloud-upload-alt text-white-500"></i>
+                      <span class="ml-2">Subir Archivo</span>
+                  </div>
+                  <div class="p-2 btn btn-dark"
+                  id="back-btn"
+                  >
+                      <!-- icon to back to previous folder -->
+                      <i class="fas fa-arrow-left text-white-500"></i>
+                      <span class="ml-2">Atras</span>
+                  </div>
+                  </div>
+          </div>
           <div class="container mx-auto px-4 py-2 flex items-center justify-between ">
               <h1 class="text-xl font-semibold text-gray-800">Archivos</h1>
               <div class="flex items-center space-x-4">

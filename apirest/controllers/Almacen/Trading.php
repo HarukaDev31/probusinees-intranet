@@ -44,7 +44,7 @@ class Trading extends CI_Controller
                 $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Entidad . "</span><span>" . $row->Nu_Documento_Identidad . "</span></div>",
                 $rows[] = "<div class='d-flex flex-column'><span class='mr-2'>" . $row->No_Contacto . "</span><span>" . $row->Nu_Celular_Contacto . "</span></div>",
                 $row->cotizacionCode,
-                $rows[] = "<button class='btn btn-xs btn-link' onclick='getAlmacenData(" . $row->ID_Pedido_Cabecera . ")' alt='Editar' title='Editar' href='javascript:void(0)'><i class='fas fa-edit fa-2x' aria-hidden='true'></i></button>",
+                $rows[] = "<button class='btn btn-xs btn-link' onclick='getAlmacenData(" . $row->ID_Pedido_Cabecera . ")' alt='Editar' title='Editar' href='javascript:void(0)'><i class='fas fa-eye fa-2x' aria-hidden='true'></i></button>",
                 $rows[] = '<select class="form-control" id="status_' . $row->estado_almacen . '" onchange="changeStatusAlmacen(this.value,' . $row->ID_Pedido_Cabecera . ')">
                 <option value="PENDIENTE" ' . ($row->estado_almacen == "PENDIENTE" ? 'selected' : '') . '>PENDIENTE</option>
                 <option value="RECIBIENDO" ' . ($row->estado_almacen == "RECIBIENDO" ? 'selected' : '') . '>RECIBIENDO</option>

@@ -149,8 +149,8 @@ $('#btn-html_reporte').on('click', function () {
 
   // Toggle drag-drop area
   $uploadBtn.on('click', function () {
-    $fileGrid.toggleClass('hidden');
     $fileInput.click();
+    handleFiles($fileInput[0].files);
   });
 
   // Prevent default drag behaviors
@@ -711,20 +711,28 @@ function addEventsToInspection(){
 function saveInspection(){
   //get all values of inputs with class box_value, cbm_value and kg_value
   let data = [];
-  $(".box_value").each(function () {
-    data.push({ id: $(this).data("id"), value: !isNaN($(this).val()) ? $(this).val() : 0, key:'total_box_almacen' 
-     });
+  $(".box_value, .cbm_value, .kg_value, .almacen_notas").each(function () {
+    let id = $(this).data("id");
+    
+    // Encontrar o crear un objeto para este id
+    let existing = data.find(item => item.id === id);
+    if (!existing) {
+      existing = { id: id, total_box_almacen: 0, total_cbm_almacen: 0, total_kg_almacen: 0, nota_almacen: "" };
+      data.push(existing);
+    }
+    
+    // Actualizar el campo correspondiente
+    if ($(this).hasClass("box_value")) {
+      existing.total_box_almacen = !isNaN($(this).val()) ? $(this).val() : 0;
+    } else if ($(this).hasClass("cbm_value")) {
+      existing.total_cbm_almacen = !isNaN($(this).val()) ? $(this).val() : 0;
+    } else if ($(this).hasClass("kg_value")) {
+      existing.total_kg_almacen = !isNaN($(this).val()) ? $(this).val() : 0;
+    } else if ($(this).hasClass("almacen_notas")) {
+      existing.nota_almacen = $(this).val();
+    }
   });
-  $(".cbm_value").each(function () {
-    data.push({ id: $(this).data("id"), value: !isNaN($(this).val()) ? $(this).val() : 0 , key:'total_cbm_almacen'});
-  });
-  $(".kg_value").each(function () {
-    data.push({ id: $(this).data("id"), value: !isNaN($(this).val()) ? $(this).val() : 0 , key:'total_kg_almacen'});
-  });
-  $(".almacen_notas").each(function () {
-    data.push({ id: $(this).data("id"), value: $(this).val() , key:'nota_almacen'});
-  });
-  console.log(data);
+
   $.ajax({
     url: base_url + "Almacen/Trading/saveInspection",
     type: "POST",

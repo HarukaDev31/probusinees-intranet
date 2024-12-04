@@ -14,43 +14,43 @@ class PermisoUsuarioModel extends CI_Model{
 		} else {
 			$cond_tipo_sistema =  "AND MNU.Nu_Tipo_Sistema=0";
 
-			$query = "SELECT DISTINCT
-MNU.ID_Padre,
-MNU.ID_Menu,
-MNU.No_Menu,
-MNU.Txt_Url_Video,
-MNUACCESS.ID_Grupo,
-MNUACCESS.Nu_Consultar,
-MNUACCESS.Nu_Agregar,
-MNUACCESS.Nu_Editar,
-MNUACCESS.Nu_Eliminar
-FROM
-menu AS MNU
-LEFT JOIN (
-SELECT DISTINCT
-MNUACCESS.ID_Menu,
-GRPUSR.ID_Grupo,
-MNUACCESS.Nu_Consultar,
-MNUACCESS.Nu_Agregar,
-MNUACCESS.Nu_Editar,
-MNUACCESS.Nu_Eliminar
-FROM
-menu_acceso AS MNUACCESS
-JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
-WHERE
-MNUACCESS.ID_Empresa = " . $arrGet['ID_Empresa'] . "
-AND GRPUSR.ID_Grupo = " . $arrGet['ID_Grupo'] . "
-) AS MNUACCESS ON (MNUACCESS.ID_Menu = MNU.ID_Menu)
-LEFT JOIN (
-SELECT
-MNU.ID_Menu AS ID_Menu_Sub_Padre,
-(SELECT COUNT(*) FROM menu WHERE Nu_Seguridad = 0 AND ID_Padre = MNU.ID_Menu) AS Nu_Cantidad_Menu_Hijos
-FROM
-menu AS MNU
-INNER JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
-WHERE
-MNU.Nu_Seguridad = 0
-AND MNU.Nu_Activo = 0
+				$query = "SELECT DISTINCT
+	MNU.ID_Padre,
+	MNU.ID_Menu,
+	MNU.No_Menu,
+	MNU.Txt_Url_Video,
+	MNUACCESS.ID_Grupo,
+	MNUACCESS.Nu_Consultar,
+	MNUACCESS.Nu_Agregar,
+	MNUACCESS.Nu_Editar,
+	MNUACCESS.Nu_Eliminar
+	FROM
+	menu AS MNU
+	LEFT JOIN (
+	SELECT DISTINCT
+	MNUACCESS.ID_Menu,
+	GRPUSR.ID_Grupo,
+	MNUACCESS.Nu_Consultar,
+	MNUACCESS.Nu_Agregar,
+	MNUACCESS.Nu_Editar,
+	MNUACCESS.Nu_Eliminar
+	FROM
+	menu_acceso AS MNUACCESS
+	JOIN grupo_usuario AS GRPUSR ON(GRPUSR.ID_Grupo_Usuario = MNUACCESS.ID_Grupo_Usuario)
+	WHERE
+	MNUACCESS.ID_Empresa = " . $arrGet['ID_Empresa'] . "
+	AND GRPUSR.ID_Grupo = " . $arrGet['ID_Grupo'] . "
+	) AS MNUACCESS ON (MNUACCESS.ID_Menu = MNU.ID_Menu)
+	LEFT JOIN (
+	SELECT
+	MNU.ID_Menu AS ID_Menu_Sub_Padre,
+	(SELECT COUNT(*) FROM menu WHERE Nu_Seguridad = 0 AND ID_Padre = MNU.ID_Menu) AS Nu_Cantidad_Menu_Hijos
+	FROM
+	menu AS MNU
+	INNER JOIN menu_acceso AS MNUACCESS ON(MNU.ID_Menu = MNUACCESS.ID_Menu)
+	WHERE
+	MNU.Nu_Seguridad = 0
+	AND MNU.Nu_Activo = 0
 " . $cond_tipo_sistema . "
 ) AS MNUSUBPADRE ON(MNUSUBPADRE.ID_Menu_Sub_Padre = MNU.ID_Menu)
 WHERE
