@@ -80,7 +80,7 @@ class TradingModel extends CI_Model{
 		return $query->get()->result();
 	}
 	public function uploadInspeccionFiles($idExcel,$idDetalle,$idOrder,$file){
-		$this->setAllowedExtensionsImagesOfficeFiles();
+		$this->setAllowedExtensionsImagesOfficeFilesVideos();
         $this->maxFileSize = 200240;
 		$fileUrl=$this->uploadSingleFile([
 			"name"=>$file["name"],
@@ -124,7 +124,22 @@ class TradingModel extends CI_Model{
 			$files=$this->db->select("id")->from($this->table_agente_compra_excel_files)->where("id_order_excel_detail",$idDetalle)->get()->result();
 			if(count($files)==0){
 				$this->db->where("id",$idDetalle)->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"PENDIENTE"]);
+				
+
+				
+				//select order_id from order_excel where id=$orderExcelId
 			}
+			$orderExcelId=$this->db->select("order_excel_id")->from($this->table_agente_compra_excel_detalle)->where("id",$idDetalle)->get()->row();
+			$orderExcelId=$orderExcelId->order_excel_id;
+			//find if exists rows in files for this order_excel 
+			$files=$this->db->select("id")->from($this->table_agente_compra_excel_files)->where("id_order_excel",$orderExcelId)->get()->result();
+			if(count($files)==0){
+				$orderId=$this->db->select("order_id")->from($this->table_agente_compra_excel)->where("id",$orderExcelId)->get()->row();
+				$orderId=$orderId->order_id;
+				$this->db->where("ID_Pedido_Cabecera",$orderId)->update($this->table,["estado_almacen"=>"PENDIENTE"]);
+				return ["message"=>"Estado Orden Actualizado"];
+			}
+	
 			return true;
 		}
 		return false;
@@ -137,13 +152,20 @@ class TradingModel extends CI_Model{
 		return false;
 	}
     public function saveInspection($data,$idOrder){
-		$isChange=false;
+		$globalChange=false;
 		$index=0;
 		foreach($data as $row){
-			echo json_encode($row);
-			if($row[$index]['total_box_almacen']!=0|| $row[$index]['total_cbm_almacen']!=0|| $row[$index]['total_kg_almacen']!=0){
+			$isChange=false;
+			return $row['total_box_almacen']==0;
+			if($row['total_box_almacen']!=0||
+				$$row['total_box_almacen']!=""||
+			$row['total_cbm_almacen']!=0||
+			$row['total_cbm_almacen']!=""
+			|| $row['total_kg_almacen']!=0
+			|| $row['total_kg_almacen']!=""
+			){
 				$isChange=true;
-			
+				$globalChange=true;
 			}
 			$dataToUpdate=[
 				"total_box_almacen"=>$row['total_box_almacen'],
@@ -151,10 +173,8 @@ class TradingModel extends CI_Model{
 				"total_kg_almacen"=>$row['total_kg_almacen'],
 				"nota_almacen"=>$row['nota_almacen'],
 			];
-			echo json_encode($dataToUpdate);
 			$this->db->where("id",$row['id'])->update($this->table_agente_compra_excel_detalle,$dataToUpdate);
 			if($isChange){
-				//get current almacen estado
 				$almacenEstado=$this->db->select("almacen_estado")->from($this->table_agente_compra_excel_detalle)->where("id",$row['id'])->get()->row();
 				if($almacenEstado->almacen_estado=="PENDIENTE"){
 					$this->db->where("id",$row['id'])->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"RECIBIDO"]);
@@ -162,11 +182,15 @@ class TradingModel extends CI_Model{
 			}
 			$index++;
 		}
-		//get current estado almacen
+		
 		$estadoAlmacen=$this->db->select("estado_almacen")->from($this->table)->where("ID_Pedido_Cabecera",$idOrder)->get()->row();
 		if($estadoAlmacen->estado_almacen=="PENDIENTE"){
 			$this->db->where("ID_Pedido_Cabecera",$idOrder)->update($this->table,["estado_almacen"=>"RECIBIENDO"]);
-		}		
-		return ["message"=>"Datos actualizados correctamente"];
+		}
+		if(!$globalChange){
+			$this->db->where("ID_Pedido_Cabecera",$idOrder)->update($this->table,["estado_almacen"=>"PENDIENTE"]);
+				
+		}
+		return ["message"=>"Datos actualizados correctamente","globalChange"=>$globalChange];
 	}
 }

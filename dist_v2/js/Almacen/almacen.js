@@ -224,8 +224,32 @@ $('#btn-html_reporte').on('click', function () {
 
   // File validation
   function validateFile(file) {
-    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const validTypes = [
+      // Imagenes
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/bmp",
+      "image/avif",
+    
+      // Videos
+      "video/mp4",
+      "video/mkv",
+      "video/webm",
+      "video/avi",
+      "video/mov",
+    
+      // Archivos de oficina
+      "application/pdf",
+      "application/msword", // .doc
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+      "application/vnd.ms-excel", // .xls
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+      "application/vnd.ms-powerpoint", // .ppt
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation" // .pptx
+    ];      
+    const maxSize = 20 * 1024 * 1024; // 10MB
 
     if (!validTypes.includes(file.type)) {
       alert(`Tipo de archivo no soportado: ${file.name}`);
@@ -352,7 +376,20 @@ $('#btn-html_reporte').on('click', function () {
         alt: file.name,
         class: 'w-full h-full object-cover'
       });
-    } else {
+    }else if (file.thumbnail && file.type.startsWith('video/')) {
+      $fileContent = $('<video>', {
+        src: file.path,
+        alt: file.name,
+        class: 'w-full h-full object-cover',
+        controls: true,
+        autoplay: false,
+        loop: true,
+        muted: true
+      });
+
+    }
+    
+    else {
       $fileContent = $('<div>', {
         class: 'w-full h-full flex items-center justify-center bg-gray-100'
       });

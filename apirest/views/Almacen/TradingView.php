@@ -138,7 +138,8 @@
                   </div>
           </div>
           <div class="container mx-auto px-4 py-2 flex items-center justify-between ">
-          <input type="file" class="form-control-file d-none" id="file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.mp4,.mp3,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.aac,.jpg,.jpeg,.png,.gif,.svg,.bmp,.tiff,.tif,.webp,.heic,.heif,.ico,.psd,.ai,.eps,.indd,.raw,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.mp4,.mp3,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.aac,.jpg,.jpeg,.png,.gif,.svg,.bmp,.tiff,.tif,.webp,.heic,.heif,.ico,.psd,.ai,.eps,.indd,.raw" multiple>
+          <input type="file" class="form-control-file d-none" id="file-input" accept="image/*,.mp4,
+          .mp3,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.aac,.jpg,.jpeg,.png,.gif,.svg,.bmp,.tiff,.tif,.webp" multiple>
     
           <h1 class="text-xl font-semibold text-gray-800">Archivos</h1>
               <div class="flex items-center space-x-4">

@@ -776,7 +776,8 @@
                 </button>
             </div>
             <div class="modal-body" id="upload-body">
-                <input type="file" class="form-control-file" id="file-input" accept=".xlsx">
+                <input type="file" class="form-control-file" id="file-input" accept="image/*,.mp4,
+          .mp3,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.aac,.jpg,.jpeg,.png,.gif,.svg,.bmp,.tiff,.tif,.webp">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
