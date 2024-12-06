@@ -10264,7 +10264,6 @@ const getExcelOrderDetails = async (id) => {
   }
 }
 const addEventsToExcelItems = () => {
-  console.log("waos")
   $('.card-custom').click(async function () {
 
     if (!$(this).hasClass('selected')) {
@@ -10272,7 +10271,8 @@ const addEventsToExcelItems = () => {
       $(this).addClass('selected');
       const id = $(this).attr('data-id');
       const total = $(this).attr('data-total');
-      $("#valor-total-excel").text("$" + total);
+      console.log(total)
+      $("#valor-total-excel-orden").text("$" + total);
 
       const detailsData = await getExcelOrderDetails(id);
       $(".row.producto").remove();

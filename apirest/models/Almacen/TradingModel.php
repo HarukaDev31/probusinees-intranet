@@ -156,17 +156,14 @@ class TradingModel extends CI_Model{
 		$index=0;
 		foreach($data as $row){
 			$isChange=false;
-			return $row['total_box_almacen']==0;
-			if($row['total_box_almacen']!=0||
-				$$row['total_box_almacen']!=""||
-			$row['total_cbm_almacen']!=0||
-			$row['total_cbm_almacen']!=""
-			|| $row['total_kg_almacen']!=0
-			|| $row['total_kg_almacen']!=""
-			){
+			echo $row['total_box_almacen']==0;
+			echo $row['total_cbm_almacen']==0;
+			echo $row['total_kg_almacen']==0;
+			if($row['total_box_almacen']!=0 || $row['total_cbm_almacen']!=0 || row['total_kg_almacen']!=0){
 				$isChange=true;
 				$globalChange=true;
 			}
+			
 			$dataToUpdate=[
 				"total_box_almacen"=>$row['total_box_almacen'],
 				"total_cbm_almacen"=>$row['total_cbm_almacen'],
@@ -178,6 +175,10 @@ class TradingModel extends CI_Model{
 				$almacenEstado=$this->db->select("almacen_estado")->from($this->table_agente_compra_excel_detalle)->where("id",$row['id'])->get()->row();
 				if($almacenEstado->almacen_estado=="PENDIENTE"){
 					$this->db->where("id",$row['id'])->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"RECIBIDO"]);
+				}
+			}else{
+				if($row['total_box_almacen']==0 && $row['total_cbm_almacen']==0 && $row['total_kg_almacen']==0){
+					$this->db->where("id",$row['id'])->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"PENDIENTE"]);
 				}
 			}
 			$index++;
