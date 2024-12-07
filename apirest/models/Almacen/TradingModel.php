@@ -102,7 +102,12 @@ class TradingModel extends CI_Model{
 		$this->db->insert($this->table_agente_compra_excel_files,$data);
 		$id=$this->db->insert_id();
 		$this->db->where("id",$idDetalle)->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"COMPLETADO"]);
-		$this->db->where("ID_Pedido_Cabecera",$idOrder)->update($this->table,["estado_almacen"=>"COMPLETADO"]);
+		$this->db->where("ID_Pedido_Cabecera",$idOrder)->update($this->table,["estado_almacen"=>"COMPLETADO",
+		"ID_Estado_Orden"=>3
+	]);
+		$this->db->where('id_order',3);
+		$this->db->where('id_pedido',$idOrder);
+		$this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
 		$dataToReturn=[
 			"id"=>$id,
 			"path"=>$fileUrl,
@@ -137,6 +142,9 @@ class TradingModel extends CI_Model{
 				$orderId=$this->db->select("order_id")->from($this->table_agente_compra_excel)->where("id",$orderExcelId)->get()->row();
 				$orderId=$orderId->order_id;
 				$this->db->where("ID_Pedido_Cabecera",$orderId)->update($this->table,["estado_almacen"=>"PENDIENTE"]);
+				$this->db->where('id_order',3);
+				$this->db->where('id_pedido',$orderId);
+				$this->db->update('agente_compra_order_steps',array('status'=>'PENDING'));
 				return ["message"=>"Estado Orden Actualizado"];
 			}
 	

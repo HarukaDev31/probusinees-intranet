@@ -226,6 +226,7 @@
         .main-container {
             height: 85vh;
             position: relative;
+
         }
 
         .file-list {
@@ -312,7 +313,7 @@
             color: #666;
         }
         .file-section-container{
-          width: 100vw;
+          width: 100%;
           height: 85vh;
           position: relative;
         }#file-grid{
@@ -322,7 +323,8 @@
           overflow-y: auto;
         }
         .group {
-          height: 350px;
+          height: 300px;
+          width: 100%;
         } 
 
 

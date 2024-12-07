@@ -776,8 +776,9 @@
                 </button>
             </div>
             <div class="modal-body" id="upload-body">
-                <input type="file" class="form-control-file" id="file-input" accept="image/*,.mp4,
-          .mp3,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.aac,.jpg,.jpeg,.png,.gif,.svg,.bmp,.tiff,.tif,.webp">
+                <input type="file" class="form-control-file" id="file-input" accept=
+                ".xls,.xlsx,.csv"
+                >
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -3906,8 +3907,9 @@ echo form_open('', $attributes);?>
             color: #666;
         }
         .file-section-container{
-          width: 100vw;
-          height: 100vh;
+          width: 100%;
+          height: 85vh;
+          position: relative;
         }#file-grid{
           height: 100%;
           width: 100%;
@@ -3915,7 +3917,8 @@ echo form_open('', $attributes);?>
           overflow-y: auto;
         }
         .group {
-          height: 350px;
+          height: 300px;
+          width: 100%;
         }
   </style>
   <?php echo form_close(); ?>
