@@ -48,7 +48,7 @@
                   </select>
                 </div>
                 <?php if ($this->user->Nu_Tipo_Privilegio_Acceso == 6) {
-    ?>
+      ?>
                   <div class="col-6 col-sm-3">
                   <label>Estado</label>
                   <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
@@ -59,10 +59,10 @@
                   </select>
                 </div>
                 <?php
-} else {
-    ;
-}
-?>
+      } else {
+          ;
+      }
+    ?>
                 <div class="col-6 col-sm-3">
                   <label>&nbsp;</label>
                   <button type="button" id="btn-html_reporte" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
@@ -84,7 +84,7 @@
                           <th>Ver</th>
                           <th>Estado</th>
                         <?php
-} else {?>
+      } else {?>
 
                       <th>N° Orden</th>
 
@@ -362,8 +362,7 @@
             </div>
             <form class="card-body almacen-form" id="container_almacen">
             </form>
-            <form class="card-body" id="container-inspeccion">
-            </form>
+
             <div class="card-body" id="container_orden-compra-pagos">
               <div class="orden-compra-header-pagos-excel">
                 <div class="row ">
@@ -500,7 +499,7 @@
             </div>
             <div class="pagos-buttons">
             </div>
-            <div class="card-body" id="container-rotulado">
+            <div class="card-body d-none" id="container-rotulado" >
             </div>
             <div class="card-body" id="container-pagos">
               <div class="row w-100 d-flex justify-content-between" id="pagos-header">
@@ -723,17 +722,43 @@
               </div>
           </div>
       </div>
+    
     </section>
-          </div>
-
-
-        </div>
-      </div>
+      
       <!-- /.row -->
-    </div>
+   
+
+      <section class="min-h-screen bg-white booking-container container-fluid" id="booking-container">
+                <header id="booking-header">
+                  <h1>
+                    <span class="text-gray-800">Booking</span>
+                    
+                  </h1>
+                  <form id="bookingForm">
+              <input type="hidden" id="cargoTypeInput" name="cargoType">
+              
+              <div class="form-section">
+                  <label>Tipo de Carga</label>
+                  <div class="space-y-8">
+                      <span class="cargo-type-toggle" data-type="fcl">FCL</span>
+                      <span class="cargo-type-toggle" data-type="lcl">LCL</span>
+                      <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span>
+                  </div>
+              </div>
+
+              
+          </form>
+
+          <div id="newShipperDialog" style="display:none;" title="Crear Nuevo Shipper">
+              <p>Ingrese el código del nuevo shipper</p>
+              <input type="text" id="newShipperInput" placeholder="Código del shipper">
+          </div>
+        </header>
     <!-- /.container-fluid -->
   </section>
+
   <!-- /.content -->
+
 </div>
 <div class="modal fade" id="imagePreviewModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -3920,5 +3945,19 @@ echo form_open('', $attributes);?>
           height: 300px;
           width: 100%;
         }
+        .form-section { margin-bottom: 20px; }
+        .cargo-type-toggle { 
+            display: inline-block; 
+            padding: 10px; 
+            margin: 5px; 
+            border: 1px solid #ccc; 
+            cursor: pointer; 
+        }
+        .cargo-type-toggle.active { 
+            background-color: #007bff; 
+            color: white; 
+        }
+        /**add  tailwind styles   to improve the UI */
+ 
   </style>
   <?php echo form_close(); ?>

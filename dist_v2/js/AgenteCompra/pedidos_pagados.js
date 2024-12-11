@@ -20,6 +20,7 @@ var containerInspection = $(".table-inspection");
 let tableAlmacen = $("#table-almacen");
 let tableInspection = $("#table-inspection");
 let driveContainer = $("#drive-container");
+let bookingContainer = $("#booking-container");
 let driveFiles = [];
 let idExcel = 0;
 let idDetalle = 0;
@@ -82,6 +83,7 @@ $(function () {
   pagosButtons = $(".pagos-buttons");
   pagosButtons.hide();
   containerInspection.hide();
+  bookingContainer.hide();
   driveContainer.hide();
   $(".select2").select2();
 
@@ -7367,9 +7369,7 @@ const openStepFunction = async (i, stepId) => {
 
     }
     if (i == 4) {
-      if (currentPrivilege == 2 || currentPrivilege == 1) {
-        openInspectionView(responseParsed.data, idPedido, currentPrivilege);
-      }
+      openBookingView(responseParsed.data, idPedido, currentPrivilege);
     }
   });
 };
@@ -11501,3 +11501,324 @@ fetch(url, {
   });
 
 }
+
+const openBookingView=(data,id,privilegios)=>{
+  containerOrdenCompra.hide();
+ 
+
+  bookingContainer.show();
+  $('.cargo-type-toggle').on('click', function() {
+    $('.cargo-type-toggle').removeClass('active');
+    $(this).addClass('active');
+    
+    const cargoType = $(this).data('type');
+    $('#cargoTypeInput').val(cargoType);
+    hideFLCForm();
+    hideLCLForm();
+    hideConsolidadoForm();
+    // Show/hide FCL specific fields
+    if (cargoType === 'fcl') {
+      showFLCForm();
+
+      setupDatePicker('cutoffTrigger', 'cutoffDate');
+      setupDatePicker('etdTrigger', 'etdDate');
+      setupDatePicker('etaTrigger', 'etaDate');
+    } else if (cargoType === 'lcl') {
+      showLCLForm();
+      setupDatePicker('cutoffTrigger', 'cutoffDate');
+      setupDatePicker('etdTrigger', 'etdDate');
+      setupDatePicker('etaTrigger', 'etaDate');
+    } else if(cargoType === 'consolidado'){
+
+      showConsolidadoForm();
+    }
+  });
+  
+  // Date Pickers
+
+  
+  
+  
+  
+}
+function setupDatePicker(triggerId, inputId) {
+  const $trigger = $(`#${triggerId}`);
+  const $input = $(`#${inputId}`);
+  const $calendar = $(`#${triggerId}Calendar`);
+
+  $trigger.datepicker({
+      dateFormat: 'yy-mm-dd',
+      onSelect: function(dateText) {
+          $trigger.text(dateText);
+          $input.val(dateText);
+          $calendar.hide();
+      }
+  });
+
+  $trigger.on('click', function() {
+      $calendar.toggle();
+  });
+}
+const showFLCForm= ()=>{
+  const html =`
+  <div id="fclDetails" class="space-y-8">
+                  <div class="form-section grid gap-4">
+                      <label for="client">Cliente</label>
+                      <input type="text" id="client" name="client" placeholder="Nombre del cliente">
+                  </div>
+
+                  <div class="form-section grid gap-4 md:grid-cols-3">
+                      <div class="grid gap-2">
+                          <label for="tc">T.C.</label>
+                          <input type="text" id="tc" name="tc" disabled>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="rmb">Total RMB</label>
+                          <input type="text" id="rmb" name="rmb" disabled>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="usd">Total USD</label>
+                          <input type="text" id="usd" name="usd" disabled>
+                      </div>
+                  </div>
+
+                  <div class="form-section grid gap-4 md:grid-cols-3">
+                      <div class="grid gap-2"> 
+                          <label for="inland">Inland (¥)</label>
+                          <input type="number" id="inland" name="inland" step="0.01" placeholder="0.00">
+                      </div>
+                      <div class="grid gap-2"> 
+                          <label for="flete">Flete ($)</label>
+                          <input type="number" id="flete" name="flete" step="0.01" placeholder="0.00">
+                      </div>
+                      <div class="grid gap-2"> 
+                          <label for="naviera">Naviera</label>
+                          <select id="naviera" name="naviera">
+                              <option value="">Seleccionar naviera</option>
+                              <option value="maersk">MAERSK</option>
+                              <option value="one">ONE</option>
+                              <option value="cosco">COSCO</option>
+                              <option value="evergreen">EVERGREEN</option>
+                              <option value="msc">MSC</option>
+                              <option value="hapag">HAPAG LLOYD</option>
+                              <option value="cma">CMA CGM</option>
+                              <option value="yang">YANG MING</option>
+                              <option value="zim">ZIM</option>
+                          </select>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="contenedor">Contenedor</label>
+                          <select id="contenedor" name="contenedor">
+                              <option value="">Seleccionar contenedor</option>
+                              <option value="20gp">20 GP</option>
+                              <option value="40nor">40 NOR</option>
+                              <option value="40gp">40 GP</option>
+                              <option value="40hq">40 HQ</option>
+                          </select>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="diasTransito">Días Tránsito</label>
+                          <input type="number" id="diasTransito" name="diasTransito" min="0">
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="cutoffTrigger">Cut Off</label>
+                          <button type="button" id="cutoffTrigger">Seleccionar fecha</button>
+                          <input type="hidden" id="cutoffDate" name="cutoffDate">
+                          <div id="cutoffTriggerCalendar" style="display:none;"></div>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="etdTrigger">ETD</label>
+                          <button type="button" id="etdTrigger">Seleccionar fecha</button>
+                          <input type="hidden" id="etdDate" name="etdDate">
+                          <div id="etdTriggerCalendar" style="display:none;"></div>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="etaTrigger">ETA</label>
+                          <button type="button" id="etaTrigger">Seleccionar fecha</button>
+                          <input type="hidden" id="etaDate" name="etaDate">
+                          <div id="etaTriggerCalendar" style="display:none;"></div>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="boxFree">Box Free</label>
+                          <input type="number" id="boxFree" name="boxFree" min="0">
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="codShipper">Cod. Shipper</label>
+                          <select id="codShipper" name="codShipper">
+                              <option value="">Seleccionar código</option>
+                              <option value="xhi">XHI - HUAN</option>
+                              <option value="agc">AG. CLIENTE</option>
+                          </select>
+                          <button type="button" id="addShipperBtn">+</button>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="norden">N. Orden</label>
+                          <input type="text" id="norden" name="norden">
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="codbl">Cod. BL</label>
+                          <input type="text" id="codbl" name="codbl">
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="servicio">Servicio</label>
+                          <select id="servicio" name="servicio">
+                              <option value="">Seleccionar servicio</option>
+                              <option value="trading">TRADING</option>
+                              <option value="cons">CONS. CHINA</option>
+                          </select>
+                      </div>
+                  </div>
+
+                  <div class="form-section">
+                      <button type="reset" id="resetBtn">Limpiar</button>
+                      <button type="submit">Guardar Booking</button>
+                  </div>
+              </div>`;
+  $("#bookingForm").append(html);
+}
+const hideFLCForm= ()=>{
+  $('#fclDetails').remove();
+}
+const showLCLForm= ()=>{
+  const html =`
+          <div id="lclDetails" class="space-y-8">
+                  <div class="form-section grid gap-4">
+                      <label for="client">Cliente</label>
+                      <input type="text" id="client" name="client" placeholder="Nombre del cliente">
+                  </div>
+
+                  <div class="form-section grid gap-4 md:grid-cols-3">
+                      <div class="grid gap-2">
+                          <label for="tc">T.C.</label>
+                          <input type="text" id="tc" name="tc" disabled>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="rmb">Total RMB</label>
+                          <input type="text" id="rmb" name="rmb" disabled>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="usd">Total USD</label>
+                          <input type="text" id="usd" name="usd" disabled>
+                      </div>
+                  </div>
+
+                  <div class="form-section grid gap-4 md:grid-cols-3">
+                      <div class="grid gap-2"> 
+                          <label for="inland">Inland (¥)</label>
+                          <input type="number" id="inland" name="inland" step="0.01" placeholder="0.00">
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="cutoffTrigger">Cut Off</label>
+                          <button type="button" id="cutoffTrigger">Seleccionar fecha</button>
+                          <input type="hidden" id="cutoffDate" name="cutoffDate">
+                          <div id="cutoffTriggerCalendar" style="display:none;"></div>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="etdTrigger">ETD</label>
+                          <button type="button" id="etdTrigger">Seleccionar fecha</button>
+                          <input type="hidden" id="etdDate" name="etdDate">
+                          <div id="etdTriggerCalendar" style="display:none;"></div>
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="etaTrigger">ETA</label>
+                          <button type="button" id="etaTrigger">Seleccionar fecha</button>
+                          <input type="hidden" id="etaDate" name="etaDate">
+                          <div id="etaTriggerCalendar" style="display:none;"></div>
+                      </div>
+                     
+                       <div class="grid gap-2">
+                          <label for="codShipper">Cod. Shipper</label>
+                          <select id="codShipper" name="codShipper">
+                              <option value="">Seleccionar código</option>
+                              <option value="xhi">XHI - HUAN</option>
+                              <option value="agc">AG. CLIENTE</option>
+                          </select>
+                          <button type="button" id="addShipperBtn">+</button>
+                      </div>
+                    <div class="grid gap-2">
+                          <label for="norden">N. Orden</label>
+                          <input type="text" id="norden" name="norden">
+                      </div>
+                       <div class="grid gap-2">
+                          <label for="codbl">Cod. BL</label>
+                          <input type="text" id="codbl" name="codbl">
+                      </div>
+                      <div class="grid gap-2">
+                          <label for="servicio">Servicio</label>
+                          <select id="servicio" name="servicio">
+                              <option value="">Seleccionar servicio</option>
+                              <option value="trading">TRADING</option>
+                              <option value="cons">CONS. CHINA</option>
+                          </select>
+                      </div>
+                  </div>
+
+                  <div class="form-section">
+                      <button type="reset" id="resetBtn">Limpiar</button>
+                      <button type="submit">Guardar Booking</button>
+                  </div>
+            </div>`;
+  $("#bookingForm").append(html);
+}
+const hideLCLForm= ()=>{
+  $('#lclDetails').remove();
+}
+const showConsolidadoForm= ()=>{
+   const html =`
+          <div id="consolidadoDetails" class="space-y-8">
+            <div class="form-section grid gap-6">
+              <div class="grid gap-2">
+                <label for="tc">PAÍS</label>
+                <select id="pais" name="pais">
+                  <option value="">Seleccionar país</option>
+                  <option value="china">PERU</option>
+                  <option value="china">ECUADOR</option>
+                </select>
+              </div>
+              <div class="grid gap-2">
+                <label for="tc">CONSOLIDADO</label>
+                <input type="number" id="consolidado" name="consolidado" step="1" placeholder="#0">
+              </div>
+          
+          </div>`;
+  $("#bookingForm").append(html);
+}
+const hideConsolidadoForm= ()=>{
+  $('#consolidadoDetails').remove();
+}
+// const containerState = {
+//   tc: 6.89,
+//   totalRmb: 10000,
+//   totalUsd: 1452.83
+// };
+
+// // Set initial container state values
+// $('#tc').val(containerState.tc);
+// $('#rmb').val(containerState.totalRmb);
+// $('#usd').val(containerState.totalUsd);
+
+// Cargo Type Toggle
+
+//Shipper Dialog
+// $('#newShipperDialog').dialog({
+//   autoOpen: false,
+//   modal: true,
+//   buttons: {
+//       "Guardar": function() {
+//           const newShipperCode = $('#newShipperInput').val();
+//           if (newShipperCode) {
+//               $('#codShipper').append(`<option value="${newShipperCode}">${newShipperCode}</option>`);
+//               $('#codShipper').val(newShipperCode);
+//               $(this).dialog("close");
+//           }
+//       },
+//       "Cancelar": function() {
+//           $(this).dialog("close");
+//       }
+//   }
+// });
+
+// $('#addShipperBtn').on('click', function() {
+//   $('#newShipperDialog').dialog('open');
+// });
+
