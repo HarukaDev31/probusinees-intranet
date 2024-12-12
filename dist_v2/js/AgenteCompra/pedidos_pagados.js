@@ -548,10 +548,8 @@ $(function () {
           "bg-danger bg-warning bg-success"
         );
         $("#modal-message").modal("show");
-
         if (response.status == "success") {
           $(".modal-reserva_booking_trading").modal("hide");
-
           $("#moda-message-content").addClass("bg-" + response.status);
           $(".modal-title-message").text(response.message);
           setTimeout(function () {
@@ -564,46 +562,36 @@ $(function () {
             $("#modal-message").modal("hide");
           }, 3200);
         }
-
         $("#btn-save_reserva_booking_trading").text("");
         $("#btn-save_reserva_booking_trading").append("Guardar");
         $("#btn-save_reserva_booking_trading").attr("disabled", false);
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        //$( '#modal-loader' ).modal('hide');
         $("#moda-message-content").removeClass(
           "bg-danger bg-warning bg-success"
         );
-
         $("#modal-message").modal("show");
         $("#moda-message-content").addClass("bg-danger");
         $(".modal-title-message").text("Problemas");
         setTimeout(function () {
           $("#modal-message").modal("hide");
         }, 1700);
-
-        //Message for developer
-        console.log(jqXHR.responseText);
-
         $("#btn-save_reserva_booking_trading").text("");
         $("#btn-save_reserva_booking_trading").append("Guardar");
         $("#btn-save_reserva_booking_trading").attr("disabled", false);
       },
     });
   });
-
   $(document).on(
     "click",
     "#btn-guardar_supervisar_llenado_contenedor",
     function (e) {
       e.preventDefault();
-
       $("#btn-guardar_supervisar_llenado_contenedor").text("");
       $("#btn-guardar_supervisar_llenado_contenedor").attr("disabled", true);
       $("#btn-guardar_supervisar_llenado_contenedor").append(
         'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>'
       );
-
       url = base_url + "AgenteCompra/PedidosPagados/supervisarContenedor";
       $.ajax({
         type: "POST",
@@ -677,9 +665,6 @@ $(function () {
     $("#btn-save_booking_consolidado").append(
       'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>'
     );
-
-    //$( '#modal-loader' ).modal('show');
-
     url = base_url + "AgenteCompra/PedidosPagados/reservaBookingConsolidado";
     $.ajax({
       type: "POST",
@@ -7592,7 +7577,7 @@ const getInspectionTableTemplate = (data, currentPrivilege, cotizacionCode) => {
               <path d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg></div>
           <div class="inspection-column inspection-estado">
-          <select class="form-select"
+          <select class="form-control"
                     ${currentPrivilege != 2 ? "disabled" : ""}
 
           >
@@ -8149,7 +8134,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
     </div>`;
     html += `
     <div class="c-estado-column supplier-column">
-          <select class="form-select" aria-label="Default select example" name="coordination[${supplier.id_coordination
+          <select class="form-control" aria-label="Default select example" name="coordination[${supplier.id_coordination
       }][estado]"
 
           ${currentPrivilege == priviligesJefeChina
@@ -8166,7 +8151,7 @@ const getSupplierCoordinationTableTemplate = (data) => {
     if (currentPrivilege == priviligesJefeChina) {
       html += `
           <div class="c-negociacion-column supplier-column">
-          <select class="form-select" aria-label="Default select example" name="coordination[${supplier.id_coordination
+          <select class="form-control" aria-label="Default select example" name="coordination[${supplier.id_coordination
         }][estado_negociacion]">
             <option value="PENDIENTE" ${supplier.estado_negociacion == "PENDIENTE" ? "selected" : ""
         }>PENDIENTE</option>
@@ -9571,7 +9556,7 @@ const getAlmacenTableBody = (
           </svg>
       </div>
       <div class="estado-column column">
-        <select class="form-select" disabled id="estado-${producto.ID_Pedido_Detalle
+        <select class="form-control" disabled id="estado-${producto.ID_Pedido_Detalle
       }">
           <option value="PENDIENTE" ${producto.almacen_estado == "PENDIENTE" ? "selected" : ""
       }>PENDIENTE</option>
@@ -11501,16 +11486,19 @@ fetch(url, {
   });
 
 }
-
+const closeBookingView=()=>{
+  bookingContainer.hide();
+}
 const openBookingView=async (data,id,privilegios)=>{
   containerOrdenCompra.hide();
+  $("#bookingForm").empty();
   const cargoType=data?.booking_tipo;
   bookingContainer.show();
 
   if(cargoType==="FCL"){
     showFLCForm();
     $("#booking-tipo-header").empty();
-    $("#booking-tipo-header").append("<h2 class='text-xl font-semibold text-gray-800'>FCL</h2>");
+    $("#booking-tipo-header").append("<h3 class=' font-semibold text-gray-800'>FCL</h3>");
     $("#btn-save-fcl").text("Editar FCL");
     await fillFlcFormSelects();
     fillFLCForm(data);
@@ -11523,8 +11511,39 @@ const openBookingView=async (data,id,privilegios)=>{
 
     });
     
-  }
+  }else if(cargoType==="LCL"){
+    showLCLForm();
+    $("#booking-tipo-header").empty();
+    $("#booking-tipo-header").append("<h3 class=' font-semibold text-gray-800'>LCL</h3>");
+    $("#btn-save-lcl").text("Editar LCL");
+    await fillLclFormSelects();
 
+    fillLCLForm(data);
+    setupDatePicker();
+    $('#btn-save-lcl').on('click', function() {
+      //prevent default
+      event.preventDefault();
+      saveLCLBooking(data?.id);
+    });
+  }else if (cargoType==="CONSOLIDADO"){
+    $("#booking-tipo-header").empty();
+    $("#booking-tipo-header").append("<h3 class=' font-semibold text-gray-800'>CONSOLIDADO</h3>");
+    $("#btn-save-fcl").text("Editar Consolidado");
+   
+    showConsolidadoForm();
+    $("#btn-save-consolidado").on("click",function(){
+      event.preventDefault();
+      saveConsolidadoBooking(data?.id);
+    });
+    await fillConsolidadoSelects();
+    fillConsolidadoForm(data);
+  }
+  else{
+    $("#booking-tipo-header").empty();
+    $("#booking-tipo-header").append(`<span class="cargo-type-toggle" data-type="fcl">FCL</span>
+                        <span class="cargo-type-toggle" data-type="lcl">LCL</span>
+                        <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span>`);
+  }
   $('.cargo-type-toggle').on('click', async function() {
     $('.cargo-type-toggle').removeClass('active');
     $(this).addClass('active');
@@ -11546,14 +11565,72 @@ const openBookingView=async (data,id,privilegios)=>{
       });
     } else if (cargoType === 'lcl') {
       showLCLForm();
+      await fillLclFormSelects();
+      $('#btn-save-lcl').on('click', function() {
+        //prevent default
+        event.preventDefault();
+        saveLCLBooking(data?.id);
+      });
     } else if(cargoType === 'consolidado'){
-
       showConsolidadoForm();
+      await fillConsolidadoSelects();
+      $("#btn-save-consolidado").on("click",function(){
+        event.preventDefault();
+        saveConsolidadoBooking(data?.id);
+      });
+      
     }
     setupDatePicker();
+  
     
   });
-  
+  $("#btn-save-shipper").on("click", async function(event) {
+    event.preventDefault();
+    const formData = new FormData();
+    const shipperName = $("#shipperName").val();
+    formData.append("shipperName", shipperName);
+    $.ajax({
+      url: base_url + "AgenteCompra/PedidosPagados/addShipper",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(data) {
+         fillCodShipperSelect()
+         $('#newShipperDialog').modal('hide');
+      }
+    });
+  });
+  $("#btn-save-country").on("click", async function(event) {
+    event.preventDefault();
+    const formData = new FormData();
+    const countryName = $("#countryName").val();
+    formData.append("countryName", countryName);
+    $.ajax({
+      url: base_url + "AgenteCompra/PedidosPagados/addCountry",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(data) {
+        fillPaisSelect()
+        $('#newCountryDialog').modal('hide');
+      }
+    });
+  });
+
+  $('.btn-back-booking').on('click', function() {
+    event.preventDefault();
+    closeBookingView();
+    getOrderProgress(id);
+  });
+  if(currentPrivilege!=priviligesJefeChina){
+    //disable form inputs and hide save buttons 
+    $(".form-control").prop("disabled", true);
+    $("#btn-save-fcl").hide();
+    $("#btn-save-lcl").hide();
+    $("#btn-save-consolidado").hide();
+  }
 }
 function setupDatePicker() {
   $(".input-date").datepicker({
@@ -11572,11 +11649,23 @@ const  fillFlcFormSelects=async()=>{
     fillCodShipperSelect()
 ]);
 }
+const fillConsolidadoSelects=async()=>{
+  await Promise.all([
+    fillPaisSelect(),
+]);
+}
+const  fillLclFormSelects=async()=>{
+  await Promise.all([
+    fillCodShipperSelect()
+]);
+}
+const fillConsolidadoForm=(data)=>{
+$('#consolidado').val(data.consolidado);
+$("#pais").val(data.id_pais_booking);
+}
+
 const fillFLCForm=(data)=>{
   $("#client").val(data.client);
-  // $("#tc").val(data.tc);
-  // $("#rmb").val(data.rmb);
-  // $("#usd").val(data.usd);
   $("#inland").val(data.inland);
   $("#flete").val(data.flete);
   $("#naviera").val(data.id_naviera);
@@ -11587,108 +11676,173 @@ const fillFLCForm=(data)=>{
   $("#etaDate").val(data.eta);
   $("#boxFree").val(data.box_fee);
   $("#codShipper").val(data.id_shipper);
-  $("#norden").val(data.nu_orden);
+  $("#norden").val(data.nu_order);
   $("#codbl").val(data.cod_bl);
   $("#servicio").val(data.servicio);
 
 }
+const fillLCLForm=(data)=>{
+  $("#client").val(data.client);
+
+  $("#inland").val(data.inland);
+  $("#cutoffDate").val(data.cut_off);
+  $("#etdDate").val(data.etd);
+  $("#etaDate").val(data.eta);
+  $("#codShipper").val(data.id_shipper);
+  $("#norden").val(data.nu_order);
+  $("#codbl").val(data.cod_bl);
+  $("#servicio").val(data.servicio);
+}
 const showFLCForm= ()=>{
   const html =`
   <div id="fclDetails" class="space-y-8">
-                  <div class="form-section grid gap-4">
-                      <label for="client">Cliente</label>
-                      <input type="text" id="client" name="client" placeholder="Nombre del cliente">
-                  </div>
-
-                  <div class="form-section grid gap-4 md:grid-cols-3">
-                      <div class="grid gap-2">
-                          <label for="tc">T.C.</label>
-                          <input type="text" id="tc" name="tc" disabled>
-                      </div>
-                      <div class="grid gap-2">
-                          <label for="rmb">Total RMB</label>
-                          <input type="text" id="rmb" name="rmb" disabled>
-                      </div>
-                      <div class="grid gap-2">
-                          <label for="usd">Total USD</label>
-                          <input type="text" id="usd" name="usd" disabled>
+                  <div class=" grid gap-4">
+                      <div class="mb-3">
+                      <label for="client" class="form-label">Cliente</label>
+                      <input type="text" id="client" name="client"  class="form-control">
                       </div>
                   </div>
 
                   <div class="form-section grid gap-4 md:grid-cols-3">
+                      <div class="grid gap-2">
+                        <div class="mb-3">
+                            <label for="tc">T.C.</label>
+                            <input type="text"  class="form-control" id="tc" name="tc" disabled>
+                          </div>
+                      </div>
+                      <div class="grid gap-2">
+                       <label for="rmb" class="form-label" >Total RMB</label>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" >¥</span>
+                          </div>
+                            <input type="text"  class="form-control" id="rmb" name="rmb" disabled placeholder="0.00">
+                        </div>
+                         
+                      </div>
+                      <div class="grid gap-2 ">
+                        <label for="usd" class="form-label" >Total USD</label>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" >$</span>
+                          </div>
+                            <input type="text"  class="form-control" id="usd" name="usd" disabled placeholder="0.00">
+                        </div>
+                          
+                      </div>
+                  </div>
+
+                  <div class="form-section grid gap-4 md:grid-cols-3">
                       <div class="grid gap-2"> 
-                          <label for="inland">Inland (¥)</label>
-                          <input type="number" id="inland" name="inland" step="0.01" placeholder="0.00">
+                          <div>
+                            <label for="inland" class="form-label">Inland </label>
+                            <div class="input-group mb-3">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" >¥</span>
+                              </div>
+                            <input type="number"  class="form-control"id="inland" name="inland" step="0.01" placeholder="0.00">
+                            </div>
+                          </div>
                       </div>
                       <div class="grid gap-2"> 
-                          <label for="flete">Flete ($)</label>
-                          <input type="number" id="flete" name="flete" step="0.01" placeholder="0.00">
+                          <div>
+                            <label for="flete" class="form-label">Flete ($)</label>
+                            <div class="input-group mb-3">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" >$</span>
+                              </div>
+                            <input type="number"  class="form-control" id="flete" name="flete" step="0.01" placeholder="0.00">
+                            </div>
+                          </div>
                       </div>
                       <div class="grid gap-2"> 
-                          <label for="naviera">Naviera</label>
-                          <select id="naviera" name="naviera">
+                          <div class="mb-3">
+                          <label for="naviera" class="w-100">Naviera</label>
+                          <select id="naviera" name="naviera" class="form-control">
                               <option value="">Seleccionar naviera</option>
                            
                           </select>
+                          </div>
                       </div>
                       <div class="grid gap-2">
-                          <label for="contenedor">Contenedor</label>
-                          <select id="contenedor" name="contenedor">
+                          <div class="mb-3">
+                          <label for="contenedor" class="w-100">Contenedor</label>
+                          <select id="contenedor" name="contenedor" class="form-control">
                               <option value="">Seleccionar contenedor</option>
                         
                           </select>
+                          </div>
                       </div>
                       <div class="grid gap-2">
+                         <div class="mb-3">
                           <label for="diasTransito">Días Tránsito</label>
-                          <input type="number" id="diasTransito" name="diasTransito" min="0">
+                          <input type="number" id="diasTransito" name="diasTransito" min="0" class="form-control">
+                        </div>
                       </div>
                       <div class="grid gap-2">
+                        <div class="mb-3">
                           <label for="cutoffTrigger">Cut Off</label>
-                          <input type="text" class="input-date" id="cutoffDate" name="cutoffDate">
-                          <div id="cutoffTriggerCalendar" style="display:none;"></div>
+                          <input type="text" class="input-date form-control" id="cutoffDate" name="cutoffDate" >
+                          </div>
                       </div>
                       <div class="grid gap-2">
+                        <div class="mb-3">
                           <label for="etdTrigger">ETD</label>
-                          <input type="text" class="input-date" id="etdDate" name="etdDate">
-                          <div id="etdTriggerCalendar" style="display:none;"></div>
+                          <input type="text" class="input-date form-control" id="etdDate" name="etdDate" >
+                        </div>
                       </div>
                       <div class="grid gap-2">
+                        <div class="mb-3">  
                           <label for="etaTrigger">ETA</label>
-                          <input type="text" class="input-date" id="etaDate" name="etaDate">
-                          <div id="etaTriggerCalendar" style="display:none;"></div>
+                          <input type="text" class="input-date form-control" id="etaDate" name="etaDate" >
+                        </div>
                       </div>
                       <div class="grid gap-2">
+                      <div class="mb-3">
                           <label for="boxFree">Box Free</label>
-                          <input type="number" id="boxFree" name="boxFree" min="0">
+                          <input type="number" id="boxFree" name="boxFree" min="0" class="form-control">
                       </div>
+                          </div>
                       <div class="grid gap-2">
-                          <label for="codShipper">Cod. Shipper</label>
-                          <select id="codShipper" name="codShipper">
-                              <option value="">Seleccionar código</option>
-                            
-                          </select>
-                          <button type="button" id="addShipperBtn">+</button>
-                      </div>
+                          <div class="mb-3">
+                            <label for="codShipper" class="form-label w-100">Cod. Shipper
+              <button
+              data-toggle="modal"
+              data-target="#newShipperDialog"
+              type="button" class="btn btn-success addShipperBtn">+</button>
+                            </label>
+                            <select id="codShipper" name="codShipper" class="form-control">
+                                <option value="">Seleccionar código</option class="form-control">
+                              
+                            </select>
+                          </div>
+                        </div>
                       <div class="grid gap-2">
+                          <div class="mb-3">
                           <label for="norden">N. Orden</label>
-                          <input type="text" id="norden" name="norden">
+                          <input type="text" id="norden" name="norden" class="form-control">
+                          </div>
                       </div>
                       <div class="grid gap-2">
+                        <div class="mb-3">
                           <label for="codbl">Cod. BL</label>
-                          <input type="text" id="codbl" name="codbl">
+                          <input type="text" id="codbl" name="codbl" class="form-control">
                       </div>
+                          </div>
                       <div class="grid gap-2">
-                          <label for="servicio">Servicio</label>
-                          <select id="servicio" name="servicio">
-                              <option value="">Seleccionar servicio</option>
-                              <option value="TRADING">TRADING</option>
-                              <option value="CONSOLIDADO CHINA">CONSOLIDADO CHINA</option>
-                          </select>
+                          <div class="mb-3">
+                            <label for="servicio" class="w-100">Servicio</label>
+                            <select id="servicio" name="servicio" class="form-control">
+                                <option value="">Seleccionar servicio</option>
+                                <option value="TRADING">TRADING</option>
+                                <option value="CONSOLIDADO CHINA">CONSOLIDADO CHINA</option>
+                            </select>
+                          </div>
                       </div>
                   </div>
 
                   <div class="form-section">
-                      <button type="reset" id="resetBtn">Limpiar</button>
+                      <button  class="btn btn-outline-secondary btn-back-booking">Volver</button>
                       <button  type="submit" id="btn-save-fcl" class="btn btn-outline-secondary">Guardar Booking</button>
                   </div>
               </div>`;
@@ -11737,6 +11891,20 @@ const fillCodShipperSelect=async ()=>{
     }
   });
 }
+const fillPaisSelect=async ()=>{
+  await $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getBookingCountries",
+    type: 'POST',
+    success: function (response) {
+      const { status, data } = JSON.parse(response);
+      $('#pais').empty();
+      $('#pais').append(`<option value="">Seleccionar país</option>`);
+      data.forEach(item => {
+        $('#pais').append(`<option value="${item.id}">${item.name}</option>`);
+      });
+    }
+  });
+}
 const hideFLCForm= ()=>{
   $('#fclDetails').remove();
 }
@@ -11744,79 +11912,107 @@ const showLCLForm= ()=>{
   const html =`
           <div id="lclDetails" class="space-y-8">
                   <div class="form-section grid gap-4">
-                      <label for="client">Cliente</label>
-                      <input type="text" id="client" name="client" placeholder="Nombre del cliente">
+                      <div class="mb-3">
+                      <label for="client" class="form-label">Cliente</label>
+                      <input type="text" id="client" name="client"  class="form-control">
+                      </div>
                   </div>
 
                   <div class="form-section grid gap-4 md:grid-cols-3">
                       <div class="grid gap-2">
-                          <label for="tc">T.C.</label>
-                          <input type="text" id="tc" name="tc" disabled>
+                          <div class="mb-3">
+                            <label for="tc">T.C.</label>
+                            <input type="text" id="tc" name="tc" disabled class="form-control">
+                          </div>
                       </div>
                       <div class="grid gap-2">
-                          <label for="rmb">Total RMB</label>
-                          <input type="text" id="rmb" name="rmb" disabled>
+                          <label for="rmb" class="form-label" >Total RMB</label>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" >¥</span>
+                          </div>
+                            <input type="text"  class="form-control" id="rmb" name="rmb" disabled placeholder="0.00">
+                        </div>
                       </div>
                       <div class="grid gap-2">
-                          <label for="usd">Total USD</label>
-                          <input type="text" id="usd" name="usd" disabled>
+                          <label for="usd" class="form-label" >Total USD</label>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" >$</span>
+                          </div>
+                            <input type="text"  class="form-control" id="usd" name="usd" disabled placeholder="0.00">
+                        </div>
                       </div>
                   </div>
 
                   <div class="form-section grid gap-4 md:grid-cols-3">
                       <div class="grid gap-2"> 
-                          <label for="inland">Inland (¥)</label>
-                          <input type="number" id="inland" name="inland" step="0.01" placeholder="0.00">
+                        <label for="inland" class="form-label">Inland </label>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" >¥</span>
+                            </div>
+                          <input type="number"  class="form-control"id="inland" name="inland" step="0.01" placeholder="0.00">
+                          </div>
                       </div>
                       <div class="grid gap-2">
+                      <div class="mb-3">
                           <label for="cutoffTrigger">Cut Off</label>
-                          <button type="button" id="cutoffTrigger">Seleccionar fecha</button>
-                          <input type="hidden" id="cutoffDate" name="cutoffDate">
-                          <div id="cutoffTriggerCalendar" style="display:none;"></div>
-                      </div>
+                          <input type="text" class="input-date form-control" id="cutoffDate" name="cutoffDate" >
+                        </div>
+                          </div>
                       <div class="grid gap-2">
+                      <div class="mb-3">
                           <label for="etdTrigger">ETD</label>
-                          <button type="button" id="etdTrigger">Seleccionar fecha</button>
-                          <input type="hidden" id="etdDate" name="etdDate">
-                          <div id="etdTriggerCalendar" style="display:none;"></div>
-                      </div>
+                          <input type="text" class="input-date form-control" id="etdDate" name="etdDate" >
+                        </div>
+                          </div>
                       <div class="grid gap-2">
-                          <label for="etaTrigger">ETA</label>
-                          <button type="button" id="etaTrigger">Seleccionar fecha</button>
-                          <input type="hidden" id="etaDate" name="etaDate">
-                          <div id="etaTriggerCalendar" style="display:none;"></div>
+                          <div class="mb-3">
+                              <label for="etaTrigger">ETA</label>
+                              <input type="text" class="input-date form-control" id="etaDate" name="etaDate" >
+                            </div>
                       </div>
                      
                        <div class="grid gap-2">
-                          <label for="codShipper">Cod. Shipper</label>
-                          <select id="codShipper" name="codShipper">
-                              <option value="">Seleccionar código</option>
-                              <option value="xhi">XHI - HUAN</option>
-                              <option value="agc">AG. CLIENTE</option>
-                          </select>
-                          <button type="button" id="addShipperBtn">+</button>
-                      </div>
-                    <div class="grid gap-2">
-                          <label for="norden">N. Orden</label>
-                          <input type="text" id="norden" name="norden">
-                      </div>
-                       <div class="grid gap-2">
-                          <label for="codbl">Cod. BL</label>
-                          <input type="text" id="codbl" name="codbl">
+                         <div class="mb-3">
+                            <label for="codShipper" class="w-100" >Cod. Shipper
+                                                        <button 
+                                                        data-toggle="modal" data-target="#newShipperDialog"
+                                                        type="button" class="btn btn-success addShipperBtn" >+</button>
+
+                            </label>
+                            <select id="codShipper" name="codShipper" class="form-control">
+                                <option value="">Seleccionar código</option class="form-control">
+                              
+                            </select>
+                          </div>
                       </div>
                       <div class="grid gap-2">
-                          <label for="servicio">Servicio</label>
-                          <select id="servicio" name="servicio">
-                              <option value="">Seleccionar servicio</option>
-                              <option value="trading">TRADING</option>
-                              <option value="cons">CONS. CHINA</option>
-                          </select>
+                          <label for="norden">N. Orden</label>
+                          <input type="text" id="norden" name="norden" class="form-control">
+                      </div>
+                       <div class="grid gap-2">
+                        <div class="mb-3">
+                          <label for="codbl">Cod. BL</label>
+                          <input type="text" id="codbl" name="codbl" class="form-control">
+                        </div>
+                      </div>
+                      <div class="grid gap-2">
+                          <div class="mb-3">
+                            <label for="servicio">Servicio</label>
+                            <select id="servicio" name="servicio" class="form-control">
+                                <option value="">Seleccionar servicio</option>
+                                <option value="TRADING">TRADING</option>
+                                <option value="CONSOLIDADO CHINA">CONSOLIDADO CHINA</option>
+                            </select>
+                          </div>
                       </div>
                   </div>
 
                   <div class="form-section">
-                      <button type="reset" id="resetBtn">Limpiar</button>
-                      <button type="submit">Guardar Booking</button>
+                      <button  class="btn btn-outline-secondary btn-back-booking">Volver</button>
+                      <button id="btn-save-lcl" class="btn btn-outline-secondary">Guardar Booking</button>
                   </div>
             </div>`;
   $("#bookingForm").append(html);
@@ -11829,18 +12025,30 @@ const showConsolidadoForm= ()=>{
           <div id="consolidadoDetails" class="space-y-8">
             <div class="form-section grid gap-6">
               <div class="grid gap-2">
-                <label for="tc">PAÍS</label>
-                <select id="pais" name="pais">
+                <div class="mb-3">
+                <label for="tc" class="form-label w-100">PAÍS
+                <button type="button" class="btn btn-success"
+                data-toggle="modal" data-target="#newCountryDialog"
+                id="addPaisButton">+</button>
+                </label>
+                <select id="pais" name="pais" class="form-control">
                   <option value="">Seleccionar país</option>
                   <option value="china">PERU</option>
                   <option value="china">ECUADOR</option>
                 </select>
+                </div>
               </div>
               <div class="grid gap-2">
-                <label for="tc">CONSOLIDADO</label>
-                <input type="number" id="consolidado" name="consolidado" step="1" placeholder="#0">
+                <div class="mb-3">
+                  <label for="tc" class="form-label">CONSOLIDADO</label>
+                  <input  class="form-control"
+                  type="number" id="consolidado" name="consolidado" step="1" placeholder="#0">
+                </div>
               </div>
-          
+          <div class="form-section">
+                      <button  class="btn btn-outline-secondary btn-back-booking">Volver</button>
+                      <div id="btn-save-consolidado" class="btn btn-outline-secondary">Guardar Booking</button>
+                  </div>
           </div>`;
   $("#bookingForm").append(html);
 }
@@ -11891,10 +12099,62 @@ const saveFCLBooking=(id=null)=>{
       idBookingDetail,
     },
     success: function (data) {
-      console.log(data);
+      openStepFunction(4,idPedido);
+
     }
   });
 }
+const saveLCLBooking=(id=null)=>{
+  const client = $('#client').val();
+  const inland = $('#inland').val();
+  const cutoffDate = $('#cutoffDate').val();
+  const etdDate = $('#etdDate').val();
+  const etaDate = $('#etaDate').val();
+  const codShipper = $('#codShipper').val();
+  const servicio = $('#servicio').val();
+  const norden = $('#norden').val();
+  const codbl = $('#codbl').val();
+  const idBookingDetail = id;
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/saveLCLBooking",
+    type: 'POST',
+    data: {
+      client,
+      inland,
+      cutoffDate,
+      etdDate,
+      etaDate,
+      codShipper,
+      servicio,
+      norden,
+      codbl,
+      idOrder,
+      idBookingDetail,
+    },
+    success: function (data) {
+      openStepFunction(4,idPedido);
+    }
+  });
+}
+const saveConsolidadoBooking=(id=null)=>{
+  const pais = $('#pais').val();
+  const consolidado = $('#consolidado').val();
+  const idBookingDetail = id;
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/saveConsolidadoBooking",
+    type: 'POST',
+    data: {
+      pais,
+      consolidado,
+      idOrder,
+      idBookingDetail,
+    },
+    success: function (data) {
+      openStepFunction(4,idPedido);
+    }
+  });
+}
+
 // const containerState = {
 //   tc: 6.89,
 //   totalRmb: 10000,
@@ -11925,9 +12185,5 @@ const saveFCLBooking=(id=null)=>{
 //           $(this).dialog("close");
 //       }
 //   }
-// });
-
-// $('#addShipperBtn').on('click', function() {
-//   $('#newShipperDialog').dialog('open');
 // });
 

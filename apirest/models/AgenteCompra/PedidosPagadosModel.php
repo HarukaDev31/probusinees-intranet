@@ -45,6 +45,7 @@ class PedidosPagadosModel extends CI_Model
     private $tableOrdenBookingNaviera="agente_compra_booking_naviera";
     private $tableOrdenBookingContainer="agente_compra_booking_container";
     private $tableOrdenBookingShipper="agente_compra_booking_shipper";
+    private $tableOrdenBookingCountry="pais_booking";  
     public function __construct()
     {
         parent::__construct();
@@ -3733,8 +3734,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $idContenedorTipo=$data['contenedor'];
         $diasTransito=$data['diasTransito'];
         $cutOff=$data['cutoffDate']?str_replace('/','-',$data['cutoffDate']):null;
-        $etd=$data['etdDate'];
-        $eta=$data['etaDate'];
+        $etd=$data['etdDate']?str_replace('/','-',$data['etdDate']):null;
+        $eta=$data['etaDate']?str_replace('/','-',$data['etaDate']):null;
         $boxFee=$data['boxFree'];
         $idShipper=$data['codShipper'];
         $nuOrder=$data['norden'];
@@ -3760,12 +3761,16 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
    
            
         ];
-        echo json_encode($data);
+       
            try{
             if($idBookingDetail!=null){
+           
                 $this->db->where('id',$idBookingDetail);
                 $this->db->update($this->tableOrdenBookingDetail,$data);
             }else{
+                $this->db->where('id_order',4);
+                $this->db->where('id_pedido',$idPedido);
+                $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
             $this->db->insert($this->tableOrdenBookingDetail,$data);
             $this->db->update($this->table,['booking_tipo'=>'FCL'],['ID_Pedido_Cabecera'=>$idPedido]);
             return ['status' => 'success', 'message' => 'FCL Booking guardado'];
@@ -3774,7 +3779,75 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             return ['status' => 'error', 'message' => $e->getMessage()];
            }
         return ['status' => 'success', 'message' => 'FCL Booking guardado'];
-    } 
+    }
+    public function saveLCLBooking($data){
+        $idPedido=$data['idOrder'];
+        $inland=$data['inland'];
+        $client=$data['client'];
+        $cutOff=$data['cutoffDate']?str_replace('/','-',$data['cutoffDate']):null;
+        $etd=$data['etdDate']?str_replace('/','-',$data['etdDate']):null;
+        $eta=$data['etaDate']?str_replace('/','-',$data['etaDate']):null;
+        $idShipper=$data['codShipper'];
+        $nuOrder=$data['norden'];
+        $codBl=$data['codbl'];
+        $servicio=$data['servicio'];
+        $idBookingDetail=$data['idBookingDetail'];
+        
+        $data=[
+            'id_pedido'=>$idPedido,
+            'client'=>$client,
+            'inland'=>$inland,
+            'cut_off'=>$cutOff,
+            'etd'=>$etd,
+            'eta'=>$eta,
+            'id_shipper'=>$idShipper,
+            'nu_order'=>$nuOrder,
+            'cod_bl'=>$codBl,
+            'servicio'=>$servicio
+        ];
+        try{
+            if($idBookingDetail!=null){
+                echo json_encode($data);
+                echo json_encode("update");
+                $this->db->where('id',$idBookingDetail);
+                $this->db->update($this->tableOrdenBookingDetail,$data);
+            }else{
+                $this->db->where('id_order',4);
+                $this->db->where('id_pedido',$idPedido);
+                $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+            $this->db->insert($this->tableOrdenBookingDetail,$data);
+            $this->db->update($this->table,['booking_tipo'=>'LCL'],['ID_Pedido_Cabecera'=>$idPedido]);
+            return ['status' => 'success', 'message' => 'LCL Booking guardado'];
+           }
+        }catch(Exception $e){
+            return ['status' => 'error', 'message' => $e->getMessage()];
+           }
+        return ['status' => 'success', 'message' => 'LCL Booking guardado'];
+    }
+    public function saveConsolidadoBooking($data){
+        $idPedido=$data['idOrder'];
+        $idBookingDetail=$data['idBookingDetail'];
+        $idPaisBooking=$data['pais'];
+        $consolidado=$data['consolidado'];
+        $data=[
+            'id_pedido'=>$idPedido,
+            'id_pais_booking'=>$idPaisBooking,
+            'consolidado'=>$consolidado
+        ];
+        if($idBookingDetail!=null){
+            $this->db->where('id',$idBookingDetail);
+            $this->db->update($this->tableOrdenBookingDetail,$data);
+        }else{
+                $this->db->insert($this->tableOrdenBookingDetail,$data);
+                $this->db->update($this->table,['booking_tipo'=>'CONSOLIDADO'],['ID_Pedido_Cabecera'=>$idPedido]);
+                //update all steps with id_order=4 and id_pedido=$idPedido
+                $this->db->where('id_order',4);
+                $this->db->where('id_pedido',$idPedido);
+                $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+                
+                return ['status' => 'success', 'message' => 'Consolidado Booking guardado'];
+        }
+    }
     public function getNavieras(){
         $this->db->select('id,name');
         $this->db->from($this->tableOrdenBookingNaviera);
@@ -3803,5 +3876,20 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
       
         return $this->db->get()->row();
     } 
-
+    public function addShipper($data){
+        $name=$data['shipperName'];
+        $this->db->insert($this->tableOrdenBookingShipper,['name'=>$name]);
+        return ['status' => 'success', 'message' => 'Shipper guardado'];
+    }
+    public function addCountry($data){
+        $name=$data['countryName'];
+        $this->db->insert($this->tableOrdenBookingCountry,['name'=>$name]);
+        return ['status' => 'success', 'message' => 'Country guardado'];
+    }
+    public function getBookingCountries(){
+        $this->db->select('id,name');
+        $this->db->from($this->tableOrdenBookingCountry);
+        return $this->db->get()->result();
+    }
+    
 }

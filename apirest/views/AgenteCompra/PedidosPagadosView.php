@@ -728,38 +728,74 @@
       <!-- /.row -->
    
 
-      <section class="min-h-screen bg-white booking-container container-fluid" id="booking-container">
+      <section class="min-h-screen bg-white booking-container container-fluid px-3" id="booking-container">
                 <header id="booking-header">
-                  <h1>
-                    <span class="text-gray-800">Booking</span>
-                    
-                  </h1>
-                  <form id="bookingForm">
-              <input type="hidden" id="cargoTypeInput" name="cargoType">
+                <h2 class="text-gray-800 text-xl mb-4">Booking</h2>
+
+         
+                    <div class="space-y-8" id="booking-tipo-header">
+                        <!-- <span class="cargo-type-toggle" data-type="fcl">FCL</span>
+                        <span class="cargo-type-toggle" data-type="lcl">LCL</span>
+                        <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span> -->
+                    </div>
+            
+                  </header>
+
+                  <form id="bookingForm" class="mt-3">
+                    <input type="hidden" id="cargoTypeInput" name="cargoType">
               
-              <div class="form-section">
-                  <label>Tipo de Carga</label>
-                  <div class="space-y-8" id="booking-tipo-header">
-                      <span class="cargo-type-toggle" data-type="fcl">FCL</span>
-                      <span class="cargo-type-toggle" data-type="lcl">LCL</span>
-                      <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span>
-                  </div>
-              </div>
+                    <div class="form-section">
+                        
+                    </div>
 
               
-          </form>
+              </form>
 
-          <div id="newShipperDialog" style="display:none;" title="Crear Nuevo Shipper">
-              <p>Ingrese el código del nuevo shipper</p>
-              <input type="text" id="newShipperInput" placeholder="Código del shipper">
-          </div>
-        </header>
+          
     <!-- /.container-fluid -->
   </section>
 
   <!-- /.content -->
-
+  <div class="modal fade" tabindex="-1" id="newShipperDialog">
+  <div class="modal-dialog modal-lg" >
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title">Crear Nuevo Shipper</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                      <form id="newShipperForm">
+                          <div class="form-group">
+                              <label for="shipperName">Nombre</label>
+                              <input type="text" class="form-control" id="shipperName" name="shipperName" required>
+                            </div>
+                            <button id="btn-save-shipper" class="btn btn-primary">Crear</button>
+                      </form>  
+                  </div>   
+              </div>
+  </div>
 </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="newCountryDialog">
+      <div class="modal-dialog modal-lg" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear Nuevo Pais de Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newCountryForm">
+                        <div class="form-group">
+                            <label for="shipperName">Nombre</label>
+                            <input type="text" class="form-control" id="countryName" name="shipperName" required>
+                          </div>
+                          <button id="btn-save-country" class="btn btn-primary">Crear</button>
+                     </form>  
+                </div>   
+          </div>
+    </div>
+    </div>
 <div class="modal fade" id="imagePreviewModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

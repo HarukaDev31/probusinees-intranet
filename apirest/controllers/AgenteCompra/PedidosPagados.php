@@ -2500,6 +2500,11 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->saveFCLBooking($data);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    public function saveLCLBooking(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->saveLCLBooking($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
     public function getNavieras(){
         $response = $this->PedidosPagadosModel->getNavieras();
         echo json_encode(array('status' => 'success', 'data' => $response));
@@ -2513,5 +2518,23 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->getShipper($idPedido);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
-    
+    public function addShipper(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->addShipper($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function addCountry(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->addCountry($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getBookingCountries(){
+        $response = $this->PedidosPagadosModel->getBookingCountries();
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function saveConsolidadoBooking(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->saveConsolidadoBooking($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
 }
