@@ -739,7 +739,7 @@
               
               <div class="form-section">
                   <label>Tipo de Carga</label>
-                  <div class="space-y-8">
+                  <div class="space-y-8" id="booking-tipo-header">
                       <span class="cargo-type-toggle" data-type="fcl">FCL</span>
                       <span class="cargo-type-toggle" data-type="lcl">LCL</span>
                       <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span>

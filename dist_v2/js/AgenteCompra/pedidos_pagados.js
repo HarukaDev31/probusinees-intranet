@@ -6835,6 +6835,7 @@ function _generarConsolidaTrading($modal_delete, ID) {
 //get order progress section
 const getOrderProgress = (id, idServicio = null) => {
   currentServicio = idServicio;
+  idOrder = id;
   $("#steps").empty();
   if (idServicio != 2) {
     $("#cotizacionOrdenContainer").hide();
@@ -11485,7 +11486,6 @@ fetch(url, {
 })
   .then(response => response.json())
   .then(data => {
-    console.log('Archivo subido:', data);
     driveFiles.push({
       id: data.id,
       name: data.name,
@@ -11502,12 +11502,30 @@ fetch(url, {
 
 }
 
-const openBookingView=(data,id,privilegios)=>{
+const openBookingView=async (data,id,privilegios)=>{
   containerOrdenCompra.hide();
- 
-
+  const cargoType=data?.booking_tipo;
   bookingContainer.show();
-  $('.cargo-type-toggle').on('click', function() {
+
+  if(cargoType==="FCL"){
+    showFLCForm();
+    $("#booking-tipo-header").empty();
+    $("#booking-tipo-header").append("<h2 class='text-xl font-semibold text-gray-800'>FCL</h2>");
+    $("#btn-save-fcl").text("Editar FCL");
+    await fillFlcFormSelects();
+    fillFLCForm(data);
+    setupDatePicker();
+
+    $('#btn-save-fcl').on('click', function() {
+      //prevent default 
+      event.preventDefault();
+      saveFCLBooking(data?.id);
+
+    });
+    
+  }
+
+  $('.cargo-type-toggle').on('click', async function() {
     $('.cargo-type-toggle').removeClass('active');
     $(this).addClass('active');
     
@@ -11519,45 +11537,60 @@ const openBookingView=(data,id,privilegios)=>{
     // Show/hide FCL specific fields
     if (cargoType === 'fcl') {
       showFLCForm();
+      await fillFlcFormSelects();
+      $('#btn-save-fcl').on('click', function() {
+        //prevent default 
+        event.preventDefault();
+        saveFCLBooking(data?.id);
 
-      setupDatePicker('cutoffTrigger', 'cutoffDate');
-      setupDatePicker('etdTrigger', 'etdDate');
-      setupDatePicker('etaTrigger', 'etaDate');
+      });
     } else if (cargoType === 'lcl') {
       showLCLForm();
-      setupDatePicker('cutoffTrigger', 'cutoffDate');
-      setupDatePicker('etdTrigger', 'etdDate');
-      setupDatePicker('etaTrigger', 'etaDate');
     } else if(cargoType === 'consolidado'){
 
       showConsolidadoForm();
     }
+    setupDatePicker();
+    
   });
-  
-  // Date Pickers
-
-  
-  
-  
   
 }
-function setupDatePicker(triggerId, inputId) {
-  const $trigger = $(`#${triggerId}`);
-  const $input = $(`#${inputId}`);
-  const $calendar = $(`#${triggerId}Calendar`);
-
-  $trigger.datepicker({
-      dateFormat: 'yy-mm-dd',
-      onSelect: function(dateText) {
-          $trigger.text(dateText);
-          $input.val(dateText);
-          $calendar.hide();
-      }
+function setupDatePicker() {
+  $(".input-date").datepicker({
+    autoclose: true,
+    startDate: new Date(fYear, fToday.getMonth(), fDay),
+    todayHighlight: true,
+    dateFormat: "yyyy-mm-dd",
+    format: "yyyy-mm-dd",
   });
+      
+}
+const  fillFlcFormSelects=async()=>{
+  await Promise.all([
+    fillNavieraSelect(),
+    fillContenedorSelect(),
+    fillCodShipperSelect()
+]);
+}
+const fillFLCForm=(data)=>{
+  $("#client").val(data.client);
+  // $("#tc").val(data.tc);
+  // $("#rmb").val(data.rmb);
+  // $("#usd").val(data.usd);
+  $("#inland").val(data.inland);
+  $("#flete").val(data.flete);
+  $("#naviera").val(data.id_naviera);
+  $("#contenedor").val(data.id_contenedor_tipo);
+  $("#diasTransito").val(data.dias_transito);
+  $("#cutoffDate").val(data.cut_off);
+  $("#etdDate").val(data.etd);
+  $("#etaDate").val(data.eta);
+  $("#boxFree").val(data.box_fee);
+  $("#codShipper").val(data.id_shipper);
+  $("#norden").val(data.nu_orden);
+  $("#codbl").val(data.cod_bl);
+  $("#servicio").val(data.servicio);
 
-  $trigger.on('click', function() {
-      $calendar.toggle();
-  });
 }
 const showFLCForm= ()=>{
   const html =`
@@ -11595,25 +11628,14 @@ const showFLCForm= ()=>{
                           <label for="naviera">Naviera</label>
                           <select id="naviera" name="naviera">
                               <option value="">Seleccionar naviera</option>
-                              <option value="maersk">MAERSK</option>
-                              <option value="one">ONE</option>
-                              <option value="cosco">COSCO</option>
-                              <option value="evergreen">EVERGREEN</option>
-                              <option value="msc">MSC</option>
-                              <option value="hapag">HAPAG LLOYD</option>
-                              <option value="cma">CMA CGM</option>
-                              <option value="yang">YANG MING</option>
-                              <option value="zim">ZIM</option>
+                           
                           </select>
                       </div>
                       <div class="grid gap-2">
                           <label for="contenedor">Contenedor</label>
                           <select id="contenedor" name="contenedor">
                               <option value="">Seleccionar contenedor</option>
-                              <option value="20gp">20 GP</option>
-                              <option value="40nor">40 NOR</option>
-                              <option value="40gp">40 GP</option>
-                              <option value="40hq">40 HQ</option>
+                        
                           </select>
                       </div>
                       <div class="grid gap-2">
@@ -11622,20 +11644,17 @@ const showFLCForm= ()=>{
                       </div>
                       <div class="grid gap-2">
                           <label for="cutoffTrigger">Cut Off</label>
-                          <button type="button" id="cutoffTrigger">Seleccionar fecha</button>
-                          <input type="hidden" id="cutoffDate" name="cutoffDate">
+                          <input type="text" class="input-date" id="cutoffDate" name="cutoffDate">
                           <div id="cutoffTriggerCalendar" style="display:none;"></div>
                       </div>
                       <div class="grid gap-2">
                           <label for="etdTrigger">ETD</label>
-                          <button type="button" id="etdTrigger">Seleccionar fecha</button>
-                          <input type="hidden" id="etdDate" name="etdDate">
+                          <input type="text" class="input-date" id="etdDate" name="etdDate">
                           <div id="etdTriggerCalendar" style="display:none;"></div>
                       </div>
                       <div class="grid gap-2">
                           <label for="etaTrigger">ETA</label>
-                          <button type="button" id="etaTrigger">Seleccionar fecha</button>
-                          <input type="hidden" id="etaDate" name="etaDate">
+                          <input type="text" class="input-date" id="etaDate" name="etaDate">
                           <div id="etaTriggerCalendar" style="display:none;"></div>
                       </div>
                       <div class="grid gap-2">
@@ -11646,8 +11665,7 @@ const showFLCForm= ()=>{
                           <label for="codShipper">Cod. Shipper</label>
                           <select id="codShipper" name="codShipper">
                               <option value="">Seleccionar código</option>
-                              <option value="xhi">XHI - HUAN</option>
-                              <option value="agc">AG. CLIENTE</option>
+                            
                           </select>
                           <button type="button" id="addShipperBtn">+</button>
                       </div>
@@ -11663,18 +11681,61 @@ const showFLCForm= ()=>{
                           <label for="servicio">Servicio</label>
                           <select id="servicio" name="servicio">
                               <option value="">Seleccionar servicio</option>
-                              <option value="trading">TRADING</option>
-                              <option value="cons">CONS. CHINA</option>
+                              <option value="TRADING">TRADING</option>
+                              <option value="CONSOLIDADO CHINA">CONSOLIDADO CHINA</option>
                           </select>
                       </div>
                   </div>
 
                   <div class="form-section">
                       <button type="reset" id="resetBtn">Limpiar</button>
-                      <button type="submit">Guardar Booking</button>
+                      <button  type="submit" id="btn-save-fcl" class="btn btn-outline-secondary">Guardar Booking</button>
                   </div>
               </div>`;
   $("#bookingForm").append(html);
+}
+
+const fillNavieraSelect=async ()=>{
+  await $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getNavieras",
+    type: 'POST',
+    success: function (response) {
+      const { status, data } = JSON.parse(response);
+      $('#naviera').empty();
+      $('#naviera').append(`<option value="">Seleccionar naviera</option>`);
+      data.forEach(item => {
+        $('#naviera').append(`<option value="${item.id}">${item.name}</option>`);
+      }); 
+    }
+  });
+}
+const fillContenedorSelect= async()=>{
+  await $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getContainer",
+    type: 'POST',
+    success: function (response) {
+      const { status, data } = JSON.parse(response);
+      $('#contenedor').empty();
+      $('#contenedor').append(`<option value="">Seleccionar contenedor</option>`);
+      data.forEach(item => {
+        $('#contenedor').append(`<option value="${item.id}">${item.name}</option>`);
+      });
+    }
+  });
+}
+const fillCodShipperSelect=async ()=>{
+  await $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/getShipper",
+    type: 'POST',
+    success: function (response) {
+      const { status, data } = JSON.parse(response);
+      $('#codShipper').empty();
+      $('#codShipper').append(`<option value="">Seleccionar código</option>`);
+      data.forEach(item => {
+        $('#codShipper').append(`<option value="${item.id}">${item.name}</option>`);
+      });
+    }
+  });
 }
 const hideFLCForm= ()=>{
   $('#fclDetails').remove();
@@ -11785,6 +11846,54 @@ const showConsolidadoForm= ()=>{
 }
 const hideConsolidadoForm= ()=>{
   $('#consolidadoDetails').remove();
+}
+const saveFCLBooking=(id=null)=>{
+  const client = $('#client').val();
+  const tc = $('#tc').val();
+  const rmb = $('#rmb').val();
+  const usd = $('#usd').val();
+  const inland = $('#inland').val();
+  const flete = $('#flete').val();
+  const naviera = $('#naviera').val();
+  const contenedor = $('#contenedor').val();
+  const diasTransito = $('#diasTransito').val();
+  const cutoffDate = $('#cutoffDate').val();
+  const etdDate = $('#etdDate').val();
+  const etaDate = $('#etaDate').val();
+  const boxFree = $('#boxFree').val();
+  const codShipper = $('#codShipper').val();
+  const servicio = $('#servicio').val();
+  const norden = $('#norden').val();
+  const codbl = $('#codbl').val();
+  const idBookingDetail = id;
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/saveFCLBooking",
+    type: 'POST',
+    data: {
+      client,
+      tc,
+      rmb,
+      usd,
+      inland,
+      flete,
+      naviera,
+      contenedor,
+      diasTransito,
+      cutoffDate,
+      etdDate,
+      etaDate,
+      boxFree,
+      codShipper,
+      servicio,
+      norden,
+      codbl,
+      idOrder,
+      idBookingDetail,
+    },
+    success: function (data) {
+      console.log(data);
+    }
+  });
 }
 // const containerState = {
 //   tc: 6.89,

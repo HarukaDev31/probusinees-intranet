@@ -41,6 +41,10 @@ class PedidosPagadosModel extends CI_Model
     private $tableOrdenExcelPagos="agente_compra_pago_excel";
     private $tableOrdenExcelPagosDetalle="agente_compra_pago_excel_detail";
     private $tableOrdenExcelPagosDocumentos="agente_compra_pago_documento";
+    private $tableOrdenBookingDetail="agente_compra_pedido_booking_details";
+    private $tableOrdenBookingNaviera="agente_compra_booking_naviera";
+    private $tableOrdenBookingContainer="agente_compra_booking_container";
+    private $tableOrdenBookingShipper="agente_compra_booking_shipper";
     public function __construct()
     {
         parent::__construct();
@@ -3719,5 +3723,85 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
      catch(Exception $e){
         return $e->getMessage();
      }
-    }  
+    } 
+    public function saveFCLBooking($data){
+        $idPedido=$data['idOrder'];
+        $inland=$data['inland'];
+        $flete=$data['flete'];
+        $client=$data['client'];
+        $idNaviera=$data['naviera'];
+        $idContenedorTipo=$data['contenedor'];
+        $diasTransito=$data['diasTransito'];
+        $cutOff=$data['cutoffDate']?str_replace('/','-',$data['cutoffDate']):null;
+        $etd=$data['etdDate'];
+        $eta=$data['etaDate'];
+        $boxFee=$data['boxFree'];
+        $idShipper=$data['codShipper'];
+        $nuOrder=$data['norden'];
+        $codBl=$data['codbl'];
+        $servicio=$data['servicio'];
+        $idBookingDetail=$data['idBookingDetail'];
+        $data=[
+            'id_pedido'=>$idPedido,
+            'client'=>$client,
+            'inland'=>$inland,
+            "flete"=>$flete,
+            'id_naviera'=>$idNaviera,
+           'id_contenedor_tipo'=>$idContenedorTipo,
+           'dias_transito'=>$diasTransito,
+           'cut_off'=>$cutOff,
+           'etd'=>$etd,
+           'eta'=>$eta,
+           'box_fee'=>$boxFee,
+           'id_shipper'=>$idShipper,
+           'nu_order'=>$nuOrder,
+           'cod_bl'=>$codBl,
+           'servicio'=>$servicio
+   
+           
+        ];
+        echo json_encode($data);
+           try{
+            if($idBookingDetail!=null){
+                $this->db->where('id',$idBookingDetail);
+                $this->db->update($this->tableOrdenBookingDetail,$data);
+            }else{
+            $this->db->insert($this->tableOrdenBookingDetail,$data);
+            $this->db->update($this->table,['booking_tipo'=>'FCL'],['ID_Pedido_Cabecera'=>$idPedido]);
+            return ['status' => 'success', 'message' => 'FCL Booking guardado'];
+           }
+        }catch(Exception $e){
+            return ['status' => 'error', 'message' => $e->getMessage()];
+           }
+        return ['status' => 'success', 'message' => 'FCL Booking guardado'];
+    } 
+    public function getNavieras(){
+        $this->db->select('id,name');
+        $this->db->from($this->tableOrdenBookingNaviera);
+        return $this->db->get()->result();
+    }
+    public function getContainer(){
+        $this->db->select('id,name');
+        $this->db->from($this->tableOrdenBookingContainer);
+        return $this->db->get()->result();
+    }
+    public function getShipper($idPedido=null){
+        $this->db->select('id,name');
+        $this->db->from($this->tableOrdenBookingShipper);
+        $this->db->where('id_pedido is null or id_pedido='.$idPedido);
+        return $this->db->get()->result();
+
+    }
+    public function getPedidoBooking($idPedido){
+        $this->db->select('booking_tipo,agente_compra_pedido_booking_details.*');
+        $this->db->from($this->table);
+        $this->db->join($this->tableOrdenBookingDetail,'agente_compra_pedido_cabecera.ID_Pedido_Cabecera=agente_compra_pedido_booking_details.id_pedido');
+        $this->db->join($this->tableOrdenBookingNaviera,'agente_compra_pedido_booking_details.id_naviera=agente_compra_booking_naviera.id','left');
+        $this->db->join($this->tableOrdenBookingContainer,'agente_compra_pedido_booking_details.id_contenedor_tipo=agente_compra_booking_container.id','left');
+        $this->db->join($this->tableOrdenBookingShipper,'agente_compra_pedido_booking_details.id_shipper=agente_compra_booking_shipper.id','left'); 
+        $this->db->where('ID_Pedido_Cabecera',$idPedido);
+      
+        return $this->db->get()->row();
+    } 
+
 }

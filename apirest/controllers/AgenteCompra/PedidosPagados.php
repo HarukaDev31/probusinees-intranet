@@ -2038,10 +2038,10 @@ class PedidosPagados extends CI_Controller
                 
             }
             if($step==4){
-                if($priviligie==$this->personalChinaPrivilegio || $priviligie==$this->personalPeruPrivilegio){
-                    $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
+                    
+                    $data = $this->PedidosPagadosModel->getPedidoBooking($idPedido);
                     echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
-                }   
+                 
             }
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
@@ -2494,4 +2494,24 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->updateExcelOrderPagos($data);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    /*Functions to Booking Step */
+    public function saveFCLBooking(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->saveFCLBooking($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getNavieras(){
+        $response = $this->PedidosPagadosModel->getNavieras();
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getContainer(){
+        $response = $this->PedidosPagadosModel->getContainer();
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getShipper(){
+        $idPedido = $this->input->post('idPedido')??null;
+        $response = $this->PedidosPagadosModel->getShipper($idPedido);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    
 }
