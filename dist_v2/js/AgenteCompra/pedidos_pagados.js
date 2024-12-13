@@ -11495,6 +11495,7 @@ const openBookingView=async (data,id,privilegios)=>{
   const cargoType=data?.booking_tipo;
   bookingContainer.show();
   if(cargoType){
+    $("#btn-confirm-edit-booking").off("click");
     $("#btn-confirm-edit-booking").on("click",function(){
       event.preventDefault();
       //send idOrder and idBooking to backend
@@ -11510,7 +11511,7 @@ const openBookingView=async (data,id,privilegios)=>{
     await fillFlcFormSelects();
     fillFLCForm(data);
     setupDatePicker();
-
+    $('#btn-save-fcl').off('click');
     $('#btn-save-fcl').on('click', function() {
       //prevent default 
       event.preventDefault();
@@ -11527,6 +11528,7 @@ const openBookingView=async (data,id,privilegios)=>{
 
     fillLCLForm(data);
     setupDatePicker();
+    $('#btn-save-lcl').off('click');
     $('#btn-save-lcl').on('click', function() {
       //prevent default
       event.preventDefault();
@@ -11538,6 +11540,8 @@ const openBookingView=async (data,id,privilegios)=>{
     $("#btn-save-fcl").text("Editar Consolidado");
    
     showConsolidadoForm();
+    //remove event listeners
+    $("#btn-save-consolidado").off("click");
     $("#btn-save-consolidado").on("click",function(){
       event.preventDefault();
       saveConsolidadoBooking(data?.id);
@@ -11551,6 +11555,7 @@ const openBookingView=async (data,id,privilegios)=>{
                         <span class="cargo-type-toggle" data-type="lcl">LCL</span>
                         <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span>`);
   }
+  $(".cargo-type-toggle").off("click");
   $('.cargo-type-toggle').on('click', async function() {
     $('.cargo-type-toggle').removeClass('active');
     $(this).addClass('active');
@@ -11572,6 +11577,7 @@ const openBookingView=async (data,id,privilegios)=>{
         $("#btn-save-consolidado").hide();
       }
       await fillFlcFormSelects();
+      $('#btn-save-fcl').off('click');
       $('#btn-save-fcl').on('click', function() {
         //prevent default 
         event.preventDefault();
@@ -11589,6 +11595,7 @@ const openBookingView=async (data,id,privilegios)=>{
         $("#btn-save-lcl").hide();
         $("#btn-save-consolidado").hide();
       }
+      $('#btn-save-lcl').off('click');
       $('#btn-save-lcl').on('click', function() {
         //prevent default
         event.preventDefault();
@@ -11606,6 +11613,8 @@ const openBookingView=async (data,id,privilegios)=>{
         $("#btn-save-consolidado").hide();
        
       }
+      //remove event listeners
+      $("#btn-save-consolidado").off("click");
       $("#btn-save-consolidado").on("click",function(){
         event.preventDefault();
         saveConsolidadoBooking(data?.id);
@@ -11613,9 +11622,8 @@ const openBookingView=async (data,id,privilegios)=>{
       
     }
     setupDatePicker();
-  
-    
   });
+  $(".btn-back-booking").off("click");
   $("#btn-save-shipper").on("click", async function(event) {
     event.preventDefault();
     const formData = new FormData();
@@ -11633,6 +11641,7 @@ const openBookingView=async (data,id,privilegios)=>{
       }
     });
   });
+  $("#btn-save-country").off("click");
   $("#btn-save-country").on("click", async function(event) {
     event.preventDefault();
     const formData = new FormData();

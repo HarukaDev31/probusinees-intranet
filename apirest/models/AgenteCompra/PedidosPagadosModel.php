@@ -65,10 +65,15 @@ class PedidosPagadosModel extends CI_Model
         // ->join($this->table_payments . ' AS PAY', 'PAY.id_pedido = ' . $this->table . '.ID_Pedido_Cabecera', 'left')
         //->join($this->table_usuario_intero . ' AS USRCHINA', 'USRCHINA.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa_China', 'left')
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
+            
             ->where_in($this->table . '.Nu_Estado_General', array(4));
 
         //$this->db->where("Fe_Emision_Cotizacion BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
-        $this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
+      //where ID_Estado_Orden!=4
+        if(!empty($this->input->post('Filtro_Estado'))!=0 ) {
+            $this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
+
+        }
         if (!empty($this->input->post('Filtro_Estado')) &&
             $this->input->post('Filtro_Estado') != '0') {
             $this->db->where($this->table . '.ID_Estado_Orden', $this->input->post('Filtro_Estado'));
