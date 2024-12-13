@@ -11494,11 +11494,18 @@ const openBookingView=async (data,id,privilegios)=>{
   $("#bookingForm").empty();
   const cargoType=data?.booking_tipo;
   bookingContainer.show();
-
+  if(cargoType){
+    $("#btn-confirm-edit-booking").on("click",function(){
+      event.preventDefault();
+      //send idOrder and idBooking to backend
+      const idBooking=data?.id;
+      editBooking(idBooking);
+    });
+  }
   if(cargoType==="FCL"){
     showFLCForm();
     $("#booking-tipo-header").empty();
-    $("#booking-tipo-header").append("<h3 class=' font-semibold text-gray-800'>FCL</h3>");
+    $("#booking-tipo-header").append("<h3 class=' font-semibold'>FCL</h3>");
     $("#btn-save-fcl").text("Editar FCL");
     await fillFlcFormSelects();
     fillFLCForm(data);
@@ -11514,7 +11521,7 @@ const openBookingView=async (data,id,privilegios)=>{
   }else if(cargoType==="LCL"){
     showLCLForm();
     $("#booking-tipo-header").empty();
-    $("#booking-tipo-header").append("<h3 class=' font-semibold text-gray-800'>LCL</h3>");
+    $("#booking-tipo-header").append("<h3 class=' font-semibold'>LCL</h3>");
     $("#btn-save-lcl").text("Editar LCL");
     await fillLclFormSelects();
 
@@ -11527,7 +11534,7 @@ const openBookingView=async (data,id,privilegios)=>{
     });
   }else if (cargoType==="CONSOLIDADO"){
     $("#booking-tipo-header").empty();
-    $("#booking-tipo-header").append("<h3 class=' font-semibold text-gray-800'>CONSOLIDADO</h3>");
+    $("#booking-tipo-header").append("<h3 class=' font-semibold'>CONSOLIDADO</h3>");
     $("#btn-save-fcl").text("Editar Consolidado");
    
     showConsolidadoForm();
@@ -11556,6 +11563,14 @@ const openBookingView=async (data,id,privilegios)=>{
     // Show/hide FCL specific fields
     if (cargoType === 'fcl') {
       showFLCForm();
+      fillFLCForm(data);
+      if(currentPrivilege!=priviligesJefeChina){
+        //disable form inputs and hide save buttons 
+        $(".form-control").prop("disabled", true);
+        $("#btn-save-fcl").hide();
+        $("#btn-save-lcl").hide();
+        $("#btn-save-consolidado").hide();
+      }
       await fillFlcFormSelects();
       $('#btn-save-fcl').on('click', function() {
         //prevent default 
@@ -11565,7 +11580,15 @@ const openBookingView=async (data,id,privilegios)=>{
       });
     } else if (cargoType === 'lcl') {
       showLCLForm();
+      fillLCLForm(data);
       await fillLclFormSelects();
+      if(currentPrivilege!=priviligesJefeChina){
+        //disable form inputs and hide save buttons 
+        $(".form-control").prop("disabled", true);
+        $("#btn-save-fcl").hide();
+        $("#btn-save-lcl").hide();
+        $("#btn-save-consolidado").hide();
+      }
       $('#btn-save-lcl').on('click', function() {
         //prevent default
         event.preventDefault();
@@ -11573,7 +11596,16 @@ const openBookingView=async (data,id,privilegios)=>{
       });
     } else if(cargoType === 'consolidado'){
       showConsolidadoForm();
+      fillConsolidadoForm(data);
       await fillConsolidadoSelects();
+      if(currentPrivilege!=priviligesJefeChina){
+        //disable form inputs and hide save buttons 
+        $(".form-control").prop("disabled", true);
+        $("#btn-save-fcl").hide();
+        $("#btn-save-lcl").hide();
+        $("#btn-save-consolidado").hide();
+       
+      }
       $("#btn-save-consolidado").on("click",function(){
         event.preventDefault();
         saveConsolidadoBooking(data?.id);
@@ -11624,14 +11656,36 @@ const openBookingView=async (data,id,privilegios)=>{
     closeBookingView();
     getOrderProgress(id);
   });
+  // $(".btn-edit-booking").on("click",function(){
+  //   event.preventDefault();
+    
+  // });
+  
   if(currentPrivilege!=priviligesJefeChina){
     //disable form inputs and hide save buttons 
     $(".form-control").prop("disabled", true);
     $("#btn-save-fcl").hide();
     $("#btn-save-lcl").hide();
     $("#btn-save-consolidado").hide();
+    $(".btn-edit-booking").hide();
   }
 }
+function editBooking(idBooking){
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/editBooking",
+    type: "POST",
+    dataType: "JSON",
+    data: { idBooking: idBooking,
+      idPedido: idPedido,
+     },
+    success: function(data) {
+      openStepFunction(4,idPedido);
+      $("#editBooking").modal("hide");
+    }
+  });
+  
+}
+
 function setupDatePicker() {
   $(".input-date").datepicker({
     autoclose: true,
@@ -11805,16 +11859,17 @@ const showFLCForm= ()=>{
                           </div>
                       <div class="grid gap-2">
                           <div class="mb-3">
-                            <label for="codShipper" class="form-label w-100">Cod. Shipper
-              <button
-              data-toggle="modal"
-              data-target="#newShipperDialog"
-              type="button" class="btn btn-success addShipperBtn">+</button>
+                            <label for="codShipper" class="w-100" >Cod. Shipper
                             </label>
-                            <select id="codShipper" name="codShipper" class="form-control">
-                                <option value="">Seleccionar código</option class="form-control">
-                              
-                            </select>
+                            <div class="input-group mb-3">
+                              <select id="codShipper" name="codShipper" class="form-control">
+                                  <option value="">Seleccionar código</option class="form-control"> 
+                              </select>
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="modal" data-target="#newShipperDialog" id="basic-addon1">+</span>
+                                <span class="input-group-text"  onclick="deleteShipper()" id="deleteShipperButton">-</span>
+                                </div>
+                            </div>
                           </div>
                         </div>
                       <div class="grid gap-2">
@@ -11842,7 +11897,6 @@ const showFLCForm= ()=>{
                   </div>
 
                   <div class="form-section">
-                      <button  class="btn btn-outline-secondary btn-back-booking">Volver</button>
                       <button  type="submit" id="btn-save-fcl" class="btn btn-outline-secondary">Guardar Booking</button>
                   </div>
               </div>`;
@@ -11898,9 +11952,13 @@ const fillPaisSelect=async ()=>{
     success: function (response) {
       const { status, data } = JSON.parse(response);
       $('#pais').empty();
-      $('#pais').append(`<option value="">Seleccionar país</option>`);
+      $('#pais').append(`<option value="">Seleccionar país
+       
+        </option>`);
       data.forEach(item => {
-        $('#pais').append(`<option value="${item.id}">${item.name}</option>`);
+        $('#pais').append(`<option value="${item.id}">${item.name}
+          
+          </option>`);
       });
     }
   });
@@ -11976,16 +12034,19 @@ const showLCLForm= ()=>{
                      
                        <div class="grid gap-2">
                          <div class="mb-3">
-                            <label for="codShipper" class="w-100" >Cod. Shipper
-                                                        <button 
-                                                        data-toggle="modal" data-target="#newShipperDialog"
-                                                        type="button" class="btn btn-success addShipperBtn" >+</button>
-
+                            <label for="codShipper" class="w-100" >Cod. Shipper                       
                             </label>
+                            <div class="input-group mb-3">
                             <select id="codShipper" name="codShipper" class="form-control">
                                 <option value="">Seleccionar código</option class="form-control">
-                              
                             </select>
+                            
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="modal" data-target="#newShipperDialog" id="basic-addon1">+</span>
+                                <span class="input-group-text"  onclick="deleteShipper()" id="deleteShipperButton">-</span>
+                                </div>
+                            </div>
+                          
                           </div>
                       </div>
                       <div class="grid gap-2">
@@ -12011,7 +12072,6 @@ const showLCLForm= ()=>{
                   </div>
 
                   <div class="form-section">
-                      <button  class="btn btn-outline-secondary btn-back-booking">Volver</button>
                       <button id="btn-save-lcl" class="btn btn-outline-secondary">Guardar Booking</button>
                   </div>
             </div>`;
@@ -12027,15 +12087,19 @@ const showConsolidadoForm= ()=>{
               <div class="grid gap-2">
                 <div class="mb-3">
                 <label for="tc" class="form-label w-100">PAÍS
-                <button type="button" class="btn btn-success"
-                data-toggle="modal" data-target="#newCountryDialog"
-                id="addPaisButton">+</button>
+
                 </label>
+                <div class="input-group mb-3">
                 <select id="pais" name="pais" class="form-control">
                   <option value="">Seleccionar país</option>
-                  <option value="china">PERU</option>
-                  <option value="china">ECUADOR</option>
+                
                 </select>
+                <div class="input-group-prepend">
+                  <span class="input-group-text"  data-toggle="modal" data-target="#newCountryDialog"
+                id="addPaisButton">+</span>
+                 <span class="input-group-text"  onclick="deleteCountry()" id="deletePaisButton">-</span>
+                </div>
+                </div>
                 </div>
               </div>
               <div class="grid gap-2">
@@ -12046,7 +12110,6 @@ const showConsolidadoForm= ()=>{
                 </div>
               </div>
           <div class="form-section">
-                      <button  class="btn btn-outline-secondary btn-back-booking">Volver</button>
                       <div id="btn-save-consolidado" class="btn btn-outline-secondary">Guardar Booking</button>
                   </div>
           </div>`;
@@ -12055,6 +12118,43 @@ const showConsolidadoForm= ()=>{
 const hideConsolidadoForm= ()=>{
   $('#consolidadoDetails').remove();
 }
+const deleteShipper=()=>{
+  const shipper = $('#codShipper').val();
+  if(shipper!=""){
+    //show confirmation dialog
+    const r = confirm("¿Está seguro de eliminar el shipper seleccionado?");
+    if (r == true) {
+      $.ajax({
+        url: base_url + "AgenteCompra/PedidosPagados/deleteShipper",
+        type: 'POST',
+        data: {
+          shipper,
+        },
+        success: function (data) {
+          fillCodShipperSelect();
+        }
+      });
+    }
+  }
+}
+const deleteCountry=()=>{
+  const pais = $('#pais').val();
+  if(pais!=""){
+    //show confirmation dialog
+    const r = confirm("¿Está seguro de eliminar el país seleccionado?");
+    if (r == true) {
+      $.ajax({
+        url: base_url + "AgenteCompra/PedidosPagados/deleteCountry",
+        type: 'POST',
+        data: {
+          pais,
+        },
+        success: function (data) {
+          fillPaisSelect();
+        }
+      });
+    }}}
+
 const saveFCLBooking=(id=null)=>{
   const client = $('#client').val();
   const tc = $('#tc').val();

@@ -2537,4 +2537,19 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->saveConsolidadoBooking($data);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    public function editBooking(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->editBooking($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function deleteCountry(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->deleteCountry($data['pais']);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function deleteShipper(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->deleteShipper($data['shipper']);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
 }

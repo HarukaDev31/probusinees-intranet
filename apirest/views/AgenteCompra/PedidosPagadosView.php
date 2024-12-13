@@ -728,20 +728,32 @@
       <!-- /.row -->
    
 
-      <section class="min-h-screen bg-white booking-container container-fluid px-3" id="booking-container">
+      <section class="min-h-screen bg-white booking-container container-fluid px-3 w-75" id="booking-container">
                 <header id="booking-header">
-                <h2 class="text-gray-800 text-xl mb-4">Booking</h2>
-
-         
+                  <div class="d-flex justify-content-between mb-4">
+                    <div>
+                      <h2 class="text-xl mb-2">Booking</h2>
+                      <h3 class="text-lg ">Selecciona el tipo de carga</h3>
+                    </div>
+                  
+                  <div>
+                  <button  class="btn btn-light btn-back-booking"><i class="fas fa-arrow-left"></i></button>
+                  <div  class="btn btn-light btn-edit-booking"
+                  data-toggle="modal"
+                  data-target="#editBooking"
+                  ><i class="fas fa-edit"></i></div>
+                  </div>
+                  </div>
+               
                     <div class="space-y-8" id="booking-tipo-header">
                         <!-- <span class="cargo-type-toggle" data-type="fcl">FCL</span>
                         <span class="cargo-type-toggle" data-type="lcl">LCL</span>
                         <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span> -->
                     </div>
-            
+
                   </header>
 
-                  <form id="bookingForm" class="mt-3">
+                  <form id="bookingForm" class="mt-3 px-2">
                     <input type="hidden" id="cargoTypeInput" name="cargoType">
               
                     <div class="form-section">
@@ -754,7 +766,25 @@
           
     <!-- /.container-fluid -->
   </section>
-
+  <div class="modal fade" tabindex="-1" id="editBooking">
+    <div class="modal-dialog modal-lg" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Booking</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!--ask if are you sure to edit, this delete all the data-->
+                      <span>¿Estás seguro de editar el booking? Esto eliminará todos los datos ingresados</span>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                      <button type="button" class="btn btn-primary" id="btn-confirm-edit-booking">Aceptar</button>
+                    </div>
+                </div>
+    </div>
+  </div>
+                            
   <!-- /.content -->
   <div class="modal fade" tabindex="-1" id="newShipperDialog">
   <div class="modal-dialog modal-lg" >
@@ -3994,6 +4024,104 @@ echo form_open('', $attributes);?>
             color: white; 
         }
         /**add  tailwind styles   to improve the UI */
- 
+        #booking-header{
+          padding: 1.2em;
+          border-top-left-radius: 1em;
+          border-top-right-radius: 1em;
+          background-color: #85c1e9; 
+          color: white;
+        }
+        /* Container for the custom dropdown */
+.custom-dropdown {
+    position: relative;
+    width: 300px; /* Adjust width as needed */
+    font-family: Arial, sans-serif;
+}
+
+/* Dropdown wrapper */
+.custom-dropdown-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Individual country option */
+.country-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.3s ease;
+}
+
+.country-option:last-child {
+    border-bottom: none;
+}
+
+.country-option:hover {
+    background-color: #f5f5f5;
+}
+
+/* Country name text */
+.country-option span {
+    flex-grow: 1;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Add button styles */
+.add-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.1);
+}
+
+.add-btn i {
+    font-size: 16px;
+}
+
+/* Dropdown header/placeholder */
+.custom-dropdown-header {
+    padding: 10px 15px;
+    background-color: #f1f1f1;
+    font-weight: bold;
+    color: #666;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Scrollbar customization (for modern browsers) */
+.custom-dropdown-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-dropdown-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.custom-dropdown-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.custom-dropdown-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
   </style>
   <?php echo form_close(); ?>

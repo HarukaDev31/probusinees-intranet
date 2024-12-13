@@ -3861,14 +3861,36 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     public function getShipper($idPedido=null){
         $this->db->select('id,name');
         $this->db->from($this->tableOrdenBookingShipper);
-        $this->db->where('id_pedido is null or id_pedido='.$idPedido);
+        $this->db->where('deleted_at is null');
         return $this->db->get()->result();
 
     }
     public function getPedidoBooking($idPedido){
-        $this->db->select('booking_tipo,agente_compra_pedido_booking_details.*');
+        $this->db->select('booking_tipo,
+        agente_compra_pedido_booking_details.id,
+        agente_compra_pedido_booking_details.id_pedido,
+        agente_compra_pedido_booking_details.id_naviera,
+        agente_compra_pedido_booking_details.id_contenedor_tipo,
+        agente_compra_pedido_booking_details.id_pais_booking,
+        ifnull(agente_compra_pedido_booking_details.client, entidad.No_Entidad) as client,
+        agente_compra_pedido_booking_details.inland,
+        agente_compra_pedido_booking_details.flete,
+        agente_compra_pedido_booking_details.dias_transito,
+        agente_compra_pedido_booking_details.cut_off,
+        agente_compra_pedido_booking_details.etd,
+        agente_compra_pedido_booking_details.eta,
+        agente_compra_pedido_booking_details.box_fee,
+        agente_compra_pedido_booking_details.id_shipper,
+        ifnull(agente_compra_pedido_booking_details.nu_order,cotizacionCode) as nu_order,
+        agente_compra_pedido_booking_details.cod_bl,
+        agente_compra_pedido_booking_details.servicio,
+        agente_compra_pedido_booking_details.consolidado,
+
+        
+        ');
         $this->db->from($this->table);
-        $this->db->join($this->tableOrdenBookingDetail,'agente_compra_pedido_cabecera.ID_Pedido_Cabecera=agente_compra_pedido_booking_details.id_pedido');
+        $this->db->join($this->tableOrdenBookingDetail,'agente_compra_pedido_cabecera.ID_Pedido_Cabecera=agente_compra_pedido_booking_details.id_pedido','left');
+        $this->db->join('entidad','agente_compra_pedido_cabecera.ID_Entidad=entidad.ID_Entidad','left');
         $this->db->join($this->tableOrdenBookingNaviera,'agente_compra_pedido_booking_details.id_naviera=agente_compra_booking_naviera.id','left');
         $this->db->join($this->tableOrdenBookingContainer,'agente_compra_pedido_booking_details.id_contenedor_tipo=agente_compra_booking_container.id','left');
         $this->db->join($this->tableOrdenBookingShipper,'agente_compra_pedido_booking_details.id_shipper=agente_compra_booking_shipper.id','left'); 
@@ -3889,7 +3911,28 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
     public function getBookingCountries(){
         $this->db->select('id,name');
         $this->db->from($this->tableOrdenBookingCountry);
+        $this->db->where('deleted_at is null');
         return $this->db->get()->result();
+    }
+    public function editBooking($data){
+        $idBooking=$data['idBooking'];
+        $idPedido=$data['idPedido'];
+        $this->db->where('id',$idBooking);
+        $this->db->delete($this->tableOrdenBookingDetail);
+        
+        $this->db->where('ID_Pedido_Cabecera',$idPedido);
+        $this->db->update($this->table,['booking_tipo'=>null]);
+        return ['status' => 'success', 'message' => 'Booking eliminado'];
+    }
+    public function deleteCountry($id){
+        $this->db->where('id',$id);
+        $this->db->update($this->tableOrdenBookingCountry,['deleted_at'=>date('Y-m-d H:i:s')]);
+        return ['status' => 'success', 'message' => 'Country eliminado'];
+    }
+    public function deleteShipper($id){
+        $this->db->where('id',$id);
+        $this->db->update($this->tableOrdenBookingShipper,['deleted_at'=>date('Y-m-d H:i:s')]);
+        return ['status' => 'success', 'message' => 'Shipper eliminado'];
     }
     
 }
