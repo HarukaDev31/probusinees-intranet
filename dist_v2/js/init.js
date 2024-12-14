@@ -115,3 +115,6 @@ function validateCodigoBarra(){
     this.value = this.value.replace(/[^a-zA-Z0-9\-]/g,'');
   });
 }
+$(document).ready(function(){
+  $(".backdrop").hide();
+});

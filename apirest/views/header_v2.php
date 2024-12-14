@@ -110,8 +110,12 @@
 
   <input type="hidden" id="hidden-id_menu" class="form-control" value="<?php echo (isset($this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu) ? $this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu : 0); ?>">
   
-  <div class="wrapper">
+  <div class="wrapper" style="position: relative;">
     <!-- Navbar -->
+    <div class="backdrop">
+      <div class="spinner-border text-primary" role="status">
+      </div>
+    </div>
     <nav class="main-header navbar navbar-expand navbar-dark">
       <!-- Left navbar links -->
       <ul class="navbar-nav">
@@ -291,3 +295,24 @@
       </div>
       <!-- /.sidebar -->
     </aside>
+  <style>
+    .backdrop {
+      z-index: 10000;
+      position: absolute;
+      height: 100%;
+      top: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    }
+    .spinner-border {
+    width: 4em;
+    height: 4em;
+    line-height: 10em;
+    /* font-weight: 500; */
+    font-size: 2em;
+    }
+  </style>

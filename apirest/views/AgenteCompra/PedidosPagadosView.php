@@ -27,7 +27,7 @@
                   <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
                   <div class="form-group">
                     <input type="text" id="txt-Fe_Inicio" class="form-control input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
-                    <span class="help-block text-danger" id="error"></span>
+                    <span class="helpe-block text-danger" id="error"></span>
                   </div>
                 </div>
                 <div class="col-6 col-sm-3">
@@ -770,12 +770,15 @@
     <div class="modal-dialog modal-lg" >
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Editar Booking</h5>
+                        <h5 class="modal-title">Cambiar Tipo de Carga</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                       <!--ask if are you sure to edit, this delete all the data-->
-                      <span>¿Estás seguro de editar el booking? Esto eliminará todos los datos ingresados</span>
+                      <span>¿Estás seguro de cambiar el tipo de carga? </span>
+                      <span>
+                            Esto eliminará todos los datos ingresados
+                      </span>
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -867,7 +870,7 @@
                 </button>
             </div>
             <div class="modal-body" id="upload-body">
-                <input type="file" class="form-control-file" id="file-input" accept=
+                <input type="file" class="form-control-file" id="file-input-modal" accept=
                 ".xls,.xlsx,.csv"
                 >
             </div>
@@ -4122,6 +4125,22 @@ echo form_open('', $attributes);?>
 
 .custom-dropdown-wrapper::-webkit-scrollbar-thumb:hover {
     background: #555;
-}
+} 
+.error { 
+  color: red;
+  font-size: 0.9em;
+  display: block;
+  margin-top: 0.5em;
+  width: 100%;
+ }
+  input.error { 
+  border: 1px solid red;
+  color: black; 
+  }
+  select.error {
+    border: 1px solid red;
+    color: black;
+  }
+
   </style>
   <?php echo form_close(); ?>

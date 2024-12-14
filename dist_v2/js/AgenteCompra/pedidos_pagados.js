@@ -50,7 +50,7 @@ let selectedStep = null;
 let containerSteps = null;
 let containerPagos = null;
 let containerCoordination = null;
-
+let spinner=null;
 let currentServicio = 1;
 let containerExcelPagos = null;
 let containerExcelPagosDetalle = null;
@@ -59,7 +59,8 @@ let containerExcelHeaderPagos = null;
 let idPedidoDetalle = null;
 let pagosButtons = null;
 $(function () {
-  
+  spinner= $(".backdrop");
+  spinner.show();
   sectionTitle = $("#section-title");
   containerVer = $("#container-ver");
   containerVer.hide();
@@ -2451,6 +2452,7 @@ $(function () {
     $("#modal-cambio_item_proveedor").modal("show");
     $("#form-cambio_item_proveedor")[0].reset();
   });
+  spinner.hide();
 });
 
 function reload_table_Entidad() {
@@ -7338,7 +7340,9 @@ const openStepFunction = async (i, stepId) => {
   $.post(url, { idPedido: idPedido, step: i }, async function (response) {
     const responseParsed = JSON.parse(response);
     currentPrivilege = responseParsed.priviligie;
+    spinner.show();
     if (i == 1) {
+      
       await openOrdenCompra(response);
     }
     if (i == 2) {
@@ -7357,6 +7361,7 @@ const openStepFunction = async (i, stepId) => {
     if (i == 4) {
       openBookingView(responseParsed.data, idPedido, currentPrivilege);
     }
+    spinner.hide();
   });
 };
 const openInspectionView = (data, idPedido, currentPrivilege) => {
@@ -8832,7 +8837,9 @@ const openOrdenCompra = async (response) => {
     $(".row.buttons").remove();
     $(".orden-compra_header").show();
     currentPrivilege = parseInt(priviligie);
+    spinner.show();
     const excelData = await getExcelOrdersList(idPedido);
+    spinner.hide();
     $(".orden-compra-header-excel-container").empty();
     if (excelData.length == 0 && currentPrivilege == priviligesPersonalChina) {
       //set backgroun color to gray and remove onclick event
@@ -8853,7 +8860,10 @@ const openOrdenCompra = async (response) => {
       const firstId = firstProduct.id;
       console.log(firstProduct.total);
       $("#valor-total-excel-orden").text("$" + firstProduct.total);
-      const detailsData = await getExcelOrderDetails(firstId);
+      spinner.show();
+      const detailsData = 
+      await getExcelOrderDetails(firstId);
+      spinner.hide();
       //set selected element with class card-custom and data-id = firstId
       $(`.card-custom[data-id=${firstId}]`).addClass("selected");
       detailsData.forEach((producto, index) => {
@@ -9991,7 +10001,7 @@ const getExcelOrderItem = (itemData, index, count) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalChina) && (index == count - 1 && index != 0) ? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalChina) && ((index==0 && count<=1)||(index!=0) )? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrder(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10047,7 +10057,7 @@ const getExcelOrderItemPagos = (itemData, index, length) => {
 
 
 $(document).ready(function () {
-  $('#file-input').on('change', function () {
+  $('#file-input-modal').on('change', function () {
     if ($(this).val()) {
       $('.upload-btn').prop('disabled', false);
     } else {
@@ -10056,12 +10066,15 @@ $(document).ready(function () {
   });
 
   $('.upload-btn').on('click', function () {
+    spinner.show();
     if (selectedStepid == 1) {
+
       const url = base_url + "AgenteCompra/PedidosPagados/uploadExcelPurchaseOrder";
       const formData = new FormData();
-      formData.append('file', $('#file-input')[0].files[0]);
+      formData.append('file', $('#file-input-modal')[0].files[0]);
       formData.append('idPedido', idPedido);
       formData.append('step', selectedStep);
+      
       $.ajax({
         url,
         type: 'POST',
@@ -10069,15 +10082,18 @@ $(document).ready(function () {
         contentType: false,
         processData: false,
         success: async function (response) {
-          $('#file-input').val('');
+          $('#file-input-modal').val('');
           $('.upload-btn').prop('disabled', true);
           $('#uploadModal').modal('hide');
-          const excelData = await getExcelOrdersList(idPedido);
+
+          const excelData = 
+          await getExcelOrdersList(idPedido);
+          spinner.hide();
           $(".orden-compra-header-excel-container").empty();
           let index = 0;
           excelData.forEach((item) => {
             const itemTest = getExcelOrderItem(item, index, excelData.length);
-
+            index++;
             $(".orden-compra-header-excel-container").append(itemTest);
           });
           addEventsToExcelItems();
@@ -10098,12 +10114,13 @@ $(document).ready(function () {
     } else if (selectedStepid == 2 && showPagosDocuments) {
       const url = base_url + "AgenteCompra/PedidosPagados/uploadExcelSeekingPagosDocument";
       const formData = new FormData();
-      formData.append('file', $('#file-input')[0].files[0]);
+      formData.append('file', $('#file-input-modal')[0].files[0]);
       formData.append('idPedido', idPedido);
       formData.append('step', selectedStep);
       formData.append('idPagoDetalle', idPedidoDetalle);
       formData.append('pagoValue', $('#pago-value').val());
       formData.append('idPagoId', selectedOrderPagoId);
+      
       $.ajax({
         url,
         type: 'POST',
@@ -10111,17 +10128,16 @@ $(document).ready(function () {
         contentType: false,
         processData: false,
         success: async function (response) {
-          console.log(response);
-          $('#file-input').val('');
+          $('#file-input-modal').val('');
           $('.upload-btn').prop('disabled', true);
           $('#uploadModal').modal('hide');
           //append input to .modal-body in #uploadModal
           $("#pago-value").remove();
-
-
           const excelData = await openPagosSeekingDetailDocuments(idPedidoDetalle);
+          spinner.hide();
           //get data-total from all items with card-custom class
 
+          // spinner.show();
           // await fillPagosSeekingDetailDocuments(
           //   containerExcelHeaderPagosDetalle,
           //   excelData);
@@ -10131,7 +10147,7 @@ $(document).ready(function () {
     else if (selectedStepid == 2) {
       const url = base_url + "AgenteCompra/PedidosPagados/uploadExcelSeekingPagos";
       const formData = new FormData();
-      formData.append('file', $('#file-input')[0].files[0]);
+      formData.append('file', $('#file-input-modal')[0].files[0]);
       formData.append('idPedido', idPedido);
       formData.append('step', selectedStep);
       $.ajax({
@@ -10142,9 +10158,10 @@ $(document).ready(function () {
         processData: false,
         success: async function (response) {
           console.log(response);
-          $('#file-input').val('');
+          $('#file-input-modal').val('');
           $('.upload-btn').prop('disabled', true);
           $('#uploadModal').modal('hide');
+        
           const excelData = await getExcelOrderPaymentsSeekingList(idPedido);
           fillExcelOrderPaymentsSeeking(
             containerExcelHeaderPagos,
@@ -10154,6 +10171,7 @@ $(document).ready(function () {
             const lastItem = $(".card-custom").last();
             lastItem.click();
           }
+          spinner.hide();
         }
       });
 
@@ -10166,6 +10184,7 @@ $(document).ready(function () {
 const getExcelOrdersList = async ($idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrdersList";
   try {
+
     const response = await $.ajax({
       url,
       type: 'POST',
@@ -10181,7 +10200,8 @@ const getExcelOrdersList = async ($idPedido) => {
 const getExcelOrderPaymentsSeekingList = async ($idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingList";
   try {
-    const response = await $.ajax({
+    const response = 
+    await $.ajax({
       url,
       type: 'POST',
       data: { idPedido: $idPedido },
@@ -10223,7 +10243,8 @@ const fillExcelOrderPaymentsSeeking = (container, data) => {
 const getExcelOrderPaymentsSeekingDetails = async (id) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingDetails";
   try {
-    const response = await $.ajax({
+    const response = 
+    await $.ajax({
       url,
       type: 'POST',
       data: { idOrder: id },
@@ -10238,7 +10259,8 @@ const getExcelOrderPaymentsSeekingDetails = async (id) => {
 const getExcelOrderDetails = async (id) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderDetails";
   try {
-    const response = await $.ajax({
+    const response = 
+    await $.ajax({
       url,
       type: 'POST',
       data: { idOrder: id },
@@ -10260,6 +10282,7 @@ const addEventsToExcelItems = () => {
       console.log(total)
       $("#valor-total-excel-orden").text("$" + total);
 
+      spinner.show();
       const detailsData = await getExcelOrderDetails(id);
       $(".row.producto").remove();
       $(".row.buttons").remove();
@@ -10325,6 +10348,7 @@ const addEventsToExcelItems = () => {
         $(".row.producto").remove();
       }
     }
+    spinner.hide();
   });
   $('.btn-item-actions').on('click', function (e) {
     e.stopPropagation();
@@ -10407,7 +10431,9 @@ const addEventToOrdenPagosExcel = () => {
       const total = $(this).attr('data-total');
       $("#valor-total-excel").text("¥" + total);
 
-      const detailsData = await getExcelOrderPaymentsSeekingDetails(id);
+      spinner.show();
+      const detailsData = 
+      await getExcelOrderPaymentsSeekingDetails(id);
       $(".producto").remove();
       $(".buttons").remove();
   
@@ -10462,6 +10488,7 @@ const addEventToOrdenPagosExcel = () => {
       }
       pagosButtons.append(getActionButtons(actionButtons));
       pagosButtons.show();
+      spinner.hide();
     }
   });
 }
@@ -10755,7 +10782,9 @@ const openPagosSeekingDetailDocuments = async (id) => {
   idPedidoDetalle = id;
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingDetailDocument";
   try {
-    const response = await $.ajax({
+
+    const response = 
+    await $.ajax({
       url,
       type: 'POST',
       data: {
@@ -10764,6 +10793,7 @@ const openPagosSeekingDetailDocuments = async (id) => {
     });
     showPagosDocuments = true;
     const data = JSON.parse(response).data;
+    // spinner.show();
     // await fillPagosSeekingDetailDocuments(containerExcelHeaderPagosDetalle, data.data);
     const productoRow = getExcelOrderPaymentsSeekingFilesTemplate(data);
     $("#orden-compra_body-detalle-excel").empty();
@@ -10800,10 +10830,14 @@ const fillPagosSeekingDetailDocuments = async (container, data) => {
   containerExcelPagos.hide();
   $(".card-custom").remove();
   data.forEach(async (item, index) => {
-    const itemTest = await getExcelOrderPagosDocumentsItem(item, index, data.length);
+    spinner.show();
+    const itemTest = 
+    await getExcelOrderPagosDocumentsItem(item, index, data.length);
     container.append(itemTest);
   }
+
   );
+  spinner.hide();
 
 }
 const getExcelOrderPagosDocumentsItem = async (itemData, index, length) => {
@@ -11410,8 +11444,10 @@ async function getInternetSpeed() {
   const fileUrl = "https://cargaconsolidadaback.probusiness.pe/storage/RC7VD9KRltwn4hEzPrrSz6Tbv6IIr2C1laOIqPa6.png";
   const startTime = Date.now();
   try {
-    const response = await fetch(fileUrl, { method: 'GET', cache: 'no-store' });
-    const blob = await response.blob();
+     response = 
+    await fetch(fileUrl, { method: 'GET', cache: 'no-store' });
+    const blob = 
+    await response.blob();
     const endTime = Date.now();
 
     const fileSizeInBits = blob.size * 8; // Tamaño del archivo en bits
@@ -11490,6 +11526,7 @@ const closeBookingView=()=>{
   bookingContainer.hide();
 }
 const openBookingView=async (data,id,privilegios)=>{
+  spinner.show();
   containerOrdenCompra.hide();
   $("#bookingForm").empty();
   const cargoType=data?.booking_tipo;
@@ -11507,7 +11544,8 @@ const openBookingView=async (data,id,privilegios)=>{
     showFLCForm();
     $("#booking-tipo-header").empty();
     $("#booking-tipo-header").append("<h3 class=' font-semibold'>FCL</h3>");
-    $("#btn-save-fcl").text("Editar FCL");
+    // $("#btn-save-fcl").text("Editar FCL");
+ 
     await fillFlcFormSelects();
     fillFLCForm(data);
     setupDatePicker();
@@ -11523,7 +11561,8 @@ const openBookingView=async (data,id,privilegios)=>{
     showLCLForm();
     $("#booking-tipo-header").empty();
     $("#booking-tipo-header").append("<h3 class=' font-semibold'>LCL</h3>");
-    $("#btn-save-lcl").text("Editar LCL");
+    // $("#btn-save-lcl").text("Editar LCL");
+    spinner.show();
     await fillLclFormSelects();
 
     fillLCLForm(data);
@@ -11537,7 +11576,7 @@ const openBookingView=async (data,id,privilegios)=>{
   }else if (cargoType==="CONSOLIDADO"){
     $("#booking-tipo-header").empty();
     $("#booking-tipo-header").append("<h3 class=' font-semibold'>CONSOLIDADO</h3>");
-    $("#btn-save-fcl").text("Editar Consolidado");
+    // $("#btn-save-fcl").text("Editar Consolidado");
    
     showConsolidadoForm();
     //remove event listeners
@@ -11546,6 +11585,7 @@ const openBookingView=async (data,id,privilegios)=>{
       event.preventDefault();
       saveConsolidadoBooking(data?.id);
     });
+    spinner.show();
     await fillConsolidadoSelects();
     fillConsolidadoForm(data);
   }
@@ -11555,8 +11595,10 @@ const openBookingView=async (data,id,privilegios)=>{
                         <span class="cargo-type-toggle" data-type="lcl">LCL</span>
                         <span class="cargo-type-toggle" data-type="consolidado">CONSOLIDADO</span>`);
   }
+  spinner.hide();
   $(".cargo-type-toggle").off("click");
   $('.cargo-type-toggle').on('click', async function() {
+    spinner.show();
     $('.cargo-type-toggle').removeClass('active');
     $(this).addClass('active');
     
@@ -11565,7 +11607,7 @@ const openBookingView=async (data,id,privilegios)=>{
     hideFLCForm();
     hideLCLForm();
     hideConsolidadoForm();
-    // Show/hide FCL specific fields
+   
     if (cargoType === 'fcl') {
       showFLCForm();
       fillFLCForm(data);
@@ -11576,6 +11618,7 @@ const openBookingView=async (data,id,privilegios)=>{
         $("#btn-save-lcl").hide();
         $("#btn-save-consolidado").hide();
       }
+      spinner.show();
       await fillFlcFormSelects();
       $('#btn-save-fcl').off('click');
       $('#btn-save-fcl').on('click', function() {
@@ -11587,6 +11630,7 @@ const openBookingView=async (data,id,privilegios)=>{
     } else if (cargoType === 'lcl') {
       showLCLForm();
       fillLCLForm(data);
+      spinner.show();
       await fillLclFormSelects();
       if(currentPrivilege!=priviligesJefeChina){
         //disable form inputs and hide save buttons 
@@ -11604,6 +11648,7 @@ const openBookingView=async (data,id,privilegios)=>{
     } else if(cargoType === 'consolidado'){
       showConsolidadoForm();
       fillConsolidadoForm(data);
+      spinner.show();
       await fillConsolidadoSelects();
       if(currentPrivilege!=priviligesJefeChina){
         //disable form inputs and hide save buttons 
@@ -11622,6 +11667,7 @@ const openBookingView=async (data,id,privilegios)=>{
       
     }
     setupDatePicker();
+    spinner.hide();
   });
   $(".btn-back-booking").off("click");
   $("#btn-save-shipper").on("click", async function(event) {
@@ -11706,6 +11752,7 @@ function setupDatePicker() {
       
 }
 const  fillFlcFormSelects=async()=>{
+
   await Promise.all([
     fillNavieraSelect(),
     fillContenedorSelect(),
@@ -11713,11 +11760,13 @@ const  fillFlcFormSelects=async()=>{
 ]);
 }
 const fillConsolidadoSelects=async()=>{
+
   await Promise.all([
     fillPaisSelect(),
 ]);
 }
 const  fillLclFormSelects=async()=>{
+
   await Promise.all([
     fillCodShipperSelect()
 ]);
@@ -11762,7 +11811,8 @@ const showFLCForm= ()=>{
                   <div class=" grid gap-4">
                       <div class="mb-3">
                       <label for="client" class="form-label">Cliente</label>
-                      <input type="text" id="client" name="client"  class="form-control">
+                      <input  type="text" id="client" name="client"  class="form-control">
+                      <span class="error" id="error-client"></span>
                       </div>
                   </div>
 
@@ -11770,7 +11820,7 @@ const showFLCForm= ()=>{
                       <div class="grid gap-2">
                         <div class="mb-3">
                             <label for="tc">T.C.</label>
-                            <input type="text"  class="form-control" id="tc" name="tc" disabled>
+                            <input  type="text"  class="form-control" id="tc" name="tc" disabled>
                           </div>
                       </div>
                       <div class="grid gap-2">
@@ -11779,7 +11829,8 @@ const showFLCForm= ()=>{
                           <div class="input-group-prepend">
                             <span class="input-group-text" >¥</span>
                           </div>
-                            <input type="text"  class="form-control" id="rmb" name="rmb" disabled placeholder="0.00">
+                            <input  type="text"  class="form-control" id="rmb" name="rmb" disabled placeholder="0.00">
+                            <span class="error" id="error-rmb"></span>
                         </div>
                          
                       </div>
@@ -11789,7 +11840,8 @@ const showFLCForm= ()=>{
                           <div class="input-group-prepend">
                             <span class="input-group-text" >$</span>
                           </div>
-                            <input type="text"  class="form-control" id="usd" name="usd" disabled placeholder="0.00">
+                            <input  type="text"  class="form-control" id="usd" name="usd" disabled placeholder="0.00">
+                            <span class="error" id="error-usd"></span>  
                         </div>
                           
                       </div>
@@ -11803,7 +11855,8 @@ const showFLCForm= ()=>{
                               <div class="input-group-prepend">
                                 <span class="input-group-text" >¥</span>
                               </div>
-                            <input type="number"  class="form-control"id="inland" name="inland" step="0.01" placeholder="0.00">
+                            <input  type="number"  class="form-control"id="inland" name="inland" step="0.01" placeholder="0.00">
+                            <span class="error" id="error-inland"></span>
                             </div>
                           </div>
                       </div>
@@ -11814,7 +11867,8 @@ const showFLCForm= ()=>{
                               <div class="input-group-prepend">
                                 <span class="input-group-text" >$</span>
                               </div>
-                            <input type="number"  class="form-control" id="flete" name="flete" step="0.01" placeholder="0.00">
+                            <input  type="number"  class="form-control" id="flete" name="flete" step="0.01" placeholder="0.00">
+                            <span class="error" id="error-flete"></span>
                             </div>
                           </div>
                       </div>
@@ -11825,6 +11879,7 @@ const showFLCForm= ()=>{
                               <option value="">Seleccionar naviera</option>
                            
                           </select>
+                          <span class="error" id="error-naviera"></span>
                           </div>
                       </div>
                       <div class="grid gap-2">
@@ -11834,36 +11889,42 @@ const showFLCForm= ()=>{
                               <option value="">Seleccionar contenedor</option>
                         
                           </select>
+                          <span class="error" id="error-contenedor"></span>
                           </div>
                       </div>
                       <div class="grid gap-2">
                          <div class="mb-3">
                           <label for="diasTransito">Días Tránsito</label>
-                          <input type="number" id="diasTransito" name="diasTransito" min="0" class="form-control">
+                          <input  type="number" id="diasTransito" name="diasTransito" min="0" class="form-control">
+                          <span class="error" id="error-diasTransito"></span>
                         </div>
                       </div>
                       <div class="grid gap-2">
                         <div class="mb-3">
                           <label for="cutoffTrigger">Cut Off</label>
-                          <input type="text" class="input-date form-control" id="cutoffDate" name="cutoffDate" >
+                          <input  type="text" class="input-date form-control" id="cutoffDate" name="cutoffDate" >
+                          <span class="error" id="error-cutoffDate"></span>
                           </div>
                       </div>
                       <div class="grid gap-2">
                         <div class="mb-3">
                           <label for="etdTrigger">ETD</label>
-                          <input type="text" class="input-date form-control" id="etdDate" name="etdDate" >
+                          <input  type="text" class="input-date form-control" id="etdDate" name="etdDate" >
+                          <span class="error" id="error-etdDate"></span>
                         </div>
                       </div>
                       <div class="grid gap-2">
                         <div class="mb-3">  
                           <label for="etaTrigger">ETA</label>
-                          <input type="text" class="input-date form-control" id="etaDate" name="etaDate" >
+                          <input  type="text" class="input-date form-control" id="etaDate" name="etaDate" >
+                          <span class="error" id="error-etaDate"></span>
                         </div>
                       </div>
                       <div class="grid gap-2">
                       <div class="mb-3">
                           <label for="boxFree">Box Free</label>
-                          <input type="number" id="boxFree" name="boxFree" min="0" class="form-control">
+                          <input  type="number" id="boxFree" name="boxFree" min="0" class="form-control">
+                          <span class="error" id="error-boxFree"></span>
                       </div>
                           </div>
                       <div class="grid gap-2">
@@ -11874,6 +11935,7 @@ const showFLCForm= ()=>{
                               <select id="codShipper" name="codShipper" class="form-control">
                                   <option value="">Seleccionar código</option class="form-control"> 
                               </select>
+                              <span class="error" id="error-codShipper"></span>
                               <div class="input-group-prepend">
                                 <span class="input-group-text" data-toggle="modal" data-target="#newShipperDialog" id="basic-addon1">+</span>
                                 <span class="input-group-text"  onclick="deleteShipper()" id="deleteShipperButton">-</span>
@@ -11884,13 +11946,15 @@ const showFLCForm= ()=>{
                       <div class="grid gap-2">
                           <div class="mb-3">
                           <label for="norden">N. Orden</label>
-                          <input type="text" id="norden" name="norden" class="form-control">
+                          <input  type="text" id="norden" name="norden" class="form-control">
+                          <span class="error" id="error-norden"></span>
                           </div>
                       </div>
                       <div class="grid gap-2">
                         <div class="mb-3">
                           <label for="codbl">Cod. BL</label>
-                          <input type="text" id="codbl" name="codbl" class="form-control">
+                          <input  type="text" id="codbl" name="codbl" class="form-control">
+                          <span class="error" id="error-codbl"></span>
                       </div>
                           </div>
                       <div class="grid gap-2">
@@ -11901,6 +11965,7 @@ const showFLCForm= ()=>{
                                 <option value="TRADING">TRADING</option>
                                 <option value="CONSOLIDADO CHINA">CONSOLIDADO CHINA</option>
                             </select>
+                            <span class="error" id="error-servicio"></span>
                           </div>
                       </div>
                   </div>
@@ -11969,6 +12034,7 @@ const fillPaisSelect=async ()=>{
           
           </option>`);
       });
+      spinner.hide();
     }
   });
 }
@@ -11982,6 +12048,7 @@ const showLCLForm= ()=>{
                       <div class="mb-3">
                       <label for="client" class="form-label">Cliente</label>
                       <input type="text" id="client" name="client"  class="form-control">
+                      <span class="error" id="error-client"></span>
                       </div>
                   </div>
 
@@ -11990,7 +12057,8 @@ const showLCLForm= ()=>{
                           <div class="mb-3">
                             <label for="tc">T.C.</label>
                             <input type="text" id="tc" name="tc" disabled class="form-control">
-                          </div>
+                       
+                            </div>
                       </div>
                       <div class="grid gap-2">
                           <label for="rmb" class="form-label" >Total RMB</label>
@@ -12020,25 +12088,29 @@ const showLCLForm= ()=>{
                               <span class="input-group-text" >¥</span>
                             </div>
                           <input type="number"  class="form-control"id="inland" name="inland" step="0.01" placeholder="0.00">
+                          <span class="error" id="error-inland"></span>
                           </div>
                       </div>
                       <div class="grid gap-2">
                       <div class="mb-3">
                           <label for="cutoffTrigger">Cut Off</label>
                           <input type="text" class="input-date form-control" id="cutoffDate" name="cutoffDate" >
-                        </div>
+                          <span class="error" id="error-cutoffDate"></span>
+                          </div>
                           </div>
                       <div class="grid gap-2">
                       <div class="mb-3">
                           <label for="etdTrigger">ETD</label>
                           <input type="text" class="input-date form-control" id="etdDate" name="etdDate" >
-                        </div>
+                          <span class="error" id="error-etdDate"></span>
+                          </div>
                           </div>
                       <div class="grid gap-2">
                           <div class="mb-3">
                               <label for="etaTrigger">ETA</label>
                               <input type="text" class="input-date form-control" id="etaDate" name="etaDate" >
-                            </div>
+                              <span class="error" id="error-etaDate"></span>
+                              </div>
                       </div>
                      
                        <div class="grid gap-2">
@@ -12049,7 +12121,7 @@ const showLCLForm= ()=>{
                             <select id="codShipper" name="codShipper" class="form-control">
                                 <option value="">Seleccionar código</option class="form-control">
                             </select>
-                            
+                            <span class="error" id="error-codShipper"></span>
                               <div class="input-group-prepend">
                                 <span class="input-group-text" data-toggle="modal" data-target="#newShipperDialog" id="basic-addon1">+</span>
                                 <span class="input-group-text"  onclick="deleteShipper()" id="deleteShipperButton">-</span>
@@ -12061,11 +12133,13 @@ const showLCLForm= ()=>{
                       <div class="grid gap-2">
                           <label for="norden">N. Orden</label>
                           <input type="text" id="norden" name="norden" class="form-control">
+                          <span class="error" id="error-norden"></span>
                       </div>
                        <div class="grid gap-2">
                         <div class="mb-3">
                           <label for="codbl">Cod. BL</label>
                           <input type="text" id="codbl" name="codbl" class="form-control">
+                          <span class="error" id="error-codbl"></span>
                         </div>
                       </div>
                       <div class="grid gap-2">
@@ -12076,6 +12150,7 @@ const showLCLForm= ()=>{
                                 <option value="TRADING">TRADING</option>
                                 <option value="CONSOLIDADO CHINA">CONSOLIDADO CHINA</option>
                             </select>
+                            <span class="error" id="error-servicio"></span>
                           </div>
                       </div>
                   </div>
@@ -12101,8 +12176,8 @@ const showConsolidadoForm= ()=>{
                 <div class="input-group mb-3">
                 <select id="pais" name="pais" class="form-control">
                   <option value="">Seleccionar país</option>
-                
                 </select>
+                <span class="error" id="error-pais"></span>
                 <div class="input-group-prepend">
                   <span class="input-group-text"  data-toggle="modal" data-target="#newCountryDialog"
                 id="addPaisButton">+</span>
@@ -12116,6 +12191,7 @@ const showConsolidadoForm= ()=>{
                   <label for="tc" class="form-label">CONSOLIDADO</label>
                   <input  class="form-control"
                   type="number" id="consolidado" name="consolidado" step="1" placeholder="#0">
+                  <span class="error" id="error-consolidado"></span>
                 </div>
               </div>
           <div class="form-section">
@@ -12182,7 +12258,72 @@ const saveFCLBooking=(id=null)=>{
   const servicio = $('#servicio').val();
   const norden = $('#norden').val();
   const codbl = $('#codbl').val();
+  $('span.error').text('');
+  $('input').removeClass('error');  
+  $('select').removeClass('error');
+  if(!client){
+    $('#error-client').text('El campo cliente es obligatorio');
+    $("#client").addClass("error");
+  }
+  if(!inland){
+    $('#error-inland').text('El campo inland es obligatorio');
+    $("#inland").addClass("error");
+   
+  }
+  if(!flete){
+    $('#error-flete').text('El campo flete es obligatorio');
+    $("#flete").addClass("error");
+  }
+  if(!naviera){
+    $('#error-naviera').text('El campo naviera es obligatorio');
+    $("#naviera").addClass("error");
+  }
+  if(!contenedor){
+    $('#error-contenedor').text('El campo contenedor es obligatorio');
+    $("#contenedor").addClass("error");
+  }
+  if(!diasTransito){
+    $('#error-diasTransito').text('El campo días tránsito es obligatorio');
+    $("#diasTransito").addClass("error");
+  }
+  if(!cutoffDate){
+    $('#error-cutoffDate').text('El campo cut off es obligatorio');
+    $("#cutoffDate").addClass("error");
+  }
+  if(!etdDate){
+    $('#error-etdDate').text('El campo etd es obligatorio');
+    $("#etdDate").addClass("error");
+  }
+  if(!etaDate){
+    $('#error-etaDate').text('El campo eta es obligatorio');
+    $("#etaDate").addClass("error");
+  }
+  if(!boxFree){
+    $('#error-boxFree').text('El campo box free es obligatorio');
+    $("#boxFree").addClass("error");
+  }
+  if(!codShipper){
+    $('#error-codShipper').text('El campo cod shipper es obligatorio');
+    $("#codShipper").addClass("error");
+  }
+  if(!norden){
+    $('#error-norden').text('El campo norden es obligatorio');
+    $("#norden").addClass("error");
+  }
+  if(!codbl){
+    $('#error-codbl').text('El campo cod bl es obligatorio');
+    $("#codbl").addClass("error");
+  }
+  if(!servicio){
+    $('#error-servicio').text('El campo servicio es obligatorio');
+    $("#servicio").addClass("error");
+  }
+  if(!client || !inland || !flete || !naviera || !contenedor || !diasTransito || !cutoffDate || !etdDate || !etaDate || !boxFree || !codShipper || !norden || !codbl || !servicio){
+    return;
+  }
+  spinner.show();
   const idBookingDetail = id;
+
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/saveFCLBooking",
     type: 'POST',
@@ -12209,6 +12350,7 @@ const saveFCLBooking=(id=null)=>{
     },
     success: function (data) {
       openStepFunction(4,idPedido);
+      spinner.hide();
 
     }
   });
@@ -12224,6 +12366,51 @@ const saveLCLBooking=(id=null)=>{
   const norden = $('#norden').val();
   const codbl = $('#codbl').val();
   const idBookingDetail = id;
+  $('span.error').text('');
+  $('input').removeClass('error');
+  $('select').removeClass('error');
+  if(!client){
+    $('#error-client').text('El campo cliente es obligatorio');
+    $("#client").addClass("error");
+  }
+  if(!inland){
+    $('#error-inland').text('El campo inland es obligatorio');
+    $("#inland").addClass("error");
+  }
+  if(!cutoffDate){
+    $('#error-cutoffDate').text('El campo cut off es obligatorio');
+    $("#cutoffDate").addClass("error");
+  }
+  if(!etdDate){
+    $('#error-etdDate').text('El campo etd es obligatorio');
+    $("#etdDate").addClass("error");
+  }
+  if(!etaDate){
+    $('#error-etaDate').text('El campo eta es obligatorio');
+    $("#etaDate").addClass("error");
+  }
+  if(!codShipper){
+    $('#error-codShipper').text('El campo cod shipper es obligatorio');
+    $("#codShipper").addClass("error");
+  }
+  if(!servicio){
+    $('#error-servicio').text('El campo servicio es obligatorio');
+    $("#servicio").addClass("error");
+  }
+  if(!norden){
+    $('#error-norden').text('El campo norden es obligatorio');
+    $("#norden").addClass("error");
+  }
+  if(!codbl){
+    $('#error-codbl').text('El campo cod bl es obligatorio');
+    $("#codbl").addClass("error");
+  }
+  if(!client || !inland || !cutoffDate || !etdDate || !etaDate || !codShipper || !servicio || !norden || !codbl){
+    return;
+  }
+
+  spinner.show();
+
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/saveLCLBooking",
     type: 'POST',
@@ -12241,7 +12428,9 @@ const saveLCLBooking=(id=null)=>{
       idBookingDetail,
     },
     success: function (data) {
+      spinner.hide();
       openStepFunction(4,idPedido);
+      
     }
   });
 }
@@ -12249,6 +12438,18 @@ const saveConsolidadoBooking=(id=null)=>{
   const pais = $('#pais').val();
   const consolidado = $('#consolidado').val();
   const idBookingDetail = id;
+  $('span.error').text('');
+  $('input').removeClass('error');
+  $('select').removeClass('error');
+  if(!pais){
+    $('#error-pais').text('El campo país es obligatorio');
+    $("#pais").addClass("error");
+  }
+  if(!consolidado){
+    $('#error-consolidado').text('El campo consolidado es obligatorio');
+    $("#consolidado").addClass("error");
+  }
+  spinner.show();
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/saveConsolidadoBooking",
     type: 'POST',
@@ -12260,6 +12461,7 @@ const saveConsolidadoBooking=(id=null)=>{
     },
     success: function (data) {
       openStepFunction(4,idPedido);
+      spinner.hide();
     }
   });
 }
