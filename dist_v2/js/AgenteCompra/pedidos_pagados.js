@@ -11669,7 +11669,7 @@ const openBookingView=async (data,id,privilegios)=>{
     setupDatePicker();
     spinner.hide();
   });
-  $(".btn-back-booking").off("click");
+  $("#btn-save-shipper").off("click");
   $("#btn-save-shipper").on("click", async function(event) {
     event.preventDefault();
     const formData = new FormData();
@@ -11895,7 +11895,7 @@ const showFLCForm= ()=>{
                       <div class="grid gap-2">
                          <div class="mb-3">
                           <label for="diasTransito">Días Tránsito</label>
-                          <input  type="number" id="diasTransito" name="diasTransito" min="0" class="form-control">
+                          <input  type="text" id="diasTransito" name="diasTransito" min="0" class="form-control">
                           <span class="error" id="error-diasTransito"></span>
                         </div>
                       </div>
@@ -11923,7 +11923,7 @@ const showFLCForm= ()=>{
                       <div class="grid gap-2">
                       <div class="mb-3">
                           <label for="boxFree">Box Free</label>
-                          <input  type="number" id="boxFree" name="boxFree" min="0" class="form-control">
+                          <input  type="text" id="boxFree" name="boxFree" min="0" class="form-control">
                           <span class="error" id="error-boxFree"></span>
                       </div>
                           </div>
@@ -11935,11 +11935,12 @@ const showFLCForm= ()=>{
                               <select id="codShipper" name="codShipper" class="form-control">
                                   <option value="">Seleccionar código</option class="form-control"> 
                               </select>
-                              <span class="error" id="error-codShipper"></span>
                               <div class="input-group-prepend">
                                 <span class="input-group-text" data-toggle="modal" data-target="#newShipperDialog" id="basic-addon1">+</span>
                                 <span class="input-group-text"  onclick="deleteShipper()" id="deleteShipperButton">-</span>
                                 </div>
+                             <span class="error" id="error-codShipper"></span>
+
                             </div>
                           </div>
                         </div>
@@ -12082,14 +12083,15 @@ const showLCLForm= ()=>{
 
                   <div class="form-section grid gap-4 md:grid-cols-3">
                       <div class="grid gap-2"> 
+                        <div>
                         <label for="inland" class="form-label">Inland </label>
                           <div class="input-group mb-3">
                             <div class="input-group-prepend">
                               <span class="input-group-text" >¥</span>
                             </div>
-                          <input type="number"  class="form-control"id="inland" name="inland" step="0.01" placeholder="0.00">
-                          <span class="error" id="error-inland"></span>
-                          </div>
+                            <input type="number"  class="form-control"id="inland" name="inland" step="0.01" placeholder="0.00">
+                            <span class="error" id="error-inland"></span>
+                          </div></div>
                       </div>
                       <div class="grid gap-2">
                       <div class="mb-3">
@@ -12121,19 +12123,22 @@ const showLCLForm= ()=>{
                             <select id="codShipper" name="codShipper" class="form-control">
                                 <option value="">Seleccionar código</option class="form-control">
                             </select>
-                            <span class="error" id="error-codShipper"></span>
                               <div class="input-group-prepend">
                                 <span class="input-group-text" data-toggle="modal" data-target="#newShipperDialog" id="basic-addon1">+</span>
                                 <span class="input-group-text"  onclick="deleteShipper()" id="deleteShipperButton">-</span>
                                 </div>
+                                                            <span class="error" id="error-codShipper"></span>
+
                             </div>
                           
                           </div>
                       </div>
                       <div class="grid gap-2">
+                      <div class="mb-3">
                           <label for="norden">N. Orden</label>
                           <input type="text" id="norden" name="norden" class="form-control">
                           <span class="error" id="error-norden"></span>
+                      </div>
                       </div>
                        <div class="grid gap-2">
                         <div class="mb-3">
@@ -12177,12 +12182,13 @@ const showConsolidadoForm= ()=>{
                 <select id="pais" name="pais" class="form-control">
                   <option value="">Seleccionar país</option>
                 </select>
-                <span class="error" id="error-pais"></span>
                 <div class="input-group-prepend">
                   <span class="input-group-text"  data-toggle="modal" data-target="#newCountryDialog"
                 id="addPaisButton">+</span>
                  <span class="input-group-text"  onclick="deleteCountry()" id="deletePaisButton">-</span>
                 </div>
+                <span class="error" id="error-pais"></span>
+
                 </div>
                 </div>
               </div>
