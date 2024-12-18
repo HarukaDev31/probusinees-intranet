@@ -785,7 +785,7 @@
     </div>
   </div>
   <section class="min-h-screen bg-white documentation-container container-fluid px-3 w-75 row" id="documentation-container">
-    <header id="documentation-header col-12 col-lg-6">
+    <header id="documentation-header">
       <div class="d-flex justify-content-between mb-4">
         <div>
           <h2 class="text-xl mb-2">Documentación</h2>
@@ -793,16 +793,16 @@
         </div>
       </div>
     </header>
-    <main id="documentation-main col-12 col-lg-6">
+    <main id="documentation-main">
       <div class="row">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-lg-6">
           <div>
             <h4>Documentos por subir</h4>
             <div class="documentation-list">
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-lg-6">
           <div>
                 <header class="sticky top-0 z-10 bg-white border-b">
                 <div class="container mx-auto px-4 py-2 w-100 flex items-center justify-between ">
