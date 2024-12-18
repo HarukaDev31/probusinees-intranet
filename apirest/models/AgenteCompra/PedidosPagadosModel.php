@@ -4037,9 +4037,16 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->insert($this->tableOrdenDocumentationFolders, $dataToInsert);
         return ['status' => 'success', 'message' => 'Folder guardado'];
     }
-    public function deleteDocumentationFiles($id){
+    public function deleteDocumentationFiles($id,$idOrder){
         $this->db->where('id',$id);
         $this->db->delete($this->tableOrdenDocumentationFiles);
+        $booking_tipo=$this->db->select('booking_tipo')->from($this->table)->where('ID_Pedido_Cabecera',$idOrder)->get()->row()->booking_tipo;
+        if(!$this->validateFilesInAllFolderOrder($idOrder,$booking_tipo)){
+            $this->db->where('id_order',5);
+            $this->db->where('id_pedido',$idOrder);
+            $this->db->update('agente_compra_order_steps',array('status'=>'PENDING'));
+        }
+        
         return ['status' => 'success', 'message' => 'Documento eliminado'];
     }
     public function validateFilesInAllFolderOrder($idPedido,$booking_tipo){

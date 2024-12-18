@@ -2579,7 +2579,8 @@ class PedidosPagados extends CI_Controller
     public function deleteDocumentationFiles(){
         $data = $this->input->post();
         $id=$data['id'];
-        $response = $this->PedidosPagadosModel->deleteDocumentationFiles($id);
+        $idOrder=$data['idOrder'];
+        $response = $this->PedidosPagadosModel->deleteDocumentationFiles($id,$idOrder);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }

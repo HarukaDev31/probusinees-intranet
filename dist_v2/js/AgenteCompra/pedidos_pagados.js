@@ -7504,7 +7504,7 @@ const deleteDocumentationFiles = (id) => {
   $.ajax({
     url,
     type: "POST",
-    data: { id },
+    data: { id,idOrder },
     success: async function (response) {
       await getDocumentationList(idOrder);
       initDocumentationDriveEvents();
