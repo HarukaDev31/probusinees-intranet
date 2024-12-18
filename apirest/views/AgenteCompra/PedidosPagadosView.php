@@ -784,7 +784,7 @@
                 </div>
     </div>
   </div>
-  <section class="min-h-screen bg-white documentation-container container-fluid px-3 w-75 row" id="documentation-container">
+  <section class="min-h-screen bg-white documentation-container container-fluid px-3 w-75" id="documentation-container">
     <header id="documentation-header">
       <div class="d-flex justify-content-between mb-4">
         <div>
