@@ -7532,13 +7532,16 @@ const initDocumentationDriveEvents = () => {
   })
 
   const $uploadBtnDocumentation = $('#btn-upload-file-documentation');
+  $uploadBtnDocumentation.off('click');
   $uploadBtnDocumentation.on('click', function () {
     event.preventDefault();
 
     // $fileInputDocumentation.click();
     handleFilesDocumentation($fileInputDocumentation[0].files);
   });
+  
   const $backBtnDocumentation = $('#back-btn-documentation');
+  $backBtnDocumentation.off('click');
   $backBtnDocumentation.on('click', function () {
     containerDocumentacion.hide();
     getOrderProgress(idOrder);
