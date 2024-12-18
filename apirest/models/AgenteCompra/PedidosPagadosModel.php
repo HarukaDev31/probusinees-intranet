@@ -4060,11 +4060,11 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         COUNT(agente_compra_documentation_folder_files.id) as file_count
         ')
         ->from($this->tableOrdenDocumentationFolders)
-        ->join($this->tableOrdenDocumentationFiles, 'agente_compra_documentation_folders.id = agente_compra_documentation_folder_files.id_folder', 'left')
+        ->join($this->tableOrdenDocumentationFiles, 'agente_compra_documentation_folders.id = agente_compra_documentation_folder_files.id_folder
+        and agente_compra_documentation_folder_files.id_pedido='.$idPedido, 'left')
         ->where('agente_compra_documentation_folders.id_pedido', $idPedido)
         ->or_where('agente_compra_documentation_folders.id_pedido IS NULL')
         ->where('agente_compra_documentation_folders.tipo_documentacion', $booking_tipo)
-        ->where('agente_compra_documentation_folder_files.id_pedido',$idPedido)
         ->group_by('agente_compra_documentation_folders.id'); // Agrupa por id_folder
         $query = $this->db->get();
         $result=$query->result();
