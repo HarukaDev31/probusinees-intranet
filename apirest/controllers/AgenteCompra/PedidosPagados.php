@@ -2034,14 +2034,11 @@ class PedidosPagados extends CI_Controller
                 if($priviligie==$this->jefeChinaPrivilegio ){
                     $data = $this->PedidosPagadosModel->getPedidoProductos($idPedido);
                     echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
-                }
-                
+                }   
             }
-            if($step==4){
-                    
+            if($step==4){          
                     $data = $this->PedidosPagadosModel->getPedidoBooking($idPedido);
-                    echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
-                 
+                    echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));     
             }
             if($step==5){
                 $data = $this->PedidosPagadosModel->getPedidoDocumentation($idPedido);

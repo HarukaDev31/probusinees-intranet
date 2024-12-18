@@ -3999,6 +3999,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             'size' => $_FILES['file']['size'],
             'lastModified' => time(),
         ];
+        $booking_tipo=$this->db->select('booking_tipo')->from($this->table)->where('ID_Pedido_Cabecera',$idPedido)->get()->row()->booking_tipo;
+        if($this->validateFilesInAllFolderOrder($idPedido,$booking_tipo)){
+            $this->db->where('id_order',4);
+            $this->db->where('id_pedido',$idPedido);
+            $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+        }
         return ['status' => 'success', 'message' => 'Documento guardado',
         "data"=>$dataToReturn];
 
@@ -4036,4 +4042,31 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->delete($this->tableOrdenDocumentationFiles);
         return ['status' => 'success', 'message' => 'Documento eliminado'];
     }
+    public function validateFilesInAllFolderOrder($idPedido,$booking_tipo){
+        //if all folders with id_pedido=$idPedido or id_pedido=null and tipo_documentacion=$booking_tipo file_count>0
+        $this->db->select('
+        agente_compra_documentation_folders.id,
+        agente_compra_documentation_folders.id_pedido,
+        agente_compra_documentation_folders.tipo_documentacion,
+        agente_compra_documentation_folders.folder_name,
+        COUNT(agente_compra_documentation_folder_files.id) as file_count
+        ')
+        ->from($this->tableOrdenDocumentationFolders)
+        ->join($this->tableOrdenDocumentationFiles, 'agente_compra_documentation_folders.id = agente_compra_documentation_folder_files.id_folder', 'left')
+        ->where('agente_compra_documentation_folders.id_pedido', $idPedido)
+        ->or_where('agente_compra_documentation_folders.id_pedido IS NULL')
+        ->where('agente_compra_documentation_folders.tipo_documentacion', $booking_tipo)
+        ->group_by('agente_compra_documentation_folders.id'); // Agrupa por id_folder
+        $query = $this->db->get();
+        $result=$query->result();
+        $isValid=true;
+        foreach($result as $row){
+            if($row->file_count==0){
+                $isValid=false;
+                break;
+            }
+        }
+        return $isValid;
+
+
 }
