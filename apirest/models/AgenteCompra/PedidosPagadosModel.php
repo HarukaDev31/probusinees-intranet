@@ -46,6 +46,8 @@ class PedidosPagadosModel extends CI_Model
     private $tableOrdenBookingContainer="agente_compra_booking_container";
     private $tableOrdenBookingShipper="agente_compra_booking_shipper";
     private $tableOrdenBookingCountry="pais_booking";  
+    public $tableOrdenDocumentationFolders="agente_compra_documentation_folders";
+    public $tableOrdenDocumentationFiles="agente_compra_documentation_folder_files";
     public function __construct()
     {
         parent::__construct();
@@ -3939,5 +3941,99 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->update($this->tableOrdenBookingShipper,['deleted_at'=>date('Y-m-d H:i:s')]);
         return ['status' => 'success', 'message' => 'Shipper eliminado'];
     }
-    
+    public function getPedidoDocumentation($idPedido){
+        $this->db->select("*");
+        $this->db->from($this->table);
+        $this->db->where('ID_Pedido_Cabecera',$idPedido);
+        return $this->db->get()->row();
+
+    }
+    public function getDocumentationList($idPedido,$tipo){
+            $this->db->select('
+            agente_compra_documentation_folders.id,
+            agente_compra_documentation_folders.id_pedido,
+            agente_compra_documentation_folders.tipo_documentacion,
+            agente_compra_documentation_folders.folder_name,
+            COUNT(agente_compra_documentation_folder_files.id) as file_count
+        ')
+        ->from($this->tableOrdenDocumentationFolders)
+        ->join($this->tableOrdenDocumentationFiles, 'agente_compra_documentation_folders.id = agente_compra_documentation_folder_files.id_folder', 'left')
+        ->where('agente_compra_documentation_folders.id_pedido', $idPedido)
+        ->or_where('agente_compra_documentation_folders.id_pedido IS NULL')
+        ->where('agente_compra_documentation_folders.tipo_documentacion', $tipo)
+        ->group_by('agente_compra_documentation_folders.id'); // Agrupa por id_folder
+        $query = $this->db->get();
+        return $query->result();
+    }
+    public function uploadDocumentationFile($data,$files){
+        $idPedido=$data['idOrder'];
+        $idFolder=$data['folder_id'];
+        $this->maxFileSize=200240;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $fileUrl = $this->uploadSingleFile([
+            'name' => $files['file']['name'],
+            'type' => $files['file']['type'],
+            'tmp_name' => $files['file']['tmp_name'],
+            'error' => $files['file']['error'],
+            'size' => $files['file']['size'],
+        ], 'assets/images/');
+       
+        $dataToInsert = [
+            'id_pedido' =>intval($idPedido),
+            'id_folder' => intval($idFolder),
+            'file_path' => $fileUrl,
+            'file_name' => $_FILES['file']['name'],
+            'file_type' => $_FILES['file']['type'],
+            'file_size' => $_FILES['file']['size'],
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+       
+        $this->db->insert($this->tableOrdenDocumentationFiles, $dataToInsert);
+        $id=$this->db->insert_id();
+        $dataToReturn = [
+            'id' => $id,
+            'name' => $_FILES['file']['name'],
+            'type' => $_FILES['file']['type'],
+            'path' => $fileUrl,
+            'thumbnail' => $fileUrl,
+            'size' => $_FILES['file']['size'],
+            'lastModified' => time(),
+        ];
+        return ['status' => 'success', 'message' => 'Documento guardado',
+        "data"=>$dataToReturn];
+
+    }
+    public function getDocumentationFiles($idPedido){
+            $this->db->select('
+            agente_compra_documentation_folder_files.id ,
+            agente_compra_documentation_folder_files.id_folder,
+            agente_compra_documentation_folder_files.file_path as path,
+            agente_compra_documentation_folder_files.file_path as thumbnail,
+            agente_compra_documentation_folder_files.file_name as name,
+            agente_compra_documentation_folder_files.file_type as type,
+            agente_compra_documentation_folder_files.file_size as size,
+            agente_compra_documentation_folder_files.created_at
+        ')
+        ->from($this->tableOrdenDocumentationFiles)
+        ->where('id_pedido', $idPedido);
+        $query = $this->db->get();
+        return $query->result();
+    }
+    public function createDocumentationFolder($data){
+        $idPedido=$data['idOrder'];
+        $tipo=$data['booking_tipo'];
+        $folderName=$data['folderName'];
+        $dataToInsert = [
+            'id_pedido' =>intval($idPedido),
+            'tipo_documentacion' => $tipo,
+            'folder_name' => $folderName,
+        ];
+        $this->db->insert($this->tableOrdenDocumentationFolders, $dataToInsert);
+        return ['status' => 'success', 'message' => 'Folder guardado'];
+    }
+    public function deleteDocumentationFiles($id){
+        $this->db->where('id',$id);
+        $this->db->delete($this->tableOrdenDocumentationFiles);
+        return ['status' => 'success', 'message' => 'Documento eliminado'];
+    }
 }

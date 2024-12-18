@@ -762,9 +762,6 @@
 
               
               </form>
-
-          
-    <!-- /.container-fluid -->
   </section>
   <div class="modal fade" tabindex="-1" id="editBooking">
     <div class="modal-dialog modal-lg" >
@@ -787,27 +784,148 @@
                 </div>
     </div>
   </div>
-                            
+  <section class="min-h-screen bg-white documentation-container container-fluid px-3 w-75" id="documentation-container">
+    <header id="documentation-header">
+      <div class="d-flex justify-content-between mb-4">
+        <div>
+          <h2 class="text-xl mb-2">Documentación</h2>
+          <h3 class="text-lg  "></h3>
+        </div>
+      </div>
+    </header>
+    <main id="documentation-main">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div>
+            <h4>Documentos por subir</h4>
+            <div class="documentation-list">
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div>
+                <header class="sticky top-0 z-10 bg-white border-b">
+                <div class="container mx-auto px-4 py-2 w-100 flex items-center justify-between ">
+                <!--subir archivo y retroceder-->
+                    <div class="flex items-center space-x-4">
+                        
+                        <!-- <div class="p-2 btn btn-dark"
+                        id="back-btn"
+                        >
+                            <i class="fas fa-arrow-left text-white-500"></i>
+                            <span class="ml-2">Atras</span>
+                        </div> -->
+                        </div>
+                </div>
+                <div class="container mx-auto px-4 py-2 flex items-center justify-between ">
+                    <h1 class="text-xl font-semibold text-gray-800">Archivos</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Buscar en Archivos" id="search-input-documentation"
+                                class="pl-8 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button class="p-2 rounded-full hover:bg-gray-100"
+                        id="back-btn-documentation"
+                        >
+                            <!-- icon to back to previous folder -->
+                            <i class="fas fa-arrow-left text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container mx-auto px-4 py-8 file-section-container">
+                <div id="drag-drop-container"
+                    class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden">
+                    <div id="drop-message">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
+                        <p class="text-gray-600">
+                            Arrastra y suelta archivos aquí
+                        </p>
+                        <p class="text-xs text-gray-500 mt-2">
+                            Soporta: PDF, JPG, PNG, DOCX (Máximo 10MB)
+                        </p>
+                    </div>
+
+                </div>
+
+                <div id="file-grid-documentation" class="grid grid-cols-4 gap-4">
+
+                    <!-- Existing and uploaded files will appear here -->
+                </div>
+                <div id="pending-files" class="mb-4">
+                    <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
+                    <div id="pending-file-list-documentation" class="space-y-2">
+                        <!-- Los archivos pendientes aparecerán aquí -->
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </main> 
+  </section>
+  <div class="modal fade" tabindex="-1" id="modal-create-folder-documentation">
+    <div class="modal-dialog modal-lg" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-create-folder-documentation-title">
+                            Crear Carpeta
+                        </h5>
+                        <button type="button" class="btn-close" data-dismiss="modal">X</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="createFolderForm">
+                              <div class="form-group">
+                                <label for="folderName">Nombre</label>
+                                <input type="text" class="form-control" id="folderName" name="folderName" required>
+                              </div>
+                              <div id="btn-save-folder-documentation" class="btn btn-primary">Crear</div>
+                        </div>  
+                    </div>   
+                </div>
+    </div>
+  </div> 
+  <div class="modal fade" tabindex="-1" id="modal-upload-file-documentation">
+    <div class="modal-dialog modal-lg" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-upload-file-documentation-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="uploadFileForm">
+                              <div class="form-group">
+                                <label for="fileDocumentation">Archivo</label>
+                                <input type="file" class="form-control" id="fileDocumentation" name="fileDocumentation" required>
+                              </div>
+                              <button id="btn-upload-file-documentation" class="btn btn-primary">Crear</button>
+                        </form>  
+                    </div>   
+                </div>
+    </div>
+  </div>                         
   <!-- /.content -->
   <div class="modal fade" tabindex="-1" id="newShipperDialog">
-  <div class="modal-dialog modal-lg" >
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 class="modal-title">Crear Nuevo Shipper</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body">
-                      <form id="newShipperForm">
-                          <div class="form-group">
-                              <label for="shipperName">Nombre</label>
-                              <input type="text" class="form-control" id="shipperName" name="shipperName" required>
-                            </div>
-                            <button id="btn-save-shipper" class="btn btn-primary">Crear</button>
-                      </form>  
-                  </div>   
-              </div>
+    <div class="modal-dialog modal-lg" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Crear Nuevo Shipper</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="newShipperForm">
+                            <div class="form-group">
+                                <label for="shipperName">Nombre</label>
+                                <input type="text" class="form-control" id="shipperName" name="shipperName" required>
+                              </div>
+                              <button id="btn-save-shipper" class="btn btn-primary">Crear</button>
+                        </form>  
+                    </div>   
+                </div>
+    </div>
   </div>
-</div>
 </div>
 
 <div class="modal fade" tabindex="-1" id="newCountryDialog">
@@ -4004,7 +4122,7 @@ echo form_open('', $attributes);?>
           width: 100%;
           height: 85vh;
           position: relative;
-        }#file-grid{
+        }#file-grid,#file-grid-documentation{
           height: 100%;
           width: 100%;
           gap: 1rem;
@@ -4141,6 +4259,15 @@ echo form_open('', $attributes);?>
     border: 1px solid red;
     color: black;
   }
-
+  .completed {
+  background-color: #d4edda; /* Verde claro indicando que está completo */
+  border: 1px solid #c3e6cb; /* Borde verde */
+  border-radius: 5px;
+}
+.documentation-list{
+    display: flex;
+    flex-direction: column;
+    row-gap: 1em;
+}
   </style>
   <?php echo form_close(); ?>

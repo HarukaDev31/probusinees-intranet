@@ -1,5 +1,5 @@
 
-var url, table_Entidad,sort_col = "0", sort_type = "desc";;
+var url, table_Entidad, sort_col = "0", sort_type = "desc";;
 var caractes_no_validos_global_autocomplete = "\"'~!@%^|";
 let search_global_autocomplete =
   caractes_no_validos_global_autocomplete.split("");
@@ -22,9 +22,13 @@ let tableInspection = $("#table-inspection");
 let driveContainer = $("#drive-container");
 let bookingContainer = $("#booking-container");
 let driveFiles = [];
+let driveFilesDocumentation = [];
 let idExcel = 0;
 let idDetalle = 0;
 let idOrder = 0;
+let folderName = "";
+let folderId = 0;
+let booking_tipo = 0;
 const editIcon = `<?xml version="1.0" encoding="utf-8"?>
 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Edit / Edit_Pencil_02">
@@ -50,7 +54,7 @@ let selectedStep = null;
 let containerSteps = null;
 let containerPagos = null;
 let containerCoordination = null;
-let spinner=null;
+let spinner = null;
 let currentServicio = 1;
 let containerExcelPagos = null;
 let containerExcelPagosDetalle = null;
@@ -58,8 +62,10 @@ let containerExcelHeaderPagosDetalle = null;
 let containerExcelHeaderPagos = null;
 let idPedidoDetalle = null;
 let pagosButtons = null;
+let containerDocumentacion = null;
+let documentationList = null;
 $(function () {
-  spinner= $(".backdrop");
+  spinner = $(".backdrop");
   spinner.show();
   sectionTitle = $("#section-title");
   containerVer = $("#container-ver");
@@ -71,16 +77,17 @@ $(function () {
   containerSteps = $("#steps");
   containerPagos = $("#container-pagos");
   containerPagos.hide();
-
   containerCoordination = $("#container-coordination");
   containerCoordination.hide();
-
   containerExcelPagos = $("#container_orden-compra-pagos");
   containerExcelPagosDetalle = $("#container_orden-compra-pagos-detalle");
   containerExcelPagos.hide();
   containerExcelPagosDetalle.hide();
   containerExcelHeaderPagosDetalle = $("#orden-compra-header-detalle-pagos-excel-container");
   containerExcelHeaderPagos = $(".orden-compra-header-pagos-excel-container");
+  containerDocumentacion = $("#documentation-container");
+  documentationList = $(".documentation-list");
+  containerDocumentacion.hide();
   pagosButtons = $(".pagos-buttons");
   pagosButtons.hide();
   containerInspection.hide();
@@ -7342,17 +7349,11 @@ const openStepFunction = async (i, stepId) => {
     currentPrivilege = responseParsed.priviligie;
     spinner.show();
     if (i == 1) {
-      
+
       await openOrdenCompra(response);
     }
     if (i == 2) {
       openPagos(response);
-      // if (currentPrivilege == 1) {
-      //   openPagos(response);
-
-      // } else {
-      //   openCoordination(response);
-      // }
     }
     if (i == 3) {
       openInspectionView(responseParsed.data, idPedido, currentPrivilege);
@@ -7361,14 +7362,525 @@ const openStepFunction = async (i, stepId) => {
     if (i == 4) {
       openBookingView(responseParsed.data, idPedido, currentPrivilege);
     }
+    if (i == 5) {
+      openDocumentationView(responseParsed.data, idPedido, currentPrivilege);
+    }
     spinner.hide();
   });
 };
 const openInspectionView = (data, idPedido, currentPrivilege) => {
   $("#container_orden-compra").hide();
-  getAlmacenData(idPedido);
   containerInspection.show();
+  getAlmacenData(idPedido);
 };
+const openDocumentationView = async (data, idPedido, currentPrivilege) => {
+  $("#container_orden-compra").hide();
+  booking_tipo = data.booking_tipo;
+  $(".tipo_documentacion").text(booking_tipo);
+  containerDocumentacion.show();
+  await getDocumentationList(idPedido);
+  await getDocumentationFiles(idPedido);
+  initDocumentationDriveEvents();
+
+}
+async function getDocumentationFiles(id) {
+  driveFilesDocumentation = [];
+  url = base_url + "AgenteCompra/PedidosPagados/getDocumentationFiles";
+  await $.ajax({
+    url,
+    type: "POST",
+    data: { id },
+    success: function (response) {
+      try {
+        const parsedResponse = JSON.parse(response);
+        console.log(parsedResponse.data);
+        driveFilesDocumentation.push(...parsedResponse.data);
+        console.log(driveFilesDocumentation);
+        renderFileGridDocumentation(driveFilesDocumentation);
+      }
+      catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+}
+async function getDocumentationList(id) {
+  idOrder = id;
+  url = base_url + "AgenteCompra/PedidosPagados/getDocumentationList";
+  await $.ajax({
+    url: url,
+    type: "POST",
+    data: { idPedido: idOrder, booking_tipo },
+    success: function (response) {
+      try {
+        const parsedResponse = JSON.parse(response);
+        documentationList.empty();
+        parsedResponse.data.forEach((item) => {
+          const html = getDocumentationItemTemplate(item);
+          documentationList.append(html);
+
+        });
+        documentationList.append(`
+          <div class="d-flex flex-row justify-content-between p-3  btn-open-modal-folder-documentation"
+          
+  style="border-radius: 10px; border: 1px solid #e5e7eb;"
+  >
+   
+    <div class="d-flex flex-row">
+       <div class="p-2 btn btn-dark btn-create-folder-documentation"
+            >
+          <i class="fas fa-cloud-upload-alt text-white-500"></i>
+          <span class="ml-2">Crear Folder</span>
+       </div>
+    </div>
+  </div>`);
+        $(".btn-open-modal-folder-documentation").off("click");
+        $(".btn-open-modal-folder-documentation").click(function () {
+          $("#modal-create-folder-documentation").modal("show");
+        });
+        $('#btn-save-folder-documentation').off('click');
+        $('#btn-save-folder-documentation').click(function () {
+          event.preventDefault();
+          const folderName = $("#folderName").val();
+          createDocumentationFolder(folderName);
+        });
+
+      }
+      catch (e) {
+        console.log(e);
+      }
+    },
+  });
+}
+const createDocumentationFolder = (folderName) => {
+  spinner.show();
+  url = base_url + "AgenteCompra/PedidosPagados/createDocumentationFolder";
+  $.ajax({
+    url,
+    type: "POST",
+    data: {
+      idOrder, folderName,
+      booking_tipo
+    },
+
+    success: async function (response) {
+      try {
+        await getDocumentationList(idOrder);
+        $("#modal-create-folder-documentation").modal("hide");
+        spinner.hide();
+        initDocumentationDriveEvents()
+      }
+      catch (e) {
+        console.log(e);
+      }
+    }
+  });
+};
+
+const getDocumentationItemTemplate = (data) => {
+  const isCompleted = data.file_count > 0 ? 'completed' : ''; // Clase condicional si file_count > 0
+  let html = `
+  <div class="d-flex flex-row justify-content-between p-3 ${isCompleted}"
+  style="border-radius: 10px; border: 1px solid #e5e7eb;"
+  >
+    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
+      <i class="fas fa-file-pdf"></i>
+      <span>${data.folder_name}</span>
+    </div>
+    <div class="d-flex flex-row">
+       <div class="p-2 btn btn-dark upload-btn-documentation"
+            data-folder-id="${data.id}"
+            data-folder-name="${data.folder_name}">
+          <i class="fas fa-cloud-upload-alt text-white-500"></i>
+          <span class="ml-2">Subir Archivo</span>
+       </div>
+    </div>
+  </div>`;
+  return html;
+};
+const deleteDocumentationFiles = (id) => {
+  url = base_url + "AgenteCompra/PedidosPagados/deleteDocumentationFiles";
+  $.ajax({
+    url,
+    type: "POST",
+    data: { id },
+    success: async function (response) {
+      await getDocumentationList(idOrder);
+      initDocumentationDriveEvents();
+    }
+  });
+
+}
+const initDocumentationDriveEvents = () => {
+  //off click
+  $(".upload-btn-documentation").off("click");
+  $(".upload-btn-documentation").click(function () {
+    folderName = $(this).data("folder-name");
+    folderId = $(this).data("folder-id");
+    $("#modal-upload-file-documentation-title").text("Subir " + folderName);
+    $("#modal-upload-file-documentation").modal("show");
+    // $("#btn-upload-file-documentation").click(function(){
+    //   event.preventDefault();
+    //   const file=$("#fileDocumentation").prop("files")[0];
+    //   const formData=new FormData();
+    //   formData.append("file",file);
+    //   formData.append("folder_id",folderId);
+    //   formData.append("idOrder",idOrder);
+    //   uploadDocumentationFile(formData);
+    // });
+  })
+
+  const $uploadBtnDocumentation = $('#btn-upload-file-documentation');
+  $uploadBtnDocumentation.on('click', function () {
+    event.preventDefault();
+
+    // $fileInputDocumentation.click();
+    handleFilesDocumentation($fileInputDocumentation[0].files);
+  });
+  const $backBtnDocumentation = $('#back-btn-documentation');
+  $backBtnDocumentation.on('click', function () {
+    containerDocumentacion.hide();
+    getOrderProgress(idOrder);
+  });
+
+}
+const $fileInputDocumentation = $('#fileDocumentation');
+
+const $fileGridDocumentation = $('#file-grid-documentation');
+const $searchInputDocumentation = $('#search-input-documentation');
+
+const iconMap = {
+  'application/pdf': '<i class="fas fa-file-pdf w-12 h-12 text-red-400"></i>',
+  'image/jpeg': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
+  'image/png': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    '<i class="fas fa-file-word w-12 h-12 text-blue-600"></i>'
+};
+const pendingFilesDocumentation = [];
+// Initial files
+// const files = [
+//   { id: 1, name: 'Proyecto.docx', type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', size: '2.5 MB', lastModified: '2023-11-26' },
+//   { id: 2, name: 'Presentacion.pdf', type: 'application/pdf', size: '1.2 MB', lastModified: '2023-11-25' },
+//   { id: 3, name: 'Imagen.jpg', type: 'image/jpeg', size: '4.7 MB', lastModified: '2023-11-24' }
+// ];
+
+// Render initial files
+// renderFileGrid(driveFilesDocumentation);
+
+// Toggle drag-drop area
+
+
+// Prevent default drag behaviors
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  $fileGridDocumentation.on(eventName, function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+});
+
+// Drag enter - add visual cue
+$fileGridDocumentation.on('dragenter', function () {
+  $(this).addClass('drag-over');
+});
+
+// Drag leave - remove visual cue
+$fileGridDocumentation.on('dragleave', function (e) {
+  // Only remove if mouse has left the entire container
+  if (e.originalEvent.clientX <= 0 ||
+    e.originalEvent.clientY <= 0 ||
+    e.originalEvent.clientX >= $(this).width() ||
+    e.originalEvent.clientY >= $(this).height()) {
+    $(this).removeClass('drag-over');
+  }
+});
+
+// Drop event
+$fileGridDocumentation.on('drop', function (e) {
+  $(this).removeClass('drag-over');
+  handleFiles(e.originalEvent.dataTransfer.files);
+});
+
+// // Click to select files
+// $fileInputDocumentation.on('change', function () {
+//   handleFiles(this.files);
+// });
+
+// Search functionality
+$searchInputDocumentation.on('input', function () {
+  const searchTerm = $(this).val().toLowerCase();
+  const filteredFiles = driveFilesDocumentation.filter(file =>
+    file.name.toLowerCase().includes(searchTerm)
+  );
+  renderFileGridDocumentation(filteredFiles);
+});
+
+// Handle file processing
+function handleFilesDocumentation(newFiles) {
+  console.log(newFiles);
+  // Convert FileList to Array and filter
+  const validFiles = Array.from(newFiles).filter(validateFile);
+
+  validFiles.forEach(file => {
+    const pendingFile = {
+      id: pendingFiles.length + 1,
+      name: file.name,
+      type: file.type,
+      size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
+      lastModified: new Date().toISOString().split('T')[0]
+    };
+
+    pendingFilesDocumentation.push(pendingFile);
+    renderPendingFilesDocumentation(pendingFile);
+
+    // Simular carga y mover el archivo a la lista de subidos
+    simulateFileUploadDocumentation(pendingFile, file);
+  });
+}
+
+function renderFileGridDocumentation(filesToRender) {
+  console.log(filesToRender, "filesToRender");
+  $fileGridDocumentation.empty();
+
+  filesToRender.forEach(function (file) {
+    const $fileItem = createFileItemDocumentation(file);
+    console.log($fileItem);
+    // Añadir la animación al aparecer
+    $fileItem.addClass('fade-in');
+    setTimeout(() => {
+      $fileItem.removeClass('fade-in');
+    }, 300);
+
+    $fileGridDocumentation.append($fileItem);
+  })
+}
+
+// Create file item for grid
+function createFileItemDocumentation(file) {
+  const $fileItem = $('<div>', {
+    class: 'group relative aspect-square border py-5 rounded-lg overflow-hidden hover:shadow-md transition-shadow'
+  });
+
+  // More options button
+  const $moreButton = $('<div>', {
+    class: 'absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10'
+  }).append(
+    $('<button>', {
+      class: 'p-1 rounded-full bg-white/80 hover:bg-white'
+    }).append(
+      $('<i>', {
+        class: 'fas fa-ellipsis-v w-4 h-4 text-gray-700'
+      })
+    )
+  );
+  const $contextMenu = $('<div>', {
+    class: 'context-menu  right-0  mt-2 bg-white border rounded shadow-lg text-sm hidden z-20'
+  }).append(
+
+    $('<button>', {
+      class: 'block w-full text-left px-4 py-2 hover:bg-gray-100',
+      text: 'Descargar',
+      click: function (e) {
+        e.stopPropagation();
+        //downloadFile(file);
+        const a = document.createElement('a');
+        a.target = '_blank';
+        a.href = file.path || 'https://via.placeholder.com/150';
+        a.download = file.name;
+        a.click();
+      }
+    }),
+    $('<button>', {
+      class: 'block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100',
+      text: 'Eliminar',
+      click: function (e) {
+        e.stopPropagation();
+        deleteDocumentationFiles(file.id);
+        driveFilesDocumentation = driveFilesDocumentation.filter(f => f.id !== file.id);
+        renderFileGridDocumentation(driveFilesDocumentation);
+      }
+    })
+  );
+  $moreButton.on('click', function (e) {
+    e.stopPropagation();
+    $contextMenu.addClass('fade-in').show();
+
+    // Quitar la clase de animación después de la animación
+    setTimeout(() => {
+      $contextMenu.removeClass('fade-in');
+    }, 300); // Duración de la animación en milisegundos
+  });
+  // Close menu on outside click
+  $(document).on('click', function () {
+    $contextMenu.hide();
+  });
+  let $fileContent;
+  if (file.thumbnail
+    && file.type.startsWith('image/')
+  ) {
+    $fileContent = $('<img>', {
+      src: file.path,
+      alt: file.name,
+      class: 'w-full h-full object-cover'
+    });
+  } else if (file.thumbnail && file.type.startsWith('video/')) {
+    $fileContent = $('<video>', {
+      src: file.path,
+      alt: file.name,
+      class: 'w-full h-full object-cover',
+      controls: true,
+      autoplay: false,
+      loop: true,
+      muted: true
+    })
+  }
+  else {
+    $fileContent = $('<div>', {
+      class: 'w-full h-full flex items-center justify-center bg-gray-100'
+    });
+    $fileContent.append(iconMap[file.type] || '<i class="fas fa-file w-12 h-12 text-gray-400"></i>');
+  }
+
+  // File name label
+  const $fileLabel = $('<div>', {
+    class: 'absolute bottom-0 left-0 right-0 bg-white/80 p-2'
+  }).append(
+    $('<p>', {
+      class: 'text-sm font-medium text-gray-800 truncate',
+      text: file.name
+    })
+  );
+
+  // Tooltip with file details
+  const $tooltip = $('<div>', {
+    class: 'absolute hidden group-hover:block top-full left-0 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 z-20',
+    text: `${file.size} • ${file.lastModified}`
+  });
+
+  // Assemble the file item
+  $fileItem
+    .append($moreButton)
+    .append($contextMenu) // Append menu to file item
+    .append($fileContent)
+    .append($fileLabel)
+    .append($tooltip);
+
+  return $fileItem;
+}
+function renderPendingFilesDocumentation(pendingFile) {
+  const $pendingFileListDocumentation = $('#pending-file-list-documentation');
+  $pendingFileListDocumentation.empty();
+
+  if (pendingFilesDocumentation.length === 0) {
+    $pendingFileListDocumentation.append('<p class="text-gray-500">No hay archivos pendientes.</p>');
+    return;
+  }
+
+  pendingFilesDocumentation.forEach(file => {
+    const $fileItem = $('<div>', {
+      class: 'file-item flex items-center space-x-4',
+      id: `pending-file-documentation-${file.id}`
+    });
+
+    const $progressWrapper = $('<div>', { class: 'relative w-12 h-12' });
+
+    const $progressCircle = $('<svg>', {
+      class: 'progress-circle',
+      viewBox: '0 0 36 36',
+
+    }).append(
+      $('<circle>', {
+        class: 'circle-background',
+        cx: 18,
+        cy: 18,
+        r: 15,
+        stroke: 'red',
+        'stroke-width': 2,
+        fill: 'none'
+      }),
+
+    );
+
+    $progressWrapper.append($progressCircle);
+
+    $fileItem.append(
+      $progressWrapper,
+      $('<div>', { class: 'file-name', text: file.name }),
+      $('<div>', { class: 'text-sm text-gray-500', text: file.size })
+    );
+
+    $pendingFileListDocumentation.append($fileItem);
+  });
+}
+
+
+function simulateFileUploadDocumentation(pendingFile, file) {
+  getInternetSpeed().then(speedInMbps => {
+    const duration = (file.size / (speedInMbps * 1024 * 1024)) * 1000; // Duración simulada en ms
+    const $fileItem = $(`#pending-file-documentation-${pendingFile.id}`); // Localizar el archivo pendiente
+    const $progressCircle = $fileItem.find('.circle-progress');
+    const progressCircle = $progressCircle[0];  // Referencia directa al SVG
+
+    let progress = 0;
+
+
+    const progressInterval = setInterval(async() => {
+      progress += 1;
+      console.log(progress);
+      const offset = 94.25 - (94.25 * progress / 100); // Calculamos el progreso en base a porcentaje
+      $progressCircle.attr('stroke-dashoffset', offset);
+      // Si el progreso alcanza el 100%, limpiamos el intervalo
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+
+        // Mover archivo de pendientes a subidos
+        pendingFilesDocumentation.splice(pendingFilesDocumentation.indexOf(pendingFile), 1);
+
+        console.log(driveFilesDocumentation);
+        renderPendingFilesDocumentation();
+        renderFileGridDocumentation(driveFilesDocumentation);
+        await getDocumentationList(idOrder);
+        initDocumentationDriveEvents();
+      }
+    }, duration / 100); // Actualiza el progreso cada 1% del tiempo estimado
+    uploadDocumentationFile(file);
+  });
+}
+const uploadDocumentationFile = async () => {
+  const formData = new FormData();
+  const file = $("#fileDocumentation").prop("files")[0];
+  formData.append("file", file);
+  formData.append("folder_id", folderId);
+  formData.append("idOrder", idOrder);
+  const url = base_url + "AgenteCompra/PedidosPagados/uploadDocumentationFile";
+  await $.ajax({
+    url,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      try {
+        const data = JSON.parse(response).data.data;
+
+        driveFilesDocumentation.push({
+          id: data.id,
+          name: data.name,
+          type: data.type,
+          path: data.path,
+          thumbnail: data.thumbnail,
+          size: `${(data.size / 1024 / 1024).toFixed(1)} MB`,
+          lastModified: data.lastModified
+        });
+        $("#modal-upload-file-documentation").modal("hide");
+      }
+      catch (e) {
+        console.log(e);
+      }
+    }
+  });
+}
+
 function getAlmacenData(idO) {
   idOrder = idO;
   url = base_url + "Almacen/Trading/getInspeccion";
@@ -7382,97 +7894,97 @@ function getAlmacenData(idO) {
   $("#table-elegir_productos_proveedor").hide();
   if ($.fn.DataTable.isDataTable("#table-inspection")) {
     console.log("Table is already initialized");
-    reload_table_inspection(); 
-  }else{
-  tableInspection = tableInspection.DataTable({
-    dom:
-      "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-      "<'row'<'col-sm-12'tr>>" +
-      "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-    buttons: [
-      {
-        extend: "excel",
-        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-        titleAttr: "Excel",
-        exportOptions: {
-          columns: ":visible",
+    reload_table_inspection();
+  } else {
+    tableInspection = tableInspection.DataTable({
+      dom:
+        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      buttons: [
+        {
+          extend: "excel",
+          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+          titleAttr: "Excel",
+          exportOptions: {
+            columns: ":visible",
+          },
+        },
+        {
+          extend: "pdf",
+          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+          titleAttr: "PDF",
+          exportOptions: {
+            columns: ":visible",
+          },
+        },
+        {
+          extend: "colvis",
+          text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+          titleAttr: "Columnas",
+          exportOptions: {
+            columns: ":visible",
+          },
+        },
+      ],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
         },
       },
-      {
-        extend: "pdf",
-        text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-        titleAttr: "PDF",
-        exportOptions: {
-          columns: ":visible",
-        },
-      },
-      {
-        extend: "colvis",
-        text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-        titleAttr: "Columnas",
-        exportOptions: {
-          columns: ":visible",
-        },
-      },
-    ],
-    paging: true,
-    lengthChange: true,
-    searching: true,
-    ordering: true,
-    info: true,
-    autoWidth: false,
-    responsive: false,
-    serverSide: false,
-    pagingType: "full_numbers",
-    oLanguage: {
-      sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-      sLengthMenu: "_MENU_",
-      sSearch: "Buscar por: ",
-      sSearchPlaceholder: "",
-      sZeroRecords: "No se encontraron registros",
-      sInfoEmpty: "No hay registros",
-      sLoadingRecords: "Cargando...",
-      sProcessing: "Procesando...",
-      oPaginate: {
-        sFirst: "<<",
-        sLast: ">>",
-        sPrevious: "<",
-        sNext: ">",
-      },
-    },
-    order: [[sort_col, "desc"]],
-    ajax: {
-      url: url,
-      type: "POST",
-      dataType: "JSON",
+      order: [[sort_col, "desc"]],
+      ajax: {
+        url: url,
+        type: "POST",
+        dataType: "JSON",
 
-      data: function (data) {
-        data.idOrder = idOrder;
+        data: function (data) {
+          data.idOrder = idOrder;
+        },
+        complete: function () {
+          $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+          calcTotales();
+        },
       },
-      complete: function () {
-        $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-        calcTotales();
-      },
-    },
-    columnDefs: [
-      {
-        targets: "no-hidden",
-        visible: false,
-      },
-      {
-        className: "text-center",
-        targets: "no-sort",
-        orderable: false,
-      },
-    ],
-    lengthMenu: [
-      [10, 100, 1000, -1],
-      [10, 100, 1000, "Todos"],
-    ],
-  })
-}
+      columnDefs: [
+        {
+          targets: "no-hidden",
+          visible: false,
+        },
+        {
+          className: "text-center",
+          targets: "no-sort",
+          orderable: false,
+        },
+      ],
+      lengthMenu: [
+        [10, 100, 1000, -1],
+        [10, 100, 1000, "Todos"],
+      ],
+    })
+  }
   addEventsToInspection();
-  
+
 }
 
 
@@ -8861,8 +9373,8 @@ const openOrdenCompra = async (response) => {
       console.log(firstProduct.total);
       $("#valor-total-excel-orden").text("$" + firstProduct.total);
       spinner.show();
-      const detailsData = 
-      await getExcelOrderDetails(firstId);
+      const detailsData =
+        await getExcelOrderDetails(firstId);
       spinner.hide();
       //set selected element with class card-custom and data-id = firstId
       $(`.card-custom[data-id=${firstId}]`).addClass("selected");
@@ -10001,7 +10513,7 @@ const getExcelOrderItem = (itemData, index, count) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalChina) && ((index==0 && count<=1)||(index!=0) )? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalChina) && ((index == 0 && count <= 1) || (index != 0)) ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrder(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10042,7 +10554,7 @@ const getExcelOrderItemPagos = (itemData, index, length) => {
             <i class="fas fa-download"></i>
             Descargar</a>
 
-            ${(currentPrivilege != priviligesPersonalPeru)  && index == length - 1 ? `<button class="btn btn-item-actions  btn-outline-danger"
+            ${(currentPrivilege != priviligesPersonalPeru) && index == length - 1 ? `<button class="btn btn-item-actions  btn-outline-danger"
             onclick="deleteExcelOrderPagos(${item.id})"
             >
             <i class="fas fa-trash"></i>
@@ -10074,7 +10586,7 @@ $(document).ready(function () {
       formData.append('file', $('#file-input-modal')[0].files[0]);
       formData.append('idPedido', idPedido);
       formData.append('step', selectedStep);
-      
+
       $.ajax({
         url,
         type: 'POST',
@@ -10086,8 +10598,8 @@ $(document).ready(function () {
           $('.upload-btn').prop('disabled', true);
           $('#uploadModal').modal('hide');
 
-          const excelData = 
-          await getExcelOrdersList(idPedido);
+          const excelData =
+            await getExcelOrdersList(idPedido);
           spinner.hide();
           $(".orden-compra-header-excel-container").empty();
           let index = 0;
@@ -10120,7 +10632,7 @@ $(document).ready(function () {
       formData.append('idPagoDetalle', idPedidoDetalle);
       formData.append('pagoValue', $('#pago-value').val());
       formData.append('idPagoId', selectedOrderPagoId);
-      
+
       $.ajax({
         url,
         type: 'POST',
@@ -10161,7 +10673,7 @@ $(document).ready(function () {
           $('#file-input-modal').val('');
           $('.upload-btn').prop('disabled', true);
           $('#uploadModal').modal('hide');
-        
+
           const excelData = await getExcelOrderPaymentsSeekingList(idPedido);
           fillExcelOrderPaymentsSeeking(
             containerExcelHeaderPagos,
@@ -10200,12 +10712,12 @@ const getExcelOrdersList = async ($idPedido) => {
 const getExcelOrderPaymentsSeekingList = async ($idPedido) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingList";
   try {
-    const response = 
-    await $.ajax({
-      url,
-      type: 'POST',
-      data: { idPedido: $idPedido },
-    });
+    const response =
+      await $.ajax({
+        url,
+        type: 'POST',
+        data: { idPedido: $idPedido },
+      });
     const dataExcel = JSON.parse(response).data;
     return dataExcel;
   } catch (error) {
@@ -10243,12 +10755,12 @@ const fillExcelOrderPaymentsSeeking = (container, data) => {
 const getExcelOrderPaymentsSeekingDetails = async (id) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingDetails";
   try {
-    const response = 
-    await $.ajax({
-      url,
-      type: 'POST',
-      data: { idOrder: id },
-    });
+    const response =
+      await $.ajax({
+        url,
+        type: 'POST',
+        data: { idOrder: id },
+      });
     return JSON.parse(response).data;
   }
   catch (error) {
@@ -10259,12 +10771,12 @@ const getExcelOrderPaymentsSeekingDetails = async (id) => {
 const getExcelOrderDetails = async (id) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderDetails";
   try {
-    const response = 
-    await $.ajax({
-      url,
-      type: 'POST',
-      data: { idOrder: id },
-    });
+    const response =
+      await $.ajax({
+        url,
+        type: 'POST',
+        data: { idOrder: id },
+      });
     return JSON.parse(response).data;
   }
   catch (error) {
@@ -10432,23 +10944,23 @@ const addEventToOrdenPagosExcel = () => {
       $("#valor-total-excel").text("¥" + total);
 
       spinner.show();
-      const detailsData = 
-      await getExcelOrderPaymentsSeekingDetails(id);
+      const detailsData =
+        await getExcelOrderPaymentsSeekingDetails(id);
       $(".producto").remove();
       $(".buttons").remove();
-  
-      let totalPagado=0;
-      let totalAdelanto=0;
-      let totalRestante=0;
-      let totalInvoice=0;
+
+      let totalPagado = 0;
+      let totalAdelanto = 0;
+      let totalRestante = 0;
+      let totalInvoice = 0;
       detailsData.forEach((producto, index) => {
         $('#orden-compra_body-pagos').append(getExcelOrderPaymentsSeekingDetailsTemplate(producto));
-        totalPagado+=
-        parseFloat(producto.total_documentos);
-        totalInvoice+=parseFloat(producto.total_invoice);
+        totalPagado +=
+          parseFloat(producto.total_documentos);
+        totalInvoice += parseFloat(producto.total_invoice);
 
-        totalAdelanto+=parseFloat(producto.adelanto);
-        totalRestante+=parseFloat(producto.restante);
+        totalAdelanto += parseFloat(producto.adelanto);
+        totalRestante += parseFloat(producto.restante);
         //add total adelanto,restante y total pagado sum as last row
         if (index == detailsData.length - 1) {
           $('#orden-compra_body-pagos').append(`
@@ -10471,10 +10983,10 @@ const addEventToOrdenPagosExcel = () => {
             <div class="pagos-column">
             <h5><strong>¥${totalPagado}</strong></h5>
             </div>`);
-      }
+        }
       });
-      $('#valor-total-excel-pagado').text("¥" + (isNaN(totalPagado)?0:totalPagado));
-      $('#valor-total-excel').text("¥" + (isNaN(totalInvoice)?0:totalInvoice));
+      $('#valor-total-excel-pagado').text("¥" + (isNaN(totalPagado) ? 0 : totalPagado));
+      $('#valor-total-excel').text("¥" + (isNaN(totalInvoice) ? 0 : totalInvoice));
       pagosButtons.empty();
       let actionButtons = {
         btnSave: {
@@ -10536,7 +11048,7 @@ const getExcelOrderPaymentsSeekingFilesTemplate = (data) => {
   const voucher1 = voucher.length > 0 ? voucher[0].voucher_1_url_link : null;
   const voucher2 = voucher.length > 0 ? voucher[0].voucher_2_url_link : null;
   const voucher3 = voucher.length > 0 ? voucher[0].voucher_3_url_link : null;
-  const total=voucher.length > 0 ?voucher[0].total:0;
+  const total = voucher.length > 0 ? voucher[0].total : 0;
   console.log(voucher1, voucher2, voucher3);
   let html = `
   <div class="producto">
@@ -10756,7 +11268,7 @@ const downloadImage = (imageSrc) => {
 
 // Función para eliminar voucher
 const deleteVoucher = (voucherKey) => {
-  console.log( `.voucher-${parseInt(voucherKey) + 1}`)
+  console.log(`.voucher-${parseInt(voucherKey) + 1}`)
   const voucherContainer = document.querySelector(
     `.voucher-${parseInt(voucherKey) + 1}`
   );
@@ -10783,14 +11295,14 @@ const openPagosSeekingDetailDocuments = async (id) => {
   const url = base_url + "AgenteCompra/PedidosPagados/getExcelOrderPaymentsSeekingDetailDocument";
   try {
 
-    const response = 
-    await $.ajax({
-      url,
-      type: 'POST',
-      data: {
-        id
-      },
-    });
+    const response =
+      await $.ajax({
+        url,
+        type: 'POST',
+        data: {
+          id
+        },
+      });
     showPagosDocuments = true;
     const data = JSON.parse(response).data;
     // spinner.show();
@@ -10831,8 +11343,8 @@ const fillPagosSeekingDetailDocuments = async (container, data) => {
   $(".card-custom").remove();
   data.forEach(async (item, index) => {
     spinner.show();
-    const itemTest = 
-    await getExcelOrderPagosDocumentsItem(item, index, data.length);
+    const itemTest =
+      await getExcelOrderPagosDocumentsItem(item, index, data.length);
     container.append(itemTest);
   }
 
@@ -10889,7 +11401,7 @@ const closePagosSeekingList = () => {
   getOrderProgress(idPedido);
 }
 const closePagosSeekingListDocuments = () => {
-  const pagoValue=$("#pagodoc-value").val()
+  const pagoValue = $("#pagodoc-value").val()
 
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/updateExcelOrderPagos",
@@ -10897,7 +11409,7 @@ const closePagosSeekingListDocuments = () => {
     data: {
       pagoValue,
       idPedidoDetalle,
-      idOrderPago:selectedOrderPagoId
+      idOrderPago: selectedOrderPagoId
     },
     success: function (response) {
 
@@ -10951,24 +11463,24 @@ const deleteExcelOrderPagosDocuments = (id) => {
 $(".custom-file-upload").click(function () {
   $('#uploadModal').modal('show');
 });
-function closeInspection(){
+function closeInspection() {
   containerInspection.hide();
   hideSteps();
 
   getOrderProgress(idOrder);
 }
-function reload_table_inspection(){
+function reload_table_inspection() {
   tableInspection.ajax.reload(null, false);
 }
-function reload_table_almacen(){
+function reload_table_almacen() {
   tableAlmacen.ajax.reload(null, false);
 }
-function removeEventInspection(){
+function removeEventInspection() {
   $(document).off("change", ".box_value");
   $(document).off("change", ".cbm_value");
   $(document).off("change", ".kg_value");
 }
-function calcTotales(){
+function calcTotales() {
   let total = 0;
   $(".box_value").each(function () {
     total += +$(this).val();
@@ -10988,7 +11500,7 @@ function calcTotales(){
   $("#total-kg").val(total);
 
 }
-function addEventsToInspection(){
+function addEventsToInspection() {
   // Add event listener to file input with class box_value on change sum all 
   // values of all inputs with class box_value and set the result to the input with id total-box
   $(document).on("input", ".box_value", function () {
@@ -11014,25 +11526,25 @@ function addEventsToInspection(){
     $("#total-kg").val(total);
   });
   $("#btn-save-inspection").on("click", function () {
-  saveInspection()
+    saveInspection()
   });
   $("#btn-back-inspection").on("click", function () {
     closeInspection();
   });
 }
-function saveInspection(){
+function saveInspection() {
   //get all values of inputs with class box_value, cbm_value and kg_value
   let data = [];
   $(".box_value, .cbm_value, .kg_value, .almacen_notas").each(function () {
     let id = $(this).data("id");
-    
+
     // Encontrar o crear un objeto para este id
     let existing = data.find(item => item.id === id);
     if (!existing) {
       existing = { id: id, total_box_almacen: 0, total_cbm_almacen: 0, total_kg_almacen: 0, nota_almacen: "" };
       data.push(existing);
     }
-    
+
     // Actualizar el campo correspondiente
     if ($(this).hasClass("box_value")) {
       existing.total_box_almacen = !isNaN($(this).val()) ? $(this).val() : 0;
@@ -11048,36 +11560,37 @@ function saveInspection(){
     url: base_url + "Almacen/Trading/saveInspection",
     type: "POST",
     dataType: "JSON",
-    data: { 
+    data: {
       data: data,
       idOrder: idOrder,
-     },
+    },
     success: function (data) {
       reload_table_inspection();
       //show toast
     },
   });
 }
-function closePagos(){
+function closePagos() {
   containerInspection.show();
   driveContainer.hide();
   reload_table_inspection();
-  
+
 }
-function deleteInspeccionFiles(id){
+function deleteInspeccionFiles(id) {
   $.ajax({
     url: base_url + "Almacen/Trading/deleteInspeccionFiles",
     type: "POST",
     dataType: "JSON",
-    data: { idFile: id,
-      idDetalle: idDetalle 
-     },
+    data: {
+      idFile: id,
+      idDetalle: idDetalle
+    },
     success: function (data) {
-      
+
     },
   });
 }
-function getFotos(idEx,idD) {
+function getFotos(idEx, idD) {
   removeEventInspection();
   idExcel = idEx;
   idDetalle = idD;
@@ -11087,9 +11600,10 @@ function getFotos(idEx,idD) {
     url: base_url + "Almacen/Trading/getInspeccionFiles",
     type: "POST",
     dataType: "JSON",
-    data: { idExcel: idExcel,
+    data: {
+      idExcel: idExcel,
       idDetalle: idDetalle
-     },
+    },
     success: function (data) {
       driveFiles = data.data;
       renderFileGrid(driveFiles);
@@ -11104,13 +11618,13 @@ const $fileGrid = $('#file-grid');
 const $searchInput = $('#search-input');
 const $fileList = $('#file-list');
 const $backBtn = $('#back-btn');
-const iconMap = {
-  'application/pdf': '<i class="fas fa-file-pdf w-12 h-12 text-red-400"></i>',
-  'image/jpeg': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
-  'image/png': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-    '<i class="fas fa-file-word w-12 h-12 text-blue-600"></i>'
-};
+// const iconMap = {
+//   'application/pdf': '<i class="fas fa-file-pdf w-12 h-12 text-red-400"></i>',
+//   'image/jpeg': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
+//   'image/png': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
+//   'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+//     '<i class="fas fa-file-word w-12 h-12 text-blue-600"></i>'
+// };
 const pendingFiles = [];
 // Initial files
 // const files = [
@@ -11207,14 +11721,14 @@ function validateFile(file) {
     "image/webp",
     "image/bmp",
     "image/avif",
-  
+
     // Videos
     "video/mp4",
     "video/mkv",
     "video/webm",
     "video/avi",
     "video/mov",
-  
+
     // Archivos de oficina
     "application/pdf",
     "application/msword", // .doc
@@ -11223,8 +11737,8 @@ function validateFile(file) {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
     "application/vnd.ms-powerpoint", // .ppt
     "application/vnd.openxmlformats-officedocument.presentationml.presentation" // .pptx
-  ];      
-    const maxSize = 20 * 1024 * 1024; // 10MB
+  ];
+  const maxSize = 20 * 1024 * 1024; // 10MB
 
   if (!validTypes.includes(file.type)) {
     alert(`Tipo de archivo no soportado: ${file.name}`);
@@ -11304,7 +11818,7 @@ function createFileItem(file) {
   const $contextMenu = $('<div>', {
     class: 'context-menu  right-0  mt-2 bg-white border rounded shadow-lg text-sm hidden z-20'
   }).append(
-    
+
     $('<button>', {
       class: 'block w-full text-left px-4 py-2 hover:bg-gray-100',
       text: 'Descargar',
@@ -11344,14 +11858,14 @@ function createFileItem(file) {
   });
   let $fileContent;
   if (file.thumbnail
-&& file.type.startsWith('image/')
+    && file.type.startsWith('image/')
   ) {
     $fileContent = $('<img>', {
       src: file.path,
       alt: file.name,
       class: 'w-full h-full object-cover'
     });
-  }else if (file.thumbnail && file.type.startsWith('video/')) {
+  } else if (file.thumbnail && file.type.startsWith('video/')) {
     $fileContent = $('<video>', {
       src: file.path,
       alt: file.name,
@@ -11362,7 +11876,7 @@ function createFileItem(file) {
       muted: true
     })
   }
-   else {
+  else {
     $fileContent = $('<div>', {
       class: 'w-full h-full flex items-center justify-center bg-gray-100'
     });
@@ -11444,10 +11958,10 @@ async function getInternetSpeed() {
   const fileUrl = "https://cargaconsolidadaback.probusiness.pe/storage/RC7VD9KRltwn4hEzPrrSz6Tbv6IIr2C1laOIqPa6.png";
   const startTime = Date.now();
   try {
-     response = 
-    await fetch(fileUrl, { method: 'GET', cache: 'no-store' });
-    const blob = 
-    await response.blob();
+    response =
+      await fetch(fileUrl, { method: 'GET', cache: 'no-store' });
+    const blob =
+      await response.blob();
     const endTime = Date.now();
 
     const fileSizeInBits = blob.size * 8; // Tamaño del archivo en bits
@@ -11472,7 +11986,7 @@ function simulateFileUpload(pendingFile, file) {
     const progressCircle = $progressCircle[0];  // Referencia directa al SVG
 
     let progress = 0;
-  
+
 
     const progressInterval = setInterval(() => {
       progress += 1;
@@ -11484,7 +11998,7 @@ function simulateFileUpload(pendingFile, file) {
 
         // Mover archivo de pendientes a subidos
         pendingFiles.splice(pendingFiles.indexOf(pendingFile), 1);
-        
+
 
         renderPendingFiles();
         renderFileGrid(driveFiles);  // Suponiendo que renderFileGrid maneja la lista de subidos
@@ -11495,69 +12009,69 @@ function simulateFileUpload(pendingFile, file) {
 }
 
 function uploadFile(file) {
-const formData = new FormData();
-formData.append('file', file);
-formData.append('idExcel', idExcel);
-formData.append('idDetalle', idDetalle);
-formData.append('idOrder', idOrder);
-let url=base_url + "Almacen/Trading/uploadInspeccionFiles";
-fetch(url, {
-  method: 'POST',
-  body: formData
-})
-  .then(response => response.json())
-  .then(data => {
-    driveFiles.push({
-      id: data.id,
-      name: data.name,
-      type: data.type,
-      path: data.path,
-      thumbnail: data.thumbnail,
-      size: `${(data.size / 1024 / 1024).toFixed(1)} MB`,
-      lastModified: data.lastModified
-    });
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('idExcel', idExcel);
+  formData.append('idDetalle', idDetalle);
+  formData.append('idOrder', idOrder);
+  let url = base_url + "Almacen/Trading/uploadInspeccionFiles";
+  fetch(url, {
+    method: 'POST',
+    body: formData
   })
-  .catch(error => {
-    console.error('Error al subir archivo:', error);
-  });
+    .then(response => response.json())
+    .then(data => {
+      driveFiles.push({
+        id: data.id,
+        name: data.name,
+        type: data.type,
+        path: data.path,
+        thumbnail: data.thumbnail,
+        size: `${(data.size / 1024 / 1024).toFixed(1)} MB`,
+        lastModified: data.lastModified
+      });
+    })
+    .catch(error => {
+      console.error('Error al subir archivo:', error);
+    });
 
 }
-const closeBookingView=()=>{
+const closeBookingView = () => {
   bookingContainer.hide();
 }
-const openBookingView=async (data,id,privilegios)=>{
+const openBookingView = async (data, id, privilegios) => {
   spinner.show();
   containerOrdenCompra.hide();
   $("#bookingForm").empty();
-  const cargoType=data?.booking_tipo;
+  const cargoType = data?.booking_tipo;
   bookingContainer.show();
-  if(cargoType){
+  if (cargoType) {
     $("#btn-confirm-edit-booking").off("click");
-    $("#btn-confirm-edit-booking").on("click",function(){
+    $("#btn-confirm-edit-booking").on("click", function () {
       event.preventDefault();
       //send idOrder and idBooking to backend
-      const idBooking=data?.id;
+      const idBooking = data?.id;
       editBooking(idBooking);
     });
   }
-  if(cargoType==="FCL"){
+  if (cargoType === "FCL") {
     showFLCForm();
     $("#booking-tipo-header").empty();
     $("#booking-tipo-header").append("<h3 class=' font-semibold'>FCL</h3>");
     // $("#btn-save-fcl").text("Editar FCL");
- 
+
     await fillFlcFormSelects();
     fillFLCForm(data);
     setupDatePicker();
     $('#btn-save-fcl').off('click');
-    $('#btn-save-fcl').on('click', function() {
+    $('#btn-save-fcl').on('click', function () {
       //prevent default 
       event.preventDefault();
       saveFCLBooking(data?.id);
 
     });
-    
-  }else if(cargoType==="LCL"){
+
+  } else if (cargoType === "LCL") {
     showLCLForm();
     $("#booking-tipo-header").empty();
     $("#booking-tipo-header").append("<h3 class=' font-semibold'>LCL</h3>");
@@ -11568,20 +12082,20 @@ const openBookingView=async (data,id,privilegios)=>{
     fillLCLForm(data);
     setupDatePicker();
     $('#btn-save-lcl').off('click');
-    $('#btn-save-lcl').on('click', function() {
+    $('#btn-save-lcl').on('click', function () {
       //prevent default
       event.preventDefault();
       saveLCLBooking(data?.id);
     });
-  }else if (cargoType==="CONSOLIDADO"){
+  } else if (cargoType === "CONSOLIDADO") {
     $("#booking-tipo-header").empty();
     $("#booking-tipo-header").append("<h3 class=' font-semibold'>CONSOLIDADO</h3>");
     // $("#btn-save-fcl").text("Editar Consolidado");
-   
+
     showConsolidadoForm();
     //remove event listeners
     $("#btn-save-consolidado").off("click");
-    $("#btn-save-consolidado").on("click",function(){
+    $("#btn-save-consolidado").on("click", function () {
       event.preventDefault();
       saveConsolidadoBooking(data?.id);
     });
@@ -11589,7 +12103,7 @@ const openBookingView=async (data,id,privilegios)=>{
     await fillConsolidadoSelects();
     fillConsolidadoForm(data);
   }
-  else{
+  else {
     $("#booking-tipo-header").empty();
     $("#booking-tipo-header").append(`<span class="cargo-type-toggle" data-type="fcl">FCL</span>
                         <span class="cargo-type-toggle" data-type="lcl">LCL</span>
@@ -11597,21 +12111,21 @@ const openBookingView=async (data,id,privilegios)=>{
   }
   spinner.hide();
   $(".cargo-type-toggle").off("click");
-  $('.cargo-type-toggle').on('click', async function() {
+  $('.cargo-type-toggle').on('click', async function () {
     spinner.show();
     $('.cargo-type-toggle').removeClass('active');
     $(this).addClass('active');
-    
+
     const cargoType = $(this).data('type');
     $('#cargoTypeInput').val(cargoType);
     hideFLCForm();
     hideLCLForm();
     hideConsolidadoForm();
-   
+
     if (cargoType === 'fcl') {
       showFLCForm();
       fillFLCForm(data);
-      if(currentPrivilege!=priviligesJefeChina){
+      if (currentPrivilege != priviligesJefeChina) {
         //disable form inputs and hide save buttons 
         $(".form-control").prop("disabled", true);
         $("#btn-save-fcl").hide();
@@ -11621,7 +12135,7 @@ const openBookingView=async (data,id,privilegios)=>{
       spinner.show();
       await fillFlcFormSelects();
       $('#btn-save-fcl').off('click');
-      $('#btn-save-fcl').on('click', function() {
+      $('#btn-save-fcl').on('click', function () {
         //prevent default 
         event.preventDefault();
         saveFCLBooking(data?.id);
@@ -11632,7 +12146,7 @@ const openBookingView=async (data,id,privilegios)=>{
       fillLCLForm(data);
       spinner.show();
       await fillLclFormSelects();
-      if(currentPrivilege!=priviligesJefeChina){
+      if (currentPrivilege != priviligesJefeChina) {
         //disable form inputs and hide save buttons 
         $(".form-control").prop("disabled", true);
         $("#btn-save-fcl").hide();
@@ -11640,37 +12154,37 @@ const openBookingView=async (data,id,privilegios)=>{
         $("#btn-save-consolidado").hide();
       }
       $('#btn-save-lcl').off('click');
-      $('#btn-save-lcl').on('click', function() {
+      $('#btn-save-lcl').on('click', function () {
         //prevent default
         event.preventDefault();
         saveLCLBooking(data?.id);
       });
-    } else if(cargoType === 'consolidado'){
+    } else if (cargoType === 'consolidado') {
       showConsolidadoForm();
       fillConsolidadoForm(data);
       spinner.show();
       await fillConsolidadoSelects();
-      if(currentPrivilege!=priviligesJefeChina){
+      if (currentPrivilege != priviligesJefeChina) {
         //disable form inputs and hide save buttons 
         $(".form-control").prop("disabled", true);
         $("#btn-save-fcl").hide();
         $("#btn-save-lcl").hide();
         $("#btn-save-consolidado").hide();
-       
+
       }
       //remove event listeners
       $("#btn-save-consolidado").off("click");
-      $("#btn-save-consolidado").on("click",function(){
+      $("#btn-save-consolidado").on("click", function () {
         event.preventDefault();
         saveConsolidadoBooking(data?.id);
       });
-      
+
     }
     setupDatePicker();
     spinner.hide();
   });
   $("#btn-save-shipper").off("click");
-  $("#btn-save-shipper").on("click", async function(event) {
+  $("#btn-save-shipper").on("click", async function (event) {
     event.preventDefault();
     const formData = new FormData();
     const shipperName = $("#shipperName").val();
@@ -11681,14 +12195,14 @@ const openBookingView=async (data,id,privilegios)=>{
       data: formData,
       processData: false,
       contentType: false,
-      success: function(data) {
-         fillCodShipperSelect()
-         $('#newShipperDialog').modal('hide');
+      success: function (data) {
+        fillCodShipperSelect()
+        $('#newShipperDialog').modal('hide');
       }
     });
   });
   $("#btn-save-country").off("click");
-  $("#btn-save-country").on("click", async function(event) {
+  $("#btn-save-country").on("click", async function (event) {
     event.preventDefault();
     const formData = new FormData();
     const countryName = $("#countryName").val();
@@ -11699,24 +12213,24 @@ const openBookingView=async (data,id,privilegios)=>{
       data: formData,
       processData: false,
       contentType: false,
-      success: function(data) {
+      success: function (data) {
         fillPaisSelect()
         $('#newCountryDialog').modal('hide');
       }
     });
   });
 
-  $('.btn-back-booking').on('click', function() {
+  $('.btn-back-booking').on('click', function () {
     event.preventDefault();
     closeBookingView();
     getOrderProgress(id);
   });
   // $(".btn-edit-booking").on("click",function(){
   //   event.preventDefault();
-    
+
   // });
-  
-  if(currentPrivilege!=priviligesJefeChina){
+
+  if (currentPrivilege != priviligesJefeChina) {
     //disable form inputs and hide save buttons 
     $(".form-control").prop("disabled", true);
     $("#btn-save-fcl").hide();
@@ -11725,20 +12239,21 @@ const openBookingView=async (data,id,privilegios)=>{
     $(".btn-edit-booking").hide();
   }
 }
-function editBooking(idBooking){
+function editBooking(idBooking) {
   $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/editBooking",
     type: "POST",
     dataType: "JSON",
-    data: { idBooking: idBooking,
+    data: {
+      idBooking: idBooking,
       idPedido: idPedido,
-     },
-    success: function(data) {
-      openStepFunction(4,idPedido);
+    },
+    success: function (data) {
+      openStepFunction(4, idPedido);
       $("#editBooking").modal("hide");
     }
   });
-  
+
 }
 
 function setupDatePicker() {
@@ -11749,34 +12264,34 @@ function setupDatePicker() {
     dateFormat: "yyyy-mm-dd",
     format: "yyyy-mm-dd",
   });
-      
+
 }
-const  fillFlcFormSelects=async()=>{
+const fillFlcFormSelects = async () => {
 
   await Promise.all([
     fillNavieraSelect(),
     fillContenedorSelect(),
     fillCodShipperSelect()
-]);
+  ]);
 }
-const fillConsolidadoSelects=async()=>{
+const fillConsolidadoSelects = async () => {
 
   await Promise.all([
     fillPaisSelect(),
-]);
+  ]);
 }
-const  fillLclFormSelects=async()=>{
+const fillLclFormSelects = async () => {
 
   await Promise.all([
     fillCodShipperSelect()
-]);
+  ]);
 }
-const fillConsolidadoForm=(data)=>{
-$('#consolidado').val(data.consolidado);
-$("#pais").val(data.id_pais_booking);
+const fillConsolidadoForm = (data) => {
+  $('#consolidado').val(data.consolidado);
+  $("#pais").val(data.id_pais_booking);
 }
 
-const fillFLCForm=(data)=>{
+const fillFLCForm = (data) => {
   $("#client").val(data.client);
   $("#inland").val(data.inland);
   $("#flete").val(data.flete);
@@ -11793,7 +12308,7 @@ const fillFLCForm=(data)=>{
   $("#servicio").val(data.servicio);
 
 }
-const fillLCLForm=(data)=>{
+const fillLCLForm = (data) => {
   $("#client").val(data.client);
 
   $("#inland").val(data.inland);
@@ -11805,8 +12320,8 @@ const fillLCLForm=(data)=>{
   $("#codbl").val(data.cod_bl);
   $("#servicio").val(data.servicio);
 }
-const showFLCForm= ()=>{
-  const html =`
+const showFLCForm = () => {
+  const html = `
   <div id="fclDetails" class="space-y-8">
                   <div class=" grid gap-4">
                       <div class="mb-3">
@@ -11978,7 +12493,7 @@ const showFLCForm= ()=>{
   $("#bookingForm").append(html);
 }
 
-const fillNavieraSelect=async ()=>{
+const fillNavieraSelect = async () => {
   await $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/getNavieras",
     type: 'POST',
@@ -11988,11 +12503,11 @@ const fillNavieraSelect=async ()=>{
       $('#naviera').append(`<option value="">Seleccionar naviera</option>`);
       data.forEach(item => {
         $('#naviera').append(`<option value="${item.id}">${item.name}</option>`);
-      }); 
+      });
     }
   });
 }
-const fillContenedorSelect= async()=>{
+const fillContenedorSelect = async () => {
   await $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/getContainer",
     type: 'POST',
@@ -12006,7 +12521,7 @@ const fillContenedorSelect= async()=>{
     }
   });
 }
-const fillCodShipperSelect=async ()=>{
+const fillCodShipperSelect = async () => {
   await $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/getShipper",
     type: 'POST',
@@ -12020,7 +12535,7 @@ const fillCodShipperSelect=async ()=>{
     }
   });
 }
-const fillPaisSelect=async ()=>{
+const fillPaisSelect = async () => {
   await $.ajax({
     url: base_url + "AgenteCompra/PedidosPagados/getBookingCountries",
     type: 'POST',
@@ -12039,11 +12554,11 @@ const fillPaisSelect=async ()=>{
     }
   });
 }
-const hideFLCForm= ()=>{
+const hideFLCForm = () => {
   $('#fclDetails').remove();
 }
-const showLCLForm= ()=>{
-  const html =`
+const showLCLForm = () => {
+  const html = `
           <div id="lclDetails" class="space-y-8">
                   <div class="form-section grid gap-4">
                       <div class="mb-3">
@@ -12166,11 +12681,11 @@ const showLCLForm= ()=>{
             </div>`;
   $("#bookingForm").append(html);
 }
-const hideLCLForm= ()=>{
+const hideLCLForm = () => {
   $('#lclDetails').remove();
 }
-const showConsolidadoForm= ()=>{
-   const html =`
+const showConsolidadoForm = () => {
+  const html = `
           <div id="consolidadoDetails" class="space-y-8">
             <div class="form-section grid gap-6">
               <div class="grid gap-2">
@@ -12206,12 +12721,12 @@ const showConsolidadoForm= ()=>{
           </div>`;
   $("#bookingForm").append(html);
 }
-const hideConsolidadoForm= ()=>{
+const hideConsolidadoForm = () => {
   $('#consolidadoDetails').remove();
 }
-const deleteShipper=()=>{
+const deleteShipper = () => {
   const shipper = $('#codShipper').val();
-  if(shipper!=""){
+  if (shipper != "") {
     //show confirmation dialog
     const r = confirm("¿Está seguro de eliminar el shipper seleccionado?");
     if (r == true) {
@@ -12228,9 +12743,9 @@ const deleteShipper=()=>{
     }
   }
 }
-const deleteCountry=()=>{
+const deleteCountry = () => {
   const pais = $('#pais').val();
-  if(pais!=""){
+  if (pais != "") {
     //show confirmation dialog
     const r = confirm("¿Está seguro de eliminar el país seleccionado?");
     if (r == true) {
@@ -12244,9 +12759,11 @@ const deleteCountry=()=>{
           fillPaisSelect();
         }
       });
-    }}}
+    }
+  }
+}
 
-const saveFCLBooking=(id=null)=>{
+const saveFCLBooking = (id = null) => {
   const client = $('#client').val();
   const tc = $('#tc').val();
   const rmb = $('#rmb').val();
@@ -12265,66 +12782,66 @@ const saveFCLBooking=(id=null)=>{
   const norden = $('#norden').val();
   const codbl = $('#codbl').val();
   $('span.error').text('');
-  $('input').removeClass('error');  
+  $('input').removeClass('error');
   $('select').removeClass('error');
-  if(!client){
+  if (!client) {
     $('#error-client').text('El campo cliente es obligatorio');
     $("#client").addClass("error");
   }
-  if(!inland){
+  if (!inland) {
     $('#error-inland').text('El campo inland es obligatorio');
     $("#inland").addClass("error");
-   
+
   }
-  if(!flete){
+  if (!flete) {
     $('#error-flete').text('El campo flete es obligatorio');
     $("#flete").addClass("error");
   }
-  if(!naviera){
+  if (!naviera) {
     $('#error-naviera').text('El campo naviera es obligatorio');
     $("#naviera").addClass("error");
   }
-  if(!contenedor){
+  if (!contenedor) {
     $('#error-contenedor').text('El campo contenedor es obligatorio');
     $("#contenedor").addClass("error");
   }
-  if(!diasTransito){
+  if (!diasTransito) {
     $('#error-diasTransito').text('El campo días tránsito es obligatorio');
     $("#diasTransito").addClass("error");
   }
-  if(!cutoffDate){
+  if (!cutoffDate) {
     $('#error-cutoffDate').text('El campo cut off es obligatorio');
     $("#cutoffDate").addClass("error");
   }
-  if(!etdDate){
+  if (!etdDate) {
     $('#error-etdDate').text('El campo etd es obligatorio');
     $("#etdDate").addClass("error");
   }
-  if(!etaDate){
+  if (!etaDate) {
     $('#error-etaDate').text('El campo eta es obligatorio');
     $("#etaDate").addClass("error");
   }
-  if(!boxFree){
+  if (!boxFree) {
     $('#error-boxFree').text('El campo box free es obligatorio');
     $("#boxFree").addClass("error");
   }
-  if(!codShipper){
+  if (!codShipper) {
     $('#error-codShipper').text('El campo cod shipper es obligatorio');
     $("#codShipper").addClass("error");
   }
-  if(!norden){
+  if (!norden) {
     $('#error-norden').text('El campo norden es obligatorio');
     $("#norden").addClass("error");
   }
-  if(!codbl){
+  if (!codbl) {
     $('#error-codbl').text('El campo cod bl es obligatorio');
     $("#codbl").addClass("error");
   }
-  if(!servicio){
+  if (!servicio) {
     $('#error-servicio').text('El campo servicio es obligatorio');
     $("#servicio").addClass("error");
   }
-  if(!client || !inland || !flete || !naviera || !contenedor || !diasTransito || !cutoffDate || !etdDate || !etaDate || !boxFree || !codShipper || !norden || !codbl || !servicio){
+  if (!client || !inland || !flete || !naviera || !contenedor || !diasTransito || !cutoffDate || !etdDate || !etaDate || !boxFree || !codShipper || !norden || !codbl || !servicio) {
     return;
   }
   spinner.show();
@@ -12355,13 +12872,13 @@ const saveFCLBooking=(id=null)=>{
       idBookingDetail,
     },
     success: function (data) {
-      openStepFunction(4,idPedido);
+      openStepFunction(4, idPedido);
       spinner.hide();
 
     }
   });
 }
-const saveLCLBooking=(id=null)=>{
+const saveLCLBooking = (id = null) => {
   const client = $('#client').val();
   const inland = $('#inland').val();
   const cutoffDate = $('#cutoffDate').val();
@@ -12375,43 +12892,43 @@ const saveLCLBooking=(id=null)=>{
   $('span.error').text('');
   $('input').removeClass('error');
   $('select').removeClass('error');
-  if(!client){
+  if (!client) {
     $('#error-client').text('El campo cliente es obligatorio');
     $("#client").addClass("error");
   }
-  if(!inland){
+  if (!inland) {
     $('#error-inland').text('El campo inland es obligatorio');
     $("#inland").addClass("error");
   }
-  if(!cutoffDate){
+  if (!cutoffDate) {
     $('#error-cutoffDate').text('El campo cut off es obligatorio');
     $("#cutoffDate").addClass("error");
   }
-  if(!etdDate){
+  if (!etdDate) {
     $('#error-etdDate').text('El campo etd es obligatorio');
     $("#etdDate").addClass("error");
   }
-  if(!etaDate){
+  if (!etaDate) {
     $('#error-etaDate').text('El campo eta es obligatorio');
     $("#etaDate").addClass("error");
   }
-  if(!codShipper){
+  if (!codShipper) {
     $('#error-codShipper').text('El campo cod shipper es obligatorio');
     $("#codShipper").addClass("error");
   }
-  if(!servicio){
+  if (!servicio) {
     $('#error-servicio').text('El campo servicio es obligatorio');
     $("#servicio").addClass("error");
   }
-  if(!norden){
+  if (!norden) {
     $('#error-norden').text('El campo norden es obligatorio');
     $("#norden").addClass("error");
   }
-  if(!codbl){
+  if (!codbl) {
     $('#error-codbl').text('El campo cod bl es obligatorio');
     $("#codbl").addClass("error");
   }
-  if(!client || !inland || !cutoffDate || !etdDate || !etaDate || !codShipper || !servicio || !norden || !codbl){
+  if (!client || !inland || !cutoffDate || !etdDate || !etaDate || !codShipper || !servicio || !norden || !codbl) {
     return;
   }
 
@@ -12435,23 +12952,23 @@ const saveLCLBooking=(id=null)=>{
     },
     success: function (data) {
       spinner.hide();
-      openStepFunction(4,idPedido);
-      
+      openStepFunction(4, idPedido);
+
     }
   });
 }
-const saveConsolidadoBooking=(id=null)=>{
+const saveConsolidadoBooking = (id = null) => {
   const pais = $('#pais').val();
   const consolidado = $('#consolidado').val();
   const idBookingDetail = id;
   $('span.error').text('');
   $('input').removeClass('error');
   $('select').removeClass('error');
-  if(!pais){
+  if (!pais) {
     $('#error-pais').text('El campo país es obligatorio');
     $("#pais").addClass("error");
   }
-  if(!consolidado){
+  if (!consolidado) {
     $('#error-consolidado').text('El campo consolidado es obligatorio');
     $("#consolidado").addClass("error");
   }
@@ -12466,7 +12983,7 @@ const saveConsolidadoBooking=(id=null)=>{
       idBookingDetail,
     },
     success: function (data) {
-      openStepFunction(4,idPedido);
+      openStepFunction(4, idPedido);
       spinner.hide();
     }
   });

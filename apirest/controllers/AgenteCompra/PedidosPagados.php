@@ -2043,6 +2043,10 @@ class PedidosPagados extends CI_Controller
                     echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
                  
             }
+            if($step==5){
+                $data = $this->PedidosPagadosModel->getPedidoDocumentation($idPedido);
+                echo json_encode(array('status' => 'success', 'data' => $data, 'priviligie' => $priviligie));
+            }
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
         }
@@ -2550,6 +2554,35 @@ class PedidosPagados extends CI_Controller
     public function deleteShipper(){
         $data = $this->input->post();
         $response = $this->PedidosPagadosModel->deleteShipper($data['shipper']);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getDocumentationList(){
+        $idPedido = $this->input->post('idPedido');
+        $tipo=$this->input->post('booking_tipo');
+        $response = $this->PedidosPagadosModel->getDocumentationList($idPedido,$tipo);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function uploadDocumentationFile(){
+        $data = $this->input->post();
+        $files = $_FILES;
+        $response = $this->PedidosPagadosModel->uploadDocumentationFile($data, $files);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function getDocumentationFiles(){
+        $data = $this->input->post();
+        $idPedido = $data['id'];
+        $response = $this->PedidosPagadosModel->getDocumentationFiles($idPedido);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function createDocumentationFolder(){
+        $data = $this->input->post();
+        $response = $this->PedidosPagadosModel->createDocumentationFolder($data);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function deleteDocumentationFiles(){
+        $data = $this->input->post();
+        $id=$data['id'];
+        $response = $this->PedidosPagadosModel->deleteDocumentationFiles($id);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }
