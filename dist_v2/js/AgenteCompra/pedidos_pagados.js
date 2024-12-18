@@ -7380,6 +7380,9 @@ const openDocumentationView = async (data, idPedido, currentPrivilege) => {
   containerDocumentacion.show();
   await getDocumentationList(idPedido);
   await getDocumentationFiles(idPedido);
+  if(!booking_tipo){
+    $(".tipo_documentacion").text("No se ha seleccionado un tipo de booking");
+  }
   initDocumentationDriveEvents();
 
 }
