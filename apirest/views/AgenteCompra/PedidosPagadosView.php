@@ -784,8 +784,8 @@
                 </div>
     </div>
   </div>
-  <section class="min-h-screen bg-white documentation-container container-fluid px-3 w-75" id="documentation-container">
-    <header id="documentation-header">
+  <section class="min-h-screen bg-white documentation-container container-fluid px-3 w-75 row" id="documentation-container">
+    <header id="documentation-header col-12 col-lg-6">
       <div class="d-flex justify-content-between mb-4">
         <div>
           <h2 class="text-xl mb-2">Documentación</h2>
@@ -793,7 +793,7 @@
         </div>
       </div>
     </header>
-    <main id="documentation-main">
+    <main id="documentation-main col-12 col-lg-6">
       <div class="row">
         <div class="col-12 col-md-6">
           <div>
