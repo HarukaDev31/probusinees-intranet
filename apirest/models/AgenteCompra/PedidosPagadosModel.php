@@ -4067,6 +4067,6 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
         }
         return $isValid;
-
+    }   
 
 }
