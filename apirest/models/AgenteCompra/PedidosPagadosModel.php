@@ -4001,7 +4001,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         ];
         $booking_tipo=$this->db->select('booking_tipo')->from($this->table)->where('ID_Pedido_Cabecera',$idPedido)->get()->row()->booking_tipo;
         if($this->validateFilesInAllFolderOrder($idPedido,$booking_tipo)){
-            $this->db->where('id_order',4);
+            $this->db->where('id_order',5);
             $this->db->where('id_pedido',$idPedido);
             $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
         }
