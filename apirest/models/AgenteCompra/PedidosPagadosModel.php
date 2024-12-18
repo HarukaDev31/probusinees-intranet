@@ -3961,6 +3961,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         ->where('agente_compra_documentation_folders.id_pedido', $idPedido)
         ->or_where('agente_compra_documentation_folders.id_pedido IS NULL')
         ->where('agente_compra_documentation_folders.tipo_documentacion', $tipo)
+        ->where('agente_compra_documentation_folder_files.id_pedido',$idPedido)
         ->group_by('agente_compra_documentation_folders.id'); // Agrupa por id_folder
         $query = $this->db->get();
         return $query->result();
@@ -4063,6 +4064,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         ->where('agente_compra_documentation_folders.id_pedido', $idPedido)
         ->or_where('agente_compra_documentation_folders.id_pedido IS NULL')
         ->where('agente_compra_documentation_folders.tipo_documentacion', $booking_tipo)
+        ->where('agente_compra_documentation_folder_files.id_pedido',$idPedido)
         ->group_by('agente_compra_documentation_folders.id'); // Agrupa por id_folder
         $query = $this->db->get();
         $result=$query->result();

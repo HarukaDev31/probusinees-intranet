@@ -7419,10 +7419,9 @@ async function getDocumentationList(id) {
         parsedResponse.data.forEach((item) => {
           const html = getDocumentationItemTemplate(item);
           documentationList.append(html);
-
         });
         documentationList.append(`
-          <div class="d-flex flex-row justify-content-between p-3  btn-open-modal-folder-documentation"
+          <div class="d-flex flex-row justify-content-center p-3  btn-open-modal-folder-documentation"
           
   style="border-radius: 10px; border: 1px solid #e5e7eb;"
   >
@@ -7431,7 +7430,7 @@ async function getDocumentationList(id) {
        <div class="p-2 btn btn-dark btn-create-folder-documentation"
             >
           <i class="fas fa-cloud-upload-alt text-white-500"></i>
-          <span class="ml-2">Crear Folder</span>
+          <span class="ml-2">+ Archivos</span>
        </div>
     </div>
   </div>`);
@@ -7535,8 +7534,6 @@ const initDocumentationDriveEvents = () => {
   $uploadBtnDocumentation.off('click');
   $uploadBtnDocumentation.on('click', function () {
     event.preventDefault();
-
-    // $fileInputDocumentation.click();
     handleFilesDocumentation($fileInputDocumentation[0].files);
   });
   
@@ -7876,6 +7873,7 @@ const uploadDocumentationFile = async () => {
           lastModified: data.lastModified
         });
         $("#modal-upload-file-documentation").modal("hide");
+        $("#fileDocumentation").val("");
       }
       catch (e) {
         console.log(e);

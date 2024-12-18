@@ -820,11 +820,11 @@
                 <div class="container mx-auto px-4 py-2 flex items-center justify-between ">
                     <h1 class="text-xl font-semibold text-gray-800">Archivos</h1>
                     <div class="flex items-center space-x-4">
-                        <div class="relative">
+                        <!-- <div class="relative">
                             <input type="text" placeholder="Buscar en Archivos" id="search-input-documentation"
                                 class="pl-8 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
+                        </div> -->
                         <button class="p-2 rounded-full hover:bg-gray-100"
                         id="back-btn-documentation"
                         >
@@ -850,7 +850,7 @@
 
                 </div>
 
-                <div id="file-grid-documentation" class="grid grid-cols-4 gap-4">
+                <div id="file-grid-documentation" class="grid grid-cols-2 gap-4">
 
                     <!-- Existing and uploaded files will appear here -->
                 </div>
@@ -900,7 +900,7 @@
                                 <label for="fileDocumentation">Archivo</label>
                                 <input type="file" class="form-control" id="fileDocumentation" name="fileDocumentation" required>
                               </div>
-                              <button id="btn-upload-file-documentation" class="btn btn-primary">Crear</button>
+                              <button id="btn-upload-file-documentation" class="btn btn-primary">Subir</button>
                         </form>  
                     </div>   
                 </div>
