@@ -795,14 +795,14 @@
     </header>
     <main id="documentation-main">
       <div class="row">
-        <div class="col-12 col-md-12 col-lg-6">
+        <div class="col-12 col-md-12 col-lg-4">
           <div>
             <h4>Documentos por subir</h4>
             <div class="documentation-list">
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-12 col-lg-6">
+        <div class="col-12 col-md-12 col-lg-8">
           <div>
                 <header class="sticky top-0 z-10 bg-white border-b">
                 <div class="container mx-auto px-4 py-2 w-100 flex items-center justify-between ">
@@ -898,6 +898,7 @@
                         <form id="uploadFileForm">
                               <div class="form-group">
                                 <label for="fileDocumentation">Archivo</label>
+                                <span id="fileDocumentationName"></span>
                                 <input type="file" class="form-control" id="fileDocumentation" name="fileDocumentation" required>
                               </div>
                               <button id="btn-upload-file-documentation" class="btn btn-primary">Subir</button>

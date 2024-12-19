@@ -7396,9 +7396,7 @@ async function getDocumentationFiles(id) {
     success: function (response) {
       try {
         const parsedResponse = JSON.parse(response);
-        console.log(parsedResponse.data);
         driveFilesDocumentation.push(...parsedResponse.data);
-        console.log(driveFilesDocumentation);
         renderFileGridDocumentation(driveFilesDocumentation);
       }
       catch (e) {
@@ -7522,6 +7520,13 @@ const initDocumentationDriveEvents = () => {
     folderId = $(this).data("folder-id");
     $("#modal-upload-file-documentation-title").text("Subir " + folderName);
     $("#modal-upload-file-documentation").modal("show");
+    //find #folder-file-${folderId}
+    $folderFile = $(`#folder-file-${folderId}`);
+    //if exists set name of file in file input
+    $("#fileDocumentationName").text("");
+    if ($folderFile.length) {
+      $('#fileDocumentationName').text($folderFile.data('name'));
+    }
     // $("#btn-upload-file-documentation").click(function(){
     //   event.preventDefault();
     //   const file=$("#fileDocumentation").prop("files")[0];
@@ -7537,6 +7542,18 @@ const initDocumentationDriveEvents = () => {
   $uploadBtnDocumentation.off('click');
   $uploadBtnDocumentation.on('click', function () {
     event.preventDefault();
+    $folderFile = $(`#folder-file-${folderId}`);
+    //if exists set name of file in file input
+    $("#fileDocumentationName").text("");
+    if ($folderFile.length) {
+      $('#fileDocumentationName').text($folderFile.data('name'));
+      //confirm upload
+      const isConfirmed = confirm(`¿Estás seguro de reemplazar el archivo ${$folderFile.data('name')}?`);
+      if (isConfirmed) {
+        handleFilesDocumentation($fileInputDocumentation[0].files);
+        return
+      }
+    }
     handleFilesDocumentation($fileInputDocumentation[0].files);
   });
   
@@ -7620,8 +7637,7 @@ $searchInputDocumentation.on('input', function () {
 
 // Handle file processing
 function handleFilesDocumentation(newFiles) {
-  console.log(newFiles);
-  // Convert FileList to Array and filter
+  spinner.show();
   const validFiles = Array.from(newFiles).filter(validateFile);
 
   validFiles.forEach(file => {
@@ -7661,7 +7677,9 @@ function renderFileGridDocumentation(filesToRender) {
 // Create file item for grid
 function createFileItemDocumentation(file) {
   const $fileItem = $('<div>', {
-    class: 'group relative aspect-square border py-5 rounded-lg overflow-hidden hover:shadow-md transition-shadow'
+    class: 'group relative aspect-square border py-5 rounded-lg overflow-hidden hover:shadow-md transition-shadow',
+    id:`folder-file-${file.id_folder}`,
+    data: { name: file.name }
   });
 
   // More options button
@@ -7864,8 +7882,21 @@ const uploadDocumentationFile = async () => {
     contentType: false,
     success: function (response) {
       try {
+        $("#modal-upload-file-documentation").modal("hide");
         const data = JSON.parse(response).data.data;
-
+        //find if exists file with id in driveFilesDocumentation same data.id and replace
+        const index = driveFilesDocumentation.findIndex(f => f.id === data.id);
+        if (index !== -1) {
+          driveFilesDocumentation[index] = {
+            id: data.id,
+            name: data.name,
+            type: data.type,
+            path: data.path,
+            thumbnail: data.thumbnail,
+            size: `${(data.size / 1024 / 1024).toFixed(1)} MB`,
+            lastModified: data.lastModified
+          }
+        } else {
         driveFilesDocumentation.push({
           id: data.id,
           name: data.name,
@@ -7875,8 +7906,9 @@ const uploadDocumentationFile = async () => {
           size: `${(data.size / 1024 / 1024).toFixed(1)} MB`,
           lastModified: data.lastModified
         });
-        $("#modal-upload-file-documentation").modal("hide");
+      }
         $("#fileDocumentation").val("");
+        spinner.hide();
       }
       catch (e) {
         console.log(e);

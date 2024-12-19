@@ -3988,11 +3988,26 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             'file_size' => $_FILES['file']['size'],
             'created_at' => date('Y-m-d H:i:s'),
         ];
+        //find if exists file in tableOrdenDocumentationFiles with id_pedido=$idPedido and id_folder=$idFolder
+        $this->db->select('id');
+        $this->db->from($this->tableOrdenDocumentationFiles);
+        $this->db->where('id_pedido',$idPedido);
+        $this->db->where('id_folder',$idFolder);
+        $query=$this->db->get();
+        if($query->num_rows()>0){
+            //update row in tableOrdenDocumentationFiles
+            $this->db->where('id_pedido',$idPedido);
+            $this->db->where('id_folder',$idFolder);
+            $this->db->update($this->tableOrdenDocumentationFiles,$dataToInsert);
+            $id=$query->row()->id;
+        }else{
+            $this->db->insert($this->tableOrdenDocumentationFiles, $dataToInsert);
+            $id=$this->db->insert_id(); 
+        }
        
-        $this->db->insert($this->tableOrdenDocumentationFiles, $dataToInsert);
-        $id=$this->db->insert_id();
         $dataToReturn = [
             'id' => $id,
+            'id_folder' => $idFolder,
             'name' => $_FILES['file']['name'],
             'type' => $_FILES['file']['type'],
             'path' => $fileUrl,
