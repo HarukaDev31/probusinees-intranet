@@ -4091,6 +4091,17 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
         }
         return $isValid;
-    }   
+    }
+    public function deleteDocumentationFolders($id,$idPedido){
+        //delete files with id_folder=$id and id_pedido=$idPedido
+        $this->db->where('id_folder',$id);
+        $this->db->where('id_pedido',$idPedido);
+        $this->db->delete($this->tableOrdenDocumentationFiles);
+        //delete folder with id=$id
+        $this->db->where('id',$id);
+        $this->db->where('id_pedido',$idPedido);
+        $this->db->delete($this->tableOrdenDocumentationFolders);
+        return ['status' => 'success', 'message' => 'Folder eliminado'];
+    }
 
 }

@@ -7488,17 +7488,37 @@ const getDocumentationItemTemplate = (data) => {
       <i class="fas fa-file-pdf"></i>
       <span>${data.folder_name}</span>
     </div>
-    <div class="d-flex flex-row">
+    <div class="d-flex flex-row gap-1">
        <div class="p-2 btn btn-dark upload-btn-documentation"
             data-folder-id="${data.id}"
             data-folder-name="${data.folder_name}">
           <i class="fas fa-cloud-upload-alt text-white-500"></i>
           
        </div>
+       ${data.id_pedido?`<div class="p-2 btn btn-danger" onclick="deleteDocumentationFolders(${data.id})">
+          <i class="fas fa-trash text-white-500"></i>
+        </div>`:""}
     </div>
   </div>`;
   return html;
 };
+const deleteDocumentationFolders = (id) => {
+  const isConfirmed = confirm("¿Estás seguro de eliminar esta archivo?");
+  if (!isConfirmed) {
+    return;
+  }
+  url = base_url + "AgenteCompra/PedidosPagados/deleteDocumentationFolders";
+  $.ajax({
+    url,
+    type: "POST",
+    data: { id,idOrder },
+    success: async function (response) {
+      getDocumentationFiles(idOrder);
+      await getDocumentationList(idOrder);
+      initDocumentationDriveEvents();
+    }})
+  }
+
 const deleteDocumentationFiles = (id) => {
   url = base_url + "AgenteCompra/PedidosPagados/deleteDocumentationFiles";
   $.ajax({
