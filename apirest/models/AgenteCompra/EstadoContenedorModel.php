@@ -11,6 +11,7 @@ class EstadoContenedorModel extends CI_Model
     public $table_container="agente_compra_booking_container";
     public $table_naviera="agente_compra_booking_naviera";
     public $table_shipping="agente_compra_booking_shipper";
+    public $table_agente="agente_compra_pedido_cabecera";
     public function __construct()
     {
         parent::__construct();
@@ -23,6 +24,7 @@ class EstadoContenedorModel extends CI_Model
         $this->db->join($this->table_container, 'agente_compra_pedido_booking_details.id_contenedor_tipo = agente_compra_booking_container.id', 'left');
         $this->db->join($this->table_naviera, 'agente_compra_pedido_booking_details.id_naviera = agente_compra_booking_naviera.id', 'left');
         $this->db->join($this->table_shipping, 'agente_compra_pedido_booking_details.id_shipper = agente_compra_booking_shipper.id', 'left');
+        $this->db->join($this->table_agente, 'agente_compra_pedido_booking_details.id_pedido = agente_compra_pedido_cabecera.ID_Pedido_Cabecera', 'left');
         $filtroEstado = $this->input->post('Filtro_Estado');
         if($filtroEstado==1 ) {
             //if bl_telex or pagado not is 1    
@@ -35,6 +37,9 @@ class EstadoContenedorModel extends CI_Model
             $this->db->where('pagado', 1);
             $this->db->where('bl_telex', 1);
         }
+        $this->db->where('(agente_compra_pedido_cabecera.booking_tipo != "CONSOLIDADO" OR agente_compra_pedido_cabecera.booking_tipo IS NULL)');
+
+
         return $this->db->get();
     }
     public function guardarTC($id, $tc)
