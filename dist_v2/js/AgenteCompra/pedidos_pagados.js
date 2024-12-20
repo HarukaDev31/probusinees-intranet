@@ -7481,7 +7481,7 @@ const createDocumentationFolder = (folderName) => {
 const getDocumentationItemTemplate = (data) => {
   const isCompleted = data.file_count > 0 ? 'completed' : ''; // Clase condicional si file_count > 0
   let html = `
-  <div class="d-flex flex-row justify-content-between p-3 ${isCompleted}"
+  <div class="d-flex flex-row  justify-content-between p-3 ${isCompleted}"
   style="border-radius: 10px; border: 1px solid #e5e7eb;"
   >
     <div class="d-flex flex-row justify-content-center align-items-center gap-2">
@@ -7493,7 +7493,7 @@ const getDocumentationItemTemplate = (data) => {
             data-folder-id="${data.id}"
             data-folder-name="${data.folder_name}">
           <i class="fas fa-cloud-upload-alt text-white-500"></i>
-          <span class="ml-2">Subir Archivo</span>
+          
        </div>
     </div>
   </div>`;

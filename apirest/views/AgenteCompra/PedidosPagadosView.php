@@ -788,21 +788,29 @@
     <header id="documentation-header">
       <div class="d-flex justify-content-between mb-4">
         <div>
-          <h2 class="text-xl mb-2">Documentación</h2>
+          <div class="d-flex flex-row justify-content-between"><h2 class="text-xl mb-2">Documentación</h2>
+            <button class="p-2 rounded-full hover:bg-gray-100"
+                        id="back-btn-documentation"
+                        >
+                            <!-- icon to back to previous folder -->
+                            <i class="fas fa-arrow-left text-gray-500"></i>
+                        </button>
+          </div>
           <h3 class="text-lg  "></h3>
         </div>
       </div>
     </header>
     <main id="documentation-main">
       <div class="row">
-        <div class="col-12 col-md-12 col-lg-4">
+        <div class="col-12 ">
           <div>
             <h4>Documentos por subir</h4>
+            
             <div class="documentation-list">
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-12 col-lg-8">
+        <div class="col-12 ">
           <div>
                 <header class="sticky top-0 z-10 bg-white border-b">
                 <div class="container mx-auto px-4 py-2 w-100 flex items-center justify-between ">
@@ -825,12 +833,7 @@
                                 class="pl-8 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div> -->
-                        <button class="p-2 rounded-full hover:bg-gray-100"
-                        id="back-btn-documentation"
-                        >
-                            <!-- icon to back to previous folder -->
-                            <i class="fas fa-arrow-left text-gray-500"></i>
-                        </button>
+                        
                     </div>
                 </div>
             </header>
@@ -4266,9 +4269,10 @@ echo form_open('', $attributes);?>
   border-radius: 5px;
 }
 .documentation-list{
-    display: flex;
-    flex-direction: column;
-    row-gap: 1em;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
 }
   </style>
   <?php echo form_close(); ?>
