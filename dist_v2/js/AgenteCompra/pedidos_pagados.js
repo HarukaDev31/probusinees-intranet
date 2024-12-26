@@ -9425,6 +9425,8 @@ const openOrdenCompra = async (response) => {
     $(".row.producto").remove();
     $(".row.buttons").remove();
     $(".orden-compra_header").show();
+    $('.orden-compra-header-excel .row').show();
+
     $(".orden-compra-header-excel").show(); 
     $(".orden-compra-header-excel-container").empty();
     currentPrivilege = parseInt(priviligie);
