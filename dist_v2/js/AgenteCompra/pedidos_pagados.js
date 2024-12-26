@@ -11715,8 +11715,8 @@ function getFotos(idEx, idD) {
 }
 /**GDrive functions */
 const $dragDropContainer = $('#drag-drop-container');
-const $fileInput = $('#file-input');
-const $uploadBtn = $('#upload-btn');
+const $fileInput = $('#fileInspection');
+const $uploadBtn = $('#btn-upload-file-inspection');
 const $fileGrid = $('#file-grid');
 const $searchInput = $('#search-input');
 const $fileList = $('#file-list');
@@ -11741,7 +11741,8 @@ renderFileGrid(driveFiles);
 
 // Toggle drag-drop area
 $uploadBtn.on('click', function () {
-  $fileInput.click();
+  event.preventDefault();
+  $("#modal-upload-file-inspection").modal("hide");
   handleFiles($fileInput[0].files);
 });
 
@@ -11776,9 +11777,9 @@ $fileGrid.on('drop', function (e) {
 });
 
 // Click to select files
-$fileInput.on('change', function () {
-  handleFiles(this.files);
-});
+// $fileInput.on('change', function () {
+//   handleFiles(this.files);
+// });
 
 // Search functionality
 $searchInput.on('input', function () {

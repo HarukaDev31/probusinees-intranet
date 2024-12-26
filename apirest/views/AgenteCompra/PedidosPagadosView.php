@@ -608,7 +608,7 @@
           <!--subir archivo y retroceder-->
               <div class="flex items-center space-x-4">
                   <div class="p-2 btn btn-dark"
-                  id="upload-btn"
+                  data-toggle="modal" data-target="#modal-upload-file-inspection"
                   >
                       <!-- icon to upload files -->
                       <i class="fas fa-cloud-upload-alt text-white-500"></i>
@@ -854,7 +854,26 @@
                     </div>   
                 </div>
     </div>
-  </div>                         
+  </div>
+  <div class="modal fade" tabindex="-1" id="modal-upload-file-inspection">
+    <div class="modal-dialog modal-lg" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-upload-file-inspection-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="uploadFileForm">
+                              <div class="form-group">
+                                <label for="fileDocumentation">Archivo</label>
+                                <input type="file" class="form-control" id="fileInspection" name="fileInspection" required>
+                              </div>
+                              <button id="btn-upload-file-inspection" class="btn btn-primary">Subir</button>
+                        </form>  
+                    </div>   
+                </div>
+    </div>
+  </div>                   
   <!-- /.content -->
   <div class="modal fade" tabindex="-1" id="newShipperDialog">
     <div class="modal-dialog modal-lg" >
@@ -1688,31 +1707,6 @@ echo form_open('', $attributes);?>
 <!-- modal pago otros_costos -->
 
 <!-- Modal comision_trading -->
-<div class="modal fade modal-comision_trading" id="modal-default">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="text-center">Comisión</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="hidden-modal-id_pedido_cabecera_comision_trading" class="form-control" autocomplete="off">
-        <div class="col-xs-12">
-          <label>Importe</label>
-          <div class="form-group">
-            <input type="text" inputmode="decimal" id="txt-modal-precio_comision_trading" class="form-control required input-decimal" maxlength="13" autocomplete="off">
-            <span class="help-block text-danger" id="error"></span>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer justify-content-between">
-        <button type="button" id="btn-modal-salir" class="btn btn-danger btn-lg btn-block pull-center col" data-dismiss="modal">Salir</button>
-        <button type="button" id="btn-save_comision_trading" class="btn btn-success btn-lg btn-block pull-center col">Guardar</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /. Modal comision_trading -->
-
 <!-- Modal proveedor -->
 <div class="modal fade modal-proveedor" id="modal-default">
   <?php $attributes = array('id' => 'form-proveedor');
