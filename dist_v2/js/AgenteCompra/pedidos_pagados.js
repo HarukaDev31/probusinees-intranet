@@ -9523,7 +9523,7 @@ const openOrdenCompra = async (response) => {
   $(".custom-file-download").off("click");
   $(".custom-file-download").click(function() {
     $(".orden-compra_header").hide();
-
+    $(".row.producto").remove();
     $(".orden-compra-header-excel-container").empty();
     // Verificar si el contenedor ya está cargado
         // Realizar una solicitud AJAX a la API
