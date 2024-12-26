@@ -47,7 +47,7 @@
                       <th>CLIENTE</th>
                       <th>COD.SHIPPER</th>
                       <th>INLAND</th>
-                      <th>T.C</th>
+                      <th style="min-width:10em">T.C</th>
                       <th>FLETE</th>
                       <th>TOTAL RMB</th>
                       <th>TOTAL USD</th>
@@ -162,27 +162,7 @@
                           <span class="error" id="error-diasTransito"></span>
                         </div>
                       </div>
-                      <div class="grid gap-2">
-                        <div class="mb-3">
-                          <label for="cutoffTrigger">Cut Off</label>
-                          <input  type="text" class="input-date form-control" id="cutoffDate" name="cutoffDate" >
-                          <span class="error" id="error-cutoffDate"></span>
-                          </div>
-                      </div>
-                      <div class="grid gap-2">
-                        <div class="mb-3">
-                          <label for="etdTrigger">ETD</label>
-                          <input  type="text" class="input-date form-control" id="etdDate" name="etdDate" >
-                          <span class="error" id="error-etdDate"></span>
-                        </div>
-                      </div>
-                      <div class="grid gap-2">
-                        <div class="mb-3">  
-                          <label for="etaTrigger">ETA</label>
-                          <input  type="text" class="input-date form-control" id="etaDate" name="etaDate" >
-                          <span class="error" id="error-etaDate"></span>
-                        </div>
-                      </div>
+                      
                       <div class="grid gap-2">
                       <div class="mb-3">
                           <label for="boxFree">Box Free</label>
@@ -273,5 +253,11 @@
   select.error {
     border: 1px solid red;
     color: black;
+  }
+  /** remove up and down button in number  input  */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
   </style>

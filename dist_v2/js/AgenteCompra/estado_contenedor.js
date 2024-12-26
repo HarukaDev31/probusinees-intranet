@@ -261,9 +261,7 @@ $("#fclDetails").submit(function (event) {
     const naviera = $('#naviera').val();
     const contenedor = $('#contenedor').val();
     const diasTransito = $('#diasTransito').val();
-    const cutoffDate = $('#cutoffDate').val();
-    const etdDate = $('#etdDate').val();
-    const etaDate = $('#etaDate').val();
+
     const boxFree = $('#boxFree').val();
     const codShipper = $('#codShipper').val();
     const servicio = $('#servicio').val();
@@ -294,18 +292,7 @@ $("#fclDetails").submit(function (event) {
       $('#error-diasTransito').text('El campo días tránsito es obligatorio');
       $("#diasTransito").addClass("error");
     }
-    if (!cutoffDate) {
-      $('#error-cutoffDate').text('El campo cut off es obligatorio');
-      $("#cutoffDate").addClass("error");
-    }
-    if (!etdDate) {
-      $('#error-etdDate').text('El campo etd es obligatorio');
-      $("#etdDate").addClass("error");
-    }
-    if (!etaDate) {
-      $('#error-etaDate').text('El campo eta es obligatorio');
-      $("#etaDate").addClass("error");
-    }
+   
     if (!boxFree) {
       $('#error-boxFree').text('El campo box free es obligatorio');
       $("#boxFree").addClass("error");
@@ -326,7 +313,8 @@ $("#fclDetails").submit(function (event) {
       $('#error-servicio').text('El campo servicio es obligatorio');
       $("#servicio").addClass("error");
     }
-    if (!client || !inland || !flete || !naviera || !contenedor || !diasTransito || !cutoffDate || !etdDate || !etaDate || !boxFree || !codShipper || !norden || !codbl || !servicio) {
+    if (!client || !inland || !flete || !naviera || !contenedor || !diasTransito || !boxFree || !codShipper || !norden || !codbl || !servicio) {
+        console.log("waos")
         return;
     }
     spinner.show();

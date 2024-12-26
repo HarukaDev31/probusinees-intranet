@@ -51,46 +51,46 @@ class EstadoContenedor extends CI_Controller
         foreach ($arrData->result() as $key => $value) {
             $inputTC='
             <div class="input-group">
-                <input type="number" class="form-control tc-input" id="txtTC-'.$value->id.'"
+                <input type="number" class="form-control tc-input" id="txtTC-'.$value->idBooking.'"
                  name="txtTC"
-                 data-id="'.$value->id.'"
+                 data-id="'.$value->idBooking.'"
                 value="'.$value->tc.'"
                 >
                 <div class="input-group-append">
                     <button 
-                    onclick="guardarTC('.$value->id.')"
+                    onclick="guardarTC('.$value->idBooking.')"
                     class="btn btn-outline-secondary " type="button" id="btnTC">
                     <i class="fas fa-save"></i>
                     </button>
                 </div>
             </div>';
             $inlandContainer='
-            <span id="inlandContainer-'.$value->id.'">
+            <span id="inlandContainer-'.$value->idBooking.'">
                 '.$value->inland.'
             </span>
             ';
             $fleteContainer='
-            <span id="fleteContainer-'.$value->id.'">
+            <span id="fleteContainer-'.$value->idBooking.'">
                 '.$value->flete.'
             </span>';
             $totalRMBContainer='
-            <span id="totalRMBContainer-'.$value->id.'">
+            <span id="totalRMBContainer-'.$value->idBooking.'">
                 '.($value->flete+$value->inland).'
             </span>';
             $totalUSDContainer='
-            <span id="totalUSDContainer-'.$value->id.'">
+            <span id="totalUSDContainer-'.$value->idBooking.'">
                 '.($value->flete+$value->inland)*$value->tc.'
             </span>';
             $blTelexSelect='
-            <select class="form-control" id="blTelex-'.$value->id.'"
-            onchange="guardarBlTelex('.$value->id.')"
+            <select class="form-control" id="blTelex-'.$value->idBooking.'"
+            onchange="guardarBlTelex('.$value->idBooking.')"
             >
                 <option value="1"' .($value->bl_telex==1?"selected":"").'>SI</option>
                 <option value="0"' .($value->bl_telex==0?"selected":"").'>NO</option>
             </select>';
             $pagadoSelect='
-            <select class="form-control" id="pagado-'.$value->id.'"
-            onchange="guardarPagado('.$value->id.')"
+            <select class="form-control" id="pagado-'.$value->idBooking.'"
+            onchange="guardarPagado('.$value->idBooking.')"
             >
                 <option value="1" '.($value->pagado==1?"selected":"").'>SI</option>
                 <option value="0" '.($value->pagado==0?"selected":"").'>NO</option>

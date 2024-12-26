@@ -19,7 +19,7 @@ class EstadoContenedorModel extends CI_Model
 
     public function _get_datatables_query()
     {
-        $this->db->select('*, agente_compra_booking_container.name as contenedor_tipo, agente_compra_booking_naviera.name as naviera, agente_compra_booking_shipper.name as shipper');
+        $this->db->select('*, agente_compra_booking_container.name as contenedor_tipo, agente_compra_booking_naviera.name as naviera, agente_compra_booking_shipper.name as shipper,agente_compra_pedido_booking_details.id as idBooking');
         $this->db->from($this->table);
         $this->db->join($this->table_container, 'agente_compra_pedido_booking_details.id_contenedor_tipo = agente_compra_booking_container.id', 'left');
         $this->db->join($this->table_naviera, 'agente_compra_pedido_booking_details.id_naviera = agente_compra_booking_naviera.id', 'left');
