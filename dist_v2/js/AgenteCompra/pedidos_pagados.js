@@ -9419,11 +9419,13 @@ const openOrdenCompra = async (response) => {
   const { status, data, priviligie, pedidoData } = JSON.parse(response);
   $("#container-rotulado").hide();
   $("#table-elegir_productos_proveedor").hide();
+  $(".orden-compra-header-excel-container").empty().show();
   if (status == "success") {
     //remove all the elements from the container with class row producto and row button
     $(".row.producto").remove();
     $(".row.buttons").remove();
     $(".orden-compra_header").show();
+    $(".orden-compra-header-excel").show(); 
     $(".orden-compra-header-excel-container").empty();
     currentPrivilege = parseInt(priviligie);
     spinner.show();
@@ -9526,7 +9528,8 @@ const openOrdenCompra = async (response) => {
   $(".custom-file-download").click(function() {
     $(".orden-compra_header").hide();
     $(".row.producto").remove();
-    $(".orden-compra-header-excel-container").empty();
+    $('.orden-compra-header-excel').hide();
+    $(".orden-compra-header-excel-container").hide();
     // Verificar si el contenedor ya está cargado
         // Realizar una solicitud AJAX a la API
         $.ajax({
@@ -9563,9 +9566,7 @@ const openOrdenCompra = async (response) => {
                                         <a class="btn btn-success"
                                         href="${cotizacion.file_url}"
                                         target="_blank">${cotizacion.file_original_name}</a>
-                                        ${cotizacion.privilege==2 || cotizacion.privilege==5 ? `<div class="btn btn-danger" id="deleteCotizacionBtn" data-id="${cotizacion.id}"
-                                          data-pedido-id="${cotizacion.ID_Pedido_Cabecera}"
-                                          >Eliminar</div>` : ''}
+                                        
 
                                     </div>
                                 </div>
@@ -9573,8 +9574,7 @@ const openOrdenCompra = async (response) => {
                         `;
                         $("#cotizacionExcelContainer").append(cotizacionHtml);
                     });
-                    const button='<div class="btn btn-primary" id="uploadCotizacionBtn">Subir Cotización</div>'
-                    $("#cotizacionExcelContainer").append(button)
+                   
                     // Mostrar el contenedor de cotizaciones
                     $("#cotizacionExcelContainer").show();
                 }

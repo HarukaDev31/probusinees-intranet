@@ -473,7 +473,7 @@
                     </div>
                     <div>
                       <label class="custom-file-download" id="custom-file-download-pagos-detalle">
-                      <i class="fas fa-upload"></i> Descargar Cotización
+                      <i class="fas fa-download"></i> Descargar Cotización
                     </label>
                     </div>
                   </div>
