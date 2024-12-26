@@ -6841,6 +6841,7 @@ const getOrderProgress = (id, idServicio = null) => {
     $("#cotizacionOrdenContainer").show();
   }
   $(".step-column").remove();
+  
   idPedido = id;
   url = base_url + "AgenteCompra/PedidosPagados/getOrderProgress";
   const steps = $("#steps");
@@ -6861,6 +6862,7 @@ const getOrderProgress = (id, idServicio = null) => {
         containerListar.hide();
         containerVer.show();
         loading.hide();
+        steps.empty();
         data.forEach((step, i) => {
           steps.append(stepTemplate(step, i));
           console.log(step);
