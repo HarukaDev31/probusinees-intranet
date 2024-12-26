@@ -9528,7 +9528,7 @@ const openOrdenCompra = async (response) => {
   $(".custom-file-download").click(function() {
     $(".orden-compra_header").hide();
     $(".row.producto").remove();
-    $('.orden-compra-header-excel').hide();
+    $('.orden-compra-header-excel .row').hide();
     $(".orden-compra-header-excel-container").hide();
     // Verificar si el contenedor ya está cargado
         // Realizar una solicitud AJAX a la API
@@ -9551,6 +9551,8 @@ const openOrdenCompra = async (response) => {
               `;
               
               $("#cotizacionExcelContainer").append(emptyListMessage);
+              $("#cotizacionExcelContainer").show();
+
                 } else {
                     // Agregar cotizaciones
                     dataParsed.forEach(function(cotizacion, index) {
