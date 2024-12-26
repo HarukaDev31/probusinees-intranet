@@ -130,9 +130,6 @@ class TradingModel extends CI_Model{
 			if(count($files)==0){
 				$this->db->where("id",$idDetalle)->update($this->table_agente_compra_excel_detalle,["almacen_estado"=>"PENDIENTE"]);
 				
-
-				
-				//select order_id from order_excel where id=$orderExcelId
 			}
 			$orderExcelId=$this->db->select("order_excel_id")->from($this->table_agente_compra_excel_detalle)->where("id",$idDetalle)->get()->row();
 			$orderExcelId=$orderExcelId->order_excel_id;

@@ -2556,7 +2556,8 @@ class PedidosPagados extends CI_Controller
     public function getDocumentationList(){
         $idPedido = $this->input->post('idPedido');
         $tipo=$this->input->post('booking_tipo');
-        $response = $this->PedidosPagadosModel->getDocumentationList($idPedido,$tipo);
+        $personal_booking_tipo=$this->input->post('personal_booking_tipo');
+        $response = $this->PedidosPagadosModel->getDocumentationList($idPedido,$tipo,$personal_booking_tipo);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
     public function uploadDocumentationFile(){
@@ -2568,7 +2569,8 @@ class PedidosPagados extends CI_Controller
     public function getDocumentationFiles(){
         $data = $this->input->post();
         $idPedido = $data['id'];
-        $response = $this->PedidosPagadosModel->getDocumentationFiles($idPedido);
+        $type=$data['type'];
+        $response = $this->PedidosPagadosModel->getDocumentationFiles($idPedido,$type);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
     public function createDocumentationFolder(){
@@ -2588,6 +2590,12 @@ class PedidosPagados extends CI_Controller
         $id=$data['id'];
         $idOrder=$data['idOrder'];
         $response = $this->PedidosPagadosModel->deleteDocumentationFolders($id,$idOrder);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
+    public function changePersonalDocumentationTipo(){
+        $tipo = $this->input->post('tipo');
+        $idPedido = $this->input->post('idOrder');
+        $response = $this->PedidosPagadosModel->changePersonalDocumentationTipo($tipo,$idPedido);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
 }

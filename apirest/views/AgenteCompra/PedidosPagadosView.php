@@ -465,10 +465,17 @@
             <div class="card-body" id="container_orden-compra">
               <div class="orden-compra-header-excel">
                 <div class="row ">
-                  <div class="col-12 col-md-6 d-flex align-items-center">
-                    <label class="custom-file-upload" id="custom-file-upload-pagos-detalle" data-toggle="modal" data-target="#uploadModal">
-                    <i class="fas fa-upload"></i> Subir Orden
+                  <div class="col-12 col-md-6 d-flex align-items-center gap-1">
+                    <div>
+                      <label class="custom-file-upload" id="custom-file-upload-pagos-detalle" data-toggle="modal" data-target="#uploadModal">
+                      <i class="fas fa-upload"></i> Subir Orden
                     </label>
+                    </div>
+                    <div>
+                      <label class="custom-file-download" id="custom-file-download-pagos-detalle">
+                      <i class="fas fa-upload"></i> Descargar Cotización
+                    </label>
+                    </div>
                   </div>
                   <!--Valor total del excel selecionado-->
                   <div class="col-12 col-md-6 text-right px-5 my-3">
@@ -494,6 +501,8 @@
                   Caracteristicas
                 </div>
 
+              </div>
+              <div id="cotizacionExcelContainer"  class="cotizacion-container">
               </div>
             </div>
             </div>
@@ -526,70 +535,6 @@
               <div class="row separator-line"></div>
               <div class="w-100 row" id="pagos-body">
                 <form class="col-12 w-100" id="pagos-form">
-                  <!-- <div class="first-column col-12 col-md-6">
-                    <div class="pago row" id="pago-garantia-container">
-                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-                        <label>PAGO GARANTIA</label>
-
-                        <input type="hidden" name="pago-garantia_URL" id="pago-garantia_URL" />
-                      </div>
-                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-garantia-div">
-                        <input type="file" name="pago-garantia" id="pago-garantia" class="" />
-                        <input type="number" name="pago-garantia-value" id="pago-garantia-value" class="form-control" />
-                      </div>
-                    </div>
-                    <div class="pago row" id="pago-1-container">
-                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-                        <label>PAGO 1:</label>
-                        <input type="hidden" name="pago-1_URL" id="pago-1_URL" />
-                      </div>
-                      <div class="col-12 col-md-10 d-flex flex-row align-items-center" id="pago-1-div">
-                        <input type="file" name="pago-1" id="pago-1" class="" />
-                        <input type="number" name="pago-1-value" id="pago-1-value" class="form-control" />
-                      </div>
-                    </div>
-                    <div class="pago row" id="pago-2-container">
-                      <div class="col-12 col-md-2 d-flex align-items-center justify-content-center ">
-                        <label>PAGO 2:</label>
-                        <input type="hidden" name="pago-2_URL" id="pago-2_URL" >
-
-                      </div>
-                      <div class="col-12 col-md-10 d-flex flex-row align-items-center " id="pago-2-div">
-                        <input type="file" name="pago-2" id="pago-2" class="" />
-                        <input type="number" name="pago-2-value" id="pago-2-value" class="form-control"/ />
-                      </div>
-                    </div>
-                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-3-div">
-                      <div class="conditional-field">
-                        <label>PAGO 3:</label>
-                        <label class="switch">
-                          <input type="checkbox" id="pago3_URL_switch">
-                          <span class="slider"></span>
-                        </label>
-                        </div>
-                      </div>
-                    <div class="pago row  form-group col-12 col-md-12 d-flex flex-row align-items-center" id="pago-4-div">
-                      <div class="conditional-field">
-                        <label>PAGO 4:</label>
-                        <label class="switch">
-                          <input type="checkbox" id="pago4_URL_switch">
-                          <span class="slider"></span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <div class="form-group" id="liquidacion-container">
-                      <label>LIQUIDACION:</label>
-                      <input type="hidden" name="liquidacion_URL" id="liquidacion_URL" />
-                      <input type="file" name="liquidacion" id="liquidacion" />
-                    </div>
-                    <div class="form-group">
-                      <label>NOTAS:</label>
-                      <textarea class="form-control" name="notas-pagos" id="notas-pagos"></textarea>
-                    </div>
-                  </div> -->
-
                 </form>
 
               </div>
@@ -796,7 +741,7 @@
                             <i class="fas fa-arrow-left text-gray-500"></i>
                         </button>
           </div>
-          <h3 class="text-lg  "></h3>
+          <h3 class="text-lg documentation-title"></h3>
         </div>
       </div>
     </header>
@@ -3944,7 +3889,7 @@ echo form_open('', $attributes);?>
           background-color: black;
           color: white;
       }
-        .custom-file-upload {
+        .custom-file-upload,.custom-file-download{
             display: inline-flex;
             align-items: center;
             padding: 8px 12px;
@@ -3954,7 +3899,7 @@ echo form_open('', $attributes);?>
             cursor: pointer;
             font-size: 1rem;
         }
-        .custom-file-upload i {
+        .custom-file-upload i,.custom-file-download i{
             margin-right: 6px;
         }
         #orden-compra_header-pagos,.orden-compra_header-detalle-excel{
@@ -4137,14 +4082,14 @@ echo form_open('', $attributes);?>
           width: 100%;
         }
         .form-section { margin-bottom: 20px; }
-        .cargo-type-toggle { 
+        .cargo-type-toggle,.cargo-documentation-type-toggle { 
             display: inline-block; 
             padding: 10px; 
             margin: 5px; 
             border: 1px solid #ccc; 
             cursor: pointer; 
         }
-        .cargo-type-toggle.active { 
+        .cargo-type-toggle.active,.cargo-documentation-type-toggle.active { 
             background-color: #007bff; 
             color: white; 
         }

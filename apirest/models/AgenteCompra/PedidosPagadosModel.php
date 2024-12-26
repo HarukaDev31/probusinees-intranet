@@ -3304,6 +3304,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->where('id_pedido', $idPedido);
         $this->db->where('id_order',2);
         $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
+        $this->verifyAllStepsCompleted($idPedido);
+
         return $excelData;
     }
 
@@ -3569,10 +3571,14 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id_order',2);
             $this->db->where('id_pedido',$idPedido);
             $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+            $this->verifyAllStepsCompleted($idPedido);
+
         }else{
             $this->db->where('id_order',2);
             $this->db->where('id_pedido',$idPedido);
             $this->db->update('agente_compra_order_steps',array('status'=>'PENDING'));
+            $this->verifyAllStepsCompleted($idPedido);
+
         }
        return ['status' => 'success', 'message' => 'Documento guardado'];
     }
@@ -3719,11 +3725,15 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id_order',2);
             $this->db->where('id_pedido',$order_id);
             $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+            $this->verifyAllStepsCompleted($order_id);
+
         }else{
             
             $this->db->where('id_order',2);
             $this->db->where('id_pedido',$order_id);
             $this->db->update('agente_compra_order_steps',array('status'=>'PENDING'));
+            $this->verifyAllStepsCompleted($order_id);
+
         }
         return ['status' => 'success', 'message' => 'Total Actualizado'];
     }
@@ -3778,7 +3788,9 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $this->db->where('id_order',4);
                 $this->db->where('id_pedido',$idPedido);
                 $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
-            $this->db->insert($this->tableOrdenBookingDetail,$data);
+                $this->verifyAllStepsCompleted($idPedido);
+
+                $this->db->insert($this->tableOrdenBookingDetail,$data);
             $this->db->update($this->table,['booking_tipo'=>'FCL'],['ID_Pedido_Cabecera'=>$idPedido]);
             return ['status' => 'success', 'message' => 'FCL Booking guardado'];
            }
@@ -3822,7 +3834,9 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $this->db->where('id_order',4);
                 $this->db->where('id_pedido',$idPedido);
                 $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
-            $this->db->insert($this->tableOrdenBookingDetail,$data);
+                $this->verifyAllStepsCompleted($idPedido);
+
+                $this->db->insert($this->tableOrdenBookingDetail,$data);
             $this->db->update($this->table,['booking_tipo'=>'LCL'],['ID_Pedido_Cabecera'=>$idPedido]);
             return ['status' => 'success', 'message' => 'LCL Booking guardado'];
            }
@@ -3851,7 +3865,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 $this->db->where('id_order',4);
                 $this->db->where('id_pedido',$idPedido);
                 $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
-                
+                $this->verifyAllStepsCompleted($idPedido);
+
                 return ['status' => 'success', 'message' => 'Consolidado Booking guardado'];
         }
     }
@@ -3948,8 +3963,8 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         return $this->db->get()->row();
 
     }
-    public function getDocumentationList($idPedido,$tipo){
-            $this->db->select('
+    public function getDocumentationList($idPedido,$tipo,$personalTipo=null){
+        $this->db->select('
             agente_compra_documentation_folders.id,
             agente_compra_documentation_folders.id_pedido,
             agente_compra_documentation_folders.tipo_documentacion,
@@ -3957,12 +3972,23 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             COUNT(agente_compra_documentation_folder_files.id) as file_count
         ')
         ->from($this->tableOrdenDocumentationFolders)
-        ->join($this->tableOrdenDocumentationFiles, 'agente_compra_documentation_folders.id = agente_compra_documentation_folder_files.id_folder
-        and agente_compra_documentation_folder_files.id_pedido='.$idPedido, 'left')
-        ->where('agente_compra_documentation_folders.id_pedido', $idPedido)
-        ->or_where('agente_compra_documentation_folders.id_pedido IS NULL')
-        ->where('agente_compra_documentation_folders.tipo_documentacion', $tipo)
-        ->group_by('agente_compra_documentation_folders.id'); // Agrupa por id_folder
+        ->join($this->tableOrdenDocumentationFiles, 
+            'agente_compra_documentation_folders.id = agente_compra_documentation_folder_files.id_folder 
+            AND agente_compra_documentation_folder_files.id_pedido = ' . $idPedido, 
+            'left')
+        ->group_start() // Agrupamiento para id_pedido
+            ->where('agente_compra_documentation_folders.id_pedido', $idPedido)
+            ->or_where('agente_compra_documentation_folders.id_pedido IS NULL')
+        ->group_end();
+
+        if ($personalTipo != null) {
+            $this->db->where('agente_compra_documentation_folders.rol_id', $this->personalChinaPrivilegio);
+            $this->db->where('agente_compra_documentation_folders.tipo_documentacion', $personalTipo);
+        }else{
+            $this->db->where('agente_compra_documentation_folders.tipo_documentacion', $tipo);
+        }
+        $this->db->group_by('agente_compra_documentation_folders.id');
+        
         $query = $this->db->get();
         return $query->result();
     }
@@ -3986,8 +4012,12 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             'file_name' => $_FILES['file']['name'],
             'file_type' => $_FILES['file']['type'],
             'file_size' => $_FILES['file']['size'],
+            
             'created_at' => date('Y-m-d H:i:s'),
         ];
+        if($this->user->Nu_Tipo_Privilegio_Acceso==$this->personalChinaPrivilegio){
+            $dataToInsert['rol_id']=$this->personalChinaPrivilegio;
+        }
         //find if exists file in tableOrdenDocumentationFiles with id_pedido=$idPedido and id_folder=$idFolder
         $this->db->select('id');
         $this->db->from($this->tableOrdenDocumentationFiles);
@@ -4020,26 +4050,34 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id_order',5);
             $this->db->where('id_pedido',$idPedido);
             $this->db->update('agente_compra_order_steps',array('status'=>'COMPLETED'));
+            $this->verifyAllStepsCompleted($idPedido);
+
         }
         return ['status' => 'success', 'message' => 'Documento guardado',
         "data"=>$dataToReturn];
 
     }
-    public function getDocumentationFiles($idPedido){
-            $this->db->select('
-            agente_compra_documentation_folder_files.id ,
-            agente_compra_documentation_folder_files.id_folder,
-            agente_compra_documentation_folder_files.file_path as path,
-            agente_compra_documentation_folder_files.file_path as thumbnail,
-            agente_compra_documentation_folder_files.file_name as name,
-            agente_compra_documentation_folder_files.file_type as type,
-            agente_compra_documentation_folder_files.file_size as size,
-            agente_compra_documentation_folder_files.created_at
-        ')
-        ->from($this->tableOrdenDocumentationFiles)
-        ->where('id_pedido', $idPedido);
-        $query = $this->db->get();
-        return $query->result();
+    public function getDocumentationFiles($idPedido,$type=null){
+        $this->db->select('
+    agente_compra_documentation_folder_files.id,
+    agente_compra_documentation_folder_files.id_folder,
+    agente_compra_documentation_folder_files.file_path as path,
+    agente_compra_documentation_folder_files.file_path as thumbnail,
+    agente_compra_documentation_folder_files.file_name as name,
+    agente_compra_documentation_folder_files.file_type as type,
+    agente_compra_documentation_folder_files.file_size as size,
+    agente_compra_documentation_folder_files.created_at
+')
+->join($this->tableOrdenDocumentationFolders, 'agente_compra_documentation_folder_files.id_folder = agente_compra_documentation_folders.id', 'left')
+->from($this->tableOrdenDocumentationFiles)
+->where('agente_compra_documentation_folder_files.id_pedido', $idPedido); // Filtro obligatorio
+
+if ($type != null) {
+    $this->db->where('agente_compra_documentation_folder_files.rol_id', $this->personalChinaPrivilegio);
+}
+
+$query = $this->db->get();
+return $query->result();
     }
     public function createDocumentationFolder($data){
         $idPedido=$data['idOrder'];
@@ -4050,6 +4088,9 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             'tipo_documentacion' => $tipo,
             'folder_name' => $folderName,
         ];
+        if($this->user->Nu_Tipo_Privilegio_Acceso==$this->personalChinaPrivilegio){
+            $dataToInsert['rol_id']=$this->personalChinaPrivilegio;
+        }
         $this->db->insert($this->tableOrdenDocumentationFolders, $dataToInsert);
         return ['status' => 'success', 'message' => 'Folder guardado'];
     }
@@ -4061,6 +4102,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             $this->db->where('id_order',5);
             $this->db->where('id_pedido',$idOrder);
             $this->db->update('agente_compra_order_steps',array('status'=>'PENDING'));
+            $this->verifyAllStepsCompleted($idOrder);
         }
         
         return ['status' => 'success', 'message' => 'Documento eliminado'];
@@ -4103,5 +4145,45 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->delete($this->tableOrdenDocumentationFolders);
         return ['status' => 'success', 'message' => 'Folder eliminado'];
     }
-
+    public function changePersonalDocumentationTipo($tipo,$id){
+        $this->db->where('ID_Pedido_Cabecera',$id);
+        $this->db->update($this->table,['personal_booking_tipo'=>$tipo]);
+        //delete all from tableOrdenDocumentationFolders where id_pedido=$id and rol_id=$this->personalChinaPrivilegio
+        // delete all from tableOrdenDocumentationFiles where id_pedido=$id and rol_id=$this->personalChinaPrivilegio
+        $this->db->where('id_pedido',$id);
+        $this->db->where('rol_id',$this->personalChinaPrivilegio);
+        $this->db->delete($this->tableOrdenDocumentationFolders);
+        $this->db->where('id_pedido',$id);
+        $this->db->where('rol_id',$this->personalChinaPrivilegio);
+        $this->db->delete($this->tableOrdenDocumentationFiles);
+    }
+    public function verifyAllStepsCompleted($idPedido){
+        $isValid=true;  
+        $this->db->select('status');
+        $this->db->from('agente_compra_order_steps');
+        $this->db->where('id_pedido',$idPedido);
+        $query=$this->db->get();
+        $result=$query->result();
+        foreach($result as $row){
+            if($row->status!="COMPLETED"){
+                $isValid=false;
+                break;
+            }
+        }
+        if($isValid){
+            $this->db->where('ID_Pedido_Cabecera',$idPedido);
+            $this->db->update($this->table,['ID_Estado_Orden'=>4]);
+        }else{
+            $this->db->select('id_order');
+            $this->db->from('agente_compra_order_steps');
+            $this->db->where('id_pedido',$idPedido);
+            $this->db->where('status','COMPLETED');
+            $this->db->order_by('id_order','desc');
+            $this->db->limit(1);
+            $query=$this->db->get();
+            $toChange=$query->row()->id_order-1;
+            $this->db->where('ID_Pedido_Cabecera',$idPedido);
+            $this->db->update($this->table,['ID_Estado_Orden'=>$toChange]);
+        }
+    }
 }

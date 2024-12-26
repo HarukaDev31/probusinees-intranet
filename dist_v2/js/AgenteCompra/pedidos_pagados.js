@@ -29,6 +29,8 @@ let idOrder = 0;
 let folderName = "";
 let folderId = 0;
 let booking_tipo = 0;
+let booking_tipo_personal=null;
+let cotizacionExcelContainer=null;
 const editIcon = `<?xml version="1.0" encoding="utf-8"?>
 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Edit / Edit_Pencil_02">
@@ -70,6 +72,8 @@ $(function () {
   sectionTitle = $("#section-title");
   containerVer = $("#container-ver");
   containerVer.hide();
+  cotizacionExcelContainer = $("#cotizacionExcelContainer");
+  cotizacionExcelContainer.hide();
   containerListar = $("#container-listar");
   containerOrdenCompra = $("#container_orden-compra");
   containerOrdenCompra.hide();
@@ -7376,23 +7380,67 @@ const openInspectionView = (data, idPedido, currentPrivilege) => {
 const openDocumentationView = async (data, idPedido, currentPrivilege) => {
   $("#container_orden-compra").hide();
   booking_tipo = data.booking_tipo;
+ 
   $(".tipo_documentacion").text(booking_tipo);
+  if(currentPrivilege==priviligesPersonalChina){
+    $(".documentation-title").empty();
+    $(".documentation-title").append(`
+      <span class="cargo-documentation-type-toggle" data-type="FCL">TRADING</span>
+      <span class="cargo-documentation-type-toggle" data-type="CONSOLIDADO">CONSOLIDADO</span>`);
+      booking_tipo_personal = data.personal_booking_tipo=="TRADING"?"FCL":"CONSOLIDADO";
+      console.log(booking_tipo_personal)
+      if(booking_tipo_personal!=null){
+        $(".cargo-documentation-type-toggle").removeClass("active");
+        $(`.cargo-documentation-type-toggle[data-type="${booking_tipo_personal}"]`).addClass("active");
+        await getDocumentationList(idPedido,booking_tipo_personal);
+        await getDocumentationFiles(idPedido,booking_tipo_personal);
+        containerDocumentacion.show();
+
+      } 
+      $(".cargo-documentation-type-toggle").off("click");
+    
+      $(".cargo-documentation-type-toggle").click(async function(){
+        if(booking_tipo_personal!=null){
+          const r=confirm("¿Estás seguro de cambiar de tipo de documentación? Se perderán todos los archivos subidos");
+          if(!r){
+            return;
+          }
+        }
+        $(".cargo-documentation-type-toggle").removeClass("active");
+        $(this).addClass("active");
+
+        const type = $(this).data("type");
+        changePersonalDocumentationTipo(type);
+        booking_tipo_personal = type;
+        await getDocumentationList(idPedido,type);
+        await getDocumentationFiles(idPedido,type);
+        containerDocumentacion.show();
+       
+        return;
+      });
+      // await Promise.all([getDocumentationList(idPedido,type),getDocumentationFiles(idPedido,type)]);
+      containerDocumentacion.show();
+
+      initDocumentationDriveEvents();
+      return;
+
+    }
   containerDocumentacion.show();
-  await getDocumentationList(idPedido);
-  await getDocumentationFiles(idPedido);
+  await getDocumentationList(idPedido,booking_tipo_personal);
+  await getDocumentationFiles(idPedido,booking_tipo_personal);
   if(!booking_tipo){
     $(".tipo_documentacion").text("No se ha seleccionado un tipo de booking");
   }
   initDocumentationDriveEvents();
 
 }
-async function getDocumentationFiles(id) {
+async function getDocumentationFiles(id,type=null) {
   driveFilesDocumentation = [];
   url = base_url + "AgenteCompra/PedidosPagados/getDocumentationFiles";
   await $.ajax({
     url,
     type: "POST",
-    data: { id },
+    data: { id,type },
     success: function (response) {
       try {
         const parsedResponse = JSON.parse(response);
@@ -7406,13 +7454,13 @@ async function getDocumentationFiles(id) {
   });
 
 }
-async function getDocumentationList(id) {
+async function getDocumentationList(id,personal_booking_tipo=null) {
   idOrder = id;
   url = base_url + "AgenteCompra/PedidosPagados/getDocumentationList";
   await $.ajax({
     url: url,
     type: "POST",
-    data: { idPedido: idOrder, booking_tipo },
+    data: { idPedido: idOrder, booking_tipo,personal_booking_tipo },
     success: function (response) {
       try {
         const parsedResponse = JSON.parse(response);
@@ -7445,7 +7493,7 @@ async function getDocumentationList(id) {
           const folderName = $("#folderName").val();
           createDocumentationFolder(folderName);
         });
-
+        initDocumentationDriveEvents();
       }
       catch (e) {
         console.log(e);
@@ -7466,7 +7514,7 @@ const createDocumentationFolder = (folderName) => {
 
     success: async function (response) {
       try {
-        await getDocumentationList(idOrder);
+        await getDocumentationList(idOrder,booking_tipo_personal);
         $("#modal-create-folder-documentation").modal("hide");
         spinner.hide();
         initDocumentationDriveEvents()
@@ -7513,8 +7561,8 @@ const deleteDocumentationFolders = (id) => {
     type: "POST",
     data: { id,idOrder },
     success: async function (response) {
-      getDocumentationFiles(idOrder);
-      await getDocumentationList(idOrder);
+      getDocumentationFiles(idOrder,booking_tipo_personal);
+      await getDocumentationList(idOrder,booking_tipo_personal);
       initDocumentationDriveEvents();
     }})
   }
@@ -7526,16 +7574,18 @@ const deleteDocumentationFiles = (id) => {
     type: "POST",
     data: { id,idOrder },
     success: async function (response) {
-      await getDocumentationList(idOrder);
+      await getDocumentationList(idOrder,booking_tipo_personal);
       initDocumentationDriveEvents();
     }
   });
 
 }
 const initDocumentationDriveEvents = () => {
-  //off click
+  
+  console.log($(".upload-btn-documentation"));
   $(".upload-btn-documentation").off("click");
   $(".upload-btn-documentation").click(function () {
+    console.log("click");
     folderName = $(this).data("folder-name");
     folderId = $(this).data("folder-id");
     $("#modal-upload-file-documentation-title").text("Subir " + folderName);
@@ -7870,20 +7920,15 @@ function simulateFileUploadDocumentation(pendingFile, file) {
       console.log(progress);
       const offset = 94.25 - (94.25 * progress / 100); // Calculamos el progreso en base a porcentaje
       $progressCircle.attr('stroke-dashoffset', offset);
-      // Si el progreso alcanza el 100%, limpiamos el intervalo
       if (progress >= 100) {
         clearInterval(progressInterval);
-
-        // Mover archivo de pendientes a subidos
         pendingFilesDocumentation.splice(pendingFilesDocumentation.indexOf(pendingFile), 1);
-
-        console.log(driveFilesDocumentation);
         renderPendingFilesDocumentation();
         renderFileGridDocumentation(driveFilesDocumentation);
-        await getDocumentationList(idOrder);
+        await getDocumentationList(idOrder,booking_tipo_personal);
         initDocumentationDriveEvents();
       }
-    }, duration / 100); // Actualiza el progreso cada 1% del tiempo estimado
+    }, duration / 100); 
     uploadDocumentationFile(file);
   });
 }
@@ -7904,7 +7949,6 @@ const uploadDocumentationFile = async () => {
       try {
         $("#modal-upload-file-documentation").modal("hide");
         const data = JSON.parse(response).data.data;
-        //find if exists file with id in driveFilesDocumentation same data.id and replace
         const index = driveFilesDocumentation.findIndex(f => f.id === data.id);
         if (index !== -1) {
           driveFilesDocumentation[index] = {
@@ -8042,32 +8086,6 @@ function getAlmacenData(idO) {
   addEventsToInspection();
 
 }
-
-
-// const saveInspection = (idPedido) => {
-//   const url = base_url + "AgenteCompra/PedidosPagados/saveInspection";
-//   const form = $("#container-inspeccion");
-//   let formData = new FormData(form[0]);
-//   formData.append("idPedido", idPedido);
-//   formData.append("step", selectedStep);
-//   $.ajax({
-//     url,
-//     type: "POST",
-//     data: formData,
-//     processData: false,
-//     contentType: false,
-//     success: function (response) {
-//       try {
-//         response = JSON.parse(response);
-//         if (response.status == "success") {
-//           hideInspection(idPedido);
-//         }
-//       } catch (e) {
-//         console.log(e);
-//       }
-//     },
-//   });
-// };
 const hideInspection = (idPedido) => {
   containerInspection.empty();
   containerInspection.hide();
@@ -9404,11 +9422,12 @@ const openOrdenCompra = async (response) => {
     $(".row.producto").remove();
     $(".row.buttons").remove();
     $(".orden-compra_header").show();
+    $(".orden-compra-header-excel-container").empty();
     currentPrivilege = parseInt(priviligie);
     spinner.show();
     const excelData = await getExcelOrdersList(idPedido);
     spinner.hide();
-    $(".orden-compra-header-excel-container").empty();
+   
     if (excelData.length == 0 && currentPrivilege == priviligesPersonalChina) {
       //set backgroun color to gray and remove onclick event
       $(".custom-file-upload").removeAttr("data-target");
@@ -9457,41 +9476,7 @@ const openOrdenCompra = async (response) => {
     } else {
 
     }
-    // containerOrdenCompra.append(getProductTemplate(firstProduct, 0));
-    // const toolbarOptions = [
-    //   [], // toggled buttons
-    //   // remove formatting button
-    // ];
-    // const quill = new Quill(`#quill-container-${0}`, {
-    //   theme: "snow",
-    //   readOnly: true,
-    //   modules: {
-    //     toolbar: null,
-    //   },
-    // });
-    // quill.root.innerHTML = clearHTMLTextArea(producto.Txt_Descripcion);
-    // data.forEach((producto, index) => {
-    //   //escape special chars product.Txt_Descripcion
 
-    //   containerOrdenCompra.append(getProductTemplate(producto, index));
-    //   const toolbarOptions = [
-    //     [], // toggled buttons
-    //     // remove formatting button
-    //   ];
-    //   const quill = new Quill(`#quill-container-${index}`, {
-    //     theme: "snow",
-    //     readOnly: true,
-    //     modules: {
-    //       toolbar: null,
-    //     },
-    //   });
-    //   quill.root.innerHTML = clearHTMLTextArea(producto.Txt_Descripcion);
-    //   if (producto.caja_master_URL) {
-    //     $(`#btn-rotulado-${index}`)
-    //       .removeClass("btn-primary")
-    //       .addClass("btn-outline-secondary");
-    //   }
-    // });
     if (typeof pedidoData != "undefined") {
       pedidoData.total_rmb = pedidoData.total_rmb ?? 0;
       pedidoData.Ss_Tipo_Cambio = pedidoData.Ss_Tipo_Cambio ?? 0;
@@ -9535,7 +9520,68 @@ const openOrdenCompra = async (response) => {
       containerOrdenCompra.append(btnsTemplate);
     }
   }
+  $(".custom-file-download").off("click");
+  $(".custom-file-download").click(function() {
+    $(".orden-compra_header").hide();
 
+    $(".orden-compra-header-excel-container").empty();
+    // Verificar si el contenedor ya está cargado
+        // Realizar una solicitud AJAX a la API
+        $.ajax({
+            url: base_url + 'AgenteCompra/PedidosGarantizados/getCotizacionesExcel/' + idPedido,
+            method: 'GET',
+            success: function(data) {
+                // Limpiar el contenedor y el mensaje vacío
+                $("#cotizacionExcelContainer").empty();
+                const dataParsed=JSON.parse(data);
+                // Verificar si hay cotizaciones
+                $("#cotizacionExcelContainer").show();
+                if (dataParsed.length === 0) {
+                  const emptyListMessage = `
+                  <div class="text-center">
+                      <h5
+                      class="text-primary">No hay cotizaciones disponibles.</h5>
+                    
+                  </div>
+              `;
+              
+              $("#cotizacionExcelContainer").append(emptyListMessage);
+                } else {
+                    // Agregar cotizaciones
+                    dataParsed.forEach(function(cotizacion, index) {
+                        var cotizacionHtml = `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="cotizacion-header">Cotización ${index + 1}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                      Fecha: ${cotizacion.created_at}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a class="btn btn-success"
+                                        href="${cotizacion.file_url}"
+                                        target="_blank">${cotizacion.file_original_name}</a>
+                                        ${cotizacion.privilege==2 || cotizacion.privilege==5 ? `<div class="btn btn-danger" id="deleteCotizacionBtn" data-id="${cotizacion.id}"
+                                          data-pedido-id="${cotizacion.ID_Pedido_Cabecera}"
+                                          >Eliminar</div>` : ''}
+
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $("#cotizacionExcelContainer").append(cotizacionHtml);
+                    });
+                    const button='<div class="btn btn-primary" id="uploadCotizacionBtn">Subir Cotización</div>'
+                    $("#cotizacionExcelContainer").append(button)
+                    // Mostrar el contenedor de cotizaciones
+                    $("#cotizacionExcelContainer").show();
+                }
+            },
+            error: function() {
+                alert('Error al cargar las cotizaciones.');
+            }
+        });
+      });
 
 };
 function clearHTMLTextArea(str) {
@@ -9876,6 +9922,7 @@ const hideOrdenCompra = () => {
   $(".producto").remove();
   $(".orden-compra-header-excel-container").empty();
   $(".buttons").remove();
+  cotizacionExcelContainer.hide();
   // containerVer.hide();
   // containerListar.show();
   containerSteps.empty();
@@ -13044,36 +13091,22 @@ const saveConsolidadoBooking = (id = null) => {
     }
   });
 }
+const changePersonalDocumentationTipo=(tipo)=>{
+  let tipo2=null;
+  if(tipo=="FCL"){
+    tipo2="TRADING";
+  }else{
+    tipo2="CONSOLIDADO";
+  }
+  $.ajax({
+    url: base_url + "AgenteCompra/PedidosPagados/changePersonalDocumentationTipo",
+    type: 'POST',
+    data: {
+      tipo:tipo2,
+      idOrder,
+    },
+    success: function (data) {
+    }});
+}
 
-// const containerState = {
-//   tc: 6.89,
-//   totalRmb: 10000,
-//   totalUsd: 1452.83
-// };
-
-// // Set initial container state values
-// $('#tc').val(containerState.tc);
-// $('#rmb').val(containerState.totalRmb);
-// $('#usd').val(containerState.totalUsd);
-
-// Cargo Type Toggle
-
-//Shipper Dialog
-// $('#newShipperDialog').dialog({
-//   autoOpen: false,
-//   modal: true,
-//   buttons: {
-//       "Guardar": function() {
-//           const newShipperCode = $('#newShipperInput').val();
-//           if (newShipperCode) {
-//               $('#codShipper').append(`<option value="${newShipperCode}">${newShipperCode}</option>`);
-//               $('#codShipper').val(newShipperCode);
-//               $(this).dialog("close");
-//           }
-//       },
-//       "Cancelar": function() {
-//           $(this).dialog("close");
-//       }
-//   }
-// });
 
