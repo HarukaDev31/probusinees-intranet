@@ -2917,27 +2917,27 @@ echo form_open('', $attributes);?>
     }
 
     .step-container:nth-child(2) {
-      animation-delay: 0.5s;
+      animation-delay: 0.2s;
     }
 
     .step-container:nth-child(3) {
-      animation-delay: 1s;
+      animation-delay: 0.4s;
     }
 
     .step-container:nth-child(4) {
-      animation-delay: 1.5s;
+      animation-delay: 0.6s;
     }
 
     .step-container:nth-child(4) {
-      animation-delay: 2s;
+      animation-delay: 0.8s;
     }
 
     .step-container:nth-child(5) {
-      animation-delay: 2.5s;
+      animation-delay: 1s;
     }
 
     .step-container:nth-child(6) {
-      animation-delay: 3s;
+      animation-delay: 1.2s;
     }
 
     .img-cuz {
