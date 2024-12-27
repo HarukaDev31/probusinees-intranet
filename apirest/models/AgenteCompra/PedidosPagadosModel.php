@@ -3424,6 +3424,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $totalColumn="F";
         $adelantoColumn="G";
         $restanteColumn="H";
+        $totalPagadoColumn="I";
         $maxRow=1000;
         $drawings = $sheet->getDrawingCollection();
         $uploadPath = 'assets/images/purchase_order_pagos/';
@@ -3455,12 +3456,13 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 'total_invoice' => $sheet->getCell($totalColumn . $row)->getValue(),
                 'adelanto' => $sheet->getCell($adelantoColumn . $row)->getValue(),
                 'restante' => $sheet->getCell($restanteColumn . $row)->getCalculatedValue(),
-
+                'pagos_total'=>$sheet->getCell($totalPagadoColumn . $row)->getValue(),
             ];
             $currentRow++;
         }
         $this->db->insert_batch($this->tableOrdenExcelPagosDetalle,$data);
         $totalValue=$sheet->getCell('F'.($currentRow))->getCalculatedValue();
+        $totalPagados=$sheet->getCell('I'.($currentRow))->getCalculatedValue();
         $this->db->where('id',$idOrderExcel);
         $this->db->update($this->tableOrdenExcelPagos,array('total'=>$totalValue));
     }
