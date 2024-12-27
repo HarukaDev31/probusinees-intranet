@@ -47,7 +47,7 @@
                       <th>CLIENTE</th>
                       <th>COD.SHIPPER</th>
                       <th>INLAND</th>
-                      <th style="min-width:10em">T.C</th>
+                      <th style="min-width:7em;max-width:8em">T.C</th>
                       <th>FLETE</th>
                       <th>TOTAL RMB</th>
                       <th>TOTAL USD</th>
@@ -57,6 +57,7 @@
                       <th>PAGADO</th>
                       <th>CONTENEDOR</th>
                       <th>ESTADO</th>
+                      <th>ACCIONES</th>
                     </tr>
                     </thead>
                 </table>

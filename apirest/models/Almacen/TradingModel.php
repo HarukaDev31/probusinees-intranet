@@ -38,7 +38,7 @@ class TradingModel extends CI_Model{
             ->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
             ->where_in($this->table . '.Nu_Estado_General', array(4));
 	
-			if(!empty($this->input->post('Filtro_Fe_Inicio')) && !empty($this->input->post('Filtro_Fe_Fin'))){
+			if(!empty($this->input->post('Filtro_Fe_Inicio')) && !empty($this->input->post('Filtro_Fe_Fin')) && $filtroEstado!="0"){
 				$this->db->where("Fe_Emision_OC_Aprobada BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
 					}	
 		if(!empty($filtroEstado)){

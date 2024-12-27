@@ -10643,6 +10643,7 @@ const getExcelOrderItemPagos = (itemData, index, length) => {
     "id": itemData.id,
     "idPedido": itemData.order_id,
     "total": itemData.total,
+    'pagos_total': itemData.pagos_total,
   }
   const html = `
   <div class="">

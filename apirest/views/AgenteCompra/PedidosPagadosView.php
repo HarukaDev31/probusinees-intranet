@@ -631,12 +631,7 @@
                           class="pl-8 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                       <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                   </div>
-                  <button class="p-2 rounded-full hover:bg-gray-100"
-                  id="back-btn"
-                  >
-                      <!-- icon to back to previous folder -->
-                      <i class="fas fa-arrow-left text-gray-500"></i>
-                  </button>
+                  
               </div>
           </div>
       </header>

@@ -353,3 +353,18 @@ const deleteShipper = () => {
       }
     }
   }
+const eliminar=(id)=>{
+    const r = confirm("¿Está seguro de eliminar el registro seleccionado?");
+    if (r == true) {
+        $.ajax({
+          url: base_url + "AgenteCompra/EstadoContenedor/eliminar",
+          type: 'POST',
+          data: {
+            id,
+          },
+          success: function (data) {
+            reloadTable();
+          }
+        });
+      }
+}

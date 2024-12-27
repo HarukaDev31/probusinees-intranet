@@ -63,4 +63,9 @@ class EstadoContenedorModel extends CI_Model
         $this->db->update($this->table);
         return $this->db->affected_rows();
     }
+    public function eliminar($idBooking){
+        $this->db->where('id', $idBooking);
+        $this->db->delete($this->table);
+        return $this->db->affected_rows();
+    }
 }
