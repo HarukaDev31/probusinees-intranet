@@ -64,8 +64,20 @@ class EstadoContenedorModel extends CI_Model
         return $this->db->affected_rows();
     }
     public function eliminar($idBooking){
+        //get id_pedido and set booking_tipo to null in table_agente
+        $this->db->select('id_pedido');
+        $this->db->from($this->table);
+        $this->db->where('id', $idBooking);
+        $query = $this->db->get();
+        $id_pedido = $query->row()->id_pedido;
+        $this->db->set('booking_tipo', null);
+        $this->db->where('ID_Pedido_Cabecera', $id_pedido);
+        $this->db->update($this->table_agente);
+        //delete booking
         $this->db->where('id', $idBooking);
         $this->db->delete($this->table);
+        
+
         return $this->db->affected_rows();
     }
 }

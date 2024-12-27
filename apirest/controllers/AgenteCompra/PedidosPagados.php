@@ -2477,7 +2477,8 @@ class PedidosPagados extends CI_Controller
     }
     public function deleteExcelOrderPagos(){
         $id = $this->input->post('id');
-        $response = $this->PedidosPagadosModel->deleteExcelOrderPagos($id);
+        $idPedido=$this->input->post('idPedido');
+        $response = $this->PedidosPagadosModel->deleteExcelOrderPagos($id,$idPedido);
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
     public function deleteExcelOrderPagosDocuments(){

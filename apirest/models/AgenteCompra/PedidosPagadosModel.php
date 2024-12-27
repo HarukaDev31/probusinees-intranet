@@ -3587,7 +3587,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
        return ['status' => 'success', 'message' => 'Documento guardado'];
     }
-    public function deleteExcelOrderPagos($id){
+    public function deleteExcelOrderPagos($id,$idPedido){
             //get all ids from table tableOrdenExcelPagosDocumentos where pagos_excel_id=$id
             $this->db->select('id');
             $this->db->from($this->tableOrdenExcelPagosDetalle);
@@ -3600,8 +3600,22 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
             $this->db->where('pagos_excel_id',$id);
             $this->db->delete($this->tableOrdenExcelPagosDetalle);
+            //get order_id from tableOrdenExcelPagos where id=$id
+            
+            //check if exist rows in tableOrdenExcelPagos where order_id=$idPedido 
             $this->db->where('id',$id);
             $this->db->delete($this->tableOrdenExcelPagos);
+
+            $this->db->where('order_id',$idPedido);
+            $this->db->from($this->tableOrdenExcelPagos);
+            $query=$this->db->get();
+            if($query->num_rows()==0){
+                $this->db->where('id_pedido', $idPedido);
+                $this->db->where('id_order',2);
+                $this->db->update('agente_compra_order_steps', array('status' => 'PENDING'));
+                return ['status' => 'success', 'message' => 'Orden eliminada y estado cambiado a pendiente'];
+            }
+        
         return ['status' => 'success', 'message' => 'Orden eliminada'];
     }
     public function deleteExcelOrderPagosDocuments($id){

@@ -6843,6 +6843,7 @@ const getOrderProgress = (id, idServicio = null) => {
   $(".step-column").remove();
   
   idPedido = id;
+  spinner.show();
   url = base_url + "AgenteCompra/PedidosPagados/getOrderProgress";
   const steps = $("#steps");
   const loading = $("#loading-steps");
@@ -6855,6 +6856,7 @@ const getOrderProgress = (id, idServicio = null) => {
       response = JSON.parse(response);
       //check if response is success
       if (response.status == "success") {
+        spinner.hide()
         //get data
         const data = response.data;
         const consolidadoOrden = $("#consolidadoOrden");
@@ -7995,7 +7997,6 @@ function getAlmacenData(idO) {
   containerAlmacen.hide();
   $("#table-elegir_productos_proveedor").hide();
   if ($.fn.DataTable.isDataTable("#table-inspection")) {
-    console.log("Table is already initialized");
     reload_table_inspection();
   } else {
     tableInspection = tableInspection.DataTable({
@@ -11611,6 +11612,8 @@ function calcTotales() {
 function addEventsToInspection() {
   // Add event listener to file input with class box_value on change sum all 
   // values of all inputs with class box_value and set the result to the input with id total-box
+  //first off all events 
+  $(document).off("change", ".box_value");
   $(document).on("input", ".box_value", function () {
     console.log("input");
     let total = 0;
@@ -11619,6 +11622,7 @@ function addEventsToInspection() {
     });
     $("#total-box").val(total);
   });
+  $(document).off("change", ".cbm_value");
   $(document).on("input", ".cbm_value", function () {
     let total = 0;
     $(".cbm_value").each(function () {
@@ -11626,6 +11630,7 @@ function addEventsToInspection() {
     });
     $("#total-cbm").val(total);
   });
+  $(document).off("change", ".kg_value");
   $(document).on("input", ".kg_value", function () {
     let total = 0;
     $(".kg_value").each(function () {
@@ -11633,9 +11638,11 @@ function addEventsToInspection() {
     });
     $("#total-kg").val(total);
   });
+  $('#btn-save-inspection').off("click");
   $("#btn-save-inspection").on("click", function () {
     saveInspection()
   });
+  $('#btn-back-inspection').off("click");
   $("#btn-back-inspection").on("click", function () {
     closeInspection();
   });
