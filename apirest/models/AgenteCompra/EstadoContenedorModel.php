@@ -73,7 +73,7 @@ class EstadoContenedorModel extends CI_Model
         $this->db->set('booking_tipo', null);
         $this->db->where('ID_Pedido_Cabecera', $id_pedido);
         $this->db->update($this->table_agente);
-        $this->db->where('id_pedido', $idPedido);
+        $this->db->where('id_pedido', $id_pedido);
         $this->db->where('id_order',4);
         $this->db->update('agente_compra_order_steps', array('status' => 'PENDING'));
         $this->db->where('id', $idBooking);
