@@ -12039,7 +12039,7 @@ function renderPendingFiles(pendingFile) {
       class: 'file-item flex items-center space-x-4',
       id: `pending-file-${file.id}`
     });
-
+    
     const $progressWrapper = $('<div>', { class: 'relative w-12 h-12' });
 
     const $progressCircle = $('<svg>', {

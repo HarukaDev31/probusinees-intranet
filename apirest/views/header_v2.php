@@ -60,6 +60,9 @@
   <?php if (isset($js_pedidos_pagados) && $js_pedidos_pagados==true) : ?>
     <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
   <?php endif; ?>
+  <?php if (isset($js_contenedor_consolidadado) && $js_contenedor_consolidadado==true) : ?>
+    <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
+  <?php endif; ?>
   <?php if (isset($js_estado_contenedor) && $js_estado_contenedor==true) : ?>
     <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
   <?php endif; ?>

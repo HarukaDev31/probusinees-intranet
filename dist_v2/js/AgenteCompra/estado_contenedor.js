@@ -5,8 +5,6 @@ var idBooking = 0;
 $(document).ready(function () {
     spinner = $(".backdrop");
     url = base_url + "AgenteCompra/EstadoContenedor/index";
-
-
     table_Entidad = $("#table-estadoContenedor").DataTable({
         dom:
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
