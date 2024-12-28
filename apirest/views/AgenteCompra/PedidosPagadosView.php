@@ -631,12 +631,7 @@
                           class="pl-8 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                       <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                   </div>
-                  <button class="p-2 rounded-full hover:bg-gray-100"
-                  id="back-btn"
-                  >
-                      <!-- icon to back to previous folder -->
-                      <i class="fas fa-arrow-left text-gray-500"></i>
-                  </button>
+                  
               </div>
           </div>
       </header>
@@ -2922,27 +2917,27 @@ echo form_open('', $attributes);?>
     }
 
     .step-container:nth-child(2) {
-      animation-delay: 0.5s;
+      animation-delay: 0.2s;
     }
 
     .step-container:nth-child(3) {
-      animation-delay: 1s;
+      animation-delay: 0.4s;
     }
 
     .step-container:nth-child(4) {
-      animation-delay: 1.5s;
+      animation-delay: 0.6s;
     }
 
     .step-container:nth-child(4) {
-      animation-delay: 2s;
+      animation-delay: 0.8s;
     }
 
     .step-container:nth-child(5) {
-      animation-delay: 2.5s;
+      animation-delay: 1s;
     }
 
     .step-container:nth-child(6) {
-      animation-delay: 3s;
+      animation-delay: 1.2s;
     }
 
     .img-cuz {

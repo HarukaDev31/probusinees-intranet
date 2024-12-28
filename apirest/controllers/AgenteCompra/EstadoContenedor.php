@@ -66,20 +66,20 @@ class EstadoContenedor extends CI_Controller
             </div>';
             $inlandContainer='
             <span id="inlandContainer-'.$value->idBooking.'">
-                '.$value->inland.'
+                ¥'.$value->inland.'
             </span>
             ';
             $fleteContainer='
             <span id="fleteContainer-'.$value->idBooking.'">
-                '.$value->flete.'
+                $'.$value->flete.'
             </span>';
             $totalRMBContainer='
             <span id="totalRMBContainer-'.$value->idBooking.'">
-                '.($value->flete+$value->inland).'
+                ¥'.(($value->flete*($value->tc==0?1:$value->tc))+$value->inland).'
             </span>';
             $totalUSDContainer='
             <span id="totalUSDContainer-'.$value->idBooking.'">
-                '.($value->flete+$value->inland)*$value->tc.'
+                $'.round((($value->inland/($value->tc==0?1:$value->tc))+$value->flete),3).'
             </span>';
             $blTelexSelect='
             <select class="form-control" id="blTelex-'.$value->idBooking.'"
@@ -95,8 +95,13 @@ class EstadoContenedor extends CI_Controller
                 <option value="1" '.($value->pagado==1?"selected":"").'>SI</option>
                 <option value="0" '.($value->pagado==0?"selected":"").'>NO</option>
             </select>';
+            
             //span estado= completado when bl_telex,pagado is 1 else pendiente
             $estado = '<span class="badge badge-'.($value->bl_telex==1 && $value->pagado==1?"success":"warning").'">'.($value->bl_telex==1 && $value->pagado==1?"Completado":"Pendiente").'</span>';
+            $acciones='
+            <button class="btn btn-danger-outline btn-sm" onclick="eliminar('.$value->idBooking.')">
+                <i class="fas fa-trash text-danger"></i>
+            </button>';
             $data[] = array(
                 $value->servicio,
                 $value->nu_order,
@@ -113,7 +118,8 @@ class EstadoContenedor extends CI_Controller
                 $blTelexSelect,
                 $pagadoSelect,
                 $value->contenedor_tipo,
-                $estado
+                $estado,
+                $acciones
             );
         }
         $output = array(
@@ -135,5 +141,9 @@ class EstadoContenedor extends CI_Controller
         $id = $this->input->post('idBooking');
         $pagado = $this->input->post('pagado');
         $this->EstadoContenedorModel->guardarPagado($id,$pagado);
+    }
+    public function eliminar(){
+        $id = $this->input->post('id');
+        $this->EstadoContenedorModel->eliminar($id);
     }
 }

@@ -3301,9 +3301,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $idPedido=$data['idPedido'];
         $step=$data['step'];
         $excelData=$this->proccessSeekingPagos($objPHPExcel,$data,$zipPath,$fileUrl);
-        $this->db->where('id_pedido', $idPedido);
-        $this->db->where('id_order',2);
-        $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
+        
         $this->verifyAllStepsCompleted($idPedido);
 
         return $excelData;
@@ -3456,7 +3454,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
                 'total_invoice' => $sheet->getCell($totalColumn . $row)->getValue(),
                 'adelanto' => $sheet->getCell($adelantoColumn . $row)->getValue(),
                 'restante' => $sheet->getCell($restanteColumn . $row)->getCalculatedValue(),
-                'pagos_total'=>$sheet->getCell($totalPagadoColumn . $row)->getValue(),
+                'pagos_total'=> $sheet->getCell($totalPagadoColumn . $row)->getCalculatedValue(),
             ];
             $currentRow++;
         }
@@ -3464,7 +3462,13 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $totalValue=$sheet->getCell('F'.($currentRow))->getCalculatedValue();
         $totalPagados=$sheet->getCell('I'.($currentRow))->getCalculatedValue();
         $this->db->where('id',$idOrderExcel);
-        $this->db->update($this->tableOrdenExcelPagos,array('total'=>$totalValue));
+        $this->db->update($this->tableOrdenExcelPagos,array('total'=>$totalValue,
+        'total_pagado'=>$totalPagados));
+        if($totalValue<=$totalPagados){
+            $this->db->where('id_pedido', $$request['idPedido']);
+            $this->db->where('id_order',2);
+            $this->db->update('agente_compra_order_steps', array('status' => 'COMPLETED'));
+        }
     }
     public function getExcelOrdersList($idPedido){
         $this->db->select('id,order_id,name,created_at,file_url,total');
@@ -3479,8 +3483,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         return $this->db->get()->result();
     }
     public function getExcelOrderPaymentsSeekingDetails($id){
-        $this->db->select('id,proveedor,product_name,fecha_entrega,total_invoice,adelanto,restante,datos_de_pago,qr_pago_url,
-        (select ifnull(sum(total),0) from '.$this->tableOrdenExcelPagosDocumentos.' where pagos_excel_id='.$this->tableOrdenExcelPagosDetalle.'.id) as total_documentos');
+        $this->db->select('id,proveedor,product_name,fecha_entrega,total_invoice,adelanto,restante,datos_de_pago,qr_pago_url,pagos_total total_documentos');
 
         $this->db->from($this->tableOrdenExcelPagosDetalle);
         $this->db->where('pagos_excel_id',$id);
@@ -3584,7 +3587,7 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         }
        return ['status' => 'success', 'message' => 'Documento guardado'];
     }
-    public function deleteExcelOrderPagos($id){
+    public function deleteExcelOrderPagos($id,$idPedido){
             //get all ids from table tableOrdenExcelPagosDocumentos where pagos_excel_id=$id
             $this->db->select('id');
             $this->db->from($this->tableOrdenExcelPagosDetalle);
@@ -3597,8 +3600,22 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
             }
             $this->db->where('pagos_excel_id',$id);
             $this->db->delete($this->tableOrdenExcelPagosDetalle);
+            //get order_id from tableOrdenExcelPagos where id=$id
+            
+            //check if exist rows in tableOrdenExcelPagos where order_id=$idPedido 
             $this->db->where('id',$id);
             $this->db->delete($this->tableOrdenExcelPagos);
+
+            $this->db->where('order_id',$idPedido);
+            $this->db->from($this->tableOrdenExcelPagos);
+            $query=$this->db->get();
+            if($query->num_rows()==0){
+                $this->db->where('id_pedido', $idPedido);
+                $this->db->where('id_order',2);
+                $this->db->update('agente_compra_order_steps', array('status' => 'PENDING'));
+                return ['status' => 'success', 'message' => 'Orden eliminada y estado cambiado a pendiente'];
+            }
+        
         return ['status' => 'success', 'message' => 'Orden eliminada'];
     }
     public function deleteExcelOrderPagosDocuments($id){
