@@ -1358,7 +1358,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells($TarifasStartColumn3 . $initialRow . ':' . $TarifasStartColumn4 . $initialRow);
 
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow,
-            "=ROUNDUP(MAX(" . $pesoTotal / 1000 . "," . $cbmTotal . "),2)");
+            "=MAX(" . $pesoTotal / 1000 . "," . $cbmTotal . ")");
         //center horizontal
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . $initialRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         //IF TIPO TARIFA IS Estandar set the value to $tarifaCell else set the TarifaCell*cbmTotal
