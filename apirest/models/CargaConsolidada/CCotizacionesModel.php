@@ -1272,8 +1272,11 @@ class CCotizacionesModel extends CI_Model
                 return $tarifa["id_tipo_cliente"] == 2;
             } else if ($tipoCliente == "SOCIO") {
                 return $tarifa["id_tipo_cliente"] == 3;
+            }else{
+                return $tarifa["id_tipo_cliente"] == 1;
             }
         });
+
         // $TarifasStartColumn = chr(ord($InitialColumn) + 5);
         // $TarifasStartColumn2 = chr(ord($InitialColumn) + 6);
         // $TarifasStartColumn3 = chr(ord($InitialColumn) + 7);
@@ -1286,6 +1289,7 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getColumnDimension($TarifasStartColumn2)->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension($TarifasStartColumn3)->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension($TarifasStartColumn4)->setAutoSize(true);
+
         $objPHPExcel->setActiveSheetIndex(2)->mergeCells($TarifasStartColumn . '8:' . $TarifasStartColumn4 . '8');
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . '8', $tipoCliente);
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . '8')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -1298,24 +1302,41 @@ class CCotizacionesModel extends CI_Model
         $tarifaCell = "";
         $tipoTarifa = "";
         $tarifaValue = 0;
+
         //fill tarifas zone
         foreach ($tarifas as $tarifa) {
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow, $tarifa["limite_inf"]);
-            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn2 . $initialRow, floatval($tarifa["limite_sup"]));
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn . $initialRow, round($tarifa["limite_inf"],10));
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn2 . $initialRow, round($tarifa["limite_sup"],10));
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn3 . $initialRow, $tarifa["tarifa"]);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($TarifasStartColumn4 . $initialRow, $tarifa["id_tipo_tarifa"] == 1 ? "Estandar" : "No Estandar");
             //set currency format with dollar symbol
-            if($cbmTotal>1 && $cbmTotal<1.1){
-                $cbmTotal = 1.1;
-            }
-            $limiteInf = round($tarifa["limite_inf"], 2);
-            $limiteSup = round($tarifa["limite_sup"], 2);
-            if ($cbmTotal >= $limiteInf && $cbmTotal <= $limiteSup) {
+           
+            $cbmRounded = round($cbmTotal, 1);
+            // if($cbmTotal>1 && $cbmTotal<1.1){
+            //     $cbmTotal = 1.1;
+            // }
+    
+            $limiteInf = $tarifa["limite_inf"];
+            $limiteSup = $tarifa["limite_sup"];
+         
+            // Modified comparison with epsilon tolerance
+            if ($cbmRounded  >= $limiteInf && $cbmRounded  <= $limiteSup) {
                 $tarifaCell = $TarifasStartColumn3 . $initialRow;
                 $tipoTarifa = $TarifasStartColumn4 . $initialRow;
             }
             $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn3 . $initialRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $initialRow++;
+        }
+        if ($tarifaCell === '' || $tipoTarifa === '') {
+            echo json_encode([
+                'cbmTotal' => $cbmTotal,
+                'cbmTotalRounded'=>$cbmRounded,
+                'limiteInf' => $limiteInf,
+                'limiteSup' => $limiteSup,
+                'tarifas' => $tarifas,
+            ]);
+            return;
+            throw new Exception("No matching tariff found for CBM value: " . $cbmTotal);
         }
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . '8:' . $TarifasStartColumn4 . ($initialRow - 1))->applyFromArray($borders);
 
@@ -1341,6 +1362,8 @@ class CCotizacionesModel extends CI_Model
         //center horizontal
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . $initialRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         //IF TIPO TARIFA IS Estandar set the value to $tarifaCell else set the TarifaCell*cbmTotal
+        
+
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
             $TarifasStartColumn3 . $initialRow,
             "=IF(" . $tipoTarifa . "=\"Estandar\"," . $tarifaCell . ",ROUNDUP(" . $tarifaCell . "*" . ($TarifasStartColumn . $initialRow) . ", 0))"
@@ -1409,15 +1432,14 @@ class CCotizacionesModel extends CI_Model
         $CBMTotal = $InitialColumn . "7";
         $antidumpingSum = 0;
         $InitialColumn = 'C';
-
         //second iteration  for each product and set values and apply styles
         foreach ($data['cliente']['productos'] as $producto) {
             //$INITIALCOLUMN13 =ROUND($VFOBCell/$InitialColumn.'11') TO PERCENTAGE;
+
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '13', "=" . $InitialColumn . '11/' . $VFOBCell);
             $distroCell = $InitialColumn . '13';
             // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '25', $tarifaValue);
 
-            // return $objPHPExcel;
 
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '13')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
             //$initialcolumn14=round($FleteCell*$InitialColumn.'13',2)
@@ -1431,7 +1453,6 @@ class CCotizacionesModel extends CI_Model
             //$initialcolumn15=roundup( $initialcolumn12+$initialcolumn14,2)
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '16', "=ROUNDUP(" . $InitialColumn . '12+' . $InitialColumn . '14,2)');
             $cfrvCell = $InitialColumn . '16';
-
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '16')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
             $seguroCell = $InitialColumn . '17';
             //set currency format with dollar symbol
