@@ -148,27 +148,31 @@ class CCotizaciones extends CI_Controller
 
             // Validate file type if necessary
             $allowedfileExtensions = array('xls', 'xlsx');
-            if (in_array($fileExtension, $allowedfileExtensions)) {
-                //convert this excel to phpoject
-                $this->load->library('PHPExcel');
-                $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
-                $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel, $tarifas, $expirationDate);
-            //    echo json_encode($zipFilePath);
-                // Assuming $zipFilePath is the path to the generated ZIP file
-                if (file_exists($zipFilePath)) {
-                    header('Content-Type: application/zip');
-                    header('Content-Disposition: attachment; filename="' . basename($zipFilePath) . '"');
-                    header('Content-Length: ' . filesize($zipFilePath));
-                    readfile($zipFilePath);
-                    unlink($zipFilePath);
-                    exit();
+            try{
+                if (in_array($fileExtension, $allowedfileExtensions)) {
+                    //convert this excel to phpoject
+                    $this->load->library('PHPExcel');
+                    $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
+                    $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel, $tarifas, $expirationDate);
+                //    echo json_encode($zipFilePath);
+                    // Assuming $zipFilePath is the path to the generated ZIP file
+                    if (file_exists($zipFilePath)) {
+                        header('Content-Type: application/zip');
+                        header('Content-Disposition: attachment; filename="' . basename($zipFilePath) . '"');
+                        header('Content-Length: ' . filesize($zipFilePath));
+                        readfile($zipFilePath);
+                        unlink($zipFilePath);
+                        exit();
+                    } else {
+                        // Handle error if file generation failed
+                        echo "Error: Unable to generate the ZIP file.";
+                    }
                 } else {
-                    // Handle error if file generation failed
-                    echo "Error: Unable to generate the ZIP file.";
+                    echo "Error: Invalid file extension.";
                 }
-            } else {
-                echo "Error: Invalid file extension.";
-            }
+            }catch(Exception $e){
+                echo "Error: " . $e->getMessage();
+            }   
         } else {
             echo "Error: " . $_FILES['file']['error'];
         }
