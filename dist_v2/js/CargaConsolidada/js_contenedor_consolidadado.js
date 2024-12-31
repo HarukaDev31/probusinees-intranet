@@ -647,6 +647,7 @@ $(document).ready(async function () {
     btnCrear.on("click", function () {
         $("#modal-crear").modal("show");
         $("#btn-guardar").show();
+        $("#btn-actualizar").hide();
     });
     btnCrearCotizacion = $("#btn-crear-cotizacion");
     btnCrearCotizacion.on("click", function () {
@@ -658,6 +659,13 @@ $(document).ready(async function () {
     $("#btn-guardar").click(function (e) {
         e.preventDefault();
         const formData = new FormData($("#form-crear")[0]);
+        let form= $("#form-crear")[0];
+        console.log(form.checkValidity());
+        if(!form.checkValidity()){
+            form.classList.add('was-validated');
+            return;
+        }
+
         $.ajax({
             url: base_url + "CargaConsolidada/ContenedorConsolidado/store",
             type: "POST",
@@ -688,6 +696,11 @@ $(document).ready(async function () {
         e.preventDefault();
         const formData = new FormData($("#form-crear-cotizacion")[0]);
         formData.append("id_contenedor", idContenedor);
+        let form= $("#form-crear-cotizacion")[0];
+        if(!form.checkValidity()){
+            form.classList.add('was-validated');
+            return;
+        }
         $.ajax({
             url: base_url + "CargaConsolidada/ContenedorConsolidado/storeCotizacion",
             type: "POST",
@@ -719,6 +732,11 @@ $(document).ready(async function () {
         e.preventDefault();
         const formData = new FormData($("#form-crear-cotizacion")[0]);
         formData.append("id", idCotizacion);
+        let form= $("#form-crear-cotizacion")[0];
+        if(!form.checkValidity()){
+            form.classList.add('was-validated');
+            return;
+        }
         $.ajax({
             url: base_url + "CargaConsolidada/ContenedorConsolidado/updateCotizacion",
             type: "POST",
@@ -749,6 +767,11 @@ $(document).ready(async function () {
         e.preventDefault();
         const formData = new FormData($("#form-crear")[0]);
         formData.append("id", currentCarga);
+        let form= $("#form-crear")[0];
+        if(!form.checkValidity()){
+            form.classList.add('was-validated');
+            return;
+        }
         $.ajax({
             url: base_url + "CargaConsolidada/ContenedorConsolidado/update",
             type: "POST",

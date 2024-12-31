@@ -129,60 +129,54 @@
               <div class="col-6 col-sm-6">
                 <label>Fecha <span class="label-advertencia text-danger"> *</span></label>
                 <div class="form-group">
-                  <input type="text" id="txt-Fe_Cotizacion" name="fecha" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                  <span class="help-block text-danger" id="error"></span>
+                  <input type="text" required id="txt-Fe_Cotizacion" name="fecha" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                  <span class="invalid-feedback" id="error-fecha">La fecha es requerida</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group ">
                   <label>Nombre <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" id="txt-Nombre" name="nombre" class="form-control input-report required">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="text" required id="txt-Nombre" name="nombre" class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-nombre">El nombre es requerido</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group">
                   <label>DNI/RUC <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" id="txt-Dni" name="documento" class="form-control input-report required">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="text" required id="txt-Dni" name="documento" class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-dni">El DNI/RUC es requerido</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
                   <label>Correo <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" id="txt-Correo" name="correo" class="form-control input-report required">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="text" required id="txt-Correo" name="correo" class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-correo">El correo es requerido</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
                   <label>Whatsapp <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" id="txt-Whatsapp" name="telefono" class="form-control input-report required">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="text" required id="txt-Whatsapp" name="telefono" class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-whatsapp">El whatsapp es requerido</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group" >
                   <label>Tipo Cliente <span class="label-advertencia text-danger"> *</span></label>
-                  <select id="txt-ID_Tipo_Cliente" name="id_tipo_cliente" class="form-control input-report required">
+                  <select id="txt-ID_Tipo_Cliente"  required name="id_tipo_cliente" class="form-control input-report required">
                   </select>
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <span class="invalid-feedback" id="error-tipo-cliente">El tipo cliente es requerido</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
                   <label>Volumen <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" id="txt-Volumen" name="volumen" class="form-control input-report required">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="number" id="txt-Volumen" name="volumen" required class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-volumen">El volumen es requerido</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
@@ -221,16 +215,15 @@
               <div class="col-6 col-sm-6">
                 <label>Mes <span class="label-advertencia text-danger"> *</span></label>
                 <div class="form-group">
-                  <select id="txt-Mes" name="mes" class="form-control input-report required">
+                  <select id="txt-Mes" required name="mes" class="form-control input-report required">
                   </select>
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <span class="invalid-feedback" id="error-mes">El mes es requerido</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group">
                   <label>Pais <span class="label-advertencia text-danger"> *</span></label>
-                  <select id="txt-ID_Pais" name="id_pais" class="form-control input-report required">
+                  <select id="txt-ID_Pais" required name="id_pais" class="form-control input-report required">
                     
                   </select>
                   <!-- <span class="help-block text-danger" id="error"></span>
@@ -240,32 +233,30 @@
               <div class="col-6 col-sm-6">
                 <div class="form-group">
                   <label>Carga <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" id="txt-No_Carga" name="carga" class="form-control input-report required">
-                  <span class="help-block text-danger" id="error"></span>
+                  <input type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
                   <label>F. Puerto <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_puerto" id="txt-Fe_Puerto" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                  <span class="invalid-feedback" id="error-f-puerto">La fecha puerto es requerida</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group" id="div-Fe_Entrega">
                   <label>F. Entrega <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text"  name="f_entrega" id="txt-Fe_Entrega" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="text"  required  name="f_entrega" id="txt-Fe_Entrega" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                  <span class="invalid-feedback" id="error-f-entrega">La fecha entrega es requerida</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group ">
                   <label>Empresa <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="empresa" id="txt-Empresa" class="form-control input-report required">
-                  <span class="help-block text-danger" id="error"></span>
+                  <input type="text"  required name="empresa" id="txt-Empresa" class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-empresa">La empresa es requerida</span>
                 </div>
               </div>
               </div>
