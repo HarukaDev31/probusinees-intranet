@@ -7,6 +7,8 @@ var btnCrearCotizacion = null;
 var paises = [];
 var fToday = new Date();
 var fYear = fToday.getFullYear();
+//parse date to yyyy-mm-dd
+
 var fDay = fToday.getDate();
 var currentCarga = 0;
 var meses = [
@@ -66,13 +68,7 @@ var stepId = 0;
 var cotizacionContainer = null;
 var tableCotizacion = null;
 var idCotizacion = 0;
-$(".input-date").datepicker({
-    autoclose: true,
-    startDate: new Date(fYear, fToday.getMonth(), fDay),
-    todayHighlight: true,
-    dateFormat: "yyyy-mm-dd",
-    format: "yyyy-mm-dd",
-});
+
 async function updateEstado(id) {
     //get select value
     const estado = $(`#estado-${id}`).val();
@@ -767,6 +763,8 @@ $(document).ready(async function () {
         e.preventDefault();
         const formData = new FormData($("#form-crear")[0]);
         formData.append("id", currentCarga);
+        //FORMAT DATES TO YYYY-MM-DD 
+
         let form= $("#form-crear")[0];
         if(!form.checkValidity()){
             form.classList.add('was-validated');
@@ -806,8 +804,11 @@ $(document).ready(async function () {
         autoclose: true,
         startDate: new Date(fYear, fToday.getMonth(), fDay),
         todayHighlight: true,
-        dateFormat: "yyyy-mm-dd",
-        format: "yyyy-mm-dd",
+        format: "dd/mm/yyyy",
+        dateFormat: "dd/mm/yyyy",
+
+        
+        
     });
     $("#modal-crear-cotizacion").on("hidden.bs.modal", function () {
         $("#form-crear-cotizacion")[0].reset();

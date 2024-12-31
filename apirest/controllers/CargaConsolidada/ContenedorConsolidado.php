@@ -38,8 +38,8 @@ class ContenedorConsolidado extends CI_Controller {
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
 			$subdata[] = $row->carga;
-			$subdata[] = $row->f_puerto;
-			$subdata[] = $row->f_entrega;
+			$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
+			$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 			$subdata[] = $row->empresa;
 			$btnView='<div>
 			<i class="fas fa-eye" style="cursor:pointer;" onclick="viewSteps('.$row->id.')"></i>
@@ -75,7 +75,14 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function store(){
 		$data=$this->input->post();
+		//parse all f_entrega and f_puerto from dd/mm/yyyy to yyyy-mm-dd
+		$data['f_puerto']=$this->convertDateFormat($data['f_puerto']);
+		$data['f_entrega']=$this->convertDateFormat($data['f_entrega']);
+		// $data['f_puerto']=date("Y-m-d", strtotime($data['f_puerto']));
+		// $data['f_entrega']=date("Y-m-d", strtotime($data['f_entrega']));
 		$response = $this->ContenedorConsolidadoModel->store($data);
+		
+
 		$id=$response['id'];
 		$this->generateSteps($id);	
 		echo json_encode([
@@ -85,6 +92,8 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function update(){
 		$data=$this->input->post();
+		$data['f_puerto']=$this->convertDateFormat($data['f_puerto']);
+		$data['f_entrega']=$this->convertDateFormat($data['f_entrega']);
 		$arrResponse = $this->ContenedorConsolidadoModel->update($data);
 		echo json_encode([
 			"status" => $arrResponse
@@ -93,6 +102,10 @@ class ContenedorConsolidado extends CI_Controller {
 	public function show($id){
 	
 		$arrResponse = $this->ContenedorConsolidadoModel->show($id);
+		//parse all f_entrega and f_puerto to Y/m/d
+		$arrResponse->f_entrega=date("Y/m/d", strtotime($arrResponse->f_entrega));
+		$arrResponse->f_puerto=date("Y/m/d", strtotime($arrResponse->f_puerto));
+	
 		echo json_encode($arrResponse);
 	}
 	public function delete(){
@@ -163,6 +176,7 @@ class ContenedorConsolidado extends CI_Controller {
 	///function to step 1 cotizacion
 	public function storeCotizacion(){
 		$data=$this->input->post();
+		$data['fecha']=$this->convertDateFormat($data['fecha']);
 		$cotizacion = $_FILES['cotizacion'];
 		
 		$response = $this->ContenedorConsolidadoModel->storeCotizacion($data,$cotizacion);
@@ -222,5 +236,9 @@ class ContenedorConsolidado extends CI_Controller {
 		echo json_encode([
 			"status" => $arrResponse
 		]);
+	}
+	function convertDateFormat($date) {
+		$dateObject = DateTime::createFromFormat('d/m/Y', $date);
+		return $dateObject ? $dateObject->format('Y-m-d') : null; // Devuelve null si la fecha no es válida
 	}
 }

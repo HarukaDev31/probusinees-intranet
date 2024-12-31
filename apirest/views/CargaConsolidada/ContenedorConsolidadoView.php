@@ -25,7 +25,7 @@
                   <div class="col-6 col-sm-2">
                     <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
                     <div class="form-group">
-                      <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                      <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required" >
                       <span class="help-block text-danger" id="error"></span>
                     </div>
                   </div>
@@ -129,7 +129,7 @@
               <div class="col-6 col-sm-6">
                 <label>Fecha <span class="label-advertencia text-danger"> *</span></label>
                 <div class="form-group">
-                  <input type="text" required id="txt-Fe_Cotizacion" name="fecha" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                  <input type="text" required id="txt-Fe_Cotizacion" name="fecha" class="form-control input-report required input-date" >
                   <span class="invalid-feedback" id="error-fecha">La fecha es requerida</span>
                 </div>
               </div>
@@ -241,14 +241,14 @@
                 <div class="form-group
                 ">
                   <label>F. Puerto <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" class="form-control input-report required input-date" >
                   <span class="invalid-feedback" id="error-f-puerto">La fecha puerto es requerida</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">
                 <div class="form-group" id="div-Fe_Entrega">
                   <label>F. Entrega <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text"  required  name="f_entrega" id="txt-Fe_Entrega" class="form-control input-report required input-date" value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                  <input type="text"  required  name="f_entrega" id="txt-Fe_Entrega" class="form-control input-report required input-date" >
                   <span class="invalid-feedback" id="error-f-entrega">La fecha entrega es requerida</span>
                 </div>
               </div>
