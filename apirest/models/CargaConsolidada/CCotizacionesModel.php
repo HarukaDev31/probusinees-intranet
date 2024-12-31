@@ -1114,12 +1114,13 @@ class CCotizacionesModel extends CI_Model
         //init more memory
         $originalMemoryLimit = ini_get('memory_limit');
         //set memory limit to 512M
-        ini_set('memory_limit', '1024M');
+        ini_set('memory_limit', '2048M');
         $this->load->library('PHPExcel');
         $this->load->library('zip');
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
+     
         // Assuming this gets the data for all rows
         // Iterate through the data, generate an Excel file for each row, add it to a ZIP file
 
@@ -1169,6 +1170,7 @@ class CCotizacionesModel extends CI_Model
     }
     public function getFinalCotizacionExcel($objPHPExcel, $data, $tarifas, $expirationDate)
     {
+        try{
         //GOD IMPLEMENTATION
         $newSheet = $objPHPExcel->createSheet();
         $newSheet->setTitle('3');
@@ -1258,6 +1260,7 @@ class CCotizacionesModel extends CI_Model
             $pesoTotal += $producto['peso'];
 
         }
+
         $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
         //get tarifas from db
         $tipoCliente = trim($data['cliente']["tipo"]);
@@ -1338,6 +1341,7 @@ class CCotizacionesModel extends CI_Model
             return;
             throw new Exception("No matching tariff found for CBM value: " . $cbmTotal);
         }
+
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . '8:' . $TarifasStartColumn4 . ($initialRow - 1))->applyFromArray($borders);
 
         $initialRow++;
@@ -1401,8 +1405,8 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getStyle($TarifasStartColumn . ($initialRow - 4) . ":" . $TarifasStartColumn4 . ($initialRow - 3))->applyFromArray($borders);
         $initialRow++;
         //create remaining zones and apply styles
-        $InitialColumnLetter = chr(ord($InitialColumn) - 1);
-        $LastColumnLetter = chr(ord($InitialColumn));
+        $InitialColumnLetter = $this->incrementColumn($InitialColumn,-1);
+        $LastColumnLetter = $InitialColumn;
         $objPHPExcel->getActiveSheet()->getStyle('B5:' . $InitialColumn . '19')->applyFromArray($borders);
         $objPHPExcel->getActiveSheet()->getStyle('B28:' . $InitialColumn . '32')->applyFromArray($borders);
 
@@ -1415,7 +1419,6 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
 
         $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', $pesoTotal > 1000 ? round($pesoTotal / 1000, 2) : $pesoTotal);
-        // IF initial column 6>= 1000 set tn format else set kg format
         if ($pesoTotal > 1000) {
             $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" tn"');
         } else {
@@ -1866,6 +1869,12 @@ class CCotizacionesModel extends CI_Model
         $objPHPExcel->getActiveSheet()->setTitle('2');
 
         return $objPHPExcel;
+    }
+    catch (Exception $e) {
+        echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+        return $objPHPExcel;
+        throw $e;
+    }
     }
 
     public function getMassiveExcelData($objPHPExcel)

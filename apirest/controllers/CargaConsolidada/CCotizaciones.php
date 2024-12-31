@@ -134,7 +134,7 @@ class CCotizaciones extends CI_Controller
     }
     public function uploadExcelMassive()
     {
-        //get tarifas from post
+        try{
         $tarifas = $_POST['tarifas'];
         $expirationDate = $_POST['expiration_date'];
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
@@ -176,6 +176,9 @@ class CCotizaciones extends CI_Controller
         } else {
             echo "Error: " . $_FILES['file']['error'];
         }
+    }catch(Exception $e){
+        echo "Error: " . $e->getMessage();
+    }
 
     }
     public function descargarExcel()
