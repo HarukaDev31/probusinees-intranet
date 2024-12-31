@@ -34,11 +34,193 @@ class ContenedorConsolidado extends CI_Controller {
         $arrData = $this->ContenedorConsolidadoModel->index();
         $data= array();
         foreach ($arrData as $row) {
-            
+            $subdata = array();
+			$subdata[] = $row->mes;
+			$subdata[] = $row->No_Pais;
+			$subdata[] = $row->carga;
+			$subdata[] = $row->f_puerto;
+			$subdata[] = $row->f_entrega;
+			$subdata[] = $row->empresa;
+			$btnView='<div>
+			<i class="fas fa-eye" style="cursor:pointer;" onclick="viewSteps('.$row->id.')"></i>
+			</div>';
+			$subdata[] = $btnView;
+			//if estado= pendiente use badge warning else success
+			$divEstadoSelect="";
+			// if($row->estado=="PENDIENTE"){
+			// 	$divEstado='<div class="badge badge-warning">'.$row->estado.'</div>';
+			// }else{
+			// 	$divEstado='<div class="badge badge-success">'.$row->estado.'</div>';
+			// }
+			$divEstado='<select class="form-control" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">
+				<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
+				<option value="COMPLETADO" '.($row->estado=="COMPLETADO" ? "selected" : "").'>COMPLETADO</option>
+			</select>';	
+			$subdata[] = $divEstado;
+			$divAcciones='<div>
+			<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="view('.$row->id.')"></i>
+			<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCarga('.$row->id.')"></i>
+			</div>';
+			$subdata[] = $divAcciones;
+			$data[] = $subdata;
         }
         $output = array(
             "data" => $data
         );
         echo json_encode($output);
     }
+	public function getPaises(){
+		$arrResponse = $this->ContenedorConsolidadoModel->getPaises();
+		echo json_encode($arrResponse);
+	}
+	public function store(){
+		$data=$this->input->post();
+		$response = $this->ContenedorConsolidadoModel->store($data);
+		$id=$response['id'];
+		$this->generateSteps($id);	
+		echo json_encode([
+			"status" => $response['status'],
+			'id' => $id
+		]);
+	}
+	public function update(){
+		$data=$this->input->post();
+		$arrResponse = $this->ContenedorConsolidadoModel->update($data);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function show($id){
+	
+		$arrResponse = $this->ContenedorConsolidadoModel->show($id);
+		echo json_encode($arrResponse);
+	}
+	public function delete(){
+		$id=$this->input->post('id');
+		$arrResponse = $this->ContenedorConsolidadoModel->delete($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function generateSteps($idContenedor){
+		$steps=$this->HelperImportacionModel->getCotizacionSteps($idContenedor);
+		$result=$this->ContenedorConsolidadoModel->generateSteps($steps);
+	}
+	public function steps($idContenedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->getOrderProgress($idContenedor);
+		echo json_encode(['data' => $arrResponse,'status' => "success"]);
+	}
+	public function step(){
+		$stepIndex=$this->input->post('stepIndex');
+		$idContenedor=$this->input->post('idContenedor');
+		if($stepIndex==1){
+			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
+			$data= array();
+			foreach ($arrResponse as $row) {
+				$subdata = array();
+				$subdata[] = $row->id_cotizacion;
+				$subdata[] = $row->fecha;
+				$subdata[] = $row->nombre;
+				$subdata[] = $row->documento;
+				$subdata[] = $row->correo;
+				$subdata[] = $row->telefono;
+				$subdata[] = $row->name;
+				$subdata[] = $row->volumen;
+				//div with a tag to download file and button to delete file
+				$divFile = '<div>';
+				if (!empty($row->cotizacion_file_url)) {
+					$divFile .= '
+						<a href="' . $row->cotizacion_file_url . '" download>
+							<i class="fas fa-file-download text-success"></i>
+						</a>
+						<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacionFile(' . $row->id_cotizacion . ')"></i>';
+				} else {
+					$divFile .= '
+						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFile(' . $row->id_cotizacion . ')"></i>';
+				}
+				$divFile .= '</div>';
+				$subdata[] = $divFile;
+				$selectEstado='<select class="form-control" id="estado-cotizacion-'.$row->id_cotizacion.'" name="estado" onchange="updateEstadoCotizacion('.$row->id_cotizacion.')">
+					<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
+					<option value="CONFIRMADO" '.($row->estado=="CONFIRMADO" ? "selected" : "").'>CONFIRMADO</option>
+					<option value="DECLINADO" '.($row->estado=="DECLINADO" ? "selected" : "").'>DECLINADO</option>
+				</select>';
+				$subdata[] = $selectEstado;
+				$divAcciones='<div>
+				<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="viewCotizacion('.$row->id_cotizacion.')"></i>
+				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id_cotizacion.')"></i>
+				</div>';
+				$subdata[] = $divAcciones;
+				$data[] = $subdata;
+			}
+			$output = array(
+				"data" => $data
+			);
+			echo json_encode($output);
+			// echo json_encode(['data' => $arrResponse,'status' => "success"]);
+		}
+	}
+	///function to step 1 cotizacion
+	public function storeCotizacion(){
+		$data=$this->input->post();
+		$cotizacion = $_FILES['cotizacion'];
+		
+		$response = $this->ContenedorConsolidadoModel->storeCotizacion($data,$cotizacion);
+		echo json_encode([
+			"status" => $response['status'],
+		]);
+	}
+	public function getTipoCliente(){
+		$arrResponse = $this->ContenedorConsolidadoModel->getTipoCliente();
+		echo json_encode($arrResponse);
+	}
+	public function deleteCotizacionFile($idCotizacion){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteCotizacionFile($idCotizacion);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function deleteCotizacion($idCotizacion){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteCotizacion($idCotizacion);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function uploadCotizacionFile(){
+		$idCotizacion=$this->input->post('id');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadCotizacionFile($idCotizacion,$file);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function showCotizacion($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->showCotizacion($id);
+		echo json_encode($arrResponse);
+	}
+	public function updateCotizacion(){
+		$data=$this->input->post();
+		$cotizacion = $_FILES['cotizacion'];
+
+		$arrResponse = $this->ContenedorConsolidadoModel->updateCotizacion($data,$cotizacion);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateEstadoCotizacion(){
+		$id=$this->input->post('id');
+		$estado=$this->input->post('estado');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoCotizacion($id,$estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateEstado(){
+		$id=$this->input->post('id');
+		$estado=$this->input->post('estado');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstado($id,$estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 }

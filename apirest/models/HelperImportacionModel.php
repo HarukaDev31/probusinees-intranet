@@ -5,6 +5,7 @@ class HelperImportacionModel extends CI_Model{
 
 	private $defautlAgenteChinaSteps=[];
 	private $defaultJefeChina=[];
+	private $defaultCotizador=[];
 
 	public function __construct(){
 		parent::__construct();
@@ -26,7 +27,13 @@ class HelperImportacionModel extends CI_Model{
 			["name"=>"RECEPCION E INSPECCION","iconURL"=>base_url()."assets/icons/recepcion.png"],
 			["name"=>"BOOKING","iconURL"=>base_url()."assets/icons/inspeccion.png"],
 			["name"=>"DOCUMENTACIÓN","iconURL"=>base_url()."assets/icons/documentacion.png"]);
-	}
+		$this->defaultCotizador=array(
+			["name"=>"COTIZACION","iconURL"=>base_url()."assets/icons/cotizacion.png"],
+			["name"=>"CLIENTES","iconURL"=>base_url()."assets/icons/clientes.png"],
+			["name"=>"DOCUMENTACION","iconURL"=>base_url()."assets/icons/cdocumentacion.png"],
+			["name"=>"COTIZACION FINAL","iconURL"=>base_url()."assets/icons/cotizacion_final.png"],
+			["name"=>"FACTURA Y GUIA","iconURL"=>base_url()."assets/icons/factura.png"]);
+		}
 
 	function obtenerEstadoImportacionIntegral($iEstado){
 		if( $iEstado == 1 )
@@ -125,7 +132,6 @@ class HelperImportacionModel extends CI_Model{
 		}
 	}
 
-	//1=Pendiente, 2=Proceso, 3=Cotizado, 4=Producción, 5=Inspección y 6=Entregado
 	function obtenerEstadoPedidoAgenteCompraChinaArray($iEstado){
 		if( $iEstado == 1 )
 			return array('No_Estado' => 'Pendiente','No_Class_Estado' => 'secondary');
@@ -361,6 +367,22 @@ WHERE USR.ID_Empresa = " . $this->user->ID_Empresa . " AND GRP.Nu_Tipo_Privilegi
 			'status' => 'warning',
 			'message' => 'No se encontro registro',
 		);
+	}
+	public function getCotizacionSteps($idContenedor){
+		$stepCotizador=[];
+		$idContenedor=intval($idContenedor);
+		$index=1;
+		foreach($this->defaultCotizador as $step){
+			$stepCotizador[]=[
+				"id_pedido"=>$idContenedor,
+				'id_order'=>$index,
+				'name'=>$step['name'],
+				'iconURL'=>$step['iconURL'],
+				'status'=>'PENDING'
+			];
+			$index++;
+		}
+		return $stepCotizador;
 	}
 	public function generateOrderSteps($privilegiesArray,$idPedido){
 		$stepAgente=[];

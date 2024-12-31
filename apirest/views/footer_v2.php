@@ -150,6 +150,8 @@
 
 <?php if (isset($js_contenedor_consolidadado) && $js_contenedor_consolidadado==true) : ?>
 <!-- datepicker -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
 
