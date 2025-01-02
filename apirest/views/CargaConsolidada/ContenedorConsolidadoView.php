@@ -38,10 +38,13 @@
                       <option value="COMPLETADO">COMPLETADO</option>
                     </select>
                   </div>
+                  <?php if($this->user->No_Grupo=="Coordinación"){  ?>
                   <div class="col-6 col-sm-2">
                     <label>&nbsp;</label>
                     <button type="button" id="btn-crear" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
                   </div>
+                  <?php } ?>
+                  
                   <div class="col-6 col-sm-2">
                     <label>&nbsp;</label>
                     <button type="button" id="btn-buscar-carga" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
