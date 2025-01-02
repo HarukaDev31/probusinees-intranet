@@ -39,7 +39,9 @@ class ContenedorConsolidado extends CI_Controller {
 			$subdata[] = $row->No_Pais;
 			$subdata[] = $row->carga;
 			$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
+			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
 			$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
+			
 			$subdata[] = $row->empresa;
 			$btnView='<div>
 			<i class="fas fa-eye" style="cursor:pointer;" onclick="viewSteps('.$row->id.')"></i>
@@ -52,15 +54,27 @@ class ContenedorConsolidado extends CI_Controller {
 			// }else{
 			// 	$divEstado='<div class="badge badge-success">'.$row->estado.'</div>';
 			// }
+			if($this->user->No_Grupo=="Coordinación"){
 			$divEstado='<select class="form-control" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">
 				<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
 				<option value="COMPLETADO" '.($row->estado=="COMPLETADO" ? "selected" : "").'>COMPLETADO</option>
 			</select>';	
+
+			}else{
+				if($row->estado=="PENDIENTE"){
+					$divEstado='<div class="badge badge-warning">'.$row->estado.'</div>';
+				}else{
+					$divEstado='<div class="badge badge-success">'.$row->estado.'</div>';
+				}
+			}
 			$subdata[] = $divEstado;
-			$divAcciones='<div>
-			<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="view('.$row->id.')"></i>
-			<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCarga('.$row->id.')"></i>
-			</div>';
+			if($this->user->No_Grupo=="Coordinación"){
+				$divAcciones='<div>
+				<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="view('.$row->id.')"></i>
+				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCarga('.$row->id.')"></i>
+				</div>';
+			}
+		
 			$subdata[] = $divAcciones;
 			$data[] = $subdata;
         }
@@ -78,6 +92,7 @@ class ContenedorConsolidado extends CI_Controller {
 		//parse all f_entrega and f_puerto from dd/mm/yyyy to yyyy-mm-dd
 		$data['f_puerto']=$this->convertDateFormat($data['f_puerto']);
 		$data['f_entrega']=$this->convertDateFormat($data['f_entrega']);
+		$data['f_cierre']=$this->convertDateFormat($data['f_cierre']);
 		// $data['f_puerto']=date("Y-m-d", strtotime($data['f_puerto']));
 		// $data['f_entrega']=date("Y-m-d", strtotime($data['f_entrega']));
 		$response = $this->ContenedorConsolidadoModel->store($data);
@@ -94,6 +109,8 @@ class ContenedorConsolidado extends CI_Controller {
 		$data=$this->input->post();
 		$data['f_puerto']=$this->convertDateFormat($data['f_puerto']);
 		$data['f_entrega']=$this->convertDateFormat($data['f_entrega']);
+		$data['f_cierre']=$this->convertDateFormat($data['f_cierre']);
+
 		$arrResponse = $this->ContenedorConsolidadoModel->update($data);
 		echo json_encode([
 			"status" => $arrResponse
@@ -132,7 +149,7 @@ class ContenedorConsolidado extends CI_Controller {
 			foreach ($arrResponse as $row) {
 				$subdata = array();
 				$subdata[] = $row->id_cotizacion;
-				$subdata[] = $row->fecha;
+				$subdata[] = date("d/m/Y", strtotime($row->fecha));
 				$subdata[] = $row->nombre;
 				$subdata[] = $row->documento;
 				$subdata[] = $row->correo;
@@ -153,11 +170,22 @@ class ContenedorConsolidado extends CI_Controller {
 				}
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
+				if($this->user->No_Grupo=="Coordinación"){
 				$selectEstado='<select class="form-control" id="estado-cotizacion-'.$row->id_cotizacion.'" name="estado" onchange="updateEstadoCotizacion('.$row->id_cotizacion.')">
 					<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
 					<option value="CONFIRMADO" '.($row->estado=="CONFIRMADO" ? "selected" : "").'>CONFIRMADO</option>
 					<option value="DECLINADO" '.($row->estado=="DECLINADO" ? "selected" : "").'>DECLINADO</option>
 				</select>';
+				}else{
+					//if estado= pendiente if confirmado use badge success else danger
+					if($row->estado=="PENDIENTE"){
+						$selectEstado='<div class="badge badge-warning">'.$row->estado.'</div>';
+					}else if($row->estado=="CONFIRMADO"){
+						$selectEstado='<div class="badge badge-success">'.$row->estado.'</div>';
+					}else{
+						$selectEstado='<div class="badge badge-danger">'.$row->estado.'</div>';
+					}
+				}
 				$subdata[] = $selectEstado;
 				$divAcciones='<div>
 				<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="viewCotizacion('.$row->id_cotizacion.')"></i>
@@ -175,14 +203,20 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	///function to step 1 cotizacion
 	public function storeCotizacion(){
-		$data=$this->input->post();
-		$data['fecha']=$this->convertDateFormat($data['fecha']);
+		try{
+			$data=$this->input->post();
 		$cotizacion = $_FILES['cotizacion'];
 		
 		$response = $this->ContenedorConsolidadoModel->storeCotizacion($data,$cotizacion);
 		echo json_encode([
 			"status" => $response['status'],
 		]);
+		}catch(Exception $e){
+			echo json_encode([
+				"status" => false,
+				"message" => $e->getMessage()
+			]);
+		}
 	}
 	public function getTipoCliente(){
 		$arrResponse = $this->ContenedorConsolidadoModel->getTipoCliente();

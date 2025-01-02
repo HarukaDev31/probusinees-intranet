@@ -54,12 +54,16 @@
                 <th>Mes  </th>
                 <th>Pais</th>
                 <th>Carga</th>
-                <th>F. Puerto</th>
+                <th>F. Arribo</th>
+                <th>F. Cierre</th>
                 <th>F. Entrega</th>
                 <th>Empresa</th>
                 <th>Ver</th>
                 <th>Estado</th>
-                <th>Acciones</th>
+                <?php if($this->user->No_Grupo=="Coordinación"){  ?>
+                <th>Acciones                 
+                </th>
+              <?php } ?>
               </tr>
             </thead>
           </table>
@@ -73,7 +77,7 @@
                 </div>
                 <div class="col-6 col-sm-2">
                   <label>&nbsp;</label>
-                  <button type="button" id="btn-crear-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
+                  <button type="button" id="btn-crear-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
                 </div>
                 <div class="col-6 col-sm-2">
                   <label>&nbsp;</label>
@@ -98,7 +102,8 @@
               <th>Volumen</th>
               <th>Cotizacion</th>
               <th>Estado</th>
-              <th>Acciones</th>
+              <th>Acciones
+              </th>
             </tr>
           </thead>
         </table>
@@ -118,7 +123,7 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Crear Cotizacion</h5>
+          <h5 class="modal-title">Subir Prospecto</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -126,66 +131,66 @@
         <div class="modal-body">
           <form id="form-crear-cotizacion" class="form-horizontal" method="post">
             <div class="row">
-              <div class="col-6 col-sm-6">
+              <!-- <div class="col-6 col-sm-6">
                 <label>Fecha <span class="label-advertencia text-danger"> *</span></label>
                 <div class="form-group">
                   <input type="text" required id="txt-Fe_Cotizacion" name="fecha" class="form-control input-report required input-date" >
                   <span class="invalid-feedback" id="error-fecha">La fecha es requerida</span>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6">
+              </div> -->
+              <!-- <div class="col-6 col-sm-6">
                 <div class="form-group ">
                   <label>Nombre <span class="label-advertencia text-danger"> *</span></label>
                   <input type="text" required id="txt-Nombre" name="nombre" class="form-control input-report required">
                   <span class="invalid-feedback" id="error-nombre">El nombre es requerido</span>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6">
+              </div> -->
+              <!-- <div class="col-6 col-sm-6">
                 <div class="form-group">
                   <label>DNI/RUC <span class="label-advertencia text-danger"> *</span></label>
                   <input type="text" required id="txt-Dni" name="documento" class="form-control input-report required">
                   <span class="invalid-feedback" id="error-dni">El DNI/RUC es requerido</span>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6">
+              </div> -->
+              <!-- <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
                   <label>Correo <span class="label-advertencia text-danger"> *</span></label>
                   <input type="text" required id="txt-Correo" name="correo" class="form-control input-report required">
                   <span class="invalid-feedback" id="error-correo">El correo es requerido</span>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6">
+              </div> -->
+              <!-- <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
                   <label>Whatsapp <span class="label-advertencia text-danger"> *</span></label>
                   <input type="text" required id="txt-Whatsapp" name="telefono" class="form-control input-report required">
                   <span class="invalid-feedback" id="error-whatsapp">El whatsapp es requerido</span>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6">
+              </div> -->
+              <!-- <div class="col-6 col-sm-6">
                 <div class="form-group" >
                   <label>Tipo Cliente <span class="label-advertencia text-danger"> *</span></label>
                   <select id="txt-ID_Tipo_Cliente"  required name="id_tipo_cliente" class="form-control input-report required">
                   </select>
                   <span class="invalid-feedback" id="error-tipo-cliente">El tipo cliente es requerido</span>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6">
+              </div> -->
+              <!-- <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
                   <label>Volumen <span class="label-advertencia text-danger"> *</span></label>
                   <input type="number" id="txt-Volumen" name="volumen" required class="form-control input-report required">
                   <span class="invalid-feedback" id="error-volumen">El volumen es requerido</span>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6">
+              </div> -->
+              <div class="col-12 col-sm-12">
                 <div class="form-group
                 ">
                   <label>Cotizacion <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="file" id="txt-Cotizacion" name="cotizacion" class="form-control input-report required">
-                  <span class="help-block
-                  text-danger" id="error"></span>
+                  <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required">
+                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+
                 </div>
               </div>  
             </div>
@@ -240,9 +245,17 @@
               <div class="col-6 col-sm-6">
                 <div class="form-group
                 ">
-                  <label>F. Puerto <span class="label-advertencia text-danger"> *</span></label>
+                  <label>F. Arribo <span class="label-advertencia text-danger"> *</span></label>
                   <input type="text" name="f_puerto" required id="txt-Fe_Puerto" class="form-control input-report required input-date" >
-                  <span class="invalid-feedback" id="error-f-puerto">La fecha puerto es requerida</span>
+                  <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
+                </div>
+              </div>
+              <div class="col-6 col-sm-6">
+                <div class="form-group
+                ">
+                  <label>F. Cierre <span class="label-advertencia text-danger"> *</span></label>
+                  <input type="text" name="f_cierre" required id="txt-Fe_Cierre" class="form-control input-report required input-date" >
+                  <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6">

@@ -1,5 +1,6 @@
 <?php
 require_once APPPATH . 'traits/FileTrait.php';
+require_once APPPATH . 'third_party/PHPExcel.php';
 
 class ContenedorConsolidadoModel extends CI_Model{
     use FileTrait;
@@ -110,6 +111,56 @@ class ContenedorConsolidadoModel extends CI_Model{
         $query = $this->db->get();
         return $query->result();
     }
+    public  function convertDateFormat($date) {
+		$dateObject = DateTime::createFromFormat('d/m/Y', $date);
+		return $dateObject ? $dateObject->format('Y-m-d') : null; // Devuelve null si la fecha no es válida
+	}
+    public function getCotizacionData($cotizacion){
+        try{
+            $objPHPExcel = PHPExcel_IOFactory::load($cotizacion['tmp_name']);
+            //find sheet 1 and get cell b8 as nombre,cell b9 as documento,cell b10 as correo,cell b11 as telefono,i11 as volumen,e9 as fecha
+            $sheet = $objPHPExcel->getSheet(0);
+            $nombre = $sheet->getCell('B8')->getValue();
+            $documento = $sheet->getCell('B9')->getValue();
+            $correo = $sheet->getCell('B10')->getValue();
+            $telefono = $sheet->getCell('B11')->getValue();
+            $volumen = $sheet->getCell('I11')->getValue(); 
+            //get calculated value from cell e9
+            $fecha = $sheet->getCell('E9')->getValue(); 
+            if($fecha=="=+TODAY()"){
+                $fecha = date("Y-m-d");
+            }else{
+                $fecha = $this->convertDateFormat($fecha);
+            }
+        
+            //get tipo cliente for e11 
+            $tipoCliente = $sheet->getCell('E11')->getValue();
+            //find if exists in table contenedor_consolidado_tipo_cliente with name = $tipoCliente else create new and get id
+            $idTipoCliente = $this->db->select('id')
+            ->from($this->table_contenedor_tipo_cliente)
+            ->where('name', $tipoCliente)
+            ->get();
+            if($idTipoCliente->num_rows() == 0){
+                $this->db->insert($this->table_contenedor_tipo_cliente, ['name' => $tipoCliente]);
+                $idTipoCliente = $this->db->insert_id();
+            }else{
+                $idTipoCliente = $idTipoCliente->row()->id;
+            }
+            return [
+                'nombre' => $nombre,
+                'documento' => $documento,
+                'correo' => $correo,
+                'telefono' => $telefono,
+                'volumen' => $volumen,
+                'id_tipo_cliente' => $idTipoCliente,
+                'fecha' => $fecha
+            ];
+        }catch(Exception $e){
+            return $e->getMessage();
+        }
+
+    }
+    
     public function storeCotizacion($data,$cotizacion){
        try{
         $this->maxFileSize = 1000000;
@@ -123,8 +174,12 @@ class ContenedorConsolidadoModel extends CI_Model{
                 "size" => $cotizacion['size']
             ]
             , 'assets/images/agentecompra/');
-        $data['cotizacion_file_url']=$fileUrl;
-        $this->db->insert($this->table_contenedor_cotizacion, $data);             
+        $dataToInsert=$this->getCotizacionData($cotizacion);
+
+        $dataToInsert['cotizacion_file_url']=$fileUrl;
+        $dataToInsert['id_contenedor']=$data['id_contenedor'];
+        
+        $this->db->insert($this->table_contenedor_cotizacion, $dataToInsert);             
         if($this->db->affected_rows() > 0){
 			return [
 				'id' => $this->db->insert_id(),
@@ -133,7 +188,10 @@ class ContenedorConsolidadoModel extends CI_Model{
 		}
 		return false;
        }catch(Exception $e){
-           return $e->getMessage();
+        return[
+            'status' => "error",
+            'message' => $e->getMessage()
+        ];
        }
 	}
     public function getTipoCliente(){
@@ -188,8 +246,10 @@ class ContenedorConsolidadoModel extends CI_Model{
                 "size" => $file['size']
             ]
             , 'assets/images/agentecompra/');
+        $dataToInsert=$this->getCotizacionData($file);
+        $dataToInsert['cotizacion_file_url']=$fileUrl;
         $this->db->where('id', $id);
-        $this->db->update($this->table_contenedor_cotizacion, ['cotizacion_file_url' => $fileUrl]);
+        $this->db->update($this->table_contenedor_cotizacion, $dataToInsert);
         if($this->db->affected_rows() > 0){
             return "success";
         }

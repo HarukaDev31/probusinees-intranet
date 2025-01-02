@@ -123,6 +123,8 @@ async function view(id) {
     $("#txt-No_Carga").val(result.carga);
     $("#txt-Fe_Puerto").val(result.f_puerto);
     $("#txt-Fe_Entrega").val(result.f_entrega);
+    $("#txt-Fe_Cierre").val(result.f_cierre);
+
     $("#txt-Empresa").val(result.empresa);
     $("#modal-crear").modal("show");
     $("#btn-guardar").hide();
