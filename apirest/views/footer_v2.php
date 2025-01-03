@@ -20,6 +20,7 @@
 
 <script src="<?php echo base_url("plugins_v2/jquery/jquery.min.js"); ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Bootstrap 4 -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
@@ -150,7 +151,6 @@
 
 <?php if (isset($js_contenedor_consolidadado) && $js_contenedor_consolidadado==true) : ?>
 <!-- datepicker -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
@@ -279,10 +279,8 @@
 <script src="<?php echo base_url() . 'dist/js/Configuracion/tarifas_cotizaciones.js'?>"></script>
 <?php endif;
 ?>
-<?php if (isset($sockets) && $sockets==true) : ?>
-<script>
-const user=JSON.parse('<?php echo json_encode($this->user) ?>');
-
+<script> 
+let user=JSON.parse('<?php echo json_encode($this->user) ?>');
 const socket = new WebSocket('wss://websockets.probusiness.pe');
 // Suscribirse a múltiples canales
 function subscribeToChannels(project, role, user) {
@@ -308,24 +306,34 @@ function publishToChannels(project, role, user, message) {
 }
 
 // Manejar mensajes recibidos del servidor
-socket.onmessage = function(event) {
-  console.log(event);
-    const message = event.data;
-    console.log('Received message:', message);
-    // Aquí puedes manejar los mensajes recibidos del servidor
-    try{
-      alert(message);
-    }
-    catch(e){
-      console.log(e);
-    }
 
-};
 socket.onopen = function(event) {
-    subscribeToChannels('intranet', user.ID_Grupo, user.ID_Usuario);
+    subscribeToChannels('intranet', user.No_Grupo, user.ID_Usuario);
 };
+//on load sweet alert 
+
+socket.onmessage = function(event) {
+  text="";
+  const {action}=JSON.parse(event.data);
+  console.log(event.data)
+  if(action=="new-container"){
+    text="El coordinador registro un nuevo contenedor"
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        title: "Nuevo contenedor",
+        text: text,
+        icon: "info",
+        confirmButtonText: "Cerrar",
+      });
+    } else {
+      console.error("SweetAlert no está disponible");
+    }
+  }
+}
+window.socket=socket
+
+
 </script>
-<?php endif; ?>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-dialog-loader">

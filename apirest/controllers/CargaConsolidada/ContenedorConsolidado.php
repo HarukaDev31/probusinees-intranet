@@ -99,10 +99,12 @@ class ContenedorConsolidado extends CI_Controller {
 		
 
 		$id=$response['id'];
+		$socketResponse=$response['socketResponse'];
 		$this->generateSteps($id);	
 		echo json_encode([
 			"status" => $response['status'],
-			'id' => $id
+			'id' => $id,
+			"socketResponse"=>$socketResponse
 		]);
 	}
 	public function update(){

@@ -1,15 +1,20 @@
 <?php
 require_once APPPATH . 'traits/FileTrait.php';
+require_once APPPATH . 'traits/WebSocketTrait.php';
 require_once APPPATH . 'third_party/PHPExcel.php';
 
 class ContenedorConsolidadoModel extends CI_Model{
-    use FileTrait;
+    use FileTrait,WebSocketTrait;
 	var $table_cliente = 'entidad';
 	private $table="carga_consolidada_contenedor";
     private $table_pais="pais";
     private $table_contenedor_steps="contenedor_consolidado_order_steps";
     private $table_contenedor_cotizacion="contenedor_consolidado_cotizacion";
     private $table_contenedor_tipo_cliente="contenedor_consolidado_tipo_cliente";
+    private $roleCotizador="Cotizador";
+    private $roleCoordinacion="Coordinación";
+    private $aNewContainer="new-container";
+    private $aNewCotizacion="new-cotizacion";
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
 	public function __construct(){
 		parent::__construct();
@@ -39,9 +44,18 @@ class ContenedorConsolidadoModel extends CI_Model{
         //set data in table 
         $this->db->insert($this->table, $data);
         if($this->db->affected_rows() > 0){
+            //{"project": "0", "role": "Cotizador", "user": "0", "message": "Prueba de comunicación en tiempo real","action":"new-container"}
+            $socketResponse=$this->sendEvent([
+                "project" => "0",
+                "role" => $this->roleCotizador,
+                "user" => "0",
+                "action"=>$this->aNewContainer,
+                "message" => "asdas",
+            ]);
             return [
                 'id' => $this->db->insert_id(),
-                'status' => true
+                'status' => true,
+                'socketResponse'=>$socketResponse
             ];
         }
         return false;
@@ -181,6 +195,13 @@ class ContenedorConsolidadoModel extends CI_Model{
         
         $this->db->insert($this->table_contenedor_cotizacion, $dataToInsert);             
         if($this->db->affected_rows() > 0){
+            $this->sendEvent([
+                "project" => "0",
+                "role" => $this->roleCotizador,
+                "user" => "0",
+                "action"=>$this->aNewCotizacion,
+                "message" => "Nueva cotización",
+            ]);
 			return [
 				'id' => $this->db->insert_id(),
 				'status' => "success"

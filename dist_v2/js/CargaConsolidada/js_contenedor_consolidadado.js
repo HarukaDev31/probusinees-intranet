@@ -821,3 +821,73 @@ $(document).ready(async function () {
     }
     );
 });
+window.addEventListener('load', () => {
+    socket.onmessage = function(event) {
+        console.log(event);
+          const {message,role,action}=JSON.parse(event.data)
+          // Aquí puedes manejar los mensajes recibidos del servidor
+          try{
+            let text="";
+            if(action=="new-container"){
+                //confirm swall
+                 text="El coordinador registro un nuevo contenedo";
+                //check if mainContainer is visible
+                if(mainContainer.is(":visible")){
+                    text+="¿Desea actualizar?"
+                    Swal.fire({
+                        title: 'Nuevo contenedor',
+                        text: text,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Si',
+                        cancelButtonText: 'Cerrar',
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            table_Entidad.ajax.reload();
+                        }
+                      })
+                }else{
+                    //show alert swall
+                    Swal.fire({
+                        title: 'Nuevo contenedor',
+                        text: text,
+                        icon: 'info',
+                        confirmButtonText: 'Cerrar',
+                      })
+                    }       
+            }
+            if(action=="new-cotizacion"){
+                //confirm swall
+                 text="El coordinador registro un nuevo prospecto";
+                //check if mainContainer is visible
+                if(cotizacionContainer.is(":visible")){
+                    text+="¿Desea actualizar?"
+                    Swal.fire({
+                        title: 'Nueva cotización',
+                        text: text,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Si',
+                        cancelButtonText: 'Cerrar',
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            tableCotizacion.ajax.reload();
+                        }
+                      })
+                }else{
+                    //show alert swall
+                    Swal.fire({
+                        title: 'Nueva cotización',
+                        text: text,
+                        icon: 'info',
+                        confirmButtonText: 'Cerrar',
+                      })
+                    }
+            }
+        }
+          catch(e){
+            console.log(e);
+          }
+      
+      };
+});
