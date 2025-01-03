@@ -38,8 +38,8 @@ class ContenedorConsolidado extends CI_Controller {
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
 			$subdata[] = $row->carga;
-			$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
+			$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 			$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 			
 			$subdata[] = $row->empresa;
@@ -146,9 +146,10 @@ class ContenedorConsolidado extends CI_Controller {
 		if($stepIndex==1){
 			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
 			$data= array();
+			$index=1;
 			foreach ($arrResponse as $row) {
 				$subdata = array();
-				$subdata[] = $row->id_cotizacion;
+				$subdata[] = $index;
 				$subdata[] = date("d/m/Y", strtotime($row->fecha));
 				$subdata[] = $row->nombre;
 				$subdata[] = $row->documento;
@@ -193,6 +194,7 @@ class ContenedorConsolidado extends CI_Controller {
 				</div>';
 				$subdata[] = $divAcciones;
 				$data[] = $subdata;
+				$index++;
 			}
 			$output = array(
 				"data" => $data

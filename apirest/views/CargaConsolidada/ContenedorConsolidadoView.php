@@ -57,8 +57,8 @@
                 <th>Mes  </th>
                 <th>Pais</th>
                 <th>Carga</th>
-                <th>F. Arribo</th>
                 <th>F. Cierre</th>
+                <th>F. Arribo</th>
                 <th>F. Entrega</th>
                 <th>Empresa</th>
                 <th>Ver</th>
