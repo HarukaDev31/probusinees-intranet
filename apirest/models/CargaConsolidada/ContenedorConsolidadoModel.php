@@ -11,6 +11,7 @@ class ContenedorConsolidadoModel extends CI_Model{
     private $table_contenedor_steps="contenedor_consolidado_order_steps";
     private $table_contenedor_cotizacion="contenedor_consolidado_cotizacion";
     private $table_contenedor_tipo_cliente="contenedor_consolidado_tipo_cliente";
+    private $table_contenedor_cotizacion_documentacion="contenedor_consolidado_cotizacion_documentacion";
     private $roleCotizador="Cotizador";
     private $roleCoordinacion="Coordinación";
     private $aNewContainer="new-container";
@@ -121,7 +122,20 @@ class ContenedorConsolidadoModel extends CI_Model{
         $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
         ->from($this->table_contenedor_cotizacion)
         ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
-        ->where('id_contenedor', $idContenedor);
+        ->where('id_contenedor', $idContenedor)
+        ->where('estado', 'PENDIENTE');
+        $query = $this->db->get();
+        return $query->result();
+    }
+    public function getContenedorClientes($idContenedor){
+        $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
+        ->from($this->table_contenedor_cotizacion)
+        ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
+        ->where('id_contenedor', $idContenedor)
+        ->where('estado', 'CONFIRMADO');
+        if($this->input->post('estado')!="0"){
+            $this->db->where('estado_cliente', $this->input->post('estado'));
+        }
         $query = $this->db->get();
         return $query->result();
     }
@@ -327,6 +341,156 @@ class ContenedorConsolidadoModel extends CI_Model{
         }
         $errors = $this->db->error();
        
+        return false;
+    }
+    public function showClientesDocumentacion($id){
+        $this->db->select("main.*, (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', docs.id,
+                        'file_url', docs.file_url,
+                        'folder_name', docs.name
+                    )
+                )
+                FROM " . $this->table_contenedor_cotizacion_documentacion . " docs 
+                WHERE docs.id_cotizacion = main.id
+            ) as files")
+            ->from($this->table_contenedor_cotizacion . " as main")
+            ->where('main.id', $id)
+            ->where('main.estado', 'CONFIRMADO');
+        $query = $this->db->get();
+        return $query->result();
+    }
+    public function createClienteDocumentacion($id,$name,$file){
+        $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $fileUrl= $this->uploadSingleFile(
+            [
+                "name" => $file['name'],
+                "type" => $file['type'],
+                "tmp_name" => $file['tmp_name'],
+                "error" => $file['error'],
+                "size" => $file['size']
+            ]
+            , 'assets/images/agentecompra/');
+        $this->db->insert($this->table_contenedor_cotizacion_documentacion, ['id_cotizacion' => $id, 'name' => $name, 'file_url' => $fileUrl]);
+        if($this->db->affected_rows() > 0){
+            return ['status' => "success"];
+        }
+        return false;
+    }
+    public function deleteClienteDocumentacionFile($id){
+        try{
+
+        $this->db->select('file_url')
+        ->from($this->table_contenedor_cotizacion_documentacion)
+        ->where('id', $id);
+        $query = $this->db->get();
+        $fileUrl=$query->row()->file_url;
+            unlink($fileUrl);
+            $this->db->delete($this->table_contenedor_cotizacion_documentacion, ['id' => $id]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+        }catch(Exception $e){
+            return false;
+        }
+        
+    }
+    public function updateClienteDocumentacion($data,$files){
+        try{
+        $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $fileUrl=null;
+        //if exists file_comercial in files update file_comercial
+        if(isset($files['file_comercial'])){
+            $this->db->select('factura_comercial')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $data['id']);
+            $query = $this->db->get();
+            $fileUrl=$query->row()->file_url;
+            unlink($fileUrl);
+            $fileUrl= $this->uploadSingleFile(
+                [
+                    "name" => $files['file_comercial']['name'],
+                    "type" => $files['file_comercial']['type'],
+                    "tmp_name" => $files['file_comercial']['tmp_name'],
+                    "error" => $files['file_comercial']['error'],
+                    "size" => $files['file_comercial']['size']
+                ]
+                , 'assets/images/agentecompra/');
+            
+        }
+        $data['factura_comercial']=$fileUrl;
+        $this->db->where('id', $data['id']);
+        $this->db->update($this->table_contenedor_cotizacion, $data);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }catch(Exception $e){
+        return false;
+    }
+    }
+    public function uploadListaEmbarque($idCotizacion,$idContenedor,$file){
+        //read excel and get data from row 5 to more get D and o values foreach row
+        try{
+            $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $fileUrl= $this->uploadSingleFile(
+            [
+                "name" => $file['name'],
+                "type" => $file['type'],
+                "tmp_name" => $file['tmp_name'],
+                "error" => $file['error'],
+                "size" => $file['size']
+            ]
+            , 'assets/images/agentecompra/');
+        $objPHPExcel = PHPExcel_IOFactory::load($file['tmp_name']);
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        $data=[];
+        $initialRow=5;
+        for ($row = $initialRow; $row <= $highestRow; ++$row) {
+            $data[]=[
+                'name' => $sheet->getCell('D'.$row)->getValue(),
+                'volumen_china' => $sheet->getCell('O'.$row)->getValue()
+            ];
+        }
+        //compare nombre in table contenedor_consolidado_cotizacion where id_contenedor=$idContenedor and compare with data excel array if exists update volumen_china
+        $this->db->select('id,nombre')
+        ->from($this->table_contenedor_cotizacion)
+        ->where('id_contenedor', $idContenedor);
+        $query = $this->db->get();
+        $cotizaciones=$query->result();
+        foreach($cotizaciones as $cotizacion){
+            foreach($data as $item){
+                if($cotizacion->nombre==$item['name']){
+                    $this->db->where('id', $cotizacion->id);
+                    $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $item['volumen_china']]);
+                }
+            }
+        }
+        //update lista_embarque_url in table contenedor_consolidado_cotizacion where id=$idCotizacion
+        $this->db->where('id', $idContenedor);
+        $this->db->update($this->table, ['lista_embarque_url' => $fileUrl]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+        }catch(Exception $e){
+            return false;
+        }
+
+    }
+    public function updateEstadoCliente($id,$estado){
+        $this->db->set('estado_cliente', $estado);
+        $this->db->where('id', $id);
+        $this->db->update($this->table_contenedor_cotizacion);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
         return false;
     }
 }

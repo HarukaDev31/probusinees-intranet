@@ -204,6 +204,58 @@ class ContenedorConsolidado extends CI_Controller {
 			echo json_encode($output);
 			// echo json_encode(['data' => $arrResponse,'status' => "success"]);
 		}
+		else if($stepIndex==2){
+			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorClientes($idContenedor);
+			$data= array();
+			$index=1;
+			$tipoTabla=$this->input->post('tipoTabla');
+			foreach ($arrResponse as $row) {
+				if($tipoTabla=="general"){
+				$subdata = array();
+				$subdata[] = $index;
+				$subdata[] = $row->nombre;
+				$subdata[] = $row->documento;
+				$subdata[] = $row->correo;
+				$subdata[] = $row->telefono;
+				$subdata[] = $row->name;
+				$subdata[] = $row->volumen;
+				$btnView='<div>
+				<i class="fas fa-eye" style="cursor:pointer;" onclick="viewClientesDocumentacion('.$row->id_cotizacion.')"></i>
+				</div>';				
+				$subdata[] = $btnView;
+				$selectEstadoCliente="";
+				if($this->user->No_Grupo=="Coordinación"){
+					$selectEstadoCliente='<select class="form-control" id="estado-cliente-'.$row->id_cotizacion.'" name="estado" onchange="updateEstadoCliente('.$row->id_cotizacion.')">
+						<option value="PENDIENTE" '.($row->estado_cliente=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
+						<option value="COTIZADO" '.($row->estado_cliente=="COTIZADO" ? "selected" : "").'>COTIZADO</option>
+						<option value="PAGADO" '.($row->estado_cliente=="PAGADO" ? "selected" : "").'>PAGADO</option>
+						<option value="ENTREGADO" '.($row->estado_cliente=="ENTREGADO" ? "selected" : "").'>ENTREGADO</option>
+					</select>';
+				}
+				$subdata[] = $selectEstadoCliente;
+				$data[] = $subdata;
+				$index++;
+			}else{
+				$subdata = array();
+				$subdata[] = $index;
+				$subdata[] = $row->nombre;
+				$subdata[] = $row->documento;
+				$subdata[] = $row->name;
+				$subdata[] = $row->volumen;
+				$subdata[] = $row->volumen_china;
+				$subdata[] = $row->volumen_doc;
+				$subdata[] = 0;
+				$subdata[] = $row->valor_doc;
+
+				$data[] = $subdata;
+				$index++;
+			}
+			}
+			$output = array(
+				"data" => $data
+			);
+			echo json_encode($output);
+		}
 	}
 	///function to step 1 cotizacion
 	public function storeCotizacion(){
@@ -271,6 +323,47 @@ class ContenedorConsolidado extends CI_Controller {
 		$id=$this->input->post('id');
 		$estado=$this->input->post('estado');
 		$arrResponse = $this->ContenedorConsolidadoModel->updateEstado($id,$estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function showClientesDocumentacion($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->showClientesDocumentacion($id);
+		echo json_encode($arrResponse);
+	}
+	public function createClienteDocumentacion(){
+		$id_cotizacion=$this->input->post('id');
+		$name=$this->input->post('name');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->createClienteDocumentacion($id_cotizacion,$name,$file);
+		echo json_encode($arrResponse);
+	}
+	public function deleteClienteDocumentacionFile($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteClienteDocumentacionFile($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateClienteDocumentacion(){
+		$data=$this->input->post();
+		$arrResponse = $this->ContenedorConsolidadoModel->updateClienteDocumentacion($data,$_FILES);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function uploadListaEmbarque(){
+		$idCotizacion=$this->input->post('idCotizacion');
+		$idContenedor=$this->input->post('idContenedor');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadListaEmbarque($idCotizacion,$idContenedor,$file);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	function updateEstadoCliente(){
+		$id=$this->input->post('id');
+		$estado=$this->input->post('estado');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoCliente($id,$estado);
 		echo json_encode([
 			"status" => $arrResponse
 		]);

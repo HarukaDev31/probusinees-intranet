@@ -76,43 +76,175 @@
     <section class="content" id="cotizacion-container">
       <div class="container-fluid ">
         <div class="row mb-2">
-                <div class="col-6 col-sm-6">
-                </div>
-                <div class="col-6 col-sm-2">
+
+                <div class="col-12 col-md-4">
                   <label>&nbsp;</label>
                   <button type="button" id="btn-crear-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
                 </div>
-                <div class="col-6 col-sm-2">
+                <div class="col-12 col-md-4">
                   <label>&nbsp;</label>
                   <button type="button" id="btn-buscar-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
                 </div>
-                <div class="col-6 col-sm-1">
+                <div class="col-12 col-md-3">
+                </div>
+                <div class="col-12 col-md-1">
                  <label>&nbsp;</label>
-                  <button type="button" id="btn-back-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i> Atras</button>
+                  <button type="button" class="btn btn-outline-primary btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> </button>
                 </div>
         </div>
-      <div class="table-responsive div-Listar">
-        <table id="table-cotizacion" class="table table-bordered table-hover table-striped">
+        <div class="table-responsive">
+          <table id="table-cotizacion" class="table table-bordered table-hover table-striped">
+            <thead class="thead-light">
+              <tr>
+                <th>N°</th>
+                <th>Fecha</th>
+                <th>Nombre</th>
+                <th>DNI/RUC</th>
+                <th>Correo</th>
+                <th>Whatsapp</th>
+                <th>T. Cliente</th>
+                <th>Volumen</th>
+                <th>Cotizacion</th>
+                <th>Estado</th>
+                <th>Acciones
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="content" id="clientes-container">
+        <div class="row mb-2">
+                <!--select estado  with TODOS PENDIENTE,COTIZADO,PAGADO Y ENTREGADO OPTIOONS-->
+                <div class="col-12 col-md-4">
+                  <label>Estado</label>
+                  <select id="txt-ID_Estado_Cliente" name="ID_Estado" class="form-control input-estado">
+                    <option value="0" selected>Todos</option>
+                    <option value="PENDIENTE">PENDIENTE</option>
+                    <option value="COTIZADO">COTIZADO</option>
+                    <option value="PAGADO">PAGADO</option>
+                    <option value="ENTREGADO">ENTREGADO</option>
+                  </select>
+                </div>
+                
+                <div class="col-12 col-md-4">
+                  <label>&nbsp;</label>
+                  <button type="button" id="btn-buscar-clientes-general" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+                </div>
+                <div class="col-12 col-md-3">
+                </div>
+                <div class="col-12 col-md-1">
+                 <label>&nbsp;</label>
+                  <button type="button"  class="btn-back-cotizacion btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i> </button>
+                </div>
+        </div>
+      <div class="table-responsive" class="table table-bordered table-hover table-striped">
+        <table id="table-clientes-general" class="table table-bordered table-hover table-striped">
           <thead class="thead-light">
             <tr>
               <th>N°</th>
-              <th>Fecha</th>
               <th>Nombre</th>
               <th>DNI/RUC</th>
               <th>Correo</th>
               <th>Whatsapp</th>
               <th>T. Cliente</th>
               <th>Volumen</th>
-              <th>Cotizacion</th>
-              <th>Estado</th>
-              <th>Acciones
-              </th>
+              <th>Ver</th>
+              <th>Estados</th>
             </tr>
           </thead>
-        </table>
-      
+        </table>               
+        <table id="table-clientes-variacion" class="table table-bordered table-hover table-striped">
+          <thead class="thead-light">
+            <tr>
+              <th>N°</th>
+              <th>Nombre</th>
+              <th>DNI/RUC</th>
+              <th>T. Cliente</th>
+              <th>Vol. Cot</th>
+              <th>Vol. China</th>
+              <th>Vol. Doc</th>
+              <th>Valor Cot</th>
+              <th>Valor Doc</th>
+            </tr>
+          </thead>
+        </table>             
+      </div>
+    </section>
+    <section class="content" id="clientes-documentation-container">
+    <!--section with 2 divs collapse, one for documentation and other for cotizacion
+    with title documentacion with 3 form inputs vol doc,valor doc y f comercial,
+    y otro div with title cotizacions with to button for download cotizacion inicial y final files
+    -->
+    <div class="col col-12" id="clientes-documentacion">
+      <h3
+      class="d-flex justify-content-between w-100"
+      >
+      <span
+      data-toggle="collapse"
+      href="#collapse-documentacion"
+      role="button"
+      aria-expanded="false"
+      aria-controls="collapse-documentacion"
+      >
+        Documentación
+      </span>
+      <div>
+      <button type="button" id="btn-crear-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-upload"></i>+</button>
+       <button type="button" id="btn-back-cliente-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-arrow-left"></i></button>        
+      </div>              
+      </h3>
+      <div class="collapse show row row-cols-3" id="collapse-documentacion">
+        <form id="form-documentacion" class="form-horizontal col-12 mb-2 gap-2 d-flex flex-column" >
+          <div class="">
+            <label>Vol. Doc</label>
+            <input type="text" id="txt-Vol_Doc"
+            name="volumen_doc"
+             class="form-control input-report required">
+            <span class="invalid-feedback" id="error-vol-doc">El volumen es requerido</span>
+          </div>
+          <div class="">
+            <label>Valor Doc</label>
+            <input type="number" 
+            name="valor_doc"
+            id="txt-Valor_Doc" class="form-control input-report required">
+            <span class="invalid-feedback" id="error-valor-doc">El valor es requerido</span>
+          </div>
+          <div class="">
+            <label>F. Comercial</label>
+            <div id="factura-comercial">
+            </div>
+          </div>
+          <div class="col-12">
+            <div id="btn-guardar-documentacion" 
+            
+            class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> Guardar</div>
+          </div>
+        </form>
+       
       </div>
     </div>
+    <div class="col col-12" id="clientes-cotizacion">
+      <h3
+      data-toggle="collapse"
+      href="#collapse-cotizacion"
+      role="button"
+      aria-expanded="false"
+      aria-controls="collapse-cotizacion"
+      class="d-block"
+
+      >Cotizaciones</h3>
+      <div class="collapse show row row-cols-2 " id="collapse-cotizacion">
+        <div class="col">
+          <a id="btn-descargar-cotizacion-inicial" 
+          class="btn btn-outline-success btn-block " target="_blank" href="#"><i class="fa fa-download"></i> Descargar Cotización Inicial</a>
+        </div>
+        <div class="col">
+          <button type="button" id="btn-descargar-cotizacion-final" class="btn btn-outline-success btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i> Descargar Cotización Final</button>
+        </div>
+      </div>
+    </div>          
     </section>
     <!--Steps-->
     <section id="steps" class="content">
@@ -134,59 +266,7 @@
         <div class="modal-body">
           <form id="form-crear-cotizacion" class="form-horizontal" method="post">
             <div class="row">
-              <!-- <div class="col-6 col-sm-6">
-                <label>Fecha <span class="label-advertencia text-danger"> *</span></label>
-                <div class="form-group">
-                  <input type="text" required id="txt-Fe_Cotizacion" name="fecha" class="form-control input-report required input-date" >
-                  <span class="invalid-feedback" id="error-fecha">La fecha es requerida</span>
-                </div>
-              </div> -->
-              <!-- <div class="col-6 col-sm-6">
-                <div class="form-group ">
-                  <label>Nombre <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" required id="txt-Nombre" name="nombre" class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-nombre">El nombre es requerido</span>
-                </div>
-              </div> -->
-              <!-- <div class="col-6 col-sm-6">
-                <div class="form-group">
-                  <label>DNI/RUC <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" required id="txt-Dni" name="documento" class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-dni">El DNI/RUC es requerido</span>
-                </div>
-              </div> -->
-              <!-- <div class="col-6 col-sm-6">
-                <div class="form-group
-                ">
-                  <label>Correo <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" required id="txt-Correo" name="correo" class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-correo">El correo es requerido</span>
-                </div>
-              </div> -->
-              <!-- <div class="col-6 col-sm-6">
-                <div class="form-group
-                ">
-                  <label>Whatsapp <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" required id="txt-Whatsapp" name="telefono" class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-whatsapp">El whatsapp es requerido</span>
-                </div>
-              </div> -->
-              <!-- <div class="col-6 col-sm-6">
-                <div class="form-group" >
-                  <label>Tipo Cliente <span class="label-advertencia text-danger"> *</span></label>
-                  <select id="txt-ID_Tipo_Cliente"  required name="id_tipo_cliente" class="form-control input-report required">
-                  </select>
-                  <span class="invalid-feedback" id="error-tipo-cliente">El tipo cliente es requerido</span>
-                </div>
-              </div> -->
-              <!-- <div class="col-6 col-sm-6">
-                <div class="form-group
-                ">
-                  <label>Volumen <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="number" id="txt-Volumen" name="volumen" required class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-volumen">El volumen es requerido</span>
-                </div>
-              </div> -->
+             
               <div class="col-12 col-sm-12">
                 <div class="form-group
                 ">
@@ -401,14 +481,9 @@
         transform: scale(1);
       }
     }
-
-
-
     .step-container-completed span {
-
       text-align: center;
     }
-
     .step-container span {
       text-align: center;
     }
@@ -416,7 +491,14 @@
     .step-container:hover {
       background-color: #f9f9f9;
     }
-
-
+    .collapse.show {
+    
+    visibility: visible;
+  }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 </style>

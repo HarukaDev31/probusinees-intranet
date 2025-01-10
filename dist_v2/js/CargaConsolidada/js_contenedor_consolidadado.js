@@ -7,8 +7,6 @@ var btnCrearCotizacion = null;
 var paises = [];
 var fToday = new Date();
 var fYear = fToday.getFullYear();
-//parse date to yyyy-mm-dd
-
 var fDay = fToday.getDate();
 var currentCarga = 0;
 var meses = [
@@ -66,14 +64,16 @@ var mainContainer = null;
 var stepIndex = 0;
 var stepId = 0;
 var cotizacionContainer = null;
+var clientesContainer = null;
 var tableCotizacion = null;
+var tableClientesGeneral = null;
+var tableClientesVariacion = null;
+var clientesDocumentacionContainer = null;
 var idCotizacion = 0;
 
 async function updateEstado(id) {
-    //get select value
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
-
     $.ajax({
         url: url,
         type: "POST",
@@ -95,6 +95,7 @@ async function updateEstado(id) {
 async function updateEstadoCotizacion(id) {
     //get select value
     const estado = $(`#estado-cotizacion-${id}`).val();
+    console.log(estado);
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacion";
     $.ajax({
         url: url,
@@ -288,9 +289,6 @@ async function deleteCotizacion(id) {
         }
     });
 }
-
-
-
 const stepTemplate = (step, i) => {
     const stepHTML = `
         <div class="step-container" onclick="openStepFunction(${i + 1},${step.id
@@ -339,6 +337,27 @@ const getActionButtons = (data) => {
 const reloadTableCotizacion = () => {
     tableCotizacion.ajax.reload();
 };
+const updateEstadoCliente = (id) => {
+    const estado = $(`#estado-cliente-${id}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCliente";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            id: id,
+            estado: estado
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+            reloadTableClientesGeneral();
+        },
+    });
+}
 const openStepFunction = async (step, id) => {
     stepIndex = step;
     stepId = id;
@@ -438,14 +457,270 @@ const openStepFunction = async (step, id) => {
                 ],
             });
         }
-        $("#btn-back-cotizacion").off("click");
-        $("#btn-back-cotizacion").on("click", function () {
-            returnToSteps();
-        });
+
         await getTipoCliente();
 
+    } else if (stepIndex == 2) {
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+        clientesContainer.show();
+        if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+            reloadTableClientesGeneral();
+        } else {
+            tableClientesGeneral.show();
+
+            tableClientesGeneral = $('#table-clientes-general').DataTable({
+                dom:
+                    "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+                buttons: [
+                    {
+                        extend: "excel",
+                        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                        titleAttr: "Excel",
+                        exportOptions: {
+                            columns: ":visible",
+                        },
+                    },
+
+                    {
+                        extend: "colvis",
+                        text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                        titleAttr: "Columnas",
+                        exportOptions: {
+                            columns: ":visible",
+                        },
+                    },
+                    //two buttons general and variacion to switch between tables
+                    {
+                        text: "General",
+                        action: function () {
+                            if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+                                $("#table-clientes-variacion").attr("style", "display:none");
+                                $("#table-clientes-variacion_wrapper").hide();
+                            }
+                            if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+                                //display block
+                                $("#table-clientes-general").attr("style", "");
+                                $("#table-clientes-general_wrapper").show();
+                            }else{
+                                $("#table-clientes-general").attr("style", "");
+                                $("#table-clientes-general_wrapper").show();
+
+                            }
+                        },
+                    },
+                    {
+                        text: "Variación",
+                        action: function () {
+                            if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+                                $("#table-clientes-general").attr("style", "display:none");
+                                $("#table-clientes-general_wrapper").hide();
+                            }
+                            if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+
+                                $("#table-clientes-variacion").attr("style", "");
+                                $("#table-clientes-variacion_wrapper").show();
+                            } else {
+                                url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+                                tableClientesVariacion.show();
+                                tableClientesVariacion = $('#table-clientes-variacion').DataTable({
+                                    dom:
+                                        "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                                        "<'row'<'col-sm-12'tr>>" +
+                                        "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+                                    buttons: [
+                                        {
+                                            extend: "excel",
+                                            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                                            titleAttr: "Excel",
+                                            exportOptions: {
+                                                columns: ":visible",
+                                            },
+                                        },
+                                        
+                                        {
+                                            extend: "colvis",
+                                            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                                            titleAttr: "Columnas",
+                                            exportOptions: {
+                                                columns: ":visible",
+                                            },
+                                        },
+                                        {
+                                            text: "General",
+                                            action: function () {
+                                                if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+                                                    $("#table-clientes-variacion").attr("style", "display:none");
+                                                    $("#table-clientes-variacion_wrapper").hide();
+                                                }
+                                                if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+                                                    $("#table-clientes-general_wrapper").show();
+
+                                                    $("#table-clientes-general").attr("style", "");
+
+                                                }else{
+                                                    $("#table-clientes-general").attr("style", "");
+                                                }
+                                            },
+                                        },
+                                        {
+                                            text: "Variación",
+                                            action: function () {
+                                                if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+                                                    $("#table-clientes-general").attr("style", "display:none");
+                                                    $("#table-clientes-general_wrapper").hide();
+                                                }
+                                                if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+
+                                                    $("#table-clientes-variacion").attr("style", "");
+                                                            
+                                                } else {
+                                                    $("#table-clientes-variacion").attr("style", "");
+                                                }
+                                            }
+                                        },
+
+                                        {
+                                            text:"<i class='fa fa-upload'></i> Lista de embarque",
+                                            action:function(){
+                                                Swal.fire({
+                                                    title: "Subir lista de embarque",
+                                                    input: "file",
+                                                    inputAttributes: {
+                                                        accept: "*",
+                                                        "aria-label": "Sube tu archivo",
+                                                    },
+                                                    showCancelButton: true,
+                                                    confirmButtonText: "Subir",
+                                                    showLoaderOnConfirm: true,
+                                                    preConfirm: (file) => {
+                                                        const formData = new FormData();
+                                                        formData.append("file", file);
+                                                        formData.append("idContenedor", idContenedor);
+                                                        formData.append("idCotizacion", idCotizacion);
+                                                        return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadListaEmbarque", {
+                                                            method: "POST",
+                                                            body: formData,
+                                                        })
+                                                            .then((response) => {
+                                                                return response.json();
+                                                            })
+                                                            .catch((error) => {
+                                                                Swal.showValidationMessage(
+                                                                    `Request failed: ${error}`
+                                                                );
+                                                            });
+                                                    },
+                                                    allowOutsideClick: () => !Swal.isLoading(),
+                                                }).then((result) => {
+                                                    if (result.value) {
+                                                        if (result.value.status == "success") {
+                                                            Swal.fire("Correcto", result.value.message, "success");
+                                                            reloadTableClientesVariacion();
+                                                        } else {
+                                                            Swal.fire("Error", result.value.message, "error");
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    ],
+                                    paging: true,
+                                    lengthChange: true,
+                                    searching: true,
+                                    ordering: true,
+                                    info: true,
+                                    autoWidth: false,
+                                    responsive: false,
+                                    serverSide: false,
+                                    pagingType: "full_numbers",
+                                    oLanguage: {
+                                        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                                        sLengthMenu: "_MENU_",
+                                        sSearch: "Buscar por: ",
+                                        sSearchPlaceholder: "",
+                                        sZeroRecords: "No se encontraron registros",
+                                        sInfoEmpty: "No hay registros",
+                                        sLoadingRecords: "Cargando...",
+                                        sProcessing: "Procesando...",
+                                        oPaginate: {
+                                            sFirst: "<<",
+                                            sLast: ">>",
+                                            sPrevious: "<",
+                                            sNext: ">",
+                                        },
+                                    },
+                                    order: [[0, "desc"]],
+                                    ajax: {
+                                        url: url,
+                                        type: "POST",
+                                        dataType: "JSON",
+                                        data: function (data) {
+                                            data.stepIndex = stepIndex;
+                                            data.idContenedor = idContenedor;
+                                            data.tipoTabla = "variacion";
+                                            data.estado=$("#txt-ID_Estado").val();
+                                        }
+                                    }
+                                });
+                            }
+
+                        },
+                    },
+
+                ],
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: false,
+                serverSide: false,
+                pagingType: "full_numbers",
+                oLanguage: {
+                    sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                    sLengthMenu: "_MENU_",
+                    sSearch: "Buscar por: ",
+                    sSearchPlaceholder: "",
+                    sZeroRecords: "No se encontraron registros",
+                    sInfoEmpty: "No hay registros",
+                    sLoadingRecords: "Cargando...",
+                    sProcessing: "Procesando...",
+                    oPaginate: {
+                        sFirst: "<<",
+                        sLast: ">>",
+                        sPrevious: "<",
+                        sNext: ">",
+                    },
+                },
+                order: [[0, "desc"]],
+                ajax: {
+                    url: url,
+                    type: "POST",
+                    dataType: "JSON",
+                    data: function (data) {
+                        data.stepIndex = stepIndex;
+                        data.idContenedor = idContenedor;
+                        data.tipoTabla = "general";
+                        data.estado=$("#txt-ID_Estado_Cliente").val();
+                    }
+                }
+            });
+        }
     }
+    $(".btn-back-cotizacion").off("click");
+    $(".btn-back-cotizacion").on("click", function () {
+        returnToSteps();
+    });
     spinner.hide();
+}
+async function reloadTableClientesGeneral() {
+    tableClientesGeneral.ajax.reload();
+}
+async function reloadTableClientesVariacion() {
+    tableClientesVariacion.ajax.reload();
 }
 async function viewCotizacion(id) {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/showCotizacion/" + id;
@@ -515,8 +790,84 @@ async function uploadCotizacionFile(id) {
         }
     }
 }
+async function viewClientesDocumentacion(id) {
+    idCotizacion = id;
+    clientesContainer.hide();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/showClientesDocumentacion/" + id;
+    const response = await fetch(url);
+    const result = await response.json();
+    $("#txt-Vol_Doc").val(result[0].volumen_doc);
+    $("#txt-Valor_Doc").val(result[0].valor_doc);
+    //set txt-F_Comercial href
+    const facturaComercial = result[0].factura_comercial;
+    if (facturaComercial) {
+        $("#factura-comercial").empty();
+        $("#factura-comercial").append(`<a href="${facturaComercial}" target="_blank"
+            class="btn btn-outline-primary"
+            >
+            <i class="fa fa-download"></i> Descargar 
+            </a>`);
+    }
+    else {
+        $("#factura-comercial").empty();
+        $("#factura-comercial").append(`<input type="file" id="txt-F_Comercial" name="file_comercial" class="form-control" required>`);
+    }
+    //clean .aditional-file
+    $(".aditional-file").remove();
+    const files = JSON.parse(result[0].files ?? '[]');
+    //for each file add a col with a link to download and delete icon  in collapse-documentacion 
+    files.forEach((file) => {
+        $("#collapse-documentacion").append(`
+        <div class="col-12 aditional-file d-flex flex-column mb-1">
+        <label>${file.folder_name}</label>
+        <div class="d-flex flex-row gap-1">
+        <div>
+            <a href="${file.file_url}" target="_blank" class="btn btn-outline-primary">
+            <i class="fa fa-download"></i>
+            Descargar
+            </a>
+           </div>
+            <div class="btn btn-outline-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
+            <i class="fa fa-trash " ></i>
+            </div>
+        </div>  
+        </div>
+        `);
+    });
+    $("#btn-descargar-cotizacion-inicial").attr("href", result[0].cotizacion_file_url);
+    clientesDocumentacionContainer.show();
+
+}
+const deleteClienteDocumentacionFile = (id) => {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteClienteDocumentacionFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    viewClientesDocumentacion(idCotizacion);
+                },
+            });
+        }
+    });
+}
 const returnToSteps = () => {
     cotizacionContainer.hide();
+    clientesContainer.hide();
     stepsContainer.show();
 }
 $(document).ready(async function () {
@@ -527,6 +878,14 @@ $(document).ready(async function () {
     cotizacionContainer = $("#cotizacion-container");
     cotizacionContainer.hide();
     tableCotizacion = $("#table-cotizacion");
+    clientesContainer = $("#clientes-container");
+    clientesContainer.hide();
+    tableClientesGeneral = $("#table-clientes-general");
+    tableClientesVariacion = $("#table-clientes-variacion");
+    tableClientesGeneral.hide();
+    tableClientesVariacion.hide();
+    clientesDocumentacionContainer = $("#clientes-documentation-container");
+    clientesDocumentacionContainer.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     table_Entidad = $("#table-contenedor").DataTable({
         dom:
@@ -615,9 +974,6 @@ $(document).ready(async function () {
             [10, 100, 1000, "Todos"],
         ],
     });
-
-
-
     const fillSelects = async () => {
         $("#txt-ID_Pais").empty();
         $("#txt-Mes").empty();
@@ -627,7 +983,6 @@ $(document).ready(async function () {
                 `<option value="${mes.id}">${mes.value}</option>`
             );
         });
-
     }
     const getPaises = async () => {
         url = base_url + "CargaConsolidada/ContenedorConsolidado/getPaises";
@@ -657,9 +1012,9 @@ $(document).ready(async function () {
     $("#btn-guardar").click(function (e) {
         e.preventDefault();
         const formData = new FormData($("#form-crear")[0]);
-        let form= $("#form-crear")[0];
+        let form = $("#form-crear")[0];
         console.log(form.checkValidity());
-        if(!form.checkValidity()){
+        if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
         }
@@ -690,12 +1045,16 @@ $(document).ready(async function () {
             },
         });
     });
+    $("#btn-back-cliente-documentacion").click(function () {
+        clientesDocumentacionContainer.hide();
+        clientesContainer.show();
+    })
     $("#btn-guardar-cotizacion").click(function (e) {
         e.preventDefault();
         const formData = new FormData($("#form-crear-cotizacion")[0]);
         formData.append("id_contenedor", idContenedor);
-        let form= $("#form-crear-cotizacion")[0];
-        if(!form.checkValidity()){
+        let form = $("#form-crear-cotizacion")[0];
+        if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
         }
@@ -724,14 +1083,14 @@ $(document).ready(async function () {
                 }
             },
         });
-        
+
     });
     $("#btn-actualizar-cotizacion").click(function (e) {
         e.preventDefault();
         const formData = new FormData($("#form-crear-cotizacion")[0]);
         formData.append("id", idCotizacion);
-        let form= $("#form-crear-cotizacion")[0];
-        if(!form.checkValidity()){
+        let form = $("#form-crear-cotizacion")[0];
+        if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
         }
@@ -767,8 +1126,8 @@ $(document).ready(async function () {
         formData.append("id", currentCarga);
         //FORMAT DATES TO YYYY-MM-DD 
 
-        let form= $("#form-crear")[0];
-        if(!form.checkValidity()){
+        let form = $("#form-crear")[0];
+        if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
         }
@@ -802,15 +1161,13 @@ $(document).ready(async function () {
         e.preventDefault();
         table_Entidad.ajax.reload();
     });
+    
     $(".input-date").datepicker({
         autoclose: true,
         startDate: new Date(fYear, fToday.getMonth(), fDay),
         todayHighlight: true,
         format: "dd/mm/yyyy",
         dateFormat: "dd/mm/yyyy",
-
-        
-        
     });
     $("#modal-crear-cotizacion").on("hidden.bs.modal", function () {
         $("#form-crear-cotizacion")[0].reset();
@@ -820,20 +1177,117 @@ $(document).ready(async function () {
         $("#form-crear")[0].reset();
     }
     );
+    $("#btn-crear-documentacion").click(function (e) {
+        e.preventDefault();
+        //show swall with text crear un nuevo documento y un input text para el nombre y uno para el file
+        Swal.fire({
+            title: 'Crear documento',
+            html:
+                '<input id="swal-input1" class="swal2-input" placeholder="Nombre del documento">' +
+                '<input type="file" id="swal-input2" class="swal2-file">',
+            focusConfirm: false,
+            buttonConfirmText: 'Crear',
+            //COLOR BUTTONS
+            confirmButtonColor: '#e67e22',
+            showCancelButton: true,
+            preConfirm: () => {
+                const name = Swal.getPopup().querySelector('#swal-input1').value
+                const file = Swal.getPopup().querySelector('#swal-input2').files[0]
+                if (!name || !file) {
+                    Swal.showValidationMessage(`Por favor, complete todos los campos`)
+                }
+                return { name: name, file: file }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append("name", result.value.name);
+                formData.append("file", result.value.file);
+                formData.append("id", idCotizacion);
+                $.ajax({
+                    url: base_url + "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        const result = JSON.parse(response);
+                        if (result.status == "success") {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Correcto",
+                                text: result.message,
+                            });
+                            viewClientesDocumentacion(idCotizacion);
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: result.message,
+                            });
+                        }
+                    },
+                });
+            }
+
+        })
+
+
+    });
+    $("#btn-guardar-documentacion").click(function (e) {
+        e.preventDefault();
+        const formData = new FormData($("#form-documentacion")[0]);
+        const check = $("#form-documentacion")[0].checkValidity();
+        if (!check) {
+            $("#form-documentacion")[0].classList.add('was-validated');
+            return;
+        }
+        formData.append("id", idCotizacion);
+        //f
+        $.ajax({
+            url: base_url + "CargaConsolidada/ContenedorConsolidado/updateClienteDocumentacion",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Correcto",
+                        text: result.message,
+                    });
+                    viewClientesDocumentacion(idCotizacion);
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: result.message,
+                    });
+                }
+            },
+        });
+    });
+    $("#btn-buscar-clientes-general").click(function (e) {
+        e.preventDefault();
+        console.log("click");   
+        tableClientesGeneral.ajax.reload();
+    });
 });
 window.addEventListener('load', () => {
-    socket.onmessage = function(event) {
+    socket.onmessage = function (event) {
         console.log(event);
-          const {message,role,action}=JSON.parse(event.data)
-          // Aquí puedes manejar los mensajes recibidos del servidor
-          try{
-            let text="";
-            if(action=="new-container"){
+        const { message, role, action } = JSON.parse(event.data)
+        // Aquí puedes manejar los mensajes recibidos del servidor
+        try {
+            let text = "";
+            if (action == "new-container") {
                 //confirm swall
-                 text="El coordinador registro un nuevo contenedo";
+                text = "El coordinador registro un nuevo contenedo";
                 //check if mainContainer is visible
-                if(mainContainer.is(":visible")){
-                    text+="¿Desea actualizar?"
+                if (mainContainer.is(":visible")) {
+                    text += "¿Desea actualizar?"
                     Swal.fire({
                         title: 'Nuevo contenedor',
                         text: text,
@@ -841,27 +1295,27 @@ window.addEventListener('load', () => {
                         showCancelButton: true,
                         confirmButtonText: 'Si',
                         cancelButtonText: 'Cerrar',
-                      }).then((result) => {
+                    }).then((result) => {
                         if (result.isConfirmed) {
                             table_Entidad.ajax.reload();
                         }
-                      })
-                }else{
+                    })
+                } else {
                     //show alert swall
                     Swal.fire({
                         title: 'Nuevo contenedor',
                         text: text,
                         icon: 'info',
                         confirmButtonText: 'Cerrar',
-                      })
-                    }       
+                    })
+                }
             }
-            if(action=="new-cotizacion"){
+            if (action == "new-cotizacion") {
                 //confirm swall
-                 text="El coordinador registro un nuevo prospecto";
+                text = "El coordinador registro un nuevo prospecto";
                 //check if mainContainer is visible
-                if(cotizacionContainer.is(":visible")){
-                    text+="¿Desea actualizar?"
+                if (cotizacionContainer.is(":visible")) {
+                    text += "¿Desea actualizar?"
                     Swal.fire({
                         title: 'Nueva cotización',
                         text: text,
@@ -869,25 +1323,25 @@ window.addEventListener('load', () => {
                         showCancelButton: true,
                         confirmButtonText: 'Si',
                         cancelButtonText: 'Cerrar',
-                      }).then((result) => {
+                    }).then((result) => {
                         if (result.isConfirmed) {
                             tableCotizacion.ajax.reload();
                         }
-                      })
-                }else{
+                    })
+                } else {
                     //show alert swall
                     Swal.fire({
                         title: 'Nueva cotización',
                         text: text,
                         icon: 'info',
                         confirmButtonText: 'Cerrar',
-                      })
-                    }
+                    })
+                }
             }
         }
-          catch(e){
+        catch (e) {
             console.log(e);
-          }
-      
-      };
+        }
+
+    };
 });
