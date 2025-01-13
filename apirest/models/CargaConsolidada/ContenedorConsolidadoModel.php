@@ -153,6 +153,7 @@ class ContenedorConsolidadoModel extends CI_Model{
             $correo = $sheet->getCell('B10')->getValue();
             $telefono = $sheet->getCell('B11')->getValue();
             $volumen = $sheet->getCell('I11')->getValue(); 
+            $valorCot=$sheet->getCell('J14')->getCalculatedValue();
             //get calculated value from cell e9
             $fecha = $sheet->getCell('E9')->getValue(); 
             if($fecha=="=+TODAY()"){
@@ -181,7 +182,8 @@ class ContenedorConsolidadoModel extends CI_Model{
                 'telefono' => $telefono,
                 'volumen' => $volumen,
                 'id_tipo_cliente' => $idTipoCliente,
-                'fecha' => $fecha
+                'fecha' => $fecha,
+                'valor_cot'=>$valorCot
             ];
         }catch(Exception $e){
             return $e->getMessage();

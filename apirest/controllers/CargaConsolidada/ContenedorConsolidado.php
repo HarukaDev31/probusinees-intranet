@@ -244,7 +244,7 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[] = $row->volumen;
 				$subdata[] = $row->volumen_china;
 				$subdata[] = $row->volumen_doc;
-				$subdata[] = 0;
+				$subdata[] = $row->valor_cot;
 				$subdata[] = $row->valor_doc;
 
 				$data[] = $subdata;

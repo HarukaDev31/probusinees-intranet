@@ -503,9 +503,11 @@ const openStepFunction = async (step, id) => {
                                 //display block
                                 $("#table-clientes-general").attr("style", "");
                                 $("#table-clientes-general_wrapper").show();
+                                reloadTableClientesGeneral();
                             }else{
                                 $("#table-clientes-general").attr("style", "");
                                 $("#table-clientes-general_wrapper").show();
+                                reloadTableClientesGeneral();
 
                             }
                         },
@@ -521,6 +523,7 @@ const openStepFunction = async (step, id) => {
 
                                 $("#table-clientes-variacion").attr("style", "");
                                 $("#table-clientes-variacion_wrapper").show();
+                                reloadTableClientesVariacion();
                             } else {
                                 url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
                                 tableClientesVariacion.show();
@@ -558,9 +561,13 @@ const openStepFunction = async (step, id) => {
                                                     $("#table-clientes-general_wrapper").show();
 
                                                     $("#table-clientes-general").attr("style", "");
+                                                    reloadTableClientesGeneral();
+
 
                                                 }else{
                                                     $("#table-clientes-general").attr("style", "");
+                                                    reloadTableClientesGeneral();
+
                                                 }
                                             },
                                         },
