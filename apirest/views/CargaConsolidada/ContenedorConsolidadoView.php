@@ -172,7 +172,7 @@
         </table>             
       </div>
     </section>
-    <section class="content" id="clientes-documentation-container">
+    <section class="content card px-4 py-3" id="clientes-documentation-container">
     <!--section with 2 divs collapse, one for documentation and other for cotizacion
     with title documentacion with 3 form inputs vol doc,valor doc y f comercial,
     y otro div with title cotizacions with to button for download cotizacion inicial y final files
@@ -188,19 +188,19 @@
       role="button"
       aria-expanded="false"
       aria-controls="collapse-documentacion"
-      class="col-10"
+      class="col-9 "
       >
         Documentación
       </span>
       <div
-      class="col-2"
+      class="col-3 d-flex justify-content-end"
       >
       <button type="button" id="btn-crear-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-upload"></i>Nuevo documento</button>
        <button type="button" id="btn-back-cliente-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-arrow-left"></i></button>        
       </div>              
       </h3>
-      <div class="collapse show row row-cols-3" id="collapse-documentacion">
-        <form id="form-documentacion" class="form-horizontal col-12 mb-2 row" >
+      <div class="collapse show row row-cols-1" id="collapse-documentacion">
+        <form id="form-documentacion" class="form-horizontal  mb-2 row" >
           <div class="col-6">
             <label>Vol. Doc</label>
             <input type="text" id="txt-Vol_Doc"
@@ -225,10 +225,10 @@
             <div id="factura-comercial">
             </div>
           </div>
-          <div class="col-12 col-guardar-documentacion m-2">
+          <div class="col-12 col-guardar-documentacion m-2 d-flex justify-content-center align-items-center">
             <div id="btn-guardar-documentacion" 
             
-            class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> Guardar</div>
+            class="btn btn-primary btn-block btn-reporte col-6" data-type="html"><i class="fa fa-save"></i> Guardar</div>
           </div>
         </form>
        

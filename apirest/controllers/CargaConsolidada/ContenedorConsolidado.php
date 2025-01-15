@@ -374,6 +374,12 @@ class ContenedorConsolidado extends CI_Controller {
 			"status" => $arrResponse
 		]);
 	}
+	public function deleteFacturaComercial($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteFacturaComercial($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 	function convertDateFormat($date) {
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);
 		return $dateObject ? $dateObject->format('Y-m-d') : null; // Devuelve null si la fecha no es válida

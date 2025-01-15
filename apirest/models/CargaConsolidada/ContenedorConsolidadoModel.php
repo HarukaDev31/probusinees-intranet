@@ -422,9 +422,9 @@ class ContenedorConsolidadoModel extends CI_Model{
                     "size" => $files['file_comercial']['size']
                 ]
                 , 'assets/images/agentecompra/');
-            
+                $data['factura_comercial']=$fileUrl;
+
         }
-        $data['factura_comercial']=$fileUrl;
         $this->db->where('id', $data['id']);
         $this->db->update($this->table_contenedor_cotizacion, $data);
         if($this->db->affected_rows() > 0){
@@ -505,5 +505,23 @@ class ContenedorConsolidadoModel extends CI_Model{
             return true;
         }
         return false;
+    }
+    public function deleteFacturaComercial($id){
+        try{
+            $this->db->select('factura_comercial')
+        ->from($this->table_contenedor_cotizacion)
+        ->where('id', $id);
+        $query = $this->db->get();
+        $fileUrl=$query->row()->factura_comercial;
+        unlink($fileUrl);
+        $this->db->where('id', $id);
+        $this->db->update($this->table_contenedor_cotizacion, ['factura_comercial' => null]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+        }catch(Exception $e){
+            return false;
+        }
     }
 }

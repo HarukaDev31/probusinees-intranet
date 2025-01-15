@@ -805,6 +805,7 @@ async function viewClientesDocumentacion(id) {
     idCotizacion = id;
     clientesContainer.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/showClientesDocumentacion/" + id;
+    spinner.show();
     const response = await fetch(url);
     const result = await response.json();
     $("#txt-Vol_Doc").val(result[0].volumen_doc);
@@ -813,11 +814,20 @@ async function viewClientesDocumentacion(id) {
     const facturaComercial = result[0].factura_comercial;
     if (facturaComercial) {
         $("#factura-comercial").empty();
-        $("#factura-comercial").append(`<a href="${facturaComercial}" target="_blank"
-            class="btn btn-outline-primary"
-            >
-            <i class="fa fa-download"></i> Descargar 
-            </a>`);
+        const facturaDiv=`
+        <div class="d-flex flex-row gap-1">
+            <div>
+                <a href="${facturaComercial}" target="_blank" class="btn btn-outline-primary">
+                <i class="fa fa-download"></i>
+                Descargar
+                </a>
+           </div>
+            <div class="btn btn-outline-danger" onclick="deleteFacturaComercial(${idCotizacion})">
+            <i class="fa fa-trash " ></i>
+            </div>
+        </div>  
+        `
+        $("#factura-comercial").append(facturaDiv);
     }
     else {
         $("#factura-comercial").empty();
@@ -847,6 +857,7 @@ async function viewClientesDocumentacion(id) {
     });
     $("#btn-descargar-cotizacion-inicial").attr("href", result[0].cotizacion_file_url);
     clientesDocumentacionContainer.show();
+    spinner.hide();
 
 }
 async function validateListEmbarque(id) {
@@ -859,6 +870,33 @@ async function validateListEmbarque(id) {
     } else {
     }
     // reloadTableClientesVariacion();
+}
+async function deleteFacturaComercial(id){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteFacturaComercial/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    viewClientesDocumentacion(idCotizacion);
+                },
+            });
+        }
+    });
 }
 const deleteClienteDocumentacionFile = (id) => {
     Swal.fire({
