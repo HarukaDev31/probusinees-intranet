@@ -438,7 +438,7 @@ class ContenedorConsolidadoModel extends CI_Model{
     public function uploadListaEmbarque($idCotizacion,$idContenedor,$file){
         //read excel and get data from row 5 to more get D and o values foreach row
         try{
-            $this->maxFileSize = 1000000;
+        $this->maxFileSize = 1000000;
         $this->setAllowedExtensionsImagesOfficeFiles();
         $fileUrl= $this->uploadSingleFile(
             [
@@ -468,7 +468,7 @@ class ContenedorConsolidadoModel extends CI_Model{
         $cotizaciones=$query->result();
         foreach($cotizaciones as $cotizacion){
             foreach($data as $item){
-                if($cotizacion->nombre==$item['name']){
+                if(trim($cotizacion->nombre)==trim($item['name'])){
                     $this->db->where('id', $cotizacion->id);
                     $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $item['volumen_china']]);
                 }
@@ -492,6 +492,17 @@ class ContenedorConsolidadoModel extends CI_Model{
         $this->db->update($this->table_contenedor_cotizacion);
         if($this->db->affected_rows() > 0){
             return "success";
+        }
+        return false;
+    }
+    public function validateListEmbarque($id){
+        $this->db->select('lista_embarque_url')
+        ->from($this->table)
+        ->where('id', $id);
+        $query = $this->db->get();
+        $fileUrl=$query->row()->lista_embarque_url;
+        if($fileUrl!=null){
+            return true;
         }
         return false;
     }

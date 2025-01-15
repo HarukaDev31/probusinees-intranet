@@ -41,8 +41,9 @@ trait FileTrait
     }
     public function setAllowedExtensionsImagesOfficeFiles()
     {
-        $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf');
-        $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/pdf');
+        $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf','xlsm');
+        $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/pdf','application/vnd.ms-excel.sheet.macroEnabled.12');
     }
     public function setAllowedExtensionsImagesOfficeFilesVideos(){
         $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf','mp4','MP4','avi','AVI','mov','MOV','flv','FLV','wmv','WMV','3gp','3GP','mkv','MKV','webm','WEBM','avif','AVIF','heif','HEIF','heic','HEIC');

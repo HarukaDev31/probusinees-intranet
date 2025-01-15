@@ -179,44 +179,53 @@
     -->
     <div class="col col-12" id="clientes-documentacion">
       <h3
-      class="d-flex justify-content-between w-100"
+      class="d-flex w-100 row documentation-title"
       >
       <span
+      
       data-toggle="collapse"
       href="#collapse-documentacion"
       role="button"
       aria-expanded="false"
       aria-controls="collapse-documentacion"
+      class="col-10"
       >
         Documentación
       </span>
-      <div>
-      <button type="button" id="btn-crear-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-upload"></i>+</button>
+      <div
+      class="col-2"
+      >
+      <button type="button" id="btn-crear-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-upload"></i>Nuevo documento</button>
        <button type="button" id="btn-back-cliente-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-arrow-left"></i></button>        
       </div>              
       </h3>
       <div class="collapse show row row-cols-3" id="collapse-documentacion">
-        <form id="form-documentacion" class="form-horizontal col-12 mb-2 gap-2 d-flex flex-column" >
-          <div class="">
+        <form id="form-documentacion" class="form-horizontal col-12 mb-2 row" >
+          <div class="col-6">
             <label>Vol. Doc</label>
             <input type="text" id="txt-Vol_Doc"
             name="volumen_doc"
              class="form-control input-report required">
             <span class="invalid-feedback" id="error-vol-doc">El volumen es requerido</span>
           </div>
-          <div class="">
-            <label>Valor Doc</label>
-            <input type="number" 
-            name="valor_doc"
-            id="txt-Valor_Doc" class="form-control input-report required">
-            <span class="invalid-feedback" id="error-valor-doc">El valor es requerido</span>
+          <div class="col-6">
+          <label class="form-label">Valor Doc</label>  
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input type="number" 
+              name="valor_doc"
+              id="txt-Valor_Doc" class="form-control input-report required">
+              <span class="invalid-feedback" id="error-valor-doc">El valor es requerido</span>
+            </div>
           </div>
-          <div class="">
+          <div class="col-3">
             <label>F. Comercial</label>
             <div id="factura-comercial">
             </div>
           </div>
-          <div class="col-12">
+          <div class="col-12 col-guardar-documentacion m-2">
             <div id="btn-guardar-documentacion" 
             
             class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> Guardar</div>
@@ -232,10 +241,10 @@
       role="button"
       aria-expanded="false"
       aria-controls="collapse-cotizacion"
-      class="d-block"
+      class="documentation-title"
 
       >Cotizaciones</h3>
-      <div class="collapse show row row-cols-2 " id="collapse-cotizacion">
+      <div class="collapse show row row-cols-4 " id="collapse-cotizacion">
         <div class="col">
           <a id="btn-descargar-cotizacion-inicial" 
           class="btn btn-outline-success btn-block " target="_blank" href="#"><i class="fa fa-download"></i> Descargar Cotización Inicial</a>
@@ -499,6 +508,20 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}.documentation-title{
+  cursor: pointer;
+  padding: 0 1em;
+  height: 3em;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 0.2em;
+  margin-bottom: 1em;
+  display: flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}.documentation-title:hover{
+  background-color: #d5dbdb;
 }
 
 </style>

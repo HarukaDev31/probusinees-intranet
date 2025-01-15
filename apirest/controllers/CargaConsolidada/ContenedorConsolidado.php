@@ -351,6 +351,12 @@ class ContenedorConsolidado extends CI_Controller {
 			"status" => $arrResponse
 		]);
 	}
+	public function validateListEmbarque($idContenedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->validateListEmbarque($idContenedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 	public function uploadListaEmbarque(){
 		$idCotizacion=$this->input->post('idCotizacion');
 		$idContenedor=$this->input->post('idContenedor');

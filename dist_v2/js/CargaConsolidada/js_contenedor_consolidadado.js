@@ -70,7 +70,6 @@ var tableClientesGeneral = null;
 var tableClientesVariacion = null;
 var clientesDocumentacionContainer = null;
 var idCotizacion = 0;
-
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
@@ -511,6 +510,8 @@ const openStepFunction = async (step, id) => {
 
                             }
                         },
+                        className:"btn btn-light"
+                        
                     },
                     {
                         text: "Variación",
@@ -573,6 +574,7 @@ const openStepFunction = async (step, id) => {
                                         },
                                         {
                                             text: "Variación",
+                                            className:"btn btn-light",
                                             action: function () {
                                                 if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
                                                     $("#table-clientes-general").attr("style", "display:none");
@@ -630,7 +632,8 @@ const openStepFunction = async (step, id) => {
                                                         }
                                                     }
                                                 });
-                                            }
+                                            },
+                                            className:"btn btn-secondary btn-lista-embarque"
                                         }
                                     ],
                                     paging: true,
@@ -668,6 +671,7 @@ const openStepFunction = async (step, id) => {
                                             data.idContenedor = idContenedor;
                                             data.tipoTabla = "variacion";
                                             data.estado=$("#txt-ID_Estado").val();
+                                            validateListEmbarque(idContenedor);
                                         }
                                     }
                                 });
@@ -824,8 +828,8 @@ async function viewClientesDocumentacion(id) {
     const files = JSON.parse(result[0].files ?? '[]');
     //for each file add a col with a link to download and delete icon  in collapse-documentacion 
     files.forEach((file) => {
-        $("#collapse-documentacion").append(`
-        <div class="col-12 aditional-file d-flex flex-column mb-1">
+        $(`
+        <div class="col-3 aditional-file d-flex flex-column mb-1">
         <label>${file.folder_name}</label>
         <div class="d-flex flex-row gap-1">
         <div>
@@ -839,11 +843,22 @@ async function viewClientesDocumentacion(id) {
             </div>
         </div>  
         </div>
-        `);
+        `).insertBefore(".col-guardar-documentacion");
     });
     $("#btn-descargar-cotizacion-inicial").attr("href", result[0].cotizacion_file_url);
     clientesDocumentacionContainer.show();
 
+}
+async function validateListEmbarque(id) {
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/validateListEmbarque/" + id;
+    const response = await fetch(url);
+    const result = await response.json();
+    if (result.status ) {
+        //from $(".btn-lista-embarque") remove btn-secondary and add btn-success
+        $(".btn-lista-embarque").removeClass("btn-secondary").addClass("btn-success");
+    } else {
+    }
+    // reloadTableClientesVariacion();
 }
 const deleteClienteDocumentacionFile = (id) => {
     Swal.fire({
