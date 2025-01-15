@@ -59,7 +59,7 @@ trait FileTrait
         $fileSize= $file['size'] / 1024; // size in K}B
         $fileTname = $file['tmp_name'];
         $fileType = $file['type'];
-        $fileName = $file['name'];
+        $fileName = mb_convert_encoding($file['name'], 'UTF-8', 'auto');
         $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($fileName, $fileType, $this->allowedExtensions, $this->allowedContentTypes);
         if (!$validateExtensionAndContentTypes) {
             return null;
