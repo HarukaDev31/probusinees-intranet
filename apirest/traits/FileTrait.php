@@ -54,22 +54,36 @@ trait FileTrait
     * @param $file - The file data
     * @param $path - The path where the file will be stored
     */
-    public function uploadSingleFile($file, $path)
-    {
-        $fileSize= $file['size'] / 1024; // size in K}B
+    public function uploadSingleFile($file, $path) {
+        $fileSize = $file['size'] / 1024;
         $fileTname = $file['tmp_name'];
         $fileType = $file['type'];
+        
+        // 1. Convertir a UTF-8 y normalizar el nombre
         $fileName = mb_convert_encoding($file['name'], 'UTF-8', 'auto');
+        if (function_exists('normalizer_normalize')) {
+            $fileName = normalizer_normalize($fileName, Normalizer::FORM_C);
+        }
+    
+        // Validaciones existentes
         $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($fileName, $fileType, $this->allowedExtensions, $this->allowedContentTypes);
         if (!$validateExtensionAndContentTypes) {
             return null;
         }
+    
         if (!$this->validateSize($fileSize, $this->maxFileSize)) {
             return null;
         }
+    
         try {
+            // 2. Sanitizar caracteres problemáticos pero mantener caracteres especiales
+            $fileName = preg_replace('/[\x00-\x1F\x7F<>:"\/\\|?*]/', '', $fileName);
+            
             $uploadedFilePath = $this->uploadFile($fileTname, $fileName, $path);
-            return base_url() . $uploadedFilePath;
+            
+            // 3. Codificar la ruta para la URL
+            $encodedPath = str_replace('%2F', '/', rawurlencode($uploadedFilePath));
+            return base_url() . $encodedPath;
         } catch (Exception $e) {
             return $e->getMessage();
         }
