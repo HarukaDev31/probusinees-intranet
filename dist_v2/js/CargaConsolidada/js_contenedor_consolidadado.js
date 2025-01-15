@@ -1078,7 +1078,7 @@ $(document).ready(async function () {
             form.classList.add('was-validated');
             return;
         }
-
+        spinner.show();
         $.ajax({
             url: base_url + "CargaConsolidada/ContenedorConsolidado/store",
             type: "POST",
@@ -1102,6 +1102,7 @@ $(document).ready(async function () {
                         text: result.message,
                     });
                 }
+                spinner.hide();
             },
         });
     });
@@ -1191,6 +1192,7 @@ $(document).ready(async function () {
             form.classList.add('was-validated');
             return;
         }
+        spinner.show();
         $.ajax({
             url: base_url + "CargaConsolidada/ContenedorConsolidado/update",
             type: "POST",
@@ -1198,6 +1200,7 @@ $(document).ready(async function () {
             contentType: false,
             processData: false,
             success: function (response) {
+                spinner.hide();
                 const result = JSON.parse(response);
                 if (result.status == 1) {
                     $("#modal-crear").modal("hide");
