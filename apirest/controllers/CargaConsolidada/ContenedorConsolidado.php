@@ -47,13 +47,8 @@ class ContenedorConsolidado extends CI_Controller {
 			<i class="fas fa-eye" style="cursor:pointer;" onclick="viewSteps('.$row->id.')"></i>
 			</div>';
 			$subdata[] = $btnView;
-			//if estado= pendiente use badge warning else success
 			$divEstadoSelect="";
-			// if($row->estado=="PENDIENTE"){
-			// 	$divEstado='<div class="badge badge-warning">'.$row->estado.'</div>';
-			// }else{
-			// 	$divEstado='<div class="badge badge-success">'.$row->estado.'</div>';
-			// }
+
 			if($this->user->No_Grupo=="Coordinación"){
 			$divEstado='<select class="form-control" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">
 				<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
@@ -233,8 +228,15 @@ class ContenedorConsolidado extends CI_Controller {
 					</select>';
 				}
 				$subdata[] = $selectEstadoCliente;
+				if($this->user->No_Grupo=="Coordinación"){
+					$divAcciones='<div>
+					<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCliente('.$row->id_cotizacion.')"></i>
+					</div>';
+				}
+				$subdata[] = $divAcciones;	
 				$data[] = $subdata;
 				$index++;
+
 			}else{
 				$subdata = array();
 				$subdata[] = $index;
@@ -376,6 +378,12 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function deleteFacturaComercial($id){
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteFacturaComercial($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function deleteCliente($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteCliente($id);
 		echo json_encode([
 			"status" => $arrResponse
 		]);

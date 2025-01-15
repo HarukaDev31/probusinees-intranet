@@ -106,8 +106,11 @@
                 <th>Volumen</th>
                 <th>Cotizacion</th>
                 <th>Estado</th>
+                <?php if($this->user->No_Grupo=="Coordinación"){  ?>
+
                 <th>Acciones
                 </th>
+                <?php } ?>
               </tr>
             </thead>
           </table>
@@ -152,6 +155,7 @@
               <th>Volumen</th>
               <th>Ver</th>
               <th>Estados</th>
+              <th>Acciones</th>
             </tr>
           </thead>
         </table>               

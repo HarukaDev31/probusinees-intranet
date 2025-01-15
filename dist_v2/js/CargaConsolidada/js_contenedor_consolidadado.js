@@ -288,6 +288,33 @@ async function deleteCotizacion(id) {
         }
     });
 }
+async function deleteCliente(idCotizacion){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteCliente/" + idCotizacion;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    reloadTableClientesGeneral();
+                },
+            });
+        }
+    });
+}
 const stepTemplate = (step, i) => {
     const stepHTML = `
         <div class="step-container" onclick="openStepFunction(${i + 1},${step.id

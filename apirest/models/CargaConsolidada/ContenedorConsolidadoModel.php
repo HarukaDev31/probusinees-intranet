@@ -524,4 +524,23 @@ class ContenedorConsolidadoModel extends CI_Model{
             return false;
         }
     }
+    public function deleteCliente($idCotizacion){
+        try{
+            $this->db->select('cotizacion_file_url')
+        ->from($this->table_contenedor_cotizacion)
+        ->where('id', $idCotizacion);
+        $query = $this->db->get();
+        $fileUrl=$query->row()->cotizacion_file_url;
+        unlink($fileUrl);
+        $this->db->where('id', $idCotizacion);
+        $this->db->delete($this->table_contenedor_cotizacion);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+        }catch(Exception $e){
+            return false;
+        }
+
+    }
 }
