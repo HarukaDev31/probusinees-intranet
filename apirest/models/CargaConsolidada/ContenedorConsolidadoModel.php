@@ -585,6 +585,12 @@ class ContenedorConsolidadoModel extends CI_Model{
                 unlink($file->file_url);
                 
                 }
+            $files=$query->result();
+            //delete files row
+            $this->db->where('id_folder', $id);
+            $this->db->delete($this->table_contenedor_documentacion_files);
+            //delete folder row
+            
             $this->db->where('id', $id);
             $this->db->delete($this->table_contenedor_documentacion_folders);
             if($this->db->affected_rows() > 0){
