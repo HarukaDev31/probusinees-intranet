@@ -628,9 +628,7 @@ class ContenedorConsolidadoModel extends CI_Model{
         if ($zip->open($zipName, ZipArchive::CREATE) === TRUE) {
             foreach($folders as $folder) {
                 // Extraer la parte de la ruta después de probusinees-intranet/
-                $filePath = preg_replace('/.*probusinees-intranet\//', '', $folder->file_url);
-                $filePath = preg_replace('/.*intranet.probusiness.pe\//', '', $folder->file_url);
-
+                $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $folder->file_url);
                 // Construir la ruta local completa
                 $fullPath = FCPATH . $filePath;
                 
