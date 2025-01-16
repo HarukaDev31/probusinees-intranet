@@ -271,10 +271,10 @@
             <div class="col-12 col-md-2">
               <button type="button" id="btn-documentacion-zip" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i>Zip</button>
             </div>
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-3">
                <button type="button" id="btn-documentacion-new" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-upload"></i> Nuevo documento</button>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
             </div>
             <div class="col-12 col-md-2">
                   <button type="button"  class="btn btn-outline-primary btn-block btn-reporte btn-back-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> </button>

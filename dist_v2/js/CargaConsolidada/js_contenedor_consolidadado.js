@@ -787,6 +787,7 @@ async function  deleteDocumentacionFolder(id) {
     });
 }
 async function viewDocumentacion() {
+    spinner.show();
     $.ajax({
         url: base_url + "CargaConsolidada/ContenedorConsolidado/step",
         type: "POST",
@@ -795,6 +796,7 @@ async function viewDocumentacion() {
             idContenedor: idContenedor,
         },
         success: function (response) {
+            
             documentationContainer.show();
             spinner.hide();
             let dataParsed = JSON.parse(response);
