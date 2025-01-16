@@ -638,6 +638,10 @@ class ContenedorConsolidadoModel extends CI_Model{
                 
                 if (file_exists($fullPath)) {
                     $fileName = basename($folder->file_url);
+                    $fileName = mb_convert_encoding($fileName, 'UTF-8', 'auto');
+                    if (function_exists('normalizer_normalize')) {
+                        $fileName = normalizer_normalize($fileName, Normalizer::FORM_C);
+                    }
                     if (!$zip->addFile($fullPath, $folder->folder_name . '/' . $fileName)) {
                         log_message('error', 'No se pudo agregar al zip: ' . $fullPath);
                     }
