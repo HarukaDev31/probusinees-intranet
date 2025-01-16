@@ -627,18 +627,22 @@ class ContenedorConsolidadoModel extends CI_Model{
         
         if ($zip->open($zipName, ZipArchive::CREATE) === TRUE) {
             foreach($folders as $folder) {
-                // Extraer la parte de la ruta después de probusinees-intranet/
                 $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $folder->file_url);
-                // Construir la ruta local completa
                 $fullPath = FCPATH . ltrim($filePath, '/');
+                
+                // Normalización de caracteres especiales
+                $fullPath = mb_convert_encoding($fullPath, 'UTF-8', 'auto');
+                if (function_exists('normalizer_normalize')) {
+                    $fullPath = normalizer_normalize($fullPath, Normalizer::FORM_C);
+                }
+                
                 if (file_exists($fullPath)) {
-                    // Usar el nombre del archivo original para el zip
                     $fileName = basename($folder->file_url);
                     if (!$zip->addFile($fullPath, $folder->folder_name . '/' . $fileName)) {
-                        error_log("No se pudo agregar el archivo: " . $fullPath);
+                        log_message('error', 'No se pudo agregar al zip: ' . $fullPath);
                     }
                 } else {
-                    error_log("Archivo no encontrado: " . $fullPath);
+                    log_message('error', 'Archivo no encontrado: ' . $fullPath);
                 }
             }
             $zip->close();
