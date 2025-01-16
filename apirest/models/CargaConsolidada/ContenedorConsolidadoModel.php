@@ -10,6 +10,8 @@ class ContenedorConsolidadoModel extends CI_Model{
     private $table_pais="pais";
     private $table_contenedor_steps="contenedor_consolidado_order_steps";
     private $table_contenedor_cotizacion="contenedor_consolidado_cotizacion";
+    private $table_contenedor_documentacion_files="contenedor_consolidado_documentacion_files";
+    private $table_contenedor_documentacion_folders="contenedor_consolidado_documentacion_folders";
     private $table_contenedor_tipo_cliente="contenedor_consolidado_tipo_cliente";
     private $table_contenedor_cotizacion_documentacion="contenedor_consolidado_cotizacion_documentacion";
     private $roleCotizador="Cotizador";
@@ -27,10 +29,7 @@ class ContenedorConsolidadoModel extends CI_Model{
         if($this->input->post('Filtro_Estado')!="0"){
             $this->db->where('estado', $this->input->post('Filtro_Estado'));
         }
-        // if Fe_Inicio_Carga is not null and Fe_Fin_Carga is null
-        // if($this->input->post('Fe_Inicio_Carga') != "" && $this->input->post('Fe_Fin_Carga') == ""){
-        //     $this->db->where('Fe_Inicio_Carga >=', $this->input->post('Fe_Inicio_Carga'));
-        // }
+
         $query = $this->db->get();
         return $query->result();
 
@@ -542,5 +541,148 @@ class ContenedorConsolidadoModel extends CI_Model{
             return false;
         }
 
+    }
+     public function getDocumentationFolderFiles($id){
+        //select * from folders where id_cotizacion is null or $id and left join files where id_folder = id
+        $this->db->select("main.*,files.id AS id_file,files.file_url")
+            ->from($this->table_contenedor_documentacion_folders . " as main")
+            ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id 
+            and files.id_contenedor = '.$id, 'left')
+            ->where('main.id_contenedor', $id)
+            ->or_where('main.id_contenedor', null);
+              
+        $query = $this->db->get();
+        return $query->result();
+    }
+    public function uploadFileDocumentation($idFolder,$idContenedor,$file){
+        $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $fileUrl= $this->uploadSingleFile(
+            [
+                "name" => $file['name'],
+                "type" => $file['type'],
+                "tmp_name" => $file['tmp_name'],
+                "error" => $file['error'],
+                "size" => $file['size']
+            ]
+            , 'assets/images/agentecompra/');
+        $this->db->insert($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'file_url' => $fileUrl,
+        'id_contenedor' => $idContenedor]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    public function deleteDocumentacionFolder($id){
+        try{
+            //delete all files with same id_folder and unlink files and later delete folder
+            $this->db->select('file_url')
+            ->from($this->table_contenedor_documentacion_files)
+            ->where('id_folder', $id);
+            $query = $this->db->get();
+            $files=$query->result();
+            foreach($files as $file){
+                unlink($file->file_url);
+                
+                }
+            $this->db->where('id', $id);
+            $this->db->delete($this->table_contenedor_documentacion_folders);
+            if($this->db->affected_rows() > 0){
+                return "success";
+            }
+            return false;
+        }catch(Exception $e){
+            return false;
+        }
+    }
+    public function deleteDocumentacionFile($id){
+        try{
+            $this->db->select('file_url')
+        ->from($this->table_contenedor_documentacion_files)
+        ->where('id', $id);
+        $query = $this->db->get();
+        $fileUrl=$query->row()->file_url;
+        unlink($fileUrl);
+        $this->db->where('id', $id);
+        $this->db->delete($this->table_contenedor_documentacion_files);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+        }catch(Exception $e){
+            return false;
+        }
+    }
+    public function downloadDocumentacionZip($id){
+    try {
+        $this->db->select("main.*,files.id AS id_file,files.file_url")
+            ->from($this->table_contenedor_documentacion_folders . " as main")
+            ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
+            ->where('files.id_contenedor', $id);
+        $query = $this->db->get();
+        $folders = $query->result();
+        
+        $zip = new ZipArchive;
+        $zipName = 'assets/images/agentecompra/contenedor_'.$id.'.zip';
+        
+        if ($zip->open($zipName, ZipArchive::CREATE) === TRUE) {
+            foreach($folders as $folder) {
+                // Extraer la parte de la ruta después de probusinees-intranet/
+                $filePath = preg_replace('/.*probusinees-intranet\//', '', $folder->file_url);
+                
+                // Construir la ruta local completa
+                $fullPath = FCPATH . $filePath;
+                
+                if (file_exists($fullPath)) {
+                    // Usar el nombre del archivo original para el zip
+                    $fileName = basename($folder->file_url);
+                    if (!$zip->addFile($fullPath, $folder->folder_name . '/' . $fileName)) {
+                        error_log("No se pudo agregar el archivo: " . $fullPath);
+                    }
+                } else {
+                    error_log("Archivo no encontrado: " . $fullPath);
+                }
+            }
+            $zip->close();
+            return $zipName;
+        }
+        return false;
+    } catch(Exception $e) {
+        return $e->getMessage();
+    }
+}
+    public function createDocumentacionFolder($name,$idContenedor,$file){
+        try{
+            $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $fileUrl= $this->uploadSingleFile(
+            [
+                "name" => $file['name'],
+                "type" => $file['type'],
+                "tmp_name" => $file['tmp_name'],
+                "error" => $file['error'],
+                "size" => $file['size']
+            ]
+            , 'assets/images/agentecompra/');
+        if($fileUrl){
+            $this->db->insert($this->table_contenedor_documentacion_folders, ['id_contenedor' => $idContenedor, 'folder_name' => $name]);
+            if($this->db->affected_rows() > 0){
+                $idFolder=$this->db->insert_id();
+                //insert file in table contenedor_consolidado_documentacion_files
+                $this->db->insert($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'file_url' => $fileUrl]);
+                if($this->db->affected_rows() > 0){
+                    return ['status' => "success",'error'=>false];
+                }
+                //if db error delete folder
+               return ['status' => "error",'error'=>true];
+             }
+        }
+       
+        if($this->db->error()){
+            return ['status' => "error",'error'=>$this->db->error()];
+        } 
+        }catch(Exception $e){
+            return false;
+        }
     }
 }

@@ -258,6 +258,10 @@ class ContenedorConsolidado extends CI_Controller {
 			);
 			echo json_encode($output);
 		}
+		else if($stepIndex==3){
+			$arrResponse = $this->ContenedorConsolidadoModel->getDocumentationFolderFiles($idContenedor);
+			echo json_encode($arrResponse);
+		}
 	}
 	///function to step 1 cotizacion
 	public function storeCotizacion(){
@@ -384,6 +388,55 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function deleteCliente($id){
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteCliente($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function uploadFileDocumentation(){
+		$idFolder=$this->input->post('idFolder');
+		$idContenedor=$this->input->post('idContenedor');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadFileDocumentation($idFolder,$idContenedor,$file);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function deleteDocumentacionFile($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteDocumentacionFile($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function deleteDocumentacionFolder($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteDocumentacionFolder($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function createDocumentacionFolder(){
+		$name=$this->input->post('name');
+		$idContenedor=$this->input->post('idContenedor');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->createDocumentacionFolder($name,$idContenedor,$file);
+		echo json_encode([
+			"status" => $arrResponse['status'],
+			"error" => $arrResponse['error']
+		]);
+	}
+	public function downloadDocumentacionZip($idContenedor){
+		$zipFilePath = $this->ContenedorConsolidadoModel->downloadDocumentacionZip($idContenedor);
+		echo $zipFilePath;
+		if (file_exists($zipFilePath)) {
+			header('Content-Type: application/zip');
+			header('Content-Disposition: attachment; filename="' . basename($zipFilePath) . '"');
+			header('Content-Length: ' . filesize($zipFilePath));
+			readfile($zipFilePath);
+			unlink($zipFilePath);
+			exit();
+		} else {
+			// Handle error if file generation failed
+			echo "Error: Unable to generate the ZIP file.";
+		}
 		echo json_encode([
 			"status" => $arrResponse
 		]);

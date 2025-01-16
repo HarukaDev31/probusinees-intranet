@@ -177,209 +177,224 @@
       </div>
     </section>
     <section class="content card px-4 py-3" id="clientes-documentation-container">
-    <!--section with 2 divs collapse, one for documentation and other for cotizacion
-    with title documentacion with 3 form inputs vol doc,valor doc y f comercial,
-    y otro div with title cotizacions with to button for download cotizacion inicial y final files
-    -->
-    <div class="col col-12" id="clientes-documentacion">
-      <h3
-      class="d-flex w-100 row documentation-title"
-      >
-      <span
-      
-      data-toggle="collapse"
-      href="#collapse-documentacion"
-      role="button"
-      aria-expanded="false"
-      aria-controls="collapse-documentacion"
-      class="col-9 "
-      >
-        Documentación
-      </span>
-      <div
-      class="col-3 d-flex justify-content-end"
-      >
-      <button type="button" id="btn-crear-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-upload"></i>Nuevo documento</button>
-       <button type="button" id="btn-back-cliente-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-arrow-left"></i></button>        
-      </div>              
-      </h3>
-      <div class="collapse show row row-cols-1" id="collapse-documentacion">
-        <form id="form-documentacion" class="form-horizontal  mb-2 row" >
-          <div class="col-6">
-            <label>Vol. Doc</label>
-            <input type="text" id="txt-Vol_Doc"
-            name="volumen_doc"
-             class="form-control input-report required">
-            <span class="invalid-feedback" id="error-vol-doc">El volumen es requerido</span>
-          </div>
-          <div class="col-6">
-          <label class="form-label">Valor Doc</label>  
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">$</span>
-              </div>
-              <input type="number" 
-              name="valor_doc"
-              id="txt-Valor_Doc" class="form-control input-report required">
-              <span class="invalid-feedback" id="error-valor-doc">El valor es requerido</span>
-            </div>
-          </div>
-          <div class="col-3">
-            <label>F. Comercial</label>
-            <div id="factura-comercial">
-            </div>
-          </div>
-          <div class="col-12 col-guardar-documentacion m-2 d-flex justify-content-center align-items-center">
-            <div id="btn-guardar-documentacion" 
-            
-            class="btn btn-primary btn-block btn-reporte col-6" data-type="html"><i class="fa fa-save"></i> Guardar</div>
-          </div>
-        </form>
-       
-      </div>
-    </div>
-    <div class="col col-12" id="clientes-cotizacion">
-      <h3
-      data-toggle="collapse"
-      href="#collapse-cotizacion"
-      role="button"
-      aria-expanded="false"
-      aria-controls="collapse-cotizacion"
-      class="documentation-title"
 
-      >Cotizaciones</h3>
-      <div class="collapse show row row-cols-4 " id="collapse-cotizacion">
-        <div class="col">
-          <a id="btn-descargar-cotizacion-inicial" 
-          class="btn btn-outline-success btn-block " target="_blank" href="#"><i class="fa fa-download"></i> Descargar Cotización Inicial</a>
-        </div>
-        <div class="col">
-          <button type="button" id="btn-descargar-cotizacion-final" class="btn btn-outline-success btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i> Descargar Cotización Final</button>
+      <div class="col col-12" id="clientes-documentacion">
+        <h3
+        class="d-flex w-100 row documentation-title"
+        >
+        <span
+        
+        data-toggle="collapse"
+        href="#collapse-documentacion"
+        role="button"
+        aria-expanded="false"
+        aria-controls="collapse-documentacion"
+        class="col-9 "
+        >
+          Documentación
+        </span>
+        <div
+        class="col-3 d-flex justify-content-end"
+        >
+        <button type="button" id="btn-crear-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-upload"></i>Nuevo documento</button>
+        <button type="button" id="btn-back-cliente-documentacion" class="btn btn-outline-primary" data-type="html"><i class="fa fa-arrow-left"></i></button>        
+        </div>              
+        </h3>
+        <div class="collapse show row row-cols-1" id="collapse-documentacion">
+          <form id="form-documentacion" class="form-horizontal  mb-2 row" >
+            <div class="col-6">
+              <label>Vol. Doc</label>
+              <input type="text" id="txt-Vol_Doc"
+              name="volumen_doc"
+              class="form-control input-report required">
+              <span class="invalid-feedback" id="error-vol-doc">El volumen es requerido</span>
+            </div>
+            <div class="col-6">
+            <label class="form-label">Valor Doc</label>  
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$</span>
+                </div>
+                <input type="number" 
+                name="valor_doc"
+                id="txt-Valor_Doc" class="form-control input-report required">
+                <span class="invalid-feedback" id="error-valor-doc">El valor es requerido</span>
+              </div>
+            </div>
+            <div class="col-3">
+              <label>F. Comercial</label>
+              <div id="factura-comercial">
+              </div>
+            </div>
+            <div class="col-12 col-guardar-documentacion m-2 d-flex justify-content-center align-items-center">
+              <div id="btn-guardar-documentacion" 
+              
+              class="btn btn-primary btn-block btn-reporte col-6" data-type="html"><i class="fa fa-save"></i> Guardar</div>
+            </div>
+          </form>
+        
         </div>
       </div>
-    </div>          
+      <div class="col col-12" id="clientes-cotizacion">
+        <h3
+        data-toggle="collapse"
+        href="#collapse-cotizacion"
+        role="button"
+        aria-expanded="false"
+        aria-controls="collapse-cotizacion"
+        class="documentation-title"
+
+        >Cotizaciones</h3>
+        <div class="collapse show row row-cols-4 " id="collapse-cotizacion">
+          <div class="col">
+            <a id="btn-descargar-cotizacion-inicial" 
+            class="btn btn-outline-success btn-block " target="_blank" href="#"><i class="fa fa-download"></i> Descargar Cotización Inicial</a>
+          </div>
+          <div class="col">
+            <button type="button" id="btn-descargar-cotizacion-final" class="btn btn-outline-success btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i> Descargar Cotización Final</button>
+          </div>
+        </div>
+      </div>          
     </section>
-    <!--Steps-->
+
     <section id="steps" class="content">
       <div id="steps-container">
       </div>
       <div class="steps-buttons">
       </div>
     </section>
-  <!--modal create cotizacion-->
-  <div class="modal fade" id="modal-crear-cotizacion" tabindex="-1" role="dialog" aria-labelledby="modal-cotizacion" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Subir Prospecto</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="form-crear-cotizacion" class="form-horizontal" method="post">
-            <div class="row">
-             
-              <div class="col-12 col-sm-12">
-                <div class="form-group
-                ">
-                  <label>Cotizacion <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
-
-                </div>
-              </div>  
+    <section class="content card px-4 py-3" id="documentation-container">
+      <div class="row">
+            <div class="col-12 col-md-2 ">
+              <button type="button" id="btn-documentacion-factura" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i>Factura General</button>
             </div>
-          </form>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            <button type="button" id="btn-actualizar-cotizacion" class="btn btn-primary">Actualizar</button>
-            <button type="button" id="btn-guardar-cotizacion" class="btn btn-primary">Guardar</button>
+            <div class="col-12 col-md-2">
+              <button type="button" id="btn-documentacion-zip" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i>Zip</button>
+            </div>
+            <div class="col-12 col-md-2">
+               <button type="button" id="btn-documentacion-new" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-upload"></i> Nuevo documento</button>
+            </div>
+            <div class="col-12 col-md-4">
+            </div>
+            <div class="col-12 col-md-2">
+                  <button type="button"  class="btn btn-outline-primary btn-block btn-reporte btn-back-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> </button>
+            </div>
+      </div>
+      <div class="row mb-2 row-cols-3 documentation-files-container mt-2">
+      </div>
+    </section>
+    <div class="modal fade" id="modal-crear-cotizacion" tabindex="-1" role="dialog" aria-labelledby="modal-cotizacion" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Subir Prospecto</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="form-crear-cotizacion" class="form-horizontal" method="post">
+              <div class="row">
+              
+                <div class="col-12 col-sm-12">
+                  <div class="form-group
+                  ">
+                    <label>Cotizacion <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required">
+                    <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+
+                  </div>
+                </div>  
+              </div>
+            </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="button" id="btn-actualizar-cotizacion" class="btn btn-primary">Actualizar</button>
+              <button type="button" id="btn-guardar-cotizacion" class="btn btn-primary">Guardar</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="modal fade" id="modal-crear" tabindex="-1" role="dialog" aria-labelledby="modal-crear" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Crear Carga Consolidada</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="form-crear" class="form-horizontal" method="post">
-            <div class="row">
-              <div class="col-6 col-sm-6">
-                <label>Mes <span class="label-advertencia text-danger"> *</span></label>
-                <div class="form-group">
-                  <select id="txt-Mes" required name="mes" class="form-control input-report required">
-                  </select>
-                  <span class="invalid-feedback" id="error-mes">El mes es requerido</span>
+    <div class="modal fade" id="modal-crear" tabindex="-1" role="dialog" aria-labelledby="modal-crear" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Crear Carga Consolidada</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="form-crear" class="form-horizontal" method="post">
+              <div class="row">
+                <div class="col-6 col-sm-6">
+                  <label>Mes <span class="label-advertencia text-danger"> *</span></label>
+                  <div class="form-group">
+                    <select id="txt-Mes" required name="mes" class="form-control input-report required">
+                    </select>
+                    <span class="invalid-feedback" id="error-mes">El mes es requerido</span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-6">
+                  <div class="form-group">
+                    <label>Pais <span class="label-advertencia text-danger"> *</span></label>
+                    <select id="txt-ID_Pais" required name="id_pais" class="form-control input-report required">
+                      
+                    </select>
+                    <!-- <span class="help-block text-danger" id="error"></span>
+                    <input type="hidden" id="txt-ID_Carga_Consolidada" name="id" value="0"> -->
+                  </div>
+                </div>
+                <div class="col-6 col-sm-6">
+                  <div class="form-group">
+                    <label>Carga <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
+                    <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-6">
+                  <div class="form-group
+                  ">
+                    <label>F. Arribo <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text" name="f_puerto" required id="txt-Fe_Puerto" class="form-control input-report required input-date" >
+                    <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-6">
+                  <div class="form-group
+                  ">
+                    <label>F. Cierre <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text" name="f_cierre" required id="txt-Fe_Cierre" class="form-control input-report required input-date" >
+                    <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-6">
+                  <div class="form-group" id="div-Fe_Entrega">
+                    <label>F. Entrega <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text"  required  name="f_entrega" id="txt-Fe_Entrega" class="form-control input-report required input-date" >
+                    <span class="invalid-feedback" id="error-f-entrega">La fecha entrega es requerida</span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-6">
+                  <div class="form-group ">
+                    <label>Empresa <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text"  required name="empresa" id="txt-Empresa" class="form-control input-report required">
+                    <span class="invalid-feedback" id="error-empresa">La empresa es requerida</span>
+                  </div>
+                </div>
                 </div>
               </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group">
-                  <label>Pais <span class="label-advertencia text-danger"> *</span></label>
-                  <select id="txt-ID_Pais" required name="id_pais" class="form-control input-report required">
-                    
-                  </select>
-                  <!-- <span class="help-block text-danger" id="error"></span>
-                  <input type="hidden" id="txt-ID_Carga_Consolidada" name="id" value="0"> -->
-                </div>
-              </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group">
-                  <label>Carga <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
-                </div>
-              </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group
-                ">
-                  <label>F. Arribo <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" class="form-control input-report required input-date" >
-                  <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
-                </div>
-              </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group
-                ">
-                  <label>F. Cierre <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_cierre" required id="txt-Fe_Cierre" class="form-control input-report required input-date" >
-                  <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
-                </div>
-              </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group" id="div-Fe_Entrega">
-                  <label>F. Entrega <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text"  required  name="f_entrega" id="txt-Fe_Entrega" class="form-control input-report required input-date" >
-                  <span class="invalid-feedback" id="error-f-entrega">La fecha entrega es requerida</span>
-                </div>
-              </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group ">
-                  <label>Empresa <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text"  required name="empresa" id="txt-Empresa" class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-empresa">La empresa es requerida</span>
-                </div>
-              </div>
-              </div>
+            </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="button" id="btn-actualizar" class="btn btn-primary">Actualizar</button>
+              <button type="button" id="btn-guardar" class="btn btn-primary">Guardar</button>
             </div>
-          </form>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            <button type="button" id="btn-actualizar" class="btn btn-primary">Actualizar</button>
-            <button type="button" id="btn-guardar" class="btn btn-primary">Guardar</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
  
 <style scoped>
 #steps{
@@ -526,6 +541,8 @@ input[type="number"]::-webkit-outer-spin-button {
   text-align:center;
 }.documentation-title:hover{
   background-color: #d5dbdb;
+}.delete-folder-button:hover{
+  cursor: pointer;
 }
 
 </style>

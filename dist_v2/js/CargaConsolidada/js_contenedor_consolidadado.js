@@ -69,6 +69,7 @@ var tableCotizacion = null;
 var tableClientesGeneral = null;
 var tableClientesVariacion = null;
 var clientesDocumentacionContainer = null;
+var documentationContainer = null;
 var idCotizacion = 0;
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
@@ -288,7 +289,7 @@ async function deleteCotizacion(id) {
         }
     });
 }
-async function deleteCliente(idCotizacion){
+async function deleteCliente(idCotizacion) {
     Swal.fire({
         title: "¿Estás seguro?",
         text: "¡No podrás revertir esto!",
@@ -530,15 +531,15 @@ const openStepFunction = async (step, id) => {
                                 $("#table-clientes-general").attr("style", "");
                                 $("#table-clientes-general_wrapper").show();
                                 reloadTableClientesGeneral();
-                            }else{
+                            } else {
                                 $("#table-clientes-general").attr("style", "");
                                 $("#table-clientes-general_wrapper").show();
                                 reloadTableClientesGeneral();
 
                             }
                         },
-                        className:"btn btn-light"
-                        
+                        className: "btn btn-light"
+
                     },
                     {
                         text: "Variación",
@@ -569,7 +570,7 @@ const openStepFunction = async (step, id) => {
                                                 columns: ":visible",
                                             },
                                         },
-                                        
+
                                         {
                                             extend: "colvis",
                                             text: '<i class="fa fa-ellipsis-v"></i> Columnas',
@@ -592,7 +593,7 @@ const openStepFunction = async (step, id) => {
                                                     reloadTableClientesGeneral();
 
 
-                                                }else{
+                                                } else {
                                                     $("#table-clientes-general").attr("style", "");
                                                     reloadTableClientesGeneral();
 
@@ -601,7 +602,7 @@ const openStepFunction = async (step, id) => {
                                         },
                                         {
                                             text: "Variación",
-                                            className:"btn btn-light",
+                                            className: "btn btn-light",
                                             action: function () {
                                                 if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
                                                     $("#table-clientes-general").attr("style", "display:none");
@@ -610,7 +611,7 @@ const openStepFunction = async (step, id) => {
                                                 if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
 
                                                     $("#table-clientes-variacion").attr("style", "");
-                                                            
+
                                                 } else {
                                                     $("#table-clientes-variacion").attr("style", "");
                                                 }
@@ -618,8 +619,8 @@ const openStepFunction = async (step, id) => {
                                         },
 
                                         {
-                                            text:"<i class='fa fa-upload'></i> Lista de embarque",
-                                            action:function(){
+                                            text: "<i class='fa fa-upload'></i> Lista de embarque",
+                                            action: function () {
                                                 Swal.fire({
                                                     title: "Subir lista de embarque",
                                                     input: "file",
@@ -660,7 +661,7 @@ const openStepFunction = async (step, id) => {
                                                     }
                                                 });
                                             },
-                                            className:"btn btn-secondary btn-lista-embarque"
+                                            className: "btn btn-secondary btn-lista-embarque"
                                         }
                                     ],
                                     paging: true,
@@ -697,7 +698,7 @@ const openStepFunction = async (step, id) => {
                                             data.stepIndex = stepIndex;
                                             data.idContenedor = idContenedor;
                                             data.tipoTabla = "variacion";
-                                            data.estado=$("#txt-ID_Estado").val();
+                                            data.estado = $("#txt-ID_Estado").val();
                                             validateListEmbarque(idContenedor);
                                         }
                                     }
@@ -742,11 +743,15 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "general";
-                        data.estado=$("#txt-ID_Estado_Cliente").val();
+                        data.estado = $("#txt-ID_Estado_Cliente").val();
                     }
                 }
             });
         }
+    } else if (stepIndex == 3) {
+        viewDocumentacion();
+
+
     }
     $(".btn-back-cotizacion").off("click");
     $(".btn-back-cotizacion").on("click", function () {
@@ -754,11 +759,152 @@ const openStepFunction = async (step, id) => {
     });
     spinner.hide();
 }
+async function  deleteDocumentacionFolder(id) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteDocumentacionFolder/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    viewDocumentacion();
+                },
+            });
+        }
+    });
+}
+async function viewDocumentacion() {
+    $.ajax({
+        url: base_url + "CargaConsolidada/ContenedorConsolidado/step",
+        type: "POST",
+        data: {
+            stepIndex: stepIndex,
+            idContenedor: idContenedor,
+        },
+        success: function (response) {
+            documentationContainer.show();
+            spinner.hide();
+            let dataParsed = JSON.parse(response);
+            $(".documentation-files-container").empty();
+            dataParsed.forEach((file) => {
+                $(".documentation-files-container").append(`
+                    <div >
+                        <label>${file.folder_name}
+                        ${file.id_contenedor?`<div class="badge badge-danger text-white delete-folder-button
+                            
+                            " onclick="deleteDocumentacionFolder(${file.id})">
+                            X
+                            </div>`
+                            :""}
+                        </label>
+                        ${file.file_url ? `<div>
+                            <a href="${file.file_url}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fa fa-download"></i>
+                            Descargar
+                            </a>
+                            <button class="btn btn-outline-danger" onclick="deleteDocumentacionFile(${file.id_file})">
+                            <i class="fa fa-trash " ></i>
+                            </button>
+                        </div>` :
+                        `<div>
+                            <button class="btn btn-outline-primary" onclick="openUploadFileDocumentation(${file.id})">
+                            <i class="fa fa-upload"></i>
+                            Subir
+                            </button>
+                        </div>`}
+                    </div>
+                `);
+            });
+        },
+    });
+
+}
 async function reloadTableClientesGeneral() {
     tableClientesGeneral.ajax.reload();
 }
 async function reloadTableClientesVariacion() {
     tableClientesVariacion.ajax.reload();
+}
+async function deleteDocumentacionFile(id) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteDocumentacionFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    viewDocumentacion();
+                },
+            });
+        }
+    });
+}
+async function openUploadFileDocumentation(idFolder) {
+    Swal.fire({
+        title: "Subir archivo",
+        input: "file",
+        inputAttributes: {
+            accept: "*",
+            "aria-label": "Sube tu archivo",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        showLoaderOnConfirm: true,
+        preConfirm: (file) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("idFolder", idFolder);
+            formData.append("idContenedor", idContenedor);
+            return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadFileDocumentation", {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => {
+                    return response.json();
+                })
+                .catch((error) => {
+                    Swal.showValidationMessage(
+                        `Request failed: ${error}`
+                    );
+                });
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+    }).then((result) => {
+        if (result.value) {
+            if (result.value.status == "success") {
+                Swal.fire("Correcto", result.value.message, "success");
+                viewDocumentacion();
+            } else {
+                Swal.fire("Error", result.value.message, "error");
+            }
+        }
+    });
 }
 async function viewCotizacion(id) {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/showCotizacion/" + id;
@@ -841,7 +987,7 @@ async function viewClientesDocumentacion(id) {
     const facturaComercial = result[0].factura_comercial;
     if (facturaComercial) {
         $("#factura-comercial").empty();
-        const facturaDiv=`
+        const facturaDiv = `
         <div class="d-flex flex-row gap-1">
             <div>
                 <a href="${facturaComercial}" target="_blank" class="btn btn-outline-primary">
@@ -891,14 +1037,14 @@ async function validateListEmbarque(id) {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/validateListEmbarque/" + id;
     const response = await fetch(url);
     const result = await response.json();
-    if (result.status ) {
+    if (result.status) {
         //from $(".btn-lista-embarque") remove btn-secondary and add btn-success
         $(".btn-lista-embarque").removeClass("btn-secondary").addClass("btn-success");
     } else {
     }
     // reloadTableClientesVariacion();
 }
-async function deleteFacturaComercial(id){
+async function deleteFacturaComercial(id) {
     Swal.fire({
         title: "¿Estás seguro?",
         text: "¡No podrás revertir esto!",
@@ -955,6 +1101,7 @@ const deleteClienteDocumentacionFile = (id) => {
 const returnToSteps = () => {
     cotizacionContainer.hide();
     clientesContainer.hide();
+    documentationContainer.hide();
     stepsContainer.show();
 }
 $(document).ready(async function () {
@@ -973,6 +1120,8 @@ $(document).ready(async function () {
     tableClientesVariacion.hide();
     clientesDocumentacionContainer = $("#clientes-documentation-container");
     clientesDocumentacionContainer.hide();
+    documentationContainer = $("#documentation-container");
+    documentationContainer.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     table_Entidad = $("#table-contenedor").DataTable({
         dom:
@@ -1137,301 +1286,384 @@ $(document).ready(async function () {
         clientesDocumentacionContainer.hide();
         clientesContainer.show();
     })
-    $("#btn-guardar-cotizacion").click(function (e) {
-        e.preventDefault();
-        const formData = new FormData($("#form-crear-cotizacion")[0]);
-        formData.append("id_contenedor", idContenedor);
-        let form = $("#form-crear-cotizacion")[0];
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
-        }
-        $.ajax({
-            url: base_url + "CargaConsolidada/ContenedorConsolidado/storeCotizacion",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function (response) {
-                const result = JSON.parse(response);
-                if (result.status == "success") {
-                    $("#modal-crear-cotizacion").modal("hide");
-                    tableCotizacion.ajax.reload();
-                    Swal.fire({
-                        icon: "success",
-                        title: "Correcto",
-                        text: result.message,
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: result.message,
-                    });
-                }
-            },
-        });
-
-    });
-    $("#btn-actualizar-cotizacion").click(function (e) {
-        e.preventDefault();
-        const formData = new FormData($("#form-crear-cotizacion")[0]);
-        formData.append("id", idCotizacion);
-        let form = $("#form-crear-cotizacion")[0];
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
-        }
-        $.ajax({
-            url: base_url + "CargaConsolidada/ContenedorConsolidado/updateCotizacion",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function (response) {
-                const result = JSON.parse(response);
-                if (result.status == "success") {
-                    $("#modal-crear-cotizacion").modal("hide");
-                    tableCotizacion.ajax.reload();
-                    Swal.fire({
-                        icon: "success",
-                        title: "Correcto",
-                        text: result.message,
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: result.message,
-                    });
-                }
-            },
-        });
-    });
-    $("#btn-actualizar").click(function (e) {
-        e.preventDefault();
-        const formData = new FormData($("#form-crear")[0]);
-        formData.append("id", currentCarga);
-        //FORMAT DATES TO YYYY-MM-DD 
-
-        let form = $("#form-crear")[0];
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
-        }
+    $(".btn-back-documentacion").click(function () {
+        returnToSteps();
+    })
+    $("#btn-documentacion-zip").click(function () {
         spinner.show();
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/downloadDocumentacionZip/" + idContenedor;
         $.ajax({
-            url: base_url + "CargaConsolidada/ContenedorConsolidado/update",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
+            url: url,
+            type: "GET",
+            //data return multipart/form-data
+            xhrFields: {
+                responseType: 'blob'
+            },
             success: function (response) {
                 spinner.hide();
-                const result = JSON.parse(response);
-                if (result.status == 1) {
-                    $("#modal-crear").modal("hide");
-                    table_Entidad.ajax.reload();
-                    Swal.fire({
-                        icon: "success",
-                        title: "Correcto",
-                        text: result.message,
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: result.message,
-                    });
-                }
+                const url = window.URL.createObjectURL(new Blob([response]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'documentacion.zip');
+                document.body.appendChild(link);
+                link.click();
+
             },
+
         });
     });
-    $("#btn-buscar-carga").click(function (e) {
-        e.preventDefault();
-        table_Entidad.ajax.reload();
-    });
-    
-    $(".input-date").datepicker({
-        autoclose: true,
-        startDate: new Date(fYear, fToday.getMonth(), fDay),
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        dateFormat: "dd/mm/yyyy",
-    });
-    $("#modal-crear-cotizacion").on("hidden.bs.modal", function () {
-        $("#form-crear-cotizacion")[0].reset();
-    }
-    );
-    $("#modal-crear").on("hidden.bs.modal", function () {
-        $("#form-crear")[0].reset();
-    }
-    );
-    $("#btn-crear-documentacion").click(function (e) {
-        e.preventDefault();
-        //show swall with text crear un nuevo documento y un input text para el nombre y uno para el file
-        Swal.fire({
-            title: 'Crear documento',
-            html:
-                '<input id="swal-input1" class="swal2-input" placeholder="Nombre del documento">' +
-                '<input type="file" id="swal-input2" class="swal2-file">',
-            focusConfirm: false,
-            buttonConfirmText: 'Crear',
-            //COLOR BUTTONS
-            confirmButtonColor: '#e67e22',
-            showCancelButton: true,
-            preConfirm: () => {
-                const name = Swal.getPopup().querySelector('#swal-input1').value
-                const file = Swal.getPopup().querySelector('#swal-input2').files[0]
-                if (!name || !file) {
-                    Swal.showValidationMessage(`Por favor, complete todos los campos`)
-                }
-                return { name: name, file: file }
+        $("#btn-guardar-cotizacion").click(function (e) {
+            e.preventDefault();
+            const formData = new FormData($("#form-crear-cotizacion")[0]);
+            formData.append("id_contenedor", idContenedor);
+            let form = $("#form-crear-cotizacion")[0];
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append("name", result.value.name);
-                formData.append("file", result.value.file);
-                formData.append("id", idCotizacion);
-                $.ajax({
-                    url: base_url + "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
-                    type: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                        const result = JSON.parse(response);
-                        if (result.status == "success") {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Correcto",
-                                text: result.message,
-                            });
-                            viewClientesDocumentacion(idCotizacion);
-                        } else {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error",
-                                text: result.message,
-                            });
-                        }
-                    },
-                });
+            $.ajax({
+                url: base_url + "CargaConsolidada/ContenedorConsolidado/storeCotizacion",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        $("#modal-crear-cotizacion").modal("hide");
+                        tableCotizacion.ajax.reload();
+                        Swal.fire({
+                            icon: "success",
+                            title: "Correcto",
+                            text: result.message,
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: result.message,
+                        });
+                    }
+                },
+            });
+
+        });
+        $("#btn-actualizar-cotizacion").click(function (e) {
+            e.preventDefault();
+            const formData = new FormData($("#form-crear-cotizacion")[0]);
+            formData.append("id", idCotizacion);
+            let form = $("#form-crear-cotizacion")[0];
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
             }
+            $.ajax({
+                url: base_url + "CargaConsolidada/ContenedorConsolidado/updateCotizacion",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        $("#modal-crear-cotizacion").modal("hide");
+                        tableCotizacion.ajax.reload();
+                        Swal.fire({
+                            icon: "success",
+                            title: "Correcto",
+                            text: result.message,
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: result.message,
+                        });
+                    }
+                },
+            });
+        });
+        $("#btn-actualizar").click(function (e) {
+            e.preventDefault();
+            const formData = new FormData($("#form-crear")[0]);
+            formData.append("id", currentCarga);
+            //FORMAT DATES TO YYYY-MM-DD 
 
-        })
+            let form = $("#form-crear")[0];
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+            spinner.show();
+            $.ajax({
+                url: base_url + "CargaConsolidada/ContenedorConsolidado/update",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    spinner.hide();
+                    const result = JSON.parse(response);
+                    if (result.status == 1) {
+                        $("#modal-crear").modal("hide");
+                        table_Entidad.ajax.reload();
+                        Swal.fire({
+                            icon: "success",
+                            title: "Correcto",
+                            text: result.message,
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: result.message,
+                        });
+                    }
+                },
+            });
+        });
+        $("#btn-buscar-carga").click(function (e) {
+            e.preventDefault();
+            table_Entidad.ajax.reload();
+        });
 
-
-    });
-    $("#btn-guardar-documentacion").click(function (e) {
-        e.preventDefault();
-        const formData = new FormData($("#form-documentacion")[0]);
-        const check = $("#form-documentacion")[0].checkValidity();
-        if (!check) {
-            $("#form-documentacion")[0].classList.add('was-validated');
-            return;
+        $(".input-date").datepicker({
+            autoclose: true,
+            startDate: new Date(fYear, fToday.getMonth(), fDay),
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            dateFormat: "dd/mm/yyyy",
+        });
+        $("#modal-crear-cotizacion").on("hidden.bs.modal", function () {
+            $("#form-crear-cotizacion")[0].reset();
         }
-        formData.append("id", idCotizacion);
-        //f
-        $.ajax({
-            url: base_url + "CargaConsolidada/ContenedorConsolidado/updateClienteDocumentacion",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function (response) {
-                const result = JSON.parse(response);
-                if (result.status == "success") {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Correcto",
-                        text: result.message,
-                    });
-                    viewClientesDocumentacion(idCotizacion);
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: result.message,
+        );
+        $("#modal-crear").on("hidden.bs.modal", function () {
+            $("#form-crear")[0].reset();
+        }
+        );
+        $("#btn-crear-documentacion").click(function (e) {
+            e.preventDefault();
+            spinner.show(); 
+            Swal.fire({
+                title: 'Crear documento',
+                html:
+                    '<input id="swal-input1" class="swal2-input" placeholder="Nombre del documento">' +
+                    '<input type="file" id="swal-input2" class="swal2-file">',
+                focusConfirm: false,
+                buttonConfirmText: 'Crear',
+                //COLOR BUTTONS
+                confirmButtonColor: '#e67e22',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const name = Swal.getPopup().querySelector('#swal-input1').value
+                    const file = Swal.getPopup().querySelector('#swal-input2').files[0]
+                    if (!name || !file) {
+                        Swal.showValidationMessage(`Por favor, complete todos los campos`)
+                    }
+                    return { name: name, file: file }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append("name", result.value.name);
+                    formData.append("file", result.value.file);
+                    formData.append("id", idCotizacion);
+                    $.ajax({
+                        url: base_url + "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            spinner.hide();
+                            const result = JSON.parse(response);
+                            if (result.status == "success") {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Correcto",
+                                    text: result.message,
+                                });
+                                viewClientesDocumentacion(idCotizacion);
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: result.message,
+                                });
+                            }
+                        },
                     });
                 }
-            },
+
+            })
+
+
+        });
+        $("#btn-guardar-documentacion").click(function (e) {
+            e.preventDefault();
+            const formData = new FormData($("#form-documentacion")[0]);
+            const check = $("#form-documentacion")[0].checkValidity();
+            if (!check) {
+                $("#form-documentacion")[0].classList.add('was-validated');
+                return;
+            }
+            formData.append("id", idCotizacion);
+            //f
+            $.ajax({
+                url: base_url + "CargaConsolidada/ContenedorConsolidado/updateClienteDocumentacion",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Correcto",
+                            text: result.message,
+                        });
+                        viewClientesDocumentacion(idCotizacion);
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: result.message,
+                        });
+                    }
+                },
+            });
+        });
+        $("#btn-documentacion-new").click(function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Crear documento',
+                html:
+                    '<input id="swal-input1" class="swal2-input" placeholder="Nombre del documento">' +
+                    '<input type="file" id="swal-input2" class="swal2-file">',
+                focusConfirm: false,
+                buttonConfirmText: 'Crear',
+                //COLOR BUTTONS
+                confirmButtonColor: '#e67e22',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const name = Swal.getPopup().querySelector('#swal-input1').value
+                    const file = Swal.getPopup().querySelector('#swal-input2').files[0]
+                    if (!name || !file) {
+                        Swal.showValidationMessage(`Por favor, complete todos los campos`)
+                    }
+                    return { name: name, file: file }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    spinner.show();
+
+                    const formData = new FormData();
+                    formData.append("name", result.value.name);
+                    formData.append("file", result.value.file);
+                    formData.append("idContenedor", idContenedor);
+                    $.ajax({
+                        url: base_url + "CargaConsolidada/ContenedorConsolidado/createDocumentacionFolder",
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            spinner.hide();
+                            const result = JSON.parse(response);
+                            if (result.status == "success") {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Correcto",
+                                    text: result.message,
+                                });
+                                viewDocumentacion();
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: result.message,
+                                });
+                            }
+                        },
+                    });
+                }
+            })
+        });
+        $("#btn-buscar-clientes-general").click(function (e) {
+            e.preventDefault();
+            console.log("click");
+            tableClientesGeneral.ajax.reload();
         });
     });
-    $("#btn-buscar-clientes-general").click(function (e) {
-        e.preventDefault();
-        console.log("click");   
-        tableClientesGeneral.ajax.reload();
-    });
-});
-window.addEventListener('load', () => {
-    socket.onmessage = function (event) {
-        console.log(event);
-        const { message, role, action } = JSON.parse(event.data)
-        // Aquí puedes manejar los mensajes recibidos del servidor
-        try {
-            let text = "";
-            if (action == "new-container") {
-                //confirm swall
-                text = "El coordinador registro un nuevo contenedo";
-                //check if mainContainer is visible
-                if (mainContainer.is(":visible")) {
-                    text += "¿Desea actualizar?"
-                    Swal.fire({
-                        title: 'Nuevo contenedor',
-                        text: text,
-                        icon: 'info',
-                        showCancelButton: true,
-                        confirmButtonText: 'Si',
-                        cancelButtonText: 'Cerrar',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            table_Entidad.ajax.reload();
-                        }
-                    })
-                } else {
-                    //show alert swall
-                    Swal.fire({
-                        title: 'Nuevo contenedor',
-                        text: text,
-                        icon: 'info',
-                        confirmButtonText: 'Cerrar',
-                    })
+    window.addEventListener('load', () => {
+        socket.onmessage = function (event) {
+            console.log(event);
+            const { message, role, action } = JSON.parse(event.data)
+            // Aquí puedes manejar los mensajes recibidos del servidor
+            try {
+                let text = "";
+                if (action == "new-container") {
+                    //confirm swall
+                    text = "El coordinador registro un nuevo contenedo";
+                    //check if mainContainer is visible
+                    if (mainContainer.is(":visible")) {
+                        text += "¿Desea actualizar?"
+                        Swal.fire({
+                            title: 'Nuevo contenedor',
+                            text: text,
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonText: 'Si',
+                            cancelButtonText: 'Cerrar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                table_Entidad.ajax.reload();
+                            }
+                        })
+                    } else {
+                        //show alert swall
+                        Swal.fire({
+                            title: 'Nuevo contenedor',
+                            text: text,
+                            icon: 'info',
+                            confirmButtonText: 'Cerrar',
+                        })
+                    }
+                }
+                if (action == "new-cotizacion") {
+                    //confirm swall
+                    text = "El coordinador registro un nuevo prospecto";
+                    //check if mainContainer is visible
+                    if (cotizacionContainer.is(":visible")) {
+                        text += "¿Desea actualizar?"
+                        Swal.fire({
+                            title: 'Nueva cotización',
+                            text: text,
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonText: 'Si',
+                            cancelButtonText: 'Cerrar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                tableCotizacion.ajax.reload();
+                            }
+                        })
+                    } else {
+                        //show alert swall
+                        Swal.fire({
+                            title: 'Nueva cotización',
+                            text: text,
+                            icon: 'info',
+                            confirmButtonText: 'Cerrar',
+                        })
+                    }
                 }
             }
-            if (action == "new-cotizacion") {
-                //confirm swall
-                text = "El coordinador registro un nuevo prospecto";
-                //check if mainContainer is visible
-                if (cotizacionContainer.is(":visible")) {
-                    text += "¿Desea actualizar?"
-                    Swal.fire({
-                        title: 'Nueva cotización',
-                        text: text,
-                        icon: 'info',
-                        showCancelButton: true,
-                        confirmButtonText: 'Si',
-                        cancelButtonText: 'Cerrar',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            tableCotizacion.ajax.reload();
-                        }
-                    })
-                } else {
-                    //show alert swall
-                    Swal.fire({
-                        title: 'Nueva cotización',
-                        text: text,
-                        icon: 'info',
-                        confirmButtonText: 'Cerrar',
-                    })
-                }
+            catch (e) {
+                console.log(e);
             }
-        }
-        catch (e) {
-            console.log(e);
-        }
 
-    };
-});
+        };
+    });
