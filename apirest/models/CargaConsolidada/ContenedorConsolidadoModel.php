@@ -630,8 +630,7 @@ class ContenedorConsolidadoModel extends CI_Model{
                 // Extraer la parte de la ruta después de probusinees-intranet/
                 $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $folder->file_url);
                 // Construir la ruta local completa
-                $fullPath = FCPATH . $filePath;
-                
+                $fullPath = FCPATH . ltrim($filePath, '/');
                 if (file_exists($fullPath)) {
                     // Usar el nombre del archivo original para el zip
                     $fileName = basename($folder->file_url);
