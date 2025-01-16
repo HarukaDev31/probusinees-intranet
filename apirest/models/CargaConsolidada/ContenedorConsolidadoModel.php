@@ -629,7 +629,8 @@ class ContenedorConsolidadoModel extends CI_Model{
             foreach($folders as $folder) {
                 // Extraer la parte de la ruta después de probusinees-intranet/
                 $filePath = preg_replace('/.*probusinees-intranet\//', '', $folder->file_url);
-                
+                $filePath = preg_replace('/.*intranet.probusiness.pe\//', '', $folder->file_url);
+
                 // Construir la ruta local completa
                 $fullPath = FCPATH . $filePath;
                 
