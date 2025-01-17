@@ -425,8 +425,9 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function downloadDocumentacionZip($idContenedor){
 		$zipFilePath = $this->ContenedorConsolidadoModel->downloadDocumentacionZip($idContenedor);
-		echo $zipFilePath;
 		if (file_exists($zipFilePath)) {
+			ob_end_clean();
+
 			header('Content-Type: application/zip');
 			header('Content-Disposition: attachment; filename="' . basename($zipFilePath) . '"');
 			header('Content-Length: ' . filesize($zipFilePath));
@@ -440,6 +441,25 @@ class ContenedorConsolidado extends CI_Controller {
 		echo json_encode([
 			"status" => $arrResponse
 		]);
+	}
+	public function downloadFacturaComercial($idContenedor){
+		try{
+			$objExcel = $this->ContenedorConsolidadoModel->downloadFacturaComercial($idContenedor);
+			//CHECK IF $objExcel is an array
+			
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="Factura_Comercial.xlsx"');
+		header('Cache-Control: max-age=0');
+		$objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
+		$objWriter->save('php://output');
+		}catch(Exception $e){
+			echo json_encode([
+				"status" => false,
+				"message" => $e->getMessage()
+			]);
+		}
+
+		
 	}
 	function convertDateFormat($date) {
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);

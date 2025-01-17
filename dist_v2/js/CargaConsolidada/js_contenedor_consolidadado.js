@@ -1537,6 +1537,55 @@ $(document).ready(async function () {
                 },
             });
         });
+        $("#btn-documentacion-factura").click(async function (e) {
+            e.preventDefault();
+            spinner.show();
+            url=base_url + "CargaConsolidada/ContenedorConsolidado/downloadFacturaComercial/" + idContenedor;
+            let isError=true;
+            await $.ajax({
+                url: url,
+                type: "GET",
+                //data return multipart/form-data
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (response) {
+                    isError=false;
+
+                    spinner.hide();
+                    //check if response is a file
+                    const url = window.URL.createObjectURL(new Blob([response]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', 'factura_comercial.xlsx');
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                },
+                error: function (response) {
+                    isError=true;
+                    spinner.hide();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "No se pudo descargar la factura comercial",
+                    });
+                }
+            
+
+            });
+            spinner.hide();
+            if(isError){
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "No se pudo descargar la factura General",
+                });
+            }
+
+        });
+                    
+
         $("#btn-documentacion-new").click(function (e) {
             e.preventDefault();
             Swal.fire({
