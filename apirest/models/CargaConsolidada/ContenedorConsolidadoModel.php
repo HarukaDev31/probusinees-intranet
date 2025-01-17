@@ -77,6 +77,9 @@ class ContenedorConsolidadoModel extends CI_Model{
     }
     public function delete($id){
         //select all from table  $table_contenedor_cotizacion
+        //set foreign key check to 0 and delete all files in folder and delete folder
+        $this->db->query('SET FOREIGN_KEY_CHECKS = 0');
+
         $this->db->where('id_contenedor', $id);
         $this->db->delete($this->table_contenedor_cotizacion);
         //select all from table  $table_contenedor_steps
@@ -84,6 +87,8 @@ class ContenedorConsolidadoModel extends CI_Model{
         $this->db->delete($this->table_contenedor_steps);
         $this->db->where('id', $id);
         $this->db->delete($this->table);
+        $this->db->query('SET FOREIGN_KEY_CHECKS = 1');
+
         if($this->db->affected_rows() > 0){
             return true;
         }
@@ -151,7 +156,7 @@ class ContenedorConsolidadoModel extends CI_Model{
             $documento = $sheet->getCell('B9')->getValue();
             $correo = $sheet->getCell('B10')->getValue();
             $telefono = $sheet->getCell('B11')->getValue();
-            $volumen = $sheet->getCell('I11')->getValue(); 
+            $volumen = $sheet->getCell('I11')->getCalculatedValue(); 
             $valorCot=$sheet->getCell('J14')->getCalculatedValue();
             //get calculated value from cell e9
             $fecha = $sheet->getCell('E9')->getValue(); 
