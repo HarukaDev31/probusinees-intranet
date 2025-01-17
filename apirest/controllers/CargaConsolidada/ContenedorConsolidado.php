@@ -186,7 +186,6 @@ class ContenedorConsolidado extends CI_Controller {
 				}
 				$subdata[] = $selectEstado;
 				$divAcciones='<div>
-				<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="viewCotizacion('.$row->id_cotizacion.')"></i>
 				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id_cotizacion.')"></i>
 				</div>';
 				$subdata[] = $divAcciones;
