@@ -570,6 +570,9 @@ class ContenedorConsolidadoModel extends CI_Model{
                 "size" => $file['size']
             ]
             , 'assets/images/agentecompra/');
+        //find if exists file in table contenedor_consolidado_documentacion_files where id_folder=$idFolder and id_contenedor=$idContenedor
+        //if exists delete
+        $this->db->delete($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'id_contenedor' => $idContenedor]);
         $this->db->insert($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'file_url' => $fileUrl,
         'id_contenedor' => $idContenedor]);
         if($this->db->affected_rows() > 0){
