@@ -889,8 +889,8 @@ class ContenedorConsolidadoModel extends CI_Model{
                                 // Si cambia el cliente, fusionar las celdas desde el inicio hasta la última fila del bloque actual
                                 $sheet->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
                                 $sheet->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                                $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                                $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
+                                // $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
+                                // $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
                                 $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
                                 $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
                                 $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
@@ -956,8 +956,8 @@ class ContenedorConsolidadoModel extends CI_Model{
                             if ($nameActual !== "") {
                                 $sheet0->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
                                 $sheet0->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                                $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                                $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
+                                // $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
+                                // $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
                                 $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
                                 $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
                                 $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);

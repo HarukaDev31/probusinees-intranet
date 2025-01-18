@@ -1557,7 +1557,7 @@ $(document).ready(async function () {
                     const url = window.URL.createObjectURL(new Blob([response]));
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', 'factura_comercial.xlsx');
+                    link.setAttribute('download', 'FACTURA_GENERAL.xlsx');
                     document.body.appendChild(link);
                     link.click();
                     
