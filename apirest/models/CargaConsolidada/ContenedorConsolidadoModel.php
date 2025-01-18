@@ -554,7 +554,7 @@ class ContenedorConsolidadoModel extends CI_Model{
             ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id 
             and files.id_contenedor = '.$id, 'left')
             ->where('main.id_contenedor', $id)
-            ->or_where('main.id_contenedor', null);
+            ->or_where('main.id_contenedor', null)
             ->where('main.id_contenedor', $id);
         $query = $this->db->get();
         return $query->result();
