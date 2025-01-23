@@ -445,6 +445,8 @@ class ContenedorConsolidadoModel extends CI_Model{
         return false;
     }
     public function deleteCotizacion($id){
+        //set foreign key check to 0 and delete all files in folder and delete folder
+        $this->db->query('SET FOREIGN_KEY_CHECKS = 0');
         $this->db->select('cotizacion_file_url')
         ->from($this->table_contenedor_cotizacion)
         ->where('id', $id);
@@ -456,6 +458,14 @@ class ContenedorConsolidadoModel extends CI_Model{
         if($this->db->affected_rows() > 0){
             return "success";
         }
+        //check if db error exists
+        if($this->db->error()['code']!=0){
+            return [
+                'status' => "error",
+                'message' => $this->db->error()['message']
+            ];
+        }
+        $this->db->query('SET FOREIGN_KEY_CHECKS = 1');
         return false;
     }
     public function uploadCotizacionFile($id,$file){
@@ -1579,6 +1589,13 @@ class ContenedorConsolidadoModel extends CI_Model{
         //validate if exists db error
        
         return ['status' => "success",'error'=>false,"data"=>$filesArray];
+    }
+    public function verCotizacionEmbarqueFiles($idProveedor){
+        $this->db->select('*')
+        ->from($this->table_contenedor_cotizacion_proveedores_documentacion)
+        ->where('id_proveedor', $idProveedor);
+        $query = $this->db->get();
+        return $query->result();
     }
     public function deleteFile($idFile){
         $this->db->where('id', $idFile);

@@ -74,6 +74,9 @@ var clientesDocumentacionContainer = null;
 var documentationContainer = null;
 var idCotizacion = 0;
 var cotizacionInspectionContainer = null;
+var dropZone ;
+var fileInput ; 
+var fileList ;
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
@@ -130,21 +133,28 @@ async function verCotizacionEmbarque(idProveedor){
     cotizacionInspectionContainer.show();
     currentProveedor=idProveedor;
      // Función para inicializar la lista al cargar la página
-   
-        $.ajax({
-            url: '/api/files', // Cambia a la URL de tu backend para obtener los archivos
-            method: 'GET',
-            success: function (data) {
-                fileList.empty();
-                data.forEach(file => {
-                    addFileToList(file);
-                });
-            },
-            error: function () {
-                alert('Error al cargar los archivos.');
-            }
-        });
-  
+     spinner.show();
+     url=base_url+"CargaConsolidada/ContenedorConsolidado/verCotizacionEmbarqueFiles/"+idProveedor;
+        try{
+            $.ajax({
+                url: url, // Cambia a la URL de tu backend para obtener los archivos
+                method: 'GET',
+                success: function (data) {
+                    fileList.empty();
+                    const dataParsed=JSON.parse(data);
+                    dataParsed.forEach(file => {
+                        addFileToList(file);
+                    });
+                },
+                error: function () {
+                    alert('Error al cargar los archivos.');
+                }
+            });
+        }catch(e){
+            console.error(e);
+            spinner.hide();
+        }
+        spinner.hide();
     // Función para agregar un archivo a la lista con vista previa y botones
   
 
@@ -1551,7 +1561,11 @@ $(document).ready(async function () {
     documentationContainer.hide();
     cotizacionInspectionContainer=$("#cotizacion-almacen-inspeccion");
     cotizacionInspectionContainer.hide();
+     dropZone = $('#drop-zone');
+         fileInput = $('#file-input');
+         fileList = $('#file-list');
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
+ 
     table_Entidad = $("#table-contenedor").DataTable({
         dom:
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -1763,7 +1777,7 @@ $(document).ready(async function () {
     // function initDropZone(dropZoneId, inputId, fileListId) {
     //     const dropZone = $(`#${dropZoneId}`);
     //     const fileInput = $(`#${inputId}`);
-    //     const fileList = $(`#${fileListId}`);
+    //     
 
     //     // Maneja el evento de clic
     //     dropZone.on('click', function () {

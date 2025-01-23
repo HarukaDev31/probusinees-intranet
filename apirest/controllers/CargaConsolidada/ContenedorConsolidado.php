@@ -681,6 +681,10 @@ class ContenedorConsolidado extends CI_Controller {
 			"status" => $arrResponse
 		]);
 	}
+	public function verCotizacionEmbarqueFiles($idProveedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->verCotizacionEmbarqueFiles($idProveedor);
+		echo json_encode($arrResponse);
+	}
 	function convertDateFormat($date) {
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);
 		return $dateObject ? $dateObject->format('Y-m-d') : null; // Devuelve null si la fecha no es válida
