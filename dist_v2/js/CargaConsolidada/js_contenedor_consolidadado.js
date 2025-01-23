@@ -9,6 +9,7 @@ var fToday = new Date();
 var fYear = fToday.getFullYear();
 var fDay = fToday.getDate();
 var currentCarga = 0;
+var currentProveedor=0;
 var meses = [
     {
         "id": "ENERO",
@@ -72,6 +73,7 @@ var tableClientesVariacion = null;
 var clientesDocumentacionContainer = null;
 var documentationContainer = null;
 var idCotizacion = 0;
+var cotizacionInspectionContainer = null;
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
@@ -92,6 +94,13 @@ async function updateEstado(id) {
             table_Entidad.ajax.reload();
         },
     });
+}
+async function verCotizacionEmbarque(idProveedor){
+    //hide table cotizacion embarque
+    cotizacionContainer.hide();
+    cotizacionInspectionContainer.show();
+    currentProveedor=idProveedor;
+
 }
 async function updateEstadoCotizacion(id) {
     //get select value
@@ -308,8 +317,32 @@ async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor){
                 link.click();
             },
         });
-        spinner.hide();
+    }else{
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                idCotizacion: idCotizacion,
+                idProveedor:idProveedor,
+                estado: estado
+            },
+            //blob
+           
+            success: function (response) {
+                //manage blob
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                }
+                else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+            },
+        });
     }
+    spinner.hide();
+
     
 }
 async function view(id) {
@@ -1469,6 +1502,8 @@ $(document).ready(async function () {
     clientesDocumentacionContainer.hide();
     documentationContainer = $("#documentation-container");
     documentationContainer.hide();
+    cotizacionInspectionContainer=$("#cotizacion-almacen-inspeccion");
+    cotizacionInspectionContainer.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     table_Entidad = $("#table-contenedor").DataTable({
         dom:
@@ -1557,6 +1592,203 @@ $(document).ready(async function () {
             [10, 100, 1000, "Todos"],
         ],
     });
+    $("#upload-documents").click(() => $("#upload-input-documents").click());
+    $("#upload-inspection").click(() => $("#upload-input-inspection").click());
+
+    // Listeners para subir archivos
+    $("#upload-input-documents").change(function () {
+        handleFileUpload(this.files, "documents");
+    });
+
+    $("#upload-input-inspection").change(function () {
+        handleFileUpload(this.files, "inspection");
+    });
+
+    // Función para manejar la subida de archivos
+    function handleFileUpload(files, section) {
+        const formData = new FormData();
+        formData.append('idProveedor', currentProveedor);
+        url=base_url + "CargaConsolidada/ContenedorConsolidado/uploadFileInspection";
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append("files[]", files[i]);
+        }
+
+        $.ajax({
+            url, // Ruta del backend
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                const data = JSON.parse(response);
+                if (data.status === "success") {
+                    addFilesToView(data.files, section);
+                } else {
+                    alert("Error uploading files: " + data.message);
+                }
+            },
+            error: function () {
+                alert("An error occurred while uploading files.");
+            },
+        });
+    }
+
+    // Función para agregar archivos a la vista
+    function addFilesToView(files, section) {
+        const container = section === "documents" ? $("#documents") : $("#inspection");
+
+        files.forEach((file) => {
+            const isImage = file.file_ext.match(/image\//); // Verificar si es una imagen
+
+            const card = $(`
+                <div class="file-card">
+                    ${
+                        isImage
+                            ? `<img src="${file.file_url}" alt="${file.file_name}">`
+                            : `<div class="file-placeholder"><i class="bi bi-file-earmark"></i></div>`
+                    }
+                    <div class="file-name">${file.file_name}</div>
+                    <div class="actions">
+                        <button class="btn btn-sm btn-primary download-btn" data-url="${file.file_url}">Download</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${file.id}">Delete</button>
+                    </div>
+                </div>
+            `);
+
+            container.append(card);
+
+            // Descargar archivo
+            card.find(".download-btn").click(function () {
+                const fileUrl = $(this).data("url");
+                window.open(fileUrl, "_blank");
+            });
+
+            // Eliminar archivo
+            card.find(".delete-btn").click(function () {
+                const fileId = $(this).data("id");
+                deleteFile(fileId, card);
+            });
+        });
+    }
+
+    // Función para eliminar archivos
+    function deleteFile(fileId, cardElement) {
+        $.ajax({
+            url: `/delete_file/${fileId}`, // Ruta del backend para eliminar archivos
+            type: "DELETE",
+            success: function (response) {
+                const data = JSON.parse(response);
+                if (data.status === "success") {
+                    cardElement.remove();
+                } else {
+                    alert("Error deleting file: " + data.message);
+                }
+            },
+            error: function () {
+                alert("An error occurred while deleting the file.");
+            },
+        });
+    }
+
+    // Función para manejar Drag & Drop
+    $(".drop-zone").on("dragover", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass("dragging");
+    });
+
+    $(".drop-zone").on("dragleave", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass("dragging");
+    });
+
+    $(".drop-zone").on("drop", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass("dragging");
+
+        const files = e.originalEvent.dataTransfer.files;
+        const section = $(this).closest("#documents").length > 0 ? "documents" : "inspection";
+        handleFileUpload(files, section);
+    });
+    // function initDropZone(dropZoneId, inputId, fileListId) {
+    //     const dropZone = $(`#${dropZoneId}`);
+    //     const fileInput = $(`#${inputId}`);
+    //     const fileList = $(`#${fileListId}`);
+
+    //     // Maneja el evento de clic
+    //     dropZone.on('click', function () {
+    //         fileInput.click();
+    //     });
+
+    //     // Maneja el cambio del input de archivos
+    //     fileInput.on('change', function (event) {
+    //         handleFiles(event.target.files, fileList);
+    //     });
+
+    //     // Maneja arrastrar y soltar
+    //     dropZone.on('dragover', function (event) {
+    //         event.preventDefault();
+    //         dropZone.addClass('dragover');
+    //     });
+
+    //     dropZone.on('dragleave', function () {
+    //         dropZone.removeClass('dragover');
+    //     });
+
+    //     dropZone.on('drop', function (event) {
+    //         event.preventDefault();
+    //         dropZone.removeClass('dragover');
+    //         const files = event.originalEvent.dataTransfer.files;
+    //         handleFiles(files, fileList);
+    //     });
+
+    //     // Maneja los archivos subidos
+    //     function handleFiles(files, fileList) {
+    //         const uploadedFiles = Array.from(files);
+    //         uploadedFiles.forEach(file => {
+    //             const listItem = $('<div>')
+    //                 .addClass('file-list-item text-secondary')
+    //                 .text(file.name);
+    //             fileList.append(listItem);
+    //         });
+
+    //         // Realiza la subida con AJAX
+    //         uploadFiles(uploadedFiles);
+    //     }
+
+    //     // Función para subir archivos con AJAX
+    //     function uploadFiles(files) {
+    //         const formData = new FormData();
+    //         formData.append('idProveedor', idProveedor);
+    //         files.forEach(file => {
+    //             formData.append('files[]', file); // Asegúrate de usar el nombre esperado por tu backend
+    //         });
+    //         url=base_url + "CargaConsolidada/ContenedorConsolidado/uploadFileInspection";
+    //         $.ajax({
+    //             url,
+    //             type: 'POST',
+    //             data: formData,
+    //             processData: false,
+    //             contentType: false,
+    //             success: function (response) {
+    //                 console.log('Archivos subidos con éxito:', response);
+    //             },
+    //             error: function (error) {
+    //                 console.error('Error al subir archivos:', error);
+    //             }
+    //         });
+    //     }
+    // }
+
+    // // Inicializa las zonas para Documents y Inspection
+    // initDropZone('documents-dropzone', 'documents-input', 'documents-list');
+    // initDropZone('inspection-dropzone', 'inspection-input', 'inspection-list');
+    
+
+
     const fillSelects = async () => {
         $("#txt-ID_Pais").empty();
         $("#txt-Mes").empty();

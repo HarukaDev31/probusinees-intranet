@@ -210,6 +210,7 @@ class ContenedorConsolidado extends CI_Controller {
 				$divInputCBMChina="";
 				$divInputArriveDateChina="";
 				$divProductos="";
+				$divViewBtn="";
 				foreach ($proveedores as $proveedor) {
 					if($this->user->No_Grupo=="ContenedorAlmacen"){
 						$proveedoresSelect.='<select class="form-control" id="estado-'.$proveedor->id_proveedor.'" name="estado" onchange="updateEstadoProveedor('.$proveedor->id_proveedor.')">
@@ -291,17 +292,18 @@ class ContenedorConsolidado extends CI_Controller {
 					$divProductos.='<div class="d-flex flex-row gap-2">
 				<textarea type="text" class="form-control" id="productos-'.$proveedor->id_proveedor.'" name="productos" value="'.$proveedor->products.'">
 				</textarea>
-				<button class="btn btn-primary" onclick="updateProductos('.$proveedor->id_proveedor.')">
+				<button class="btn btn-primary" onclick="updateProductos('.$proveedor->proveedor.')">
 				<i class="fas fa-save"></i>
 				</button>
+				</div>';
+				$divViewBtn.='<div>
+				<i class="fas fa-eye" style="cursor:pointer;" onclick="verCotizacionEmbarque('.$proveedor->id_proveedor.')"></i>
 				</div>';
 				}
 				//input productos with with button to save text in input and call function to save
 				
 				//div view with fa eye icon call function verCotizacionEmbarque
-				$btnView='<div>
-				<i class="fas fa-eye" style="cursor:pointer;" onclick="verCotizacionEmbarque('.$row->id_cotizacion.')"></i>
-				</div>';
+			
 				$subdata[]=$proveedoresSelect;
 				$subdata[]=$index;
 				$subdata[]=$row->nombre;
@@ -317,7 +319,7 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[]=$divInputQtyChina;
 				$subdata[]=$divInputCBMChina;
 				$subdata[]=$divInputArriveDateChina;
-				$subdata[]=$btnView;
+				$subdata[]=$divViewBtn;
 				$data[] = $subdata;
 
 			}
@@ -653,6 +655,24 @@ class ContenedorConsolidado extends CI_Controller {
 		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoProveedor($idProveedor,$estado);
 		echo json_encode([
 			"status" => $arrResponse
+		]);
+	}
+	public function uploadFileInspection(){
+		$idProveedor=$this->input->post('idProveedor');
+		//files file[] array
+		$files = $_FILES;
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadFileInspection($idProveedor,$files);
+		if($arrResponse){
+			echo json_encode([
+				"status" => $arrResponse['status'],
+				"data" => $arrResponse['data'],
+				'error' => $arrResponse['error']
+			]);
+			return;
+		}
+		echo json_encode([
+			"status" => $arrResponse['status'],
+			"error" => $arrResponse['error']
 		]);
 	}
 	function convertDateFormat($date) {

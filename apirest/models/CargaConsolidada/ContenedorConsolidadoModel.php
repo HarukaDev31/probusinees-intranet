@@ -23,6 +23,7 @@ class ContenedorConsolidadoModel extends CI_Model{
     private $roleCoordinacion="Coordinación";
     private $aNewContainer="new-container";
     private $aNewCotizacion="new-cotizacion";
+    private $table_contenedor_cotizacion_proveedores_documentacion="contenedor_consolidado_proveedores_documentacion";
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
 	public function __construct(){
 		parent::__construct();
@@ -1381,7 +1382,6 @@ class ContenedorConsolidadoModel extends CI_Model{
        
         if($this->db->affected_rows() > 0){
             $data=$this->handlerUpdateCotizacionProveedor($estado,$idProveedor,$idCotizacion);
-            return $data;
             return "success";
         }
         return false;
@@ -1453,8 +1453,21 @@ class ContenedorConsolidadoModel extends CI_Model{
              $dompdf->loadHtml($htmlContent);
              $dompdf->setPaper('A4', 'portrait');
              $dompdf->render();
-             $output = $dompdf->output();
+             $pdfContent = $dompdf->output();
+             $tempFilePath = sys_get_temp_dir() . '/temp_document.pdf';
+                file_put_contents($tempFilePath, $pdfContent);
 
+                try {
+                    $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
+                    $sendRotulado = $this->sendRotulado($mediaId, $supplierCode);
+                } catch (Exception $e) {
+                    echo 'Error: ' . $e->getMessage();
+                } finally {
+                    // Eliminar el archivo temporal
+                    if (file_exists($tempFilePath)) {
+                        unlink($tempFilePath);
+                    }
+}
             // $ruta = 'assets/downloads/Rotulado.pdf';
             // $fileUrl= file_put_contents($ruta, $output);
             // $fileUrl=base_url($ruta);
@@ -1463,11 +1476,12 @@ class ContenedorConsolidadoModel extends CI_Model{
             //     $response=$this->sendRotulado($fileUrl,"waos");
                 
             
-             $dompdf->stream('Cotizacion.pdf', ["Attachment" => 0]);
+            $dompdf->stream('Cotizacion.pdf', ["Attachment" => 0]);
            }catch(Exception $e){
                echo $e->getMessage();
            }
         }
+        return true;
     }
     public function updateTelefonoProveedor($idProveedor,$telefono){
         $this->db->where('id', $idProveedor);
@@ -1528,6 +1542,47 @@ class ContenedorConsolidadoModel extends CI_Model{
             return "success";
         }
         return false;
+    }
+    public function uploadFileInspection($idProveedor,$files){
+        $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+     
+        $index=0;
+        $filesArray=[];
+        foreach ($files as $file) {
+            $fileToUp=  [
+                "name" => $file['name'][$index],
+                "type" => $file['type'][$index],
+                "tmp_name" => $file['tmp_name'][$index],
+                "error" => $file['error'][$index],
+                "size" => $file['size'][$index]
+            ];
+            $fileUrl= $this->uploadSingleFile(
+                $fileToUp
+                , 'assets/images/agentecompra/');
+            if($fileUrl){
+                $this->db->insert($this->table_contenedor_cotizacion_proveedores_documentacion, 
+                ['id_proveedor' => $idProveedor, 'file_url' => $fileUrl,'file_name'=>$file['name'][$index],
+                'file_ext'=>$file['type'][$index]]);
+                if($this->db->affected_rows() > 0){
+                    $fileToReturn=[
+                        'id'=>$this->db->insert_id(),
+                        'file_url'=>$fileUrl,
+                        'file_name'=>$file['name'][$index],
+                        'file_ext'=>$file['type'][$index]
+                    ];
+                    $filesArray[]=$fileToReturn;
+                }
+            }
+            echo json_encode($filesArray);
+            $index++;
+        }
+       
+        //validate if exists db error
+        if($this->db->error()){
+            return ['status' => "error",'error'=>$this->db->error()];
+        }
+        return ['status' => "success",'error'=>false,"data"=>$filesArray];
     }
     
       

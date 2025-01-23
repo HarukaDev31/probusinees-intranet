@@ -308,7 +308,35 @@
         </div>
       </div>          
     </section>
+    <section class="content" id="cotizacion-almacen-inspeccion">
+    <div class="row">
+        <div class="col-md-6">
+            <h5>DOCUMENTS</h5>
+            <div id="documents" class="border p-3">
+                <div class="drop-zone">
+                    <span>Drag & Drop files here or <button id="upload-documents" class="btn btn-link p-0">Browse</button></span>
+                    <input type="file" id="upload-input-documents" multiple hidden>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h5>NOTES</h5>
+            <textarea id="notes" class="form-control" rows="5" placeholder="Enter notes here..."></textarea>
+        </div>
+    </div>
 
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h5>INSPECTION</h5>
+            <div id="inspection" class="border p-3">
+                <div class="drop-zone">
+                    <span>Drag & Drop files here or <button id="upload-inspection" class="btn btn-link p-0">Browse</button></span>
+                    <input type="file" id="upload-input-inspection" multiple hidden>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
     <section id="steps" class="content">
       <div id="steps-container">
       </div>
@@ -596,5 +624,56 @@ input[type="number"]::-webkit-outer-spin-button {
 }.delete-folder-button:hover{
   cursor: pointer;
 }
+.drop-zone {
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
+.drop-zone.dragging {
+    background-color: #e0f7fa;
+}
+
+.file-card {
+    display: inline-block;
+    width: 150px;
+    height: 180px;
+    margin: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.file-card img {
+    max-width: 100%;
+    height: 100px;
+    object-fit: cover;
+}
+
+.file-card .file-name {
+    padding: 5px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.file-card .actions {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.file-card .actions button {
+    font-size: 12px;
+}
 </style>
