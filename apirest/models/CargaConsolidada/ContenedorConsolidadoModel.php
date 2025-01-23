@@ -1463,8 +1463,8 @@ class ContenedorConsolidadoModel extends CI_Model{
              $dompdf->setPaper('A4', 'portrait');
              $dompdf->render();
              $pdfContent = $dompdf->output();
-             $tempFilePath = sys_get_temp_dir() . '/temp_document.pdf';
-                file_put_contents($tempFilePath, $pdfContent);
+             $tempFilePath = base_url() . '/temp_document.pdf';
+             file_put_contents($tempFilePath, $pdfContent);
 
                 try {
                     $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
