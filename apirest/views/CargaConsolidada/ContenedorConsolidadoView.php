@@ -93,7 +93,7 @@
                 </div>
         </div>
         <div class="table-responsive">
-          <table id="table-cotizacion" class="table table-bordered table-hover table-striped">
+          <table id="table-cotizacion-prospectos" class="table table-bordered table-hover table-striped">
             <thead class="thead-light">
               <tr>
                 <th>N°</th>
@@ -104,13 +104,65 @@
                 <th>Whatsapp</th>
                 <th>T. Cliente</th>
                 <th>Volumen</th>
+                <th>Monto</th>
+                <th>Tarifa</th>
                 <th>Cotizacion</th>
-                <th>Estado</th>
                 <?php if($this->user->No_Grupo=="Coordinación"){  ?>
 
                 <th>Acciones
                 </th>
                 <?php } ?>
+              </tr>
+            </thead>
+          </table>
+          <table id="table-cotizacion-embarque" class="table table-bordered table-hover table-striped">
+            <thead class="thead-light">
+              <tr>
+                <th>Asesor</th>
+                <th>Status</th>
+                <th>N.</th>
+                <th>Buyer</th>
+                <th>Whatsapp</th>
+                <th
+                style="min-width: 10em;"
+
+                >Estado</th>
+                <th
+                style="min-width: 20em;"
+                >Productos</th>
+                <th
+                style="min-width: 5em;"
+
+                >Qty Box.</th>
+                <th
+                style="min-width: 5em;"
+                >CBM Total</th>
+                <th
+                style="min-width: 5em;"
+
+                >Weight</th>
+                <th
+                style="min-width: 10em;"
+
+                >Supplier</th>
+                <th
+                style="min-width: 10em;"
+
+                >Code Supplier</th>
+                <th 
+                style="min-width: 10em;"
+                >Phone Number</th>
+                <th 
+                style="min-width: 5em;"
+                >Qty Box.</th>
+                <th 
+                style="min-width: 5em;"
+                >CBM China </th>
+                <th 
+                style="min-width: 5em;"
+                >Arrive Date </th>
+                <th>Ver </th>
+
               </tr>
             </thead>
           </table>

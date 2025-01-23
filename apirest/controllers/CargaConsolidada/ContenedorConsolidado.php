@@ -140,11 +140,21 @@ class ContenedorConsolidado extends CI_Controller {
 	public function step(){
 		$stepIndex=$this->input->post('stepIndex');
 		$idContenedor=$this->input->post('idContenedor');
+		$tipoTabla=$this->input->post('tipoTabla');
+
 		if($stepIndex==1){
-			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
-			$data= array();
+			$arrResponse=[];
+			if($tipoTabla=="prospectos"){
+				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
+			}else{
+				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
+
+			}
+			$data = array();
 			$index=1;
 			foreach ($arrResponse as $row) {
+				if($tipoTabla=="prospectos"){
+
 				$subdata = array();
 				$subdata[] = $index;
 				$subdata[] = date("d/m/Y", strtotime($row->fecha));
@@ -166,30 +176,151 @@ class ContenedorConsolidado extends CI_Controller {
 					$divFile .= '
 						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFile(' . $row->id_cotizacion . ')"></i>';
 				}
+				$subdata[] = $row->monto;
+				$subdata[] = $row->tarifa;
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
-				if($this->user->No_Grupo=="Coordinación"){
-				$selectEstado='<select class="form-control" id="estado-cotizacion-'.$row->id_cotizacion.'" name="estado" onchange="updateEstadoCotizacion('.$row->id_cotizacion.')">
-					<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
-					<option value="CONFIRMADO" '.($row->estado=="CONFIRMADO" ? "selected" : "").'>CONFIRMADO</option>
-					<option value="DECLINADO" '.($row->estado=="DECLINADO" ? "selected" : "").'>DECLINADO</option>
-				</select>';
-				}else{
-					//if estado= pendiente if confirmado use badge success else danger
-					if($row->estado=="PENDIENTE"){
-						$selectEstado='<div class="badge badge-warning">'.$row->estado.'</div>';
-					}else if($row->estado=="CONFIRMADO"){
-						$selectEstado='<div class="badge badge-success">'.$row->estado.'</div>';
-					}else{
-						$selectEstado='<div class="badge badge-danger">'.$row->estado.'</div>';
-					}
-				}
-				$subdata[] = $selectEstado;
 				$divAcciones='<div>
 				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id_cotizacion.')"></i>
 				</div>';
 				$subdata[] = $divAcciones;
 				$data[] = $subdata;
+			}
+			else{
+				$subdata = array();
+				$subdata[]=$row->No_Usuario;
+				$proveedores=$row->proveedores;
+				//check if is posible to decode json
+				if($proveedores==null){
+					$proveedores=[];
+				}else{
+					$proveedores=json_decode($proveedores);
+				}
+				
+				//foreach proveedores add to select
+				$proveedoresSelect="";
+				$estadoSelect="";
+				$qtyBoxDiv="";
+				$cbmTotalDiv="";
+				$pesoTotalDiv="";
+				$divInputsSupplier="";
+				$divInputsCodeSupplier="";
+				$divInputsPhoneNumberSupplier="";
+				$divInputQtyChina="";	
+				$divInputCBMChina="";
+				$divInputArriveDateChina="";
+				$divProductos="";
+				foreach ($proveedores as $proveedor) {
+					if($this->user->No_Grupo=="ContenedorAlmacen"){
+						$proveedoresSelect.='<select class="form-control" id="estado-'.$proveedor->id_proveedor.'" name="estado" onchange="updateEstadoProveedor('.$proveedor->id_proveedor.')">
+							<option value="C" '.($proveedor->estados_proveedor=="C" ? "selected" : "").'>C</option>
+							<option value="R" '.($proveedor->estados_proveedor=="R" ? "selected" : "").'>R</option>
+							<option value="NS" '.($proveedor->estados_proveedor=="NS" ? "selected" : "").'>NS</option>
+						</select>';
+						$divInputQtyChina.='<div class="d-flex flex-row gap-2">
+						<input type="text" class="form-control" id="qty-china-'.$proveedor->id_proveedor.'" name="qty" value="'.$proveedor->qty_china.'">
+						<button class="btn btn-primary" onclick="updateQtyChina('.$proveedor->id_proveedor.')">
+						<i class="fas fa-save"></i>
+						</button>
+						</div>';
+						$divInputCBMChina.='<div class="d-flex flex-row gap-2">
+						<input type="text" class="form-control" id="cbm-china-'.$proveedor->id_proveedor.'" name="cbm" value="'.$proveedor->cbm_china.'">
+						<button class="btn btn-primary" onclick="updateCBMChina('.$proveedor->id_proveedor.')">
+						<i class="fas fa-save"></i>
+						</button>
+						</div>';
+						$divInputArriveDateChina.='<div class="d-flex flex-row gap-2">
+						<input type="text" class="form-control" id="arrive-date-china-'.$proveedor->id_proveedor.'" name="arrive-date" value="'.$proveedor->arrive_date_china.'">
+						<button class="btn btn-primary" onclick="updateArriveDateChina('.$proveedor->id_proveedor.')">
+						<i class="fas fa-save"></i>
+						</button>
+						</div>';
+					}else{
+						$proveedoresSelect.='<div class="badge badge-success">'.$proveedor->estados_proveedor.'</div>';
+						$divInputQtyChina.='<div>
+						<span>'.($proveedor->qty_box_china??0).'</span>
+						</div>';
+						$divInputCBMChina.='<div>
+						<span>'.($proveedor->cbm_total_china??0).'</span>
+						</div>';
+						$divInputArriveDateChina.='<div>
+						<span>'.$proveedor->arrive_date_china.'</span>
+						</div>';
+						
+					}
+					//add select with status enum("ROTULADO","DATOS PROVEEDOR","INSPECCIONADO","RESERVADO","EMBARCADO","NO EMBARCADO"),
+					$estadoSelect.='<select class="form-control" 
+					id="estado-'.$row->id.'-'.$proveedor->id_proveedor.'"
+					 name="estado" onchange="updateEstadoCotizacionProveedor('.$row->id.','.$proveedor->id.')">
+						<option value="" '.($proveedor->estados=="" ? "selected disabled" : "").'>--Seleccionar--</option>
+						<option value="ROTULADO" '.($proveedor->estados=="ROTULADO" ? "selected" : "").'>ROTULADO</option>
+						<option value="DATOS PROVEEDOR" '.($proveedor->estados=="DATOS PROVEEDOR" ? "selected" : "").'>DATOS PROVEEDOR</option>
+						<option value="INSPECCIONADO" '.($proveedor->estados=="INSPECCIONADO" ? "selected" : "").'>INSPECCIONADO</option>
+						<option value="RESERVADO" '.($proveedor->estados=="RESERVADO" ? "selected" : "").'>RESERVADO</option>
+						<option value="EMBARCADO" '.($proveedor->estados=="EMBARCADO" ? "selected" : "").'>EMBARCADO</option>
+						<option value="NO EMBARCADO" '.($proveedor->estados=="NO EMBARCADO" ? "selected" : "").'>NO EMBARCADO</option>
+					</select>';
+					$qtyBoxDiv.='<div>
+					<span>'.($proveedor->qty_box??0).'</span>
+					</div>';
+					$cbmTotalDiv.='<div>
+					<span>'.($proveedor->cbm_total??0).'</span>
+					</div>';
+					$pesoTotalDiv.='<div>
+					<span>'.$proveedor->peso.'</span>
+					</div>';
+					//add inputs to supplier
+					$divInputsSupplier.='<div class="d-flex flex-row gap-2">
+					<input type="text" class="form-control" id="proveedor-'.$proveedor->id_proveedor.'" name="proveedor" value="'.$proveedor->supplier.'">
+					<button class="btn btn-primary" onclick="updateProveedor('.$proveedor->id_proveedor.')">
+					<i class="fas fa-save"></i>
+					</button>
+					</div>';
+					$divInputsCodeSupplier.='<div class="d-flex flex-row gap-2">
+					<input type="text" class="form-control" id="codigo-'.$proveedor->id_proveedor.'" name="codigo" value="'.$proveedor->code_supplier.'">
+					<button class="btn btn-primary" onclick="updateCodigoProveedor('.$proveedor->id_proveedor.')">
+					<i class="fas fa-save"></i>
+					</button>
+					</div>';
+					$divInputsPhoneNumberSupplier.='<div class="d-flex flex-row gap-2">
+					<input type="text" class="form-control" id="telefono-'.$proveedor->id_proveedor.'" name="telefono" value="'.$proveedor->supplier_phone.'">
+					<button class="btn btn-primary" onclick="updateTelefonoProveedor('.$proveedor->id_proveedor.')">
+					<i class="fas fa-save"></i>
+					</button>
+					</div>';
+					$divProductos.='<div class="d-flex flex-row gap-2">
+				<textarea type="text" class="form-control" id="productos-'.$proveedor->id_proveedor.'" name="productos" value="'.$proveedor->products.'">
+				</textarea>
+				<button class="btn btn-primary" onclick="updateProductos('.$proveedor->id_proveedor.')">
+				<i class="fas fa-save"></i>
+				</button>
+				</div>';
+				}
+				//input productos with with button to save text in input and call function to save
+				
+				//div view with fa eye icon call function verCotizacionEmbarque
+				$btnView='<div>
+				<i class="fas fa-eye" style="cursor:pointer;" onclick="verCotizacionEmbarque('.$row->id_cotizacion.')"></i>
+				</div>';
+				$subdata[]=$proveedoresSelect;
+				$subdata[]=$index;
+				$subdata[]=$row->nombre;
+				$subdata[]=$row->telefono;
+				$subdata[]=$estadoSelect;
+				$subdata[]=$divProductos;
+				$subdata[]=$qtyBoxDiv;
+				$subdata[]=$cbmTotalDiv;
+				$subdata[]=$pesoTotalDiv;
+				$subdata[]=$divInputsSupplier;
+				$subdata[]=$divInputsCodeSupplier;
+				$subdata[]=$divInputsPhoneNumberSupplier;
+				$subdata[]=$divInputQtyChina;
+				$subdata[]=$divInputCBMChina;
+				$subdata[]=$divInputArriveDateChina;
+				$subdata[]=$btnView;
+				$data[] = $subdata;
+
+			}
 				$index++;
 			}
 			$output = array(
@@ -262,7 +393,6 @@ class ContenedorConsolidado extends CI_Controller {
 			echo json_encode($arrResponse);
 		}
 	}
-	///function to step 1 cotizacion
 	public function storeCotizacion(){
 		try{
 			$data=$this->input->post();
@@ -459,6 +589,71 @@ class ContenedorConsolidado extends CI_Controller {
 		}
 
 		
+	}
+	public function updateEstadoCotizacionProveedor(){
+		$idCotizacion=$this->input->post('idCotizacion');
+		$idProveedor=$this->input->post('idProveedor');
+		$estado=$this->input->post('estado');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoCotizacionProveedor($idCotizacion,$idProveedor,$estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateTelefonoProveedor(){
+		$idProveedor=$this->input->post('idProveedor');
+		$telefono=$this->input->post('telefono');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateTelefonoProveedor($idProveedor,$telefono);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateProveedor(){
+		$idProveedor=$this->input->post('idProveedor');
+		$proveedor=$this->input->post('supplier');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateProveedor($idProveedor,$proveedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateQtyChina(){
+		$idProveedor=$this->input->post('idProveedor');
+		$qty=$this->input->post('qtyChina');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateQtyChina($idProveedor,$qty);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateCBMChina(){
+		$idProveedor=$this->input->post('idProveedor');
+		$cbm=$this->input->post('cbmChina');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateCBMChina($idProveedor,$cbm);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateArriveDateChina(){
+		$idProveedor=$this->input->post('idProveedor');
+		$arriveDate=$this->input->post('arriveDateChina');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateArriveDateChina($idProveedor,$arriveDate);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateProductos(){
+		$idProveedor=$this->input->post('idProveedor');
+		$productos=$this->input->post('productos');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateProductos($idProveedor,$productos);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateEstadoProveedor(){
+		$idProveedor=$this->input->post('idProveedor');
+		$estado=$this->input->post('estado');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoProveedor($idProveedor,$estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
 	}
 	function convertDateFormat($date) {
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);

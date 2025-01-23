@@ -66,6 +66,7 @@ var stepId = 0;
 var cotizacionContainer = null;
 var clientesContainer = null;
 var tableCotizacion = null;
+var tableCotizacionEmbarque=null;
 var tableClientesGeneral = null;
 var tableClientesVariacion = null;
 var clientesDocumentacionContainer = null;
@@ -114,6 +115,202 @@ async function updateEstadoCotizacion(id) {
             reloadTableCotizacion();
         },
     });
+}
+async function updateTelefonoProveedor(idProveedor){
+    $telefono=$("#telefono-"+idProveedor).val();    
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateTelefonoProveedor";
+    spinner.show();
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idProveedor: idProveedor,
+            telefono: $telefono
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionEmbarque();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+        },
+    });
+    spinner.hide();
+}
+async function updateProveedor($idProveedor){
+    $supplier=$("#proveedor-"+$idProveedor).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateProveedor";
+    spinner.show();
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idProveedor: $idProveedor,
+            supplier: $supplier
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionEmbarque();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+        },
+    });
+}
+async function updateQtyChina($idProveedor){
+    $qtyChina=$(`#qty-china-${$idProveedor}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateQtyChina";
+    spinner.show();
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idProveedor: $idProveedor,
+            qtyChina: $qtyChina
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionEmbarque();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+        },
+    });
+    spinner.hide();
+
+}
+async function updateCBMChina($idProveedor){
+    $cbmChina=$(`#cbm-china-${$idProveedor}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateCBMChina";
+    spinner.show();
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idProveedor: $idProveedor,
+            cbmChina: $cbmChina
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionEmbarque();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+        },
+    });
+    spinner.hide();
+
+}
+async function updateArriveDateChina($idProveedor){
+    $arriveDateChina=$(`#arrive-date-china-${$idProveedor}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateArriveDateChina";
+    spinner.show();
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idProveedor: $idProveedor,
+            arriveDateChina: $arriveDateChina
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionEmbarque();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+        },
+    });
+    spinner.hide();
+
+}
+async function updateProductos($idProveedor){
+    $productos=$(`#productos-${$idProveedor}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateProductos";
+    spinner.show();
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idProveedor: $idProveedor,
+            productos: $productos
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionEmbarque();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+        },
+    });
+    spinner.hide();
+
+}
+async function updateEstadoProveedor($idProveedor){
+    $estado=$(`#estado-${$idProveedor}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoProveedor";
+    spinner.show();
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idProveedor: $idProveedor,
+            estado: $estado
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionEmbarque();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+        },
+    });
+    spinner.hide();
+
+}
+async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor){
+    const estado = $(`#estado-${idCotizacion}-${idProveedor}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
+    spinner.show();
+    if(estado=="ROTULADO"){
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                idCotizacion: idCotizacion,
+                idProveedor:idProveedor,
+                estado: estado
+            },
+            //blob
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function (response) {
+                //manage blob
+                var blob = new Blob([response], { type: 'application/pdf' });
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = `rotulado_${idCotizacion}_${idProveedor}.pdf`;
+                link.click();
+            },
+        });
+        spinner.hide();
+    }
+    
 }
 async function view(id) {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/show/" + id;
@@ -393,10 +590,10 @@ const openStepFunction = async (step, id) => {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
     if (stepIndex == 1) {
         cotizacionContainer.show();
-        if ($.fn.DataTable.isDataTable("#table-cotizacion")) {
+        if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
             reloadTableCotizacion();
         } else {
-            tableCotizacion = $('#table-cotizacion').DataTable({
+            tableCotizacion = $('#table-cotizacion-prospectos').DataTable({
                 dom:
                     "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
                     "<'row'<'col-sm-12'tr>>" +
@@ -424,6 +621,149 @@ const openStepFunction = async (step, id) => {
                         titleAttr: "Columnas",
                         exportOptions: {
                             columns: ":visible",
+                        },
+                    },
+                    {
+                        text: "Prospectos",
+                        action: function () {
+                            if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+                                $("#table-cotizacion-embarque").attr("style", "display:none");
+                                $("#table-cotizacion-embarque_wrapper").hide();
+                            }
+                            if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+                                //display block
+                                $("#table-cotizacion-prospectos").attr("style", "");
+                                $("#table-cotizacion-prospectos_wrapper").show();
+                                reloadTableCotizacion();
+                            } else {
+                                $("#table-cotizacion-prospectos").attr("style", "");
+                                $("#table-cotizacion-prospectos_wrapper").show();
+                                reloadTableCotizacion();
+
+                            }
+                        },
+                        className: "btn btn-light"
+                    },
+                    {
+                        text: "Por Embarcar",
+                        action: function () {
+                            if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+                                $("#table-cotizacion-prospectos").attr("style", "display:none");
+                                $("#table-cotizacion-prospectos_wrapper").hide();
+                            }
+                            if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+
+                                $("#table-cotizacion-embarque").attr("style", "");
+                                $("#table-cotizacion-embarque_wrapper").show();
+                                reloadTableCotizacionEmbarque();
+                            } else {
+                                url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+                                tableCotizacionEmbarque.show();
+                                tableCotizacionEmbarque = $('#table-cotizacion-embarque').DataTable({
+                                    dom:
+                                        "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                                        "<'row'<'col-sm-12'tr>>" +
+                                        "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+                                    buttons: [
+                                        {
+                                            extend: "excel",
+                                            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                                            titleAttr: "Excel",
+                                            exportOptions: {
+                                                columns: ":visible",
+                                            },
+                                        },
+
+                                        {
+                                            extend: "colvis",
+                                            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                                            titleAttr: "Columnas",
+                                            exportOptions: {
+                                                columns: ":visible",
+                                            },
+                                        },
+                                        {
+                                            text: "Prospectos",
+                                            action: function () {
+                                                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+                                                    $("#table-cotizacion-embarque").attr("style", "display:none");
+                                                    $("#table-cotizacion-embarque_wrapper").hide();
+                                                }
+                                                if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+                                                    $("#table-cotizacion-prospectos_wrapper").show();
+
+                                                    $("#table-cotizacion-prospectos").attr("style", "");
+                                                    reloadTableCotizacion();
+
+
+                                                } else {
+                                                    $("#table-cotizacion-prospectos").attr("style", "");
+                                                    reloadTableCotizacion();
+
+                                                }
+                                            },
+                                        },
+                                        {
+                                            text: "Por Embarcar",
+                                            className: "btn btn-light",
+                                            action: function () {
+                                                if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+                                                    $("#table-cotizacion-prospectos").attr("style", "display:none");
+                                                    $("#table-cotizacion-prospectos_wrapper").hide();
+                                                }
+                                                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+
+                                                    $("#table-cotizacion-embarque").attr("style", "");
+
+                                                } else {
+                                                    $("#table-cotizacion-embarque").attr("style", "");
+                                                }
+                                            }
+                                        },
+
+                                   
+                                    ],
+                                    paging: true,
+                                    lengthChange: true,
+                                    searching: true,
+                                    ordering: true,
+                                    info: true,
+                                    autoWidth: false,
+                                    responsive: false,
+                                    serverSide: false,
+                                    pagingType: "full_numbers",
+                                    oLanguage: {
+                                        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                                        sLengthMenu: "_MENU_",
+                                        sSearch: "Buscar por: ",
+                                        sSearchPlaceholder: "",
+                                        sZeroRecords: "No se encontraron registros",
+                                        sInfoEmpty: "No hay registros",
+                                        sLoadingRecords: "Cargando...",
+                                        sProcessing: "Procesando...",
+                                        oPaginate: {
+                                            sFirst: "<<",
+                                            sLast: ">>",
+                                            sPrevious: "<",
+                                            sNext: ">",
+                                        },
+                                    },
+                                    order: [[0, "desc"]],
+                                    ajax: {
+                                        url: url,
+                                        type: "POST",
+                                        dataType: "JSON",
+                                        data: function (data) {
+                                            data.stepIndex = stepIndex;
+                                            data.idContenedor = idContenedor;
+                                            data.tipoTabla = "embarque";
+                                            data.estado = $("#txt-ID_Estado").val();
+                                            validateListEmbarque(idContenedor);
+                                        }
+                                    }
+                                });
+                            }
+
                         },
                     },
                 ],
@@ -460,6 +800,7 @@ const openStepFunction = async (step, id) => {
                     data: function (data) {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
+                        data.tipoTabla = "prospectos";
 
                     },
                     complete: function () {
@@ -518,7 +859,6 @@ const openStepFunction = async (step, id) => {
                             columns: ":visible",
                         },
                     },
-                    //two buttons general and variacion to switch between tables
                     {
                         text: "General",
                         action: function () {
@@ -539,7 +879,6 @@ const openStepFunction = async (step, id) => {
                             }
                         },
                         className: "btn btn-light"
-
                     },
                     {
                         text: "Variación",
@@ -840,6 +1179,10 @@ async function reloadTableClientesGeneral() {
 async function reloadTableClientesVariacion() {
     tableClientesVariacion.ajax.reload();
 }
+
+async function reloadTableCotizacionEmbarque(){
+    tableCotizacionEmbarque.ajax.reload()
+}
 async function deleteDocumentacionFile(id) {
     Swal.fire({
         title: "¿Estás seguro?",
@@ -1113,7 +1456,9 @@ $(document).ready(async function () {
     stepsContainer.hide();
     cotizacionContainer = $("#cotizacion-container");
     cotizacionContainer.hide();
-    tableCotizacion = $("#table-cotizacion");
+    tableCotizacion = $("#table-cotizacion-prospectos");
+    tableCotizacionEmbarque=$("#table-cotizacion-embarque");
+    tableCotizacionEmbarque.hide();
     clientesContainer = $("#clientes-container");
     clientesContainer.hide();
     tableClientesGeneral = $("#table-clientes-general");

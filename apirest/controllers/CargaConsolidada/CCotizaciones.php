@@ -295,7 +295,7 @@ class CCotizaciones extends CI_Controller
                     <td style="border-top:none!important;border-bottom:none!important" >$' . number_format($data['antidumping'], 2, '.', ',') . '</td>
                     <td style="border-top:none!important;border-bottom:none!important" >USD</td>
                     </tr>';
-                    $htmlContent = str_replace('{{antidumping}}', $antidumpingHtml, $htmlContent);
+                        $htmlContent = str_replace('{{antidumping}}', $antidumpingHtml, $htmlContent);
                     //search items with class ipm and set border none
                     }
                 if ($key == "items") {

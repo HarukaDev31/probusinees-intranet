@@ -1,0 +1,17 @@
+{
+    "open sans": {
+        "normal": "open_sans_normal_bf11512877ef2223afd06e89358ef2fc"
+    },
+    "cwtexkai": {
+        "500": "cwtexkai_500_701b4b93c9cfb4e873a4cc3fe28c65a4"
+    },
+    "ma shan zheng": {
+        "normal": "ma_shan_zheng_normal_bedc45753b5bffc0a21c5fc25848b649"
+    },
+    "noto sans tc": {
+        "normal": "noto_sans_tc_normal_3931d8f2ec734beedacf8627aac63492"
+    },
+    "noto sans sc": {
+        "normal": "noto_sans_sc_normal_fa8130ed19d81fe718fc84ecaef9893a"
+    }
+}

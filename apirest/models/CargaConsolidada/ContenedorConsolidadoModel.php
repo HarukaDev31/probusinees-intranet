@@ -1,15 +1,20 @@
 <?php
 require_once APPPATH . 'traits/FileTrait.php';
+require_once APPPATH . 'traits/WhatsappTrait.php';
+
 require_once APPPATH . 'traits/WebSocketTrait.php';
 require_once APPPATH . 'third_party/PHPExcel.php';
-
+require_once APPPATH . 'third_party/tcpdf/tcpdf.php';
+require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class ContenedorConsolidadoModel extends CI_Model{
-    use FileTrait,WebSocketTrait;
+    use FileTrait,WebSocketTrait,WhatsappTrait;
 	var $table_cliente = 'entidad';
+    private $table_usuario = 'usuario';
 	private $table="carga_consolidada_contenedor";
     private $table_pais="pais";
     private $table_contenedor_steps="contenedor_consolidado_order_steps";
     private $table_contenedor_cotizacion="contenedor_consolidado_cotizacion";
+    private $table_contenedor_cotizacion_proveedores="contenedor_consolidado_cotizacion_proveedores";
     private $table_contenedor_documentacion_files="contenedor_consolidado_documentacion_files";
     private $table_contenedor_documentacion_folders="contenedor_consolidado_documentacion_folders";
     private $table_contenedor_tipo_cliente="contenedor_consolidado_tipo_cliente";
@@ -131,6 +136,36 @@ class ContenedorConsolidadoModel extends CI_Model{
         $query = $this->db->get();
         return $query->result();
     }
+    public function getContenedorCotizacionProveedores($idContenedor){
+       //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
+        $this->db->select("main.*,
+        U.No_Usuario,
+        (
+            SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id', proveedores.id,
+                    'qty_box', proveedores.qty_box,
+                    'peso', proveedores.peso,
+                    'cbm_total', proveedores.cbm_total,
+                    'supplier', proveedores.supplier,
+                    'code_supplier', proveedores.code_supplier,
+                    'estados_proveedor', proveedores.estados_proveedor,
+                    'estados', proveedores.estados,
+                    'supplier_phone', proveedores.supplier_phone,
+                    'id_proveedor', proveedores.id
+                )
+            )
+            FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
+            WHERE proveedores.id_cotizacion = main.id
+        ) as proveedores")
+        ->from($this->table_contenedor_cotizacion . " as main")
+        ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
+        ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
+        ->where('main.id_contenedor', $idContenedor);
+        $query = $this->db->get();
+        return $query->result();
+       
+    }
     public function getContenedorClientes($idContenedor){
         $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
         ->from($this->table_contenedor_cotizacion)
@@ -179,6 +214,12 @@ class ContenedorConsolidadoModel extends CI_Model{
             }else{
                 $idTipoCliente = $idTipoCliente->row()->id;
             }
+            if(trim($sheet->getCell('A23')->getValue())=="ANTIDUMPING"){
+                $monto=$sheet->getCell('J31')->getCalculatedValue();
+            }else{
+                $monto=$sheet->getCell('J30')->getCalculatedValue();
+            }
+            $tarifa=$monto/($volumen<=0?1:$volumen);
             return [
                 'nombre' => $nombre,
                 'documento' => $documento,
@@ -187,14 +228,137 @@ class ContenedorConsolidadoModel extends CI_Model{
                 'volumen' => $volumen,
                 'id_tipo_cliente' => $idTipoCliente,
                 'fecha' => $fecha,
-                'valor_cot'=>$valorCot
+                'valor_cot'=>$valorCot,
+                'monto'=>$monto,
+                'tarifa'=>$tarifa
             ];
         }catch(Exception $e){
             return $e->getMessage();
         }
 
     }
-    
+    public function incrementColumn($column, $increment = 1)
+    {
+        $column = strtoupper($column); // Asegurarse de que todas las letras sean mayúsculas
+        $length = strlen($column);
+        $number = 0;
+
+        // Convertir la columna a un número
+        for ($i = 0; $i < $length; $i++) {
+            $number = $number * 26 + (ord($column[$i]) - ord('A') + 1);
+        }
+
+        // Incrementar el número
+        $number += $increment;
+
+        // Convertir el número de vuelta a una columna
+        $newColumn = '';
+        while ($number > 0) {
+            $remainder = ($number - 1) % 26;
+            $newColumn = chr(ord('A') + $remainder) . $newColumn;
+            $number = intval(($number - 1) / 26);
+        }
+
+        return $newColumn;
+    }
+    public function getEmbarqueData($cotizacion,$data){
+        try{
+            $objPHPExcel = PHPExcel_IOFactory::load($cotizacion['tmp_name']);
+            $rowProveedores=4;
+            $nameCliente=$objPHPExcel->getSheet(0)->getCell('B8')->getValue();
+            $sheet2=$objPHPExcel->getSheet(1);
+            $columnStart="C";
+            $columnTotales="";
+            //if data if associative array convert to object
+            if(is_array($data)){
+                $data=(object)$data;
+            }
+            $idContenedor=$data->id_contenedor;
+            //get count of row with name in table cotizacion and this id_contenedor
+            $query = $this->db->select('COUNT(*) as count')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id_contenedor', $idContenedor)
+            ->where('UPPER(nombre)', strtoupper($nameCliente))
+            ->get();
+            $count=$query->row()->count==0?1:$query->row()->count+1;//if count is 0 set 1 else increment by 1
+            $stop=false;
+
+            while(!$stop){
+                $cell=$sheet2->getCell($columnStart."3")->getValue();
+                if(strtoupper(trim($cell))=="TOTALES"){
+                    $columnTotales=$columnStart;
+                    $stop=true;
+                }else{
+                    $columnStart=$this->incrementColumn($columnStart);
+                }
+            }
+            $rowCajasProveedor=5;
+            $rowPesoProveedor=6;
+            $rowVolProveedor=8;
+            //iterate from C TO $columnTotales and get values from row 5,6,8
+            $columnStart = "C"; // Columna inicial
+            $stop = false;
+            $provider = 1;
+            $currentRange = null;
+            $processedRanges = []; // Almacena los rangos procesados
+            $proveedores = []; // Lista de proveedores
+
+            while (!$stop) {
+                // Verifica si la columna actual es la última
+                    if ($columnStart == $columnTotales) {
+                        $stop = true;
+                    } else {
+                        // Obtiene el rango combinado de la celda actual
+                        $cell = $sheet2->getCell($columnStart . $rowProveedores);
+                        $currentRange = $cell->getMergeRange();
+
+                        // Si el rango ya fue procesado, pasa a la siguiente columna
+                        if ($currentRange && in_array($currentRange, $processedRanges)) {
+                            $columnStart = $this->incrementColumn($columnStart);
+                            continue;
+                        }
+
+                        // Agrega el rango actual a los rangos procesados
+                        if ($currentRange) {
+                            $processedRanges[] = $currentRange;
+                        }
+
+                        // Genera el código del proveedor
+                        $codeSupplier = $this->generateCodeSupplier($nameCliente, $count, $provider);
+
+                        // Agrega los datos del proveedor
+                        $proveedores[] = [
+                            'qty_box' => $sheet2->getCell($columnStart . $rowCajasProveedor)->getValue(),
+                            'peso' => $sheet2->getCell($columnStart . $rowPesoProveedor)->getValue(),
+                            'cbm_total' => $sheet2->getCell($columnStart . $rowVolProveedor)->getValue(),
+                            'id_cotizacion' => $data->id_cotizacion,
+                            'code_supplier' => $codeSupplier,
+                        ];
+
+                        // Incrementa la columna y el contador del proveedor
+                        $columnStart = $this->incrementColumn($columnStart);
+                        $provider++;
+                    }
+                }
+
+                return $proveedores;
+
+        }catch(Exception $e){
+            return [
+                "status" => "error",
+                "message" => $e->getMessage()
+            ];
+        }
+    }
+    public function generateCodeSupplier($string,$rowCount,$index){
+        //from string get first letter each word in uppercase and concatenate with rowCount and index
+        $words=explode(" ",$string);
+        $code="";
+        foreach($words as $word){
+            $code.=strtoupper(substr($word,0,1));
+        }
+        return $code.$rowCount."-".$index;
+    }
     public function storeCotizacion($data,$cotizacion){
        try{
         $this->maxFileSize = 1000000;
@@ -212,20 +376,32 @@ class ContenedorConsolidadoModel extends CI_Model{
 
         $dataToInsert['cotizacion_file_url']=$fileUrl;
         $dataToInsert['id_contenedor']=$data['id_contenedor'];
-        
-        $this->db->insert($this->table_contenedor_cotizacion, $dataToInsert);             
+        $dataToInsert['id_usuario']=$this->user->ID_Usuario;
+        $this->db->insert($this->table_contenedor_cotizacion, $dataToInsert);  
+
         if($this->db->affected_rows() > 0){
-            $this->sendEvent([
-                "project" => "0",
-                "role" => $this->roleCotizador,
-                "user" => "0",
-                "action"=>$this->aNewCotizacion,
-                "message" => "Nueva cotización",
-            ]);
-			return [
-				'id' => $this->db->insert_id(),
-				'status' => "success"
-			];
+           
+            //get inserted id
+            $idCotizacion=$this->db->insert_id();
+            $dataToInsert['id_cotizacion']=$idCotizacion;
+            $dataEmbarque=$this->getEmbarqueData($cotizacion,$dataToInsert);
+            //insert in tabla proveedores 
+            $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
+            if($this->db->affected_rows() > 0){
+                //{"project": "0", "role": "Cotizador", "user": "0", "message": "Prueba de comunicación en tiempo real","action":"new-cotizacion"}
+                $this->sendEvent([
+                    "project" => "0",
+                    "role" => $this->roleCotizador,
+                    "user" => "0",
+                    "action"=>$this->aNewCotizacion,
+                    "message" => "Nueva cotización",
+                ]);
+                return [
+                    'id' => $idCotizacion,
+                    'status' => "success"
+                ];
+            }
+            return false;
 		}
 		return false;
        }catch(Exception $e){
@@ -270,13 +446,15 @@ class ContenedorConsolidadoModel extends CI_Model{
         return false;
     }
     public function uploadCotizacionFile($id,$file){
+        try{
         $this->maxFileSize = 1000000;
         $this->setAllowedExtensionsImagesOfficeFiles();
-        $this->db->select('cotizacion_file_url')
+        $this->db->select('*')
         ->from($this->table_contenedor_cotizacion)
         ->where('id', $id);
         $query = $this->db->get();
-        $fileUrl=$query->row()->cotizacion_file_url;
+        $data=$query->row();
+        $fileUrl=$data->cotizacion_file_url;
         unlink($fileUrl);
         $fileUrl= $this->uploadSingleFile(
             [
@@ -291,10 +469,24 @@ class ContenedorConsolidadoModel extends CI_Model{
         $dataToInsert['cotizacion_file_url']=$fileUrl;
         $this->db->where('id', $id);
         $this->db->update($this->table_contenedor_cotizacion, $dataToInsert);
+        //truncate all data in table contenedor_consolidado_cotizacion_proveedores where id_cotizacion=$id
+        
         if($this->db->affected_rows() > 0){
-            return "success";
+            $this->db->where('id_cotizacion', $id);
+            $this->db->delete($this->table_contenedor_cotizacion_proveedores);
+            $dataEmbarque=$this->getEmbarqueData($file,$data);
+            
+            //insert in tabla proveedores
+            $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
+            if($this->db->affected_rows() > 0){
+                return "success";
+            }
+            return false;
         }
         return false;
+        }catch(Exception $e){
+            return false;
+        }
     }
     public function showCotizacion($id){
         $this->db->select("*")
@@ -1169,4 +1361,162 @@ class ContenedorConsolidadoModel extends CI_Model{
             return false;
         }
     }
+    public function updateEstadoCotizacionProveedor($idCotizacion,$idProveedor,$estado){
+        $this->db->where('id_cotizacion', $idCotizacion);
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
+        //find query error
+       
+        if($this->db->affected_rows() > 0){
+            $data=$this->handlerUpdateCotizacionProveedor($estado,$idProveedor,$idCotizacion);
+            return $data;
+            return "success";
+        }
+        return false;
+    }
+    public function handlerUpdateCotizacionProveedor($estado,$idProveedor,$idCotizacion){
+        if($estado=="ROTULADO"){
+
+           try{
+             //select nombre from contenedor_consolidado_cotizacion where id=idCotizacion
+             $this->db->select('nombre,id_contenedor')
+             ->from($this->table_contenedor_cotizacion)
+             ->where('id', $idCotizacion);
+             $query = $this->db->get();
+             $cliente=$query->row()->nombre;
+             $idContenedor=$query->row()->id_contenedor;
+ 
+             //get supplier_code from contenedor_consolidado_cotizacion_proveedores where id=idProveedor
+             $this->db->select('code_supplier')
+             ->from($this->table_contenedor_cotizacion_proveedores)
+             ->where('id', $idProveedor);
+             $query = $this->db->get();
+             $supplierCode=$query->row()->code_supplier;
+             //select carga from contenedor_consolidado where id=idContenedor
+             $this->db->select('carga')
+             ->from($this->table)
+             ->where('id', $idContenedor);
+             $query = $this->db->get();
+             $carga=$query->row()->carga;
+ 
+             $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
+             $htmlContent = file_get_contents($htmlFilePath);
+             $htmlContent = mb_convert_encoding($htmlContent, 'UTF-8', mb_detect_encoding($htmlContent));
+         
+         
+             $htmlContent = str_replace('{{cliente}}', $cliente, $htmlContent);
+             $htmlContent = str_replace('{{supplier_code}}', $supplierCode, $htmlContent);
+             $htmlContent = str_replace('{{carga}}', $carga, $htmlContent);
+         
+             $options = new Dompdf\Options();
+             $options->set('isHtml5ParserEnabled', true);
+             $options->set('isFontSubsettingEnabled', true);
+             $options->set('isRemoteEnabled', true);
+            $dompdf = new Dompdf\Dompdf($options);
+
+            //  $fontDir = 'assets/downloads/';
+            //  $options->set('fontDir', $fontDir);
+         
+         
+            
+             
+          
+            //  // Add CSS for font
+            //  $htmlContent = '
+            // <style>
+            // @font-face {
+            //     font-family: "NotoSansTC";
+            //     src: url("assets/downloads/NotoSansTC-Regular.ttf") format("truetype");
+            // }
+            // body { 
+            //     font-family: "NotoSansTC", "Noto Sans TC", Arial, sans-serif; 
+            // }
+            // </style>' . $htmlContent;
+            // $htmlContent = mb_convert_encoding($htmlContent, 'UTF-8', mb_detect_encoding($htmlContent));
+        //     $dompdf->getFontMetrics()->registerFont(
+        //         ['family' => 'Muli', 'style' => 'normal', 'weight' => 'normal'],
+        //         $fontDir . '/muli-v20-latin-regular.ttf'
+        // );
+
+             $dompdf->loadHtml($htmlContent);
+             $dompdf->setPaper('A4', 'portrait');
+             $dompdf->render();
+             $output = $dompdf->output();
+
+            // $ruta = 'assets/downloads/Rotulado.pdf';
+            // $fileUrl= file_put_contents($ruta, $output);
+            // $fileUrl=base_url($ruta);
+            
+           
+            //     $response=$this->sendRotulado($fileUrl,"waos");
+                
+            
+             $dompdf->stream('Cotizacion.pdf', ["Attachment" => 0]);
+           }catch(Exception $e){
+               echo $e->getMessage();
+           }
+        }
+    }
+    public function updateTelefonoProveedor($idProveedor,$telefono){
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores,
+         ['supplier_phone' => $telefono,
+    "estados" => "DATOS PROVEEDOR"]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    public function updateProveedor($idProveedor,$proveedor){
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, 
+        ['supplier' => $proveedor]
+    );
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    public function updateQtyChina($idProveedor,$qtyChina){
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, ['qty_box_china' => $qtyChina]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    public function updateCBMChina($idProveedor,$cbm){
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, ['cbm_total_china' => $cbm]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    public function updateArriveDateChina($idProveedor,$arriveDate){
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, ['arrive_date_china' => $arriveDate]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    public function updateProductos($idProveedor,$productos){
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, ['productos' => $productos]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    public function updateEstadoProveedor($idProveedor,$estados_proveedor){
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estados_proveedor]);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
+    }
+    
+      
 }
