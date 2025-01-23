@@ -1466,6 +1466,8 @@ class ContenedorConsolidadoModel extends CI_Model{
              $tempFilePath = sys_get_temp_dir() . '/temp_document.pdf';
                 file_put_contents($tempFilePath, $pdfContent);
                 echo $tempFilePath;
+                echo sys_get_temp_dir();
+
                 return ;
                 try {
                     $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
