@@ -387,6 +387,13 @@ class ContenedorConsolidadoModel extends CI_Model{
             $dataEmbarque=$this->getEmbarqueData($cotizacion,$dataToInsert);
             //insert in tabla proveedores 
             $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
+            //if db error return error
+            if($this->db->error()['code']!=0){
+                return [
+                    'status' => "error",
+                    'message' => $this->db->error()['message']
+                ];
+            }
             if($this->db->affected_rows() > 0){
                 //{"project": "0", "role": "Cotizador", "user": "0", "message": "Prueba de comunicación en tiempo real","action":"new-cotizacion"}
                 $this->sendEvent([
@@ -475,7 +482,6 @@ class ContenedorConsolidadoModel extends CI_Model{
             $this->db->where('id_cotizacion', $id);
             $this->db->delete($this->table_contenedor_cotizacion_proveedores);
             $dataEmbarque=$this->getEmbarqueData($file,$data);
-            
             //insert in tabla proveedores
             $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
             if($this->db->affected_rows() > 0){
