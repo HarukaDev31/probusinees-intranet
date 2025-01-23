@@ -95,12 +95,12 @@ class ContenedorConsolidadoModel extends CI_Model{
         $this->db->delete($this->table);
         $this->db->query('SET FOREIGN_KEY_CHECKS = 1');
 
-        if($this->db->affected_rows() > 0){
-            return true;
-        }
+      
         $errors = $this->db->error();
-
-        return $errors;
+        //if not exists error return success
+        if($errors['code']==0){
+            return "success";
+        }
         return false;
     }
     public function generateSteps($steps){
