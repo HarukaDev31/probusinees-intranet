@@ -1,6 +1,6 @@
 <?php
 trait WhatsappTrait{
-    private $token="EAAWycxktPLABO7Bo0bxeznJ4PFZAp6aPLo7W9j0rxRFndvG5PgqRFouSZBMPQL99mcRe3zPeotmhuZBfcVPrD9y5oUCZCeuapcESA2ZCZALsHHhN4krT3GrIHzqtaRoyAqoMtf7NIXXMLEkfvjeqb9a7IoTZCi7tuAl552v5aqiWrwYtAgGStpbfJflAHfTdHZAOmDUSPhKcD0Sj6hXZByRj2YqUwYrEZD";
+    private $token="EAAWycxktPLABO2ksqmUaZAVfcq6kryAgXGZCWnGjW4FBuSP4qFm50Qx8GBJHpt7jduA37nAvg1FPKXwCbunZBMyPXsRi0P2XL7VkYBWmJprX6xPGVuzROIYKWASRwZABxq0ihSu5IzWfrZAVZCL5cWoh2kc9v712WmEJWCpbQ4Kc7BZBXulZCVBNoO3u6NayQbXTJBwnY285UXMVrGF5mYpAn1Nt5eMZC";
     private $phoneNumberId="530883513442650";
     public function sendRotulado($mediaId, $cotizadoNumber)
 {
@@ -97,7 +97,7 @@ trait WhatsappTrait{
     
         // Mostrar la respuesta completa para depuración
         if ($httpStatus !== 200) {
-            throw new Exception('Error uploading document.');
+            throw new Exception('Error uploading document.'.$httpError.' '.$response);
         }
         $data = json_decode($response, true);
         return $data['id'];

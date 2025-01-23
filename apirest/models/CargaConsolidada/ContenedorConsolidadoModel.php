@@ -1463,23 +1463,20 @@ class ContenedorConsolidadoModel extends CI_Model{
              $dompdf->setPaper('A4', 'portrait');
              $dompdf->render();
              $pdfContent = $dompdf->output();
+             $pdfContent = $dompdf->output();
              $tempFilePath = sys_get_temp_dir() . '/temp_document.pdf';
                 file_put_contents($tempFilePath, $pdfContent);
-                echo $tempFilePath;
-                echo sys_get_temp_dir();
-
-                return ;
+               
                 try {
                     $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
+                  
                     $sendRotulado = $this->sendRotulado($mediaId, $supplierCode);
                 } catch (Exception $e) {
                     echo 'Error: ' . $e->getMessage();
                 } finally {
-                    // Eliminar el archivo temporal
-                    if (file_exists($tempFilePath)) {
-                        unlink($tempFilePath);
-                    }
-}
+                                    // Eliminar el archivo temporal
+                                            
+                }
             // $ruta = 'assets/downloads/Rotulado.pdf';
             // $fileUrl= file_put_contents($ruta, $output);
             // $fileUrl=base_url($ruta);
