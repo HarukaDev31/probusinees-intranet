@@ -413,7 +413,7 @@ class ContenedorConsolidadoModel extends CI_Model{
 		}
         if($this->db->error()['code']!=0){
             return [
-                'status' => "error",
+                'status' => $this->db->error()['message'],
                 'message' => $this->db->error()['message']
             ];
         }
