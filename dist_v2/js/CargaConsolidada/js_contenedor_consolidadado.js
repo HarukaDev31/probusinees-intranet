@@ -1623,7 +1623,7 @@ $(document).ready(async function () {
             success: function (response) {
                 const data = JSON.parse(response);
                 if (data.status === "success") {
-                    addFilesToView(data.files, section);
+                    addFilesToView(data.data, section);
                 } else {
                     alert("Error uploading files: " + data.message);
                 }
@@ -1675,8 +1675,8 @@ $(document).ready(async function () {
     // Función para eliminar archivos
     function deleteFile(fileId, cardElement) {
         $.ajax({
-            url: `/delete_file/${fileId}`, // Ruta del backend para eliminar archivos
-            type: "DELETE",
+            url: base_url + "CargaConsolidada/ContenedorConsolidado/deleteFile/"+fileId,
+            type: "GET",
             success: function (response) {
                 const data = JSON.parse(response);
                 if (data.status === "success") {

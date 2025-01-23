@@ -1549,13 +1549,13 @@ class ContenedorConsolidadoModel extends CI_Model{
      
         $index=0;
         $filesArray=[];
-        foreach ($files as $file) {
+        foreach ($files['files']['name'] as $index => $fileName) {
             $fileToUp=  [
-                "name" => $file['name'][$index],
-                "type" => $file['type'][$index],
-                "tmp_name" => $file['tmp_name'][$index],
-                "error" => $file['error'][$index],
-                "size" => $file['size'][$index]
+                "name" => $files['files']['name'][$index],
+                "type" => $files['files']['type'][$index],
+                "tmp_name" => $files['files']['tmp_name'][$index],
+                "error" => $files['files']['error'][$index],
+                "size" => $files['files']['size'][$index]
             ];
             $fileUrl= $this->uploadSingleFile(
                 $fileToUp
@@ -1563,26 +1563,31 @@ class ContenedorConsolidadoModel extends CI_Model{
             if($fileUrl){
                 $this->db->insert($this->table_contenedor_cotizacion_proveedores_documentacion, 
                 ['id_proveedor' => $idProveedor, 'file_url' => $fileUrl,'file_name'=>$file['name'][$index],
-                'file_ext'=>$file['type'][$index]]);
+                'file_ext'=>$files['files']['type'][$index]]);
                 if($this->db->affected_rows() > 0){
                     $fileToReturn=[
                         'id'=>$this->db->insert_id(),
                         'file_url'=>$fileUrl,
-                        'file_name'=>$file['name'][$index],
-                        'file_ext'=>$file['type'][$index]
+                        'file_name'=>$files['files']['name'][$index],
+                        'file_ext'=>$files['files']['type'][$index]
                     ];
                     $filesArray[]=$fileToReturn;
                 }
             }
-            echo json_encode($filesArray);
             $index++;
         }
        
         //validate if exists db error
-        if($this->db->error()){
-            return ['status' => "error",'error'=>$this->db->error()];
-        }
+       
         return ['status' => "success",'error'=>false,"data"=>$filesArray];
+    }
+    public function deleteFile($idFile){
+        $this->db->where('id', $idFile);
+        $this->db->delete($this->table_contenedor_cotizacion_proveedores_documentacion);
+        if($this->db->affected_rows() > 0){
+            return "success";
+        }
+        return false;
     }
     
       
