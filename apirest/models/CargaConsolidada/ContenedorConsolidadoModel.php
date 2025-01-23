@@ -385,6 +385,7 @@ class ContenedorConsolidadoModel extends CI_Model{
             $idCotizacion=$this->db->insert_id();
             $dataToInsert['id_cotizacion']=$idCotizacion;
             $dataEmbarque=$this->getEmbarqueData($cotizacion,$dataToInsert);
+            return $dataEmbarque;
             //insert in tabla proveedores 
             $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
             //if db error return error
@@ -410,6 +411,12 @@ class ContenedorConsolidadoModel extends CI_Model{
             }
             return false;
 		}
+        if($this->db->error()['code']!=0){
+            return [
+                'status' => "error",
+                'message' => $this->db->error()['message']
+            ];
+        }
 		return false;
        }catch(Exception $e){
         return[
