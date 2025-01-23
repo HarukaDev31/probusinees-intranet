@@ -594,7 +594,6 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function updateEstadoCotizacionProveedor(){
 		//clean buffer
-		ob_end_clean();
 		$idCotizacion=$this->input->post('idCotizacion');
 		$idProveedor=$this->input->post('idProveedor');
 		$estado=$this->input->post('estado');
