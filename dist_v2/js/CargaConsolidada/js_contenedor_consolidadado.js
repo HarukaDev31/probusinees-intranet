@@ -95,11 +95,58 @@ async function updateEstado(id) {
         },
     });
 }
+function addFileToList(file) {
+    const isImage = file.file_ext.startsWith('image');
+    const fileItem = $(`
+        <div class="file-item">
+            <div class="file-preview">
+                ${isImage ? `<img src="${file.file_url}" alt="${file.file_name}">` : `<span>📄</span>`}
+                <span>${file.file_name}</span>
+            </div>
+            <div class="file-actions">
+                <button class="btn btn-primary btn-sm download-btn" data-url="${file.file_url}">Descargar</button>
+                <button class="btn btn-danger btn-sm delete-btn" data-id="${file.id}">Eliminar</button>
+            </div>
+        </div>
+    `);
+
+    // Botón de descarga
+    fileItem.find('.download-btn').on('click', function () {
+        const url = $(this).data('url');
+        window.open(url, '_blank');
+    });
+
+    // Botón de eliminar
+    fileItem.find('.delete-btn').on('click', function () {
+        const id = $(this).data('id');
+        deleteFile(id, fileItem);
+    });
+
+    fileList.append(fileItem);
+}
 async function verCotizacionEmbarque(idProveedor){
     //hide table cotizacion embarque
     cotizacionContainer.hide();
     cotizacionInspectionContainer.show();
     currentProveedor=idProveedor;
+     // Función para inicializar la lista al cargar la página
+   
+        $.ajax({
+            url: '/api/files', // Cambia a la URL de tu backend para obtener los archivos
+            method: 'GET',
+            success: function (data) {
+                fileList.empty();
+                data.forEach(file => {
+                    addFileToList(file);
+                });
+            },
+            error: function () {
+                alert('Error al cargar los archivos.');
+            }
+        });
+  
+    // Función para agregar un archivo a la lista con vista previa y botones
+  
 
 }
 async function updateEstadoCotizacion(id) {
