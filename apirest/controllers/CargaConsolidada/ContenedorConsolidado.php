@@ -141,7 +141,6 @@ class ContenedorConsolidado extends CI_Controller {
 		$stepIndex=$this->input->post('stepIndex');
 		$idContenedor=$this->input->post('idContenedor');
 		$tipoTabla=$this->input->post('tipoTabla');
-
 		if($stepIndex==1){
 			$arrResponse=[];
 			if($tipoTabla=="prospectos"){
@@ -150,6 +149,7 @@ class ContenedorConsolidado extends CI_Controller {
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
 
 			}
+			
 			$data = array();
 			$index=1;
 			foreach ($arrResponse as $row) {

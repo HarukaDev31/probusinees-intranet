@@ -132,8 +132,7 @@ class ContenedorConsolidadoModel extends CI_Model{
         $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
         ->from($this->table_contenedor_cotizacion)
         ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
-        ->where('id_contenedor', $idContenedor)
-        ->where('estado', 'PENDIENTE');
+        ->where('id_contenedor', $idContenedor);
         $query = $this->db->get();
         return $query->result();
     }
