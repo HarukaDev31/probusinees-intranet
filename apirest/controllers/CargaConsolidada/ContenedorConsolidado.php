@@ -290,9 +290,11 @@ class ContenedorConsolidado extends CI_Controller {
 					</button>
 					</div>';
 					$divProductos.='<div class="d-flex flex-row gap-2">
-				<textarea type="text" class="form-control" id="productos-'.$proveedor->id_proveedor.'" name="productos" value="'.$proveedor->products.'">
-				</textarea>
-				<button class="btn btn-primary" onclick="updateProductos('.$proveedor->proveedor.')">
+				<input type="text" class="form-control cotizacion-products-'.$row->id.'"
+				
+				id="productos-'.$proveedor->id_proveedor.'" name="productos" value="'.$proveedor->products.'">
+				</input>
+				<button class="btn btn-primary" onclick="updateProductos('.$proveedor->id_proveedor.','.$row->id.')">
 				<i class="fas fa-save"></i>
 				</button>
 				</div>';
@@ -598,7 +600,16 @@ class ContenedorConsolidado extends CI_Controller {
 		$idProveedor=$this->input->post('idProveedor');
 		$estado=$this->input->post('estado');
 		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoCotizacionProveedor($idCotizacion,$idProveedor,$estado);
-		
+		if($estado=!"ROTULADO"){
+			echo json_encode([
+				"status" => $arrResponse
+			]);
+			return;
+		}
+		//checkf if arrRepsonseis accessible path and return
+		if(file_exists($arrResponse)){
+			
+		}
 		
 	}
 	public function updateTelefonoProveedor(){

@@ -159,10 +159,11 @@ async function verCotizacionEmbarque(idProveedor){
   
 
 }
-async function updateEstadoCotizacion(id) {
+async function updateEstadoCotizacion(id,idCotizacion) {
     //get select value
     const estado = $(`#estado-cotizacion-${id}`).val();
-    console.log(estado);
+   
+    
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacion";
     $.ajax({
         url: url,
@@ -299,8 +300,9 @@ async function updateArriveDateChina($idProveedor){
     spinner.hide();
 
 }
-async function updateProductos($idProveedor){
+async function updateProductos($idProveedor,idCotizacion){
     $productos=$(`#productos-${$idProveedor}`).val();
+    
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateProductos";
     spinner.show();
     $.ajax({
@@ -349,9 +351,25 @@ async function updateEstadoProveedor($idProveedor){
 }
 async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor){
     const estado = $(`#estado-${idCotizacion}-${idProveedor}`).val();
+    //set this previous status
+    previousStatus=$(`#estado-${idCotizacion}-${idProveedor}`).data("previous");
+    //validate if all products are filled
+    allProducts=$(`.cotizacion-products-${idCotizacion}`);
+    isValid=true;
+    allProducts.each(function(){
+        if($(this).val()==""){
+            isValid=false;
+
+        }
+    });
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
     spinner.show();
     if(estado=="ROTULADO"){
+        if(!isValid){
+            Swal.fire("Error!", "Debe ingresar todos los productos", "error");
+            spinner.hide();
+            return;
+        }
         url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
         $.ajax({
             url: url,
@@ -366,11 +384,12 @@ async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor){
                 responseType: 'blob'
             },
             success: function (response) {
-                //manage blob
-                var blob = new Blob([response], { type: 'application/pdf' });
+                var blob = new Blob([response], { type: //zip
+                    'application/zip'
+                });
                 var link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = `rotulado_${idCotizacion}_${idProveedor}.pdf`;
+                link.download = `Cotizacion-${idCotizacion}.zip`;
                 link.click();
             },
         });
