@@ -78,11 +78,11 @@ trait FileTrait
         try {
             // 2. Sanitizar caracteres problemáticos pero mantener caracteres especiales
             $fileName = preg_replace('/[\x00-\x1F\x7F<>:"\/\\|?*]/', '', $fileName);
-            
+
             $uploadedFilePath = $this->uploadFile($fileTname, $fileName, $path);
-            
+            $encodedPath=str_replace("%2F","/",rawurlencode($uploadedFilePath));
             // 3. Codificar la ruta para la URL
-            $encodedPath = str_replace('%2F', '/', rawurlencode($uploadedFilePath));
+
             return base_url() . $encodedPath;
         } catch (Exception $e) {
             return $e->getMessage();

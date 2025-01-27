@@ -1,9 +1,9 @@
 <?php
 trait WhatsappTrait
 {
-    private $token = "EAAWycxktPLABO07BigQ3fbS0ih1H9ZBZCVV9iNHh7dVyrJ5TyLIwQ2yrUKGl4LFvrZA2hD4kmATt8C7ekp8N5AdWdN4rMZB9bZA1QYsD728F8hezSxsctZCvzQmqN3fmzgvHSNN6FTKpNbhNWa6NKZCLAynyaTiSgxmhHMZAEqKOBWxaJ1uLLioPRrTbVWDfpDg10PPZAusV9vqMKL7xX8npHwQNWIb4ZD";
+    private $token = "EAAWycxktPLABO1mMGWamek2oZAKFcaD1fzmPa3CXjTmjZCQyBXsG6BnyZA3GGmvDAc4kTHHcgcRoZAPZBFeCoA6cFH1Yp6Pd2iMj7Wm5EHAxQqIWsteiZC65C3oAYZBEJzSvhm6jXATWZBVRxEIkAzxfjPwvCMDqTSbCHVSCZAANR5v2CcP62ya6YkTH3kXD4YgMAeFv7L2oiW4FvqQO1g5GuyXpMDvos";
     private $phoneNumberId = "530883513442650";
-    private $phoneNumberDestiny = "+51934958839";
+    private $phoneNumberDestiny = "+51912705923";
     public function sendWelcome()
     {
         try {
@@ -72,6 +72,105 @@ trait WhatsappTrait
 
             // Si todo es correcto, procesa la respuesta
             return json_encode($response);
+        } catch (Exception $e) {
+            // Captura y retorna excepciones
+            return json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT);
+        }
+    }
+    public function sendInspectionXSupllier($mediaData,$cliente,$codeSupplier,$qtyBoxChina){
+        try {
+            $ch = curl_init(); // Inicializa cURL
+
+            $data = [
+                "messaging_product" => "whatsapp",
+                "recipient_type" => "individual",
+                "to" => $this->phoneNumberDestiny,
+                "type" => "template",
+                "template" => [
+                    "name" => "inspection_x_supplier",
+                    "language" => [
+                        "code" => "en_US"
+                    ],
+                    "components" => [
+                       
+                        [
+                            "type" => "body",
+                            "parameters" => [
+                                [
+                                    "type" => "text",
+                                    "text" =>  $cliente 
+                                ],
+                                [
+                                    "type" => "text",
+                                    "text" =>  $codeSupplier 
+                                ],
+                                [
+                                    "type" => "text",
+                                    "text" =>  $qtyBoxChina 
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+            curl_setopt_array($ch, [
+                CURLOPT_URL => "https://graph.facebook.com/v21.0/530883513442650/messages",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => json_encode($data),
+                CURLOPT_HTTPHEADER => [
+                    "Authorization: Bearer " . $this->token,
+                    "Content-Type: application/json"
+                ],
+            ]);
+
+            $response = curl_exec($ch);
+            $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $httpError = curl_error($ch);
+
+            curl_close($ch);
+
+            if ($response === false) {
+                throw new Exception("cURL error: $httpError");
+            }
+
+            if ($httpStatus !== 200) {
+                // Maneja el error HTTP
+                $errorResponse = [
+                    'http_status' => $httpStatus,
+                    'curl_error' => $httpError,
+                    'response_body' => $response // Guarda la respuesta para depuración
+                ];
+                return json_encode($errorResponse, JSON_PRETTY_PRINT);
+            }else{
+                //for each media id send the media
+                foreach ($mediaData as $media) {
+                    try{
+                        $typesimage=['image/png','image/jpeg','image/jpg'];
+                    $typesdoc=['application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/pdf'];
+                    $typesvideo=['video/mp4','video/avi','video/mov','video/flv','video/wmv','video/3gp','video/mkv','video/webm'];
+                    if(in_array($media->file_type,$typesimage)){
+                        $response=$this->sendFileProveedor($media->media_id,"image");
+                    }else if(in_array($media->file_type,$typesdoc)){
+                        
+                        $response=$this->sendFileProveedor($media->media_id,"document");
+                    }else if(in_array($media->file_type,$typesvideo)){
+                        $response=$this->sendFileProveedor($media->media_id,"video");
+                    }
+                    echo $response;
+                    }catch(Exception $e){
+                        return json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT);
+                    }
+                }
+                return json_encode($response);
+
+            }
+            
         } catch (Exception $e) {
             // Captura y retorna excepciones
             return json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT);
@@ -250,5 +349,86 @@ trait WhatsappTrait
         }
         $data = json_decode($response, true);
         return $data['id'];
+    }
+    public function sendFileProveedor($mediaId,$type)
+    {
+        
+        try {
+            $ch = curl_init(); // Inicializa cURL
+            $template="";
+            if($type=="image"){
+                $template="send_media_img";
+            }else if($type=="document"){
+                $template="send_media_doc";
+            }else if($type=="video"){
+                $template="send_media_vid";
+            }
+            $data = [
+                "messaging_product" => "whatsapp",
+                "recipient_type" => "individual",
+                "to" => $this->phoneNumberDestiny,
+                "type" => "template",
+                "template" => [
+                    "name" => $template,
+                    "language" => [
+                        "code" => "en_US"
+                    ],
+                    "components" => [
+                        [
+                            "type" => "header",
+                            "parameters" => [
+                                [
+                                    "type" => $type,
+                                    $type => [
+                                        "id" => $mediaId
+                                    ]
+                                ]
+                            ]
+                        ],
+                     
+                    ]
+                ]
+            ];
+            echo json_encode($data);
+            curl_setopt_array($ch, [
+                CURLOPT_URL => "https://graph.facebook.com/v21.0/530883513442650/messages",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => json_encode($data),
+                CURLOPT_HTTPHEADER => [
+                    "Authorization: Bearer " . $this->token,
+                    "Content-Type: application/json"
+                ],
+            ]);
+            $response = curl_exec($ch);
+            $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $httpError = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false) {
+                throw new Exception("cURL error: $httpError");
+            }
+
+            if ($httpStatus !== 200) {
+                // Maneja el error HTTP
+                $errorResponse = [
+                    'http_status' => $httpStatus,
+                    'curl_error' => $httpError,
+                    'response_body' => $response // Guarda la respuesta para depuración
+                ];
+                return json_encode($errorResponse, JSON_PRETTY_PRINT);
+            }
+
+            // Si todo es correcto, procesa la respuesta
+            return json_encode($response);
+        } catch (Exception $e) {
+            // Captura y retorna excepciones
+            return json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT);
+        }
     }
 }

@@ -7586,8 +7586,6 @@ const deleteDocumentationFiles = (id) => {
 }
 const initDocumentationDriveEvents = () => {
   
-  console.log($(".upload-btn-documentation"));
-  $(".upload-btn-documentation").off("click");
   $(".upload-btn-documentation").click(function () {
     console.log("click");
     folderName = $(this).data("folder-name");
@@ -11733,22 +11731,8 @@ const $fileGrid = $('#file-grid');
 const $searchInput = $('#search-input');
 const $fileList = $('#file-list');
 const $backBtn = $('#back-btn');
-// const iconMap = {
-//   'application/pdf': '<i class="fas fa-file-pdf w-12 h-12 text-red-400"></i>',
-//   'image/jpeg': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
-//   'image/png': '<i class="fas fa-file-image w-12 h-12 text-blue-400"></i>',
-//   'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-//     '<i class="fas fa-file-word w-12 h-12 text-blue-600"></i>'
-// };
 const pendingFiles = [];
-// Initial files
-// const files = [
-//   { id: 1, name: 'Proyecto.docx', type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', size: '2.5 MB', lastModified: '2023-11-26' },
-//   { id: 2, name: 'Presentacion.pdf', type: 'application/pdf', size: '1.2 MB', lastModified: '2023-11-25' },
-//   { id: 3, name: 'Imagen.jpg', type: 'image/jpeg', size: '4.7 MB', lastModified: '2023-11-24' }
-// ];
 
-// Render initial files
 renderFileGrid(driveFiles);
 
 // Toggle drag-drop area
