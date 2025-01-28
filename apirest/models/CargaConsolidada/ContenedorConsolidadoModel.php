@@ -41,7 +41,7 @@ class ContenedorConsolidadoModel extends CI_Model
         if ($this->input->post('Filtro_Estado') != "0") {
             $this->db->where('estado', $this->input->post('Filtro_Estado'));
         }
-
+        $this->db->order_by('id', 'desc');
         $query = $this->db->get();
         return $query->result();
     }
@@ -179,7 +179,8 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " as main")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
-            ->where('main.id_contenedor', $idContenedor);
+            ->where('main.id_contenedor', $idContenedor)
+            ->order_by('main.id', 'desc');
         $query = $this->db->get();
         return $query->result();
     }
@@ -295,13 +296,14 @@ class ContenedorConsolidadoModel extends CI_Model
                 $data = (object)$data;
             }
             $idContenedor = $data->id_contenedor;
-            //get count of row with name in table cotizacion and this id_contenedor
-            $query = $this->db->select('COUNT(*) as count')
-                ->from($this->table_contenedor_cotizacion)
-                ->where('id_contenedor', $idContenedor)
-                ->where('UPPER(nombre)', strtoupper($nameCliente))
-                ->get();
-            $count = $query->row()->count == 0 ? 1 : $query->row()->count + 1; //if count is 0 set 1 else increment by 1
+            //get carga field from table with id=$idContenedor
+            $this->db->select('carga')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $carga = $query->row()->carga;
+            //complete to 0 to 2 digits if can converted to number else use last to chars
+            $count = is_numeric($carga) ? str_pad($carga, 2, "0", STR_PAD_LEFT) : substr($carga, -2);
             $stop = false;
 
             while (!$stop) {
@@ -381,7 +383,7 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         //complete $idcontenedor with 0 to 2 digits
         $idContenedor = str_pad($idContenedor, 2, "0", STR_PAD_LEFT);
-        return $code . $idContenedor . "-" . $index;
+        return $code . $rowCount . "-" . $index;
     }
     public function storeCotizacion($data, $cotizacion)
     {
@@ -1915,13 +1917,32 @@ class ContenedorConsolidadoModel extends CI_Model
         return false;
     }
     public function updateProveedorData($data,$idProveedor){
-        $this->db->where('id', $idProveedor);
-        //data arrive_date_china from  dd/mm/yyyy to date 
+        //data arrive_date_china from  dd/mm/yyyy to date
+        //if data supplier phone or supplier is not null or empty change status  and status tracking tyo DATOS PROVEEDOR
+        if(isset($data['supplier_phone']) || isset($data['supplier'])){ 
+            //CHECK CURRENT STATUS IS EQUAL TO ROTULADO CHANGE TO DATOS PROVEEDOR
+            $this->db->select('estados')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id', $idProveedor);
+            $query = $this->db->get();
+            $estado = $query->row()->estados;
+            if($estado=="ROTULADO" || !$estado){
+                $this->db->where('id', $idProveedor);
+                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'DATOS PROVEEDOR']);
+                $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, ['id_proveedor' => $idProveedor, 'estado' => 'DATOS PROVEEDOR']);
+
+            }
+            //insert into tracking table
+
+        }
         if(isset($data['arrive_date_china'])){
             $data['arrive_date_china']=date('Y-m-d',strtotime(str_replace('/', '-', $data['arrive_date_china'])));
         }
+        $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
-        if ($this->db->affected_rows() > 0) {
+        if ($this->db->error()->code!=0) {
+            return ['status' => "error", 'error' => $this->db->error()];
+        }else{
             return "success";
         }
         
@@ -2158,5 +2179,38 @@ class ContenedorConsolidadoModel extends CI_Model
             return "success";
         }
         return false;
+    }
+    public function deleteBL($idContenedor){
+        $this->db->where('id', $idContenedor);
+        $this->db->update($this->table, ['bl_file_url' => '']);
+        if ($this->db->affected_rows() > 0) {
+            return "success";
+        }
+        return false;
+    }
+    public function deleteListaEmbarque($idContenedor){
+        $this->db->where('id', $idContenedor);
+        $this->db->update($this->table, ['lista_embarque_url' => '']);
+        if ($this->db->affected_rows() > 0) {
+            return "success";
+        }
+        return false;
+
+    }
+    public function getValidContainers(){
+        //return array from 1 to 50 and remove this array with rows from table contenedor where id in array
+        $this->db->select('carga')
+            ->from($this->table);
+        $query = $this->db->get();
+        $containers = $query->result();
+        $containersArray=[];
+        foreach ($containers as $container) {
+            $containersArray[]=$container->carga;
+        }
+        $containersArray=array_diff(range(1, 50), $containersArray);
+        //convert to simple array
+        $containersArray=array_values($containersArray);
+        return $containersArray;
+        
     }
 }

@@ -37,10 +37,12 @@ class ContenedorConsolidado extends CI_Controller {
             $subdata = array();
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
-			$subdata[] = $row->carga;
+			$subdata[] = "Consolidado #".$row->carga;
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
+			if($this->user->No_Grupo=="Coordinación"){
 			$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 			$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
+			}
 			
 			$subdata[] = $row->empresa;
 			$btnView='<div>
@@ -49,19 +51,13 @@ class ContenedorConsolidado extends CI_Controller {
 			$subdata[] = $btnView;
 			$divEstadoSelect="";
 
-			if($this->user->No_Grupo=="Coordinación"){
+			
 			$divEstado='<select class="form-control" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">
 				<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
 				<option value="COMPLETADO" '.($row->estado=="COMPLETADO" ? "selected" : "").'>COMPLETADO</option>
 			</select>';	
 
-			}else{
-				if($row->estado=="PENDIENTE"){
-					$divEstado='<div class="badge badge-warning">'.$row->estado.'</div>';
-				}else{
-					$divEstado='<div class="badge badge-success">'.$row->estado.'</div>';
-				}
-			}
+			
 			$subdata[] = $divEstado;
 			if($this->user->No_Grupo=="Coordinación"){
 				$divAcciones='<div>
@@ -135,7 +131,8 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function steps($idContenedor){
 		$arrResponse = $this->ContenedorConsolidadoModel->getOrderProgress($idContenedor);
-		echo json_encode(['data' => $arrResponse,'status' => "success"]);
+		echo json_encode(['data' => $arrResponse,'status' => "success",
+		"currentPrivilege" => $this->user->No_Grupo]);
 	}
 	public function step(){
 		$stepIndex=$this->input->post('stepIndex');
@@ -188,7 +185,9 @@ class ContenedorConsolidado extends CI_Controller {
 			}
 			else{
 				$subdata = array();
-				$subdata[]=$row->No_Usuario;
+				if($this->user->No_Grupo!="ContenedorAlmacen"){
+					$subdata[]=$row->No_Usuario;
+				}
 				$proveedores=$row->proveedores;
 				//check if is posible to decode json
 				if($proveedores==null){
@@ -230,15 +229,15 @@ class ContenedorConsolidado extends CI_Controller {
 							<option value="NS" '.($proveedor->estados_proveedor=="NS" ? "selected" : "").'>NS</option>
 						</select>';
 						$divInputQtyChina.='<div class="d-flex flex-row gap-2">
-						<input type="text" class="form-control" id="qty-china-'.$proveedor->id_proveedor.'" name="qty" value="'.$proveedor->qty_box_china.'">
+						<input type="text" class="form-control mb-1" id="qty-china-'.$proveedor->id_proveedor.'" name="qty" value="'.$proveedor->qty_box_china.'">
 					
 						</div>';
 						$divInputCBMChina.='<div class="d-flex flex-row gap-2">
-						<input type="text" class="form-control" id="cbm-china-'.$proveedor->id_proveedor.'" name="cbm" value="'.$proveedor->cbm_total_china.'">
+						<input type="text" class="form-control mb-1" id="cbm-china-'.$proveedor->id_proveedor.'" name="cbm" value="'.$proveedor->cbm_total_china.'">
 					
 						</div>';
 						$divInputArriveDateChina.='<div class="d-flex flex-row gap-2">
-						<input type="text" class="form-control input-date"  id="arrive-date-china-'.$proveedor->id_proveedor.'" name="arrive-date" value="'.$proveedor->arrive_date_china.'">
+						<input type="text" class="form-control input-date mb-1"  id="arrive-date-china-'.$proveedor->id_proveedor.'" name="arrive-date" value="'.$proveedor->arrive_date_china.'">
 					
 						</div>';
 						$divEstadoChina.='<select class="form-control" id="estado-china-'.$proveedor->id_proveedor.'" name="estado" onchange="updateEstadoChina('.$proveedor->id_proveedor.')">
@@ -255,13 +254,13 @@ class ContenedorConsolidado extends CI_Controller {
 						
 						">'.$proveedor->estados_proveedor.'</div>';
 						$divInputQtyChina.='<div>
-						<span>'.($proveedor->qty_box_china??0).'</span>
+						<div class="">'.($proveedor->qty_box_china??0).'</div>
 						</div>';
 						$divInputCBMChina.='<div>
-						<span>'.($proveedor->cbm_total_china??0).'</span>
+						<div class="">'.($proveedor->cbm_total_china??0).'</div>
 						</div>';
 						$divInputArriveDateChina.='<div>
-						<span>'.$proveedor->arrive_date_china.'</span>
+						<div class="">'.$proveedor->arrive_date_china.'</div>
 						</div>';
 						
 					}
@@ -283,47 +282,54 @@ class ContenedorConsolidado extends CI_Controller {
 					</select>';
 					}
 					$qtyBoxDiv.='<div>
-					<span>'.($proveedor->qty_box??0).'</span>
+					<input disabled  class="form-control mb-1" 
+					value="'.($proveedor->qty_box??0).'"
+					></input>
 					</div>';
 					$cbmTotalDiv.='<div>
-					<span>'.($proveedor->cbm_total??0).'</span>
+					<input disabled  class="form-control mb-1" value="'.($proveedor->cbm_total??0).'"></input>
 					</div>';
 					$pesoTotalDiv.='<div>
-					<span>'.$proveedor->peso.'</span>
+					<input disabled  class="form-control mb-1" value="'.($proveedor->peso??0).'"></input>
 					</div>';
 					//add inputs to supplier
-					$divInputsSupplier.='<div class="d-flex flex-row gap-2">
-					<input type="text" class="form-control" id="proveedor-'.$proveedor->id_proveedor.'" name="proveedor" value="'.$proveedor->supplier.'">
+					$divInputsSupplier.='<div class="d-flex flex-row mb-1">
+					<input type="text" class="form-control" id="proveedor-'.$proveedor->id_proveedor.'" name="proveedor" value="'.$proveedor->supplier.'"
+					'.($this->user->No_Grupo=="ContenedorAlmacen" ? "disabled" : "").'>
 				
 					</div>';
-					$divInputsCodeSupplier.='<div class="d-flex flex-row gap-2">
-					<input type="text" class="form-control" id="codigo-'.$proveedor->id_proveedor.'" name="codigo" value="'.$proveedor->code_supplier.'">
+					$divInputsCodeSupplier.='<div class="d-flex flex-row mb-1">
+					<input type="text" class="form-control" id="codigo-'.$proveedor->id_proveedor.'" name="codigo" value="'.$proveedor->code_supplier.'"
+					'.($this->user->No_Grupo=="ContenedorAlmacen" ? "disabled" : "").'>
 				
 					</div>';
-					$divInputsPhoneNumberSupplier.='<div class="d-flex flex-row gap-2">
-					<input type="text" class="form-control" id="telefono-'.$proveedor->id_proveedor.'" name="telefono" value="'.$proveedor->supplier_phone.'">
+					$divInputsPhoneNumberSupplier.='<div class="d-flex flex-row mb-1">
+					<input type="text" class="form-control" id="telefono-'.$proveedor->id_proveedor.'" name="telefono" value="'.$proveedor->supplier_phone.'"
+					'.($this->user->No_Grupo=="ContenedorAlmacen" ? "disabled" : "").'>
 				
 					</div>';
-					$divProductos.='<div class="d-flex flex-row gap-2">
-				<input type="text" class="form-control cotizacion-products-'.$row->id.'"
-				
-				id="productos-'.$proveedor->id_proveedor.'" name="productos" value="'.$proveedor->products.'">
-				</input>
-		
-				</div>';
-				$divViewBtn .= '<div>
-				<i class="fas fa-eye" style="cursor:pointer;" 
-				onclick="verCotizacionEmbarque(
-					' . $proveedor->id_proveedor . ',
-					' . $row->id . ',
-					\'' . addslashes($proveedor->code_supplier) . '\',
-					\'' . addslashes($row->nombre) . '\'
-				)"></i>
-			</div>';
-				$divAcciones.='<div>
-				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id.')"></i>
-				<i class="fas fa-save text-success" style="cursor:pointer;" onclick="updateProveedorData('.$row->id. ','.$proveedor->id_proveedor.')"></i>
-				</div>';
+					$divProductos.='<div class="d-flex flex-row gap-2 mb-1">
+					<input type="text" class="form-control cotizacion-products-'.$row->id.'"
+					
+					id="productos-'.$proveedor->id_proveedor.'" name="productos" value="'.$proveedor->products.'"
+					'.($this->user->No_Grupo=="ContenedorAlmacen" ? "disabled" : "").'
+					>
+					</input>
+			
+					</div>';
+					$divViewBtn .= '<div  class="btn btn-outline-primary mb-1">
+					<i class="fas fa-eye" style="cursor:pointer;" 
+					onclick="verCotizacionEmbarque(
+						' . $proveedor->id_proveedor . ',
+						' . $row->id . ',
+						\'' . addslashes($proveedor->code_supplier) . '\',
+						\'' . addslashes($row->nombre) . '\'
+					)"></i>
+					</div>';
+					$divAcciones.='<div class="btn btn-outline-success mb-1">
+					'.($this->user->No_Grupo!="ContenedorAlmacen" ? '<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id.','.$proveedor->id_proveedor.')"></i>' : '').'
+					<i class="fas fa-save text-success" style="cursor:pointer;" onclick="updateProveedorData('.$row->id. ','.$proveedor->id_proveedor.')"></i>
+					</div>';
 				}
 				//input productos with with button to save text in input and call function to save
 				
@@ -332,7 +338,9 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[]=$proveedoresSelect;
 				$subdata[]=$index;
 				$subdata[]=$row->nombre;
+				if($this->user->No_Grupo!="ContenedorAlmacen"){
 				$subdata[]=$row->telefono;
+				}
 				$subdata[]=$estadoSelect;
 				$subdata[]=$divProductos;
 				$subdata[]=$qtyBoxDiv;
@@ -812,6 +820,22 @@ class ContenedorConsolidado extends CI_Controller {
 		$idCotizacion=$this->input->post('idCotizacion');
 		$volSelected=$this->input->post('type');
 		$arrResponse = $this->ContenedorConsolidadoModel->updateVolSelected($idCotizacion,$volSelected);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function getValidContainers(){
+		$arrResponse = $this->ContenedorConsolidadoModel->getValidContainers();
+		echo json_encode($arrResponse);
+	}
+	public function deleteBL($idContenedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteBL($idContenedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function deleteListaEmbarque($idContenedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteListaEmbarque($idContenedor);
 		echo json_encode([
 			"status" => $arrResponse
 		]);

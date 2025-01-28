@@ -57,9 +57,15 @@
                 <th>Mes  </th>
                 <th>Pais</th>
                 <th>Carga</th>
+                <?php if($this->user->No_Grupo=="Coordinación"){
+                ?>
                 <th>F. Cierre</th>
                 <th>F. Arribo</th>
                 <th>F. Entrega</th>
+                <?php }else{ ?>
+                  <th>Cut Off </th>
+                <?php } ?>
+
                 <th>Empresa</th>
                 <th>Ver</th>
                 <th>Estado</th>
@@ -79,11 +85,16 @@
 
                 <div class="col-12 col-md-4">
                   <label>&nbsp;</label>
+                  <?php if($this->user->No_Grupo=="Coordinación"){  ?>
                   <button type="button" id="btn-crear-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
+                  <?php } ?>
                 </div>
                 <div class="col-12 col-md-4">
                   <label>&nbsp;</label>
+                  <?php if($this->user->No_Grupo=="Coordinación"){  ?>
                   <button type="button" id="btn-buscar-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+                  <?php } ?>
+
                 </div>
                 <div class="col-12 col-md-3">
                 </div>
@@ -144,45 +155,49 @@
           <table id="table-cotizacion-embarque" class="table table-bordered table-hover table-striped">
             <thead class="thead-light">
               <tr>
+                <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
                 <th>Asesor</th>
+                <?php } ?>
                 <th>Status</th>
                 <th>N.</th>
                 <th>Buyer</th>
+                <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
                 <th>Whatsapp</th>
+                <?php } ?>
                 <th
                 style="min-width: 10em;"
 
                 >Estado</th>
                 <th
-                style="min-width: 20em;"
+                style="min-width: 10em;"
                 >Productos</th>
                 <th
-                style="min-width: 5em;"
+                style="min-width: 2em;"
 
                 >Qty Box.</th>
                 <th
-                style="min-width: 5em;"
+                style="min-width: 2em;"
                 >CBM Total</th>
                 <th
-                style="min-width: 5em;"
+                style="min-width: 2em;"
 
                 >Weight</th>
                 <th
-                style="min-width: 10em;"
+                style="min-width: 5em;"
 
                 >Supplier</th>
                 <th
-                style="min-width: 10em;"
+                style="min-width: 5em;"
 
                 >Code Supplier</th>
                 <th 
-                style="min-width: 10em;"
+                style="min-width: 7em;"
                 >Phone Number</th>
                 <th 
-                style="min-width: 5em;"
+                style="min-width: 3em;"
                 >Qty Box.</th>
                 <th 
-                style="min-width: 5em;"
+                style="min-width: 3em;"
                 >CBM China </th>
                 <th 
                 style="min-width: 5em;"
@@ -388,7 +403,7 @@
 
               <!-- Existing and uploaded files will appear here -->
         </div>
-        <div id="pending-files" class="mb-4">
+        <div id="pending-files" class="mb-4 absolute bottom-0 right-4 max-h-[80%] bg-yellow-50 border border-yellow-300 p-4 rounded-md overflow-y-auto">
           <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
             <div id="pending-file-list" class="space-y-2">
                   <!-- Los archivos pendientes aparecerán aquí -->
@@ -497,7 +512,7 @@
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary upload-btn" >Upload</button>
+                  <button type="button" class="btn btn-primary upload-btn-inspection" >Upload</button>
               </div>
           </div>
       </div>
@@ -569,7 +584,8 @@
                 <div class="col-6 col-sm-6">
                   <div class="form-group">
                     <label>Carga <span class="label-advertencia text-danger"> *</span></label>
-                    <input type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
+                    <select type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
+                    </select>
                     <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
                   </div>
                 </div>

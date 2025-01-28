@@ -11,6 +11,10 @@ var fDay = fToday.getDate();
 var currentCarga = 0;
 var currentProveedor=0;
 var currentCotizacion
+var currentTableCotizacion="";
+var currentPrivilege="";
+var fileManager = null;
+var fileManagerInspection = null;
 var meses = [
     {
         "id": "ENERO",
@@ -139,7 +143,7 @@ async function verCotizacionEmbarque(idProveedor,idCotizacion,supplierCode,clien
      spinner.show();
      $("#client-title").text(clientName);
      $("#client-supplier-code").text(supplierCode);
-     const fileManager = new FileManager({
+      fileManager = new FileManager({
         fileGrid: "#file-grid",
         fileInput: "#file-input-modal",
         uploadBtn: "#btn-upload",
@@ -149,7 +153,7 @@ async function verCotizacionEmbarque(idProveedor,idCotizacion,supplierCode,clien
         onFileUpload:(file)=> uploadFileDocument(file,fileManager),
         onLoadFiles:()=>getFilesAlmacenDocument(idProveedor,idCotizacion),
       });
-      const fileManagerInspection = new FileManager({
+       fileManagerInspection = new FileManager({
         fileGrid: "#file-grid-inspection",
         fileInput: "#file-input-modal-inspection",
         uploadBtn: "#btn-upload-inspection",
@@ -656,6 +660,7 @@ async function viewSteps(id) {
         if (result.status == "success") {
             spinner.hide()
             const data = result.data;
+            currentPrivilege=result.currentPrivilege;
             mainContainer.hide();
             stepsContainer.show();
             loading.hide();
@@ -901,11 +906,151 @@ const openStepFunction = async (step, id) => {
     stepsContainer.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
     if (stepIndex == 1) {
-        cotizacionContainer.show();
-        if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+        cotizacionContainer.show();        
+        await getTipoCliente();
+        if(currentPrivilege=="ContenedorAlmacen"){
+            $("#table-cotizacion-prospectos").attr("style", "display:none");
+            if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+                reloadTableCotizacionEmbarque();
+            }else{
+                url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+                                tableCotizacionEmbarque.show();
+                                tableCotizacionEmbarque = $('#table-cotizacion-embarque').DataTable({
+                                    dom:
+                                        "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                                        "<'row'<'col-sm-12'tr>>" +
+                                        "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+                                    buttons: [
+                                        {
+                                            extend: "excel",
+                                            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                                            titleAttr: "Excel",
+                                            exportOptions: {
+                                                columns: ":visible",
+                                            },
+                                        },
+
+                                        {
+                                            extend: "colvis",
+                                            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                                            titleAttr: "Columnas",
+                                            exportOptions: {
+                                                columns: ":visible",
+                                            },
+                                        },
+                                        
+                                        {
+                                            text: "Por Embarcar",
+                                            className: "btn btn-light",
+                                            action: function () {
+                                                if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+                                                    $("#table-cotizacion-prospectos").attr("style", "display:none");
+                                                    $("#table-cotizacion-prospectos_wrapper").hide();
+                                                }
+                                                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+
+                                                    $("#table-cotizacion-embarque").attr("style", "");
+
+                                                } else {
+                                                    $("#table-cotizacion-embarque").attr("style", "");
+                                                }
+                                                $(".input-date").datepicker({
+                                                    autoclose: true,
+                                                    startDate: new Date(fYear, fToday.getMonth(), fDay),
+                                                    todayHighlight: true,
+                                                    format: "dd/mm/yyyy",
+                                                    dateFormat: "dd/mm/yyyy",
+                                                });
+                                                currentTableCotizacion="embarque";
+                                            }
+                                        },
+
+                                   
+                                    ],
+                                    paging: true,
+                                    lengthChange: true,
+                                    searching: true,
+                                    ordering: true,
+                                    info: true,
+                                    autoWidth: false,
+                                    responsive: false,
+                                    serverSide: false,
+                                    pagingType: "full_numbers",
+                                    oLanguage: {
+                                        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                                        sLengthMenu: "_MENU_",
+                                        sSearch: "Buscar por: ",
+                                        sSearchPlaceholder: "",
+                                        sZeroRecords: "No se encontraron registros",
+                                        sInfoEmpty: "No hay registros",
+                                        sLoadingRecords: "Cargando...",
+                                        sProcessing: "Procesando...",
+                                        oPaginate: {
+                                            sFirst: "<<",
+                                            sLast: ">>",
+                                            sPrevious: "<",
+                                            sNext: ">",
+                                        },
+                                    },
+                                    order: [[0, "desc"]],
+                                    //hide last two columns
+                                    columnDefs: [
+                                        {
+                                            targets: "no-hidden",
+                                            visible: false,
+                                        },
+                                        {
+                                            className: "text-center",
+                                            targets: "no-sort",
+                                            orderable: false,
+                                        },
+                                        {
+                                            targets:"",
+                                            orderable:false
+                                        }
+
+                                    ],
+                                    ajax: {
+                                        url: url,
+                                        type: "POST",
+                                        dataType: "JSON",
+                                        data: function (data) {
+                                            data.stepIndex = stepIndex;
+                                            data.idContenedor = idContenedor;
+                                            data.tipoTabla = "embarque";
+                                            data.estado = $("#txt-ID_Estado").val();
+                                            validateListEmbarque(idContenedor);
+                                            $(".input-date").datepicker({
+                                                autoclose: true,
+                                                startDate: new Date(fYear, fToday.getMonth(), fDay),
+                                                todayHighlight: true,
+                                                format: "dd/mm/yyyy",
+                                                dateFormat: "dd/mm/yyyy",
+                                            });
+                                            getTableCotizacionEmbarqueHeaders();
+                                        }
+                                    },
+                                    //when data is loaded
+                                    initComplete: function (settings, json) {
+                                        $(".input-date").datepicker({
+                                            autoclose: true,
+                                            startDate: new Date(fYear, fToday.getMonth(), fDay),
+                                            todayHighlight: true,
+                                            format: "dd/mm/yyyy",
+                                            dateFormat: "dd/mm/yyyy",
+                                        });
+                                    },
+                                });
+            }
+            spinner.hide();
+        }else{
+        if(currentTableCotizacion!="prospectos"){
+            reloadTableCotizacionEmbarque();
+        }
+        if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos") && currentTableCotizacion!="embarque") {
             reloadTableCotizacion();
-    
-        } else {
+            
+        } else if(currentTableCotizacion!="embarque") {
             tableCotizacion = $('#table-cotizacion-prospectos').DataTable({
                 dom:
                     "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -954,6 +1099,7 @@ const openStepFunction = async (step, id) => {
                                 reloadTableCotizacion();
 
                             }
+                            currentTableCotizacion="prospectos";
                             
                         },
                         className: "btn btn-light"
@@ -1015,6 +1161,7 @@ const openStepFunction = async (step, id) => {
                                                     reloadTableCotizacion();
 
                                                 }
+                                                currentTableCotizacion="prospectos";
                                             },
                                         },
                                         {
@@ -1039,6 +1186,7 @@ const openStepFunction = async (step, id) => {
                                                     format: "dd/mm/yyyy",
                                                     dateFormat: "dd/mm/yyyy",
                                                 });
+                                                currentTableCotizacion="embarque";
                                             }
                                         },
 
@@ -1081,6 +1229,10 @@ const openStepFunction = async (step, id) => {
                                             targets: "no-sort",
                                             orderable: false,
                                         },
+                                        {
+                                            targets:"",
+                                            orderable:false
+                                        }
 
                                     ],
                                     ajax: {
@@ -1105,6 +1257,7 @@ const openStepFunction = async (step, id) => {
                                 });
                                await  getTableCotizacionEmbarqueHeaders();
                             }
+                            currentTableCotizacion="embarque";
                             $(".input-date").datepicker({
                                 autoclose: true,
                                 startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -1142,6 +1295,22 @@ const openStepFunction = async (step, id) => {
                     },
                 },
                 order: [[0, "desc"]],
+                columnDefs: [
+                    {
+                        targets: "no-hidden",
+                        visible: false,
+                    },
+                    {
+                        className: "text-center",
+                        targets: "no-sort",
+                        orderable: false,
+                    },
+                    {
+                        targets:"",
+                        orderable:false
+                    }
+
+                ],
                 ajax: {
                     url: url,
                     type: "POST",
@@ -1167,6 +1336,11 @@ const openStepFunction = async (step, id) => {
                         targets: "no-sort",
                         orderable: false,
                     },
+                    {
+                        targets:"",
+                        orderable:false
+                    }
+
                 ],
                 lengthMenu: [
                     [10, 100, 1000, -1],
@@ -1175,8 +1349,8 @@ const openStepFunction = async (step, id) => {
             });
           
         }
-
-        await getTipoCliente();
+    }
+        
 
     } else if (stepIndex == 2) {
         url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
@@ -1551,8 +1725,12 @@ async function getTableCotizacionEmbarqueHeaders(){
         <i class="fa fa-download"></i>
         Descargar
         </a>
-    
+        <button class="btn btn-outline-danger" onclick="deleteListaEmbarque()">
+        <i class="fa fa-trash " ></i>
+        </button>
         `);
+        //add event for delete 
+        
     }else{
         $("#packing-list-container").empty();
         $("#packing-list-container").append(`
@@ -1666,6 +1844,61 @@ async function getTableCotizacionEmbarqueHeaders(){
         });
         
     }
+}
+
+async function deleteBL(){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteBL/" + idContenedor;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    getTableCotizacionEmbarqueHeaders();
+                },
+            });
+        }
+    });
+}
+async function deleteListaEmbarque(){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteListaEmbarque/" + idContenedor;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    getTableCotizacionEmbarqueHeaders();
+                },
+            });
+        }
+    });
 }
 
 async function deleteDocumentacionFile(id) {
@@ -2332,6 +2565,8 @@ $(document).ready(async function () {
         $("#txt-ID_Pais").empty();
         $("#txt-Mes").empty();
         await getPaises();
+        //APPEND DEFAULT OPTION DISABLED SELECT
+        $("#txt-Mes").append('<option value="" disabled selected>Seleccione un mes</option>');
         meses.forEach((mes) => {
             $("#txt-Mes").append(
                 `<option value="${mes.id}">${mes.value}</option>`
@@ -2343,6 +2578,8 @@ $(document).ready(async function () {
         const response = await fetch(url);
         const result = await response.json();
         paises = result;
+    
+        $("#txt-ID_Pais").append('<option value="" disabled selected>Seleccione un país</option>');
         paises.forEach((pais) => {
             $("#txt-ID_Pais").append(
                 `<option value="${pais.ID_Pais}">${pais.No_Pais}</option>`
@@ -2351,9 +2588,28 @@ $(document).ready(async function () {
     }
     await fillSelects();
     btnCrear = $("#btn-crear");
-    btnCrear.on("click", function () {
+    btnCrear.on("click", async function () {
         $("#modal-crear").modal("show");
         $("#btn-guardar").show();
+        //do fetch to get data from id
+        const validContainers=await fetch(base_url + "CargaConsolidada/ContenedorConsolidado/getValidContainers");
+        const parsedContainer=await validContainers.json();
+        console.log(parsedContainer);
+        $("#txt-No_Carga").empty();
+        parsedContainer.forEach((container)=>{
+            $("#txt-No_Carga").append(
+                `<option value="${container}">Consolidado #${container}</option>`
+            );
+        });
+        //off event listener
+        $("#txt-ID_Pais").off("change");
+        $("#txt-ID_Pais").on("change",function(){
+            if($(this).val()==1){
+                $("#txt-Empresa").val("PRO MUNDO COMEX SAC.");
+            }else{
+                $("#txt-Empresa").val("");
+            }
+        })
         $("#btn-actualizar").hide();
     });
     btnCrearCotizacion = $("#btn-crear-cotizacion");
@@ -2453,7 +2709,11 @@ $(document).ready(async function () {
                     const result = JSON.parse(response);
                     if (result.status == "success") {
                         $("#modal-crear-cotizacion").modal("hide");
-                        tableCotizacion.ajax.reload();
+                        if(currentTableCotizacion=="prospectos"){
+                            tableCotizacion.ajax.reload();
+                        }else if(currentTableCotizacion=="embarque"){
+                            tableCotizacionEmbarque.ajax.reload();
+                        }
                         Swal.fire({
                             icon: "success",
                             title: "Correcto",
@@ -2658,6 +2918,26 @@ $(document).ready(async function () {
                 },
             });
         });
+        $(".upload-btn").click(() =>{
+            const file= $("#file-input-modal").prop('files')[0];
+
+            uploadFileDocument(file,fileManager).then((response)=>{
+                console.log(response)
+                fileManager.data.driveFiles.push(response);
+                fileManager.renderFileGrid(fileManager.data.driveFiles);
+            });
+            //hide modal
+            $("#uploadModal").modal("hide");
+        })
+        $(".upload-btn-inspection").click(function () {
+            const file=$("#file-input-modal-inspection").prop('files')[0];
+            uploadFileDocument(file,fileManagerInspection).then((response)=>{
+                fileManagerInspection.data.driveFiles.push(response);
+                fileManagerInspection.renderFileGrid(fileManagerInspection.data.driveFiles);
+            }
+            );
+            $("#uploadModalInspection").modal("hide");
+        })
         $("#btn-documentacion-factura").click(async function (e) {
             e.preventDefault();
             spinner.show();
