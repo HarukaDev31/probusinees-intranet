@@ -49,7 +49,7 @@ class ContenedorConsolidado extends CI_Controller {
 			<i class="fas fa-eye" style="cursor:pointer;" onclick="viewSteps('.$row->id.')"></i>
 			</div>';
 			$subdata[] = $btnView;
-			$divEstadoSelect="";
+			
 
 			
 			$divEstado='<select class="form-control" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">

@@ -366,10 +366,10 @@
     </section>
     <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
-    <div class="row mb-2 bg-white shadow-sm px-4 py-4">
+    <div class="row mb-2 bg-white shadow-sm px-4 py-4 mx-3">
       <div class="col-12 col-md-8">
         <div class="d-flex flex-row">
-          <h1 id="client-title"></h1>
+          <h1 id="client-title" style="margin-right: 2em;"></h1>
           <h1 id="client-supplier-code"></h1>
         </div>
       </div>
