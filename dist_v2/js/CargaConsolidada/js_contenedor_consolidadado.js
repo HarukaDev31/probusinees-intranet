@@ -890,8 +890,10 @@ const getActionButtons = (data) => {
         return "";
     }
 };
-const reloadTableCotizacion = () => {
+const reloadTableCotizacion = async() => {
     tableCotizacion.ajax.reload();
+    await getTableCotizacionEmbarqueHeaders();
+
 };
 const updateEstadoCliente = (id) => {
     const estado = $(`#estado-cliente-${id}`).val();
@@ -1344,9 +1346,10 @@ const openStepFunction = async (step, id) => {
                         data.tipoTabla = "prospectos";
 
                     },
-                    complete: function () {
+                    complete: async function () {
                         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
                         spinner.hide();
+                        await getTableCotizacionEmbarqueHeaders();
                     },
                 },
                 columnDefs: [

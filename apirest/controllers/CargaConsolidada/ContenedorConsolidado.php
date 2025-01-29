@@ -249,16 +249,16 @@ class ContenedorConsolidado extends CI_Controller {
 						</div>';
 						
 					}else{
-						$proveedoresSelect.='<div class="badge  d-block mb-1
-						'.($proveedor->estados_proveedor=="NS" ? "badge-danger" : "").'
-						'.($proveedor->estados_proveedor=="C" ? "badge-success" : "").'
-						'.($proveedor->estados_proveedor=="R" ? "badge-warning" : "").'
-						'.($proveedor->estados_proveedor=="NC" ? "badge-info" : "").'
-						'.($proveedor->estados_proveedor=="INSPECTION" ? "badge-primary" : "").'
-						'.($proveedor->estados_proveedor=="LOADED" ? "badge-success" : "").'
-						'.($proveedor->estados_proveedor=="NO LOADED" ? "badge-danger" : "").'
-						
-						">'.$proveedor->estados_proveedor.'</div>';
+						$proveedoresSelect .= '<div class="badge d-block mb-1 ' . 
+							($proveedor->estados_proveedor == "NS" ? "badge-danger" : "") . 
+							($proveedor->estados_proveedor == "C" ? "badge-success" : "") . 
+							($proveedor->estados_proveedor == "R" ? "badge-warning" : "") . 
+							($proveedor->estados_proveedor == "NC" ? "badge-info" : "") . 
+							($proveedor->estados_proveedor == "INSPECTION" ? "badge-primary" : "") . 
+							($proveedor->estados_proveedor == "LOADED" ? "badge-success" : "") . 
+							($proveedor->estados_proveedor == "NO LOADED" ? "badge-danger" : "") . 
+							'">' . $proveedor->estados_proveedor . '</div>';
+
 						$divInputQtyChina.='<div>
 						<div class="">'.($proveedor->qty_box_china??0).'</div>
 						</div>';

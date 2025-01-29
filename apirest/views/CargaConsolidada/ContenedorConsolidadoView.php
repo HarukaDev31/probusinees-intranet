@@ -101,8 +101,8 @@
                   <button type="button" class="btn btn-outline-primary btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> </button>
                 </div>
         </div>
-        <?php if($this->user->No_Grupo=="ContenedorAlmacen"){  ?>
           <div class="row mb-2">
+
             <div class="col-12 col-md-3">
               <label>CBM Total Peru</label>
               <div class="input-group mb-3">
@@ -115,6 +115,8 @@
                 <input type="number" id="txt-CBM_Total_China" class="form-control input-report" disabled>
               </div>
             </div>
+            <?php if($this->user->No_Grupo=="ContenedorAlmacen"){  ?>
+
             <div class="col-12 col-md-3">
               <label>Packing List</label>
               <div class="input-group mb-3" id="packing-list-container">
@@ -125,8 +127,9 @@
               <div class="input-group mb-3" id="bl-file-container">
               </div>
             </div>
+            <?php } ?>
           </div>
-        <?php } ?>
+   
         <div class="table-responsive">
           <table id="table-cotizacion-prospectos" class="table table-bordered table-hover table-striped">
             <thead class="thead-light">
