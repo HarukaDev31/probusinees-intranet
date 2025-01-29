@@ -1,10 +1,10 @@
-<?php $iControlVersionDashboard = '1.2.55'; ?>
+<?php $iControlVersionDashboard = '1.2.6'; ?>
 <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
       <b>Version</b> <?php echo $iControlVersionDashboard; ?>
     </div>
-    <strong>&copy; 2023 <a style="color: #FF500B !important" href="https://probusiness.pe" target="_blank" alt="ProBusiness" rel="noopener noreferrer">ProBusiness</a></strong>
+    <strong>&copy; 2025 <a style="color: #FF500B !important" href="https://probusiness.pe" target="_blank" alt="ProBusiness" rel="noopener noreferrer">ProBusiness</a></strong>
   </footer>
 
   <!-- Control Sidebar -->
