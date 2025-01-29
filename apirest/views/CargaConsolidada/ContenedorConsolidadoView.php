@@ -54,24 +54,31 @@
           <table id="table-contenedor" class="table table-bordered table-hover table-striped">
             <thead class="thead-light">
               <tr>
+              <?php if($this->user->No_Grupo=="Coordinación"){
+                ?>
                 <th>Mes  </th>
                 <th>Pais</th>
                 <th>Carga</th>
-                <?php if($this->user->No_Grupo=="Coordinación"){
-                ?>
+  
                 <th>F. Cierre</th>
                 <th>F. Arribo</th>
                 <th>F. Entrega</th>
-                <?php }else{ ?>
-                  <th>Cut Off </th>
-                <?php } ?>
 
                 <th>Empresa</th>
                 <th>Ver</th>
                 <th>Estado</th>
-                <?php if($this->user->No_Grupo=="Coordinación"){  ?>
                 <th>Acciones                 
                 </th>
+              <?php } else{?>
+                <th>Month</th>
+                <th>Country</th>
+                <th
+                >Cargo.</th>
+                <th>Cut off</th>
+                <th>Company</th>
+                <th>Check</th>
+                <th>Status</th>
+               
               <?php } ?>
               </tr>
             </thead>
@@ -943,5 +950,9 @@ i:hover {
         }h1{
           font-weight: 600;
           font-size: 1.5em;
-        }
+        }@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
 </style>

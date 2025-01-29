@@ -45,15 +45,25 @@ class ContenedorConsolidado extends CI_Controller {
 			}
 			
 			$subdata[] = $row->empresa;
-			$btnView='<div>
-			<i class="fas fa-eye" style="cursor:pointer;" onclick="viewSteps('.$row->id.')"></i>
-			</div>';
+			$btnView = '<div>' .
+			'<i class="fas fa-eye ' . 
+			($row->estado == "PENDIENTE" ? 'text-primary fa-blink fa-lg  ' : 'text-primary') . 
+			'" style="cursor:pointer;font-size:20px;' . 
+			($row->estado == "PENDIENTE" ? 'font-size:20px;animation: blink 1s linear infinite;' : '') . 
+			'" onclick="viewSteps(' . $row->id . ')"></i>' .
+			'</div>';
 			$subdata[] = $btnView;
-			
 
 			
-			$divEstado='<select class="form-control" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">
-				<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
+			$divEstado='<select 
+			class="form-control
+			'.($row->estado=="PENDIENTE" ? "bg-light" : "").
+			($row->estado=="RECIBIENDO" ? "bg-primary" : "").
+			($row->estado=="COMPLETADO" ? "bg-success" : "").'
+			
+			" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">
+				<option 
+				value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
 				<option value="RECIBIENDO" '.($row->estado=="RECIBIENDO" ? "selected" : "").'>RECIBIENDO</option>
 
 				<option value="COMPLETADO" '.($row->estado=="COMPLETADO" ? "selected" : "").'>COMPLETADO</option>
