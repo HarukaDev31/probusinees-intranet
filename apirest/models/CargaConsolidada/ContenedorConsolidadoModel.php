@@ -835,7 +835,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     'message' => "Lista de embarque actualizada"
                 ];
             }
-            
+            $this->verifyContainerIsCompleted($idContenedor);
             if ($this->db->error()['code'] != 0) {
                 return [
                     'status' => "error",
@@ -863,6 +863,22 @@ class ContenedorConsolidadoModel extends CI_Model
             return "success";
         }
         return false;
+    }
+    public function verifyContainerIsCompleted($idcontenedor){
+        //IF lista_embarque_url  && bl_file_url is no null set estado COMPLETADO ELSE RECIBIENDO
+        $this->db->select('lista_embarque_url,bl_file_url')
+            ->from($this->table)
+            ->where('id', $idcontenedor);
+        $query = $this->db->get();
+        $listaEmbarque = $query->row()->lista_embarque_url;
+        $blFile = $query->row()->bl_file_url;
+        if ($listaEmbarque != null && $blFile != null) {
+            $this->db->set('estado', 'COMPLETADO');
+        } else {
+            $this->db->set('estado', 'RECIBIENDO');
+        }
+        $this->db->where('id', $idcontenedor);
+        $this->db->update($this->table);
     }
     public function validateListEmbarque($id)
     {
@@ -1867,6 +1883,11 @@ class ContenedorConsolidadoModel extends CI_Model
         $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estados_proveedor]);
         if ($this->db->affected_rows() > 0) {
+            if($estados_proveedor=="LOADED"){
+                $this->db->where('id', $idProveedor);
+                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
+                
+            }
             return "success";
         }
         return false;
@@ -1935,30 +1956,48 @@ class ContenedorConsolidadoModel extends CI_Model
         return false;
     }
     public function updateProveedorData($data,$idProveedor){
-        //data arrive_date_china from  dd/mm/yyyy to date
-        //if data supplier phone or supplier is not null or empty change status  and status tracking tyo DATOS PROVEEDOR
-        if(isset($data['supplier_phone']) || isset($data['supplier'])){ 
-            //CHECK CURRENT STATUS IS EQUAL TO ROTULADO CHANGE TO DATOS PROVEEDOR
-            $this->db->select('estados')
+        
+        $this->db->select('estados,estados_proveedor,id_contenedor')
                 ->from($this->table_contenedor_cotizacion_proveedores)
                 ->where('id', $idProveedor);
             $query = $this->db->get();
             $estado = $query->row()->estados;
+            $estadoProveedor = $query->row()->estados_proveedor;
+            $idContenedor = $query->row()->id_contenedor;
+        if(isset($data['supplier_phone']) || isset($data['supplier'])){ 
+            //CHECK CURRENT STATUS IS EQUAL TO ROTULADO CHANGE TO DATOS PROVEEDOR
+            
             if($estado=="ROTULADO" || !$estado){
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'DATOS PROVEEDOR']);
                 $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, ['id_proveedor' => $idProveedor, 'estado' => 'DATOS PROVEEDOR']);
 
             }
-            //insert into tracking table
+            $this->verifyContainerIsCompleted($idContenedor);
 
         }
+
         if(isset($data['arrive_date_china'])){
             $data['arrive_date_china']=date('Y-m-d',strtotime(str_replace('/', '-', $data['arrive_date_china'])));
+            if($estadoProveedor=="NC"){
+                $this->db->where('id', $idProveedor);
+                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'C']);
+            }
+            $this->verifyContainerIsCompleted($idContenedor);
+
+        }
+        if(isset($data['qty_box_china']) && isset($data['cbm_total_china'])){
+            if($estadoProveedor=="NC" || $estadoProveedor=="C"){
+                $this->db->where('id', $idProveedor);
+                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'R']);
+            }
         }
         $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
+        $this->verifyContainerIsCompleted($idContenedor);
+
         if ($this->db->error()->code!=0) {
+            
             return ['status' => "error", 'error' => $this->db->error()];
         }else{
             return "success";
@@ -2184,6 +2223,8 @@ class ContenedorConsolidadoModel extends CI_Model
         if ($fileUrl) {
             $this->db->where('id', $idContenedor);
             $this->db->update($this->table, ['bl_file_url' => $fileUrl]);
+            $this->verifyContainerIsCompleted($idContenedor);
+
             if ($this->db->affected_rows() > 0) {
                 return ['status' => "success", 'error' => false];
             }
@@ -2201,6 +2242,8 @@ class ContenedorConsolidadoModel extends CI_Model
     public function deleteBL($idContenedor){
         $this->db->where('id', $idContenedor);
         $this->db->update($this->table, ['bl_file_url' => '']);
+        $this->verifyContainerIsCompleted($idContenedor);
+
         if ($this->db->affected_rows() > 0) {
             return "success";
         }
@@ -2209,6 +2252,8 @@ class ContenedorConsolidadoModel extends CI_Model
     public function deleteListaEmbarque($idContenedor){
         $this->db->where('id', $idContenedor);
         $this->db->update($this->table, ['lista_embarque_url' => '']);
+        $this->verifyContainerIsCompleted($idContenedor);
+
         if ($this->db->affected_rows() > 0) {
             return "success";
         }

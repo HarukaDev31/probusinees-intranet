@@ -251,8 +251,8 @@ class ContenedorConsolidado extends CI_Controller {
 					}else{
 						$proveedoresSelect .= '<div class="badge d-block mb-1 ' . 
 							($proveedor->estados_proveedor == "NS" ? "badge-danger" : "") . 
-							($proveedor->estados_proveedor == "C" ? "badge-success" : "") . 
-							($proveedor->estados_proveedor == "R" ? "badge-warning" : "") . 
+							($proveedor->estados_proveedor == "C" ? "badge-warning" : "") . 
+							($proveedor->estados_proveedor == "R" ? "badge-success" : "") . 
 							($proveedor->estados_proveedor == "NC" ? "badge-info" : "") . 
 							($proveedor->estados_proveedor == "INSPECTION" ? "badge-primary" : "") . 
 							($proveedor->estados_proveedor == "LOADED" ? "badge-success" : "") . 
@@ -280,7 +280,7 @@ class ContenedorConsolidado extends CI_Controller {
 						<option value="" '.($proveedor->estados=="" ? "selected disabled" : "").'>--Seleccionar--</option>
 						<option value="ROTULADO" '.($proveedor->estados=="ROTULADO" ? "selected" : "").'>ROTULADO</option>
 						<option value="DATOS PROVEEDOR" '.($proveedor->estados=="DATOS PROVEEDOR" ? "selected" : "").'>DATOS PROVEEDOR</option>
-						<option value="INSPECCIONADO" '.($proveedor->estados=="INSPECCIONADO" ? "selected" : "").'>INSPECCIONADO</option>
+						<option value="INSPECCIONADO" '.($proveedor->estados=="INSPECCIONADO" ? "selected" : "").''.($this->user->No_Grupo!=="ContenedorAlmacen" ? " disabled" : "").'		>INSPECCIONADO</option>
 						<option value="RESERVADO" '.($proveedor->estados=="RESERVADO" ? "selected" : "").'>RESERVADO</option>
 						<option value="EMBARCADO" '.($proveedor->estados=="EMBARCADO" ? "selected" : "").''.($this->user->No_Grupo!=="ContenedorAlmacen" ? "disabled" : "").'
 						>EMBARCADO</option>

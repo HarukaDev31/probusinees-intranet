@@ -720,6 +720,7 @@ async function viewSteps(id) {
 async function hideSteps() {
     stepsContainer.hide();
     mainContainer.show();
+    table_Entidad.ajax.reload();
 }
 async function deleteCarga(id) {
     Swal.fire({
@@ -2430,6 +2431,10 @@ $(document).ready(async function () {
                 targets: "no-sort",
                 orderable: false,
             },
+            {
+                targets:"",
+                orderable:false
+            }
         ],
         lengthMenu: [
             [10, 100, 1000, -1],

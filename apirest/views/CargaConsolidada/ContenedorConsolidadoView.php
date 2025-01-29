@@ -409,7 +409,7 @@
 
               <!-- Existing and uploaded files will appear here -->
         </div>
-        <div id="pending-files" class="mb-4 absolute bottom-0 right-4 max-h-[80%] bg-yellow-50 border border-yellow-300 p-4 rounded-md overflow-y-auto">
+        <div id="pending-files" class="hidden d-none">
           <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
             <div id="pending-file-list" class="space-y-2">
                   <!-- Los archivos pendientes aparecerán aquí -->
@@ -431,7 +431,7 @@
       </div>
       </div>
     </div>
-    <div class="row my-5">
+    <div class="row my-3">
       <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
       <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top" >Inspection
         <button   data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -458,7 +458,7 @@
 
               <!-- Existing and uploaded files will appear here -->
         </div>
-        <div id="pending-files-inspection" class="mb-4">
+        <div id="pending-files-inspection hidden" class="mb-4">
           <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
             <div id="pending-file-list-inspection" class="space-y-2">
                   <!-- Los archivos pendientes aparecerán aquí -->
