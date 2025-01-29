@@ -141,7 +141,7 @@ async function verCotizacionEmbarque(idProveedor,idCotizacion,supplierCode,clien
     currentCotizacion=idCotizacion;
      // Función para inicializar la lista al cargar la página
      spinner.show();
-     $("#client-title").text(clientName);
+     $("#client-title").text(clientName+":");
      $("#client-supplier-code").text(supplierCode);
       fileManager = new FileManager({
         fileGrid: "#file-grid",
