@@ -174,14 +174,14 @@
                 style="min-width: 10em;"
                 >Productos</th>
                 <th
-                style="min-width: 2em;"
+                style="min-width: 3em;"
 
                 >Qty Box.</th>
                 <th
-                style="min-width: 2em;"
+                style="min-width: 4em;"
                 >CBM Total</th>
                 <th
-                style="min-width: 2em;"
+                style="min-width: 4em;"
 
                 >Weight</th>
                 <th
@@ -937,7 +937,7 @@ i:hover {
           height: auto;
           width: 100%;
           gap: 1rem;
-          max-height: 50vh;
+          max-height: 500px;
           min-height: 400px;
           overflow-y: auto;
         }h1{
