@@ -332,10 +332,14 @@ class ContenedorConsolidado extends CI_Controller {
 						\'' . addslashes($row->nombre) . '\'
 					)"></i>
 					</div>';
-					$divAcciones.='<div class="btn btn-outline-success mb-1">
+					$divAcciones.=
+					'<div class="d-flex flex-row gap-1">'.
+					'<div class="btn btn-outline-danger mb-1">
 					'.($this->user->No_Grupo!="ContenedorAlmacen" ? '<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id.','.$proveedor->id_proveedor.')"></i>' : '').'
-					<i class="fas fa-save text-success" style="cursor:pointer;" onclick="updateProveedorData('.$row->id. ','.$proveedor->id_proveedor.')"></i>
-					</div>';
+					</div>'.
+					'<div class="btn btn-outline-success mb-1"> 					<i class="fas fa-save text-success" style="cursor:pointer;" onclick="updateProveedorData('.$row->id. ','.$proveedor->id_proveedor.')"></i>
+					</div>'.
+					'</div>';
 				}
 				//input productos with with button to save text in input and call function to save
 				

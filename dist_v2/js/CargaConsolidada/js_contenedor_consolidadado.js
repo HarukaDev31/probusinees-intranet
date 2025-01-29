@@ -1030,7 +1030,7 @@ const openStepFunction = async (step, id) => {
                                         url: url,
                                         type: "POST",
                                         dataType: "JSON",
-                                        data: function (data) {
+                                        data:   function (data) {
                                             data.stepIndex = stepIndex;
                                             data.idContenedor = idContenedor;
                                             data.tipoTabla = "embarque";
@@ -1043,7 +1043,7 @@ const openStepFunction = async (step, id) => {
                                                 format: "dd/mm/yyyy",
                                                 dateFormat: "dd/mm/yyyy",
                                             });
-                                            getTableCotizacionEmbarqueHeaders();
+                                             getTableCotizacionEmbarqueHeaders();
                                         }
                                     },
                                     //when data is loaded
@@ -1056,6 +1056,28 @@ const openStepFunction = async (step, id) => {
                                             dateFormat: "dd/mm/yyyy",
                                         });
                                     },
+                                    complete: function () {
+
+                                        $('.input-date').datepicker({
+                                            autoclose: true,
+                                            startDate: new Date(fYear, fToday.getMonth(), fDay),
+                                            todayHighlight: true,
+                                            format: "dd/mm/yyyy",
+                                            dateFormat: "dd/mm/yyyy",
+                                        });
+                                    },
+                                    drawCallback: function (settings) {
+                                        $('.input-date').datepicker({
+                                            autoclose: true,
+                                            startDate: new Date(fYear, fToday.getMonth(), fDay),
+                                            todayHighlight: true,
+                                            format: "dd/mm/yyyy",
+                                            dateFormat: "dd/mm/yyyy",
+                                        });
+                                    }
+
+                                    //on complete ajax call
+                                    
                                 });
             }
             spinner.hide();
@@ -1736,6 +1758,7 @@ async function reloadTableClientesVariacion() {
 async function reloadTableCotizacionEmbarque(){
     tableCotizacionEmbarque.ajax.reload()
     await getTableCotizacionEmbarqueHeaders();
+   
    
 }
 async function getTableCotizacionEmbarqueHeaders(){

@@ -1606,18 +1606,19 @@ class ContenedorConsolidadoModel extends CI_Model
         
         if ($this->db->affected_rows() > 0) {
             //update past rows updated_at
-            $this->db->where('id_proveedor', $idProveedor);
-            $this->db->update($this->table_conteneodr_proveedor_estados_tracking, ['updated_at' => date('Y-m-d H:i:s')]);
-            $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, ['id_cotizacion' => $idCotizacion, 'id_proveedor' => $idProveedor, 'estado' => $estado]);
-            $this->db->where('id_cotizacion', $idCotizacion);
-            $data = $this->handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion);
-            // return $data;
-            return "success";
+           
         }
-        if ($this->db->error() ) {
+        //if exists error with different code than 0
+        if ($this->db->error() && $this->db->error()['code'] != 0) {
             return ['status' => "error", 'error' => $this->db->error()];
         }
-        return false;
+        $this->db->where('id_proveedor', $idProveedor);
+        $this->db->update($this->table_conteneodr_proveedor_estados_tracking, ['updated_at' => date('Y-m-d H:i:s')]);
+        $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, ['id_cotizacion' => $idCotizacion, 'id_proveedor' => $idProveedor, 'estado' => $estado]);
+        $this->db->where('id_cotizacion', $idCotizacion);
+        $data = $this->handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion);
+        // return $data;
+        return "success";
     }
     public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
     {
