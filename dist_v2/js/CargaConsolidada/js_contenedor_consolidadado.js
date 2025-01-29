@@ -11,7 +11,7 @@ var fDay = fToday.getDate();
 var currentCarga = 0;
 var currentProveedor=0;
 var currentCotizacion
-var currentTableCotizacion="";
+var currentTableCotizacion="prospectos";
 var currentPrivilege="";
 var fileManager = null;
 var fileManagerInspection = null;
@@ -163,23 +163,12 @@ async function verCotizacionEmbarque(idProveedor,idCotizacion,supplierCode,clien
         onFileUpload:(file)=> uploadFileAlmacenInspection(file,fileManagerInspection),
         onLoadFiles:()=>getFilesAlmacenInspection(idProveedor,idCotizacion),
       });
-    //  url=base_url+"CargaConsolidada/ContenedorConsolidado/verCotizacionEmbarqueFiles/"+idProveedor;
-    //     try{
-    //         $.ajax({
-    //             url: url, // Cambia a la URL de tu backend para obtener los archivos
-    //             method: 'GET',
-    //             success: function (data) {
-    //                 // fileList.empty();
-    //                 // const dataParsed=JSON.parse(data);
-    //                 // dataParsed.forEach(file => {
-    //                 //     addFileToList(file);
-    //                 // });
-                   
-    //             },
-    //             error: function () {
-    //                 alert('Error al cargar los archivos.');
-    //             }
-    //         });
+        //fectch getNotes
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/getNotes/"+idProveedor;
+        const response = await fetch(url);
+        const result = await response.json();
+        $("#txt-Id_Carga_Consolidada").val(result.nota);   
+   
     //     }catch(e){
     //         console.error(e);
     //         spinner.hide();
@@ -327,6 +316,32 @@ async function updateEstadoCotizacion(id,idCotizacion) {
                 Swal.fire("Error!", result.message, "error");
             }
             reloadTableCotizacion();
+        },
+    });
+}
+async function addNote() {
+    event.preventDefault();
+    const note = $("#txt-Id_Carga_Consolidada").val();
+    spinner.show();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/addNote";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            id: currentCarga,
+            idProveedor: currentProveedor,
+            note: note,
+        },
+        success: function (response) {
+            spinner.hide();
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                $("#txt-Nota").val("");
+                table_Entidad.ajax.reload();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
         },
     });
 }
@@ -907,7 +922,6 @@ const openStepFunction = async (step, id) => {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
     if (stepIndex == 1) {
         cotizacionContainer.show();        
-        await getTipoCliente();
         if(currentPrivilege=="ContenedorAlmacen"){
             $("#table-cotizacion-prospectos").attr("style", "display:none");
             if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
@@ -1050,7 +1064,7 @@ const openStepFunction = async (step, id) => {
         if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos") && currentTableCotizacion!="embarque") {
             reloadTableCotizacion();
             
-        } else if(currentTableCotizacion!="embarque") {
+        } else if(currentTableCotizacion=="prospectos") {
             tableCotizacion = $('#table-cotizacion-prospectos').DataTable({
                 dom:
                     "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -1253,7 +1267,16 @@ const openStepFunction = async (step, id) => {
                                                 dateFormat: "dd/mm/yyyy",
                                             });
                                         }
-                                    }
+                                    },
+                                    initComplete: function (settings, json) {
+                                        $(".input-date").datepicker({
+                                            autoclose: true,
+                                            startDate: new Date(fYear, fToday.getMonth(), fDay),
+                                            todayHighlight: true,
+                                            format: "dd/mm/yyyy",
+                                            dateFormat: "dd/mm/yyyy",
+                                        });
+                                    },
                                 });
                                await  getTableCotizacionEmbarqueHeaders();
                             }
@@ -1349,6 +1372,8 @@ const openStepFunction = async (step, id) => {
             });
           
         }
+        await getTipoCliente();
+
     }
         
 
@@ -2699,6 +2724,7 @@ $(document).ready(async function () {
                 form.classList.add('was-validated');
                 return;
             }
+            spinner.show();
             $.ajax({
                 url: base_url + "CargaConsolidada/ContenedorConsolidado/storeCotizacion",
                 type: "POST",
@@ -2728,7 +2754,7 @@ $(document).ready(async function () {
                     }
                 },
             });
-
+            spinner.hide();
         });
         $("#btn-actualizar-cotizacion").click(function (e) {
             e.preventDefault();

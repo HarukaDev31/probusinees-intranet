@@ -314,7 +314,14 @@
       // Renderizar la cuadrícula de archivos
       renderFileGrid(files) {
         this.$fileGrid.empty();
-        console.log(files,"files");
+        if (files.length === 0) {
+          this.$fileGrid.append(`<div class="searchable flex flex-col items-center justify-center py-12 col-span-4">
+            <i  class="w-16 h-16 text-gray-300 mb-4 fas fa-folder-open font h-50" style="font-size:3em"></i>
+            <p class="text-gray-500 text-lg">No hay archivos registrados</p>
+            <p class="text-gray-400 text-sm mt-1">Sube un nuevo archivo para comenzar</p>
+          </div>`);
+          return;
+        }
         files.forEach(file => {
           console.log(file,"file");
           const $fileItem = this.createFileItem(file);

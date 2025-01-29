@@ -54,6 +54,8 @@ class ContenedorConsolidado extends CI_Controller {
 			
 			$divEstado='<select class="form-control" id="estado-'.$row->id.'" name="estado" onchange="updateEstado('.$row->id.')">
 				<option value="PENDIENTE" '.($row->estado=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
+				<option value="RECIBIENDO" '.($row->estado=="RECIBIENDO" ? "selected" : "").'>RECIBIENDO</option>
+
 				<option value="COMPLETADO" '.($row->estado=="COMPLETADO" ? "selected" : "").'>COMPLETADO</option>
 			</select>';	
 
@@ -224,9 +226,14 @@ class ContenedorConsolidado extends CI_Controller {
 
 					if($this->user->No_Grupo=="ContenedorAlmacen"){
 						$proveedoresSelect.='<select class="form-control" id="estado-'.$proveedor->id_proveedor.'" name="estado" onchange="updateEstadoProveedor('.$proveedor->id_proveedor.')">
+							<option value="NC" '.($proveedor->estados_proveedor=="NC" ? "selected" : "").'>NC</option>
 							<option value="C" '.($proveedor->estados_proveedor=="C" ? "selected" : "").'>C</option>
 							<option value="R" '.($proveedor->estados_proveedor=="R" ? "selected" : "").'>R</option>
 							<option value="NS" '.($proveedor->estados_proveedor=="NS" ? "selected" : "").'>NS</option>
+							<option value="INSPECTION" '.($proveedor->estados_proveedor=="INSPECTION" ? "selected" : "").'>INSPECTION</option>
+							<option value="LOADED" '.($proveedor->estados_proveedor=="LOADED" ? "selected" : "").'>LOADED</option>
+							<option value="NO LOADED" '.($proveedor->estados_proveedor=="NO LOADED" ? "selected" : "").'>NO LOADED</option>
+							
 						</select>';
 						$divInputQtyChina.='<div class="d-flex flex-row gap-2">
 						<input type="text" class="form-control mb-1" id="qty-china-'.$proveedor->id_proveedor.'" name="qty" value="'.$proveedor->qty_box_china.'">
@@ -240,17 +247,16 @@ class ContenedorConsolidado extends CI_Controller {
 						<input type="text" class="form-control input-date mb-1"  id="arrive-date-china-'.$proveedor->id_proveedor.'" name="arrive-date" value="'.$proveedor->arrive_date_china.'">
 					
 						</div>';
-						$divEstadoChina.='<select class="form-control" id="estado-china-'.$proveedor->id_proveedor.'" name="estado" onchange="updateEstadoChina('.$proveedor->id_proveedor.')">
-							<option value="PENDIENTE" '.($proveedor->estado_china=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
-							<option value="INSPECTION" '.($proveedor->estado_china=="INSPECTION" ? "selected" : "").'>INSPECTION</option>
-							<option value="LOADED" '.($proveedor->estado_china=="LOADED" ? "selected" : "").'>LOADED</option>
-							<option value="NO LOADED" '.($proveedor->estado_china=="NO LOADED" ? "selected" : "").'>NO LOADED</option>
-						</select>';
+						
 					}else{
 						$proveedoresSelect.='<div class="badge  d-block mb-1
 						'.($proveedor->estados_proveedor=="NS" ? "badge-danger" : "").'
 						'.($proveedor->estados_proveedor=="C" ? "badge-success" : "").'
 						'.($proveedor->estados_proveedor=="R" ? "badge-warning" : "").'
+						'.($proveedor->estados_proveedor=="NC" ? "badge-info" : "").'
+						'.($proveedor->estados_proveedor=="INSPECTION" ? "badge-primary" : "").'
+						'.($proveedor->estados_proveedor=="LOADED" ? "badge-success" : "").'
+						'.($proveedor->estados_proveedor=="NO LOADED" ? "badge-danger" : "").'
 						
 						">'.$proveedor->estados_proveedor.'</div>';
 						$divInputQtyChina.='<div>
@@ -340,8 +346,9 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[]=$row->nombre;
 				if($this->user->No_Grupo!="ContenedorAlmacen"){
 				$subdata[]=$row->telefono;
-				}
 				$subdata[]=$estadoSelect;
+
+				}
 				$subdata[]=$divProductos;
 				$subdata[]=$qtyBoxDiv;
 				$subdata[]=$cbmTotalDiv;
@@ -353,9 +360,7 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[]=$divInputCBMChina;
 				$subdata[]=$divInputArriveDateChina;
 				$subdata[]=$divViewBtn;
-				if($this->user->No_Grupo=="ContenedorAlmacen"){
-					$subdata[]=$divEstadoChina;
-				}
+			
 				$subdata[]=$divAcciones;
 
 				$data[] = $subdata;
@@ -839,6 +844,18 @@ class ContenedorConsolidado extends CI_Controller {
 		echo json_encode([
 			"status" => $arrResponse
 		]);
+	}
+	public function addNote(){
+		$note=$this->input->post('note');
+		$idProveedor=$this->input->post('idProveedor');
+		$arrResponse = $this->ContenedorConsolidadoModel->addNote($note,$idProveedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function getNotes($idProveedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->getNotes($idProveedor);
+		echo json_encode($arrResponse);
 	}
 	function convertDateFormat($date) {
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);

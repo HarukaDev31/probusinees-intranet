@@ -52,6 +52,23 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         return $query->result();
     }
+    public function addNote($note,$idProveedor){
+        $this->db->where('id', $idProveedor);
+        $this->db->update('contenedor_consolidado_cotizacion_proveedores', ['nota' => $note]);
+
+        if ($this->db->affected_rows() > 0) {
+            return "success";
+        } else {
+            return false;
+        }
+    }
+    public function getNotes($idProveedor){
+        $this->db->select('nota')
+            ->from('contenedor_consolidado_cotizacion_proveedores')
+            ->where('id', $idProveedor);
+        $query = $this->db->get();
+        return $query->row();
+    }
     public function store($data)
     {
         //set data in table 
@@ -2106,15 +2123,15 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         $videos = $query->num_rows();
         //get current estado_china from proveedor
-        $this->db->select('estado_china')
+        $this->db->select('estados_proveedor')
             ->from($this->table_contenedor_cotizacion_proveedores)
             ->where('id', $idProveedor);
         $query = $this->db->get();
-        $estadoChina = $query->row()->estado_china;
+        $estadoChina = $query->row()->estados_proveedor;
         if ($images >= 2 && $videos >= 1 && $estadoChina != "INSPECTION") {
             //set estado_china to INSPECTION
             $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estado_china' => 'INSPECTION'
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'INSPECTION'
             ,'estados'=>'INSPECCIONADO']);
             return true;
         }

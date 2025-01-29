@@ -1876,7 +1876,7 @@ class CCotizacionesModel extends CI_Model
         throw $e;
     }
     }
-
+ 
     public function getMassiveExcelData($objPHPExcel)
     {
         $this->load->library('PHPExcel');

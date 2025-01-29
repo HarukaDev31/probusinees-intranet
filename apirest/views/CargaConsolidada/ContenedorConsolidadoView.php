@@ -91,9 +91,7 @@
                 </div>
                 <div class="col-12 col-md-4">
                   <label>&nbsp;</label>
-                  <?php if($this->user->No_Grupo=="Coordinación"){  ?>
-                  <button type="button" id="btn-buscar-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
-                  <?php } ?>
+                  
 
                 </div>
                 <div class="col-12 col-md-3">
@@ -158,16 +156,17 @@
                 <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
                 <th>Asesor</th>
                 <?php } ?>
-                <th>Status</th>
+                <th style="min-width: 5em;" >Status</th>
                 <th>N.</th>
                 <th>Buyer</th>
                 <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
                 <th>Whatsapp</th>
-                <?php } ?>
                 <th
                 style="min-width: 10em;"
 
                 >Estado</th>
+                <?php } ?>
+              
                 <th
                 style="min-width: 10em;"
                 >Productos</th>
@@ -203,9 +202,7 @@
                 style="min-width: 5em;"
                 >Arrive Date </th>
                 <th> Ver </th>
-                <?php if($this->user->No_Grupo=="ContenedorAlmacen"){  ?>
-                  <th style="min-width: 10em;"> Estado </th>
-                <?php } ?>
+             
                 <th> Acciones </th>
 
 
@@ -369,24 +366,30 @@
     </section>
     <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
-    <div class="row mb-2">
+    <div class="row mb-2 bg-white shadow-sm px-4 py-4">
       <div class="col-12 col-md-8">
         <div class="d-flex flex-row">
           <h1 id="client-title"></h1>
           <h1 id="client-supplier-code"></h1>
         </div>
       </div>
-      <div class="col-12 col-md-4"> 
+      <div class="col-12 col-md-4 d-flex justify-content-end  "> 
         <div class="btn btn-outline-primary " data-type="html" id="btn-back-cotizacion-almacen"><i class="fa fa-arrow-left"></i> </div>
       </div>
     </div>
     <div class="row mb-2">
       <div class="container mx-auto px-4 py-8 file-section-container col-12 col-md-8">
-        <h2 class="text-lg font-semibold mb-2 documentation-title">Documents
-                <i class="fas fa-plus-circle text-primary float-right"  data-toggle="modal" data-target="#uploadModal"></i>
+        <div>
+        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Documents
+        <button  data-toggle="modal" data-target="#uploadModal" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <i class="fas fa-plus"></i>
+                  <span>Nuevo</span>
+        </button>
         </h2>
+        
+      </div>
         <div id="drag-drop-container"
-                class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden">
+                class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden bg-white rounded-lg shadow">
           <div id="drop-message">
             <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
               <p class="text-gray-600">
@@ -399,7 +402,7 @@
 
         </div>
 
-        <div id="file-grid" class="grid grid-cols-4 gap-4">
+        <div id="file-grid" class="grid grid-cols-4 gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
 
               <!-- Existing and uploaded files will appear here -->
         </div>
@@ -411,17 +414,29 @@
         </div>
       </div>
       <div class="col-12 col-md-4 px-4 py-8 ">
-        <h2 class="text-lg font-semibold mb-2 documentation-title">Notas</h2>
+        <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas  
+        <button   onclick="addNote()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <i class="fas fa-save  float-right" ></i>
+
+                  <span>Guardar</span>
+        </button>
+        </h2>
+        <div id="note-container" class="bg-white shadow p-4 rounded-lg">
         <textarea id="txt-Id_Carga_Consolidada"
         class="form-control"
-        ></textarea>
+        ></textarea>        
+      </div>
       </div>
     </div>
-    <div class="row mb-2">
-      <div class="container mx-auto px-4 py-8 file-section-container col-12 col-md-8">
-        <h2 class="text-lg font-semibold mb-2 documentation-title">Inspection
-                <i class="fas fa-plus-circle text-primary float-right"  data-toggle="modal" data-target="#uploadModalInspection"></i>
+    <div class="row my-5">
+      <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
+      <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top" >Inspection
+        <button   data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <i class="fas fa-plus"></i>
+                  <span>Nuevo</span>
+        </button>
         </h2>
+       
         <div id="drag-drop-container-inspection"
                 class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden">
           <div id="drop-message">
@@ -436,7 +451,7 @@
 
         </div>
 
-        <div id="file-grid-inspection" class="grid grid-cols-4 gap-4">
+        <div id="file-grid-inspection" class="grid grid-cols-4 gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
 
               <!-- Existing and uploaded files will appear here -->
         </div>
@@ -767,10 +782,7 @@ input[type="number"]::-webkit-outer-spin-button {
   cursor: pointer;
   padding: 0 1em;
   height: 3em;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 0.2em;
-  margin-bottom: 1em;
+  background-color: white;
   display: flex;
   justify-content:center;
   align-items:center;
@@ -916,11 +928,14 @@ i:hover {
         .file-section-container{
           width: 100%;
           height: 50vh;
+          min-height: 600px;
           position: relative;
         }#file-grid,#file-grid-inspection{
-          height: 100%;
+          height: auto;
           width: 100%;
           gap: 1rem;
+          max-height: 50vh;
+          min-height: 400px;
           overflow-y: auto;
         }h1{
           font-weight: 600;
