@@ -28,6 +28,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $roleContenedorAlmacen="ContenedorAlmacen";
     private $aNewContainer = "new-container";
     private $aNewCotizacion = "new-cotizacion";
+    private $cambioEstadoProveedor= "cambio-estado-proveedor";
 
     private $table_contenedor_cotizacion_proveedores_documentacion = "contenedor_consolidado_proveedores_documentacion";
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
@@ -1985,9 +1986,9 @@ class ContenedorConsolidadoModel extends CI_Model
                 $socketResponse=$this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleContenedorAlmacen,
-                    "user" => $id,
-                    "action" => $this->aNewContainer,
-                    "message" => "asdas",
+                    "user" => 0,
+                    "action" => $this->cambioEstadoProveedor,
+                    "message" => $message
                 ]);
             }
         }
@@ -2005,9 +2006,9 @@ class ContenedorConsolidadoModel extends CI_Model
                     $socketResponse=$this->sendEvent([
                         "project" => "intranet",
                         "role" => $this->roleContenedorAlmacen,
-                        "user" => $id,
-                        "action" => $this->aNewContainer,
-                        "message" => "asdas",
+                        "user" => 0,
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
                     ]);
                 }
             }
@@ -2026,9 +2027,9 @@ class ContenedorConsolidadoModel extends CI_Model
                     $socketResponse=$this->sendEvent([
                         "project" => "intranet",
                         "role" => $this->roleContenedorAlmacen,
-                        "user" => $id,
-                        "action" => $this->aNewContainer,
-                        "message" => "asdas",
+                        "user" => 0,
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
                     ]);
                 }
             }

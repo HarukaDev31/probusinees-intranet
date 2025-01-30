@@ -3169,6 +3169,15 @@ $(document).ready(async function () {
                         })
                     }
                 }
+                if( action =="cambio-estado-proveedor"){
+                    //show message swall
+                    Swal.fire({
+                        title: 'Cambio de estado',
+                        text: message,
+                        icon: 'info',
+                        confirmButtonText: 'Cerrar',
+                    })
+                }
             }
             catch (e) {
                 console.log(e);
