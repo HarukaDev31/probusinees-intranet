@@ -1985,8 +1985,8 @@ class ContenedorConsolidadoModel extends CI_Model
             foreach($ids as $id){
                 $socketResponse=$this->sendEvent([
                     "project" => "intranet",
-                    "role" => $this->roleContenedorAlmacen,
-                    "user" => 0,
+                    "role" => 0,
+                    "user" => $id,
                     "action" => $this->cambioEstadoProveedor,
                     "message" => $message
                 ]);
@@ -2006,7 +2006,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     $socketResponse=$this->sendEvent([
                         "project" => "intranet",
                         "role" => $this->roleContenedorAlmacen,
-                        "user" => 0,
+                        "user" => $id,
                         "action" => $this->cambioEstadoProveedor,
                         "message" => $message
                     ]);
@@ -2027,7 +2027,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     $socketResponse=$this->sendEvent([
                         "project" => "intranet",
                         "role" => $this->roleContenedorAlmacen,
-                        "user" => 0,
+                        "user" => $id,
                         "action" => $this->cambioEstadoProveedor,
                         "message" => $message
                     ]);
