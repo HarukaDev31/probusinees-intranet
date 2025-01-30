@@ -322,7 +322,7 @@ setInterval(() => {
 socket.onopen = function(event) {
     subscribeToChannels('intranet', userJS.No_Grupo, userJS.ID_Usuario);
 };
-soket.onclose = function(event) {
+socket.onclose = function(event) {
   console.log("Socket cerrado")
 }
 //on load sweet alert 
