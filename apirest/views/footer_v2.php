@@ -281,8 +281,16 @@
 <?php endif;
 ?>
 <script> 
-let user=JSON.parse('<?php echo json_encode($this->user) ?>');
-const socket = new WebSocket('wss://websockets.probusiness.pe');
+if (typeof userJS === 'undefined') {
+  var userJS = JSON.parse('<?php echo json_encode($this->user) ?>');
+}else{
+  userJS = JSON.parse('<?php echo json_encode($this->user) ?>');
+}
+if(typeof socket === 'undefined'){
+  var socket = new WebSocket('wss://websockets.probusiness.pe');
+}else{
+  socket = new WebSocket('wss://websockets.probusiness.pe');
+}
 // Suscribirse a múltiples canales
 function subscribeToChannels(project, role, user) {
     const message = JSON.stringify({
@@ -309,7 +317,7 @@ function publishToChannels(project, role, user, message) {
 // Manejar mensajes recibidos del servidor
 
 socket.onopen = function(event) {
-    subscribeToChannels('intranet', user.No_Grupo, user.ID_Usuario);
+    subscribeToChannels('intranet', userJS.No_Grupo, userJS.ID_Usuario);
 };
 //on load sweet alert 
 

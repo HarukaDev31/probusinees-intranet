@@ -169,7 +169,7 @@
                         <?php echo $row->No_Usuario_Evento; ?>
                       </h3>
                       <span class="badge bg-success"><?php echo $row->No_Menu; ?></span>
-                      <p class="text-sm"><?php echo substr($row->No_Evento, 0, 50); ?></p>
+                      <p class="text-sm"><?php echo substr($row->No_Evento, 0, 100); ?></p>
                       <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i><?php echo $time; ?></p>
                     </div>
                   </div>

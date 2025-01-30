@@ -72,7 +72,7 @@ class NotificacionModel extends CI_Model{
 			);
 		}
 		$arrResponseSQL = $this->db->query($query);
-		if ( $arrResponseSQL->num_rows() > 0 ){
+		if ( $arrResponseSQL->num_rows() >= 0 ){
 			return array(
 				'status' => 'success',
 				'result' => $arrResponseSQL->result()

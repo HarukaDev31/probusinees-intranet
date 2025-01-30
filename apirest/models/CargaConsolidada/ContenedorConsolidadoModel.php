@@ -1,14 +1,14 @@
 <?php
 require_once APPPATH . 'traits/FileTrait.php';
 require_once APPPATH . 'traits/WhatsappTrait.php';
-
+require_once APPPATH . 'traits/NotificationTrait.php';
 require_once APPPATH . 'traits/WebSocketTrait.php';
 require_once APPPATH . 'third_party/PHPExcel.php';
 require_once APPPATH . 'third_party/tcpdf/tcpdf.php';
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class ContenedorConsolidadoModel extends CI_Model
 {
-    use FileTrait, WebSocketTrait, WhatsappTrait;
+    use FileTrait, WebSocketTrait, WhatsappTrait, NotificationTrait;
     var $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
@@ -25,8 +25,10 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_conteneodr_proveedor_estados_tracking="contenedor_proveedor_estados_tracking";
     private $roleCotizador = "Cotizador";
     private $roleCoordinacion = "Coordinación";
+    private $roleContenedorAlmacen="ContenedorAlmacen";
     private $aNewContainer = "new-container";
     private $aNewCotizacion = "new-cotizacion";
+
     private $table_contenedor_cotizacion_proveedores_documentacion = "contenedor_consolidado_proveedores_documentacion";
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
     public function __construct()
@@ -1957,13 +1959,14 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function updateProveedorData($data,$idProveedor){
         
-        $this->db->select('estados,estados_proveedor,id_contenedor')
+        $this->db->select('estados,estados_proveedor,id_contenedor,code_supplier')
                 ->from($this->table_contenedor_cotizacion_proveedores)
                 ->where('id', $idProveedor);
             $query = $this->db->get();
             $estado = $query->row()->estados;
             $estadoProveedor = $query->row()->estados_proveedor;
             $idContenedor = $query->row()->id_contenedor;
+            $supplierCode = $query->row()->code_supplier;
         if(isset($data['supplier_phone']) || isset($data['supplier'])){ 
             //CHECK CURRENT STATUS IS EQUAL TO ROTULADO CHANGE TO DATOS PROVEEDOR
             
@@ -1974,7 +1977,19 @@ class ContenedorConsolidadoModel extends CI_Model
 
             }
             $this->verifyContainerIsCompleted($idContenedor);
-
+            $usuariosAlmacen=$this->getUsersByGrupo($this->roleContenedorAlmacen);
+            $ids=array_column($usuariosAlmacen,'ID_Usuario');
+            $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado DATOS PROVEEDOR";
+            $notifications=$this->createNotification($ids,$message,"CARGA CONSOLIDADA",$this->user->ID_Usuario);
+            foreach($ids as $id){
+                $socketResponse=$this->sendEvent([
+                    "project" => "intranet",
+                    "role" => $this->roleContenedorAlmacen,
+                    "user" => $id,
+                    "action" => $this->aNewContainer,
+                    "message" => "asdas",
+                ]);
+            }
         }
 
         if(isset($data['arrive_date_china'])){
@@ -1982,15 +1997,42 @@ class ContenedorConsolidadoModel extends CI_Model
             if($estadoProveedor=="NC"){
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'C']);
+                $usuariosAlmacen=$this->getUsersByGrupo($this->roleCoordinacion);
+                $ids=array_column($usuariosAlmacen,'ID_Usuario');
+                $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado CONTACTADO";
+                $notifications=$this->createNotification($ids,$message,"CARGA CONSOLIDADA",$this->user->ID_Usuario);
+                foreach($ids as $id){
+                    $socketResponse=$this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleContenedorAlmacen,
+                        "user" => $id,
+                        "action" => $this->aNewContainer,
+                        "message" => "asdas",
+                    ]);
+                }
             }
             $this->verifyContainerIsCompleted($idContenedor);
-
+          
         }
         if(isset($data['qty_box_china']) && isset($data['cbm_total_china'])){
             if($estadoProveedor=="NC" || $estadoProveedor=="C"){
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'R']);
+                $usuariosAlmacen=$this->getUsersByGrupo($this->roleCoordinacion);
+                $ids=array_column($usuariosAlmacen,'ID_Usuario');
+                $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado RECIBIDO";
+                $notifications=$this->createNotification($ids,$message,"CARGA CONSOLIDADA",$this->user->ID_Usuario);
+                foreach($ids as $id){
+                    $socketResponse=$this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleContenedorAlmacen,
+                        "user" => $id,
+                        "action" => $this->aNewContainer,
+                        "message" => "asdas",
+                    ]);
+                }
             }
+ 
         }
         $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
@@ -2273,7 +2315,29 @@ class ContenedorConsolidadoModel extends CI_Model
         $containersArray=array_diff(range(1, 50), $containersArray);
         //convert to simple array
         $containersArray=array_values($containersArray);
-        return $containersArray;
-        
+        return $containersArray;   
+    }
+    public function getUsersByGrupo($grupo){
+        /**
+         * select u.ID_Usuario from usuario  u left  join grupo_usuario gu  on gu.ID_Usuario =u.ID_Usuario 
+         * join grupo g on g.ID_Grupo =gu.ID_Grupo 
+         * where g.No_Grupo ="Cliente" and u.Nu_Estado =1
+         */
+        try{
+            $this->db->select('u.ID_Usuario')
+            ->from('usuario u')
+            ->join('grupo_usuario gu', 'gu.ID_Usuario = u.ID_Usuario')
+            ->join('grupo g', 'g.ID_Grupo = gu.ID_Grupo')
+            ->where('g.No_Grupo', $grupo)
+            ->where('u.Nu_Estado', 1);
+        $query = $this->db->get();
+        $usuarios = $query->result();
+        if($this->db->error()['code']!=0){
+            return ['status' => "error", 'error' => $this->db->error()];
+        }
+        return $usuarios;
+        }catch(Exception $e){
+            return $e->getMessage();
+        }
     }
 }
