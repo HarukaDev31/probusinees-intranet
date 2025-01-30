@@ -314,11 +314,17 @@ function publishToChannels(project, role, user, message) {
     socket.send(msg);
 }
 
-// Manejar mensajes recibidos del servidor
-
+setInterval(() => {
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: "ping" }));
+  }
+}, 30000);
 socket.onopen = function(event) {
     subscribeToChannels('intranet', userJS.No_Grupo, userJS.ID_Usuario);
 };
+soket.onclose = function(event) {
+  console.log("Socket cerrado")
+}
 //on load sweet alert 
 
 socket.onmessage = function(event) {
