@@ -92,7 +92,7 @@
 
                 <div class="col-12 col-md-4">
                   <label>&nbsp;</label>
-                  <?php if($this->user->No_Grupo=="Coordinación"){  ?>
+                  <?php if($this->user->No_Grupo!="ContenedorAlmacen" ){  ?>
                   <button type="button" id="btn-crear-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
                   <?php } ?>
                 </div>
