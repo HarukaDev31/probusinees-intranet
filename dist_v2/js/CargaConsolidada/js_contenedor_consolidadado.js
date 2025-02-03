@@ -1752,7 +1752,7 @@ async function updateEstadoCotizador(id) {
         success: function (response) {
             const result = JSON.parse(response);
             if (result.status == "success") {
-                Swal.fire("Correcto!", result.message, "success");
+                Swal.fire("Correcto!", "Se cambio el estado con éxito", "success"); 
             } else {
                 Swal.fire("Error!", result.message, "error");
             }
