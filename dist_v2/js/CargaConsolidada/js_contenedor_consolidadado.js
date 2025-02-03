@@ -686,6 +686,12 @@ async function viewSteps(id) {
             spinner.hide()
             const data = result.data;
             currentPrivilege=result.currentPrivilege;
+            //here
+            if(currentPrivilege=="ContenedorAlmacen"){
+                openStepFunction(1,id);
+                mainContainer.hide();
+                return;
+            }
             mainContainer.hide();
             stepsContainer.show();
             loading.hide();
@@ -1709,7 +1715,13 @@ const openStepFunction = async (step, id) => {
     }
     $(".btn-back-cotizacion").off("click");
     $(".btn-back-cotizacion").on("click", function () {
+        if (currentPrivilege == "ContenedorAlmacen") {
+            mainContainer.show();
+            cotizacionContainer.hide();
+            stepsContainer.hide();
+        } else {
         returnToSteps();
+        }
     });
 
     spinner.hide();
