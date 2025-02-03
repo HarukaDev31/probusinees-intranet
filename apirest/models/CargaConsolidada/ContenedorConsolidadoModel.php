@@ -2446,8 +2446,8 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->select('id')
                 ->from($this->table_contenedor_cotizacion_proveedores)
                 ->where('id_cotizacion', $ID)
-                ->where('products', '')
-                ->or_where('products', null);
+                //and where products is empty or null
+                ->where('products is null or products=""');
             $query = $this->db->get();
             $result = $query->result();
             if(count($result)>0){
