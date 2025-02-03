@@ -539,7 +539,6 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[] = $row->nombre;
 				$subdata[] = $row->documento;
 				$subdata[] = $row->name;
-				$subdata[] = $row->monto;
 				$subdata[] = $row->tarifa;
 				$subdata[] = $divVol;
 				$subdata[] = $divVolChina;

@@ -277,7 +277,6 @@
               <th>Nombre</th>
               <th>DNI/RUC</th>
               <th>T. Cliente</th>
-              <th>Monto</th>
               <th>Tarifa</th>
               <th>Vol. Cot</th>
               <th>Vol. China</th>
