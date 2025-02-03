@@ -1,6 +1,6 @@
 $(function () {
   $('.select2').select2(); 
-  
+ 
   //Date picker invoice
   $( '.input-report' ).datepicker({
     autoclose : true,

@@ -233,5 +233,9 @@ class InicioController extends CI_Controller {
 			echo json_encode(array('sStatus' => 'danger', 'sMessage' => 'Sesión terminar. Ingresar nuevamente'));
 		}
 	}
+	public function updateNotificaciones(){
+		$currentUserId = $this->user->ID_Usuario;
+		echo json_encode($this->LoginModel->updateNotificaciones($currentUserId));
+	}
 }
 	

@@ -361,4 +361,12 @@ class LoginModel extends CI_Model{
 			return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al modificar');
 		}
     }
+	public function updateNotificaciones($idUsuario){
+		$this->db->where('ID_Usuario', $idUsuario);
+		$this->db->update('notificacion', array('viewed' => 1));
+		if($this->db->error()['code'] == 0){
+			return array('status' => 'success', 'message' => 'Notificaciones actualizadas');
+		}
+
+	}
 }

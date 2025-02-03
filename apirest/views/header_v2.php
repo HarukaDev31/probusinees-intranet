@@ -39,6 +39,7 @@
   <?php if (isset($js_inicio) && $js_inicio==true) : ?>
   <link rel="stylesheet" href="<?php echo base_url("plugins_v2/select2/css/select2.min.css"); ?>">
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  
   <?php endif; ?>
 
   <?php if (isset($js_permiso_usuario) && $js_permiso_usuario==true) : ?>
@@ -139,13 +140,16 @@
             <?php
               $iCantidadNotificaciones = 0;
               foreach($this->notificaciones['result'] as $row) {
+                if($row->viewed != 0) {
+                  continue;
+                }
                 ++$iCantidadNotificaciones;
               }
             ?>
             <li class="nav-item dropdown">
               <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
                 <i class="far fa-bell"></i>
-                <span class="badge badge-danger navbar-badge"><?php echo $iCantidadNotificaciones; ?></span>
+                <span class="badge badge-danger navbar-badge " id="counter-notifacions"><?php echo $iCantidadNotificaciones; ?></span>
               </a>
               <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <?php
@@ -153,6 +157,9 @@
                   foreach($this->notificaciones['result'] as $row) {
                     if($iCantidadNotificaciones == 3){
                       break;
+                    }
+                    if($row->viewed != 0) {
+                      continue;
                     }
                     $segundos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'segundos');
                     $minutos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'minutos');
@@ -179,7 +186,9 @@
                     ++$iCantidadNotificaciones;
                   }
                 ?>
-                <a href="#" class="dropdown-item dropdown-footer" data-toggle="modal" data-target="#modal-notification">Ver notificaciones</a>
+                <a href="#" class="dropdown-item dropdown-footer"
+                id="verNotificaciones"
+                data-toggle="modal" data-target="#modal-notification">Ver notificaciones</a>
               </div>
             </li>
           <?php } ?>

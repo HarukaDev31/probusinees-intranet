@@ -346,8 +346,29 @@ socket.onmessage = function(event) {
   }
 }
 window.socket=socket
-
-
+//add on click #ver-notificaciones listener
+$(document).on('click', '#verNotificaciones', function() {
+  //fetch notifications
+  fetchNotifications();
+});
+function fetchNotifications() {
+  $.ajax({
+    url: base_url + 'InicioController/updateNotificaciones',
+    type: 'POST',
+    dataType: 'json',
+    success: function(response) {
+      if (response.status == 'success') {
+        // $('#modal-notification').modal('show');
+        $("#counter-notifacions").text('0');
+      } else {
+        console.error(response.message);
+      }
+    },
+    error: function(error) {
+      console.error(error);
+    }
+  });
+}
 </script>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">
@@ -409,6 +430,9 @@ window.socket=socket
           <?php if($this->notificaciones['status']=='success') {
             $iCantidadNotificaciones = 0;
             foreach($this->notificaciones['result'] as $row) {
+              if($row->viewed != 0) {
+                continue;
+              }
               $segundos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'segundos');
               $minutos = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'minutos');
               $horas = diferenciaFechasMultipleFormato($row->Fe_Registro, dateNow('fecha_hora'), 'horas');
