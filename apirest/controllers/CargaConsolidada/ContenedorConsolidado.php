@@ -47,9 +47,9 @@ class ContenedorConsolidado extends CI_Controller {
 			$subdata[] = $row->empresa;
 			$btnView = '<div>' .
 			'<i class="fas fa-eye ' . 
-			($row->estado == "PENDIENTE" ? 'text-primary fa-blink fa-lg  ' : 'text-primary') . 
+			($row->estado == "PENDIENTE" ? 'text-primary' : 'text-primary') . 
 			'" style="cursor:pointer;font-size:20px;' . 
-			($row->estado == "PENDIENTE" ? 'font-size:20px;animation: blink 1s linear infinite;' : '') . 
+			($row->estado == "PENDIENTE" ? 'font-size:20px;' : '') . 
 			'" onclick="viewSteps(' . $row->id . ')"></i>' .
 			'</div>';
 			$subdata[] = $btnView;
@@ -235,11 +235,27 @@ class ContenedorConsolidado extends CI_Controller {
 					}
 
 					if($this->user->No_Grupo=="ContenedorAlmacen"){
-						$proveedoresSelect.='<select class="form-control" id="estado-'.$proveedor->id_proveedor.'" name="estado" onchange="updateEstadoProveedor('.$proveedor->id_proveedor.')">
-							<option value="NC" '.($proveedor->estados_proveedor=="NC" ? "selected" : "").'>NC</option>
-							<option value="C" '.($proveedor->estados_proveedor=="C" ? "selected" : "").'>C</option>
-							<option value="R" '.($proveedor->estados_proveedor=="R" ? "selected" : "").'>R</option>
-							<option value="NS" '.($proveedor->estados_proveedor=="NS" ? "selected" : "").'>NS</option>
+						$proveedoresSelect.='<select class="form-control
+						'.($proveedor->estados_proveedor=="NC" ? "bg-info" : "").
+						($proveedor->estados_proveedor=="C" ? "bg-warning" : "").
+						($proveedor->estados_proveedor=="R" ? "bg-success" : "").
+						($proveedor->estados_proveedor=="NS" ? "bg-danger" : "").
+						($proveedor->estados_proveedor=="INSPECTION" ? "bg-primary" : "").
+						($proveedor->estados_proveedor=="LOADED" ? "bg-success" : "").
+						($proveedor->estados_proveedor=="NO LOADED" ? "bg-danger" : "").'	
+						" id="estado-'.$proveedor->id_proveedor.'" name="estado" onchange="updateEstadoProveedor('.$row->id.','.$proveedor->id_proveedor.')">
+							<option 
+							class="bg-info"
+							value="NC"'.($proveedor->estados_proveedor=="NC" ? "selected" : "").'>NC</option>
+							<option value="C" 
+							class="bg-warning"
+							'.($proveedor->estados_proveedor=="C" ? "selected" : "").'>C</option>
+							<option value="R"
+							class="bg-success"
+							'.($proveedor->estados_proveedor=="R" ? "selected" : "").'>R</option>
+							<option value="NS"
+							class="bg-danger"
+							'.($proveedor->estados_proveedor=="NS" ? "selected" : "").'>NS</option>
 							<option value="INSPECTION" '.($proveedor->estados_proveedor=="INSPECTION" ? "selected" : "").'>INSPECTION</option>
 							<option value="LOADED" '.($proveedor->estados_proveedor=="LOADED" ? "selected" : "").'>LOADED</option>
 							<option value="NO LOADED" '.($proveedor->estados_proveedor=="NO LOADED" ? "selected" : "").'>NO LOADED</option>
@@ -254,8 +270,8 @@ class ContenedorConsolidado extends CI_Controller {
 					
 						</div>';
 						$divInputArriveDateChina.='<div class="d-flex flex-row gap-2">
-						<input type="text" class="form-control input-date mb-1"  id="arrive-date-china-'.$proveedor->id_proveedor.'" name="arrive-date" value="'.$proveedor->arrive_date_china.'">
-					
+						<input type="text" class="form-control input-date mb-1"  id="arrive-date-china-'.$proveedor->id_proveedor.'" name="arrive-date" value="'.
+						($product->arrive_date_china?date("Y-m-d", strtotime($proveedor->arrive_date_china)):$proveedor->arrive_date_china).'">
 						</div>';
 						
 					}else{
@@ -270,13 +286,18 @@ class ContenedorConsolidado extends CI_Controller {
 							'">' . $proveedor->estados_proveedor . '</div>';
 
 						$divInputQtyChina.='<div>
-						<div class="">'.($proveedor->qty_box_china??0).'</div>
+						<input disabled  class="form-control mb-1" 
+							value="'.($proveedor->qty_box_china??0).'"
+						></input>
 						</div>';
 						$divInputCBMChina.='<div>
-						<div class="">'.($proveedor->cbm_total_china??0).'</div>
+						<input disabled  class="form-control mb-1"
+							value="'.($proveedor->cbm_total_china??0).'"
+						></input>
 						</div>';
 						$divInputArriveDateChina.='<div>
-						<div class="">'.$proveedor->arrive_date_china.'</div>
+						<input disabled  class="form-control mb-1"
+							value="'.($proveedor->arrive_date_china??date('Y-m-d')).'"
 						</div>';
 						
 					}
@@ -286,8 +307,8 @@ class ContenedorConsolidado extends CI_Controller {
 					}else{
 					$estadoSelect.='<select class="form-control" 
 					id="estado-'.$row->id.'-'.$proveedor->id_proveedor.'"
-					 name="estado" onchange="updateEstadoCotizacionProveedor('.$row->id.','.$proveedor->id.')">
-						<option value="" '.($proveedor->estados=="" ? "selected disabled" : "").'>--Seleccionar--</option>
+					name="estado" onchange="updateEstadoCotizacionProveedor('.$row->id.','.$proveedor->id.','.$row->estados.')">
+						<option value="DEFAULT" '.($proveedor->estados=="" ? "selected disabled" : "").'>--Seleccionar--</option>
 						<option value="ROTULADO" '.($proveedor->estados=="ROTULADO" ? "selected" : "").'>ROTULADO</option>
 						<option value="DATOS PROVEEDOR" '.($proveedor->estados=="DATOS PROVEEDOR" ? "selected" : "").'>DATOS PROVEEDOR</option>
 						<option value="INSPECCIONADO" '.($proveedor->estados=="INSPECCIONADO" ? "selected" : "").''.($this->user->No_Grupo!=="ContenedorAlmacen" ? " disabled" : "").'		>INSPECCIONADO</option>
@@ -773,11 +794,20 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function updateEstadoProveedor(){
 		$idProveedor=$this->input->post('idProveedor');
+		$idCotizacion=$this->input->post('idCotizacion');
 		$estado=$this->input->post('estado');
-		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoProveedor($idProveedor,$estado);
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoCotizacionProveedor($idCotizacion,$idProveedor,$estado);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
+	}
+	public function downloadContenedorCotizacionProveedoresExcel($idContenedor){
+		$objExcel = $this->ContenedorConsolidadoModel->downloadContenedorCotizacionProveedoresExcel($idContenedor);
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="Cotizacion_Proveedores.xlsx"');
+		header('Cache-Control: max-age=0');
+		$objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
+		$objWriter->save('php://output');
 	}
 	public function uploadFileInspection(){
 		$idProveedor=$this->input->post('idProveedor');

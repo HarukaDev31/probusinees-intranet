@@ -168,11 +168,11 @@ async function verCotizacionEmbarque(idProveedor,idCotizacion,supplierCode,clien
         const response = await fetch(url);
         const result = await response.json();
         $("#txt-Id_Carga_Consolidada").val(result.nota);   
-   
-    //     }catch(e){
-    //         console.error(e);
-    //         spinner.hide();
-    //     }
+        if(currentPrivilege!="ContenedorAlmacen"){
+            $(".file-section-container").css("pointer-events","none");
+            $(".note-container-container").css("pointer-events","none");
+        }
+
         spinner.hide();
     // Función para agregar un archivo a la lista con vista previa y botones
   
@@ -546,7 +546,7 @@ async function updateProductos($idProveedor,idCotizacion){
     spinner.hide();
 
 }
-async function updateEstadoProveedor($idProveedor){
+async function updateEstadoProveedor($idCotizacion,$idProveedor){
     $estado=$(`#estado-${$idProveedor}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoProveedor";
     spinner.show();
@@ -554,6 +554,7 @@ async function updateEstadoProveedor($idProveedor){
         url: url,
         type: "POST",
         data: {
+            idCotizacion: $idCotizacion,
             idProveedor: $idProveedor,
             estado: $estado
         },
@@ -570,7 +571,7 @@ async function updateEstadoProveedor($idProveedor){
     spinner.hide();
 
 }
-async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor){
+async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor,previousStatus){
     const estado = $(`#estado-${idCotizacion}-${idProveedor}`).val();
     //set this previous status
     previousStatus=$(`#estado-${idCotizacion}-${idProveedor}`).data("previous");
@@ -588,6 +589,9 @@ async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor){
     if(estado=="ROTULADO"){
         if(!isValid){
             Swal.fire("Error!", "Debe ingresar todos los productos", "error");
+            //set current select previous status
+            $(`#estado-${idCotizacion}-${idProveedor}`).val(previousStatus);
+            console.log(previousStatus);
             spinner.hide();
             return;
         }
@@ -613,6 +617,12 @@ async function updateEstadoCotizacionProveedor(idCotizacion,idProveedor){
                 link.download = `Cotizacion-${idCotizacion}.zip`;
                 link.click();
             },
+            error:function(){
+                //set current select previous status
+                $(`#estado-${idCotizacion}-${idProveedor}`).val(previousStatus);
+                Swal.fire("Error!", "Hubo un error", "error"); 
+                spinner.hide();
+            }
         });
     }else{
         url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
@@ -942,11 +952,31 @@ const openStepFunction = async (step, id) => {
                                             extend: "excel",
                                             text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
                                             titleAttr: "Excel",
-                                            exportOptions: {
-                                                columns: ":visible",
-                                            },
+                                            action: function () {
+                                                url=base_url+"CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/"+idContenedor;
+                                                //AJAX MULTIPART FOR EXCEL
+                                                $.ajax({
+                                                    url: url,
+                                                    type: "GET",
+                                                    xhrFields: {
+                                                        responseType: 'blob'
+                                                    },
+                                                    success: function (response) {
+                                                        //excel
+                                                        var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                                                        var link = document.createElement('a');
+                                                        link.href = window.URL.createObjectURL(blob);
+                                                        link.download = `Cotizacion-${idContenedor}.xlsx`;
+                                                        link.click();
+                                                        
+                                                    },
+                                                    error:function(){
+                                                        Swal.fire("Error!", "Hubo un error", "error");
+                                                    }
+                                                });
+                                                
+                                            }
                                         },
-
                                         {
                                             extend: "colvis",
                                             text: '<i class="fa fa-ellipsis-v"></i> Columnas',
@@ -954,8 +984,7 @@ const openStepFunction = async (step, id) => {
                                             exportOptions: {
                                                 columns: ":visible",
                                             },
-                                        },
-                                        
+                                        },                              
                                         {
                                             text: "Por Embarcar",
                                             className: "btn btn-light",
@@ -982,7 +1011,6 @@ const openStepFunction = async (step, id) => {
                                             }
                                         },
 
-                                   
                                     ],
                                     paging: true,
                                     lengthChange: true,
@@ -1009,8 +1037,7 @@ const openStepFunction = async (step, id) => {
                                             sNext: ">",
                                         },
                                     },
-                                    order: [[0, "desc"]],
-                                    //hide last two columns
+                                    order: [[0, "asc"]],
                                     columnDefs: [
                                         {
                                             targets: "no-hidden",
@@ -1021,11 +1048,6 @@ const openStepFunction = async (step, id) => {
                                             targets: "no-sort",
                                             orderable: false,
                                         },
-                                        {
-                                            targets:"",
-                                            orderable:false
-                                        }
-
                                     ],
                                     ajax: {
                                         url: url,
@@ -1047,7 +1069,6 @@ const openStepFunction = async (step, id) => {
                                              getTableCotizacionEmbarqueHeaders();
                                         }
                                     },
-                                    //when data is loaded
                                     initComplete: function (settings, json) {
                                         $(".input-date").datepicker({
                                             autoclose: true,
@@ -1058,7 +1079,6 @@ const openStepFunction = async (step, id) => {
                                         });
                                     },
                                     complete: function () {
-
                                         $('.input-date').datepicker({
                                             autoclose: true,
                                             startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -1076,9 +1096,6 @@ const openStepFunction = async (step, id) => {
                                             dateFormat: "dd/mm/yyyy",
                                         });
                                     }
-
-                                    //on complete ajax call
-                                    
                                 });
             }
             spinner.hide();
@@ -1104,6 +1121,7 @@ const openStepFunction = async (step, id) => {
                             columns: ":visible",
                         },
                     },
+                    
                     {
                         extend: "pdf",
                         text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
@@ -1165,12 +1183,33 @@ const openStepFunction = async (step, id) => {
                                         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
                                     buttons: [
                                         {
-                                            extend: "excel",
-                                            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                                            titleAttr: "Excel",
-                                            exportOptions: {
-                                                columns: ":visible",
-                                            },
+                                             extend: "excel",
+                        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                        titleAttr: "Excel",
+                        action: function () {
+                            url=base_url+"CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/"+idContenedor;
+                            //AJAX MULTIPART FOR EXCEL
+                            $.ajax({
+                                url: url,
+                                type: "GET",
+                                xhrFields: {
+                                    responseType: 'blob'
+                                },
+                                success: function (response) {
+                                    //excel
+                                    var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                                    var link = document.createElement('a');
+                                    link.href = window.URL.createObjectURL(blob);
+                                    link.download = `Cotizacion-${idContenedor}.xlsx`;
+                                    link.click();
+                                    
+                                },
+                                error:function(){
+                                    Swal.fire("Error!", "Hubo un error", "error");
+                                }
+                            });
+                            
+                        }
                                         },
 
                                         {
@@ -1224,6 +1263,7 @@ const openStepFunction = async (step, id) => {
                                                     todayHighlight: true,
                                                     format: "dd/mm/yyyy",
                                                     dateFormat: "dd/mm/yyyy",
+                                                    
                                                 });
                                                 currentTableCotizacion="embarque";
                                             }
@@ -1342,7 +1382,7 @@ const openStepFunction = async (step, id) => {
                         sNext: ">",
                     },
                 },
-                order: [[0, "desc"]],
+                order: [[0, "asc"]],
                 columnDefs: [
                     {
                         targets: "no-hidden",

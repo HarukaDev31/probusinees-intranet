@@ -204,6 +204,79 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         return $query->result();
     }
+    public function downloadContenedorCotizacionProveedoresExcel($idContenedor) {
+        $data = $this->getContenedorCotizacionProveedores($idContenedor);
+        
+        // Create new PHPExcel object
+        $objPHPExcel = new PHPExcel();
+        $sheet = $objPHPExcel->getActiveSheet();
+        
+        // Headers
+        $headers = [
+            'Status', 'N', 'Buyer', 'Productos', 'Qty Box', 'CBM Total', 
+            'Weight', 'Supplier', 'Code Supplier', 'Phone Number', 
+            'Qty Box China', 'CBM Total China', 'Arrive Date China'
+        ];
+        
+        // Write headers
+        foreach ($headers as $col => $header) {
+            $sheet->setCellValueByColumnAndRow($col, 1, $header);
+        }
+        
+        $row = 2;
+        foreach ($data as $item) {
+            // Parse providers JSON
+            $providers = json_decode($item->proveedores, true);
+            
+            // If multiple providers, we'll need to merge cells
+            $providerCount = count($providers);
+            $startRow = $row;
+            
+            // Main row data (non-provider specific)
+            $sheet->setCellValue('A'.$row, $item->estado);
+            $sheet->setCellValue('B'.$row, $item->id);
+            $sheet->setCellValue('C'.$row, $item->No_Usuario);
+            
+            // Process providers
+            foreach ($providers as $providerIndex => $provider) {
+                $currentRow = $row + $providerIndex;
+                
+                $sheet->setCellValue('D'.$currentRow, $provider['products']);
+                $sheet->setCellValue('E'.$currentRow, $provider['qty_box']);
+                $sheet->setCellValue('F'.$currentRow, $provider['cbm_total']);
+                $sheet->setCellValue('G'.$currentRow, $provider['peso']);
+                $sheet->setCellValue('H'.$currentRow, $provider['supplier']);
+                $sheet->setCellValue('I'.$currentRow, $provider['code_supplier']);
+                $sheet->setCellValue('J'.$currentRow, $provider['supplier_phone']);
+                $sheet->setCellValue('K'.$currentRow, $provider['qty_box_china']);
+                $sheet->setCellValue('L'.$currentRow, $provider['cbm_total_china']);
+                $sheet->setCellValue('M'.$currentRow, $provider['arrive_date_china']);
+            }
+            
+            // Merge cells for main columns if multiple providers
+            if ($providerCount > 1) {
+                $sheet->mergeCells('A'.$startRow.':A'.($startRow + $providerCount - 1));
+                $sheet->mergeCells('B'.$startRow.':B'.($startRow + $providerCount - 1));
+                $sheet->mergeCells('C'.$startRow.':C'.($startRow + $providerCount - 1));
+            }
+            
+            $row += $providerCount;
+        }
+        
+        // Auto-size columns
+        foreach (range('A', 'M') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        
+        // Prepare download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="container_quotation_providers.xlsx"');
+        header('Cache-Control: max-age=0');
+        
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        exit;
+    }
     public function getContenedorClientes($idContenedor)
     {
         $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
@@ -875,9 +948,24 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         $listaEmbarque = $query->row()->lista_embarque_url;
         $blFile = $query->row()->bl_file_url;
+        //FIND IF EXISTS PROVEEDOR WITH ESTADOS = DATOS PROVEEDOR
+        $this->db->select('estado')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id_contenedor', $idcontenedor);
+        $query = $this->db->get();
+        $estadoProveedores = $query->result();
+        $estado = null;
+        foreach ($estadoProveedores as $estadoProveedor) {
+            if ($estadoProveedor->estado == "DATOS PROVEEDOR") {
+                $estado = "DATOS PROVEEDOR";
+                break;
+            }
+        }
         if ($listaEmbarque != null && $blFile != null) {
             $this->db->set('estado', 'COMPLETADO');
-        } else {
+        }else if($estado == "DATOS PROVEEDOR"){
+        }
+        else {
             $this->db->set('estado', 'RECIBIENDO');
         }
         $this->db->where('id', $idcontenedor);
@@ -1587,17 +1675,17 @@ class ContenedorConsolidadoModel extends CI_Model
          
             //WHERE estados is null
             $this->db->where('id_cotizacion', $idCotizacion);
-            $this->db->where('estados IS NULL');
-            $this->db->or_where('estados', 'RESERVADO');
-            $this->db->or_where('estados', 'ROTULADO');
-            $this->db->or_where('estados', 'DATOS PROVEEDOR');
+            $this->db->where('estados_proveedor IS NULL');
+            $this->db->or_where('estados_proveedor', 'RESERVADO');
+            $this->db->or_where('estados_proveedor', 'ROTULADO');
+            $this->db->or_where('estados_proveedor', 'DATOS PROVEEDOR');
 
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
         }
-        else if($estado=="EMBARCADO"){
+        else if($estado=="LOADED"){
             //valid if in tracking exists row with estado=reservado then update estado_cliente from table cotizacion to reservado else no reservado
             $this->db->select('estado')
                 ->from($this->table_conteneodr_proveedor_estados_tracking)
@@ -1614,9 +1702,13 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->update($this->table_contenedor_cotizacion, ['estado_cliente' => $estadoCliente]);
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
-        }
-        else {
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED"]);
+        }else if($estado=="NC"||$estado=="C"||
+        $estado=="R"||$estado=="NS"||$estado=="NO LOADED"||$estado=="INSPECTION"){
+            $this->db->where('id_cotizacion', $idCotizacion);
+            $this->db->where('id', $idProveedor);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estado]);
+        }else{
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
@@ -1881,7 +1973,7 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return false;
     }
-    public function updateEstadoProveedor($idProveedor, $estados_proveedor)
+    public function updateEstadoProveedor($idCotizacion,$idProveedor, $estados_proveedor)
     {
         $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estados_proveedor]);
@@ -1889,6 +1981,7 @@ class ContenedorConsolidadoModel extends CI_Model
             if($estados_proveedor=="LOADED"){
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
+                
                 
             }
             return "success";

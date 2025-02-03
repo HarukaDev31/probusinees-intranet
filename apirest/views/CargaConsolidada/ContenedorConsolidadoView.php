@@ -166,8 +166,8 @@
                 <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
                 <th>Asesor</th>
                 <?php } ?>
-                <th style="min-width: 5em;" >Status</th>
-                <th>N.</th>
+                <th style="min-width: 8em;" >Status</th>
+                <th class="orderable">N.</th>
                 <th>Buyer</th>
                 <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
                 <th>Whatsapp</th>
@@ -300,7 +300,7 @@
         role="button"
         aria-expanded="false"
         aria-controls="collapse-documentacion"
-        class="col-9 "
+        class="col-9"
         >
           Documentación
         </span>
@@ -423,7 +423,7 @@
             </div>
         </div>
       </div>
-      <div class="col-12 col-md-4 px-4 py-8 ">
+      <div class="col-12 col-md-4 px-4 py-8 note-container-container">
         <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas  
         <button   onclick="addNote()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                   <i class="fas fa-save  float-right" ></i>
@@ -438,7 +438,7 @@
       </div>
       </div>
     </div>
-    <div class="row my-3">
+    <div class="row my-2">
       <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
       <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top" >Inspection
         <button   data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
