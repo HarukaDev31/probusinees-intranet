@@ -164,7 +164,11 @@ class ContenedorConsolidadoModel extends CI_Model
         $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
             ->from($this->table_contenedor_cotizacion)
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
-            ->where('id_contenedor', $idContenedor);
+            ->where('id_contenedor', $idContenedor)
+            ->order_by('id_cotizacion', 'asc');
+        if($this->user->No_Grupo != "Cotizador"){
+            $this->db->where('estado_cotizador', 'CONFIRMADO');
+        }
         $query = $this->db->get();
         return $query->result();
     }
@@ -200,7 +204,10 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
-            ->order_by('main.id', 'desc');
+            ->order_by('main.id', 'asc');
+        if($this->user->No_Grupo != "Cotizador"){
+            $this->db->where('main.estado_cotizador', 'CONFIRMADO');
+        }
         $query = $this->db->get();
         return $query->result();
     }
@@ -2433,5 +2440,27 @@ class ContenedorConsolidadoModel extends CI_Model
         }catch(Exception $e){
             return $e->getMessage();
         }
-    }
+    }public function updateEstadoCotizador($ID, $estado){
+		try{
+            //find if all proveedores have products not empty
+            $this->db->select('id')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id_cotizacion', $ID)
+                ->where('products', '')
+                ->or_where('products', null);
+            $query = $this->db->get();
+            $result = $query->result();
+            if(count($result)>0){
+                return ['status' => "error", 'error' => "No se puede cambiar el estado a ".$estado." hasta que todos los proveedores tengan productos"];
+            }
+			$this->db->where('id', $ID);
+            $this->db->update($this->table_contenedor_cotizacion, ['estado_cotizador' => $estado]);
+            if ($this->db->error()['code']!=0) {
+                return ['status' => "error", 'error' => $this->db->error()];
+            }
+            return "success";
+        }catch(Exception $e){
+            return $e->getMessage();
+        }
+	}
 }

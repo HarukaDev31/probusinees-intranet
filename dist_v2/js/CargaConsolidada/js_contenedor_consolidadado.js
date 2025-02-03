@@ -15,6 +15,7 @@ var currentTableCotizacion="prospectos";
 var currentPrivilege="";
 var fileManager = null;
 var fileManagerInspection = null;
+var fileManagerInspectionCoordinacion = null;
 var meses = [
     {
         "id": "ENERO",
@@ -1043,7 +1044,6 @@ const openStepFunction = async (step, id) => {
                                             sNext: ">",
                                         },
                                     },
-                                    order: [[0, "asc"]],
                                     columnDefs: [
                                         {
                                             targets: "no-hidden",
@@ -1302,7 +1302,6 @@ const openStepFunction = async (step, id) => {
                                             sNext: ">",
                                         },
                                     },
-                                    order: [[0, "desc"]],
                                     //hide last two columns
                                     columnDefs: [
                                         {
@@ -1388,22 +1387,11 @@ const openStepFunction = async (step, id) => {
                         sNext: ">",
                     },
                 },
-                order: [[0, "asc"]],
                 columnDefs: [
                     {
                         targets: "no-hidden",
                         visible: false,
                     },
-                    {
-                        className: "text-center",
-                        targets: "no-sort",
-                        orderable: false,
-                    },
-                    {
-                        targets:"",
-                        orderable:false
-                    }
-
                 ],
                 ajax: {
                     url: url,
@@ -1649,7 +1637,6 @@ const openStepFunction = async (step, id) => {
                                             sNext: ">",
                                         },
                                     },
-                                    order: [[0, "desc"]],
                                     ajax: {
                                         url: url,
                                         type: "POST",
@@ -1694,7 +1681,6 @@ const openStepFunction = async (step, id) => {
                         sNext: ">",
                     },
                 },
-                order: [[0, "desc"]],
                 ajax: {
                     url: url,
                     type: "POST",
@@ -1753,6 +1739,27 @@ async function  deleteDocumentacionFolder(id) {
         }
     });
 }
+async function updateEstadoCotizador(id) {
+    const estado = $(`#estado-cotizador-${id}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizador";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            id: id,
+            estado: estado
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+            reloadTableCotizacion();
+        },
+    });
+}
 async function viewDocumentacion() {
     spinner.show();
     $.ajax({
@@ -1797,6 +1804,7 @@ async function viewDocumentacion() {
                     </div>
                 `);
             });
+          
         },
     });
 
@@ -2237,6 +2245,16 @@ async function viewClientesDocumentacion(id) {
 
     $("#btn-descargar-cotizacion-inicial").attr("href", result[0].cotizacion_file_url);
     clientesDocumentacionContainer.show();
+    fileManagerInspectionCoordinacion = new FileManager({
+        fileGrid: "#file-grid-inspection-coordinacion",
+        fileInput: "#file-input-modal-inspection-coordinacion",
+        uploadBtn: "#btn-upload-inspection-coordinacion",
+        dragDropContainer: "#drag-drop-container-inspection-coordinacion",
+        searchInput: "#search-input-inspection-coordinacion",
+        pendingFileList: "#pending-file-list-inspection-coordinacion",
+        onFileUpload:(file)=> uploadFileAlmacenInspection(file,fileManagerInspectionCoordinacion),
+        // onLoadFiles:()=>getFilesAlmacenInspection(idProveedor,idCotizacion),
+      });
     spinner.hide();
 
 }
@@ -3031,7 +3049,6 @@ $(document).ready(async function () {
             const file= $("#file-input-modal").prop('files')[0];
 
             uploadFileDocument(file,fileManager).then((response)=>{
-                console.log(response)
                 fileManager.data.driveFiles.push(response);
                 fileManager.renderFileGrid(fileManager.data.driveFiles);
             });

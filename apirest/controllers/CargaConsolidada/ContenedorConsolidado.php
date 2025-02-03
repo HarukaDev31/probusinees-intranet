@@ -71,13 +71,14 @@ class ContenedorConsolidado extends CI_Controller {
 
 			
 			$subdata[] = $divEstado;
+			
 			if($this->user->No_Grupo=="Coordinación"){
 				$divAcciones='<div>
 				<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="view('.$row->id.')"></i>
 				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCarga('.$row->id.')"></i>
 				</div>';
 			}
-		
+			
 			$subdata[] = $divAcciones;
 			$data[] = $subdata;
         }
@@ -189,10 +190,27 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[] = $row->tarifa;
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
-				$divAcciones='<div>
-				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id_cotizacion.')"></i>
-				</div>';
+				if($this->user->No_Grupo=="Coordinación"){
+					$divAcciones='<div>
+					<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id_cotizacion.')"></i>
+					</div>';
 				$subdata[] = $divAcciones;
+				}
+				if($this->user->No_Grupo=="Cotizador"){
+					$divEstadoCotizador='<select 
+						class="form-control
+						'.($row->estado_cotizador=="PENDIENTE" ? "bg-light" : "").
+						
+						($row->estado_cotizador=="CONFIRMADO" ? "bg-success" : "").'
+						
+						" id="estado-cotizador-'.$row->id_cotizacion.'" name="estado" onchange="updateEstadoCotizador('.$row->id_cotizacion.')">
+							<option 
+							value="PENDIENTE" '.($row->estado_cotizador=="PENDIENTE" ? "selected" : "").'>PENDIENTE</option>
+	
+							<option value="CONFIRMADO" '.($row->estado_cotizador=="CONFIRMADO" ? "selected" : "").'>CONFIRMADO</option>
+						</select>';
+						$subdata[] = $divEstadoCotizador;	
+						}
 				$data[] = $subdata;
 			}
 			else{
@@ -271,19 +289,36 @@ class ContenedorConsolidado extends CI_Controller {
 						</div>';
 						$divInputArriveDateChina.='<div class="d-flex flex-row gap-2">
 						<input type="text" class="form-control input-date mb-1"  id="arrive-date-china-'.$proveedor->id_proveedor.'" name="arrive-date" value="'.
-						($product->arrive_date_china?date("Y-m-d", strtotime($proveedor->arrive_date_china)):$proveedor->arrive_date_china).'">
+						($proveedor->arrive_date_china?date("d-m-Y", strtotime($proveedor->arrive_date_china)):$proveedor->arrive_date_china).'">
 						</div>';
 						
 					}else{
-						$proveedoresSelect .= '<div class="badge d-block mb-1 ' . 
-							($proveedor->estados_proveedor == "NS" ? "badge-danger" : "") . 
-							($proveedor->estados_proveedor == "C" ? "badge-warning" : "") . 
-							($proveedor->estados_proveedor == "R" ? "badge-success" : "") . 
-							($proveedor->estados_proveedor == "NC" ? "badge-info" : "") . 
-							($proveedor->estados_proveedor == "INSPECTION" ? "badge-primary" : "") . 
-							($proveedor->estados_proveedor == "LOADED" ? "badge-success" : "") . 
-							($proveedor->estados_proveedor == "NO LOADED" ? "badge-danger" : "") . 
-							'">' . $proveedor->estados_proveedor . '</div>';
+						$proveedoresSelect .= '<select class="form-control mb-1
+						'.($proveedor->estados_proveedor=="NC" ? "bg-info" : "").
+						($proveedor->estados_proveedor=="C" ? "bg-warning" : "").
+						($proveedor->estados_proveedor=="R" ? "bg-success" : "").
+						($proveedor->estados_proveedor=="NS" ? "bg-danger" : "").
+						($proveedor->estados_proveedor=="INSPECTION" ? "bg-primary" : "").
+						($proveedor->estados_proveedor=="LOADED" ? "bg-success" : "").
+						($proveedor->estados_proveedor=="NO LOADED" ? "bg-danger" : "").'	
+						" id="estado-'.$proveedor->id_proveedor.'" name="estado" disabled onchange="updateEstadoProveedor('.$row->id.','.$proveedor->id_proveedor.')">
+							<option 
+							class="bg-info"
+							value="NC"'.($proveedor->estados_proveedor=="NC" ? "selected" : "").'>NC</option>
+							<option value="C" 
+							class="bg-warning"
+							'.($proveedor->estados_proveedor=="C" ? "selected" : "").'>C</option>
+							<option value="R"
+							class="bg-success"
+							'.($proveedor->estados_proveedor=="R" ? "selected" : "").'>R</option>
+							<option value="NS"
+							class="bg-danger"
+							'.($proveedor->estados_proveedor=="NS" ? "selected" : "").'>NS</option>
+							<option value="INSPECTION" '.($proveedor->estados_proveedor=="INSPECTION" ? "selected" : "").'>INSPECTION</option>
+							<option value="LOADED" '.($proveedor->estados_proveedor=="LOADED" ? "selected" : "").'>LOADED</option>
+							<option value="NO LOADED" '.($proveedor->estados_proveedor=="NO LOADED" ? "selected" : "").'>NO LOADED</option>
+							
+						</select>';
 
 						$divInputQtyChina.='<div>
 						<input disabled  class="form-control mb-1" 
@@ -297,7 +332,7 @@ class ContenedorConsolidado extends CI_Controller {
 						</div>';
 						$divInputArriveDateChina.='<div>
 						<input disabled  class="form-control mb-1"
-							value="'.($proveedor->arrive_date_china??date('Y-m-d')).'"
+							value="'.($proveedor->arrive_date_china?date("d-m-Y", strtotime($proveedor->arrive_date_china)):$proveedor->arrive_date_china).'"
 						</div>';
 						
 					}
@@ -305,7 +340,7 @@ class ContenedorConsolidado extends CI_Controller {
 					if($proveedor->estados=="EMBARCADO" ){
 						$estadoSelect.='<div class="badge badge-success d-block mb-1">'.$proveedor->estados.'</div>';
 					}else{
-					$estadoSelect.='<select class="form-control" 
+					$estadoSelect.='<select class="form-control mb-1"'.($this->user->No_Grupo=="Cotizador" ? "disabled" : "").'
 					id="estado-'.$row->id.'-'.$proveedor->id_proveedor.'"
 					name="estado" onchange="updateEstadoCotizacionProveedor('.$row->id.','.$proveedor->id.','.$row->estados.')">
 						<option value="DEFAULT" '.($proveedor->estados=="" ? "selected disabled" : "").'>--Seleccionar--</option>
@@ -331,17 +366,21 @@ class ContenedorConsolidado extends CI_Controller {
 					</div>';
 					//add inputs to supplier
 					$divInputsSupplier.='<div class="d-flex flex-row mb-1">
-					<input type="text" class="form-control" id="proveedor-'.$proveedor->id_proveedor.'" name="proveedor" value="'.$proveedor->supplier.'"
+					<input type="text" class="form-control"'.($this->user->No_Grupo=="Cotizador" ? "disabled" : "").'
+					
+					id="proveedor-'.$proveedor->id_proveedor.'" name="proveedor" value="'.$proveedor->supplier.'"
 					'.($this->user->No_Grupo=="ContenedorAlmacen" ? "disabled" : "").'>
 				
 					</div>';
 					$divInputsCodeSupplier.='<div class="d-flex flex-row mb-1">
-					<input type="text" class="form-control" id="codigo-'.$proveedor->id_proveedor.'" name="codigo" value="'.$proveedor->code_supplier.'"
+					<input type="text" class="form-control"'.($this->user->No_Grupo=="Cotizador" ? "disabled" : "").' id="codigo-'.$proveedor->id_proveedor.'" name="codigo" value="'.$proveedor->code_supplier.'"
 					'.($this->user->No_Grupo=="ContenedorAlmacen" ? "disabled" : "").'>
 				
 					</div>';
 					$divInputsPhoneNumberSupplier.='<div class="d-flex flex-row mb-1">
-					<input type="text" class="form-control" id="telefono-'.$proveedor->id_proveedor.'" name="telefono" value="'.$proveedor->supplier_phone.'"
+					<input type="text" class="form-control"'
+					.($this->user->No_Grupo=="Cotizador" ? "disabled" : "").' 
+					id="telefono-'.$proveedor->id_proveedor.'" name="telefono" value="'.$proveedor->supplier_phone.'"
 					'.($this->user->No_Grupo=="ContenedorAlmacen" ? "disabled" : "").'>
 				
 					</div>';
@@ -405,9 +444,7 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[]=$divInputCBMChina;
 				$subdata[]=$divInputArriveDateChina;
 				$subdata[]=$divViewBtn;
-			
 				$subdata[]=$divAcciones;
-
 				$data[] = $subdata;
 
 			}
@@ -481,16 +518,23 @@ class ContenedorConsolidado extends CI_Controller {
 				</div>';
 				$divVolChina='<div class="d-flex flex-row gap-2">
 					<div class="d-flex flex-row gap-2">
-					<span class="badge badge-light">'.($row->volumen_china??0).'</span>
+					<span class="badge badge-primary">'.($row->volumen_china??0).'</span>
 					'.($volSelected!="volumen_china" ? '<i class="fas fa-check text-success" onclick="updateVolSelected('.$row->id_cotizacion.',\'volumen_china\')"></i>' : '').'
 					</div>
 				</div>';
 				$divVolDoc='<div class="d-flex flex-row gap-2">
 					<div class="d-flex flex-row gap-2">
-					<span class="badge badge-success">'.($row->volumen_doc??0).'</span>
+					<span class="badge badge-primary">'.($row->volumen_doc??0).'</span>
 					'.($volSelected!="volumen_doc" ? '<i class="fas fa-check text-success" onclick="updateVolSelected('.$row->id_cotizacion.',\'volumen_doc\')"></i>' : '').'
 					</div>
 				</div>';
+				$divValorCot='<div class="d-flex flex-row gap-2">
+					<div class="d-flex flex-row gap-2">
+					<span class="badge badge-success">'.($row->valor_cot??0).'</span></div>';
+				$divValorDoc='<div class="d-flex flex-row gap-2">
+					<div class="d-flex flex-row gap-2">
+					<span class="badge badge-success">'.($row->valor_doc??0).'</span></div>';
+
 				$subdata[] = $index;
 				$subdata[] = $row->nombre;
 				$subdata[] = $row->documento;
@@ -500,8 +544,8 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[] = $divVol;
 				$subdata[] = $divVolChina;
 				$subdata[] = $divVolDoc;
-				$subdata[] = $row->valor_cot;
-				$subdata[] = $row->valor_doc;
+				$subdata[] = $divValorCot;
+				$subdata[] = $divValorDoc;
 				$subdata[] = $divValidacion;
 				
 				$data[] = $subdata;
@@ -910,6 +954,16 @@ class ContenedorConsolidado extends CI_Controller {
 	public function getNotes($idProveedor){
 		$arrResponse = $this->ContenedorConsolidadoModel->getNotes($idProveedor);
 		echo json_encode($arrResponse);
+	}
+	public function updateEstadoCotizador(){
+		$estado=$this->input->post('estado');
+		$id=$this->input->post('id');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoCotizador($id,$estado);
+		echo json_encode([
+			"status" => $arrResponse,
+			"message" => "No todos los proveedores tienen productos"
+			
+		]);
 	}
 	function convertDateFormat($date) {
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);

@@ -152,6 +152,9 @@
                 <th>Monto</th>
                 <th>Tarifa</th>
                 <th>Cotizacion</th>
+                <?php if($this->user->No_Grupo=="Cotizador"){  ?>
+                <th>Estado</th>
+                <?php } ?>
                 <?php if($this->user->No_Grupo=="Coordinación"){  ?>
 
                 <th>Acciones
@@ -289,7 +292,7 @@
     </section>
     <section class="content card px-4 py-3" id="clientes-documentation-container">
 
-      <div class="col col-12" id="clientes-documentacion">
+      <div class="col col-12 my-2" id="clientes-documentacion">
         <h3
         class="d-flex w-100 row documentation-title"
         >
@@ -353,7 +356,7 @@
         
         </div>
       </div>
-      <div class="col col-12" id="clientes-cotizacion">
+      <div class="col col-12 my-2" id="clientes-cotizacion">
         <h3
         data-toggle="collapse"
         href="#collapse-cotizacion"
@@ -372,7 +375,46 @@
             <button type="button" id="btn-descargar-cotizacion-final" class="btn btn-outline-success btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i> Descargar Cotización Final</button>
           </div>
         </div>
-      </div>          
+      </div>
+      <div class="col col-12 my-2" id="clientes-inpection">
+      <h3
+        data-toggle="collapse"
+        href="#collapse-inspection"
+        role="button"
+        aria-expanded="false"
+        aria-controls="collapse-inspection"
+        class="documentation-title"
+
+        >Inpection</h3>
+        <div class="collapse show row row-cols-4 " id="collapse-inspection">
+        <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
+        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top" >Inspection
+         
+        </h2>  
+        <div id="drag-drop-container-inspection-coordinacion"
+                class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden">
+          <div id="drop-message">
+            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
+              <p class="text-gray-600">
+                        Arrastra y suelta archivos aquí
+              </p>
+              <p class="text-xs text-gray-500 mt-2">
+                        Soporta: PDF, JPG, PNG, DOCX (Máximo 10MB)
+              </p>
+          </div>
+        </div>
+
+        <div id="file-grid-inspection-coordinacion" class="grid grid-cols-4 gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
+        </div>
+        <div id="pending-files-inspection-coordinacion hidden" class="mb-4">
+          <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
+            <div id="pending-file-list-inspection-coordinacion" class="space-y-2">
+                  <!-- Los archivos pendientes aparecerán aquí -->
+            </div>
+        </div>
+      </div>
+        </div>
+      
     </section>
     <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
@@ -462,8 +504,6 @@
         </div>
 
         <div id="file-grid-inspection" class="grid grid-cols-4 gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
-
-              <!-- Existing and uploaded files will appear here -->
         </div>
         <div id="pending-files-inspection hidden" class="mb-4">
           <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
@@ -497,6 +537,9 @@
             <div class="col-12 col-md-2">
                   <button type="button"  class="btn btn-outline-primary btn-block btn-reporte btn-back-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> </button>
             </div>
+      </div>
+      <div class="row documentation-files-container
+      grid grid-cols-2   gap-4 text-lg font-semibold bg-white shadow p-3 rounded-lg">
       </div>
      
     </section>
@@ -900,7 +943,9 @@ i:hover {
         }
 
         #pending-files,
-        #pending-files-inspection {
+        #pending-files-inspection,
+        #pending-files-inspection-coordinacion
+        {
             background-color: #fff8e1;
             border: 1px solid #ffe082;
             padding: 1em;
@@ -917,21 +962,27 @@ i:hover {
         }
 
         #pending-file-list .file-item ,
-        #pending-file-list-inspection .file-item {
+        #pending-file-list-inspection .file-item,
+        #pending-file-list-inspection-coordinacion .file-item 
+        {
             display: flex;
             align-items: center;
             margin-bottom: 1rem;
         }
 
         #pending-file-list .file-name,
-        #pending-file-list-inspection .file-name {
+        #pending-file-list-inspection .file-name,
+        #pending-file-list-inspection-coordinacion 
+        .file-name {
             flex-grow: 1;
             padding-left: 10px;
             font-weight: 600;
         }
 
         #pending-file-list .text-sm,
-        #pending-file-list-inspection .text-xs {
+        #pending-file-list-inspection .text-sm,
+        #pending-file-list-coordinacion 
+        .text-xs {
             color: #666;
         }
         
@@ -940,7 +991,9 @@ i:hover {
           height: 50vh;
           min-height: 600px;
           position: relative;
-        }#file-grid,#file-grid-inspection{
+        }#file-grid,#file-grid-inspection,
+        #file-grid-inspection-coordinacion
+        {
           height: auto;
           width: 100%;
           gap: 1rem;
