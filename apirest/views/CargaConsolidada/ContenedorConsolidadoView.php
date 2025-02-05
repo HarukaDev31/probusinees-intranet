@@ -639,6 +639,14 @@
                   </div>
                 </div>
                 <div class="col-6 col-sm-6">
+                  <div class="form-group
+                  ">
+                    <label>F. Cierre <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text" name="f_cierre" required id="txt-Fe_Cierre" class="form-control input-report required input-date" >
+                    <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
+                  </div>
+                </div>
+                <div class="col-6 col-sm-6">
                   <div class="form-group">
                     <label>Pais <span class="label-advertencia text-danger"> *</span></label>
                     <select id="txt-ID_Pais" required name="id_pais" class="form-control input-report required">
@@ -646,14 +654,6 @@
                     </select>
                     <!-- <span class="help-block text-danger" id="error"></span>
                     <input type="hidden" id="txt-ID_Carga_Consolidada" name="id" value="0"> -->
-                  </div>
-                </div>
-                <div class="col-6 col-sm-6">
-                  <div class="form-group">
-                    <label>Carga <span class="label-advertencia text-danger"> *</span></label>
-                    <select type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
-                    </select>
-                    <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
                   </div>
                 </div>
                 <div class="col-6 col-sm-6">
@@ -665,13 +665,15 @@
                   </div>
                 </div>
                 <div class="col-6 col-sm-6">
-                  <div class="form-group
-                  ">
-                    <label>F. Cierre <span class="label-advertencia text-danger"> *</span></label>
-                    <input type="text" name="f_cierre" required id="txt-Fe_Cierre" class="form-control input-report required input-date" >
-                    <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
+                  <div class="form-group">
+                    <label>Carga <span class="label-advertencia text-danger"> *</span></label>
+                    <select type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
+                    </select>
+                    <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
                   </div>
                 </div>
+               
+              
                 <div class="col-6 col-sm-6">
                   <div class="form-group" id="div-Fe_Entrega">
                     <label>F. Entrega <span class="label-advertencia text-danger"> *</span></label>
