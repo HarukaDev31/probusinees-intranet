@@ -337,9 +337,7 @@ class ContenedorConsolidado extends CI_Controller {
 						
 					}
 					//add select with status enum("ROTULADO","DATOS PROVEEDOR","INSPECCIONADO","RESERVADO","EMBARCADO","NO EMBARCADO"),
-					if($proveedor->estados=="EMBARCADO" ){
-						$estadoSelect.='<div class="badge badge-success d-block mb-1">'.$proveedor->estados.'</div>';
-					}else{
+					
 					$estadoSelect.='<select class="form-control mb-1"'.($this->user->No_Grupo=="Cotizador" ? "disabled" : "").'
 					id="estado-'.$row->id.'-'.$proveedor->id_proveedor.'"
 					name="estado" onchange="updateEstadoCotizacionProveedor('.$row->id.','.$proveedor->id.','.$row->estados.')">
@@ -352,7 +350,7 @@ class ContenedorConsolidado extends CI_Controller {
 						>EMBARCADO</option>
 						<option value="NO EMBARCADO" '.($proveedor->estados=="NO EMBARCADO" ? "selected" : "").''.($this->user->No_Grupo!=="ContenedorAlmacen" ? "disabled" : "").'>NO EMBARCADO</option>
 					</select>';
-					}
+					
 					$qtyBoxDiv.='<div>
 					<input disabled  class="form-control mb-1" 
 					value="'.($proveedor->qty_box??0).'"
