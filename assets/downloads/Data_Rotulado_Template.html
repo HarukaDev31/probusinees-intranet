@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td {
+            padding: 0;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f3f4f6;
+            padding: 20px;
+        }
+
+        .content-box {
+            background-color: white;
+            border: 2px solid black;
+            padding: 32px;
+        }
+
+        .header-section {
+            border-bottom: 2px solid black;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .icon {
+            width: 32px;
+            height: 32px;
+            vertical-align: middle;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+            padding-left: 8px;
+        }
+
+        .number {
+            font-size: 18px;
+            font-weight: bold;
+            padding:  0 1em;
+            text-align: right;
+        }
+
+        .intro {
+            font-size: 18px;
+            margin-bottom: 24px;
+            padding: 0 1em;
+        }
+
+        .supplier-section {
+            background-color: #f9fafb;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .supplier-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 0 16px 0;
+        }
+
+        .field-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            padding-right: 12px;
+        }
+
+        .field-label {
+            font-weight: 500;
+            margin: 0;
+            padding: 8px 0;
+        }
+
+        .footer-section {
+            border-top: 2px solid black;
+            padding-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <table class="main-wrapper" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <table class="content-box" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <table class="header-section" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="width: 50%">
+                                        <table cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="32">
+                                                    <i data-lucide="package" class="icon"></i>
+                                                </td>
+                                                <td>
+                                                    <h1 class="title">Pro Business</h1>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td style="width: 50%">
+                                        <p class="number">Consolidado #16</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table cellpadding="10" cellspacing="10">
+                                <tr>
+                                    <td class="intro">
+                                        <p>También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="supplier-section" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <h2 class="supplier-title">➡ Datos del proveedor: (Usted lo llena)</h2>
+                                        
+                                        <table cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="32">
+                                                    <i data-lucide="box" class="field-icon"></i>
+                                                </td>
+                                                <td>
+                                                    <p class="field-label">☑ Nombre del producto:</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="32">
+                                                    <i data-lucide="user-circle" class="field-icon"></i>
+                                                </td>
+                                                <td>
+                                                    <p class="field-label">☑ Nombre del vendedor:</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="32">
+                                                    <i data-lucide="message-circle" class="field-icon"></i>
+                                                </td>
+                                                <td>
+                                                    <p class="field-label">☑ WeChat del vendedor:</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="footer-section" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <p style="padding:0 1em;">Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</body>
+</html>

@@ -265,6 +265,7 @@ async function uploadFileDocument(file,fileManager){
     });
 }
 async function uploadFileAlmacenInspection(file,fileManager){
+    console.log("upload file inspection");
     spinner.show();
     const formData = new FormData();
     formData.append('file', file);
@@ -1752,7 +1753,7 @@ async function updateEstadoCotizador(id) {
         success: function (response) {
             const result = JSON.parse(response);
             if (result.status == "success") {
-                Swal.fire("Correcto!", "Se cambio el estado con éxito", "success"); 
+                Swal.fire("Correcto!", "Se cambio el estado con wéxito", "success"); 
             } else {
                 Swal.fire("Error!", result.message, "error");
             }
@@ -3057,7 +3058,7 @@ $(document).ready(async function () {
         })
         $(".upload-btn-inspection").click(function () {
             const file=$("#file-input-modal-inspection").prop('files')[0];
-            uploadFileDocument(file,fileManagerInspection).then((response)=>{
+            uploadFileAlmacenInspection(file,fileManagerInspection).then((response)=>{
                 fileManagerInspection.data.driveFiles.push(response);
                 fileManagerInspection.renderFileGrid(fileManagerInspection.data.driveFiles);
             }

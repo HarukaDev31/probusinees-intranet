@@ -70,6 +70,7 @@
         self.$dragDropContainer.off("drop");
         self.$searchInput.off("input");
         self.$fileGrid.off("click");
+        self.$uploadBtn.off("click");
         self.$uploadBtn.on("click", function (e) {
           e.preventDefault();
           self.handleFiles(self.$fileInput[0].files);
@@ -80,7 +81,6 @@
           self.$fileGrid.on(eventName, function (e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log(eventName);
           });
         });
     

@@ -12,6 +12,23 @@
         "normal": "noto_sans_tc_normal_3931d8f2ec734beedacf8627aac63492"
     },
     "noto sans sc": {
-        "normal": "noto_sans_sc_normal_fa8130ed19d81fe718fc84ecaef9893a"
+        "normal": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_normal_fa8130ed19d81fe718fc84ecaef9893a",
+        "100": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_100_dfe53c38f6ba5ee80ad4d766ef26362e",
+        "200": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_200_44b23586aa344e648391bd3f213a0f2d",
+        "300": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_300_0be2474e8942719bc52c192786d9d2ea",
+        "500": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_500_80e78e680e6290c4e93fb02cabd9fa74",
+        "600": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_600_e86d7dcef6d0d437e8fc4381c901290a",
+        "bold": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_bold_1b8553df3171c589bf020d8694480f0f",
+        "800": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_sc_800_62dca35631bf42f5977517283cc993ce",
+        "900": "noto_sans_sc_900_450df6eefd612ea2fcaecdb7b55a1f67"
+    },
+    "noto sans": {
+        "italic": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_italic_f2af51e9feba91b2518440a889e713c3",
+        "bold_italic": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_bold_italic_6c4f983cf1098e677c609089f2ad2fb0",
+        "normal": "C:\\xampp\\htdocs\\probusinees-intranet\\apirest\\third_party\\dompdf\\vendor\\dompdf\\dompdf\/lib\/fonts\/noto_sans_normal_aae357edc48299888123f133be2d7aef",
+        "bold": "noto_sans_bold_61c56aab9e439e54707190f59bc8c51c"
+    },
+    "noto color emoji": {
+        "normal": "noto_color_emoji_normal_d511041856972bbf829654613c013108"
     }
 }

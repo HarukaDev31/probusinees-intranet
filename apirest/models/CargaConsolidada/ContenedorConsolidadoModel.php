@@ -3,12 +3,13 @@ require_once APPPATH . 'traits/FileTrait.php';
 require_once APPPATH . 'traits/WhatsappTrait.php';
 require_once APPPATH . 'traits/NotificationTrait.php';
 require_once APPPATH . 'traits/WebSocketTrait.php';
+require_once APPPATH . 'traits/MailTrait.php';
 require_once APPPATH . 'third_party/PHPExcel.php';
 require_once APPPATH . 'third_party/tcpdf/tcpdf.php';
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class ContenedorConsolidadoModel extends CI_Model
 {
-    use FileTrait, WebSocketTrait, WhatsappTrait, NotificationTrait;
+    use FileTrait, WebSocketTrait, WhatsappTrait, NotificationTrait,MailTrait;
     var $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
@@ -153,6 +154,10 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->from($this->table_contenedor_steps);
             $this->db->where('id_pedido', $idContenedor);
             $this->db->order_by('id_order', 'asc');
+            if($this->user->No_Grupo == "Cotizador"){
+                //limit to 2 steps
+                $this->db->limit(2);
+            }
             $query = $this->db->get();
             return $query->result();
         } catch (Exception $e) {
@@ -1313,26 +1318,24 @@ class ContenedorConsolidadoModel extends CI_Model
         $greenColor = "7dcea0";
         $grayColor = "dcdde1";
         $yellow2Color = "fad7a0";
-        $dataSystem = $this->db->select('nombre,volumen,volumen_doc,valor_doc,valor_cot,volumen_china,name')
+        $dataSystem = $this->db->select('nombre,volumen,volumen_doc,valor_doc,valor_cot,volumen_china,name,vol_selected')
             ->from($this->table_contenedor_cotizacion)
             ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
             ->where('id_contenedor', $idContenedor)
-            ->where('estado', "CONFIRMADO")
+            ->where('estado_cliente!=', null)
             ->get()->result();
-        //return $dataSystem;
         try {
             $sheetCount = $objPHPExcel->getSheetCount();
             $sheet0 = $objPHPExcel->getSheet(0);
             $sheet0->insertNewColumnBefore('C', 2);
             $sheet0->setCellValue('D25', 'CLIENTE');
             $sheet0->setCellValue('C25', 'TIPO DE CLIENTE');
-            //remove e column 
             $sheet0->removeColumn('E');
             $sheet0->setCellValue('R25', 'ADVALOREM');
             $sheet0->setCellValue('S25', 'ANTIDUMPING');
-            $sheet0->setCellValue('T25', 'VOL. COT.');
-            $sheet0->setCellValue('U25', 'VOL. CHINA');
-            $sheet0->setCellValue('V25', 'VOL. DOC.');
+            $sheet0->setCellValue('T25', 'VOL. SISTEMA');
+            // $sheet0->setCellValue('U25', 'VOL. CHINA');
+            // $sheet0->setCellValue('V25', 'VOL. DOC.');
             $styleArray = array(
                 'borders' => array(
                     'allborders' => array(
@@ -1362,31 +1365,22 @@ class ContenedorConsolidadoModel extends CI_Model
                         foreach ($mergedCells as $range) {
                             // Extraer las celdas inicial y final del rango
                             [$startCell, $endCell] = explode(':', $range);
-
                             // Verificar si el rango está en la columna B
                             if (preg_match('/^B\d+$/', $startCell)) {
                                 // Obtener el valor de la celda fusionada
                                 $value = $sheetListaPartidas->getCell($startCell)->getValue();
-
-                                // Comparar el valor con el itemNumber
                                 if (trim($value) == $itemN) {
-                                    // Obtener el rango de filas del rango fusionado
                                     preg_match('/\d+/', $startCell, $startMatches);
                                     preg_match('/\d+/', $endCell, $endMatches);
                                     $startRow = (int)$startMatches[0];
                                     $endRow = (int)$endMatches[0];
-
-                                    // Obtener el valor de la columna G para el rango fusionado
                                     for ($r = $startRow; $r <= $endRow; $r++) {
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
                                         $antiDumping = $sheetListaPartidas->getCell('H' . $r)->getValue();
-
                                         $sheet->setCellValue('R' . $row, $adValorem);
                                         $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
                                         break;
                                     }
-
-                                    // Salir del bucle si ya encontramos el rango que buscamos
                                     break;
                                 }
                             }
@@ -1401,8 +1395,8 @@ class ContenedorConsolidadoModel extends CI_Model
                                 // $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
                                 // $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
                                 $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                                $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                                $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
+                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
                             }
 
                             // Actualizar el valor actual y establecer nuevas celdas iniciales
@@ -1413,6 +1407,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         $sheet->setCellValue('D' . $row, $client);
                         //find if exists row in datasystem array where trim(nombre)=trim(client) if exists set volumen_cotizacion, volumen_china, volumen_doc, valor_doc, valor_cot else set -
                         $volumen_cotizacion = "-";
+                        $volumen_selected='';
                         $volumen_china = "-";
                         $volumen_doc = "-";
                         $valor_doc = "-";
@@ -1423,16 +1418,27 @@ class ContenedorConsolidadoModel extends CI_Model
                             if (trim($item->nombre) == trim($client)) {
                                 $volumen_cotizacion = $item->volumen;
                                 $volumen_china = $item->volumen_china;
+                                $volumen_selected = $item->vol_selected??'';
                                 $volumen_doc = $item->volumen_doc;
                                 $valor_doc = $item->valor_doc;
                                 $tipoCliente = $item->name;
                                 break;
                             }
                         }
+                        //volumen_doc,volumen_china,volumen
+                        if($volumen_selected=='volumen_doc'){
+                            $volumen_cotizacion=$volumen_doc;
+                        }
+                        if($volumen_selected=='volumen_china'){
+                            $volumen_cotizacion=$volumen_china;
+                        }
+                        if($volumen_selected=='volumen'){
+                            $volumen_cotizacion=$volumen_cotizacion;
+                        }
                         //set vol_cot to t column
                         $sheet->setCellValue('T' . $row, $volumen_cotizacion);
-                        $sheet->setCellValue('U' . $row, $volumen_china);
-                        $sheet->setCellValue('V' . $row, $volumen_doc);
+                        // $sheet->setCellValue('U' . $row, $volumen_china);
+                        // $sheet->setCellValue('V' . $row, $volumen_doc);
                         $sheet->setCellValue('C' . $row, $tipoCliente);
                         if (trim($itemN) == "TOTAL FOB PRICE") {
                             //unmerge cell 
@@ -1448,11 +1454,11 @@ class ContenedorConsolidadoModel extends CI_Model
                         $startPackingListIndex++;
 
 
-                        $sheet0->getStyle('R' . $row . ':V' . $row)->applyFromArray($styleArray);
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
                         //set horizontal alignment to center
-                        $sheet0->getStyle('R' . $row . ':V' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                         //set vertical alignment to center
-                        $sheet0->getStyle('R' . $row . ':V' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
                         $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                     }
@@ -1468,8 +1474,8 @@ class ContenedorConsolidadoModel extends CI_Model
                                 // $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
                                 // $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
                                 $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                                $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                                $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
+                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
                             }
 
                             // Actualizar el valor actual y establecer nuevas celdas iniciales
@@ -1492,12 +1498,15 @@ class ContenedorConsolidadoModel extends CI_Model
                         $volumen_doc = "-";
                         $valor_doc = "-";
                         $valor_cot = "-";
+                        $volumen_selected='';
+
                         $tipoCliente = "No existe en contenedor";
                         //find in array
                         foreach ($dataSystem as $item) {
                             if (trim($item->nombre) == trim($client)) {
                                 $volumen_cotizacion = $item->volumen;
                                 $volumen_china = $item->volumen_china;
+                                $volumen_selected = $item->vol_selected??'';
                                 $volumen_doc = $item->volumen_doc;
                                 $valor_doc = $item->valor_doc;
                                 $tipoCliente = $item->name;
@@ -1506,10 +1515,19 @@ class ContenedorConsolidadoModel extends CI_Model
                         }
 
                         //set vol_cot to t column
+                        if($volumen_selected=='volumen_doc'){
+                            $volumen_cotizacion=$volumen_doc;
+                        }
+                        if($volumen_selected=='volumen_china'){
+                            $volumen_cotizacion=$volumen_china;
+                        }
+                        if($volumen_selected=='volumen'){
+                            $volumen_cotizacion=$volumen_cotizacion;
+                        }
                         $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
-                        $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
-                        $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
-                        $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
+                        // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
+                        // $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
+                        // $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
                         $mergedCells = $sheetListaPartidas->getMergeCells();
                         foreach ($mergedCells as $range) {
                             // Extraer las celdas inicial y final del rango
@@ -1574,11 +1592,11 @@ class ContenedorConsolidadoModel extends CI_Model
                         $objPHPExcel->getActiveSheet()->mergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
 
 
-                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':V' . $highestFirstSheetRow)->applyFromArray($styleArray);
+                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
                         //set horizontal alignment to center
-                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':V' . $highestFirstSheetRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                         //set vertical alignment to center
-                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':V' . $highestFirstSheetRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                         $sheet0->getStyle('O' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                         $sheet0->getStyle('Q' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                         //set r column porcentage format
@@ -1594,7 +1612,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $objPHPExcel->getActiveSheet()->unmergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
             $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
             //set fill none in sheet 0 row=highestFirstSheetRow
-            $sheet0->getStyle('R' . $highestFirstSheetRow . ':V' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
+            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
             //set all borders
             $styleArray = array(
                 'borders' => array(
@@ -1603,7 +1621,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     )
                 )
             );
-            $sheet0->getStyle('R' . $highestFirstSheetRow . ':V' . $highestFirstSheetRow)->applyFromArray($styleArray);
+            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
 
             //MERGE B TO 0
             //set p highestFirstSheetRow value to sum from p.startColumn to p.highestFirstSheetRow-1
@@ -1617,8 +1635,8 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheet0->getColumnDimension('R')->setWidth(20);
             $sheet0->getColumnDimension('S')->setWidth(25);
             $sheet0->getColumnDimension('T')->setWidth(15);
-            $sheet0->getColumnDimension('U')->setWidth(15);
-            $sheet0->getColumnDimension('V')->setWidth(15);
+            // $sheet0->getColumnDimension('U')->setWidth(15);
+            // $sheet0->getColumnDimension('V')->setWidth(15);
             //from b starcolumn to b highestFirstSheetRow-1 set fill pinkColor
             $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
             $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
@@ -1629,10 +1647,10 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
             $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
             $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
-            $sheet0->getStyle('U' . ($startColumn - 1) . ':U' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('U' . ($startColumn - 1) . ':U' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($greenColor);
-            $sheet0->getStyle('V' . ($startColumn - 1) . ':V' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('V' . ($startColumn - 1) . ':V' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($yellow2Color);
+            // $sheet0->getStyle('U' . ($startColumn - 1) . ':U' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $sheet0->getStyle('U' . ($startColumn - 1) . ':U' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($greenColor);
+            // $sheet0->getStyle('V' . ($startColumn - 1) . ':V' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $sheet0->getStyle('V' . ($startColumn - 1) . ':V' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($yellow2Color);
             //set wrap text to true
             return $objPHPExcel;
         } catch (Exception $e) {
@@ -1678,179 +1696,135 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function updateEstadoCotizacionProveedor($idCotizacion, $idProveedor, $estado)
     {
-        if ($estado == "ROTULADO" || $estado == "RESERVADO") {
-         
-            //WHERE estados is null
+        if (in_array($estado, ["ROTULADO", "RESERVADO"])) {
             $this->db->where('id_cotizacion', $idCotizacion);
-            $this->db->where('estados_proveedor IS NULL');
+            $this->db->group_start(); // Agrupar condiciones OR
+            $this->db->where('estados_proveedor IS NULL', null, false);
             $this->db->or_where('estados_proveedor', 'RESERVADO');
             $this->db->or_where('estados_proveedor', 'ROTULADO');
             $this->db->or_where('estados_proveedor', 'DATOS PROVEEDOR');
-
+            $this->db->group_end();
+            
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
+    
+            // Segunda actualización para un proveedor específico
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
         }
-        else if($estado=="LOADED"){
-            //valid if in tracking exists row with estado=reservado then update estado_cliente from table cotizacion to reservado else no reservado
+        // Manejo del estado "LOADED"
+        else if ($estado == "LOADED") {
             $this->db->select('estado')
                 ->from($this->table_conteneodr_proveedor_estados_tracking)
                 ->where('id_cotizacion', $idCotizacion)
                 ->where('estado', 'RESERVADO');
             $query = $this->db->get();
-            $estadoCliente = $query->row();
-            if ($estadoCliente) {
-                $estadoCliente = "RESERVADO";
-            } else {
-                $estadoCliente = "NO RESERVADO";
-            }
+            $estadoCliente = $query->row() ? "RESERVADO" : "NO RESERVADO";
+    
             $this->db->where('id', $idCotizacion);
             $this->db->update($this->table_contenedor_cotizacion, ['estado_cliente' => $estadoCliente]);
+    
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED"]);
-        }else if($estado=="NC"||$estado=="C"||
-        $estado=="R"||$estado=="NS"||$estado=="NO LOADED"||$estado=="INSPECTION"){
+        }
+        // Manejo de los estados específicos en array
+        else if (in_array($estado, ["NC", "C", "R", "NS", "NO LOADED", "INSPECTION"])) {
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estado]);
-        }else{
+        }
+        // Manejo de otros estados
+        else {
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
         }
-        //find query error
-        
+    
+        // Verificar si hubo una actualización exitosa
         if ($this->db->affected_rows() > 0) {
-            //update past rows updated_at
-           
+            // Aquí podrías registrar logs o hacer otra acción si se requiere
         }
-        //if exists error with different code than 0
-        if ($this->db->error() && $this->db->error()['code'] != 0) {
-            return ['status' => "error", 'error' => $this->db->error()];
+    
+        // Manejo de errores en la base de datos
+        $dbError = $this->db->error();
+        if ($dbError && $dbError['code'] != 0) {
+            return ['status' => "error", 'error' => $dbError];
         }
+    
+        // Actualizar timestamp en `tracking`
         $this->db->where('id_proveedor', $idProveedor);
         $this->db->update($this->table_conteneodr_proveedor_estados_tracking, ['updated_at' => date('Y-m-d H:i:s')]);
-        $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, ['id_cotizacion' => $idCotizacion, 'id_proveedor' => $idProveedor, 'estado' => $estado]);
-        $this->db->where('id_cotizacion', $idCotizacion);
+    
+        // Insertar nuevo tracking
+        $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, [
+            'id_cotizacion' => $idCotizacion,
+            'id_proveedor' => $idProveedor,
+            'estado' => $estado
+        ]);
+    
+        // Manejo de errores en la inserción
+        $dbError = $this->db->error();
+        if ($dbError && $dbError['code'] != 0) {
+            return ['status' => "error", 'error' => $dbError];
+        }
+    
+        // Llamada al manejador de actualización de cotización
         $data = $this->handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion);
-        // return $data;
-        return "success";
+    
+        return $data ?: "success";
+   
     }
     public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
     {
         if ($estado == "ROTULADO") {
             try {
-                //select nombre from contenedor_consolidado_cotizacion where id=idCotizacion
-                // $this->db->select('nombre,id_contenedor')
-                //     ->from($this->table_contenedor_cotizacion)
-                //     ->where('id', $idCotizacion);
-                // $query = $this->db->get();
-                // $cliente = $query->row()->nombre;
-                // $idContenedor = $query->row()->id_contenedor;
-
-                // //get supplier_code from contenedor_consolidado_cotizacion_proveedores where id=idProveedor
-                // $this->db->select('code_supplier')
-                //     ->from($this->table_contenedor_cotizacion_proveedores)
-                //     ->where('id', $idProveedor);
-                // $query = $this->db->get();
-                // $supplierCode = $query->row()->code_supplier;
-                // //select carga from contenedor_consolidado where id=idContenedor
-                // $this->db->select('carga')
-                //     ->from($this->table)
-                //     ->where('id', $idContenedor);
-                // $query = $this->db->get();
-                // $carga = $query->row()->carga;
-
-                // $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
-                // $htmlContent = file_get_contents($htmlFilePath);
-                // $htmlContent = mb_convert_encoding($htmlContent, 'UTF-8', mb_detect_encoding($htmlContent));
-
-
-                // $htmlContent = str_replace('{{cliente}}', $cliente, $htmlContent);
-                // $htmlContent = str_replace('{{supplier_code}}', $supplierCode, $htmlContent);
-                // $htmlContent = str_replace('{{carga}}', $carga, $htmlContent);
-
-                // $options = new Dompdf\Options();
-                // $options->set('isHtml5ParserEnabled', true);
-                // $options->set('isFontSubsettingEnabled', true);
-                // $options->set('isRemoteEnabled', true);
-                // $dompdf = new Dompdf\Dompdf($options);
-
-                // $dompdf->loadHtml($htmlContent);
-                // $dompdf->setPaper('A4', 'portrait');
-                // $dompdf->render();
-                // $pdfContent = $dompdf->output();
-                // $pdfContent = $dompdf->output();
-                // $tempFilePath = sys_get_temp_dir() . '/temp_document.pdf';
-                // file_put_contents($tempFilePath, $pdfContent);
-
-                // // try {
-                // //     $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
-
-                // //     $sendRotulado = $this->sendRotulado($mediaId, $supplierCode);
-                // // } catch (Exception $e) {
-                // //     echo 'Error: ' . $e->getMessage();
-                // // } finally {
-                // //                     // Eliminar el archivo temporal
-
-                // // }
-                // // $ruta = 'assets/downloads/Rotulado.pdf';
-                // // $fileUrl= file_put_contents($ruta, $output);
-                // // $fileUrl=base_url($ruta);
-
-
-                // //     $response=$this->sendRotulado($fileUrl,"waos");
-                // //add to zip and returns 3 pdfs
-                // $zip = new ZipArchive();
-                // $zipFileName = 'assets/downloads/Rotulado.zip';
-                // if ($zip->open($zipFileName, ZipArchive::CREATE) === TRUE) {
-                //     $zip->addFile($tempFilePath, 'Rotulado.pdf');
-                //     $zip->close();
-                // }
-                // //return $zip blob
-                // $zip->close();
-                // header('Content-Type: application/zip');
-                // header('Content-Disposition: attachment; filename="Rotulado.zip"');
-                // header('Content-Length: ' . filesize($zipFileName));
-                // readfile($zipFileName);
-                // exit;
-
-                // $dompdf->stream('Cotizacion.pdf', ["Attachment" => 0]);
-                // $dompdf->stream('Cotizacion.pdf', ["Attachment" => 0]);
-
-                $this->db->select('nombre, id_contenedor')
+                $email="mvillegas@probusiness.pe";
+                $this->db->select('nombre,id_contenedor')
                     ->from($this->table_contenedor_cotizacion)
                     ->where('id', $idCotizacion);
                 $query = $this->db->get();
+               
                 $cliente = $query->row()->nombre;
                 $idContenedor = $query->row()->id_contenedor;
-
-                // Obtener todos los proveedores asociados a la cotización
+                $this->db->close();
+                $this->db->initialize();
                 $this->db->select('code_supplier,products')
                     ->from($this->table_contenedor_cotizacion_proveedores)
                     ->where('id_cotizacion', $idCotizacion); // Cambiado a `id_cotizacion`
                 $query = $this->db->get();
                 $proveedores = $query->result_array();
 
-                // Obtener el valor de `carga` del contenedor consolidado
                 $this->db->select('carga')
                     ->from($this->table)
                     ->where('id', $idContenedor);
                 $query = $this->db->get();
                 $carga = $query->row()->carga;
+                $htmlWelcomePath='assets/downloads/Welcome_Consolidado_Template.html';
+                $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
+                $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
+                $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
+                // $options = new Dompdf\Options();
+                // $options->set('isHtml5ParserEnabled', true);
+                // $options->set('isFontSubsettingEnabled', true);
+                // $options->set('isRemoteEnabled', true);
+                // $dompdf = new Dompdf\Dompdf($options);
+                // $dompdf->loadHtml($htmlWelcomeContent);
+                // $dompdf->setPaper('A4', 'portrait');
+                // $dompdf->render();
+                // $pdfContent = $dompdf->output();
+                // $uuid=uniqid();
+                // $tempFilePath = sys_get_temp_dir() . "/temp_document_{$uuid}.pdf";
+                // file_put_contents($tempFilePath, $pdfContent);
+                $this->sendMail($email,"Welcome to Consolidado",$htmlWelcomeContent,[
+                    
+                ]);
+                $this->email->clear(TRUE);
 
-                // Cargar la plantilla HTML
-                $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
-                $htmlContentTemplate = file_get_contents($htmlFilePath);
-                $htmlContentTemplate = mb_convert_encoding($htmlContentTemplate, 'UTF-8', mb_detect_encoding($htmlContentTemplate));
-
-                $this->sendWelcome();
-                // Crear un archivo ZIP para almacenar los PDFs
+                unlink($tempFilePath);
+             
                 $zip = new ZipArchive();
                 $zipFileName = 'assets/downloads/Rotulado.zip';
-                //if exist delete
                 if (file_exists($zipFileName)) {
                     unlink($zipFileName);
                 }
@@ -1867,6 +1841,9 @@ class ContenedorConsolidadoModel extends CI_Model
                 foreach ($proveedores as $proveedor) {
                     $supplierCode = $proveedor['code_supplier'];
                     $products = $proveedor['products'];
+                    $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
+                    $htmlContentTemplate = file_get_contents($htmlFilePath);
+                    $htmlContentTemplate = mb_convert_encoding($htmlContentTemplate, 'UTF-8', mb_detect_encoding($htmlContentTemplate));
                     $htmlContent = str_replace('{{cliente}}', $cliente, $htmlContentTemplate);
                     $htmlContent = str_replace('{{supplier_code}}', $supplierCode, $htmlContent);
                     $htmlContent = str_replace('{{carga}}', $carga, $htmlContent);
@@ -1875,14 +1852,20 @@ class ContenedorConsolidadoModel extends CI_Model
                     $dompdf->setPaper('A4', 'portrait');
                     $dompdf->render();
                     $pdfContent = $dompdf->output();
-                    $tempFilePath = sys_get_temp_dir() . "/temp_document_{$supplierCode}.pdf";
-                    file_put_contents($tempFilePath, $pdfContent);
-                    
-                    file_put_contents($tempFilePath, $pdfContent);
-    
+                    $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
+                    file_put_contents($tempFilePath, $pdfContent); 
                     try {
-                        $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
-                        $sendRotulado = $this->sendDatosProveedor($mediaId, $supplierCode,$products);
+                        $this->sendMail($email,
+                            "Datos Item",
+                            `Producto: {$products}
+                            Código de proveedor: {$supplierCode}
+                            `,
+                            [
+                                $tempFilePath
+                            ]
+                        );
+                        // $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
+                        // $sendRotulado = $this->sendDatosProveedor($mediaId, $supplierCode,$products);
                     } catch (Exception $e) {
                         echo 'Error: ' . $e->getMessage();
                     } finally {
@@ -1890,12 +1873,25 @@ class ContenedorConsolidadoModel extends CI_Model
                     $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
                     }
                 }
-                // Cerrar el archivo ZIP
-                $zip->close();
-                //wait 5 seconds
-               
+                    $zip->close();
+                    $htmlDataPath='assets/downloads/Data_Rotulado_Template.html';
+                    $htmlDataContent = file_get_contents($htmlDataPath);
+                    // $dompdf = new Dompdf\Dompdf($options);
+                    // $dompdf->loadHtml($htmlDataContent);
+                    // $dompdf->setPaper('A4', 'portrait');
+                    // $dompdf->render();
+                    // $pdfContent = $dompdf->output();
+                    // $tempFilePath = sys_get_temp_dir() . "/temp_document_data_{$supplierCode}.pdf";
+                    // file_put_contents($tempFilePath, $pdfContent);
+                    $this->sendMail($email,
+                        "Datos Cliente",
+                        $htmlDataContent,
+                        [
+                            
+                        ]
+                    );
+                    unlink($tempFilePath);
 
-                // Enviar el archivo ZIP al frontend
                 header('Content-Type: application/zip');
                 header('Content-Disposition: attachment; filename="Rotulado.zip"');
                 header('Content-Length: ' . filesize($zipFileName));
@@ -1903,13 +1899,11 @@ class ContenedorConsolidadoModel extends CI_Model
 
                 // Limpiar archivos temporales
                 foreach ($proveedores as $proveedor) {
-                    $tempFilePath = sys_get_temp_dir() . "/temp_document_{$proveedor['code_supplier']}.pdf";
+                    $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$proveedor['code_supplier']}.pdf";
                     if (file_exists($tempFilePath)) {
                         unlink($tempFilePath);
                     }
                 }
-                sleep(5);
-                $this->sendDataRotulado();
                 exit;
             } catch (Exception $e) {
                 echo $e->getMessage();
@@ -2060,13 +2054,14 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function updateProveedorData($data,$idProveedor){
         
-        $this->db->select('estados,estados_proveedor,id_contenedor,code_supplier')
+        $this->db->select('estados,estados_proveedor,id_contenedor,code_supplier,id_cotizacion')
                 ->from($this->table_contenedor_cotizacion_proveedores)
                 ->where('id', $idProveedor);
             $query = $this->db->get();
             $estado = $query->row()->estados;
             $estadoProveedor = $query->row()->estados_proveedor;
             $idContenedor = $query->row()->id_contenedor;
+            $idCotizacion = $query->row()->id_cotizacion;
             $supplierCode = $query->row()->code_supplier;
         if(isset($data['supplier_phone']) || isset($data['supplier'])){ 
             //CHECK CURRENT STATUS IS EQUAL TO ROTULADO CHANGE TO DATOS PROVEEDOR
@@ -2119,6 +2114,9 @@ class ContenedorConsolidadoModel extends CI_Model
             if($estadoProveedor=="NC" || $estadoProveedor=="C"){
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'R']);
+                //sum all provider cbm_total_china and set volumen_china in cotizacion table
+             
+                
                 $usuariosAlmacen=$this->getUsersByGrupo($this->roleCoordinacion);
                 $ids=array_column($usuariosAlmacen,'ID_Usuario');
                 $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado RECIBIDO";
@@ -2137,7 +2135,17 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
-        $this->verifyContainerIsCompleted($idContenedor);
+        $this->db->close();
+        $this->db->initialize();
+        $this->db->select('SUM(ifnull(cbm_total_china,0)) as volumen_china')
+        ->from($this->table_contenedor_cotizacion_proveedores)
+        ->where('id_contenedor', $idContenedor);
+        $query = $this->db->get();
+        $volumenChina = $query->row()->volumen_china;
+      
+        $this->db->where('id', $idCotizacion);
+        $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $volumenChina]);
+            $this->verifyContainerIsCompleted($idContenedor);
 
         if ($this->db->error()->code!=0) {
             
@@ -2219,42 +2227,14 @@ class ContenedorConsolidadoModel extends CI_Model
             'last_modified' => time(),
         ];
         if ($fileUrl) {
-            try {
-                $mediaId = $this->uploadDocument($file['tmp_name'], $file['type']);
-            } catch (Exception $e) {
-                return ['status' => "error", 'error' => $e->getMessage()];
-            } finally {
-
-          
-            }
-            $fileToInsert['media_id']=$mediaId;
+         
            
             $this->db->insert($this->table_contenedor_almacen_inspection, $fileToInsert);
+            if($this->db->error()['code']!=0){
+                return ['status' => "error", 'error' => $this->db->error()];
+            }
             if ($this->db->affected_rows() > 0) {
-                
-                $sendMesagge=$this->validateToSendInspectionMessage($idProveedor);
-                if($sendMesagge){
-                    //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
-                    $this->db->select('nombre')
-                        ->from($this->table_contenedor_cotizacion)
-                        ->where('id', $idCotizacion);
-                    $query = $this->db->get();
-                    $cliente = $query->row()->nombre;
-                    $this->db->select('qty_box_china,code_supplier')
-                        ->from($this->table_contenedor_cotizacion_proveedores)
-                        ->where('id', $idProveedor);
-                    $query = $this->db->get();
-                    $qtyBoxChina = $query->row()->qty_box_china;
-                    $supplierCode = $query->row()->code_supplier;
-                    //get media_id from all files inspection for this proveedor
-                    $this->db->select('media_id,file_type')
-                        ->from($this->table_contenedor_almacen_inspection)
-                        ->where('id_proveedor', $idProveedor);
-                    $query = $this->db->get();
-                    $mediaData = $query->result();
-                    $response=$this->sendInspectionXSupllier($mediaData,$cliente,$qtyBoxChina,$supplierCode);
-                    
-                }
+                $this->validateToSendInspectionMessage($idProveedor);
                 $fileToReturn = [
                     'name' => $file['name'],
                     'path' => $fileUrl,
@@ -2265,6 +2245,30 @@ class ContenedorConsolidadoModel extends CI_Model
                     'id' => 1,
                 ];
                 return ['status' => "success", 'error' => false, "data" => $fileToReturn]; 
+                // $sendMesagge=
+                // if($sendMesagge){
+                //     //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
+                //     $this->db->select('nombre')
+                //         ->from($this->table_contenedor_cotizacion)
+                //         ->where('id', $idCotizacion);
+                //     $query = $this->db->get();
+                //     $cliente = $query->row()->nombre;
+                //     $this->db->select('qty_box_china,code_supplier')
+                //         ->from($this->table_contenedor_cotizacion_proveedores)
+                //         ->where('id', $idProveedor);
+                //     $query = $this->db->get();
+                //     $qtyBoxChina = $query->row()->qty_box_china;
+                //     $supplierCode = $query->row()->code_supplier;
+                //     //get media_id from all files inspection for this proveedor
+                //     $this->db->select('media_id,file_type')
+                //         ->from($this->table_contenedor_almacen_inspection)
+                //         ->where('id_proveedor', $idProveedor);
+                //     $query = $this->db->get();
+                //     $mediaData = $query->result();
+                //     $response=$this->sendInspectionXSupllier($mediaData,$cliente,$qtyBoxChina,$supplierCode);
+                    
+                // }
+              
             }
         }
         return ['status' => "error", 'error' => true];
@@ -2306,16 +2310,32 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         $videos = $query->num_rows();
         //get current estado_china from proveedor
-        $this->db->select('estados_proveedor')
+        $this->db->select('estados_proveedor,code_supplier')
             ->from($this->table_contenedor_cotizacion_proveedores)
             ->where('id', $idProveedor);
         $query = $this->db->get();
         $estadoChina = $query->row()->estados_proveedor;
+        $supplierCode = $query->row()->code_supplier;
         if ($images >= 2 && $videos >= 1 && $estadoChina != "INSPECTION") {
             //set estado_china to INSPECTION
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'INSPECTION'
-            ,'estados'=>'INSPECCIONADO']);
+            ,'estados'=>'INSPECCIONADO','estados_proveedor'=>'INSPECTION']);
+            $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado INSPECCIONADO";
+            $socketResponse = $this->sendEvent([
+                "project" => "0",
+                "role" => $this->roleCotizador,
+                "user" => "0",
+                "action" => $this->cambioEstadoProveedor,
+                "message" =>$message,
+            ]);
+            $socketResponse = $this->sendEvent([
+                "project" => "0",
+                "role" => $this->roleCoordinacion,
+                "user" => "0",
+                "action" => $this->cambioEstadoProveedor,
+                "message" =>$message,
+            ]);
             return true;
         }
         return false;
