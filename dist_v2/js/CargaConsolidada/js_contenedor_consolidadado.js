@@ -1056,7 +1056,7 @@ const openStepFunction = async (step, id) => {
                                             orderable: false,
                                         },
                                     ],
-                                    order: [[1, "asc"]],
+                                   
                                     ajax: {
                                         url: url,
                                         type: "POST",
