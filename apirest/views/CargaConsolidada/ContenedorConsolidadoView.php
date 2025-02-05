@@ -169,7 +169,7 @@
                 <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
                 <th>Asesor</th>
                 <?php } ?>
-                <th style="min-width: 8em;" class="no-sort" >Status</th>
+                <th style="min-width: 8em;" class="no-sort">Status</th>
                 <th class="orderable">N.</th>
                 <th>Buyer</th>
                 <?php if($this->user->No_Grupo!="ContenedorAlmacen"){  ?>
