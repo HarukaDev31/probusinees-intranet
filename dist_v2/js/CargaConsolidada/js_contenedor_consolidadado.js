@@ -1576,51 +1576,51 @@ const openStepFunction = async (step, id) => {
                                             }
                                         },
 
-                                        {
-                                            text: "<i class='fa fa-upload'></i> Lista de embarque",
-                                            action: function () {
-                                                Swal.fire({
-                                                    title: "Subir lista de embarque",
-                                                    input: "file",
-                                                    inputAttributes: {
-                                                        accept: "*",
-                                                        "aria-label": "Sube tu archivo",
-                                                    },
-                                                    showCancelButton: true,
-                                                    confirmButtonText: "Subir",
-                                                    showLoaderOnConfirm: true,
-                                                    preConfirm: (file) => {
-                                                        const formData = new FormData();
-                                                        formData.append("file", file);
-                                                        formData.append("idContenedor", idContenedor);
-                                                        formData.append("idCotizacion", idCotizacion);
-                                                        return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadListaEmbarque", {
-                                                            method: "POST",
-                                                            body: formData,
-                                                        })
-                                                            .then((response) => {
-                                                                return response.json();
-                                                            })
-                                                            .catch((error) => {
-                                                                Swal.showValidationMessage(
-                                                                    `Request failed: ${error}`
-                                                                );
-                                                            });
-                                                    },
-                                                    allowOutsideClick: () => !Swal.isLoading(),
-                                                }).then((result) => {
-                                                    if (result.value) {
-                                                        if (result.value.status == "success") {
-                                                            Swal.fire("Correcto", result.value.message, "success");
-                                                            reloadTableClientesVariacion();
-                                                        } else {
-                                                            Swal.fire("Error", result.value.message, "error");
-                                                        }
-                                                    }
-                                                });
-                                            },
-                                            className: "btn btn-secondary btn-lista-embarque"
-                                        }
+                                        // {
+                                        //     text: "<i class='fa fa-upload'></i> Lista de embarque",
+                                        //     action: function () {
+                                        //         Swal.fire({
+                                        //             title: "Subir lista de embarque",
+                                        //             input: "file",
+                                        //             inputAttributes: {
+                                        //                 accept: "*",
+                                        //                 "aria-label": "Sube tu archivo",
+                                        //             },
+                                        //             showCancelButton: true,
+                                        //             confirmButtonText: "Subir",
+                                        //             showLoaderOnConfirm: true,
+                                        //             preConfirm: (file) => {
+                                        //                 const formData = new FormData();
+                                        //                 formData.append("file", file);
+                                        //                 formData.append("idContenedor", idContenedor);
+                                        //                 formData.append("idCotizacion", idCotizacion);
+                                        //                 return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadListaEmbarque", {
+                                        //                     method: "POST",
+                                        //                     body: formData,
+                                        //                 })
+                                        //                     .then((response) => {
+                                        //                         return response.json();
+                                        //                     })
+                                        //                     .catch((error) => {
+                                        //                         Swal.showValidationMessage(
+                                        //                             `Request failed: ${error}`
+                                        //                         );
+                                        //                     });
+                                        //             },
+                                        //             allowOutsideClick: () => !Swal.isLoading(),
+                                        //         }).then((result) => {
+                                        //             if (result.value) {
+                                        //                 if (result.value.status == "success") {
+                                        //                     Swal.fire("Correcto", result.value.message, "success");
+                                        //                     reloadTableClientesVariacion();
+                                        //                 } else {
+                                        //                     Swal.fire("Error", result.value.message, "error");
+                                        //                 }
+                                        //             }
+                                        //         });
+                                        //     },
+                                        //     className: "btn btn-secondary btn-lista-embarque"
+                                        // }
                                     ],
                                     paging: true,
                                     lengthChange: true,
@@ -3248,14 +3248,36 @@ $(document).ready(async function () {
                     }
                 }
                 if( action =="cambio-estado-proveedor"){
+                    
+                    if (
+                        $("#table-cotizacion-embarque")
+                        .is(":visible")) {
+                        text="Actualización de estado de proveedor";
+                        text += "¿Desea actualizar?"
+                        Swal.fire({
+                            title: 'Cambio de estado',
+                            text: message,
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonText: 'Si',
+                            cancelButtonText: 'Cerrar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                tableCotizacionEmbarque.ajax.reload();
+                            }
+                        })
+                    } else {
+                        //show alert swall
+                        Swal.fire({
+                            title: 'Cambio de estado',
+                            text: message,
+                            icon: 'info',
+                            confirmButtonText: 'Cerrar',
+                        })
+                    }
+                    }
                     //show message swall
-                    Swal.fire({
-                        title: 'Cambio de estado',
-                        text: message,
-                        icon: 'info',
-                        confirmButtonText: 'Cerrar',
-                    })
-                }
+                   
             }
             catch (e) {
                 console.log(e);
