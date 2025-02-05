@@ -2486,7 +2486,6 @@ $(document).ready(async function () {
                 sNext: ">",
             },
         },
-        order: [[0, "desc"]],
         ajax: {
             url: url,
             type: "POST",
