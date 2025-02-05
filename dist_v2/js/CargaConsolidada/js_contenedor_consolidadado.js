@@ -1055,6 +1055,10 @@ const openStepFunction = async (step, id) => {
                                             targets: "no-sort",
                                             orderable: false,
                                         },
+                                        {
+                                            targets: "",
+                                            orderable: false,
+                                        }
                                     ],
                                    
                                     ajax: {
