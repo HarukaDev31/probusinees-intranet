@@ -105,6 +105,7 @@ async function updateEstado(id) {
         },
     });
 }
+
 function addFileToList(file) {
     const isImage = file.file_ext.startsWith('image');
     const fileItem = $(`
@@ -133,6 +134,17 @@ function addFileToList(file) {
     });
 
     fileList.append(fileItem);
+}
+async function getClientesHeader(){
+    spinner.show();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/getClientesHeader/"+idContenedor;
+    const response = await fetch(url);
+    const result = await response.json();
+    $("#txt-Monto_Total").val(result.monto);
+    $("#txt-CBM_Total_China").val(result.total);
+    console.log(result);
+    spinner.hide();
+    
 }
 async function verCotizacionEmbarque(idProveedor,idCotizacion,supplierCode,clientName){
     //hide table cotizacion embarque
@@ -1448,10 +1460,12 @@ const openStepFunction = async (step, id) => {
         
 
     } else if (stepIndex == 2) {
+        await getClientesHeader();
         url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
         clientesContainer.show();
         if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
             reloadTableClientesGeneral();
+            
         } else {
             tableClientesGeneral.show();
 
@@ -1575,7 +1589,6 @@ const openStepFunction = async (step, id) => {
                                                 }
                                             }
                                         },
-
                                         // {
                                         //     text: "<i class='fa fa-upload'></i> Lista de embarque",
                                         //     action: function () {
@@ -1621,6 +1634,25 @@ const openStepFunction = async (step, id) => {
                                         //     },
                                         //     className: "btn btn-secondary btn-lista-embarque"
                                         // }
+                                    ],
+                                    columnDefs: [
+                                        {
+                                            targets: "no-hidden",
+                                            visible: false,
+                                        },
+                                        {
+                                            className: "text-center",
+                                            targets: "no-sort",
+                                            orderable: false,
+                                        },
+                                        {
+                                            targets: "",
+                                            orderable: false,
+                                        },
+                                        {
+                                            targets: "sorting_asc",
+                                            orderable: false,
+                                        }
                                     ],
                                     paging: true,
                                     lengthChange: true,
@@ -1675,6 +1707,25 @@ const openStepFunction = async (step, id) => {
                 responsive: false,
                 serverSide: false,
                 pagingType: "full_numbers",
+                columnDefs: [
+                    {
+                        targets: "no-hidden",
+                        visible: false,
+                    },
+                    {
+                        className: "text-center",
+                        targets: "no-sort",
+                        orderable: false,
+                    },
+                    {
+                        targets: "",
+                        orderable: false,
+                    },
+                    {
+                        targets: "sorting_asc",
+                        orderable: false,
+                    }
+                ],
                 oLanguage: {
                     sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
                     sLengthMenu: "_MENU_",
@@ -1821,9 +1872,13 @@ async function viewDocumentacion() {
 }
 async function reloadTableClientesGeneral() {
     tableClientesGeneral.ajax.reload();
+    await getClientesHeader();
+
 }
 async function reloadTableClientesVariacion() {
     tableClientesVariacion.ajax.reload();
+    await getClientesHeader();
+
 }
 
 async function reloadTableCotizacionEmbarque(){
@@ -2842,6 +2897,8 @@ $(document).ready(async function () {
                 contentType: false,
                 processData: false,
                 success: function (response) {
+                    spinner.hide();
+
                     const result = JSON.parse(response);
                     if (result.status == "success") {
                         $("#modal-crear-cotizacion").modal("hide");
@@ -2863,8 +2920,11 @@ $(document).ready(async function () {
                         });
                     }
                 },
+                error: function (error) {
+                    spinner.hide();
+                    console.log(error);
+                }
             });
-            spinner.hide();
         });
         $("#btn-actualizar-cotizacion").click(function (e) {
             e.preventDefault();
@@ -3120,8 +3180,6 @@ $(document).ready(async function () {
             }
 
         });
-                    
-
         $("#btn-documentacion-new").click(function (e) {
             e.preventDefault();
             Swal.fire({

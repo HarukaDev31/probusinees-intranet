@@ -155,7 +155,7 @@
                 <?php if($this->user->No_Grupo=="Cotizador"){  ?>
                 <th>Estado</th>
                 <?php } ?>
-                <?php if($this->user->No_Grupo=="Coordinación"){  ?>
+                <?php if($this->user->No_Grupo=="Coordinación"||$this->user->No_Grupo=="Cotizador"){  ?>
 
                 <th>Acciones
                 </th>
@@ -250,6 +250,20 @@
                   <button type="button"  class="btn-back-cotizacion btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i> </button>
                 </div>
         </div>
+        <div class="row mb-2">
+          <!-- monto total, cbm total_china-->
+          <div class="col-12 col-md-3">
+            <label>Monto Total</label>
+            <div class="input-group mb-3">
+              <input type="number" id="txt-Monto_Total" class="form-control input-report" disabled>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <label>CBM Total China</label>
+            <div class="input-group mb-3">
+              <input type="number" id="txt-CBM_Total_China" class="form-control input-report" disabled>
+            </div>
+          </div>
       <div class="table-responsive" class="table table-bordered table-hover table-striped">
         <table id="table-clientes-general" class="table table-bordered table-hover table-striped">
           <thead class="thead-light">

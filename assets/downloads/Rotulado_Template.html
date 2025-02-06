@@ -10,6 +10,10 @@
 
     <title>Notice Template</title>
     <style>
+        html {
+            margin: 5px
+        }
+
         body {
             font-family: Arial, sans-serif;
             line-height: 1.2;
@@ -50,7 +54,8 @@
         .list-item {
             margin-left: 20px;
             margin-bottom: 2px;
-            text-align: justify;
+            font-size: 14px;
+            word-break: break-all;
         }
 
         .header {
@@ -75,9 +80,11 @@
             color: #000;
             background-color: yellow;
         }
-        .tblack{
+
+        .tblack {
             color: #000;
         }
+
         .info {
             font-size: 14px;
             margin: 10px 0;
@@ -85,8 +92,8 @@
 
         .info span {
             font-weight: bold;
-        }   
-        
+        }
+
         .footer {
             margin-top: 20px;
             font-weight: bold;
@@ -99,13 +106,14 @@
         .f-20 {
             font-size: 20px !important;
         }
-        h1{
+
+        h1 {
             margin-bottom: 2px;
         }
 
-    * {
-        font-family: 'Noto Sans SC', sans-serif;
-    }
+        * {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
     </style>
 </head>
 
@@ -128,8 +136,8 @@
                 </li>
                 <li class="list-item">每一个产品单独包装外面要贴中国自造
                     <span class="highlight">
-                        （HECHO EN CHINA 还是 MADE IN CHINA）</span>
-                    ,包装已经有的不用再贴。我们会验货的
+                        （HECHO EN CHINA 还是 MADE IN CHINA）,包装已经有的不用再贴 。</span>
+                    <span class="highlight">我们会验货的</span>
                 </li>
                 <li class="list-item">外箱包装要用厚的纸箱，
                     <span class="highlight f-16">外面套绿色编织袋 </span>
@@ -165,29 +173,21 @@
             <h1>
                 <span class="twhite-subred f-20">2.唛头:
                 </span>
-                <span
-                class="f-20 tblack "
-                style="padding-left: 2em;"
-                >PRO MUNDO COMEX S.A.C （要做大的）/ 套编织袋后贴两面</span>
+                <span class="f-20 tblack " style="padding-left: 2em;">PRO MUNDO COMEX S.A.C （要做大的）/ 套编织袋后贴两面</span>
 
             </h1>
             <br>
             <h1>
                 <span class="twhite-subred f-20">3.侧唛资料：
                 </span>
-                <span
-                class="f-20 tblack "
-                
-                >/ 套编织袋后贴两面</span>
+                <span class="f-20 tblack ">/ 套编织袋后贴两面</span>
             </h1>
             <span
-            style="text-align: center;display: flex;align-items: center;justify-content: center;font-size:18px;"
-            >CONSOLIDADO #{{carga}}</span>
-        
+                style="text-align: center;display: flex;align-items: center;justify-content: center;font-size:18px;">CONSOLIDADO
+                #{{carga}}</span>
+
             </span>
-            <ul
-            style="list-style: none;padding: 0;font-size: 14px;gap:1em;"
-            >
+            <ul style="list-style: none;padding: 0;font-size: 14px;gap:1em;">
                 <li>COMPANY: PRO MUNDO COMEX S.A.C</li>
                 <li>CONTACT: {{cliente}}</li>
                 <li>ITEM NRO:这里写产品货号
@@ -199,11 +199,9 @@
                 <li>MEASURE： 箱子规格 CM</li>
                 <li>SUPPLIER CODE: {{supplier_code}}</li>
             </ul>
-            <span
-            style="text-align: center;display: flex;align-items: center;justify-content: center;font-size:18px;"
-            >
-            <strong>HECHO EN CHINA</strong>
-        
+            <span style="text-align: center;display: flex;align-items: center;justify-content: center;font-size:18px;">
+                <strong>HECHO EN CHINA</strong>
+
             </span>
         </div>
     </div>
@@ -213,4 +211,5 @@
         font-family: 'Noto Sans SC', sans-serif;
     }
 </style>
+
 </html>

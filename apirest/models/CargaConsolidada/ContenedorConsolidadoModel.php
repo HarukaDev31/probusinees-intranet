@@ -1788,7 +1788,7 @@ class ContenedorConsolidadoModel extends CI_Model
     {
         if ($estado == "ROTULADO") {
             try {
-                $email="mvillegas@probusiness.pe";
+                $email="harukakasugano31@gmail.com";
                 $this->db->select('nombre,id_contenedor')
                     ->from($this->table_contenedor_cotizacion)
                     ->where('id', $idCotizacion);
@@ -1859,6 +1859,8 @@ class ContenedorConsolidadoModel extends CI_Model
                     $dompdf = new Dompdf\Dompdf($options);
                     $dompdf->loadHtml($htmlContent);
                     $dompdf->setPaper('A4', 'portrait');
+
+            
                     $dompdf->render();
                     $pdfContent = $dompdf->output();
                     $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
@@ -2392,6 +2394,33 @@ class ContenedorConsolidadoModel extends CI_Model
             return true;
         }
         return false;
+    }
+    public function getClientesHeader($idContenedor){
+        //get sum of cbm_total_china from proveedor where states is LOADED, and get total monto from cotizacion
+        $this->db->select('SUM(ifnull(cbm_total_china,0)) as cbm_total_china')
+            ->from($this->table_contenedor_cotizacion_proveedores)
+            ->where('id_contenedor', $idContenedor)
+            ->where('estados_proveedor', 'LOADED');
+        $query = $this->db->get();
+        $result = $query->row();
+        $this->db->select('SUM(ifnull(monto,0)) as monto')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id_contenedor', $idContenedor)
+            ->where('estado_cotizador', 'CONFIRMADO');
+        $query = $this->db->get();
+        $result2 = $query->row();
+        if ($result) {
+            return [
+                'cbm_total_china'=>$result->cbm_total_china,
+                'monto'=>$result2->monto
+            ];
+        }else{
+            return ['status' => "error", 'error' => false, "data" => [
+                'cbm_total_china'=>0,
+                'monto'=>0
+            ]];
+        }
+
     }
     public function getCotizacionEmbarqueHeaders($idContenedor){
         //get sum of cbm_total_china and cbm_total from each cotizacion proveedor

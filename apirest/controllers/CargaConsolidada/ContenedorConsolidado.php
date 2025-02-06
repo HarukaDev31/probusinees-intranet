@@ -45,12 +45,12 @@ class ContenedorConsolidado extends CI_Controller {
 			}
 			
 			$subdata[] = $row->empresa;
-			$btnView = '<div>' .
+			$btnView = '<div'.' onclick="viewSteps(' . $row->id . ')"'.	'>' .
 			'<i class="fas fa-eye ' . 
 			($row->estado == "PENDIENTE" ? 'text-primary' : 'text-primary') . 
 			'" style="cursor:pointer;font-size:20px;' . 
 			($row->estado == "PENDIENTE" ? 'font-size:20px;' : '') . 
-			'" onclick="viewSteps(' . $row->id . ')"></i>' .
+			'"></i>' .
 			'</div>';
 			$subdata[] = $btnView;
 
@@ -209,7 +209,13 @@ class ContenedorConsolidado extends CI_Controller {
 	
 							<option value="CONFIRMADO" '.($row->estado_cotizador=="CONFIRMADO" ? "selected" : "").'>CONFIRMADO</option>
 						</select>';
-						$subdata[] = $divEstadoCotizador;	
+						$subdata[] = $divEstadoCotizador;
+						if($row->estado_cotizador=="PENDIENTE"){
+							$divAcciones='<div>
+							<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id_cotizacion.')"></i>
+							</div>';
+						}
+						$subdata[] = $divAcciones;
 						}
 				$data[] = $subdata;
 			}
@@ -391,24 +397,26 @@ class ContenedorConsolidado extends CI_Controller {
 					</input>
 			
 					</div>';
-					$divViewBtn .= '<div  class="btn btn-outline-primary mb-1">
-					<i class="fas fa-eye" style="cursor:pointer;" 
+					$divViewBtn .= '<div  class="btn btn-outline-primary mb-1"
 					onclick="verCotizacionEmbarque(
 						' . $proveedor->id_proveedor . ',
 						' . $row->id . ',
 						\'' . addslashes($proveedor->code_supplier) . '\',
 						\'' . addslashes($row->nombre) . '\'
-					)"></i>
+					)"
+					>
+					<i class="fas fa-eye" style="cursor:pointer;" 
+					></i>
 					</div>';
 					$divAcciones.=
 					'<div class="d-flex flex-row gap-1">';
 					if($this->user->No_Grupo=="Coordinación"){
-						$divAcciones.='<div class="btn btn-outline-danger mb-1"> 
-						<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion('.$row->id.','.$proveedor->id_proveedor.')"></i>
+						$divAcciones.='<div class="btn btn-outline-danger mb-1" onclick="deleteCotizacion('.$row->id.','.$proveedor->id_proveedor.')"> 
+						<i class="fas fa-trash text-danger" style="cursor:pointer;" "></i>
 						</div>';
 					}
-					$divAcciones.='<div class="btn btn-outline-success mb-1">
-					<i class="fas fa-save text-success" style="cursor:pointer;" onclick="updateProveedorData('.$row->id. ','.$proveedor->id_proveedor.')"></i>
+					$divAcciones.='<div class="btn btn-outline-success mb-1"  onclick="updateProveedorData('.$row->id. ','.$proveedor->id_proveedor.')">
+					<i class="fas fa-save text-success" style="cursor:pointer;"></i>
 					</div>
 					</div>';
 
@@ -472,8 +480,8 @@ class ContenedorConsolidado extends CI_Controller {
 				$subdata[] = $row->monto;
 				$subdata[] = $row->tarifa;
 
-				$btnView='<div>
-				<i class="fas fa-eye" style="cursor:pointer;" onclick="viewClientesDocumentacion('.$row->id_cotizacion.')"></i>
+				$btnView='<div  onclick="viewClientesDocumentacion('.$row->id_cotizacion.')">
+				<i class="fas fa-eye" style="cursor:pointer;"></i>
 				</div>';				
 				$subdata[] = $btnView;
 				$selectEstadoCliente="";
@@ -488,8 +496,8 @@ class ContenedorConsolidado extends CI_Controller {
 				}
 				$subdata[] = $selectEstadoCliente;
 				if($this->user->No_Grupo=="Coordinación"){
-					$divAcciones='<div>
-					<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCliente('.$row->id_cotizacion.')"></i>
+					$divAcciones='<div onclick="deleteCliente('.$row->id_cotizacion.')">
+					<i class="fas fa-trash text-danger" style="cursor:pointer;" ></i>
 					</div>';
 				}
 				$subdata[] = $divAcciones;	
@@ -960,6 +968,10 @@ class ContenedorConsolidado extends CI_Controller {
 			"message" => "No todos los proveedores tienen productos"
 			
 		]);
+	}
+	public function getClientesHeader($idContenedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->getClientesHeader($idContenedor);
+		echo json_encode($arrResponse);
 	}
 	function convertDateFormat($date) {
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);
