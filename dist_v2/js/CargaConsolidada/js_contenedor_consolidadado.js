@@ -141,7 +141,7 @@ async function getClientesHeader(){
     const response = await fetch(url);
     const result = await response.json();
     $("#txt-Monto_Total").val(result.monto);
-    $("#txt-CBM_Total_China").val(result.cbm_total_china);
+    $("#txt-CBM_Total_China_Clientes").val(result.cbm_total_china);
     console.log(result);
     spinner.hide();
     

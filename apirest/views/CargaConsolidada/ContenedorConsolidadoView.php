@@ -261,7 +261,7 @@
           <div class="col-12 col-md-3">
             <label>CBM Total China</label>
             <div class="input-group mb-3">
-              <input type="number" id="txt-CBM_Total_China" class="form-control input-report" disabled>
+              <input type="number" id="txt-CBM_Total_China_Clientes" class="form-control input-report" disabled>
             </div>
           </div>
       <div class="table-responsive" class="table table-bordered table-hover table-striped">
