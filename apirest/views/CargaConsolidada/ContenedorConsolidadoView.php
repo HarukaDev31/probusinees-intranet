@@ -232,10 +232,11 @@
                   <label>Estado</label>
                   <select id="txt-ID_Estado_Cliente" name="ID_Estado" class="form-control input-estado">
                     <option value="0" selected>Todos</option>
-                    <option value="PENDIENTE">PENDIENTE</option>
-                    <option value="COTIZADO">COTIZADO</option>
-                    <option value="PAGADO">PAGADO</option>
-                    <option value="ENTREGADO">ENTREGADO</option>
+                    <option value="RESERVADO">RESERVADO</option>
+                    <option value="NO RESERVADO">NO RESERVADO</option>
+                    <option value="DOCUMENTACION">DOCUMENTACION</option>
+                    <option value="C FINAL">C FINAL</option>
+                    <option value="FACTURADO">FACTURADO</option>
                   </select>
                 </div>
                 
