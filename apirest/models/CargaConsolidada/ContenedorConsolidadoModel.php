@@ -1290,8 +1290,6 @@ class ContenedorConsolidadoModel extends CI_Model
         $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
         $listaPartidas = FCPATH . ltrim($decodedPath, '/');
         $objPHPExcelListaPartidas = PHPExcel_IOFactory::load($listaPartidas);
-        //get b merged rows range
-
         $itemNColumn = "B";
         $tipoClienteColumn = "C";
         $clienteColumn = "D";
@@ -1376,7 +1374,10 @@ class ContenedorConsolidadoModel extends CI_Model
                                     $endRow = (int)$endMatches[0];
                                     for ($r = $startRow; $r <= $endRow; $r++) {
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                        $antiDumping = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                        if(trim($adValorem)=="FTA"){
+                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                        }
+                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
                                         $sheet->setCellValue('R' . $row, $adValorem);
                                         $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
                                         break;
@@ -1549,8 +1550,10 @@ class ContenedorConsolidadoModel extends CI_Model
                                     // Obtener el valor de la columna G para el rango fusionado
                                     for ($r = $startRow; $r <= $endRow; $r++) {
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                        $antiDumping = $sheetListaPartidas->getCell('H' . $r)->getValue();
-
+                                        if(trim($adValorem)=="FTA"){
+                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                        }
+                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
                                         $sheet0->setCellValue('R' . $highestFirstSheetRow, $adValorem);
                                         $sheet0->setCellValue('S' . $highestFirstSheetRow, $antiDumping == 0 ? "-" : $antiDumping);
                                         break;
@@ -1647,11 +1650,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
             $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
             $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
-            // $sheet0->getStyle('U' . ($startColumn - 1) . ':U' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            // $sheet0->getStyle('U' . ($startColumn - 1) . ':U' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($greenColor);
-            // $sheet0->getStyle('V' . ($startColumn - 1) . ':V' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            // $sheet0->getStyle('V' . ($startColumn - 1) . ':V' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($yellow2Color);
-            //set wrap text to true
+            
             return $objPHPExcel;
         } catch (Exception $e) {
             return ['status' => "error", 'message' => $e->getMessage()];
