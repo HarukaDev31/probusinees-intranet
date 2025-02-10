@@ -1233,6 +1233,7 @@ class ContenedorConsolidadoModel extends CI_Model
         if (!$facturaComercial) {
             return ['status' => "error", 'message' => "No se encontró la factura comercial"];
         }
+       
         $facturaComercial = $facturaComercial->file_url;
         //validate if factura_comercial is xls, xlsx,xlsm
         $path_parts = pathinfo($facturaComercial);
@@ -1282,6 +1283,8 @@ class ContenedorConsolidadoModel extends CI_Model
         $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
         $facturaComercial = FCPATH . ltrim($decodedPath, '/');
         $objPHPExcel = PHPExcel_IOFactory::load($facturaComercial);
+
+
         $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $packingList); // Extraer ruta relativa
         $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
         $packingList = FCPATH . ltrim($decodedPath, '/');
@@ -1290,6 +1293,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
         $listaPartidas = FCPATH . ltrim($decodedPath, '/');
         $objPHPExcelListaPartidas = PHPExcel_IOFactory::load($listaPartidas);
+
         $itemNColumn = "B";
         $tipoClienteColumn = "C";
         $clienteColumn = "D";
@@ -1322,6 +1326,8 @@ class ContenedorConsolidadoModel extends CI_Model
             ->where('id_contenedor', $idContenedor)
             ->where('estado_cliente!=', null)
             ->get()->result();
+        // echo json_encode($dataSystem);
+
         try {
             $sheetCount = $objPHPExcel->getSheetCount();
             $sheet0 = $objPHPExcel->getSheet(0);
@@ -1528,7 +1534,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
                         // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
                         // $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
-                        // $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
+                        $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
                         $mergedCells = $sheetListaPartidas->getMergeCells();
                         foreach ($mergedCells as $range) {
                             // Extraer las celdas inicial y final del rango
@@ -1629,6 +1635,8 @@ class ContenedorConsolidadoModel extends CI_Model
             //MERGE B TO 0
             //set p highestFirstSheetRow value to sum from p.startColumn to p.highestFirstSheetRow-1
             $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
+            $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
+
             //set  d column auto size                
             $sheet0->getStyle('D')->getAlignment()->setWrapText(true);
             $sheet0->getColumnDimension('C')->setWidth(30);

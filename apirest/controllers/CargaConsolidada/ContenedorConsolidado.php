@@ -758,9 +758,8 @@ class ContenedorConsolidado extends CI_Controller {
 	}
 	public function downloadFacturaComercial($idContenedor){
 		try{
-			$objExcel = $this->ContenedorConsolidadoModel->downloadFacturaComercial($idContenedor);
-			//CHECK IF $objExcel is an array
-			
+		ob_end_clean();
+		$objExcel = $this->ContenedorConsolidadoModel->downloadFacturaComercial($idContenedor);
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		header('Content-Disposition: attachment;filename="Factura_Comercial.xlsx"');
 		header('Cache-Control: max-age=0');
