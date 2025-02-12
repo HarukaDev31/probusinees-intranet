@@ -9,7 +9,7 @@ require_once APPPATH . 'third_party/tcpdf/tcpdf.php';
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class ContenedorConsolidadoModel extends CI_Model
 {
-    use FileTrait, WebSocketTrait, WhatsappTrait, NotificationTrait,MailTrait;
+    use FileTrait, WebSocketTrait, WhatsappTrait, NotificationTrait, MailTrait;
     var $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
@@ -22,14 +22,14 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_contenedor_tipo_cliente = "contenedor_consolidado_tipo_cliente";
     private $table_contenedor_cotizacion_documentacion = "contenedor_consolidado_cotizacion_documentacion";
     private $table_contenedor_almacen_documentacion = "contenedor_consolidado_almacen_documentacion";
-    private $table_contenedor_almacen_inspection="contenedor_consolidado_almacen_inspection";
-    private $table_conteneodr_proveedor_estados_tracking="contenedor_proveedor_estados_tracking";
+    private $table_contenedor_almacen_inspection = "contenedor_consolidado_almacen_inspection";
+    private $table_conteneodr_proveedor_estados_tracking = "contenedor_proveedor_estados_tracking";
     private $roleCotizador = "Cotizador";
     private $roleCoordinacion = "Coordinación";
-    private $roleContenedorAlmacen="ContenedorAlmacen";
+    private $roleContenedorAlmacen = "ContenedorAlmacen";
     private $aNewContainer = "new-container";
     private $aNewCotizacion = "new-cotizacion";
-    private $cambioEstadoProveedor= "cambio-estado-proveedor";
+    private $cambioEstadoProveedor = "cambio-estado-proveedor";
 
     private $table_contenedor_cotizacion_proveedores_documentacion = "contenedor_consolidado_proveedores_documentacion";
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
@@ -56,7 +56,8 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         return $query->result();
     }
-    public function addNote($note,$idProveedor){
+    public function addNote($note, $idProveedor)
+    {
         $this->db->where('id', $idProveedor);
         $this->db->update('contenedor_consolidado_cotizacion_proveedores', ['nota' => $note]);
 
@@ -66,7 +67,8 @@ class ContenedorConsolidadoModel extends CI_Model
             return false;
         }
     }
-    public function getNotes($idProveedor){
+    public function getNotes($idProveedor)
+    {
         $this->db->select('nota')
             ->from('contenedor_consolidado_cotizacion_proveedores')
             ->where('id', $idProveedor);
@@ -154,7 +156,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->from($this->table_contenedor_steps);
             $this->db->where('id_pedido', $idContenedor);
             $this->db->order_by('id_order', 'asc');
-            if($this->user->No_Grupo == "Cotizador"){
+            if ($this->user->No_Grupo == "Cotizador") {
                 //limit to 2 steps
                 $this->db->limit(2);
             }
@@ -171,7 +173,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
             ->where('id_contenedor', $idContenedor)
             ->order_by('id_cotizacion', 'asc');
-        if($this->user->No_Grupo != "Cotizador"){
+        if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
         }
         $query = $this->db->get();
@@ -210,81 +212,92 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
             ->order_by('main.id', 'asc');
-        if($this->user->No_Grupo != "Cotizador"){
+        if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('main.estado_cotizador', 'CONFIRMADO');
         }
         $query = $this->db->get();
         return $query->result();
     }
-    public function downloadContenedorCotizacionProveedoresExcel($idContenedor) {
+    public function downloadContenedorCotizacionProveedoresExcel($idContenedor)
+    {
         $data = $this->getContenedorCotizacionProveedores($idContenedor);
-        
+
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcel();
         $sheet = $objPHPExcel->getActiveSheet();
-        
+
         // Headers
         $headers = [
-            'Status', 'N', 'Buyer', 'Productos', 'Qty Box', 'CBM Total', 
-            'Weight', 'Supplier', 'Code Supplier', 'Phone Number', 
-            'Qty Box China', 'CBM Total China', 'Arrive Date China'
+            'Status',
+            'N',
+            'Buyer',
+            'Productos',
+            'Qty Box',
+            'CBM Total',
+            'Weight',
+            'Supplier',
+            'Code Supplier',
+            'Phone Number',
+            'Qty Box China',
+            'CBM Total China',
+            'Arrive Date China'
         ];
-        
+
         // Write headers
         foreach ($headers as $col => $header) {
             $sheet->setCellValueByColumnAndRow($col, 1, $header);
         }
-        
+
         $row = 2;
         foreach ($data as $item) {
             // Parse providers JSON
             $providers = json_decode($item->proveedores, true);
-            
+
             // If multiple providers, we'll need to merge cells
             $providerCount = count($providers);
             $startRow = $row;
-            
+
             // Main row data (non-provider specific)
-            $sheet->setCellValue('A'.$row, $item->estado);
-            $sheet->setCellValue('B'.$row, $item->id);
-            $sheet->setCellValue('C'.$row, $item->No_Usuario);
-            
+            $sheet->setCellValue('A' . $row, $item->estado);
+            $sheet->setCellValue('B' . $row, $item->id);
+            $sheet->setCellValue('C' . $row, $item->No_Usuario);
+
             // Process providers
             foreach ($providers as $providerIndex => $provider) {
                 $currentRow = $row + $providerIndex;
-                
-                $sheet->setCellValue('D'.$currentRow, $provider['products']);
-                $sheet->setCellValue('E'.$currentRow, $provider['qty_box']);
-                $sheet->setCellValue('F'.$currentRow, $provider['cbm_total']);
-                $sheet->setCellValue('G'.$currentRow, $provider['peso']);
-                $sheet->setCellValue('H'.$currentRow, $provider['supplier']);
-                $sheet->setCellValue('I'.$currentRow, $provider['code_supplier']);
-                $sheet->setCellValue('J'.$currentRow, $provider['supplier_phone']);
-                $sheet->setCellValue('K'.$currentRow, $provider['qty_box_china']);
-                $sheet->setCellValue('L'.$currentRow, $provider['cbm_total_china']);
-                $sheet->setCellValue('M'.$currentRow, $provider['arrive_date_china']);
+
+                $sheet->setCellValue('D' . $currentRow, $provider['products']);
+                $sheet->setCellValue('E' . $currentRow, $provider['qty_box']);
+                $sheet->setCellValue('F' . $currentRow, $provider['cbm_total']);
+                $sheet->setCellValue('G' . $currentRow, $provider['peso']);
+                $sheet->setCellValue('H' . $currentRow, $provider['supplier']);
+                $sheet->setCellValue('I' . $currentRow, $provider['code_supplier']);
+                $sheet->setCellValue('J' . $currentRow, $provider['supplier_phone']);
+                $sheet->setCellValue('K' . $currentRow, $provider['qty_box_china']);
+                $sheet->setCellValue('L' . $currentRow, $provider['cbm_total_china']);
+                $sheet->setCellValue('M' . $currentRow, $provider['arrive_date_china']);
             }
-            
+
             // Merge cells for main columns if multiple providers
             if ($providerCount > 1) {
-                $sheet->mergeCells('A'.$startRow.':A'.($startRow + $providerCount - 1));
-                $sheet->mergeCells('B'.$startRow.':B'.($startRow + $providerCount - 1));
-                $sheet->mergeCells('C'.$startRow.':C'.($startRow + $providerCount - 1));
+                $sheet->mergeCells('A' . $startRow . ':A' . ($startRow + $providerCount - 1));
+                $sheet->mergeCells('B' . $startRow . ':B' . ($startRow + $providerCount - 1));
+                $sheet->mergeCells('C' . $startRow . ':C' . ($startRow + $providerCount - 1));
             }
-            
+
             $row += $providerCount;
         }
-        
+
         // Auto-size columns
         foreach (range('A', 'M') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
-        
+
         // Prepare download
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="container_quotation_providers.xlsx"');
         header('Cache-Control: max-age=0');
-        
+
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         exit;
@@ -347,6 +360,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $monto = $sheet->getCell('J30')->getCalculatedValue();
             }
             $tarifa = $monto / ($volumen <= 0 ? 1 : $volumen);
+            $peso = $sheet->getCell('I9')->getCalculatedValue();
             return [
                 'nombre' => $nombre,
                 'documento' => $documento,
@@ -357,7 +371,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 'fecha' => $fecha,
                 'valor_cot' => $valorCot,
                 'monto' => $monto,
-                'tarifa' => $tarifa
+                'tarifa' => $tarifa,
+                'peso' => $peso
             ];
         } catch (Exception $e) {
             return $e->getMessage();
@@ -452,7 +467,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     }
 
                     // Genera el código del proveedor
-                    $codeSupplier = $this->generateCodeSupplier($nameCliente, $count, $provider,$idContenedor);
+                    $codeSupplier = $this->generateCodeSupplier($nameCliente, $count, $provider, $idContenedor);
 
                     // Agrega los datos del proveedor
                     $proveedores[] = [
@@ -478,7 +493,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ];
         }
     }
-    public function generateCodeSupplier($string, $rowCount, $index,$idContenedor)
+    public function generateCodeSupplier($string, $rowCount, $index, $idContenedor)
     {
         //from string get first letter each word in uppercase and concatenate with rowCount and index
         $words = explode(" ", $string);
@@ -853,29 +868,29 @@ class ContenedorConsolidadoModel extends CI_Model
             $highestRow = $sheet->getHighestRow();
             $data = [];
             $initialRow = 5;
-            
+
             // Obtén las celdas fusionadas
             $mergedCells = $sheet->getMergeCells();
-            
+
             for ($row = $initialRow; $row <= $highestRow; ++$row) {
                 $currentName = $sheet->getCell('D' . $row)->getValue();
                 $isMerged = false;
                 $totalVolumen = 0;
-            
+
                 // Verifica si la celda actual está fusionada
                 foreach ($mergedCells as $mergedRange) {
                     [$start, $end] = explode(':', $mergedRange);
                     $startRow = preg_replace('/[^\d]/', '', $start);
                     $endRow = preg_replace('/[^\d]/', '', $end);
                     $startCol = preg_replace('/\d/', '', $start);
-            
+
                     // Si la celda está en un rango fusionado en la columna D
                     if ($startCol == 'D' && $row >= $startRow && $row <= $endRow) {
                         $isMerged = true;
-            
+
                         // Obtén el valor fusionado
                         $currentName = $sheet->getCell($start)->getValue();
-            
+
                         // Suma los valores de la columna O en el rango fusionado
                         for ($mergeRow = $startRow; $mergeRow <= $endRow; ++$mergeRow) {
                             $cellValue = $sheet->getCell('O' . $mergeRow)->getValue();
@@ -884,26 +899,26 @@ class ContenedorConsolidadoModel extends CI_Model
                         break;
                     }
                 }
-            
+
                 // Si no está fusionada, solo toma el valor de la fila actual
                 if (!$isMerged) {
                     $cellValue = $sheet->getCell('O' . $row)->getValue();
                     $totalVolumen = is_numeric($cellValue) ? $cellValue : 0;
                 }
-            
+
                 $data[] = [
                     'name' => trim($currentName),
                     'volumen_china' => $totalVolumen
                 ];
             }
-            
+
             // Compara con la base de datos y actualiza
             $this->db->select('id,nombre')
                 ->from($this->table_contenedor_cotizacion)
                 ->where('id_contenedor', $idContenedor);
             $query = $this->db->get();
             $cotizaciones = $query->result();
-            
+
             foreach ($cotizaciones as $cotizacion) {
                 foreach ($data as $item) {
                     if (trim($cotizacion->nombre) == trim($item['name'])) {
@@ -912,11 +927,11 @@ class ContenedorConsolidadoModel extends CI_Model
                     }
                 }
             }
-            
+
             // Actualiza el archivo en la tabla
             $this->db->where('id', $idContenedor);
             $this->db->update($this->table, ['lista_embarque_url' => $fileUrl]);
-            
+
             if ($this->db->affected_rows() > 0) {
                 return [
                     'status' => "success",
@@ -930,7 +945,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     'message' => $this->db->error()['message']
                 ];
             }
-            
+
             return [
                 'status' => "error",
                 'message' => "No se pudo actualizar la lista de embarque"
@@ -952,7 +967,8 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return false;
     }
-    public function verifyContainerIsCompleted($idcontenedor){
+    public function verifyContainerIsCompleted($idcontenedor)
+    {
         //IF lista_embarque_url  && bl_file_url is no null set estado COMPLETADO ELSE RECIBIENDO
         $this->db->select('lista_embarque_url,bl_file_url')
             ->from($this->table)
@@ -975,9 +991,8 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         if ($listaEmbarque != null && $blFile != null) {
             $this->db->set('estado', 'COMPLETADO');
-        }else if($estado == "DATOS PROVEEDOR"){
-        }
-        else {
+        } else if ($estado == "DATOS PROVEEDOR") {
+        } else {
             $this->db->set('estado', 'RECIBIENDO');
         }
         $this->db->where('id', $idcontenedor);
@@ -1233,7 +1248,7 @@ class ContenedorConsolidadoModel extends CI_Model
         if (!$facturaComercial) {
             return ['status' => "error", 'message' => "No se encontró la factura comercial"];
         }
-       
+
         $facturaComercial = $facturaComercial->file_url;
         //validate if factura_comercial is xls, xlsx,xlsm
         $path_parts = pathinfo($facturaComercial);
@@ -1380,7 +1395,7 @@ class ContenedorConsolidadoModel extends CI_Model
                                     $endRow = (int)$endMatches[0];
                                     for ($r = $startRow; $r <= $endRow; $r++) {
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                        if(trim($adValorem)=="FTA"){
+                                        if (trim($adValorem) == "FTA") {
                                             $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
                                         }
                                         $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
@@ -1414,7 +1429,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         $sheet->setCellValue('D' . $row, $client);
                         //find if exists row in datasystem array where trim(nombre)=trim(client) if exists set volumen_cotizacion, volumen_china, volumen_doc, valor_doc, valor_cot else set -
                         $volumen_cotizacion = "-";
-                        $volumen_selected='';
+                        $volumen_selected = '';
                         $volumen_china = "-";
                         $volumen_doc = "-";
                         $valor_doc = "-";
@@ -1425,7 +1440,7 @@ class ContenedorConsolidadoModel extends CI_Model
                             if (trim($item->nombre) == trim($client)) {
                                 $volumen_cotizacion = $item->volumen;
                                 $volumen_china = $item->volumen_china;
-                                $volumen_selected = $item->vol_selected??'';
+                                $volumen_selected = $item->vol_selected ?? '';
                                 $volumen_doc = $item->volumen_doc;
                                 $valor_doc = $item->valor_doc;
                                 $tipoCliente = $item->name;
@@ -1433,14 +1448,14 @@ class ContenedorConsolidadoModel extends CI_Model
                             }
                         }
                         //volumen_doc,volumen_china,volumen
-                        if($volumen_selected=='volumen_doc'){
-                            $volumen_cotizacion=$volumen_doc;
+                        if ($volumen_selected == 'volumen_doc') {
+                            $volumen_cotizacion = $volumen_doc;
                         }
-                        if($volumen_selected=='volumen_china'){
-                            $volumen_cotizacion=$volumen_china;
+                        if ($volumen_selected == 'volumen_china') {
+                            $volumen_cotizacion = $volumen_china;
                         }
-                        if($volumen_selected=='volumen'){
-                            $volumen_cotizacion=$volumen_cotizacion;
+                        if ($volumen_selected == 'volumen') {
+                            $volumen_cotizacion = $volumen_cotizacion;
                         }
                         //set vol_cot to t column
                         $sheet->setCellValue('T' . $row, $volumen_cotizacion);
@@ -1505,7 +1520,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         $volumen_doc = "-";
                         $valor_doc = "-";
                         $valor_cot = "-";
-                        $volumen_selected='';
+                        $volumen_selected = '';
 
                         $tipoCliente = "No existe en contenedor";
                         //find in array
@@ -1513,7 +1528,7 @@ class ContenedorConsolidadoModel extends CI_Model
                             if (trim($item->nombre) == trim($client)) {
                                 $volumen_cotizacion = $item->volumen;
                                 $volumen_china = $item->volumen_china;
-                                $volumen_selected = $item->vol_selected??'';
+                                $volumen_selected = $item->vol_selected ?? '';
                                 $volumen_doc = $item->volumen_doc;
                                 $valor_doc = $item->valor_doc;
                                 $tipoCliente = $item->name;
@@ -1522,14 +1537,14 @@ class ContenedorConsolidadoModel extends CI_Model
                         }
 
                         //set vol_cot to t column
-                        if($volumen_selected=='volumen_doc'){
-                            $volumen_cotizacion=$volumen_doc;
+                        if ($volumen_selected == 'volumen_doc') {
+                            $volumen_cotizacion = $volumen_doc;
                         }
-                        if($volumen_selected=='volumen_china'){
-                            $volumen_cotizacion=$volumen_china;
+                        if ($volumen_selected == 'volumen_china') {
+                            $volumen_cotizacion = $volumen_china;
                         }
-                        if($volumen_selected=='volumen'){
-                            $volumen_cotizacion=$volumen_cotizacion;
+                        if ($volumen_selected == 'volumen') {
+                            $volumen_cotizacion = $volumen_cotizacion;
                         }
                         $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
                         // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
@@ -1556,7 +1571,7 @@ class ContenedorConsolidadoModel extends CI_Model
                                     // Obtener el valor de la columna G para el rango fusionado
                                     for ($r = $startRow; $r <= $endRow; $r++) {
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                        if(trim($adValorem)=="FTA"){
+                                        if (trim($adValorem) == "FTA") {
                                             $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
                                         }
                                         $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
@@ -1658,7 +1673,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
             $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
             $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
-            
+
             return $objPHPExcel;
         } catch (Exception $e) {
             return ['status' => "error", 'message' => $e->getMessage()];
@@ -1711,9 +1726,9 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->or_where('estados_proveedor', 'ROTULADO');
             $this->db->or_where('estados_proveedor', 'DATOS PROVEEDOR');
             $this->db->group_end();
-            
+
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
-    
+
             // Segunda actualización para un proveedor específico
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
@@ -1727,20 +1742,20 @@ class ContenedorConsolidadoModel extends CI_Model
                 ->where('estado', 'RESERVADO');
             $query = $this->db->get();
             $estadoCliente = $query->row() ? "RESERVADO" : "NO RESERVADO";
-    
+
             $this->db->where('id', $idCotizacion);
             $this->db->update($this->table_contenedor_cotizacion, ['estado_cliente' => $estadoCliente]);
-    
+
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED","estados"=>"EMBARCADO"]);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED", "estados" => "EMBARCADO"]);
             $this->db->select('SUM(ifnull(cbm_total_china,0)) as volumen_china')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id_cotizacion', $idCotizacion)
-            ->where('estados_proveedor',"LOADED");
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id_cotizacion', $idCotizacion)
+                ->where('estados_proveedor', "LOADED");
             $query = $this->db->get();
             $volumenChina = $query->row()->volumen_china;
-          
+
             $this->db->where('id', $idCotizacion);
             $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $volumenChina]);
         }
@@ -1756,51 +1771,50 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
         }
-    
+
         // Verificar si hubo una actualización exitosa
         if ($this->db->affected_rows() > 0) {
             // Aquí podrías registrar logs o hacer otra acción si se requiere
         }
-    
+
         // Manejo de errores en la base de datos
         $dbError = $this->db->error();
         if ($dbError && $dbError['code'] != 0) {
             return ['status' => "error", 'error' => $dbError];
         }
-    
+
         // Actualizar timestamp en `tracking`
         $this->db->where('id_proveedor', $idProveedor);
         $this->db->update($this->table_conteneodr_proveedor_estados_tracking, ['updated_at' => date('Y-m-d H:i:s')]);
-    
+
         // Insertar nuevo tracking
         $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, [
             'id_cotizacion' => $idCotizacion,
             'id_proveedor' => $idProveedor,
             'estado' => $estado
         ]);
-    
+
         // Manejo de errores en la inserción
         $dbError = $this->db->error();
         if ($dbError && $dbError['code'] != 0) {
             return ['status' => "error", 'error' => $dbError];
         }
-    
+
         // Llamada al manejador de actualización de cotización
         $data = $this->handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion);
-    
+
         return $data ?: "success";
-   
     }
     public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
     {
         if ($estado == "ROTULADO") {
             try {
-                $email="harukakasugano31@gmail.com";
+                $email = "harukakasugano31@gmail.com";
                 $this->db->select('nombre,id_contenedor')
                     ->from($this->table_contenedor_cotizacion)
                     ->where('id', $idCotizacion);
                 $query = $this->db->get();
-               
+
                 $cliente = $query->row()->nombre;
                 $idContenedor = $query->row()->id_contenedor;
                 $this->db->close();
@@ -1816,7 +1830,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     ->where('id', $idContenedor);
                 $query = $this->db->get();
                 $carga = $query->row()->carga;
-                $htmlWelcomePath='assets/downloads/Welcome_Consolidado_Template.html';
+                $htmlWelcomePath = 'assets/downloads/Welcome_Consolidado_Template.html';
                 $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
                 $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
                 $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
@@ -1832,13 +1846,11 @@ class ContenedorConsolidadoModel extends CI_Model
                 // $uuid=uniqid();
                 // $tempFilePath = sys_get_temp_dir() . "/temp_document_{$uuid}.pdf";
                 // file_put_contents($tempFilePath, $pdfContent);
-                $this->sendMail($email,"Welcome to Consolidado",$htmlWelcomeContent,[
-                    
-                ]);
+                $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
                 $this->email->clear(TRUE);
 
                 unlink($tempFilePath);
-             
+
                 $zip = new ZipArchive();
                 $zipFileName = 'assets/downloads/Rotulado.zip';
                 if (file_exists($zipFileName)) {
@@ -1867,13 +1879,14 @@ class ContenedorConsolidadoModel extends CI_Model
                     $dompdf->loadHtml($htmlContent);
                     $dompdf->setPaper('A4', 'portrait');
 
-            
+
                     $dompdf->render();
                     $pdfContent = $dompdf->output();
                     $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
-                    file_put_contents($tempFilePath, $pdfContent); 
+                    file_put_contents($tempFilePath, $pdfContent);
                     try {
-                        $this->sendMail($email,
+                        $this->sendMail(
+                            $email,
                             "Datos Item",
                             `Producto: {$products}
                             Código de proveedor: {$supplierCode}
@@ -1887,28 +1900,27 @@ class ContenedorConsolidadoModel extends CI_Model
                     } catch (Exception $e) {
                         echo 'Error: ' . $e->getMessage();
                     } finally {
-                                        // Eliminar el archivo temporal
-                    $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
+                        // Eliminar el archivo temporal
+                        $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
                     }
                 }
-                    $zip->close();
-                    $htmlDataPath='assets/downloads/Data_Rotulado_Template.html';
-                    $htmlDataContent = file_get_contents($htmlDataPath);
-                    // $dompdf = new Dompdf\Dompdf($options);
-                    // $dompdf->loadHtml($htmlDataContent);
-                    // $dompdf->setPaper('A4', 'portrait');
-                    // $dompdf->render();
-                    // $pdfContent = $dompdf->output();
-                    // $tempFilePath = sys_get_temp_dir() . "/temp_document_data_{$supplierCode}.pdf";
-                    // file_put_contents($tempFilePath, $pdfContent);
-                    $this->sendMail($email,
-                        "Datos Cliente",
-                        $htmlDataContent,
-                        [
-                            
-                        ]
-                    );
-                    unlink($tempFilePath);
+                $zip->close();
+                $htmlDataPath = 'assets/downloads/Data_Rotulado_Template.html';
+                $htmlDataContent = file_get_contents($htmlDataPath);
+                // $dompdf = new Dompdf\Dompdf($options);
+                // $dompdf->loadHtml($htmlDataContent);
+                // $dompdf->setPaper('A4', 'portrait');
+                // $dompdf->render();
+                // $pdfContent = $dompdf->output();
+                // $tempFilePath = sys_get_temp_dir() . "/temp_document_data_{$supplierCode}.pdf";
+                // file_put_contents($tempFilePath, $pdfContent);
+                $this->sendMail(
+                    $email,
+                    "Datos Cliente",
+                    $htmlDataContent,
+                    []
+                );
+                unlink($tempFilePath);
 
                 header('Content-Type: application/zip');
                 header('Content-Disposition: attachment; filename="Rotulado.zip"');
@@ -1992,16 +2004,14 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return false;
     }
-    public function updateEstadoProveedor($idCotizacion,$idProveedor, $estados_proveedor)
+    public function updateEstadoProveedor($idCotizacion, $idProveedor, $estados_proveedor)
     {
         $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estados_proveedor]);
         if ($this->db->affected_rows() > 0) {
-            if($estados_proveedor=="LOADED"){
+            if ($estados_proveedor == "LOADED") {
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
-                
-                
             }
             return "success";
         }
@@ -2070,33 +2080,33 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return false;
     }
-    public function updateProveedorData($data,$idProveedor){
-        
+    public function updateProveedorData($data, $idProveedor)
+    {
+
         $this->db->select('estados,estados_proveedor,id_contenedor,code_supplier,id_cotizacion')
-                ->from($this->table_contenedor_cotizacion_proveedores)
-                ->where('id', $idProveedor);
-            $query = $this->db->get();
-            $estado = $query->row()->estados;
-            $estadoProveedor = $query->row()->estados_proveedor;
-            $idContenedor = $query->row()->id_contenedor;
-            $idCotizacion = $query->row()->id_cotizacion;
-            $supplierCode = $query->row()->code_supplier;
-        if(isset($data['supplier_phone']) || isset($data['supplier'])){ 
+            ->from($this->table_contenedor_cotizacion_proveedores)
+            ->where('id', $idProveedor);
+        $query = $this->db->get();
+        $estado = $query->row()->estados;
+        $estadoProveedor = $query->row()->estados_proveedor;
+        $idContenedor = $query->row()->id_contenedor;
+        $idCotizacion = $query->row()->id_cotizacion;
+        $supplierCode = $query->row()->code_supplier;
+        if (isset($data['supplier_phone']) || isset($data['supplier'])) {
             //CHECK CURRENT STATUS IS EQUAL TO ROTULADO CHANGE TO DATOS PROVEEDOR
-            
-            if($estado=="ROTULADO" || !$estado){
+
+            if ($estado == "ROTULADO" || !$estado) {
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'DATOS PROVEEDOR']);
                 $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, ['id_proveedor' => $idProveedor, 'estado' => 'DATOS PROVEEDOR']);
-
             }
             $this->verifyContainerIsCompleted($idContenedor);
-            $usuariosAlmacen=$this->getUsersByGrupo($this->roleContenedorAlmacen);
-            $ids=array_column($usuariosAlmacen,'ID_Usuario');
-            $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado DATOS PROVEEDOR";
-            $notifications=$this->createNotification($ids,$message,"CARGA CONSOLIDADA",$this->user->ID_Usuario);
-            foreach($ids as $id){
-                $socketResponse=$this->sendEvent([
+            $usuariosAlmacen = $this->getUsersByGrupo($this->roleContenedorAlmacen);
+            $ids = array_column($usuariosAlmacen, 'ID_Usuario');
+            $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado DATOS PROVEEDOR";
+            $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
+            foreach ($ids as $id) {
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => 0,
                     "user" => $id,
@@ -2106,40 +2116,40 @@ class ContenedorConsolidadoModel extends CI_Model
             }
         }
 
-        if(isset($data['arrive_date_china'])){
-            $data['arrive_date_china']=date('Y-m-d',strtotime(str_replace('/', '-', $data['arrive_date_china'])));
-            if($estadoProveedor=="NC"){
+        if (isset($data['arrive_date_china'])) {
+            $data['arrive_date_china'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['arrive_date_china'])));
+            if ($estadoProveedor == "NC") {
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'C']);
-                $usuariosAlmacen=$this->getUsersByGrupo($this->roleCoordinacion);
-                $ids=array_column($usuariosAlmacen,'ID_Usuario');
+                $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
+                $ids = array_column($usuariosAlmacen, 'ID_Usuario');
 
-                $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado CONTACTADO";
-                $notifications=$this->createNotification($ids,$message,"CARGA CONSOLIDADA",$this->user->ID_Usuario);
-                $socketResponse=$this->sendEvent([
+                $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado CONTACTADO";
+                $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCoordinacion,
                     "user" => 0,
                     "action" => $this->cambioEstadoProveedor,
                     "message" => $message
                 ]);
-                $socketResponse=$this->sendEvent([
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCotizador,
                     "user" => 0,
                     "action" => $this->cambioEstadoProveedor,
                     "message" => $message
                 ]);
-            }else{
-                $message="Se ha actualizado la fecha de llegada de china del proveedor con codigo de proveedor ".$supplierCode." a ".$data['arrive_date_china'];
-                $socketResponse=$this->sendEvent([
+            } else {
+                $message = "Se ha actualizado la fecha de llegada de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['arrive_date_china'];
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCoordinacion,
                     "user" => "0",
                     "action" => $this->cambioEstadoProveedor,
                     "message" => $message
                 ]);
-                $socketResponse=$this->sendEvent([
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCotizador,
                     "user" => "0",
@@ -2148,43 +2158,42 @@ class ContenedorConsolidadoModel extends CI_Model
                 ]);
             }
             $this->verifyContainerIsCompleted($idContenedor);
-          
         }
-        if(isset($data['qty_box_china']) && isset($data['cbm_total_china'])){
-            if($estadoProveedor=="NC" || $estadoProveedor=="C"){
+        if (isset($data['qty_box_china']) && isset($data['cbm_total_china'])) {
+            if ($estadoProveedor == "NC" || $estadoProveedor == "C") {
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'R']);
                 //sum all provider cbm_total_china and set volumen_china in cotizacion table
-             
-                
-                $usuariosAlmacen=$this->getUsersByGrupo($this->roleCoordinacion);
-                $ids=array_column($usuariosAlmacen,'ID_Usuario');
-                $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado RECIBIDO";
-                $notifications=$this->createNotification($ids,$message,"CARGA CONSOLIDADA",$this->user->ID_Usuario);
-                $socketResponse=$this->sendEvent([
+
+
+                $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
+                $ids = array_column($usuariosAlmacen, 'ID_Usuario');
+                $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado RECIBIDO";
+                $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCoordinacion,
                     "user" => "0",
                     "action" => $this->cambioEstadoProveedor,
                     "message" => $message
                 ]);
-                $socketResponse=$this->sendEvent([
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCotizador,
                     "user" => "0",
                     "action" => $this->cambioEstadoProveedor,
                     "message" => $message
                 ]);
-            }else{
-                $message="Se ha actualizado la cantidad de cajas y volumen total de china del proveedor con codigo de proveedor ".$supplierCode." a ".$data['qty_box_china']." cajas y ".$data['cbm_total_china']." m3";
-                $socketResponse=$this->sendEvent([
+            } else {
+                $message = "Se ha actualizado la cantidad de cajas y volumen total de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['qty_box_china'] . " cajas y " . $data['cbm_total_china'] . " m3";
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCoordinacion,
                     "user" => 0,
                     "action" => $this->cambioEstadoProveedor,
                     "message" => $message
                 ]);
-                $socketResponse=$this->sendEvent([
+                $socketResponse = $this->sendEvent([
                     "project" => "intranet",
                     "role" => $this->roleCotizador,
                     "user" => 0,
@@ -2192,33 +2201,33 @@ class ContenedorConsolidadoModel extends CI_Model
                     "message" => $message
                 ]);
             }
- 
         }
         $this->db->where('id', $idProveedor);
         $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
         $this->db->close();
         $this->db->initialize();
         $this->db->select('SUM(ifnull(cbm_total_china,0)) as volumen_china')
-        ->from($this->table_contenedor_cotizacion_proveedores)
-        ->where('id_cotizacion', $idCotizacion)
-        ->where('estados_proveedor',"LOADED");
+            ->from($this->table_contenedor_cotizacion_proveedores)
+            ->where('id_cotizacion', $idCotizacion)
+            ->where('estados_proveedor', "LOADED");
         $query = $this->db->get();
         $volumenChina = $query->row()->volumen_china;
-      
+
         $this->db->where('id', $idCotizacion);
         $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $volumenChina]);
-            $this->verifyContainerIsCompleted($idContenedor);
+        $this->verifyContainerIsCompleted($idContenedor);
 
-        if ($this->db->error()->code!=0) {
-            
+        if ($this->db->error()->code != 0) {
+
             return ['status' => "error", 'error' => $this->db->error()];
-        }else{
+        } else {
             return "success";
         }
-        
+
         return false;
     }
-    public function uploadFileDocument($file,$idProveedor,$idCotizacion){
+    public function uploadFileDocument($file, $idProveedor, $idCotizacion)
+    {
         $this->maxFileSize = 1000000;
         $this->setAllowedExtensionsImagesOfficeFiles();
         $fileUrl = $this->uploadSingleFile(
@@ -2231,7 +2240,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ],
             'assets/images/agentecompra/'
         );
-        $fileToInsert=[
+        $fileToInsert = [
             'file_path' => $fileUrl,
             'file_name' => $file['name'],
             'file_type' => $file['type'],
@@ -2256,7 +2265,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
         }
 
-       
+
 
         // if ($fileUrl) {
         //     $this->db->insert($this->table_contenedor_documentacion_files, ['file_url' => $fileUrl]);
@@ -2266,7 +2275,8 @@ class ContenedorConsolidadoModel extends CI_Model
         // }
         return ['status' => "error", 'error' => true];
     }
-    public function uploadFileAlmacenInspection($file,$idProveedor,$idCotizacion){
+    public function uploadFileAlmacenInspection($file, $idProveedor, $idCotizacion)
+    {
         $this->maxFileSize = 1000000;
         $this->setAllowedExtensionsImagesOfficeFilesVideos();
         $fileUrl = $this->uploadSingleFile(
@@ -2279,7 +2289,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ],
             'assets/images/agentecompra/'
         );
-        $fileToInsert=[
+        $fileToInsert = [
             'file_path' => $fileUrl,
             'file_name' => $file['name'],
             'file_type' => $file['type'],
@@ -2289,10 +2299,10 @@ class ContenedorConsolidadoModel extends CI_Model
             'last_modified' => time(),
         ];
         if ($fileUrl) {
-         
-           
+
+
             $this->db->insert($this->table_contenedor_almacen_inspection, $fileToInsert);
-            if($this->db->error()['code']!=0){
+            if ($this->db->error()['code'] != 0) {
                 return ['status' => "error", 'error' => $this->db->error()];
             }
             if ($this->db->affected_rows() > 0) {
@@ -2306,7 +2316,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     'size' => $file['size'],
                     'id' => 1,
                 ];
-                return ['status' => "success", 'error' => false, "data" => $fileToReturn]; 
+                return ['status' => "success", 'error' => false, "data" => $fileToReturn];
                 // $sendMesagge=
                 // if($sendMesagge){
                 //     //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
@@ -2328,35 +2338,35 @@ class ContenedorConsolidadoModel extends CI_Model
                 //     $query = $this->db->get();
                 //     $mediaData = $query->result();
                 //     $response=$this->sendInspectionXSupllier($mediaData,$cliente,$qtyBoxChina,$supplierCode);
-                    
+
                 // }
-              
+
             }
         }
         return ['status' => "error", 'error' => true];
     }
-    public function getFilesAlmacenDocument($idProveedor){
+    public function getFilesAlmacenDocument($idProveedor)
+    {
         $this->db->select('id,file_name as name,file_path as path,file_type as type,file_size as size,last_modified as lastModified')
             ->from($this->table_contenedor_almacen_documentacion)
             ->where('id_proveedor', $idProveedor);
         $query = $this->db->get();
         $result = $query->result();
-       
-            return ['status' => "success", 'error' => false, "data" => $result];
-        
+
+        return ['status' => "success", 'error' => false, "data" => $result];
     }
-    public function getFilesAlmacenInspection($idProveedor){
+    public function getFilesAlmacenInspection($idProveedor)
+    {
         $this->db->select('id,file_name as name,file_path as path,file_type as type,file_size as size,last_modified as lastModified')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor);
         $query = $this->db->get();
         $result = $query->result();
-        
-            return ['status' => "success", 'error' => false, "data" => $result];
-        
 
+        return ['status' => "success", 'error' => false, "data" => $result];
     }
-    function validateToSendInspectionMessage($idProveedor){
+    function validateToSendInspectionMessage($idProveedor)
+    {
         //find if exists more two files type image and one type video
         $this->db->select('id')
             ->from($this->table_contenedor_almacen_inspection)
@@ -2381,28 +2391,32 @@ class ContenedorConsolidadoModel extends CI_Model
         if ($images >= 2 && $videos >= 1 && $estadoChina != "INSPECTION") {
             //set estado_china to INSPECTION
             $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'INSPECTION'
-            ,'estados'=>'INSPECCIONADO','estados_proveedor'=>'INSPECTION']);
-            $message="Se ha actualizado el proveedor con codigo de proveedor ".$supplierCode." a estado INSPECCIONADO";
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, [
+                'estados_proveedor' => 'INSPECTION',
+                'estados' => 'INSPECCIONADO',
+                'estados_proveedor' => 'INSPECTION'
+            ]);
+            $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado INSPECCIONADO";
             $socketResponse = $this->sendEvent([
                 "project" => "0",
                 "role" => $this->roleCotizador,
                 "user" => "0",
                 "action" => $this->cambioEstadoProveedor,
-                "message" =>$message,
+                "message" => $message,
             ]);
             $socketResponse = $this->sendEvent([
                 "project" => "0",
                 "role" => $this->roleCoordinacion,
                 "user" => "0",
                 "action" => $this->cambioEstadoProveedor,
-                "message" =>$message,
+                "message" => $message,
             ]);
             return true;
         }
         return false;
     }
-    public function getClientesHeader($idContenedor){
+    public function getClientesHeader($idContenedor)
+    {
         //get sum of cbm_total_china from proveedor where states is LOADED, and get total monto from cotizacion
         $this->db->select('SUM(ifnull(cbm_total_china,0)) as cbm_total_china')
             ->from($this->table_contenedor_cotizacion_proveedores)
@@ -2418,18 +2432,18 @@ class ContenedorConsolidadoModel extends CI_Model
         $result2 = $query->row();
         if ($result) {
             return [
-                'cbm_total_china'=>$result->cbm_total_china,
-                'monto'=>$result2->monto
+                'cbm_total_china' => $result->cbm_total_china,
+                'monto' => $result2->monto
             ];
-        }else{
+        } else {
             return ['status' => "error", 'error' => false, "data" => [
-                'cbm_total_china'=>0,
-                'monto'=>0
+                'cbm_total_china' => 0,
+                'monto' => 0
             ]];
         }
-
     }
-    public function getCotizacionEmbarqueHeaders($idContenedor){
+    public function getCotizacionEmbarqueHeaders($idContenedor)
+    {
         //get sum of cbm_total_china and cbm_total from each cotizacion proveedor
         $this->db->select('SUM(ifnull(cbm_total_china,0)) as cbm_total_china,SUM(ifnull(cbm_total,0)) as cbm_total')
             ->from($this->table_contenedor_cotizacion_proveedores)
@@ -2442,24 +2456,25 @@ class ContenedorConsolidadoModel extends CI_Model
             ->where('id', $idContenedor);
         $query = $this->db->get();
         $result2 = $query->row();
-        
+
         if ($result) {
             return [
-                'cbm_total_china'=>$result->cbm_total_china,
-                'cbm_total'=>$result->cbm_total,
-                'bl_file_url'=>$result2->bl_file_url,
-                'lista_embarque_url'=>$result2->lista_embarque_url
+                'cbm_total_china' => $result->cbm_total_china,
+                'cbm_total' => $result->cbm_total,
+                'bl_file_url' => $result2->bl_file_url,
+                'lista_embarque_url' => $result2->lista_embarque_url
             ];
-        }else{
+        } else {
             return ['status' => "error", 'error' => false, "data" => [
-                'cbm_total_china'=>0,
-                'cbm_total'=>0,
-                'bl_file_url'=>'',
-                'lista_embarque_url'=>''
+                'cbm_total_china' => 0,
+                'cbm_total' => 0,
+                'bl_file_url' => '',
+                'lista_embarque_url' => ''
             ]];
-        }    
+        }
     }
-    public function uploadBL($idContenedor,$file){
+    public function uploadBL($idContenedor, $file)
+    {
         $this->maxFileSize = 1000000;
         $this->setAllowedExtensionsImagesOfficeFiles();
         $fileUrl = $this->uploadSingleFile(
@@ -2483,7 +2498,8 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return ['status' => "error", 'error' => true];
     }
-    public function updateVolSelected($idCotizacion,$volSelected){
+    public function updateVolSelected($idCotizacion, $volSelected)
+    {
         $this->db->where('id', $idCotizacion);
         $this->db->update($this->table_contenedor_cotizacion, ['vol_selected' => $volSelected]);
         if ($this->db->affected_rows() > 0) {
@@ -2491,7 +2507,8 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return false;
     }
-    public function deleteBL($idContenedor){
+    public function deleteBL($idContenedor)
+    {
         $this->db->where('id', $idContenedor);
         $this->db->update($this->table, ['bl_file_url' => '']);
         $this->verifyContainerIsCompleted($idContenedor);
@@ -2501,7 +2518,8 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return false;
     }
-    public function deleteListaEmbarque($idContenedor){
+    public function deleteListaEmbarque($idContenedor)
+    {
         $this->db->where('id', $idContenedor);
         $this->db->update($this->table, ['lista_embarque_url' => '']);
         $this->verifyContainerIsCompleted($idContenedor);
@@ -2510,47 +2528,74 @@ class ContenedorConsolidadoModel extends CI_Model
             return "success";
         }
         return false;
-
     }
-    public function getValidContainers(){
+    public function getValidContainers()
+    {
         //return array from 1 to 50 and remove this array with rows from table contenedor where id in array
         $this->db->select('carga')
             ->from($this->table);
         $query = $this->db->get();
         $containers = $query->result();
-        $containersArray=[];
+        $containersArray = [];
         foreach ($containers as $container) {
-            $containersArray[]=$container->carga;
+            $containersArray[] = $container->carga;
         }
-        $containersArray=array_diff(range(1, 50), $containersArray);
+        $containersArray = array_diff(range(1, 50), $containersArray);
         //convert to simple array
-        $containersArray=array_values($containersArray);
-        return $containersArray;   
+        $containersArray = array_values($containersArray);
+        return $containersArray;
     }
-    public function getUsersByGrupo($grupo){
+    public function getUsersByGrupo($grupo)
+    {
         /**
          * select u.ID_Usuario from usuario  u left  join grupo_usuario gu  on gu.ID_Usuario =u.ID_Usuario 
          * join grupo g on g.ID_Grupo =gu.ID_Grupo 
          * where g.No_Grupo ="Cliente" and u.Nu_Estado =1
          */
-        try{
+        try {
             $this->db->select('u.ID_Usuario')
-            ->from('usuario u')
-            ->join('grupo_usuario gu', 'gu.ID_Usuario = u.ID_Usuario')
-            ->join('grupo g', 'g.ID_Grupo = gu.ID_Grupo')
-            ->where('g.No_Grupo', $grupo)
-            ->where('u.Nu_Estado', 1);
-        $query = $this->db->get();
-        $usuarios = $query->result();
-        if($this->db->error()['code']!=0){
-            return ['status' => "error", 'error' => $this->db->error()];
-        }
-        return $usuarios;
-        }catch(Exception $e){
+                ->from('usuario u')
+                ->join('grupo_usuario gu', 'gu.ID_Usuario = u.ID_Usuario')
+                ->join('grupo g', 'g.ID_Grupo = gu.ID_Grupo')
+                ->where('g.No_Grupo', $grupo)
+                ->where('u.Nu_Estado', 1);
+            $query = $this->db->get();
+            $usuarios = $query->result();
+            if ($this->db->error()['code'] != 0) {
+                return ['status' => "error", 'error' => $this->db->error()];
+            }
+            return $usuarios;
+        } catch (Exception $e) {
             return $e->getMessage();
         }
-    }public function updateEstadoCotizador($ID, $estado){
-		try{
+    }
+    public function uploadGeneral($idContenedor, $file)
+    {
+        $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        $fileUrl = $this->uploadSingleFile(
+            [
+                "name" => $file['name'],
+                "type" => $file['type'],
+                "tmp_name" => $file['tmp_name'],
+                "error" => $file['error'],
+                "size" => $file['size']
+            ],
+            'assets/images/agentecompra/'
+        );
+        if ($fileUrl) {
+            $this->db->where('id', $idContenedor);
+            $this->db->update($this->table, ['factura_general_url' => $fileUrl]);
+
+            if ($this->db->affected_rows() > 0) {
+                return ['status' => "success", 'error' => false];
+            }
+        }
+        return ['status' => "error", 'error' => true];
+    }
+    public function updateEstadoCotizador($ID, $estado)
+    {
+        try {
             //find if all proveedores have products not empty
             $this->db->select('id')
                 ->from($this->table_contenedor_cotizacion_proveedores)
@@ -2559,17 +2604,818 @@ class ContenedorConsolidadoModel extends CI_Model
                 ->where('products is null or products=""');
             $query = $this->db->get();
             $result = $query->result();
-            if(count($result)>0){
-                return ['status' => "error", 'error' => "No se puede cambiar el estado a ".$estado." hasta que todos los proveedores tengan productos"];
+            if (count($result) > 0) {
+                return ['status' => "error", 'error' => "No se puede cambiar el estado a " . $estado . " hasta que todos los proveedores tengan productos"];
             }
-			$this->db->where('id', $ID);
+            $this->db->where('id', $ID);
             $this->db->update($this->table_contenedor_cotizacion, ['estado_cotizador' => $estado]);
-            if ($this->db->error()['code']!=0) {
+            if ($this->db->error()['code'] != 0) {
                 return ['status' => "error", 'error' => $this->db->error()];
             }
             return "success";
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return $e->getMessage();
         }
-	}
+    }
+    public function downloadPlantillaGeneral($idContenedor)
+    {
+        try {
+            $this->db->select('factura_general_url')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $result = $query->row();
+            if ($result) {
+                $facturaGeneralUrl = $result->factura_general_url;
+
+                $startRow = 26;
+                $startIndex = 26;
+                $itemNColumn = "B";
+                $tipoClienteColumn = "C";
+                $clienteColumn = "D";
+                $descriptionColumn = "E";
+                $qtyColumn = "M";
+                $qtyUnitColumn = "N";
+                $unitPriceColumn = "O";
+                $unitPriceUnitColumn = "P";
+                $fobPriceColumn = "Q";
+                $adValoremColumn = "R";
+                $anticipoColumn = "S";
+                $volSistemaColumn = "T";
+                $dataSystem = $this->db->select('nombre,volumen,documento,volumen_doc,valor_doc,valor_cot,volumen_china,name,vol_selected,peso')
+                    ->from($this->table_contenedor_cotizacion)
+                    ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
+                    ->where('id_contenedor', $idContenedor)
+                    ->where('estado_cliente!=', null)
+                    ->get()->result();
+                $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $facturaGeneralUrl);
+                $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
+                $facturaGeneralUrl = FCPATH . ltrim($decodedPath, '/');
+
+                $objPHPExcel = PHPExcel_IOFactory::load($facturaGeneralUrl);
+                $sheet = $objPHPExcel->getActiveSheet();
+                $plantillaGeneralUrl = 'assets/downloads/PLANTILLA_GENERAL.xlsx';
+                $newExcel = PHPExcel_IOFactory::load($plantillaGeneralUrl);
+                $newSheet = $newExcel->getActiveSheet();
+
+                $newSheet->setCellValue('A1', "CLIENTE");
+                $newSheet->setCellValue('B1', "TIPO");
+                $newSheet->setCellValue('C1', "DNI");
+                $newSheet->setCellValue('D1', "TELEFONO");
+                $newSheet->setCellValue('E1', "ITEM");
+                $newSheet->setCellValue('F1', "PRODUCTO");
+                $newSheet->setCellValue('N1', "CANTIDAD");
+                $newSheet->setCellValue('O1', "PRECIO UNITARIO");
+                $newSheet->setCellValue('P1', "ANTIDUMPING");
+                $newSheet->setCellValue('Q1', "VALORACION");
+                $newSheet->setCellValue('R1', "AD VALOREM");
+                $newSheet->setCellValue('S1', "PERCEPCION");
+                $newSheet->setCellValue('T1', "PESO");
+                $newSheet->setCellValue('U1', "VOLUMEN SISTEMA");
+                //get merge ranges from excel
+                $highestRow = $sheet->getHighestRow();
+                $nameActual = "";
+                $mergedEndCell = 0;
+                $mergedStartCell = $startIndex;
+                $currentRow = $startRow;
+                $newRow = 2;
+                $continue = true;
+                while ($continue) {
+                    $mergeRanges = $sheet->getMergeCells();
+                    $mergeStart = $currentRow;
+                    $mergeEnd = $currentRow;
+                    //if sheet b column trim =TOTAL FOB PRICE then break
+                    if (trim($sheet->getCell('B' . $currentRow)->getValue()) == "TOTAL FOB PRICE") {
+                        $continue = false;
+                        break;
+                    }
+                    foreach ($mergeRanges as $mergeRange) {
+                        if (strpos($mergeRange, 'D') !== false) {
+                            list($startCell, $endCell) = explode(':', $mergeRange);
+                            $startRow = (int)preg_replace('/[^0-9]/', '', $startCell);
+                            $endRow = (int)preg_replace('/[^0-9]/', '', $endCell);
+
+                            if ($currentRow >= $startRow && $currentRow <= $endRow) {
+                                $mergeStart = $startRow;
+                                $mergeEnd = $endRow;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Get client and type info from merged range
+                    $clientName = $sheet->getCell('D' . $mergeStart)->getValue();
+                    $clientType = $sheet->getCell('C' . $mergeStart)->getValue();
+                    $newSheet->mergeCells('F' . $newRow . ':M' . $newRow);
+
+                    $mergeStartRow = $newRow;
+
+                    // Process all rows within the merge range
+                    for ($i = $mergeStart; $i <= $mergeEnd; $i++) {
+                        // Get product information
+                        $itemNo = $sheet->getCell('B' . $i)->getValue();
+                        $description = $sheet->getCell('E' . $i)->getValue();
+                        $quantity = $sheet->getCell('M' . $i)->getValue();
+                        $quantityUnit = $sheet->getCell('N' . $i)->getValue();
+                        $unitPrice = $sheet->getCell('O' . $i)->getValue();
+                        $unitPriceUnit = $sheet->getCell('P' . $i)->getValue();
+                        $fobPrice = $sheet->getCell('Q' . $i)->getValue();
+                        $adValorem = $sheet->getCell('R' . $i)->getValue();
+                        $antiDumping = $sheet->getCell('S' . $i)->getValue();
+                        $volSistema = $sheet->getCell('T' . $i)->getValue();
+                        //insert before $newRow-1
+                        $newSheet->insertNewRowBefore($newRow, 1);
+                        $newSheet->mergeCells('F' . $newRow . ':M' . $newRow);
+                        // Transfer to new Excel
+                        $newSheet->setCellValue('A' . $newRow, $clientName);
+                        $newSheet->setCellValue('B' . $newRow, $clientType);
+                        $newSheet->setCellValue('E' . $newRow, $itemNo);
+                        $newSheet->setCellValue('F' . $newRow, $description);
+                        $newSheet->setCellValue('N' . $newRow, $quantity);
+                        $newSheet->setCellValue('O' . $newRow, $unitPrice);
+                        $newSheet->setCellValue('P' . $newRow, $antiDumping);
+                        $newSheet->setCellValue('Q' . $newRow, 0);
+
+                        $newSheet->setCellValue('R' . $newRow, $adValorem);
+                        $newSheet->setCellValue('S' . $newRow, 0.035);
+                        $newSheet->setCellValue('U' . $newRow, $volSistema);
+                        //center horizontally all columns in this row
+                        $newSheet->getStyle('A' . $newRow . ':U' . $newRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                        //apply dollar format to columns O, P, Q, R, S to percentage format
+                        $newSheet->getStyle('O' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                        $newSheet->getStyle('P' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                        $newSheet->getStyle('Q' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                        $newSheet->getStyle('R' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                        $newSheet->getStyle('S' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                        foreach ($dataSystem as $data) {
+                            if (trim($data->nombre) == trim($clientName)) {
+                                $newSheet->setCellValue('C' . $newRow, $data->name);
+                                $newSheet->setCellValue('D' . $newRow, $data->documento);
+                                $newSheet->setCellValue('T' . $newRow, $data->peso);
+                                break;
+                            }
+                        }
+                        $newRow++;
+                    }
+                    if ($mergeStartRow < ($newRow - 1)) {
+                        // Merge columns A, B, C, D, T, and U
+                        $columnsToMerge = ['A', 'B', 'C', 'D', 'T', 'U'];
+                        foreach ($columnsToMerge as $column) {
+                            $newSheet->mergeCells($column . $mergeStartRow . ':' . $column . ($newRow - 1));
+                        }
+
+                        // Apply cell styling to merged cells
+                        foreach ($columnsToMerge as $column) {
+                            $newSheet->getStyle($column . $mergeStartRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                        }
+                    }
+                    $currentRow = $mergeEnd + 1;
+                }
+                //center horizontally all columns  sete o  p q r to dollar format and  s to percentage format
+
+                $newSheet->getStyle('A1:U1')->getFont()->setBold(true);
+                $newSheet->mergeCells('F1:M1');
+
+                $newSheet->getStyle('A1:U1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $newSheet->getStyle('A1:U1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9D9D9');
+                $newSheet->getStyle('A1:U1')->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+                $newSheet->getStyle('A1:U1')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                $newSheet->getStyle('A1:U1')->getAlignment()->setWrapText(true);
+                $newSheet->getStyle('A1:U1')->getAlignment()->setShrinkToFit(true);
+                //set all columns to center horizontally
+
+                //set p lastrow +1 =sum(p2:p lastrow)
+                $newSheet->setCellValue('P' . $newRow, '=SUM(P2:P' . ($newRow - 1) . ')');
+
+                return $newExcel;
+            } else {
+                return ['status' => "error", 'error' => false, "data" => ''];
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function generateMassiveExcelPayrolls($objPHPExcel, $idContainer)
+    {
+        //init more memory
+        $originalMemoryLimit = ini_get('memory_limit');
+        //set memory limit to 512M
+        ini_set('memory_limit', '2048M');
+        $this->load->library('PHPExcel');
+        $this->load->library('zip');
+        // Create a new PHPExcel object
+        $templatePath = 'assets/downloads/Boleta_Template.xlsx';
+        $data = $this->getMassiveExcelData($objPHPExcel);
+        $this->db->select("
+        cccp.supplier,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'supplier', cccp.supplier,
+                'items', (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'peso', p.peso,
+                            'estados', p.estados,
+                            'qty_box', p.qty_box,
+                            'products', p.products,
+                            'cbm_total', p.cbm_total,
+                            'estado_china', p.estado_china,
+                            'id_proveedor', p.id,
+                            'code_supplier', p.code_supplier,
+                            'qty_box_china', p.qty_box_china,
+                            'supplier_phone', p.supplier_phone,
+                            'cbm_total_china', p.cbm_total_china,
+                            'arrive_date_china', p.arrive_date_china,
+                            'estados_proveedor', p.estados_proveedor,
+                            'nombre_cliente', ccc.nombre,
+                            'tarifa', ccc.tarifa
+                        )
+                    )
+                    FROM " . $this->table_contenedor_cotizacion_proveedores . " AS p
+                    JOIN " . $this->table_contenedor_cotizacion . " AS ccc ON ccc.id = p.id_cotizacion
+                    WHERE p.supplier = cccp.supplier
+                    AND p.estados_proveedor = 'LOADED'
+                    AND p.id_cotizacion IN (
+                        SELECT id 
+                        FROM " . $this->table_contenedor_cotizacion . "
+                            WHERE id_contenedor = " . $this->db->escape($idContainer) . "
+                        )
+                    )
+                )
+            ) AS proveedores
+        ")
+            ->from($this->table_contenedor_cotizacion_proveedores . " AS cccp")
+            ->join($this->table_contenedor_cotizacion . " AS ccc", "cccp.id_cotizacion = ccc.id", "join")
+            ->where("ccc.id_contenedor", $idContainer)
+            ->group_by("cccp.supplier");
+        try {
+            $result = $this->db->get()->result();
+            foreach ($result as $supplier) {
+                $supplier->proveedores = json_decode($supplier->proveedores, true)[0]['items'];
+            }
+            foreach ($data as $cliente) {
+                $nombreCliente = $cliente['cliente']['nombre'];
+                $cliente['cliente']['proveedores'] = [];
+                foreach ($result as $proveedor) {
+                    foreach ($proveedor->proveedores as $item) {
+                        if (trim($item['nombre_cliente']) === trim($nombreCliente)) {
+                            foreach ($cliente['cliente']['productos'] as $producto) {
+                                if ($producto['nombre'] == $item['products']) {
+                                    $item['producto'] = $producto;
+                                    break;
+                                }
+                            }
+                            $cliente['cliente']['proveedores'][$proveedor->supplier][] = $item;
+                        }
+                    }
+                }
+                $dataToGenerate[] = $cliente;
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            return $e->getMessage();
+        }
+        foreach ($dataToGenerate as $key => $value) {
+            $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
+            $objPHPExcel = $this->getFinalCotizacionExcel($objPHPExcel, $value);
+            // return $objPHPExcel;
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $excelFileName = 'Cotizacion' . $value['cliente']['nombre'] . '.xlsx';
+            $excelFilePath = 'assets/downloads/' . $excelFileName;
+            $objWriter->save($excelFilePath);
+            $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
+            unlink($excelFilePath); // Remove the Excel file after adding it to the ZIP
+        }
+
+        // Save the ZIP file
+        $zipFileName = 'Boletas.zip';
+        $zipFilePath = 'assets/downloads/' . $zipFileName;
+        $this->zip->archive($zipFilePath);
+        ini_set('memory_limit', $originalMemoryLimit);
+        gc_collect_cycles();
+        return $zipFilePath;
+    }
+
+    public function getFinalCotizacionExcel($objPHPExcel, $data)
+    {
+        try {
+            //GOD IMPLEMENTATION
+          
+            /**Base Styles */
+            $grayColor = 'F8F9F9';
+            $blueColor = '1F618D';
+            $yellowColor = 'FFFF33';
+            $greenColor = "009999";
+            $whiteColor = "FFFFFF";
+            $borders = array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+            );
+            //REMOVE SHEET INDEX 1
+            $objPHPExcel->removeSheetByIndex(1);
+            /**Apply Tributes Calc Zones Rows Title */
+            $newSheet = $objPHPExcel->createSheet();
+            $newSheet->setTitle('2');
+            /**Base Styles */
+            $grayColor = 'F8F9F9';
+            $blueColor = '1F618D';
+            $yellowColor = 'FFFF33';
+            $greenColor = "009999";
+            $whiteColor = "FFFFFF";
+            $borders = array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+            );
+            /**Apply Tributes Calc Zones Rows Title */
+            $objPHPExcel->setActiveSheetIndex(1)->mergeCells('B1:Z1');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B1', 'Calculo de Tributos');
+            $style = $objPHPExcel->getActiveSheet()->getStyle('B1');
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($grayColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B1:Z1')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B4', 'N.Proveedor');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B5', 'N° Cajas');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B6', 'Peso(KG)');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B7', 'Medida');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B8', 'VOL. X PROVEEDOR');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B11', 'Nombres');
+            $objPHPExcel->getActiveSheet()->getStyle('B11')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B11')->getFill()->getStartColor()->setARGB($blueColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B11')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
+            $objPHPExcel->getActiveSheet()->getStyle('B11')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B12', 'Cantidad Cajones');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B13', 'Peso');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B14', "TOTAL CBM");
+
+            // $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B7', "Valor CBM");
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B15', 'Valor Unitario');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B16', 'Valoracion');
+            $objPHPExcel->getActiveSheet()->getStyle('B16')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B16')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B17', 'Cantidad');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B18', 'Valor FOB');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B19', 'Distribucion %');
+            // $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B20', 'Flete');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B21', 'Valor CFR');
+            $objPHPExcel->getActiveSheet()->getStyle('B18')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B18')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B22', 'Seguro');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B23', 'Valor CIF');
+            $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->setActiveSheetIndex(1)->mergeCells('B28:Z28');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B28', 'Tributos Aplicables');
+            $style = $objPHPExcel->getActiveSheet()->getStyle('B28');
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($grayColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B28:Z28')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B28')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            
+            $objPHPExcel->setActiveSheetIndex(1)->mergeCells('B42:Z42');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B42', 'COSTOS DESTINOS');
+            $style = $objPHPExcel->getActiveSheet()->getStyle('B42');
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($grayColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B42:Z42')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B42')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+            
+            $objPHPExcel->setActiveSheetIndex(1)->mergeCells('B48:Z48');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B48', 'COSTO TOTAL DE IMPORTACIÓN');
+            $style = $objPHPExcel->getActiveSheet()->getStyle('B48');
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($grayColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B48:Z48')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B48')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            
+            
+            
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B31', 'ANTIDUMPING');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B34', 'AD VALOREM');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B35', 'IGB 16%');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B36', 'IPM 2%');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B37', 'PERCEPCION');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B38', 'TOTAL');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B45', 'ITEM');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B50', 'ITEM');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B51', 'COSTO TOTAL');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B52', 'CANTIDAD');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B53', 'COSTO UNITARIO');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B54', 'COSTO SOLES');
+
+
+
+
+            $objPHPExcel->getActiveSheet()->getColumnDimension("B")->setAutoSize(true);
+
+            $InitialColumn = 'C';
+            $LastColumn = 'C';
+            $LastColumnTotal='C';
+            $totalRows = 0;
+            $cbmTotal = 0;
+            $pesoTotal = 0;
+            //first iterate for tributes zone, set values and apply styles to cells
+            $index=1;
+            $tarifa=0;
+            foreach ($data['cliente']['proveedores'] as $proveedor=>$items) {
+                //validate if $InitialColumn is more than Z then set A$
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '4', $proveedor);
+
+                foreach ($items as $item) {
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '10', $index);
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '11', $item["products"]);
+                    $tarifa=$item['tarifa'];
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '12', $item["qty_box"]);
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '13', $item["peso"]);
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '14', $item['producto']['cbm']);
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '15', $item['producto']['precio_unitario']);
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '17', $item['producto']['cantidad']);
+                    
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '18',"=".$LastColumn."15*".$LastColumn."17");
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '31', "=".$item['producto']['antidumping']."*".$LastColumn."17");
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '33', "=".$item['producto']['ad_valorem']);
+                    //set cell to percentage format
+                    $objPHPExcel->getActiveSheet()->getStyle($LastColumn . '33')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '34', "=".$item['producto']['ad_valorem']."*".$LastColumn."23");
+
+                    $objPHPExcel->getActiveSheet()->mergeCells($InitialColumn . '14:' . $LastColumn . '14');
+                    $objPHPExcel->getActiveSheet()->mergeCells($InitialColumn . '14:' . $LastColumn . '14');
+
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '5', "=SUM(" . $InitialColumn . "12:" . $LastColumn . "12)");
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '6', "=SUM(" . $InitialColumn . "13:" . $LastColumn . "13)");
+                    $LastColumn=$this->incrementColumn($LastColumn);
+                    $index++;
+
+                }
+                $LastColumnRow=$this->incrementColumn($LastColumn,-1);
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '5', "=SUM(C12:" . $LastColumnRow . "12)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '6', "=SUM(C13:" . $LastColumnRow . "13)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '12', "=SUM(C12:" . $LastColumnRow . "12)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '13', "=SUM(C13:" . $LastColumnRow . "13)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '14', "=SUM(C14:" . $LastColumnRow . "14)");
+
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '15', "=SUM(C15:" . $LastColumnRow . "15)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '17', "=SUM(C17:" . $LastColumnRow . "17)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '18', "=SUM(C18:" . $LastColumnRow . "18)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '20', "=" . $LastColumn . "14*0.6*" . $tarifa);
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '21', "=SUM(C21:" . $LastColumnRow . "21)");
+                //if k last column is more than 5000 set 100 else set 50
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '22', "=IF(" . $LastColumn . "21>5000,100,50)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '31', "=SUM(C31:" . $LastColumnRow . "31)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '34', "=SUM(C34:" . $LastColumnRow . "34)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '35', "=SUM(C35:" . $LastColumnRow . "35)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '36', "=SUM(C36:" . $LastColumnRow . "36)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '37', "=SUM(C36:" . $LastColumnRow . "37)");
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '38', "=SUM(C38:" . $LastColumnRow . "38)");
+
+                $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '45', "=" . $LastColumn . "14*0.4*" . $tarifa);
+
+                $InitialColumn = $LastColumn;
+                $LastColumnTotal = $LastColumn;
+                // $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '5', $producto["nombre"]);
+                // //APLY BACKGROUND COLOR BLUE AND LETTERS WHITE
+                // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->getStartColor()->setARGB($blueColor);
+                // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
+
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '6', 0);
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '7', 0);
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '8', $producto["precio_unitario"]);
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '9', $producto["valoracion"]);
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '10', $producto["cantidad"]);
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '11', "=" . $InitialColumn . "8*" . $InitialColumn . "10");
+                // $objPHPExcel->setActiveSheetIndex(1)->setCellValue($InitialColumn . '12', "=" . $InitialColumn . "10*" . $InitialColumn . "9");
+                // //set format currency with dollar symbol $InitialColumn.8,9,11,12
+                // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '8')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '9')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '12')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // //set auto size for columns
+
+                // $InitialColumn = $this->incrementColumn($InitialColumn);
+
+                $totalRows++;
+                // $cbmTotal += $producto['cbm'];
+                // $pesoTotal += $producto['peso'];
+            }
+            $InitialColumn = 'C';
+            $LastColumn = 'C';
+            //SET T 39 TC AND T 40 3.7 
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('T39', 'TC');
+            $objPHPExcel->setActiveSheetIndex(1)->setCellValue('T40', 3.7);  
+            foreach ($data['cliente']['proveedores'] as $proveedor=>$items) {
+                //validate if $InitialColumn is more than Z then set A$
+            
+                foreach ($items as $item) {
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '19','='.$LastColumn.'18/'.$LastColumnTotal.'18');
+                    //set format percentage to $LastColumn.19
+                    $objPHPExcel->getActiveSheet()->getStyle($LastColumn . '19')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '20','='.$LastColumnTotal.'20*'.$LastColumn.'19');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '21','='.$LastColumn.'18+'.$LastColumn.'20');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '22','='.$LastColumnTotal.'22*'.$LastColumn.'19');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '23','='.$LastColumn.'21+'.$LastColumn.'22');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '35','='.$LastColumn.'23*0.16');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '36','='.$LastColumn.'23*0.02');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '37','='.$LastColumn.'23*'.$item['producto']['percepcion']);
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '38','=SUM('.$LastColumn.'34:'.$LastColumn.'37)'); 
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '45','='.$LastColumnTotal.'45*'.$LastColumn.'19');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '50',$item["products"]);
+                    //B51 = VALOR CFR +ANTIDUMPING + TOTAL TRIBUTOS +COSTO DESTINO
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '51','='.$LastColumn.'21+'.$LastColumn.'31+'.$LastColumn.'38+'.$LastColumn.'45');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '52','='.$LastColumn.'17');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '53','='.$LastColumn.'51/'.$LastColumn.'52');
+                    $objPHPExcel->setActiveSheetIndex(1)->setCellValue($LastColumn . '54','='.$LastColumn.'53*T40');
+                    $LastColumn=$this->incrementColumn($LastColumn);
+
+                }
+            }
+           
+            //return $objPHPExcel;
+           
+            $ColumndIndex = PHPExcel_Cell::stringFromColumnIndex($index );
+
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue('J20', "=MAX('2'!C33:" . $ColumndIndex . "33)");
+
+            $columnaIndex = PHPExcel_Cell::stringFromColumnIndex($index + 1);
+            $objPHPExcel->setActiveSheetIndex(0);
+            $objPHPExcel->getActiveSheet()->setCellValue('K14', "='2'!" . $columnaIndex . "18");
+            $formula = "='2'!" . $columnaIndex . "20 + '2'!" . $columnaIndex . "22";
+            $objPHPExcel->getActiveSheet()->setCellValue('K15', $formula);
+            $objPHPExcel->getActiveSheet()->setCellValue('K20', "='2'!" . $columnaIndex . "34");
+            $objPHPExcel->getActiveSheet()->setCellValue('K21', "='2'!" . $columnaIndex . "35");
+            $objPHPExcel->getActiveSheet()->setCellValue('K22', "='2'!" . $columnaIndex . "36");
+            $objPHPExcel->getActiveSheet()->setCellValue('K25', "='2'!" . $columnaIndex . "37");
+            $objPHPExcel->getActiveSheet()->setCellValue('K30', "='2'!" . $columnaIndex . "18");
+            $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
+            $ImpuestosCellValue = round($objPHPExcel->getActiveSheet()->getCell('K38')->getCalculatedValue(), 2);
+            //            $expirationDate = date('d/m/Y', strtotime($expirationDate));
+
+            for ($row = 36; $row <= 39; $row++) {
+                for ($col = 1; $col <= 12; $col++) {
+                    $cell = PHPExcel_Cell::stringFromColumnIndex($col) . $row;
+                    $objPHPExcel->getActiveSheet()->setCellValue($cell, ''); // Establecer el valor de la celda como vacío
+                    $objPHPExcel->getActiveSheet()->getStyle($cell)->applyFromArray(array()); // Eliminar cualquier estilo aplicado a la celda
+
+                }
+            }
+
+            $lastRow = 0;
+            $InitialColumn = 'C';
+            //if count query is lower than 3 get sustract 3- count query and set the value to $substract and for each $substract remove border from row 36 to 39
+            if ($index < 3) {
+                $substract = 3 - $index;
+                for ($i = 0; $i < $substract; $i++) {
+                    $row = 36 + $i + $index;
+                    //set not borders from b$row to l$row
+                    $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray(array());
+                }
+                //remove borders from b36 to l39
+            }
+            return $objPHPExcel;
+            for ($i = 0; $i < $index; $i++) {
+            }
+            $cellToCheck = 'I22';
+            $rowToCheck = 23;
+            $sheet = $objPHPExcel->getActiveSheet();
+
+            // Obtener el valor de la celda
+
+            // Verificar si se cumple la condición
+            if ($antidumpingSum != 0) {
+                // Insertar una nueva fila en la posición 22
+                // $objPHPExcel->getActiveSheet()->getStyle('K23')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle('K22')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle('K24')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle('K25')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $sheet->insertNewRowBefore($rowToCheck, 1);
+
+                // Opcional: Puedes rellenar la nueva fila con datos si es necesario
+                $newRowIndex = $rowToCheck;
+                $sheet->setCellValue('B' . $newRowIndex, "ANTIDUMPING");
+                $sheet->setCellValue('K' . $newRowIndex, $antidumpingSum);
+                //set currency format with dollar symbol
+
+                //set b$NewRowIndex to l$NewRowIndex    background yellow
+                $style = $sheet->getStyle('B' . $newRowIndex . ':L' . $newRowIndex);
+                $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                $style->getFill()->getStartColor()->setARGB($yellowColor);
+                // Ajusta según tus necesidades
+                $objPHPExcel->getActiveSheet()->setCellValue('K24', "=SUM(K20:K23)");
+            } else {
+            }
+
+            //merge c8:c9
+            $objPHPExcel->getActiveSheet()->mergeCells('C8:C9');
+            //center vertically and horizontally
+            $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->setCellValue('C8', $data['cliente']['nombre']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C10', $data['cliente']['dni']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C11', $data['cliente']['telefono']);
+            $objPHPExcel->getActiveSheet()->setCellValue('J9', $pesoTotal >= 1000 ? $pesoTotal / 1000 . " Tn" : $pesoTotal . " Kg");
+            $objPHPExcel->getActiveSheet()->setCellValue('J11', $cbmTotal . " m3");
+            //   $objPHPExcel->getActiveSheet()->setCellValue('I10', "QTY PROVEEDORES");
+            $objPHPExcel->getActiveSheet()->setCellValue('I11', "CBM");
+
+            //set number format
+            $objPHPExcel->getActiveSheet()->getStyle('J9')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
+            //SET COLUMN I AUTO SIZE
+            $objPHPExcel->getActiveSheet()->getColumnDimension("I")->setAutoSize(true);
+
+            //   $objPHPExcel->getActiveSheet()->setCellValue('K10', $query[0]["count_proveedores"]);
+            $objPHPExcel->getActiveSheet()->setCellValue('J10', "");
+            //APPPLY NUMBER FORMAT TO K10
+            $objPHPExcel->getActiveSheet()->getStyle('K10')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
+            $objPHPExcel->getActiveSheet()->setCellValue('L10', "");
+
+            $objPHPExcel->getActiveSheet()->setCellValue('F11', $tipoCliente);
+            if ($productsCount < 3) {
+                //remove borders from b36 to l39
+                $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
+            }
+            $ClientName = $objPHPExcel->getActiveSheet()->getCell('C8')->getValue();
+            //ajustar texto in c column
+            $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setWrapText(true);
+            //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
+            $N20CellValue =
+                "Hola " . $ClientName . " 😁 un gusto saludarte!
+        A continuación te envío la cotización final de tu importación📋📦.
+        🙋‍♂️ PAGO PENDIENTE :
+        ☑️Costo CBM: $" . $CobroCellValue . "
+        ☑️Impuestos: $" . $ImpuestosCellValue . "
+        ☑️ Total: $" . ($ImpuestosCellValue + $CobroCellValue) . "
+        Pronto le aviso nuevos avances, que tengan buen día🚢
+        Último día de pago:" . $expirationDate;
+            $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
+            //select
+            //remove page 2
+            $objPHPExcel->removeSheetByIndex(1);
+            //set sheet 3 title to 2
+            $objPHPExcel->setActiveSheetIndex(1);
+            $objPHPExcel->getActiveSheet()->setTitle('2');
+
+            return $objPHPExcel;
+        } catch (Exception $e) {
+            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+            return $objPHPExcel;
+            throw $e;
+        }
+    }
+    private function getCellValue($worksheet, $columnRanges, $startRow, $endRow, $defaultValue = null)
+    {
+        foreach ($columnRanges as $mergedRange) {
+            preg_match('/^\w(\d+):\w(\d+)$/', $mergedRange, $matches);
+            $startRowMatch = $matches[1];
+            $endRowMatch = $matches[2];
+            if ($startRowMatch == $startRow && $endRowMatch == $endRow) {
+                $range = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRange);
+                $firstCell = $range[0];
+                $value = $worksheet->getCell($firstCell)->getValue();
+                return $value === null || $value === "-" ? $defaultValue : $value;
+            }
+        }
+        return $defaultValue;
+    }
+    public function getMassiveExcelData($objPHPExcel)
+    {
+        $this->load->library('PHPExcel');
+
+        // Crear un nuevo objeto PHPExcel
+        $excel = $objPHPExcel;
+        $worksheet = $excel->getActiveSheet();
+
+        // Obtener los rangos de celdas combinadas
+        $mergedCells = $worksheet->getMergeCells();
+
+        // Columnas que están combinadas
+        $mergedColumns = ['A', 'B', 'C', 'D', 'T', 'U'];
+
+        $columnData = [];
+
+        // Procesar columnas combinadas
+        foreach ($mergedColumns as $col) {
+            $columnData[$col] = array_filter($mergedCells, function ($range) use ($col) {
+                return preg_match("/^{$col}\d+:{$col}\d+$/", $range);
+            });
+
+            usort($columnData[$col], function ($a, $b) use ($col) {
+                preg_match("/^{$col}(\d+):{$col}\d+$/", $a, $matchesA);
+                preg_match("/^{$col}(\d+):{$col}\d+$/", $b, $matchesB);
+                return $matchesA[1] - $matchesB[1];
+            });
+        }
+
+        $clients = [];
+
+        foreach ($columnData['A'] as $key => $mergedRangeA) {
+            $rangeA = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeA);
+            $firstCellA = $rangeA[0];
+            $valueA = trim($worksheet->getCell($firstCellA)->getValue());
+
+            if (empty($valueA)) {
+                continue;
+            }
+
+            // Obtener los límites del rango de la columna A
+            preg_match('/^A(\d+):A(\d+)$/', $mergedRangeA, $matchesA);
+            $startRowA = (int) $matchesA[1];
+            $endRowA = (int) $matchesA[2];
+
+            // Obtener valores de B, C, D (celdas combinadas)
+            $tipo = $dni = $telefono = '';
+            foreach ($columnData['B'] as $mergedRangeB) {
+                preg_match('/^B(\d+):B(\d+)$/', $mergedRangeB, $matchesB);
+                if ($matchesB[1] == $startRowA && $matchesB[2] == $endRowA) {
+                    $tipo = trim($worksheet->getCell("B{$matchesB[1]}")->getValue());
+                    break;
+                }
+            }
+
+            foreach ($columnData['C'] as $mergedRangeC) {
+                preg_match('/^C(\d+):C(\d+)$/', $mergedRangeC, $matchesC);
+                if ($matchesC[1] == $startRowA && $matchesC[2] == $endRowA) {
+                    $dni = trim($worksheet->getCell("C{$matchesC[1]}")->getValue());
+                    break;
+                }
+            }
+
+            foreach ($columnData['D'] as $mergedRangeD) {
+                preg_match('/^D(\d+):D(\d+)$/', $mergedRangeD, $matchesD);
+                if ($matchesD[1] == $startRowA && $matchesD[2] == $endRowA) {
+                    $telefono = trim($worksheet->getCell("D{$matchesD[1]}")->getValue());
+                    break;
+                }
+            }
+
+            // Crear el cliente
+            $client = [
+                'nombre' => $valueA,
+                'tipo' => $tipo,
+                'dni' => $dni,
+                'telefono' => $telefono,
+                'productos' => [],
+            ];
+
+            // Procesar productos (filas dentro del rango del cliente)
+            for ($row = $startRowA; $row <= $endRowA; $row++) {
+                $producto = trim($worksheet->getCell("F{$row}")->getValue());
+
+                if (empty($producto)) {
+                    continue;
+                }
+
+                // Obtener peso y cbm (manejar celdas combinadas)
+                $peso = $worksheet->getCell("T{$row}")->getValue();
+                $cbm = $worksheet->getCell("U{$row}")->getValue();
+
+                // Si están vacíos, buscar en los rangos combinados
+                foreach ($columnData['T'] as $mergedRangeT) {
+                    preg_match('/^T(\d+):T(\d+)$/', $mergedRangeT, $matchesT);
+                    if ($row >= $matchesT[1] && $row <= $matchesT[2]) {
+                        $peso = trim($worksheet->getCell("T{$matchesT[1]}")->getValue());
+                        break;
+                    }
+                }
+
+                foreach ($columnData['U'] as $mergedRangeU) {
+                    preg_match('/^U(\d+):U(\d+)$/', $mergedRangeU, $matchesU);
+                    if ($row >= $matchesU[1] && $row <= $matchesU[2]) {
+                        $cbm = trim($worksheet->getCell("U{$matchesU[1]}")->getValue());
+                        break;
+                    }
+                }
+
+                $productoData = [
+                    'nombre' => $producto,
+                    'cantidad' => trim($worksheet->getCell("N{$row}")->getValue()),
+                    'precio_unitario' => trim($worksheet->getCell("O{$row}")->getValue()),
+                    'antidumping' => trim($worksheet->getCell("P{$row}")->getValue()) ?: 0,
+                    'valoracion' => trim($worksheet->getCell("Q{$row}")->getValue()) ?: 0,
+                    'ad_valorem' => trim($worksheet->getCell("R{$row}")->getValue()) ?: 0,
+                    'percepcion' => trim($worksheet->getCell("S{$row}")->getValue()) ?: 0.035,
+                    'peso' => $peso ?: 0,
+                    'cbm' => $cbm ?: '',
+                ];
+
+                // Validar solo campos esenciales
+                if (!empty($productoData['cantidad']) && !empty($productoData['precio_unitario'])) {
+                    array_push($client['productos'], $productoData);
+                }
+            }
+
+            $clients[] = ['cliente' => $client];
+        }
+        return $clients;
+    }
 }

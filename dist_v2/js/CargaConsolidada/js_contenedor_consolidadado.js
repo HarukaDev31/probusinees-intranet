@@ -84,6 +84,8 @@ var dropZone ;
 var fileInput ; 
 var fileList ;
 var cotizacionAlmacenContainer = null;
+var cotizacionFinalContainer = null;
+var tableCotizacionFinal = null;
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
@@ -1757,8 +1759,8 @@ const openStepFunction = async (step, id) => {
         }
     } else if (stepIndex == 3) {
         viewDocumentacion();
-
-
+    } else if (stepIndex==4){
+        viewCotizacionFinal();
     }
     $(".btn-back-cotizacion").off("click");
     $(".btn-back-cotizacion").on("click", function () {
@@ -1772,6 +1774,99 @@ const openStepFunction = async (step, id) => {
     });
 
     spinner.hide();
+}
+async function viewCotizacionFinal(){
+    cotizacionFinalContainer.show();
+    spinner.show();
+    url=base_url+"CargaConsolidada/ContenedorConsolidado/step";
+    if($.fn.DataTable.isDataTable("#table-cotizacion-final")){
+        tableCotizacionFinal.ajax.reload();
+    }else{
+        tableCotizacionFinal=$('#table-cotizacion-final').DataTable({
+            dom:
+            "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [
+                {
+                    extend: "excel",
+                    text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                    titleAttr: "Excel",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+                {
+                    extend: "pdf",
+                    text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+                    titleAttr: "PDF",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+                {
+                    extend: "colvis",
+                    text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                    titleAttr: "Columnas",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                    sFirst: "<<",
+                    sLast: ">>",
+                    sPrevious: "<",
+                    sNext: ">",
+                },
+            },
+            columnDefs: [
+                {
+                    targets: "no-hidden",
+                    visible: false,
+                },
+                {
+                    className: "text-center",
+                    targets: "no-sort",
+                    orderable: false,
+                },
+                {
+                    targets: "",
+                    orderable: false,
+                }
+            ],
+            ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                    data.stepIndex = stepIndex;
+                    data.idContenedor = idContenedor;
+                }
+            },
+            initComplete: function (settings, json) {
+                spinner.hide();
+            },
+        });
+    }
 }
 async function  deleteDocumentacionFolder(id) {
     Swal.fire({
@@ -2480,9 +2575,13 @@ $(document).ready(async function () {
     cotizacionInspectionContainer.hide();
     cotizacionAlmacenContainer=$("#cotizacion-almacen");
     cotizacionAlmacenContainer.hide();
-     dropZone = $('#drop-zone');
-         fileInput = $('#file-input');
-         fileList = $('#file-list');
+    dropZone = $('#drop-zone');
+    fileInput = $('#file-input');
+    fileList = $('#file-list');
+    cotizacionFinalContainer=$("#cotizacion-final-container");
+    cotizacionFinalContainer.hide();
+    tableCotizacionFinal=$("#table-cotizacion-final");
+    tableCotizacionFinal.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
  
     table_Entidad = $("#table-contenedor").DataTable({
@@ -2777,6 +2876,7 @@ $(document).ready(async function () {
         });
     }
     await fillSelects();
+    /**Start of Listeners */
     btnCrear = $("#btn-crear");
     btnCrear.on("click", async function () {
         $("#modal-crear").modal("show");
@@ -3241,7 +3341,128 @@ $(document).ready(async function () {
             console.log("click");
             tableClientesGeneral.ajax.reload();
         });
+        $("#uploadGeneral").click(() => {
+            url=base_url + "CargaConsolidada/ContenedorConsolidado/uploadGeneral";
+            const formData = new FormData();
+            formData.append("idContenedor", idContenedor);
+            //swall input file
+            Swal.fire({
+                title: 'Subir Factura General',
+                input: 'file',
+                inputAttributes: {
+                    accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Subir',
+                showLoaderOnConfirm: true,
+                preConfirm: async (file) => {
+                    formData.append("file", file);
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            body: formData,
+                        });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return await response.json();
+                    } catch (error) {
+                        Swal.showValidationMessage(
+                            `Request failed: ${error}`
+                        );
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (result.value.status == "success") {
+                        Swal.fire("Correcto", result.value.message, "success");
+                        tableClientesGeneral.ajax.reload();
+                    } else {
+                        Swal.fire("Error", result.value.message, "error");
+                    }
+                }
+            })
+
+        });
+        $("#downloadTemplate").click(function (e) {
+            e.preventDefault();
+            //ajax request to download template blob excel
+            url=base_url + "CargaConsolidada/ContenedorConsolidado/downloadPlantillaGeneral/"+idContenedor;
+            $.ajax({
+                url: url,
+                type: "GET",
+                //data return multipart/form-data
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (response) {
+                    const url = window.URL.createObjectURL(new Blob([response]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', 'PLANTILLA GENERAL.xlsx');
+                    document.body.appendChild(link);
+                    link.click();
+                },
+            });
+        });
+        $("#uploadFinal").click(() => {
+
+            url=base_url + "CargaConsolidada/ContenedorConsolidado/generateMassiveExcelPayrolls";
+            const formData = new FormData();
+            formData.append("idContenedor", idContenedor);
+            //swall input file
+            Swal.fire({
+                title: 'Subir Factura Final',
+                input: 'file',
+                inputAttributes: {
+                    accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Subir',
+                showLoaderOnConfirm: true,
+                preConfirm: async (file) => {
+                    formData.append("file", file);
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            body: formData, // Asegúrate de que formData contiene los datos correctos
+                        });
+                
+                      
+                        const blob = await response.blob();
+                        const blobUrl = window.URL.createObjectURL(blob);
+                
+                        // Crear un enlace <a> invisible y simular un clic para descargar
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = 'Cotizaciones Finales.zip'; // Nombre del archivo
+                        document.body.appendChild(a);
+                        a.click();
+                
+                        // Limpiar recursos
+                        window.URL.revokeObjectURL(blobUrl);
+                        document.body.removeChild(a);
+                    } catch (error) {
+                        console.error('Error al descargar el archivo:', error);
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                  
+                        Swal.fire("Correcto", result.value.message, "success");
+                        tableCotizacionFinal.ajax.reload();
+                    } 
+                    
+                
+            })
+        })
+        /*End of Listeners */
     });
+    /**Sockets Config */
     window.addEventListener('load', () => {
         socket.onmessage = function (event) {
             console.log(event);

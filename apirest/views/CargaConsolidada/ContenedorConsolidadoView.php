@@ -557,6 +557,54 @@
       </div>
      
     </section>
+    <section class="content card" id="cotizacion-final-container">
+    <div class="min-h-screen bg-gray-50 p-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">CONSOLIDADO #1: COTIZACIÓN FINAL</h1>
+    
+    <div class="flex gap-4 mb-8">
+      
+      <button
+        id="uploadGeneral"
+        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+      >
+      <div class="fa fa-upload"></div>
+        Subir Factura
+      </button>
+      <button
+        id="downloadTemplate"
+        class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors flex items-center gap-2"
+      >
+      <div class="fa fa-download"></div>
+        Plantilla General
+      </button>
+      <button
+        id="uploadFinal"
+        class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"
+      >
+        <div class="fa fa-upload"></div>
+        Plantilla Final
+      </button>
+    </div>
+    <div class="table-responsive" class="table table-bordered table-hover table-striped">
+        <table id="table-cotizacion-final" class="table table-bordered table-hover table-striped">
+          <thead class="thead-light">
+            <tr>
+              <th>N°</th>
+              <th>Nombre</th>
+              <th>DNI/RUC</th>
+              <th>Correo</th>
+              <th>Whatsapp</th>
+              <th>T. Cliente</th>
+              <th>Volumen F</th>
+              <th>Monto F</th>
+              <th>Tarifa F</th>
+              <th>Estados</th>
+              <th>C Final</th>
+            </tr>
+          </thead>
+        </table>
+      </div>      
+    </section>
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
       <div class="modal-dialog">
           <div class="modal-content">
