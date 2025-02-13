@@ -1060,7 +1060,7 @@ class ContenedorConsolidado extends CI_Controller
 		$this->load->library('PHPExcel');
 		$objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
 		$zipFilePath = $this->ContenedorConsolidadoModel->generateMassiveExcelPayrolls($objPHPExcel, $idContenedor);
-
+		
 		if (file_exists($zipFilePath)) {
 			header('Content-Type: application/zip');
 			header('Content-Disposition: attachment; filename="' . basename($zipFilePath) . '"');
