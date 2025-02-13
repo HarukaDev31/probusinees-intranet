@@ -2807,78 +2807,26 @@ class ContenedorConsolidadoModel extends CI_Model
         // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
-        $this->db->select("
-        cccp.supplier,
-        JSON_ARRAYAGG(
-            JSON_OBJECT(
-                'supplier', cccp.supplier,
-                'items', (
-                    SELECT JSON_ARRAYAGG(
-                        JSON_OBJECT(
-                            'peso', p.peso,
-                            'estados', p.estados,
-                            'qty_box', p.qty_box,
-                            'products', p.products,
-                            'cbm_total', p.cbm_total,
-                            'estado_china', p.estado_china,
-                            'id_proveedor', p.id,
-                            'code_supplier', p.code_supplier,
-                            'qty_box_china', p.qty_box_china,
-                            'supplier_phone', p.supplier_phone,
-                            'cbm_total_china', p.cbm_total_china,
-                            'arrive_date_china', p.arrive_date_china,
-                            'estados_proveedor', p.estados_proveedor,
-                            'nombre_cliente', ccc.nombre,
-                            'tarifa', ccc.tarifa,
-                            'dni', ccc.documento,
-                            'correo', ccc.correo,
-                            'tipo_cliente',cctc.name,
-                            'telefono', ccc.telefono,
-                            'id_tipo_cliente', ccc.id_tipo_cliente,
-                            'id_contenedor', ccc.id_contenedor
-                        )
-                    )
-                    FROM " . $this->table_contenedor_cotizacion_proveedores . " AS p
-                    JOIN " . $this->table_contenedor_cotizacion . " AS ccc ON ccc.id = p.id_cotizacion
-                    JOIN " . $this->table_contenedor_tipo_cliente . " AS cctc ON cctc.id = ccc.id_tipo_cliente
-                    WHERE p.supplier = cccp.supplier
-                    AND p.estados_proveedor = 'LOADED'
-                    AND p.id_cotizacion IN (
-                        SELECT id 
-                        FROM " . $this->table_contenedor_cotizacion . "
-                            WHERE id_contenedor = " . $this->db->escape($idContainer) . "
-                        )
-                    )
-                )
-            ) AS proveedores
-        ")
-            ->from($this->table_contenedor_cotizacion_proveedores . " AS cccp")
-            ->join($this->table_contenedor_cotizacion . " AS ccc", "cccp.id_cotizacion = ccc.id", "join")
-            ->where("ccc.id_contenedor", $idContainer)
-            ->group_by("cccp.supplier");
+        //get tarifa for each  cotizacion from table cotizaciones where id_contenedor = $idContainer
+
+        $result = $this->db->select('id,tarifa,nombre,correo')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id_contenedor', $idContainer);
+        
         try {
             $result = $this->db->get()->result();
-            foreach ($result as $supplier) {
-                $supplier->proveedores = json_decode($supplier->proveedores, true)[0]['items'];
-            }
-            foreach ($data as $cliente) {
+            foreach ($data as &$cliente) {
                 $nombreCliente = $cliente['cliente']['nombre'];
-                $cliente['cliente']['proveedores'] = [];
-                foreach ($result as $proveedor) {
-                    foreach ($proveedor->proveedores as $item) {
-                        if (trim($item['nombre_cliente']) === trim($nombreCliente)) {
-                            foreach ($cliente['cliente']['productos'] as $producto) {
-                                if ($producto['nombre'] == $item['products']) {
-                                    $item['producto'] = $producto;
-                                    break;
-                                }
-                            }
-                            $cliente['cliente']['proveedores'][$proveedor->supplier][] = $item;
-                        }
+
+                foreach ($result as $item) {
+         
+                    if (trim($item->nombre) === trim($nombreCliente)) {
+                        $cliente['cliente']['tarifa'] = $item->tarifa;
+                        $cliente['cliente']['correo'] = $item->correo;
                     }
                 }
-                $dataToGenerate[] = $cliente;
             }
+            unset($cliente);
         } catch (Exception $e) {
             echo $e->getMessage();
 
@@ -2888,10 +2836,10 @@ class ContenedorConsolidadoModel extends CI_Model
             // delete from cotizacion_final where id_contenedor=IdContainer
             $this->db->where('id_contenedor', $idContainer);
             $this->db->delete($this->table_contenedor_cotizacion_final);
-            foreach ($dataToGenerate as $key => $value) {
+            foreach ($data as $key => $value) {
                 $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 
-                $result = $this->getFinalCotizacionExcel($objPHPExcel, $value);
+                $result = $this->getFinalCotizacionExcelv2($objPHPExcel, $value,$idContainer);
                 $excelFileName = $result['excel_file_name'];
                 $excelFilePath = $result['excel_file_path'];
                 $fileUrl = base_url($excelFilePath); // Asumiendo que usas CodeIgniter
@@ -2920,7 +2868,633 @@ class ContenedorConsolidadoModel extends CI_Model
             return $e->getMessage();
         }
     }
+    public function getFinalCotizacionExcelv2($objPHPExcel, $data,$idContenedor)
+    {
+        try {
+            //GOD IMPLEMENTATION
+            $newSheet = $objPHPExcel->createSheet();
+            $newSheet->setTitle('3');
+            /**Base Styles */
+            $grayColor = 'F8F9F9';
+            $blueColor = '1F618D';
+            $yellowColor = 'FFFF33';
+            $greenColor = "009999";
+            $whiteColor = "FFFFFF";
+            $borders = array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+            );
+            /**Apply Tributes Calc Zones Rows Title */
+            $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B3:G3');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B3', 'Calculo de Tributos');
+            $style = $objPHPExcel->getActiveSheet()->getStyle('B3');
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($grayColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B3:G3')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B5', 'Nombres');
+            $objPHPExcel->getActiveSheet()->getStyle('B5')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B5')->getFill()->getStartColor()->setARGB($blueColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B5')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
+            $objPHPExcel->getActiveSheet()->getStyle('B5')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B6', 'Peso');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B7', "Valor CBM");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B8', 'Valor Unitario');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B9', 'Valoracion');
+            $objPHPExcel->getActiveSheet()->getStyle('B9')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B9')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B10', 'Cantidad');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B11', 'Valor FOB');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B12', 'Valor FOB Valoracion');
+            $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B12')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B13', 'Distribucion %');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B14', 'Flete');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B15', 'Valor CFR');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B16', 'CFR Valorizado');
+            $objPHPExcel->getActiveSheet()->getStyle('B16')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B16')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B17', 'Seguro');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B18', 'Valor CIF');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B19', 'CIF Valorizado');
+            $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle('B19')->getFill()->getStartColor()->setARGB($yellowColor);
+            $objPHPExcel->getActiveSheet()->getColumnDimension("B")->setAutoSize(true);
+            $InitialColumn = 'C';
 
+            $totalRows = 0;
+            $cbmTotal = 0;
+            $pesoTotal = 0;
+            $tarifa=$data['cliente']['tarifa'];
+            //first iterate for tributes zone, set values and apply styles to cells
+            foreach ($data['cliente']['productos'] as $producto) {
+                //validate if $InitialColumn is more than Z then set A$
+
+                $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '5', $producto["nombre"]);
+                //APLY BACKGROUND COLOR BLUE AND LETTERS WHITE
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->getStartColor()->setARGB($blueColor);
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
+
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', 0);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', 0);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '8', $producto["precio_unitario"]);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '9', $producto["valoracion"]);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '10', $producto["cantidad"]);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '11', "=" . $InitialColumn . "8*" . $InitialColumn . "10");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '12', "=" . $InitialColumn . "10*" . $InitialColumn . "9");
+                //set format currency with dollar symbol $InitialColumn.8,9,11,12
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '8')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '9')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '12')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                //set auto size for columns
+
+                $InitialColumn = $this->incrementColumn($InitialColumn);
+
+                $totalRows++;
+                $cbmTotal += $producto['cbm'];
+                $pesoTotal += $producto['peso'];
+            }
+
+            $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
+            $tipoCliente = trim($data['cliente']["tipo"]);
+            $tipoClienteCell=$this->incrementColumn($InitialColumn,3) . '6';
+            $tipoClienteCellValue=$this->incrementColumn($InitialColumn,3) . '7';
+
+            $tarifaCell=$this->incrementColumn($InitialColumn,4) . '6';
+            $tarifaCellValue=$this->incrementColumn($InitialColumn,4) . '7';
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($tipoClienteCell, "Tipo Cliente");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($tarifaCell, "Tarifa");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($tipoClienteCellValue, $tipoCliente);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($tarifaCellValue, $tarifa);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCell)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCell)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCell)->getAlignment()->setWrapText(true);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCell)->getAlignment()->setShrinkToFit(true);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCell)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCell)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCell)->getAlignment()->setWrapText(true);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCell)->getAlignment()->setShrinkToFit(true);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCellValue)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCellValue)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCellValue)->getAlignment()->setShrinkToFit(true);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCellValue)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCellValue)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCellValue)->getAlignment()->setShrinkToFit(true);
+            //apply borders to cells
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCell)->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCell)->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle($tipoClienteCellValue)->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle($tarifaCellValue)->applyFromArray($borders);
+            
+
+            //create remaining zones and apply styles
+            $InitialColumnLetter = $this->incrementColumn($InitialColumn, -1);
+            $LastColumnLetter = $InitialColumn;
+            $objPHPExcel->getActiveSheet()->getStyle('B5:' . $InitialColumn . '19')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B28:' . $InitialColumn . '32')->applyFromArray($borders);
+
+            $objPHPExcel->getActiveSheet()->getStyle('B40:' . $InitialColumn . '40')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B43:' . $InitialColumn . '47')->applyFromArray($borders);
+
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFill()->getStartColor()->setARGB($blueColor);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '5', "Total");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '5')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
+
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '6', $pesoTotal > 1000 ? round($pesoTotal / 1000, 2) : $pesoTotal);
+            if ($pesoTotal > 1000) {
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" tn"');
+            } else {
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getNumberFormat()->setFormatCode('0.00" Kg"');
+            }
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+            // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $cbmTotal);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '7')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '10', "=SUM(C10:" . $InitialColumnLetter . "10)");
+
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '11', "=SUM(C11:" . $InitialColumnLetter . "11)");
+            $VFOBCell = $InitialColumn . '11';
+            $CBMTotal = $InitialColumn . "7";
+            $FleteCell= $InitialColumn . '14';
+            $CobroCell= $InitialColumn . '40';
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
+                $InitialColumn . '14',
+                "=IF($CBMTotal<1, ROUNDUP($tarifaCellValue*0.6, 0), ROUNDUP($tarifaCellValue*0.6*$CBMTotal, 0))"
+            );            // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', "=IF($CBMTotal<1,ROUNDUP($tarifaCellValue*0.4),ROUNDUP($tarifaCellValue*0.4*$CBMTotal))");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
+                $InitialColumn . '40',
+                "=IF($CBMTotal<1, ROUNDUP($tarifaCellValue*0.4, 0), ROUNDUP($tarifaCellValue*0.4*$CBMTotal, 0))"
+            );
+            $antidumpingSum = 0;
+            $InitialColumn = 'C';   
+            //second iteration  for each product and set values and apply styles
+            foreach ($data['cliente']['productos'] as $producto) {
+                //$INITIALCOLUMN13 =ROUND($VFOBCell/$InitialColumn.'11') TO PERCENTAGE;
+
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '13', "=" . $InitialColumn . '11/' . $VFOBCell);
+                $distroCell = $InitialColumn . '13';
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '25', $tarifaValue);
+
+
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '13')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                //$initialcolumn14=round($FleteCell*$InitialColumn.'13',2)
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '14', "=ROUNDUP(" . $FleteCell . '*' . $InitialColumn . '13,2)');
+                //$objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '14', '0');
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '14')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                //$initialcolumn15=roundup( $initialcolumn11+$initialcolumn14,2)
+
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '15', "=ROUNDUP(" . $InitialColumn . '11+' . $InitialColumn . '14,2)');
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '15')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $cfrCell = $InitialColumn . '15';
+                //$initialcolumn15=roundup( $initialcolumn12+$initialcolumn14,2)
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '16', "=ROUNDUP(" . $InitialColumn . '12+' . $InitialColumn . '14,2)');
+                $cfrvCell = $InitialColumn . '16';
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '16')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $seguroCell = $InitialColumn . '17';
+                //set currency format with dollar symbol
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '17')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                //IF COBROCELL IS GREATER THAN 5000 SET THE VALUE TO $initialcolumn17  TO roundup100/ distroCell ELSE SET roundup50/distroCell
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,ROUND(100*" . $distroCell . ",2),ROUND(50*" . $distroCell . ",2))");
+                //initial18 is roundup($cfrCell+$seguroCell,2)
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', "=ROUNDUP(" . $cfrCell . '+' . $seguroCell . ",2)");
+                //initial19 is roundup($cfrvCell+$seguroCell,2)
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '19', "=ROUNDUP(" . $cfrvCell . '+' . $seguroCell . ",2)");
+
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '18')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '19')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', $producto["antidumping"]=="-" ? 0 : $producto["antidumping"]);
+                $antidumpingSum += $producto["antidumping"];
+                //set currency format with $ symbol
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '26')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $producto["ad_valorem"]);
+                //set porcentage format
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '27')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                //set text color red
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '27')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+                $AdValoremCell = $InitialColumn . '28';
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
+                    $InitialColumn . '28',
+                    "=MAX(" . $InitialColumn . "19," . $InitialColumn . "18)*" . $InitialColumn . "27"
+                );
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '28')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "$" . $row["igv_value"]);
+                //set initialcolumn29 = $row["igv"]*initialcolumn19
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "=" . (16 / 100) . "*(" . "MAX(" . $InitialColumn . "19," . $InitialColumn . "18)+" . $AdValoremCell . ")");
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '29')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "$" . $row["ipm_value"]);
+                //set initialcolumn30 = $row["ipm"]*initialcolumn19
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "=" . (2 / 100) . "*(" . "MAX(" . $InitialColumn . "19," . $InitialColumn . "18)+" . $AdValoremCell . ")");
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '30')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "$" . $row["percepcion_value"]);
+                //set initialcolumn31 = $row["percepcion"]*initialcolumn19
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
+                    $InitialColumn . '31',
+                    "=" . ($producto['percepcion']) . "*(MAX(" . $InitialColumn . '18,' . $InitialColumn . '19) +' . $InitialColumn . '28+' . $InitialColumn . '29+' . $InitialColumn . '30)'
+                );
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '31')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+
+                $sum = "=SUM(" . $InitialColumn . "28:" . $InitialColumn . "31)";
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', $sum);
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '32')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', "=" . $distroCell . "*" . $CobroCell);
+                //Set currency format with dollar symbol
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '40')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '43', $producto["nombre"]);
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '44', "$" . $producto["Total_Cantidad"]);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '45', $producto["cantidad"]);
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '46', "$" . round($producto["Total_Cantidad"] / $producto["Cantidad"], 2));
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '47', 'S/.' . round(($producto["Total_Cantidad"] / $producto["Cantidad"]) * 3.7, 2));
+                // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '43', $producto["Nombre_Comercial"]);
+                //initial column 44=sum(initialcolumn16+initialcolumn40+initialcolumn32)
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
+                    $InitialColumn . '44',
+                    "=SUM(" . $InitialColumn . "15," . $InitialColumn . "40," . $InitialColumn . "32,(" . $InitialColumn . "26*" . $InitialColumn . "10))"
+                );
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '44')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '45', $producto["cantidad"]);
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '46', "=ROUND(SUM(" . $InitialColumn . "44/" . $InitialColumn . "45),2)");
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '46')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                //initial column 47=S/.initialcolumn46*3.7
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '47', "=ROUND(" . $InitialColumn . "46*3.7,2)");
+                $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '47')->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+                $InitialColumn++;
+            }
+
+            // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', "=" . $CobroCell);
+            //$objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', "0");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '11')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '12', "=SUM(C12:" . $InitialColumnLetter . "12)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '12')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '12')->getFont()->setBold(true);
+            // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '14', "=SUM(C14:" . $InitialColumnLetter . "14)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '14')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '14')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '15', "=SUM(C15:" . $InitialColumnLetter . "15)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '15')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '15')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '16', "=SUM(C16:" . $InitialColumnLetter . "16)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '16')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '16')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=SUM(C17:" . $InitialColumnLetter . "17)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '17')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '17')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', "=SUM(C18:" . $InitialColumnLetter . "18)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '18')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '18')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '19', "=SUM(C19:" . $InitialColumnLetter . "19)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '19')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '19')->getFont()->setBold(true);
+
+            $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B23:E23');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B23', 'Tributos Aplicables');
+            $style = $objPHPExcel->getActiveSheet()->getStyle('B23');
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($grayColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B23:E23')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B23')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B26', 'ANTIDUMPING');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B28', 'AD VALOREM');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B29', 'IGV');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B30', 'IPM');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B31', 'PERCEPCION');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B32', 'TOTAL');
+            //waos
+            $objPHPExcel->getActiveSheet()->getStyle('B26:' . $InitialColumn . '26')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('C27:' . $InitialColumn . '27')->applyFromArray($borders);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', "=SUM(C26:" . $InitialColumnLetter . "26)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '26')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            // Verificar si el valor es numérico
+
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', "=SUM(C27:" . $InitialColumnLetter . "27)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '27')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '28', "=SUM(C28:" . $InitialColumnLetter . "28)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '28')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '29', "=SUM(C29:" . $InitialColumnLetter . "29)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '29')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '30', "=SUM(C30:" . $InitialColumnLetter . "30)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '30')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '31', "=SUM(C31:" . $InitialColumnLetter . "31)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '31')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '32', "=SUM($InitialColumn" . "28:" . $InitialColumn . "31)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '32')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            //Costos Destinos
+            $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B37:E37');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B37', 'Costos Destinos');
+            $style = $objPHPExcel->getActiveSheet()->getStyle('B37');
+            $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB($grayColor);
+            $objPHPExcel->getActiveSheet()->getStyle('B37:E37')->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B37')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B40', 'ITEM');
+            // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', "=SUM(C40:" . $InitialColumnLetter . "40)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '40')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->setActiveSheetIndex(2)->mergeCells('B41:E41');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B43', 'ITEM');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B44', 'COSTO TOTAL');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B45', 'CANTIDAD');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B46', 'COSTO UNITARIO');
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue('B47', 'COSTO SOLES');
+
+            //a
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '44', "=SUM(C44" . ":" . $InitialColumnLetter . "44)");
+            $productsCount = count($data['cliente']['productos']);
+            $ColumndIndex = PHPExcel_Cell::stringFromColumnIndex($productsCount + 1);
+
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue('J20', "=MAX('3'!C27:" . $ColumndIndex . "27)");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '43', "Total");
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '44', "=SUM(C44:" . $InitialColumnLetter . "44)");
+            $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '44')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+
+            $columnaIndex = PHPExcel_Cell::stringFromColumnIndex($productsCount + 2);
+
+            $objPHPExcel->setActiveSheetIndex(0);
+            $objPHPExcel->getActiveSheet()->setCellValue('K14', "='3'!" . $columnaIndex . "11");
+
+            // Construir la fórmula para sumar los valores de las celdas en las columnas 14 y 17
+            $formula = "='3'!" . $columnaIndex . "14 + '3'!" . $columnaIndex . "17";
+
+            // Establecer la fórmula en la celda K14
+            $objPHPExcel->getActiveSheet()->setCellValue('K15', $formula);
+            //k20 =columnaIndex 28
+            $objPHPExcel->getActiveSheet()->setCellValue('K20', "='3'!" . $columnaIndex . "28");
+            //k21 =columnaIndex 29
+            $objPHPExcel->getActiveSheet()->setCellValue('K21', "='3'!" . $columnaIndex . "29");
+            //k22 =columnaIndex 30
+            $objPHPExcel->getActiveSheet()->setCellValue('K22', "='3'!" . $columnaIndex . "30");
+            //k25 =columnaIndex 31
+            $objPHPExcel->getActiveSheet()->setCellValue('K25', "='3'!" . $columnaIndex . "31");
+
+            //k30 =$query[0]["Flete"]/$query[0]["Distribucion"]
+            $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $CBMTotal . "*J11");
+            //$objPHPExcel->getActiveSheet()->setCellValue('K30', "0");
+            //get $CobroCell value of formula
+            $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
+            $ImpuestosCellValue = round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
+            //convert $expirationDate dd//mm/yyyy to day de mes de año
+            // $expirationDate = date('d/m/Y', strtotime($expirationDate));
+
+            for ($row = 36; $row <= 39; $row++) {
+                for ($col = 1; $col <= 12; $col++) {
+                    $cell = PHPExcel_Cell::stringFromColumnIndex($col) . $row;
+                    $objPHPExcel->getActiveSheet()->setCellValue($cell, ''); // Establecer el valor de la celda como vacío
+                    $objPHPExcel->getActiveSheet()->getStyle($cell)->applyFromArray(array()); // Eliminar cualquier estilo aplicado a la celda
+
+                }
+            }
+            // //set column j y k autosize
+            // $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
+            // $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+            /*foreach query as row starts in row 36 set b as index +1, c as query["Nombre_Comercial"]
+        f as query["Cantidad"] g as query["Valor_Unitario"] i as query["costo_total"]/ $query["Cantidad"]
+        j as  query["costo_total"] k as query["Valor_Unitario"]*3.7
+         */
+
+            $lastRow = 0;
+            $InitialColumn = 'C';
+            //if count query is lower than 3 get sustract 3- count query and set the value to $substract and for each $substract remove border from row 36 to 39
+            if ($productsCount < 3) {
+                $substract = 3 - $productsCount;
+                for ($i = 0; $i < $substract; $i++) {
+                    $row = 36 + $i + $productsCount;
+                    //set not borders from b$row to l$row
+                    $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray(array());
+                }
+                //remove borders from b36 to l39
+            }
+            for ($index = 0; $index < $productsCount; $index++) {
+                $row = 36 + $index;
+                if ($index >= 7 && $index != $productsCount) {
+                    $sheet = $objPHPExcel->getActiveSheet();
+                    $sheet->insertNewRowBefore($row, 1);
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue('B' . $row, $index + 1);
+                //SET FONT BOLD FALSE
+                $objPHPExcel->getActiveSheet()->getStyle('B' . $row)->getFont()->setBold(false);
+                $objPHPExcel->getActiveSheet()->setCellValue('C' . $row, $data['cliente']['productos'][$index]["nombre"]);
+                $objPHPExcel->getActiveSheet()->setCellValue('F' . $row, "='3'!" . $InitialColumn . 10);
+                $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getFont()->setBold(false);
+                //center text
+                $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objPHPExcel->getActiveSheet()->setCellValue('G' . $row, "='3'!" . $InitialColumn . 8);
+                //set currency format with dollar symbol
+                $objPHPExcel->getActiveSheet()->getStyle('G' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $objPHPExcel->getActiveSheet()->setCellValue('I' . $row, "='3'!" . $InitialColumn . 46);
+                //set currency format with dollar symbol
+                $objPHPExcel->getActiveSheet()->getStyle('I' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('J' . $row, "='3'!" . $InitialColumn . 44);
+                $objPHPExcel->getActiveSheet()->getStyle('J' . $row)->getFont()->setBold(false);
+
+                //set currency format with dollar symbol
+                $objPHPExcel->getActiveSheet()->getStyle('J' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $JCellVal = $objPHPExcel->getActiveSheet()->getCell('J' . $row)->getValue();
+                $objPHPExcel->getActiveSheet()->setCellValue('K' . $row, "='3'!" . $InitialColumn . 47);
+                //set currency format with pen symbol
+                //combine cells from C$ROW to e$row
+                $objPHPExcel->getActiveSheet()->mergeCells('C' . $row . ':E' . $row);
+                $objPHPExcel->getActiveSheet()->mergeCells('G' . $row . ':H' . $row);
+                //SET CURRRENCY FORMAT WITH DOLLAR SYMBOL
+
+                $objPHPExcel->getActiveSheet()->mergeCells('K' . $row . ':L' . $row);
+                //copy currency format from k$row-1 to k$row
+                $style = $objPHPExcel->getActiveSheet()->getStyle('K' . $row);
+                $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                $style->getFill()->getStartColor()->setARGB($greenColor);
+                //set letter color to white
+                $style->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
+                //center text
+                //set normal weight
+                $columnsToApply = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+                //apply borders from b$row to l$row
+                $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray($borders);
+                //for each column in columnsToApply apply style center and auto size
+                foreach ($columnsToApply as $column) {
+                    //set font to calibri
+                    $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setName('Calibri');
+                    //set font size to 11
+                    $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setSize(11);
+                    $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getFont()->setBold(true);
+                    $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    if ($column == 'K') {
+                        $objPHPExcel->getActiveSheet()->getStyle($column . $row)->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
+                    }
+                }
+                $InitialColumn = $this->incrementColumn($InitialColumn);
+                $lastRow = $row;
+            };
+            $notUsedDefaultRows = 3 - $productsCount;
+            if ($notUsedDefaultRows >= 0) {
+                for ($i = 0; $i <= $notUsedDefaultRows; $i++) {
+                    $row = 36 + $productsCount + $i;
+                    $objPHPExcel->getActiveSheet()->getStyle('B' . $row . ':L' . $row)->applyFromArray(array(
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_NONE,
+                                'color' => array('rgb' => '000000'),
+                            ),
+                        ),
+                    ));
+                    //set k background color to white
+                    $style = $objPHPExcel->getActiveSheet()->getStyle('K' . $row);
+                    $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $style->getFill()->getStartColor()->setARGB($whiteColor);
+                }
+            }
+            $lastRow++;
+            //set b$latsrow values "total"
+            if ($productsCount >= 7) {
+                //unmerge b row
+                $objPHPExcel->getActiveSheet()->unmergeCells('B' . $lastRow . ':L' . $lastRow);
+                //merge b to e
+                $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
+                //merge f to f+1
+                // $objPHPExcel->getActiveSheet()->mergeCells('F' . $lastRow . ':F' . $lastRow+1);
+                // $objPHPExcel->getActiveSheet()->mergeCells('J' . $lastRow . ':J' . $lastRow+1);
+
+                //merge k to l
+            }
+            if ($notUsedDefaultRows >= 0) {
+                //unmerge c to e
+                $objPHPExcel->getActiveSheet()->mergeCells('C' . $lastRow . ':E' . $lastRow);
+
+                $objPHPExcel->getActiveSheet()->unmergeCells('C' . $lastRow . ':E' . $lastRow);
+                $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue('B' . $lastRow, "TOTAL");
+            $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':E' . $lastRow)->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->setCellValue('F' . $lastRow, "=SUM(F36:F" . ($lastRow - 1) . ")");
+            $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle('F' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->setCellValue('J' . $lastRow, "=SUM(J36:J" . ($lastRow - 1) . ")");
+            $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->applyFromArray($borders);
+            $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            $objPHPExcel->getActiveSheet()->getStyle('J' . $lastRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':L' . $lastRow)->applyFromArray(array());
+            //SET FONT SIZE TO 11
+            $objPHPExcel->getActiveSheet()->getStyle('B' . $lastRow . ':L' . $lastRow + 1)->getFont()->setSize(11);
+            $cellToCheck = 'I22';
+            $rowToCheck = 23;
+            $sheet = $objPHPExcel->getActiveSheet();
+
+            // Obtener el valor de la celda
+
+            // Verificar si se cumple la condición
+            if ($antidumpingSum != 0) {
+                // Insertar una nueva fila en la posición 22
+                // $objPHPExcel->getActiveSheet()->getStyle('K23')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle('K22')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle('K24')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                // $objPHPExcel->getActiveSheet()->getStyle('K25')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $sheet->insertNewRowBefore($rowToCheck, 1);
+
+                // Opcional: Puedes rellenar la nueva fila con datos si es necesario
+                $newRowIndex = $rowToCheck;
+                $sheet->setCellValue('B' . $newRowIndex, "ANTIDUMPING");
+                $sheet->setCellValue('K' . $newRowIndex, $antidumpingSum);
+                //set currency format with dollar symbol
+
+                //set b$NewRowIndex to l$NewRowIndex    background yellow
+                $style = $sheet->getStyle('B' . $newRowIndex . ':L' . $newRowIndex);
+                $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                $style->getFill()->getStartColor()->setARGB($yellowColor);
+                // Ajusta según tus necesidades
+                $objPHPExcel->getActiveSheet()->setCellValue('K24', "=SUM(K20:K23)");
+            } else {
+            }
+
+            //merge c8:c9
+            $objPHPExcel->getActiveSheet()->mergeCells('C8:C9');
+            //center vertically and horizontally
+            $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->setCellValue('C8', $data['cliente']['nombre']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C10', $data['cliente']['dni']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C11', $data['cliente']['telefono']);
+            $objPHPExcel->getActiveSheet()->setCellValue('J9', $pesoTotal >= 1000 ? $pesoTotal / 1000 . " Tn" : $pesoTotal . " Kg");
+            $objPHPExcel->getActiveSheet()->setCellValue('J11', $cbmTotal);
+            //mantain as numbrer custom format with m3 sufix
+            $objPHPExcel->getActiveSheet()->getStyle('J11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER . ' "m3"');
+            //   $objPHPExcel->getActiveSheet()->setCellValue('I10', "QTY PROVEEDORES");
+            $objPHPExcel->getActiveSheet()->setCellValue('I11', "CBM");
+
+            //set number format
+            $objPHPExcel->getActiveSheet()->getStyle('J9')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
+            //SET COLUMN I AUTO SIZE
+            $objPHPExcel->getActiveSheet()->getColumnDimension("I")->setAutoSize(true);
+
+            //   $objPHPExcel->getActiveSheet()->setCellValue('K10', $query[0]["count_proveedores"]);
+            $objPHPExcel->getActiveSheet()->setCellValue('J10', "");
+            //APPPLY NUMBER FORMAT TO K10
+            $objPHPExcel->getActiveSheet()->getStyle('K10')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
+            $objPHPExcel->getActiveSheet()->setCellValue('L10', "");
+
+            $objPHPExcel->getActiveSheet()->setCellValue('F11', $tipoCliente);
+            if ($productsCount < 3) {
+                //remove borders from b36 to l39
+                $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
+            }
+            $ClientName = $objPHPExcel->getActiveSheet()->getCell('C8')->getValue();
+            //ajustar texto in c column
+            $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setWrapText(true);
+            //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
+            $N20CellValue =
+                "Hola " . $ClientName . " 😁 un gusto saludarte!
+        A continuación te envío la cotización final de tu importación📋📦.
+        🙋‍♂️ PAGO PENDIENTE :
+        ☑️Costo CBM: $" . $CobroCellValue . "
+        ☑️Impuestos: $" . $ImpuestosCellValue . "
+        ☑️ Total: $" . ($ImpuestosCellValue + $CobroCellValue) . "
+        Pronto le aviso nuevos avances, que tengan buen día🚢
+        Último día de pago:" ;
+            $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
+            //select
+            //remove page 2
+            $objPHPExcel->removeSheetByIndex(1);
+            //set sheet 3 title to 2
+            $objPHPExcel->setActiveSheetIndex(1);
+            $objPHPExcel->getActiveSheet()->setTitle('2');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $excelFileName = 'Cotizacion' . $data['cliente']['nombre'] . '.xlsx';
+            $excelFilePath = 'assets/downloads/' . $excelFileName;
+            $objWriter->save($excelFilePath);
+            return [
+                //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
+                'id_contenedor' => $idContenedor,
+                'id_tipo_cliente' => 1,
+                'nombre' => $data['cliente']['nombre'],
+                'documento' => $data['cliente']['dni'],
+                'correo' => $data['cliente']['correo'],
+                'whatsapp' => $data['cliente']['telefono'],
+                'volumen_final' => $data['cliente']['productos'][0]['cbm'],
+                'monto_final' => 0,
+                'tarifa_final' => $data['cliente']['tarifa'],
+                'estado' => 'PENDIENTE',
+                "excel_file_name" => $excelFileName,
+                "excel_file_path" => $excelFilePath
+            ];
+
+        } catch (Exception $e) {
+            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+            return $objPHPExcel;
+            throw $e;
+        }
+    }
     public function getFinalCotizacionExcel($objPHPExcel, $data)
     {
         try {
@@ -3012,8 +3586,6 @@ class ContenedorConsolidadoModel extends CI_Model
             $style->getFill()->getStartColor()->setARGB($grayColor);
             $objPHPExcel->getActiveSheet()->getStyle('B42:Z42')->applyFromArray($borders);
             $objPHPExcel->getActiveSheet()->getStyle('B42')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-
-
             $objPHPExcel->setActiveSheetIndex(1)->mergeCells('B48:Z48');
             $objPHPExcel->setActiveSheetIndex(1)->setCellValue('B48', 'COSTO TOTAL DE IMPORTACIÓN');
             $style = $objPHPExcel->getActiveSheet()->getStyle('B48');
@@ -3320,7 +3892,7 @@ class ContenedorConsolidadoModel extends CI_Model
         } catch (PHPExcel_Exception $e) {
             echo "Error en la fórmula de la celda " . $LastColumn . "18: " . $e->getMessage() . "\n";
             throw $e;
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             echo 'Excepción capturada: ',  $e->getMessage(), "\n";
             return $objPHPExcel;
             throw $e;
@@ -3727,13 +4299,10 @@ class ContenedorConsolidadoModel extends CI_Model
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
             $dompdf->stream('Cotizacion.pdf', array("Attachment" => 0));
-            // Eliminar el archivo temporal
-
-        }
-        catch (PHPExcel_Exception $e) {
-            echo "Error en la fórmula de la celda " ;
+        } catch (PHPExcel_Exception $e) {
+            echo "Error en la fórmula de la celda ";
             throw $e;
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             echo 'Excepción descargarBoleta: ',  $e->getMessage(), "\n";
             return $objPHPExcel;
             throw $e;
