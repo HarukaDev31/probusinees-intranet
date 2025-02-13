@@ -39,9 +39,9 @@ class ContenedorConsolidado extends CI_Controller
 		$data = array();
 		foreach ($arrData as $row) {
 			$subdata = array();
+			$subdata[] = "Consolidado #" . $row->carga;
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
-			$subdata[] = "Consolidado #" . $row->carga;
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
 			if ($this->user->No_Grupo == "Coordinación") {
 				$subdata[] = date("d/m/Y", strtotime($row->f_puerto));

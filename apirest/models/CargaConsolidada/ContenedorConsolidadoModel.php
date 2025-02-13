@@ -3236,7 +3236,9 @@ class ContenedorConsolidadoModel extends CI_Model
             $objPHPExcel->getActiveSheet()->setCellValue('K25', "='3'!" . $columnaIndex . "31");
 
             //k30 =$query[0]["Flete"]/$query[0]["Distribucion"]
-            $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $CBMTotal . "*J11");
+            // $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $tarifaCellValue . "*J11");
+            //if j11<1=sheet 3 tarifa cell value else j11* tarifa cell value
+            $objPHPExcel->getActiveSheet()->setCellValue('K30', "=IF('3'!" . $tarifaCellValue . "<1, '3'!" . $tarifaCellValue . "*J11, '3'!" . $tarifaCellValue . "*J11)");
             //$objPHPExcel->getActiveSheet()->setCellValue('K30', "0");
             //get $CobroCell value of formula
             $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
@@ -3472,6 +3474,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $excelFileName = 'Cotizacion' . $data['cliente']['nombre'] . '.xlsx';
             $excelFilePath = 'assets/downloads/' . $excelFileName;
+            $montoFinal=$objPHPExcel->setActiveSheetIndex(0)->getCell('J30')->getCalculatedValue();
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
@@ -3482,7 +3485,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 'correo' => $data['cliente']['correo'],
                 'whatsapp' => $data['cliente']['telefono'],
                 'volumen_final' => $data['cliente']['productos'][0]['cbm'],
-                'monto_final' => 0,
+                'monto_final' =>$montoFinal,
                 'tarifa_final' => $data['cliente']['tarifa'],
                 'estado' => 'PENDIENTE',
                 "excel_file_name" => $excelFileName,

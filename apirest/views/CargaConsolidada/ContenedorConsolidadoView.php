@@ -56,9 +56,9 @@
               <tr>
               <?php if($this->user->No_Grupo=="Coordinación"){
                 ?>
+                <th>Carga</th>
                 <th>Mes  </th>
                 <th>Pais</th>
-                <th>Carga</th>
   
                 <th>F. Cierre</th>
                 <th>F. Arribo</th>
