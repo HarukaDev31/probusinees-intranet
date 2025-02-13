@@ -37,6 +37,7 @@ class ContenedorConsolidado extends CI_Controller
 	{
 		$arrData = $this->ContenedorConsolidadoModel->index();
 		$data = array();
+		
 		foreach ($arrData as $row) {
 			$subdata = array();
 			$subdata[] = "Consolidado #" . $row->carga;
@@ -86,6 +87,11 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $divAcciones;
 			$data[] = $subdata;
 		}
+		usort($data, function($a, $b) {
+			$numA = (int) substr($a['carga'], 1); // Elimina el '#' y convierte a número
+			$numB = (int) substr($b['carga'], 1); // Elimina el '#' y convierte a número
+			return $numB - $numA; // Orden descendente
+		});
 		$output = array(
 			"data" => $data
 		);

@@ -46,7 +46,7 @@ class ContenedorConsolidadoModel extends CI_Model
         if ($this->input->post('Filtro_Estado') != "0") {
             $this->db->where('estado', $this->input->post('Filtro_Estado'));
         }
-        $this->db->order_by('id', 'desc');
+        $this->db->order_by('carga', 'desc');
         $query = $this->db->get();
         return $query->result();
     }
