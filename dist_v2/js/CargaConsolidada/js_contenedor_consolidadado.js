@@ -86,6 +86,40 @@ var fileList ;
 var cotizacionAlmacenContainer = null;
 var cotizacionFinalContainer = null;
 var tableCotizacionFinal = null;
+async function descargarBoletaPDF (idCotizacionFinal)  {
+    spinner.show();
+    $.ajax({
+      url: base_url + "CargaConsolidada/ContenedorConsolidado/downloadBoleta/"+idCotizacionFinal,
+      type: "GET",
+      xhrFields: {
+        responseType: "blob",
+      },
+    //   data: JSON.stringify({ idCotizacionFinal: idCotizacionFinal }),
+      success: function (response) {
+        var blob = new Blob([response], {
+          type: "application/pdf",  
+        });
+        var link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        const currentDate = new Date();
+        //format date to dd_mm_yyyy
+        const formattedDate = `${currentDate.getDate()}_${
+          currentDate.getMonth() + 1
+        }_${currentDate.getFullYear()}`;
+        link.download = `Cotizacion.pdf`
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+  
+        spinner.hide();
+      },
+      error: function (errorThrown) {
+        Swal.fire("Error!", "Hubo un error", "error");
+        console.error("Error al descargar el archivo Excel: " + errorThrown);
+        spinner.hide();
+      },
+    });
+  };
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
@@ -107,7 +141,102 @@ async function updateEstado(id) {
         },
     });
 }
+async function uploadCotizacionFinal(id){
+    //swall with file input 
+    const { value: file } = await Swal.fire({
+        title: 'Subir Cotización Final',
+        input: 'file',
+        inputAttributes: {
+            'accept': //excel
+                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'aria-label': 'Sube tu archivo'
 
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes elegir un archivo!'
+            }
+        }
+    })
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('idCotizacionFinal', id);
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadCotizacionFinal";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                    tableCotizacionFinal.ajax.reload();
+                } else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+            },
+        });
+    }
+
+}
+async function deleteCotizacionFinalFile(id){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteCotizacionFinalFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        tableCotizacionFinal.ajax.reload();
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    reloadTableCotizacionFinal();
+                },
+            });
+        }
+    });
+}
+async function updateEstadoCotizacionFinal(idCotizacionFinal){
+    const estado = $(`#estado-cotizacion-final${idCotizacionFinal}`).val();
+    
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionFinal";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idCotizacionFinal: idCotizacionFinal,
+            estado: estado
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionFinal();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+            table_Entidad.ajax.reload();
+        },
+    });
+}
 function addFileToList(file) {
     const isImage = file.file_ext.startsWith('image');
     const fileItem = $(`
@@ -1782,6 +1911,8 @@ async function viewCotizacionFinal(){
     if($.fn.DataTable.isDataTable("#table-cotizacion-final")){
         tableCotizacionFinal.ajax.reload();
     }else{
+        tableCotizacionFinal.show();
+
         tableCotizacionFinal=$('#table-cotizacion-final').DataTable({
             dom:
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -1978,9 +2109,10 @@ async function reloadTableClientesVariacion() {
 
 async function reloadTableCotizacionEmbarque(){
     tableCotizacionEmbarque.ajax.reload()
-    await getTableCotizacionEmbarqueHeaders();
-   
-   
+    await getTableCotizacionEmbarqueHeaders(); 
+}
+async function reloadTableCotizacionFinal(){
+    tableCotizacionFinal.ajax.reload()
 }
 async function getTableCotizacionEmbarqueHeaders(){
     url=base_url+"CargaConsolidada/ContenedorConsolidado/getCotizacionEmbarqueHeaders/"+idContenedor;
@@ -3451,14 +3583,19 @@ $(document).ready(async function () {
                 },
                 allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
-                if (result.isConfirmed) {
+                
                   
                         Swal.fire("Correcto", result.value.message, "success");
                         tableCotizacionFinal.ajax.reload();
-                    } 
+
                     
                 
             })
+        })
+        $("#btn-back-cotizacion-final").click(function () {
+            cotizacionFinalContainer.hide();
+            returnToSteps();
+
         })
         /*End of Listeners */
     });

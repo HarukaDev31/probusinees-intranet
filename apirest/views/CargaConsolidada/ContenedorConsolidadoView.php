@@ -584,6 +584,13 @@
         <div class="fa fa-upload"></div>
         Plantilla Final
       </button>
+                  <!--button back-->
+      <button
+        id="btn-back-cotizacion-final"
+        class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"
+      >
+        <div class="fa fa-arrow-left"></div>
+      </button>
     </div>
     <div class="table-responsive" class="table table-bordered table-hover table-striped">
         <table id="table-cotizacion-final" class="table table-bordered table-hover table-striped">

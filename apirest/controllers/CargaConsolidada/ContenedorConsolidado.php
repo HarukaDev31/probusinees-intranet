@@ -571,6 +571,56 @@ class ContenedorConsolidado extends CI_Controller
 		} else if ($stepIndex == 3) {
 			$arrResponse = $this->ContenedorConsolidadoModel->getDocumentationFolderFiles($idContenedor);
 			echo json_encode($arrResponse);
+		} else if($stepIndex==4){
+			$arrResponse= $this->ContenedorConsolidadoModel->getContenedorCotizacionesFinales($idContenedor);
+			$data = array();
+			$index = 1;
+			foreach ($arrResponse as $row) {
+					$subdata = array();
+					$subdata[] = $index;
+					$subdata[] = $row->nombre;
+					$subdata[] = $row->documento;
+					$subdata[] = $row->correo;
+					$subdata[] = $row->whatsapp;
+					$subdata[] = "NUEVO";
+					$subdata[] = $row->volumen_final;
+					$subdata[] = $row->monto_final;
+					$subdata[] = $row->tarifa_final;
+					$selectEstados= '<select class="form-control" id="estado-cotizacion-final' . $row->id . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id. ')">
+					<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
+					<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
+					<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>';
+					$subdata[] = $selectEstados;
+					//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
+					$divFile = '<div>';
+					if (!empty($row->cotizacion_final_url)) {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+						<a href="' . $row->cotizacion_final_url . '" download>
+							<i class="fas fa-file-excel text-success"></i>
+
+						</a>
+						<i class="fas fa-file-pdf text-danger"
+						onclick="descargarBoletaPDF(' . $row->id . ')" ></i>
+			
+						<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacionFinalFile(' . $row->id . ')"></i>
+						
+						</div>
+						';
+					} else {
+						$divFile .= '
+						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFinal(' . $row->id . ')"></i>';
+					}
+					$divFile .= '</div>';
+					$subdata[] = $divFile;
+					$data[] = $subdata;
+					$index++;
+
+				}
+			
+			$output = array(
+				"data" => $data
+			);
+			echo json_encode($output);
 		}
 	}
 	public function getCotizacionEmbarqueHeaders($idContenedor)
@@ -1077,6 +1127,34 @@ class ContenedorConsolidado extends CI_Controller
 		// header('Cache-Control: max-age=0');
 		// $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
 		// $objWriter->save('php://output');
+	}
+	public function updateEstadoCotizacionFinal(){
+		$idCotizacionFinal= $this->input->post('idCotizacionFinal');
+		$estado= $this->input->post('estado');
+		$arrResponse= $this->ContenedorConsolidadoModel->updateEstadoCotizacionFinal($idCotizacionFinal, $estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+		
+	}
+	public function deleteCotizacionFinalFile($id){
+		$arrResponse= $this->ContenedorConsolidadoModel->deleteCotizacionFinalFile($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function uploadCotizacionFinal(){
+		$idCotizacionFinal= $this->input->post('idCotizacionFinal');
+		$file= $_FILES['file'];
+		$arrResponse= $this->ContenedorConsolidadoModel->uploadCotizacionFinal($idCotizacionFinal, $file);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function downloadBoleta($idCotizacionFinal){
+		ob_end_clean();
+		$this->ContenedorConsolidadoModel->downloadBoleta($idCotizacionFinal);
+		
 	}
 	function convertDateFormat($date)
 	{
