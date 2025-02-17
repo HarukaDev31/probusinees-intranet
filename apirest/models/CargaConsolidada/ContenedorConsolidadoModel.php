@@ -2730,6 +2730,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         // Transfer to new Excel
                         $newSheet->setCellValue('A' . $newRow, $clientName);
                         $newSheet->setCellValue('B' . $newRow, $clientType);
+                        
                         $newSheet->setCellValue('E' . $newRow, $itemNo);
                         $newSheet->setCellValue('F' . $newRow, $description);
                         $newSheet->setCellValue('N' . $newRow, $quantity);
