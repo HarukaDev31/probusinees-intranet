@@ -86,6 +86,8 @@ var fileList ;
 var cotizacionAlmacenContainer = null;
 var cotizacionFinalContainer = null;
 var tableCotizacionFinal = null;
+var facturaGuiaContainer=null;
+var tableFacturaGuia=null;
 async function descargarBoletaPDF (idCotizacionFinal)  {
     spinner.show();
     $.ajax({
@@ -665,6 +667,150 @@ async function updateArriveDateChina($idProveedor){
     });
     spinner.hide();
 
+}
+async function uploadFacturaGeneral(idCotizacion){
+    //swall with file input 
+    const { value: file } = await Swal.fire({
+        title: 'Subir Factura',
+        input: 'file',
+        inputAttributes: {
+            'accept': //excel
+                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'aria-label': 'Sube tu archivo'
+
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes elegir un archivo!'
+            }
+        }
+    })
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('idCotizacion', idCotizacion);
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadFacturaGeneral";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                    tableFacturaGuia.ajax.reload();
+                } else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+            },
+        });
+    }
+}
+async function uploadGuiaRemision(idCotizacion){
+    //swall with file input 
+    const { value: file } = await Swal.fire({
+        title: 'Subir Guia de Remisión',
+        input: 'file',
+        inputAttributes: {
+            'accept': //excel
+                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'aria-label': 'Sube tu archivo'
+
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes elegir un archivo!'
+            }
+        }
+    })
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('idCotizacion', idCotizacion);
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadGuiaRemision";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                    tableFacturaGuia.ajax.reload();
+                } else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+            },
+        });
+    }
+}
+async function deleteFacturaGeneralFile(id){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteFacturaGeneralFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        tableFacturaGuia.ajax.reload();
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    reloadTableFacturaGuia();
+                },
+            });
+        }
+    });
+}
+async function deleteGuiaRemisionFile(id){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteGuiaRemisionFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        tableFacturaGuia.ajax.reload();
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    reloadTableFacturaGuia();
+                },
+            });
+        }
+    });
 }
 async function updateProductos($idProveedor,idCotizacion){
     $productos=$(`#productos-${$idProveedor}`).val();
@@ -1890,6 +2036,8 @@ const openStepFunction = async (step, id) => {
         viewDocumentacion();
     } else if (stepIndex==4){
         viewCotizacionFinal();
+    }else if (stepIndex == 5) {
+        viewFacturaGuia();
     }
     $(".btn-back-cotizacion").off("click");
     $(".btn-back-cotizacion").on("click", function () {
@@ -1903,6 +2051,101 @@ const openStepFunction = async (step, id) => {
     });
 
     spinner.hide();
+}
+async function viewFacturaGuia(){
+    facturaGuiaContainer.show();
+    spinner.show();
+    url=base_url+"CargaConsolidada/ContenedorConsolidado/step";
+    if($.fn.DataTable.isDataTable("#table-factura-guia")){
+        tableFacturaGuia.ajax.reload();
+    }else{
+        tableFacturaGuia.show();
+
+        tableFacturaGuia=$('#table-factura-guia').DataTable({
+            dom:
+            "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [
+                {
+                    extend: "excel",
+                    text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                    titleAttr: "Excel",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+                {
+                    extend: "pdf",
+                    text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+                    titleAttr: "PDF",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+                {
+                    extend: "colvis",
+                    text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                    titleAttr: "Columnas",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: false,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                    sFirst: "<<",
+                    sLast: ">>",
+                    sPrevious: "<",
+                    sNext: ">",
+                },
+            },
+            columnDefs: [
+                {
+                    targets: "no-hidden",
+                    visible: false,
+                },
+                {
+                    className: "text-center",
+                    targets: "no-sort",
+                    orderable: false,
+                },
+                {
+                    targets: "",
+                    orderable: false,
+                }
+            ],
+            ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                    data.stepIndex = stepIndex;
+                    data.idContenedor = idContenedor;
+                }
+            },
+            initComplete: function (settings, json) {
+                spinner.hide();
+            },
+        });
+    }
 }
 async function viewCotizacionFinal(){
     cotizacionFinalContainer.show();
@@ -2679,7 +2922,7 @@ const returnToSteps = () => {
     cotizacionContainer.hide();
     clientesContainer.hide();
     documentationContainer.hide();
-
+    facturaGuiaContainer.hide();
     stepsContainer.show();
 
 }
@@ -2714,6 +2957,10 @@ $(document).ready(async function () {
     cotizacionFinalContainer.hide();
     tableCotizacionFinal=$("#table-cotizacion-final");
     tableCotizacionFinal.hide();
+    facturaGuiaContainer=$("#factura-guia-container");
+    facturaGuiaContainer.hide();
+    tableFacturaGuia=$("#table-factura-guia");
+    tableFacturaGuia.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
  
     table_Entidad = $("#table-contenedor").DataTable({
@@ -3088,6 +3335,9 @@ $(document).ready(async function () {
     $("#btn-back-cotizacion-almacen").click(function () {
         cotizacionAlmacenContainer.hide();
         cotizacionContainer.show();
+    })
+    $("#btn-back-factura-guia").click(function () {
+        returnToSteps();
     })
     $("#btn-documentacion-zip").click(function () {
         spinner.show();

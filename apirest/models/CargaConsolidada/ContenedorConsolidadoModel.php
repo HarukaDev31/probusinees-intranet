@@ -712,15 +712,29 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function updateEstado($id, $estado)
     {
-        $this->db->set('estado', $estado);
-        $this->db->where('id', $id);
-        $this->db->update($this->table);
-        if ($this->db->affected_rows() > 0) {
-            return "success";
+        //if no_grupo is  roleContenedorAlmacen
+        try{
+            if ($this->user->No_Grupo == $this->roleContenedorAlmacen) {
+                $this->db->set('estado_china', $estado);
+                $this->db->where('id', $id);
+                $this->db->update($this->table);
+            } else {
+                $this->db->set('estado', $estado);
+                $this->db->where('id', $id);
+                $this->db->update($this->table);
+            }
+         
+            if ($this->db->affected_rows() > 0) {
+                return "success";
+            }
+            $errors = $this->db->error();
+    
+            return false;
         }
-        $errors = $this->db->error();
-
-        return false;
+        catch(Exception $e){
+            log_message('error', $e->getMessage());
+            return false;
+        }
     }
     public function showClientesDocumentacion($id)
     {
@@ -1803,7 +1817,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
         // Llamada al manejador de actualización de cotización
         $data = $this->handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion);
-
+       
         return $data ?: "success";
     }
     public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
@@ -1850,7 +1864,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
                 $this->email->clear(TRUE);
 
-                unlink($tempFilePath);
+                // unlink($tempFilePath);
 
                 $zip = new ZipArchive();
                 $zipFileName = 'assets/downloads/Rotulado.zip';
@@ -2643,7 +2657,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $adValoremColumn = "R";
                 $anticipoColumn = "S";
                 $volSistemaColumn = "T";
-                $dataSystem = $this->db->select('nombre,volumen,documento,volumen_doc,valor_doc,valor_cot,volumen_china,name,vol_selected,peso')
+                $dataSystem = $this->db->select('nombre,volumen,documento,volumen_doc,valor_doc,valor_cot,volumen_china,name,vol_selected,peso,telefono')
                     ->from($this->table_contenedor_cotizacion)
                     ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
                     ->where('id_contenedor', $idContenedor)
@@ -2751,8 +2765,9 @@ class ContenedorConsolidadoModel extends CI_Model
                         $newSheet->getStyle('S' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                         foreach ($dataSystem as $data) {
                             if (trim($data->nombre) == trim($clientName)) {
-                                $newSheet->setCellValue('C' . $newRow, $data->name);
-                                $newSheet->setCellValue('D' . $newRow, $data->documento);
+                                //$newSheet->setCellValue('C' . $newRow, $data->name);
+                                $newSheet->setCellValue('C' . $newRow, $data->documento);
+                                $newSheet->setCellValue('D' . $newRow, $data->telefono);
                                 $newSheet->setCellValue('T' . $newRow, $data->peso);
                                 break;
                             }
@@ -2785,7 +2800,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 $newSheet->getStyle('A1:U1')->getAlignment()->setWrapText(true);
                 $newSheet->getStyle('A1:U1')->getAlignment()->setShrinkToFit(true);
                 //set all columns to center horizontally
-
+                //set  r column to percentange format
+                $newSheet->getStyle('R2:R' . ($newRow - 1))->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                 //set p lastrow +1 =sum(p2:p lastrow)
                 $newSheet->setCellValue('P' . $newRow, '=SUM(P2:P' . ($newRow - 1) . ')');
 
@@ -2809,34 +2825,29 @@ class ContenedorConsolidadoModel extends CI_Model
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
         //get tarifa for each  cotizacion from table cotizaciones where id_contenedor = $idContainer
-
+        log_message('error', json_encode($data));
         $result = $this->db->select('id,tarifa,nombre,correo')
             ->from($this->table_contenedor_cotizacion)
             ->where('id_contenedor', $idContainer);
-        
         try {
             $result = $this->db->get()->result();
             foreach ($data as &$cliente) {
                 $nombreCliente = $cliente['cliente']['nombre'];
-
                 foreach ($result as $item) {
-         
                     if (trim($item->nombre) === trim($nombreCliente)) {
                         $cliente['cliente']['tarifa'] = $item->tarifa;
                         $cliente['cliente']['correo'] = $item->correo;
+                        $cliente['id'] = $item->id;
+                        break;
                     }
                 }
             }
             unset($cliente);
         } catch (Exception $e) {
             echo $e->getMessage();
-
             return $e->getMessage();
         }
         try {
-            // delete from cotizacion_final where id_contenedor=IdContainer
-            $this->db->where('id_contenedor', $idContainer);
-            $this->db->delete($this->table_contenedor_cotizacion_final);
             foreach ($data as $key => $value) {
                 $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 
@@ -2852,11 +2863,13 @@ class ContenedorConsolidadoModel extends CI_Model
                 //remove excel_file_name and excel_file_path 
                 unset($result['excel_file_name']);
                 unset($result['excel_file_path']);
-                //insert batch 
-                $this->db->insert($this->table_contenedor_cotizacion_final, $result);
-                // unlink($excelFilePath);
+                unset($result['whatsapp']);
+                //update table cotizciones with result
+                log_message('error', json_encode($result));
+                $this->db->where('id', $result['id']);
+                $this->db->update($this->table_contenedor_cotizacion, $result);
             }
-
+            
             // Save the ZIP file
             $zipFileName = 'Boletas.zip';
             $zipFilePath = 'assets/downloads/' . $zipFileName;
@@ -3290,6 +3303,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 //center text
                 $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 $objPHPExcel->getActiveSheet()->setCellValue('G' . $row, "='3'!" . $InitialColumn . 8);
+                $objPHPExcel->getActiveSheet()->setCellValue('J11', "='3'!" . $CBMTotal);
+
                 //set currency format with dollar symbol
                 $objPHPExcel->getActiveSheet()->getStyle('G' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('I' . $row, "='3'!" . $InitialColumn . 46);
@@ -3429,9 +3444,11 @@ class ContenedorConsolidadoModel extends CI_Model
             $objPHPExcel->getActiveSheet()->setCellValue('C10', $data['cliente']['dni']);
             $objPHPExcel->getActiveSheet()->setCellValue('C11', $data['cliente']['telefono']);
             $objPHPExcel->getActiveSheet()->setCellValue('J9', $pesoTotal >= 1000 ? $pesoTotal / 1000 . " Tn" : $pesoTotal . " Kg");
-            $objPHPExcel->getActiveSheet()->setCellValue('J11', $cbmTotal);
             //mantain as numbrer custom format with m3 sufix
             $objPHPExcel->getActiveSheet()->getStyle('J11')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER . ' "m3"');
+            //FORMAT J11 2 DECIMALS
+            $objPHPExcel->getActiveSheet()->getStyle('J11')->getNumberFormat()->setFormatCode('#,##0.00');
+            
             //   $objPHPExcel->getActiveSheet()->setCellValue('I10', "QTY PROVEEDORES");
             $objPHPExcel->getActiveSheet()->setCellValue('I11', "CBM");
 
@@ -3475,10 +3492,15 @@ class ContenedorConsolidadoModel extends CI_Model
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $excelFileName = 'Cotizacion' . $data['cliente']['nombre'] . '.xlsx';
             $excelFilePath = 'assets/downloads/' . $excelFileName;
-            $montoFinal=$objPHPExcel->setActiveSheetIndex(0)->getCell('J30')->getCalculatedValue();
+            $montoFinal=$objPHPExcel->setActiveSheetIndex(0)->getCell('K30')->getCalculatedValue();
+            //if b23 = antidumping then montofinal=k31;
+            if ($objPHPExcel->getActiveSheet()->getCell('B23')->getValue() == "ANTIDUMPING") {
+                $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
+            }
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
+                'id'=>$data['id'],
                 'id_contenedor' => $idContenedor,
                 'id_tipo_cliente' => 1,
                 'nombre' => $data['cliente']['nombre'],
@@ -3495,6 +3517,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
         } catch (Exception $e) {
             echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+            log_message('error', $e->getMessage());
             return $objPHPExcel;
             throw $e;
         }
@@ -3843,12 +3866,17 @@ class ContenedorConsolidadoModel extends CI_Model
             $objPHPExcel->getActiveSheet()->setCellValue('F11', $item['tipo_cliente']);
             $objPHPExcel->getActiveSheet()->setCellValue('J8', $cajasTotales);
             $objPHPExcel->getActiveSheet()->setCellValue('J9', $pesoTotal);
-            $objPHPExcel->getActiveSheet()->setCellValue('J11', $volumenTotal);
+            //$objPHPExcel->getActiveSheet()->setCellValue('J11', $volumenTotal);
 
-
+            $montoFinal = $objPHPExcel->setActiveSheetIndex(0)->getCell('K30')->getCalculatedValue();
+            //if b23 =ANTIDUMPING THEN MONTOFINAL=K31
+            if ($objPHPExcel->getActiveSheet()->getCell('B23')->getValue() == 'ANTIDUMPING') {
+                $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
+            }
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $excelFileName = 'Cotizacion' . $item['nombre_cliente'] . '.xlsx';
             $excelFilePath = 'assets/downloads/' . $excelFileName;
+            
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
@@ -3859,38 +3887,13 @@ class ContenedorConsolidadoModel extends CI_Model
                 'correo' => $item['correo'],
                 'whatsapp' => $item['telefono'],
                 'volumen_final' => $volumenTotal,
-                'monto_final' => $ImpuestosCellValue + $CobroCellValue,
+                'monto_final' => $montoFinal??0,
                 'tarifa_final' => $tarifa,
                 'estado' => 'PENDIENTE',
                 "excel_file_name" => $excelFileName,
                 "excel_file_path" => $excelFilePath
             ];
 
-
-            //     if ($productsCount < 3) {
-            //         //remove borders from b36 to l39
-            //         $objPHPExcel->getActiveSheet()->getStyle('B39:L39')->applyFromArray(array());
-            //     }
-            //     $ClientName = $objPHPExcel->getActiveSheet()->getCell('C8')->getValue();
-            //     //ajustar texto in c column
-            //     $objPHPExcel->getActiveSheet()->getStyle('C8')->getAlignment()->setWrapText(true);
-            //     //select * from table_tarifas where id_tipo_cliente=$ID_Tipo_Cliente and updated_at is null
-            //     $N20CellValue =
-            //         "Hola " . $ClientName . " 😁 un gusto saludarte!
-            // A continuación te envío la cotización final de tu importación📋📦.
-            // 🙋‍♂️ PAGO PENDIENTE :
-            // ☑️Costo CBM: $" . $CobroCellValue . "
-            // ☑️Impuestos: $" . $ImpuestosCellValue . "
-            // ☑️ Total: $" . ($ImpuestosCellValue + $CobroCellValue) . "
-            // Pronto le aviso nuevos avances, que tengan buen día🚢
-            // Último día de pago:" . $expirationDate;
-            //     $objPHPExcel->getActiveSheet()->setCellValue('N20', $N20CellValue);
-            //     //select
-            //     //remove page 2
-            //     $objPHPExcel->removeSheetByIndex(1);
-            //     //set sheet 3 title to 2
-            //     $objPHPExcel->setActiveSheetIndex(1);
-            //     $objPHPExcel->getActiveSheet()->setTitle('2');
 
             return $objPHPExcel;
         } catch (PHPExcel_Exception $e) {
@@ -4050,18 +4053,20 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function getContenedorCotizacionesFinales($idContenedor)
     {
-        $this->db->select('*');
-        $this->db->from($this->table_contenedor_cotizacion_final);
-        $this->db->where('id_contenedor', $idContenedor);
+        $this->db->select('*,contenedor_consolidado_cotizacion.id as id_cotizacion')
+        ->from($this->table_contenedor_cotizacion)
+        ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
+        ->where('id_contenedor', $idContenedor)
+        ->where('estado_cliente!=', null);
         $query = $this->db->get();
         return $query->result();
     }
     public function updateEstadoCotizacionFinal($idCotizacionFinal, $estado)
     {
         try {
-            $this->db->set('estado', $estado);
+            $this->db->set('estado_cotizacion_final', $estado);
             $this->db->where('id', $idCotizacionFinal);
-            $this->db->update($this->table_contenedor_cotizacion_final);
+            $this->db->update($this->table_contenedor_cotizacion);
             //if db error is diferent to 0 return false
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error en updateEstadoCotizacionFinal: ' . $this->db->error()['message']);
@@ -4079,7 +4084,7 @@ class ContenedorConsolidadoModel extends CI_Model
         try {
             //get cotizacion_final_url from table where id=idCotizacion final and try to unlink and set null in database
             $this->db->select('cotizacion_final_url');
-            $this->db->from($this->table_contenedor_cotizacion_final);
+            $this->db->from($this->table_contenedor_cotizacion);
             $this->db->where('id', $idCotizacionFinal);
             $query = $this->db->get();
             $cotizacionFinal = $query->row();
@@ -4091,7 +4096,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
             $this->db->set('cotizacion_final_url', null);
             $this->db->where('id', $idCotizacionFinal);
-            $this->db->update($this->table_contenedor_cotizacion_final);
+            $this->db->update($this->table_contenedor_cotizacion);
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error en deleteCotizacionFinalFile: ' . $this->db->error()['message']);
                 return false;
@@ -4122,8 +4127,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $dataToUpdate['cotizacion_final_url'] = $fileUrl;
             //change key telefono for whatsapp
 
-            $dataToUpdate['whatsapp'] = $dataToUpdate['telefono'];
-            unset($dataToUpdate['telefono']);
+            ;
             $dataToUpdate['volumen_final'] = $dataToUpdate['volumen'];
             unset($dataToUpdate['volumen']);
             $dataToUpdate['monto_final'] = $dataToUpdate['monto'];
@@ -4135,7 +4139,7 @@ class ContenedorConsolidadoModel extends CI_Model
             unset($dataToUpdate['valor_cot']);
 
             $this->db->where('id', $id);
-            $this->db->update($this->table_contenedor_cotizacion_final, $dataToUpdate);
+            $this->db->update($this->table_contenedor_cotizacion, $dataToUpdate);
 
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error en uploadCotizacionFinal: ' . $this->db->error()['message']);
@@ -4153,7 +4157,7 @@ class ContenedorConsolidadoModel extends CI_Model
         //get cotizacion_final_url from table where id=idCotizacion final and get objPHPExcel and generate boleta and return it
         try {
             $this->db->select('cotizacion_final_url');
-            $this->db->from($this->table_contenedor_cotizacion_final);
+            $this->db->from($this->table_contenedor_cotizacion);
             $this->db->where('id', $idCotizacionFinal);
             $query = $this->db->get();
             $cotizacionFinal = $query->row();
@@ -4310,6 +4314,135 @@ class ContenedorConsolidadoModel extends CI_Model
             echo 'Excepción descargarBoleta: ',  $e->getMessage(), "\n";
             return $objPHPExcel;
             throw $e;
+        }
+    }
+    public function getContenedorFacturaGuia($idContenedor){
+		//from cotizacion table get aal with estado_cliente not null and join with tipo cliente
+        $this->db->select('*,contenedor_consolidado_cotizacion.id as id_cotizacion')
+                    ->from($this->table_contenedor_cotizacion)
+                    ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
+                    ->where('id_contenedor', $idContenedor)
+                    ->where('estado_cliente!=', null);
+        $query = $this->db->get();
+        return $query->result();
+
+	}
+    public function uploadFacturaGeneral($id, $file)
+    {
+        try {
+            $this->maxFileSize = 1000000;
+            $this->setAllowedExtensionsImagesOfficeFiles();
+            $fileUrl = $this->uploadSingleFile(
+                [
+                    "name" => $file['name'],
+                    "type" => $file['type'],
+                    "tmp_name" => $file['tmp_name'],
+                    "error" => $file['error'],
+                    "size" => $file['size']
+                ],
+                'assets/cargaconsolidada/facturasGenerales'
+            );
+            $dataToUpdate['factura_general_url'] = $fileUrl;
+            $this->db->where('id', $id);
+            $this->db->update($this->table_contenedor_cotizacion, $dataToUpdate);
+
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en uploadFacturaGeneral: ' . $this->db->error()['message']);
+                return false;
+            } else {
+                return "success";
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en uploadFacturaGeneral: ' . $e->getMessage());
+            return false;
+        }
+    }
+    public function uploadGuiaRemision($id, $file)
+    {
+        try {
+            $this->maxFileSize = 1000000;
+            $this->setAllowedExtensionsImagesOfficeFiles();
+            $fileUrl = $this->uploadSingleFile(
+                [
+                    "name" => $file['name'],
+                    "type" => $file['type'],
+                    "tmp_name" => $file['tmp_name'],
+                    "error" => $file['error'],
+                    "size" => $file['size']
+                ],
+                'assets/cargaconsolidada/guiasRemision'
+            );
+            $dataToUpdate['guia_remision_url'] = $fileUrl;
+            $this->db->where('id', $id);
+            $this->db->update($this->table_contenedor_cotizacion, $dataToUpdate);
+
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en uploadGuiaRemision: ' . $this->db->error()['message']);
+                return false;
+            } else {
+                return "success";
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en uploadGuiaRemision: ' . $e->getMessage());
+            return false;
+        }
+    }
+    public function deleteFacturaGeneralFile($idCotizacion)
+    {
+        try {
+            //get factura_general_url from table where id=idCotizacion and try to unlink and set null in database
+            $this->db->select('factura_general_url');
+            $this->db->from($this->table_contenedor_cotizacion);
+            $this->db->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $cotizacion = $query->row();
+            if ($cotizacion) {
+                $facturaGeneralUrl = $cotizacion->factura_general_url;
+                if (file_exists($facturaGeneralUrl)) {
+                    unlink($facturaGeneralUrl);
+                }
+            }
+            $this->db->set('factura_general_url', null);
+            $this->db->where('id', $idCotizacion);
+            $this->db->update($this->table_contenedor_cotizacion);
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en deleteFacturaGeneralFile: ' . $this->db->error()['message']);
+                return false;
+            } else {
+                return "success";
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en deleteFacturaGeneralFile: ' . $e->getMessage());
+            return false;
+        }
+    }
+    public function deleteGuiaRemisionFile($idCotizacion)
+    {
+        try {
+            //get guia_remision_url from table where id=idCotizacion and try to unlink and set null in database
+            $this->db->select('guia_remision_url');
+            $this->db->from($this->table_contenedor_cotizacion);
+            $this->db->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $cotizacion = $query->row();
+            if ($cotizacion) {
+                $guiaRemisionUrl = $cotizacion->guia_remision_url;
+                if (file_exists($guiaRemisionUrl)) {
+                    unlink($guiaRemisionUrl);
+                }
+            }
+            $this->db->set('guia_remision_url', null);
+            $this->db->where('id', $idCotizacion);
+            $this->db->update($this->table_contenedor_cotizacion);
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en deleteGuiaRemisionFile: ' . $this->db->error()['message']);
+                return false;
+            } else {
+                return "success";
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en deleteGuiaRemisionFile: ' . $e->getMessage());
+            return false;
         }
     }
 }
