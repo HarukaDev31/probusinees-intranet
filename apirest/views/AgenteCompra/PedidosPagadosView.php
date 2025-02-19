@@ -12,7 +12,7 @@
       </div>
     </div><!-- /.container-fluid -->
   </section>
-  <?php //array_debug($this->user);
+  <?php
 ?>
   <section class="content">
     <div class="container-fluid">
@@ -84,7 +84,7 @@
                           <th>Ver</th>
                           <th>Estado</th>
                         <?php
-      } else {?>
+              } else {?>
 
                       <th>N° Orden</th>
 

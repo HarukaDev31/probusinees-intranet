@@ -56,9 +56,15 @@
             <tr>
               <?php if ($this->user->No_Grupo == "Coordinación") {
               ?>
+<<<<<<< HEAD
                 <th>Mes </th>
                 <th>Pais</th>
                 <th>Carga</th>
+=======
+                <th>Carga</th>
+                <th>Mes </th>
+                <th>Pais</th>
+>>>>>>> b17ee25a6d1ada8f6e8358c25718701c34ec054d
 
                 <th>F. Cierre</th>
                 <th>F. Arribo</th>
@@ -556,6 +562,15 @@
           <div class="fa fa-upload"></div>
           Plantilla Final
         </button>
+<<<<<<< HEAD
+=======
+        <!--button back-->
+        <button
+          id="btn-back-cotizacion-final"
+          class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
+          <div class="fa fa-arrow-left"></div>
+        </button>
+>>>>>>> b17ee25a6d1ada8f6e8358c25718701c34ec054d
       </div>
       <div class="table-responsive" class="table table-bordered table-hover table-striped">
         <table id="table-cotizacion-final" class="table table-bordered table-hover table-striped">
@@ -577,6 +592,45 @@
         </table>
       </div>
   </section>
+<<<<<<< HEAD
+=======
+  <section class="content card" id="factura-guia-container">
+    <div class="min-h-screen bg-gray-50 p-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">CONSOLIDADO #1: FACTURA Y GUIA</h1>
+      <div class="flex 
+      w-full gap-4 mb-8
+      justify-end
+      
+      ">
+          <!--3 empty divs-->
+       
+        <!--button back-->
+        <button
+          id="btn-back-factura-guia"
+          class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
+          <div class="fa fa-arrow-left"></div>
+        </button>
+      </div>
+      <div class="table-responsive" class="table table-bordered table-hover table-striped">
+        <table id="table-factura-guia" class="table table-bordered table-hover table-striped">
+          <thead class="thead-light">
+            <tr>
+              <th>N°</th>
+              <th>Nombre</th>
+              <th>DNI/RUC</th>
+              <th>Correo</th>
+              <th>Whatsapp</th>
+              <th>T. Cliente</th>
+              <th>Ajuste</th>
+              <th>C.Final</th>
+              <th>Factura</th>
+              <th>Guia R</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+  </section>
+>>>>>>> b17ee25a6d1ada8f6e8358c25718701c34ec054d
   <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">

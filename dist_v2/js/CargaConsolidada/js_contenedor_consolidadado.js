@@ -86,6 +86,42 @@ var fileList ;
 var cotizacionAlmacenContainer = null;
 var cotizacionFinalContainer = null;
 var tableCotizacionFinal = null;
+var facturaGuiaContainer=null;
+var tableFacturaGuia=null;
+async function descargarBoletaPDF (idCotizacionFinal)  {
+    spinner.show();
+    $.ajax({
+      url: base_url + "CargaConsolidada/ContenedorConsolidado/downloadBoleta/"+idCotizacionFinal,
+      type: "GET",
+      xhrFields: {
+        responseType: "blob",
+      },
+    //   data: JSON.stringify({ idCotizacionFinal: idCotizacionFinal }),
+      success: function (response) {
+        var blob = new Blob([response], {
+          type: "application/pdf",  
+        });
+        var link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        const currentDate = new Date();
+        //format date to dd_mm_yyyy
+        const formattedDate = `${currentDate.getDate()}_${
+          currentDate.getMonth() + 1
+        }_${currentDate.getFullYear()}`;
+        link.download = `Cotizacion.pdf`
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+  
+        spinner.hide();
+      },
+      error: function (errorThrown) {
+        Swal.fire("Error!", "Hubo un error", "error");
+        console.error("Error al descargar el archivo Excel: " + errorThrown);
+        spinner.hide();
+      },
+    });
+  };
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
@@ -107,7 +143,102 @@ async function updateEstado(id) {
         },
     });
 }
+async function uploadCotizacionFinal(id){
+    //swall with file input 
+    const { value: file } = await Swal.fire({
+        title: 'Subir Cotización Final',
+        input: 'file',
+        inputAttributes: {
+            'accept': //excel
+                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'aria-label': 'Sube tu archivo'
 
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes elegir un archivo!'
+            }
+        }
+    })
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('idCotizacionFinal', id);
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadCotizacionFinal";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                    tableCotizacionFinal.ajax.reload();
+                } else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+            },
+        });
+    }
+
+}
+async function deleteCotizacionFinalFile(id){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteCotizacionFinalFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        tableCotizacionFinal.ajax.reload();
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    reloadTableCotizacionFinal();
+                },
+            });
+        }
+    });
+}
+async function updateEstadoCotizacionFinal(idCotizacionFinal){
+    const estado = $(`#estado-cotizacion-final${idCotizacionFinal}`).val();
+    
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionFinal";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            idCotizacionFinal: idCotizacionFinal,
+            estado: estado
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+                reloadTableCotizacionFinal();
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+            table_Entidad.ajax.reload();
+        },
+    });
+}
 function addFileToList(file) {
     const isImage = file.file_ext.startsWith('image');
     const fileItem = $(`
@@ -536,6 +667,150 @@ async function updateArriveDateChina($idProveedor){
     });
     spinner.hide();
 
+}
+async function uploadFacturaGeneral(idCotizacion){
+    //swall with file input 
+    const { value: file } = await Swal.fire({
+        title: 'Subir Factura',
+        input: 'file',
+        inputAttributes: {
+            'accept': //excel
+                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'aria-label': 'Sube tu archivo'
+
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes elegir un archivo!'
+            }
+        }
+    })
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('idCotizacion', idCotizacion);
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadFacturaGeneral";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                    tableFacturaGuia.ajax.reload();
+                } else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+            },
+        });
+    }
+}
+async function uploadGuiaRemision(idCotizacion){
+    //swall with file input 
+    const { value: file } = await Swal.fire({
+        title: 'Subir Guia de Remisión',
+        input: 'file',
+        inputAttributes: {
+            'accept': //excel
+                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'aria-label': 'Sube tu archivo'
+
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes elegir un archivo!'
+            }
+        }
+    })
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('idCotizacion', idCotizacion);
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadGuiaRemision";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                    tableFacturaGuia.ajax.reload();
+                } else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+            },
+        });
+    }
+}
+async function deleteFacturaGeneralFile(id){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteFacturaGeneralFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        tableFacturaGuia.ajax.reload();
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    reloadTableFacturaGuia();
+                },
+            });
+        }
+    });
+}
+async function deleteGuiaRemisionFile(id){
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteGuiaRemisionFile/" + id;
+            $.ajax({
+                url: url,
+                type: "GET",
+
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        tableFacturaGuia.ajax.reload();
+                        Swal.fire("Eliminado!", result.message, "success");
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    reloadTableFacturaGuia();
+                },
+            });
+        }
+    });
 }
 async function updateProductos($idProveedor,idCotizacion){
     $productos=$(`#productos-${$idProveedor}`).val();
@@ -1037,7 +1312,7 @@ const openStepFunction = async (step, id) => {
                                     paging: true,
                                     lengthChange: true,
                                     searching: true,
-                                    ordering: true,
+                                    ordering: false,
                                     info: true,
                                     autoWidth: false,
                                     responsive: false,
@@ -1304,7 +1579,7 @@ const openStepFunction = async (step, id) => {
                                     paging: true,
                                     lengthChange: true,
                                     searching: true,
-                                    ordering: true,
+                                    ordering: false,
                                     info: true,
                                     autoWidth: false,
                                     responsive: false,
@@ -1761,6 +2036,8 @@ const openStepFunction = async (step, id) => {
         viewDocumentacion();
     } else if (stepIndex==4){
         viewCotizacionFinal();
+    }else if (stepIndex == 5) {
+        viewFacturaGuia();
     }
     $(".btn-back-cotizacion").off("click");
     $(".btn-back-cotizacion").on("click", function () {
@@ -1775,6 +2052,101 @@ const openStepFunction = async (step, id) => {
 
     spinner.hide();
 }
+async function viewFacturaGuia(){
+    facturaGuiaContainer.show();
+    spinner.show();
+    url=base_url+"CargaConsolidada/ContenedorConsolidado/step";
+    if($.fn.DataTable.isDataTable("#table-factura-guia")){
+        tableFacturaGuia.ajax.reload();
+    }else{
+        tableFacturaGuia.show();
+
+        tableFacturaGuia=$('#table-factura-guia').DataTable({
+            dom:
+            "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [
+                {
+                    extend: "excel",
+                    text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                    titleAttr: "Excel",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+                {
+                    extend: "pdf",
+                    text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+                    titleAttr: "PDF",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+                {
+                    extend: "colvis",
+                    text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                    titleAttr: "Columnas",
+                    exportOptions: {
+                        columns: ":visible",
+                    },
+                },
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: false,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                    sFirst: "<<",
+                    sLast: ">>",
+                    sPrevious: "<",
+                    sNext: ">",
+                },
+            },
+            columnDefs: [
+                {
+                    targets: "no-hidden",
+                    visible: false,
+                },
+                {
+                    className: "text-center",
+                    targets: "no-sort",
+                    orderable: false,
+                },
+                {
+                    targets: "",
+                    orderable: false,
+                }
+            ],
+            ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                    data.stepIndex = stepIndex;
+                    data.idContenedor = idContenedor;
+                }
+            },
+            initComplete: function (settings, json) {
+                spinner.hide();
+            },
+        });
+    }
+}
 async function viewCotizacionFinal(){
     cotizacionFinalContainer.show();
     spinner.show();
@@ -1782,6 +2154,8 @@ async function viewCotizacionFinal(){
     if($.fn.DataTable.isDataTable("#table-cotizacion-final")){
         tableCotizacionFinal.ajax.reload();
     }else{
+        tableCotizacionFinal.show();
+
         tableCotizacionFinal=$('#table-cotizacion-final').DataTable({
             dom:
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -1978,9 +2352,10 @@ async function reloadTableClientesVariacion() {
 
 async function reloadTableCotizacionEmbarque(){
     tableCotizacionEmbarque.ajax.reload()
-    await getTableCotizacionEmbarqueHeaders();
-   
-   
+    await getTableCotizacionEmbarqueHeaders(); 
+}
+async function reloadTableCotizacionFinal(){
+    tableCotizacionFinal.ajax.reload()
 }
 async function getTableCotizacionEmbarqueHeaders(){
     url=base_url+"CargaConsolidada/ContenedorConsolidado/getCotizacionEmbarqueHeaders/"+idContenedor;
@@ -2547,7 +2922,7 @@ const returnToSteps = () => {
     cotizacionContainer.hide();
     clientesContainer.hide();
     documentationContainer.hide();
-
+    facturaGuiaContainer.hide();
     stepsContainer.show();
 
 }
@@ -2582,6 +2957,10 @@ $(document).ready(async function () {
     cotizacionFinalContainer.hide();
     tableCotizacionFinal=$("#table-cotizacion-final");
     tableCotizacionFinal.hide();
+    facturaGuiaContainer=$("#factura-guia-container");
+    facturaGuiaContainer.hide();
+    tableFacturaGuia=$("#table-factura-guia");
+    tableFacturaGuia.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
  
     table_Entidad = $("#table-contenedor").DataTable({
@@ -2618,7 +2997,7 @@ $(document).ready(async function () {
         paging: true,
         lengthChange: true,
         searching: true,
-        ordering: true,
+        ordering: false,
         info: true,
         autoWidth: false,
         responsive: false,
@@ -2956,6 +3335,9 @@ $(document).ready(async function () {
     $("#btn-back-cotizacion-almacen").click(function () {
         cotizacionAlmacenContainer.hide();
         cotizacionContainer.show();
+    })
+    $("#btn-back-factura-guia").click(function () {
+        returnToSteps();
     })
     $("#btn-documentacion-zip").click(function () {
         spinner.show();
@@ -3451,14 +3833,19 @@ $(document).ready(async function () {
                 },
                 allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
-                if (result.isConfirmed) {
+                
                   
                         Swal.fire("Correcto", result.value.message, "success");
                         tableCotizacionFinal.ajax.reload();
-                    } 
+
                     
                 
             })
+        })
+        $("#btn-back-cotizacion-final").click(function () {
+            cotizacionFinalContainer.hide();
+            returnToSteps();
+
         })
         /*End of Listeners */
     });

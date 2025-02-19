@@ -90,4 +90,5 @@ class ConsolidadoModel extends CI_Model{
         return array('status' => 'error', 'style_modal' => 'modal-danger', 'message' => 'Error al eliminar');
 	}
 	
+	
 }

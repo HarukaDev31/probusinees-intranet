@@ -342,6 +342,7 @@ class CCotizaciones extends CI_Controller
             // Eliminar el archivo temporal
 
         } catch (Exception $e) {
+            log_message('error', 'Error en descargarBoleta: ' . $e->getMessage());
             echo $e->getMessage();
         }
 
