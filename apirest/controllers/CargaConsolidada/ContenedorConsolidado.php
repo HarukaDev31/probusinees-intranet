@@ -1257,9 +1257,14 @@ class ContenedorConsolidado extends CI_Controller
 			"status" => $arrResponse
 		]);
 	}
+	public function receiveMessage(){
+		$inputPost= $this->input->post();
+		log_message('error', $inputPost);
+	}
 	function convertDateFormat($date)
 	{
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);
 		return $dateObject ? $dateObject->format('Y-m-d') : null; // Devuelve null si la fecha no es válida
 	}
+
 }
