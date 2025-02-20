@@ -3,12 +3,26 @@
   <section class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
-        <div class="col-sm-8">
+        <div class="col-sm-7">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <span id="section-title"><?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></span>
             &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
           </h1>
         </div>
+        <div class="col-6 col-sm-2">
+          <button type="button" id="btn-buscar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+        </div>
+        <div class="col-6 col-sm-1">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-upload"></i> Exportar</button>
+        </div>
+        <div class="col-6 col-sm-1">
+          <button type="button" id="btn-filtrar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-filter"></i> Filtro</button>
+        </div>
+        <?php if($this->user->No_Grupo=="Coordinación"){  ?>
+        <div class="col-6 col-sm-1">
+          <button type="button" id="btn-crear" class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Crear<i class="fa fa-plus"></i> </button>
+        </div>
+        <?php } ?>
       </div>
     </div><!-- /.container-fluid -->
   </section>
@@ -38,21 +52,13 @@
             <option value="COMPLETADO">COMPLETADO</option>
           </select>
         </div>
-        <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
-          <div class="col-6 col-sm-2">
-            <label>&nbsp;</label>
-            <button type="button" id="btn-crear" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
-          </div>
-        <?php } ?>
+      
 
-        <div class="col-6 col-sm-2">
-          <label>&nbsp;</label>
-          <button type="button" id="btn-buscar-carga" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
-        </div>
+      
       </div>
       <div class="table-responsive div-Listar">
-        <table id="table-contenedor" class="table table-bordered table-hover table-striped">
-          <thead class="thead-light">
+        <table id="table-contenedor" class="table table-hover">
+          <thead class="thead-default">
             <tr>
               <?php if ($this->user->No_Grupo == "Coordinación") {
               ?>
@@ -65,7 +71,6 @@
                 <th>F. Entrega</th>
 
                 <th>Empresa</th>
-                <th>Ver</th>
                 <th>Estado</th>
                 <th>Acciones
                 </th>
@@ -1111,5 +1116,51 @@
     100% {
       opacity: 1;
     }
-  }
+  }.btn-block{
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.bg-orange{
+  background-color: #FF500B !important;
+  color: #fff !important;
+}
+#table-contenedor tbody{
+  background-color: white !important;
+}
+.table tr.odd>td, tr.even>td{
+  border-top: 4px solid #f4f6f9;
+  border-bottom: 4px solid #f4f6f9;
+  vertical-align: bottom !important;
+}
+th.sorting_disabled{
+  font-weight: normal !important;
+}
+.table thead th {
+    vertical-align: bottom !important;
+    border-bottom: 0px solid #dee2e6 !important;
+    border-top: 0px solid #dee2e6;
+}
+#table-contenedor_info{
+  display: none;
+}
+
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+    margin: 2px 0;
+    white-space: nowrap;
+    justify-content: flex-start;
+}
+div#table-contenedor_length{
+  display: none;
+}
+
+.page-item.active .page-link {
+  background-color: #FF500B;
+  border-color: #FF500B;
+}
+.page-link {
+  color: #585858;
+}
+
 </style>

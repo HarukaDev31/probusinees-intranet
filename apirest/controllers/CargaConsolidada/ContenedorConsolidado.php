@@ -51,55 +51,31 @@ class ContenedorConsolidado extends CI_Controller
 			}
 
 			$subdata[] = $row->empresa;
-			$btnView = '<div' . ' onclick="viewSteps(' . $row->id . ')"' .	'>' .
-				'<i class="fas fa-eye ' .
-				($row->estado == "PENDIENTE" ? 'text-primary' : 'text-primary') .
-				'" style="cursor:pointer;font-size:20px;' .
-				($row->estado == "PENDIENTE" ? 'font-size:20px;' : '') .
-				'"></i>' .
-				'</div>';
-			$subdata[] = $btnView;
 
-			//if no_grupo is ContenedorAlmacen add 
-			if ($this->user->No_Grupo == "ContenedorAlmacen") {
-				$divEstado = '<select 
-				class="form-control
-				' . ($row->estado_china == "PENDIENTE" ? "bg-light" : "") .
-					($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .
-					($row->estado_china == "COMPLETADO" ? "bg-success" : "") . '
-				
-				" id="estado-' . $row->id . '" name="estado" onchange="updateEstado(' . $row->id . ')">
-					<option 
-					value="PENDIENTE" ' . ($row->estado_china == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
-					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>RECIBIENDO</option>
 
-					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>COMPLETADO</option>
-				</select>';
 
-			}else{
-				$divEstado = '<select 
+			$divEstado = '<select 
 			class="form-control
-			' . ($row->estado == "PENDIENTE" ? "bg-light" : "") .
+			' . ($row->estado == "PENDIENTE" ? "bg-warning" : "") .
 				($row->estado == "RECIBIENDO" ? "bg-primary" : "") .
 				($row->estado == "COMPLETADO" ? "bg-success" : "") . '
 			
 			" id="estado-' . $row->id . '" name="estado" onchange="updateEstado(' . $row->id . ')">
 				<option 
-				value="PENDIENTE" ' . ($row->estado == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
-				<option value="RECIBIENDO" ' . ($row->estado == "RECIBIENDO" ? "selected" : "") . '>RECIBIENDO</option>
+				value="PENDIENTE" ' . ($row->estado == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
+				<option value="RECIBIENDO" ' . ($row->estado == "RECIBIENDO" ? "selected" : "") . '>Recibiendo</option>
 
-				<option value="COMPLETADO" ' . ($row->estado == "COMPLETADO" ? "selected" : "") . '>COMPLETADO</option>
+				<option value="COMPLETADO" ' . ($row->estado == "COMPLETADO" ? "selected" : "") . '>Completado</option>
 			</select>';
 
-			}
-			
 
 			$subdata[] = $divEstado;
 
 			if ($this->user->No_Grupo == "Coordinación") {
 				$divAcciones = '<div>
-				<i class="fas fa-edit text-warning" style="cursor:pointer;" onclick="view(' . $row->id . ')"></i>
-				<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCarga(' . $row->id . ')"></i>
+				<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ')"></i>
+				<i class="fas fa-edit text-warning" style="cursor:pointer; padding:10px;" onclick="view(' . $row->id . ')"></i>
+				<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="deleteCarga(' . $row->id . ')"></i>
 				</div>';
 			}
 
