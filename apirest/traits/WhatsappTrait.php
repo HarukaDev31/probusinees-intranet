@@ -1,9 +1,9 @@
 <?php
 trait WhatsappTrait
 {
-    private $apiUrl = 'http://localhost:8082/enviar-mensaje';
+    private $apiUrl = 'https://whatsapp.probusiness.pe/enviar-mensaje';
     // private $token = "EAAWycxktPLABO1mMGWamek2oZAKFcaD1fzmPa3CXjTmjZCQyBXsG6BnyZA3GGmvDAc4kTHHcgcRoZAPZBFeCoA6cFH1Yp6Pd2iMj7Wm5EHAxQqIWsteiZC65C3oAYZBEJzSvhm6jXATWZBVRxEIkAzxfjPwvCMDqTSbCHVSCZAANR5v2CcP62ya6YkTH3kXD4YgMAeFv7L2oiW4FvqQO1g5GuyXpMDvos";
-    private $phoneNumberId = "51912705923@c.us";
+    private $phoneNumberId = "51934958839@c.us";
     public function sendWelcome()
     {
         try {
@@ -12,7 +12,7 @@ trait WhatsappTrait
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 'mensaje' => '
-Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business\n, 
+Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business, 
 yo me encargaré de ayudarte en tu importación del *consolidado #16.*
 
 📢 Preste atención al siguiente paso: Rotulado 👇🏼
