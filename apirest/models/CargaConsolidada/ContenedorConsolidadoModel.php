@@ -1919,11 +1919,17 @@ class ContenedorConsolidadoModel extends CI_Model
                         //     [
                         //         $tempFilePath
                         //     ]
-                        // );
+                        // );   
+                        $data=$this->sendDataItem(
+                        "
+                        Producto: {$products}
+                        Código de proveedor: {$supplierCode}
+                    ", $tempFilePath);
                         // $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
                         // $sendRotulado = $this->sendDatosProveedor($mediaId, $supplierCode,$products);
                     } catch (Exception $e) {
                         echo 'Error: ' . $e->getMessage();
+                        log_message('error', 'Error: ' . $e->getMessage());
                     } finally {
                         // Eliminar el archivo temporal
                         $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
@@ -1946,7 +1952,16 @@ class ContenedorConsolidadoModel extends CI_Model
                 //     []
                 // );
                 unlink($tempFilePath);
+                $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
+➡ Datos del proveedor: (Usted lo llena)
+
+☑ Nombre del producto:
+☑ Nombre del vendedor:
+☑ WeChat del vendedor:
+
+Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
+");
                 header('Content-Type: application/zip');
                 header('Content-Disposition: attachment; filename="Rotulado.zip"');
                 header('Content-Length: ' . filesize($zipFileName));
@@ -1962,6 +1977,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 exit;
             } catch (Exception $e) {
                 echo $e->getMessage();
+                log_message('error', 'Error: ' . $e->getMessage());
             }
         }
         return "success";
@@ -2393,27 +2409,32 @@ class ContenedorConsolidadoModel extends CI_Model
     function validateToSendInspectionMessage($idProveedor)
     {
         //find if exists more two files type image and one type video
-        $this->db->select('id')
+        $this->db->select('id,file_path')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor)
             ->where('file_type', 'image/jpeg')
             ->or_where('file_type', 'image/png');
         $query = $this->db->get();
+        $imagesUrls = $query->result();
         $images = $query->num_rows();
-        $this->db->select('id')
+        $this->db->select('id,file_path')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor)
             ->where('file_type', 'video/mp4');
         $query = $this->db->get();
+        $videosUrls = $query->result();
         $videos = $query->num_rows();
         //get current estado_china from proveedor
-        $this->db->select('estados_proveedor,code_supplier')
+        $this->db->select('estados_proveedor,code_supplier,qty_box_china,qty_box,id_cotizacion')
             ->from($this->table_contenedor_cotizacion_proveedores)
             ->where('id', $idProveedor);
         $query = $this->db->get();
         $estadoChina = $query->row()->estados_proveedor;
         $supplierCode = $query->row()->code_supplier;
-        if ($images >= 2 && $videos >= 1 && $estadoChina != "INSPECTION") {
+        $qtyBoxChina = $query->row()->qty_box_china;
+        $qtyBox = $query->row()->qty_box;
+        $idCotizacion = $query->row()->id_cotizacion;
+        if ( $estadoChina != "INSPECTION") {
             //set estado_china to INSPECTION
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, [
@@ -2436,8 +2457,30 @@ class ContenedorConsolidadoModel extends CI_Model
                 "action" => $this->cambioEstadoProveedor,
                 "message" => $message,
             ]);
+            //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
+            $this->db->select('nombre')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $cliente = $query->row()->nombre;
+            //message = cliente code supplieer qtyboxchina??qtybox
+            $message=$cliente." ".$supplierCode." ".($qtyBoxChina??$qtyBox);
+            $this->sendMessage("Hola buen día 🙋🏻‍♀
+
+            *Inspección:*".
+            $message."
+
+            ");
+            //for each images and video send media
+            foreach ($imagesUrls as $image) {
+                $this->sendMedia($image->file_path, 'image/jpeg');
+            }
+            foreach ($videosUrls as $video) {
+                $this->sendMedia($video->file_path, 'video/mp4');
+            }
             return true;
         }
+
         return false;
     }
     public function getClientesHeader($idContenedor)
