@@ -3488,7 +3488,7 @@ $(document).ready(async function () {
         });
 
         $(".input-date").datepicker({
-            autoclose: true,
+            autoclose: true,    
             startDate: new Date(fYear, fToday.getMonth(), fDay),
             todayHighlight: true,
             format: "dd/mm/yyyy",

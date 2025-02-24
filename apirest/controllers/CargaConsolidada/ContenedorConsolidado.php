@@ -19,31 +19,38 @@ class ContenedorConsolidado extends CI_Controller
 			redirect('');
 		}
 		log_message('error', 'ContenedorConsolidado : __construct()');
-
 	}
 
 	public function listar($ID_Carga_Consolidada = 0)
 	{
-		if (!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
-		if (isset($this->session->userdata['usuario'])) {
-			$this->load->view('header_v2', array("js_contenedor_consolidadado" => true));
-			$this->load->view('CargaConsolidada/ContenedorConsolidadoView', array(
-				'arrResponseConsolidado' => $arrResponseConsolidado,
-				'ID_Carga_Consolidada' => $ID_Carga_Consolidada,
-			));
-			$this->load->view('footer_v2', array("js_contenedor_consolidadado" => true));
+		try {
+			if (!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
+			if (isset($this->session->userdata['usuario'])) {
+				$this->load->view('header_v2', array("js_contenedor_consolidadado" => true));
+				$this->load->view('CargaConsolidada/ContenedorConsolidadoView', array(
+					'arrResponseConsolidado' => $arrResponseConsolidado,
+					'ID_Carga_Consolidada' => $ID_Carga_Consolidada,
+				));
+				$this->load->view('footer_v2', array("js_contenedor_consolidadado" => true));
+			}
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : listar() => ' . $e->getMessage());
 		}
 	}
 	public function index()
 	{
 		$arrData = $this->ContenedorConsolidadoModel->index();
 		$data = array();
-		
+
 		foreach ($arrData as $row) {
 			$subdata = array();
 			$subdata[] = "Consolidado #" . $row->carga;
 			$subdata[] = $row->mes;
-			$subdata[] = $row->No_Pais;
+			$subdata[] =
+				"<div>" .
+				$row->No_Pais .
+				$row->Txt_Icon .
+				"</div>";
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
 			if ($this->user->No_Grupo == "Coordinación") {
 				$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
@@ -75,13 +82,12 @@ class ContenedorConsolidado extends CI_Controller
 
 					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>COMPLETADO</option>
 				</select>';
-
-			}else{
+			} else {
 				$divEstado = '<select 
 			class="form-control
 			' . ($row->estado == "PENDIENTE" ? "bg-light" : "") .
-				($row->estado == "RECIBIENDO" ? "bg-primary" : "") .
-				($row->estado == "COMPLETADO" ? "bg-success" : "") . '
+					($row->estado == "RECIBIENDO" ? "bg-primary" : "") .
+					($row->estado == "COMPLETADO" ? "bg-success" : "") . '
 			
 			" id="estado-' . $row->id . '" name="estado" onchange="updateEstado(' . $row->id . ')">
 				<option 
@@ -90,9 +96,8 @@ class ContenedorConsolidado extends CI_Controller
 
 				<option value="COMPLETADO" ' . ($row->estado == "COMPLETADO" ? "selected" : "") . '>COMPLETADO</option>
 			</select>';
-
 			}
-			
+
 
 			$subdata[] = $divEstado;
 
@@ -106,7 +111,7 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $divAcciones;
 			$data[] = $subdata;
 		}
-		usort($data, function($a, $b) {
+		usort($data, function ($a, $b) {
 			$numA = (int) substr($a['carga'], 1); // Elimina el '#' y convierte a número
 			$numB = (int) substr($b['carga'], 1); // Elimina el '#' y convierte a número
 			return $numB - $numA; // Orden descendente
@@ -596,30 +601,30 @@ class ContenedorConsolidado extends CI_Controller
 		} else if ($stepIndex == 3) {
 			$arrResponse = $this->ContenedorConsolidadoModel->getDocumentationFolderFiles($idContenedor);
 			echo json_encode($arrResponse);
-		} else if($stepIndex==4){
-			$arrResponse= $this->ContenedorConsolidadoModel->getContenedorCotizacionesFinales($idContenedor);
+		} else if ($stepIndex == 4) {
+			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionesFinales($idContenedor);
 			$data = array();
 			$index = 1;
 			foreach ($arrResponse as $row) {
-					$subdata = array();
-					$subdata[] = $index;
-					$subdata[] = $row->nombre;
-					$subdata[] = $row->documento;
-					$subdata[] = $row->correo;
-					$subdata[] = $row->telefono;
-					$subdata[] = $row->name;
-					$subdata[] = $row->volumen_final;
-					$subdata[] = $row->monto_final;
-					$subdata[] = $row->tarifa_final;
-					$selectEstados= '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion. ')">
+				$subdata = array();
+				$subdata[] = $index;
+				$subdata[] = $row->nombre;
+				$subdata[] = $row->documento;
+				$subdata[] = $row->correo;
+				$subdata[] = $row->telefono;
+				$subdata[] = $row->name;
+				$subdata[] = $row->volumen_final;
+				$subdata[] = $row->monto_final;
+				$subdata[] = $row->tarifa_final;
+				$selectEstados = '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
 					<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
 					<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
 					<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>';
-					$subdata[] = $selectEstados;
-					//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
-					$divFile = '<div>';
-					if (!empty($row->cotizacion_final_url)) {
-						$divFile .= '<div class="d-flex flex-row gap-2">
+				$subdata[] = $selectEstados;
+				//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
+				$divFile = '<div>';
+				if (!empty($row->cotizacion_final_url)) {
+					$divFile .= '<div class="d-flex flex-row gap-2">
 						<a href="' . $row->cotizacion_final_url . '" download>
 							<i class="fas fa-file-excel text-success"></i>
 
@@ -631,52 +636,51 @@ class ContenedorConsolidado extends CI_Controller
 						
 						</div>
 						';
-					} else {
-						$divFile .= '
+				} else {
+					$divFile .= '
 						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFinal(' . $row->id_cotizacion . ')"></i>';
-					}
-					$divFile .= '</div>';
-					$subdata[] = $divFile;
-					$data[] = $subdata;
-					$index++;
-
 				}
-			
+				$divFile .= '</div>';
+				$subdata[] = $divFile;
+				$data[] = $subdata;
+				$index++;
+			}
+
 			$output = array(
 				"data" => $data
 			);
 			echo json_encode($output);
-		} else if($stepIndex==5){
-			$arrResponse= $this->ContenedorConsolidadoModel->getContenedorFacturaGuia($idContenedor);
+		} else if ($stepIndex == 5) {
+			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorFacturaGuia($idContenedor);
 			$data = array();
 			$index = 1;
 			foreach ($arrResponse as $row) {
-					$subdata = array();
-					$subdata[] = $index;
-					$subdata[] = $row->nombre;
-					$subdata[] = $row->documento;
-					$subdata[] = $row->correo;
-					$subdata[] = $row->telefono;
-					$subdata[] = $row->name;
-					$subdata[] ='<div class="badge badge-'.($row->estado_cotizacion_final=="AJUSTADO" ? "danger" : "success").'">'.
-					($row->estado_cotizacion_final=="AJUSTADO" ? "SI" : "NO").'</div>';
+				$subdata = array();
+				$subdata[] = $index;
+				$subdata[] = $row->nombre;
+				$subdata[] = $row->documento;
+				$subdata[] = $row->correo;
+				$subdata[] = $row->telefono;
+				$subdata[] = $row->name;
+				$subdata[] = '<div class="badge badge-' . ($row->estado_cotizacion_final == "AJUSTADO" ? "danger" : "success") . '">' .
+					($row->estado_cotizacion_final == "AJUSTADO" ? "SI" : "NO") . '</div>';
 
-					//if cotizacion_final_url exists add icon download
-					$divFile = '<div>';
-					if(!empty($row->cotizacion_final_url)){
-						$divFile .= '<div class="d-flex flex-row gap-2">
-						<a href="'.$row->cotizacion_final_url.'" download>
+				//if cotizacion_final_url exists add icon download
+				$divFile = '<div>';
+				if (!empty($row->cotizacion_final_url)) {
+					$divFile .= '<div class="d-flex flex-row gap-2">
+						<a href="' . $row->cotizacion_final_url . '" download>
 							<i class="fas fa-file-excel text-success"></i>
 						</a>						
 						</div>
 						';
-					}
-					$divFile .= '</div>';
-					$subdata[] = $divFile;
-					//if factura_general_url is not null add download and delete button else add upload button
-					$divFile = '<div>';
-					if (!empty($row->factura_general_url)) {
-						$divFile .= '<div class="d-flex flex-row gap-2">
+				}
+				$divFile .= '</div>';
+				$subdata[] = $divFile;
+				//if factura_general_url is not null add download and delete button else add upload button
+				$divFile = '<div>';
+				if (!empty($row->factura_general_url)) {
+					$divFile .= '<div class="d-flex flex-row gap-2">
 						<a href="' . $row->factura_general_url . '" download>
 							<i class="fas fa-file-excel text-success"></i>
 
@@ -685,16 +689,16 @@ class ContenedorConsolidado extends CI_Controller
 						
 						</div>
 						';
-					} else {
-						$divFile .= '
+				} else {
+					$divFile .= '
 						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadFacturaGeneral(' . $row->id_cotizacion . ')"></i>';
-					}
-					$divFile .= '</div>';
-					$subdata[] = $divFile;
-					//if guia_remision_url is not null add download and delete button else add upload button
-					$divFile = '<div>';
-					if (!empty($row->guia_remision_url)) {
-						$divFile .= '<div class="d-flex flex-row gap-2">
+				}
+				$divFile .= '</div>';
+				$subdata[] = $divFile;
+				//if guia_remision_url is not null add download and delete button else add upload button
+				$divFile = '<div>';
+				if (!empty($row->guia_remision_url)) {
+					$divFile .= '<div class="d-flex flex-row gap-2">
 						<a href="' . $row->guia_remision_url . '" download>
 							<i class="fas fa-file-excel text-success"></i>
 
@@ -703,17 +707,16 @@ class ContenedorConsolidado extends CI_Controller
 						
 						</div>
 						';
-					} else {
-						$divFile .= '
+				} else {
+					$divFile .= '
 						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadGuiaRemision(' . $row->id_cotizacion . ')"></i>';
-					}
-					$divFile .= '</div>';
-					$subdata[] = $divFile;
-					$data[] = $subdata;
-					$index++;
-
 				}
-			
+				$divFile .= '</div>';
+				$subdata[] = $divFile;
+				$data[] = $subdata;
+				$index++;
+			}
+
 			$output = array(
 				"data" => $data
 			);
@@ -952,7 +955,8 @@ class ContenedorConsolidado extends CI_Controller
 		}
 	}
 	public function updateEstadoCotizacionProveedor()
-	{	ob_end_clean();
+	{
+		ob_end_clean();
 		$idCotizacion = $this->input->post('idCotizacion');
 		$idProveedor = $this->input->post('idProveedor');
 		$estado = $this->input->post('estado');
@@ -1197,7 +1201,7 @@ class ContenedorConsolidado extends CI_Controller
 	public function generateMassiveExcelPayrolls()
 	{
 		ob_end_clean();
-		$idContenedor= $this->input->post('idContenedor');
+		$idContenedor = $this->input->post('idContenedor');
 		$fileTmpPath = $_FILES['file']['tmp_name'];
 		$fileName = $_FILES['file']['name'];
 		$fileSize = $_FILES['file']['size'];
@@ -1207,7 +1211,7 @@ class ContenedorConsolidado extends CI_Controller
 		$this->load->library('PHPExcel');
 		$objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
 		$zipFilePath = $this->ContenedorConsolidadoModel->generateMassiveExcelPayrolls($objPHPExcel, $idContenedor);
-		
+
 		if (file_exists($zipFilePath)) {
 			header('Content-Type: application/zip');
 			header('Content-Disposition: attachment; filename="' . basename($zipFilePath) . '"');
@@ -1225,58 +1229,64 @@ class ContenedorConsolidado extends CI_Controller
 		// $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
 		// $objWriter->save('php://output');
 	}
-	public function updateEstadoCotizacionFinal(){
-		$idCotizacionFinal= $this->input->post('idCotizacionFinal');
-		$estado= $this->input->post('estado');
-		$arrResponse= $this->ContenedorConsolidadoModel->updateEstadoCotizacionFinal($idCotizacionFinal, $estado);
-		echo json_encode([
-			"status" => $arrResponse
-		]);
-		
-	}
-	public function deleteCotizacionFinalFile($id){
-		$arrResponse= $this->ContenedorConsolidadoModel->deleteCotizacionFinalFile($id);
+	public function updateEstadoCotizacionFinal()
+	{
+		$idCotizacionFinal = $this->input->post('idCotizacionFinal');
+		$estado = $this->input->post('estado');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoCotizacionFinal($idCotizacionFinal, $estado);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
 	}
-	public function uploadCotizacionFinal(){
-		$idCotizacionFinal= $this->input->post('idCotizacionFinal');
-		$file= $_FILES['file'];
-		$arrResponse= $this->ContenedorConsolidadoModel->uploadCotizacionFinal($idCotizacionFinal, $file);
+	public function deleteCotizacionFinalFile($id)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteCotizacionFinalFile($id);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
 	}
-	public function downloadBoleta($idCotizacionFinal){
+	public function uploadCotizacionFinal()
+	{
+		$idCotizacionFinal = $this->input->post('idCotizacionFinal');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadCotizacionFinal($idCotizacionFinal, $file);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function downloadBoleta($idCotizacionFinal)
+	{
 		ob_end_clean();
 		$this->ContenedorConsolidadoModel->downloadBoleta($idCotizacionFinal);
-		
 	}
-	public function uploadFacturaGeneral(){
-		$idCotizacion= $this->input->post('idCotizacion');
-		$file= $_FILES['file'];
-		$arrResponse= $this->ContenedorConsolidadoModel->uploadFacturaGeneral($idCotizacion, $file);
+	public function uploadFacturaGeneral()
+	{
+		$idCotizacion = $this->input->post('idCotizacion');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadFacturaGeneral($idCotizacion, $file);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
 	}
-	public function uploadGuiaRemision(){
-		$idCotizacion= $this->input->post('idCotizacion');
-		$file= $_FILES['file'];
-		$arrResponse= $this->ContenedorConsolidadoModel->uploadGuiaRemision($idCotizacion, $file);
+	public function uploadGuiaRemision()
+	{
+		$idCotizacion = $this->input->post('idCotizacion');
+		$file = $_FILES['file'];
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadGuiaRemision($idCotizacion, $file);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
 	}
-	public function deleteFacturaGeneralFile($id){
-		$arrResponse= $this->ContenedorConsolidadoModel->deleteFacturaGeneralFile($id);
+	public function deleteFacturaGeneralFile($id)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteFacturaGeneralFile($id);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
 	}
-	public function deleteGuiaRemisionFile($id){
-		$arrResponse= $this->ContenedorConsolidadoModel->deleteGuiaRemisionFile($id);
+	public function deleteGuiaRemisionFile($id)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteGuiaRemisionFile($id);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
