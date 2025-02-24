@@ -36,7 +36,11 @@ class ContenedorConsolidadoModel extends CI_Model
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
     public function __construct()
     {
+        try{
         parent::__construct();
+        }catch(Exception $e){
+            log_message('error', $e->getMessage());
+        }
     }
     public function index()
     {
@@ -1753,7 +1757,6 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
-            $this->sendWelcome();
         }
         // Manejo del estado "LOADED"
         else if ($estado == "LOADED") {
@@ -1867,9 +1870,10 @@ class ContenedorConsolidadoModel extends CI_Model
                 // $uuid=uniqid();
                 // $tempFilePath = sys_get_temp_dir() . "/temp_document_{$uuid}.pdf";
                 // file_put_contents($tempFilePath, $pdfContent);
-                $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
-                $this->email->clear(TRUE);
-
+                // $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
+                //$this->email->clear(TRUE);
+                $response=$this->sendWelcome();
+                log_message('error', 'response: '.$response);
                 // unlink($tempFilePath);
 
                 $zip = new ZipArchive();
@@ -1906,16 +1910,16 @@ class ContenedorConsolidadoModel extends CI_Model
                     $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
                     file_put_contents($tempFilePath, $pdfContent);
                     try {
-                        $this->sendMail(
-                            $email,
-                            "Datos Item",
-                            `Producto: {$products}
-                            Código de proveedor: {$supplierCode}
-                            `,
-                            [
-                                $tempFilePath
-                            ]
-                        );
+                        // $this->sendMail(
+                        //     $email,
+                        //     "Datos Item",
+                        //     `Producto: {$products}
+                        //     Código de proveedor: {$supplierCode}
+                        //     `,
+                        //     [
+                        //         $tempFilePath
+                        //     ]
+                        // );
                         // $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
                         // $sendRotulado = $this->sendDatosProveedor($mediaId, $supplierCode,$products);
                     } catch (Exception $e) {
@@ -1935,12 +1939,12 @@ class ContenedorConsolidadoModel extends CI_Model
                 // $pdfContent = $dompdf->output();
                 // $tempFilePath = sys_get_temp_dir() . "/temp_document_data_{$supplierCode}.pdf";
                 // file_put_contents($tempFilePath, $pdfContent);
-                $this->sendMail(
-                    $email,
-                    "Datos Cliente",
-                    $htmlDataContent,
-                    []
-                );
+                // $this->sendMail(
+                //     $email,
+                //     "Datos Cliente",
+                //     $htmlDataContent,
+                //     []
+                // );
                 unlink($tempFilePath);
 
                 header('Content-Type: application/zip');

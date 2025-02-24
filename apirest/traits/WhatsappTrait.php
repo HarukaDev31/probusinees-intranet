@@ -1,30 +1,31 @@
 <?php
 trait WhatsappTrait
 {
-    private $url = "htpp:localhost:8082/api/send-message";
+    private $apiUrl = 'http://localhost:8082/enviar-mensaje';
     // private $token = "EAAWycxktPLABO1mMGWamek2oZAKFcaD1fzmPa3CXjTmjZCQyBXsG6BnyZA3GGmvDAc4kTHHcgcRoZAPZBFeCoA6cFH1Yp6Pd2iMj7Wm5EHAxQqIWsteiZC65C3oAYZBEJzSvhm6jXATWZBVRxEIkAzxfjPwvCMDqTSbCHVSCZAANR5v2CcP62ya6YkTH3kXD4YgMAeFv7L2oiW4FvqQO1g5GuyXpMDvos";
     private $phoneNumberId = "51912705923@c.us";
     public function sendWelcome()
     {
         try {
-            $ch = curl_init($this->url);
+            $ch = curl_init($this->apiUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'message' => '
-                Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business, yo me encargaré de ayudarte en tu importación del *consolidado #16.*
+                'mensaje' => '
+Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business\n, 
+yo me encargaré de ayudarte en tu importación del *consolidado #16.*
 
-                📢 Preste atención al siguiente paso: Rotulado 👇🏼
-                Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.
+📢 Preste atención al siguiente paso: Rotulado 👇🏼
+Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.
 
-                ☑ El documento está en idioma chino, solo debes enviarle a tu proveedor 📤
+☑ El documento está en idioma chino, solo debes enviarle a tu proveedor 📤
 
-                Nota: No cambiar ninguno de los datos, en caso tu proveedor tenga alguna consulta, se puede comunicarse:
+Nota: No cambiar ninguno de los datos, en caso tu proveedor tenga alguna consulta, se puede comunicarse:
 
-                🙍🏻‍♂ Álmacen China: Mr. Younus 
-                📞 Wechat: 13185122926
-                ',
-                'number' => $this->phoneNumberId
+🙍🏻‍♂ Álmacen China: Mr. Younus 
+📞 Wechat: 13185122926
+                    ',
+                'numero' => $this->phoneNumberId
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
             $response = curl_exec($ch);
@@ -463,3 +464,4 @@ trait WhatsappTrait
     //     }
     // }
 }
+?>
