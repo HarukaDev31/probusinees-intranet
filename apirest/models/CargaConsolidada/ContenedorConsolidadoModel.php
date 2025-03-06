@@ -2540,16 +2540,16 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $query = $this->db->get();
             $cliente = $query->row()->nombre;
             //message = cliente code supplieer qtyboxchina??qtybox
-            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
-            '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n" .
-            'Reserva de espacio: Consolidado #01-2025 ' . "\n\n" .
-            'Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor. ' . "\n\n" .
-            '☑ CBM Preliminar: cbm. ' . $volumen . ' ' . "\n" .
-            '☑ Costo CBM: $.' . $valorCot . ' ' . "\n" .
-            '☑ Fecha Limite de pago: ' . $fCierre . ' ' . "\n\n" .
-            '⚠Nota: Realizar el pago antes del llenado del contenedor. ' . "\n\n" .
-            '📦En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final. ' . "\n\n" .
-            'Apenas haga el pago me envía por este medio para hacer la reserva.';
+            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" ;
+            // '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n" .
+            // 'Reserva de espacio: Consolidado #01-2025 ' . "\n\n" .
+            // 'Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor. ' . "\n\n" .
+            // '☑ CBM Preliminar: cbm. ' . $volumen . ' ' . "\n" .
+            // '☑ Costo CBM: $.' . $valorCot . ' ' . "\n" .
+            // '☑ Fecha Limite de pago: ' . $fCierre . ' ' . "\n\n" .
+            // '⚠Nota: Realizar el pago antes del llenado del contenedor. ' . "\n\n" .
+            // '📦En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final. ' . "\n\n" .
+            // 'Apenas haga el pago me envía por este medio para hacer la reserva.';
 
 $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
             
