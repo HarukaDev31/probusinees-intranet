@@ -1132,7 +1132,7 @@ async function showDocumentacionDocumentacionContainer(id) {
           </div>
           <a class="download-btn text-blue-500 hover:text-blue-700"
           href="${file.file_url}" target="_blank" download>
-    
+                
             <i class="${file.b_icon ?? `bi bi-download`}"></i>
           </a>
         </div>
@@ -1148,11 +1148,32 @@ async function showDocumentacionDocumentacionContainer(id) {
                     <h3 class="font-medium text-gray-800">${file.folder_name}</h3>
                     <p class="text-sm text-red-500">Documento no subido</p>
                 </div>
+                <!-- button to upload file -->
+                <label class="btn btn-sm btn-outline-primary" for="file-input"
+                id="file-input-doc-${file.id}-label">
+                
+                    <i class="bi bi-upload"></i>
+                    Subir
+                </label>
+                <input type="file" id="file-input-doc-${file.id}" class="hidden" />
+
             </div>
            
         </div>
     </div>`);
+    // Add event listener to file input
+    $(`#file-input-doc-${file.id}-label`).off('click');
+    $(`#file-input-doc-${file.id}-label`).on('click', function () {
+        $(`#file-input-doc-${file.id}`).click();
+    });
+
+    $(`#file-input-doc-${file.id}`).off('change');
+    $(`#file-input-doc-${file.id}`).on('change', function () {
+        uploadDocumentationFile(file.id, this.files[0]);
+        
+    });
         }
+    
     });
     $('.input-group').on('focusin', 'input', function () {
         $(this).parent().addClass('ring-2 ring-blue-500');

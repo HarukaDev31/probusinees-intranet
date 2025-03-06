@@ -2989,6 +2989,7 @@ $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . 
                 $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 
                 $result = $this->getFinalCotizacionExcelv2($objPHPExcel, $value, $idContainer);
+                log_message('error', json_encode($result));
                 $excelFileName = $result['excel_file_name'];
                 $excelFilePath = $result['excel_file_path'];
                 $fileUrl = base_url($excelFilePath); // Asumiendo que usas CodeIgniter
