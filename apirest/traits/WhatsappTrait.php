@@ -13,7 +13,7 @@ trait WhatsappTrait
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'mensaje' => '
 Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business, 
-yo me encargaré de ayudarte en tu importación del *consolidado #' . $carga . '.
+yo me encargaré de ayudarte en tu importación del *consolidado #' . $carga . '*.
 
 📢 Preste atención al siguiente paso: Rotulado 👇🏼
 Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.

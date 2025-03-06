@@ -2003,7 +2003,7 @@ Código de proveedor: {$supplierCode}
 
 ☑ Nombre del producto:
 ☑ Nombre del vendedor:
-☑ WeChat del vendedor:
+☑ Celular del vendedor:
 
 Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
                 ");
