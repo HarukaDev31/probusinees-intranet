@@ -1916,7 +1916,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 // file_put_contents($tempFilePath, $pdfContent);
                 // $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
                 //$this->email->clear(TRUE);
-                $response=$this->sendWelcome();
+                $response=$this->sendWelcome($carga);
                 // log_message('error', 'response: '.$response);
                 // unlink($tempFilePath);
 

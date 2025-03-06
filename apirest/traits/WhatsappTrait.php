@@ -4,7 +4,7 @@ trait WhatsappTrait
     private $apiUrl = 'https://whatsapp.probusiness.pe/enviar-mensaje';
     // private $token = "EAAWycxktPLABO1mMGWamek2oZAKFcaD1fzmPa3CXjTmjZCQyBXsG6BnyZA3GGmvDAc4kTHHcgcRoZAPZBFeCoA6cFH1Yp6Pd2iMj7Wm5EHAxQqIWsteiZC65C3oAYZBEJzSvhm6jXATWZBVRxEIkAzxfjPwvCMDqTSbCHVSCZAANR5v2CcP62ya6YkTH3kXD4YgMAeFv7L2oiW4FvqQO1g5GuyXpMDvos";
     private $phoneNumberId = "51912705923@c.us";
-    public function sendWelcome()
+    public function sendWelcome($carga)
     {
         try {
             $ch = curl_init($this->apiUrl);
@@ -13,7 +13,7 @@ trait WhatsappTrait
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'mensaje' => '
 Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business, 
-yo me encargaré de ayudarte en tu importación del *consolidado #16.*
+yo me encargaré de ayudarte en tu importación del *consolidado #' . $carga . '.
 
 📢 Preste atención al siguiente paso: Rotulado 👇🏼
 Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.
