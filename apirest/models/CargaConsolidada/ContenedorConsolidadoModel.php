@@ -1967,8 +1967,8 @@ class ContenedorConsolidadoModel extends CI_Model
                         // );   
                             $data=$this->sendDataItem(
                             "
-                            Producto: {$products}
-                            Código de proveedor: {$supplierCode}
+Producto: {$products}
+Código de proveedor: {$supplierCode}
                         ", $tempFilePath);
                         // $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
                         // $sendRotulado = $this->sendDatosProveedor($mediaId, $supplierCode,$products);
