@@ -44,7 +44,7 @@ class ContenedorConsolidado extends CI_Controller
 
 		foreach ($arrData as $row) {
 			$subdata = array();
-			$subdata[] = "Consolidado #" . $row->carga;
+			$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : $row->tipo_carga . " #" . $row->carga;
 			$subdata[] = $row->mes;
 			$subdata[] =
 				"<div>" .
@@ -52,7 +52,10 @@ class ContenedorConsolidado extends CI_Controller
 				$row->Txt_Icon .
 				"</div>";
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
-			if ($this->user->No_Grupo == "Coordinación") {
+			if (
+				$this->user->No_Grupo == "Coordinación"
+				|| $this->user->No_Grupo == "Documentacion"
+			) {
 				$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 				$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 			}
@@ -81,6 +84,22 @@ class ContenedorConsolidado extends CI_Controller
 					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>RECIBIENDO</option>
 
 					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>COMPLETADO</option>
+				</select>';
+			} else if (
+				$this->user->No_Grupo == "Documentacion"
+			) {
+				$divEstado = '<select 
+				class="form-control
+				' . ($row->estado_documentacion == "PENDIENTE" ? "bg-light" : "") .
+					($row->estado_documentacion == "DOCUMENTACION" ? "bg-primary" : "") .
+					($row->estado_documentacion == "COMPLETADO" ? "bg-success" : "") . '
+				
+				" id="estado-documentacion-' . $row->id . '" name="estado" onchange="updateEstadoDocumentacion(' . $row->id . ')">
+					<option 
+					value="PENDIENTE" ' . ($row->estado_documentacion == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
+					<option value="DOCUMENTACION" ' . ($row->estado_documentacion == "DOCUMENTACION" ? "selected" : "") . '>DOCUMENTACION</option>
+	
+					<option value="COMPLETADO" ' . ($row->estado_documentacion == "COMPLETADO" ? "selected" : "") . '>COMPLETADO</option>
 				</select>';
 			} else {
 				$divEstado = '<select 
@@ -180,7 +199,8 @@ class ContenedorConsolidado extends CI_Controller
 	public function generateSteps($idContenedor)
 	{
 		$steps = $this->HelperImportacionModel->getCotizacionSteps($idContenedor);
-		$result = $this->ContenedorConsolidadoModel->generateSteps($steps);
+		$stepsDocumentacion = $this->HelperImportacionModel->getDocumentacionSteps($idContenedor);
+		$result = $this->ContenedorConsolidadoModel->generateSteps($steps, $stepsDocumentacion);
 	}
 	public function steps($idContenedor)
 	{
@@ -196,7 +216,7 @@ class ContenedorConsolidado extends CI_Controller
 		$stepIndex = $this->input->post('stepIndex');
 		$idContenedor = $this->input->post('idContenedor');
 		$tipoTabla = $this->input->post('tipoTabla');
-		if ($stepIndex == 1) {
+		if ($stepIndex == 1 && $this->user->No_Grupo != "Documentacion") {
 			$arrResponse = [];
 			if ($tipoTabla == "prospectos") {
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
@@ -500,7 +520,10 @@ class ContenedorConsolidado extends CI_Controller
 			);
 			echo json_encode($output);
 			// echo json_encode(['data' => $arrResponse,'status' => "success"]);
-		} else if ($stepIndex == 2) {
+		} else if (
+			$stepIndex == 2
+			|| ($stepIndex == 1 && $this->user->No_Grupo == "Documentacion")
+		) {
 			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorClientes($idContenedor);
 			$data = array();
 			$index = 1;
@@ -517,10 +540,15 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->volumen;
 					$subdata[] = $row->monto;
 					$subdata[] = $row->tarifa;
-
-					$btnView = '<div  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
+					if ($this->user->No_Grupo == "Documentacion") {
+						$btnView = '<div  onclick="viewDocumentacionByDocumentacionProfile(' . $row->id_cotizacion . ')">
 				<i class="fas fa-eye" style="cursor:pointer;"></i>
 				</div>';
+					} else {
+						$btnView = '<div  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
+				<i class="fas fa-eye" style="cursor:pointer;"></i>
+				</div>';
+					}
 					$subdata[] = $btnView;
 					$selectEstadoCliente = "";
 					if ($this->user->No_Grupo == "Coordinación") {
@@ -806,6 +834,15 @@ class ContenedorConsolidado extends CI_Controller
 			"status" => $arrResponse
 		]);
 	}
+	public function updateEstadoDocumentacion()
+	{
+		$id = $this->input->post('id');
+		$estado = $this->input->post('estado');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateEstadoDocumentacion($id, $estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 	public function showClientesDocumentacion($id)
 	{
 		$arrResponse = $this->ContenedorConsolidadoModel->showClientesDocumentacion($id);
@@ -911,7 +948,15 @@ class ContenedorConsolidado extends CI_Controller
 		$name = $this->input->post('name');
 		$idContenedor = $this->input->post('idContenedor');
 		$file = $_FILES['file'];
-		$arrResponse = $this->ContenedorConsolidadoModel->createDocumentacionFolder($name, $idContenedor, $file);
+		$categoria = $this->input->post('categoria');
+		$icon = $this->input->post('icon');
+		$arrResponse = $this->ContenedorConsolidadoModel->createDocumentacionFolder(
+			$name,
+			$idContenedor,
+			$file,
+			$categoria,
+			$icon
+		);
 		echo json_encode([
 			"status" => $arrResponse['status'],
 			"error" => $arrResponse['error']
@@ -1287,6 +1332,30 @@ class ContenedorConsolidado extends CI_Controller
 	public function deleteGuiaRemisionFile($id)
 	{
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteGuiaRemisionFile($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function showClientesDocumentacionByDoc($id)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->showClientesDocumentacionByDoc($id);
+		echo json_encode($arrResponse);
+	}
+	public function getDocumentationFolderFiles($idContenedor)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->getDocumentationFolderFiles($idContenedor);
+		echo json_encode($arrResponse);
+	}
+	public function viewFormularioAduana($idContenedor)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->viewFormularioAduana($idContenedor);
+		echo json_encode($arrResponse);
+	}
+	public function updateFormularioAduana()
+	{
+		$idContenedor = $this->input->post('idContainer');
+		$data = $this->input->post();
+		$arrResponse = $this->ContenedorConsolidadoModel->updateFormularioAduana($idContenedor, $data);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
