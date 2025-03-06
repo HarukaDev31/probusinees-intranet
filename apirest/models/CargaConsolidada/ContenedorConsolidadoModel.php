@@ -183,7 +183,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->where('tipo', 'DOCUMENTACION');
             } else {
                 //limit to 3 last steps
-                $this->db->where('tipo', 'COTIZADOR');
+                // $this->db->where('tipo', 'COTIZADOR');
             }
             $query = $this->db->get();
             return $query->result();
@@ -1041,7 +1041,10 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->set('estado', 'COMPLETADO');
         } else if ($estado == "DATOS PROVEEDOR") {
         } else {
-            $this->db->set('estado', 'RECIBIENDO');
+            if($this->user->No_Grupo=='Coordinación'){
+                $this->db->set('estado', 'RECIBIENDO');
+
+            }
         }
         $this->db->where('id', $idcontenedor);
         $this->db->update($this->table);
@@ -1913,7 +1916,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 // file_put_contents($tempFilePath, $pdfContent);
                 // $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
                 //$this->email->clear(TRUE);
-                // $response=$this->sendWelcome();
+                $response=$this->sendWelcome();
                 // log_message('error', 'response: '.$response);
                 // unlink($tempFilePath);
 
@@ -1986,23 +1989,23 @@ class ContenedorConsolidadoModel extends CI_Model
                 // $pdfContent = $dompdf->output();
                 // $tempFilePath = sys_get_temp_dir() . "/temp_document_data_{$supplierCode}.pdf";
                 // file_put_contents($tempFilePath, $pdfContent);
-                // $this->sendMail(
-                //     $email,
-                //     "Datos Cliente",
-                //     $htmlDataContent,
-                //     []
-                // );
+                $this->sendMail(
+                    $email,
+                    "Datos Cliente",
+                    $htmlDataContent,
+                    []
+                );
                 unlink($tempFilePath);
-                //                 $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
+                                $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
-                // ➡ Datos del proveedor: (Usted lo llena)
+                ➡ Datos del proveedor: (Usted lo llena)
 
-                // ☑ Nombre del producto:
-                // ☑ Nombre del vendedor:
-                // ☑ WeChat del vendedor:
+                ☑ Nombre del producto:
+                ☑ Nombre del vendedor:
+                ☑ WeChat del vendedor:
 
-                // Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
-                // ");
+                Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
+                ");
                 header('Content-Type: application/zip');
                 header('Content-Disposition: attachment; filename="Rotulado.zip"');
                 header('Content-Length: ' . filesize($zipFileName));
@@ -2475,6 +2478,35 @@ class ContenedorConsolidadoModel extends CI_Model
         $qtyBoxChina = $query->row()->qty_box_china;
         $qtyBox = $query->row()->qty_box;
         $idCotizacion = $query->row()->id_cotizacion;
+                //from table cotizacion get volumen valor_cot y id_contenedor
+        $this->db->select('volumen,valor_cot,id_contenedor')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $idCotizacion);
+        $query = $this->db->get();
+        $volumen = $query->row()->volumen;
+        $valorCot = $query->row()->valor_cot;
+        $idContenedor = $query->row()->id_contenedor;
+        //from  contenedor get f_cierre
+        $this->db->select('f_cierre')
+            ->from($this->table)
+            ->where('id', $idContenedor);
+        $query = $this->db->get();
+        $fCierre = $query->row()->f_cierre;
+        //if fcierre is date format to 10 febrero
+        $fCierre = date('d F', strtotime($fCierre));
+        //convert month in english to spanish
+        $fCierre = str_replace('January', 'Enero', $fCierre);
+        $fCierre = str_replace('February', 'Febrero', $fCierre);
+        $fCierre = str_replace('March', 'Marzo', $fCierre);
+        $fCierre = str_replace('April', 'Abril', $fCierre);
+        $fCierre = str_replace('May', 'Mayo', $fCierre);
+        $fCierre = str_replace('June', 'Junio', $fCierre);
+        $fCierre = str_replace('July', 'Julio', $fCierre);
+        $fCierre = str_replace('August', 'Agosto', $fCierre);
+        $fCierre = str_replace('September', 'Septiembre', $fCierre);
+        $fCierre = str_replace('October', 'Octubre', $fCierre);
+        $fCierre = str_replace('November', 'Noviembre', $fCierre);
+        $fCierre = str_replace('December', 'Diciembre', $fCierre);
         if ($estadoChina != "INSPECTION") {
             //set estado_china to INSPECTION
             $this->db->where('id', $idProveedor);
@@ -2505,20 +2537,28 @@ class ContenedorConsolidadoModel extends CI_Model
             $query = $this->db->get();
             $cliente = $query->row()->nombre;
             //message = cliente code supplieer qtyboxchina??qtybox
-            $message = $cliente . " " . $supplierCode . " " . ($qtyBoxChina ?? $qtyBox);
-            $this->sendMessage("Hola buen día 🙋🏻‍♀
+            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
+            '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n" .
+            'Reserva de espacio: Consolidado #01-2025 ' . "\n\n" .
+            'Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor. ' . "\n\n" .
+            '☑ CBM Preliminar: cbm. ' . $volumen . ' ' . "\n" .
+            '☑ Costo CBM: $.' . $valorCot . ' ' . "\n" .
+            '☑ Fecha Limite de pago: ' . $fCierre . ' ' . "\n\n" .
+            '⚠Nota: Realizar el pago antes del llenado del contenedor. ' . "\n\n" .
+            '📦En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final. ' . "\n\n" .
+            'Apenas haga el pago me envía por este medio para hacer la reserva.';
 
-            *Inspección:*" .
-                $message . "
-
-            ");
+$this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
+            
+//             $this->sendMessage('Hola buen día 🙋🏻‍♀
+// Inspección: ' . $message);
             //for each images and video send media
-            // foreach ($imagesUrls as $image) {
-            //     $this->sendMedia($image->file_path, 'image/jpeg');
-            // }
-            // foreach ($videosUrls as $video) {
-            //     $this->sendMedia($video->file_path, 'video/mp4');
-            // }
+            foreach ($imagesUrls as $image) {
+                $this->sendMedia($image->file_path, 'image/jpeg');
+            }
+            foreach ($videosUrls as $video) {
+                $this->sendMedia($video->file_path, 'video/mp4');
+            }
             return true;
         }
 

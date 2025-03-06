@@ -256,15 +256,14 @@
               $contextMenu.hide();
             });
             let $fileContent;
-            if (file.thumbnail
-              && file.type.startsWith('image/')
+            if ( file.type.startsWith('image/')
             ) {
               $fileContent = $('<img>', {
                 src: file.path,
                 alt: file.name,
                 class: 'w-full h-full object-cover'
               });
-            } else if (file.thumbnail && file.type.startsWith('video/')) {
+            } else if ( file.type.startsWith('video/')) {
               $fileContent = $('<video>', {
                 src: file.path,
                 alt: file.name,

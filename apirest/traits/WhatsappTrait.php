@@ -11,20 +11,19 @@ trait WhatsappTrait
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'mensaje' => '
-                Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business, 
-                yo me encargaré de ayudarte en tu importación del *consolidado #16.*
+            'mensaje' => '
+Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business, 
+yo me encargaré de ayudarte en tu importación del *consolidado #16.*
 
-                📢 Preste atención al siguiente paso: Rotulado 👇🏼
-                Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.
+📢 Preste atención al siguiente paso: Rotulado 👇🏼
+Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.
 
-                ☑ El documento está en idioma chino, solo debes enviarle a tu proveedor 📤
+☑ El documento está en idioma chino, solo debes enviarle a tu proveedor 📤
 
-                Nota: No cambiar ninguno de los datos, en caso tu proveedor tenga alguna consulta, se puede comunicarse:
+Nota: No cambiar ninguno de los datos, en caso tu proveedor tenga alguna consulta, se puede comunicarse:
 
-                🙍🏻‍♂ Álmacen China: Mr. Younus 
-                📞 Wechat: 13185122926
-                    ',
+🙍🏻‍♂ Álmacen China: Mr. Younus 
+📞 Wechat: 13185122926',
                 'numero' => $this->phoneNumberId
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));

@@ -823,7 +823,9 @@
       <div class="container mx-auto px-4 py-8 file-section-container col-12 col-md-8">
         <div>
           <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Documents
-            <button data-toggle="modal" data-target="#uploadModal" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+            id="btn-upload-document-cotizacion"
+            data-toggle="modal" data-target="#uploadModal" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <i class="fas fa-plus"></i>
               <span>Nuevo</span>
             </button>
@@ -872,7 +874,9 @@
     <div class="row my-2">
       <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
         <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
-          <button data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+          id="btn-upload-inspection-cotizacion"
+          data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <i class="fas fa-plus"></i>
             <span>Nuevo</span>
           </button>

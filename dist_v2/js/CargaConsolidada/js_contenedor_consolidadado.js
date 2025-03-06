@@ -340,8 +340,8 @@ async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, cl
     const result = await response.json();
     $("#txt-Id_Carga_Consolidada").val(result.nota);
     if (currentPrivilege != "ContenedorAlmacen") {
-        $(".file-section-container").css("pointer-events", "none");
-        $(".note-container-container").css("pointer-events", "none");
+        $("#btn-upload-document-cotizacion").css("pointer-events", "none");
+        $("#btn-upload-inspection-cotizacion").css("pointer-events", "none");
     }
 
     spinner.hide();
@@ -700,7 +700,7 @@ async function uploadFacturaGeneral(idCotizacion) {
         input: 'file',
         inputAttributes: {
             'accept': //excel
-                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+                '*',
             'aria-label': 'Sube tu archivo'
 
         },
@@ -742,8 +742,8 @@ async function uploadGuiaRemision(idCotizacion) {
         title: 'Subir Guia de Remisión',
         input: 'file',
         inputAttributes: {
-            'accept': //excel
-                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'accept': //all files
+                '*',
             'aria-label': 'Sube tu archivo'
 
         },
@@ -4493,7 +4493,7 @@ $(document).ready(async function () {
             if (result.isConfirmed) {
                 if (result.value.status == "success") {
                     Swal.fire("Correcto", result.value.message, "success");
-                    tableClientesGeneral.ajax.reload();
+                    tableCotizacionFinal.ajax.reload();
                 } else {
                     Swal.fire("Error", result.value.message, "error");
                 }
@@ -4531,7 +4531,7 @@ $(document).ready(async function () {
         Swal.fire({
             title: 'Subir Factura Final',
             input: 'file',
-            inputAttributes: {
+            inputAttributes: {//excel file
                 accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
             },
