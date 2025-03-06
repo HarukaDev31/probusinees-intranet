@@ -183,7 +183,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->where('tipo', 'DOCUMENTACION');
             } else {
                 //limit to 3 last steps
-                // $this->db->where('tipo', 'COTIZADOR');
+                $this->db->where('tipo', 'COTIZADOR');
             }
             $query = $this->db->get();
             return $query->result();
