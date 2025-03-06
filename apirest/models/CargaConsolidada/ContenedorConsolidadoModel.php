@@ -1998,13 +1998,13 @@ class ContenedorConsolidadoModel extends CI_Model
                 unlink($tempFilePath);
                                 $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
-                ➡ Datos del proveedor: (Usted lo llena)
+➡ Datos del proveedor: (Usted lo llena)
 
-                ☑ Nombre del producto:
-                ☑ Nombre del vendedor:
-                ☑ WeChat del vendedor:
+☑ Nombre del producto:
+☑ Nombre del vendedor:
+☑ WeChat del vendedor:
 
-                Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
+Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
                 ");
                 header('Content-Type: application/zip');
                 header('Content-Disposition: attachment; filename="Rotulado.zip"');
