@@ -2540,8 +2540,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $query = $this->db->get();
             $cliente = $query->row()->nombre;
             //message = cliente code supplieer qtyboxchina??qtybox
-            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" ;
-            // '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n" .
+            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
+            '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n" ;
             // 'Reserva de espacio: Consolidado #01-2025 ' . "\n\n" .
             // 'Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor. ' . "\n\n" .
             // '☑ CBM Preliminar: cbm. ' . $volumen . ' ' . "\n" .
