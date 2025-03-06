@@ -4,11 +4,33 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-lg-12 col-12">
-          <h1 class="mb-3">Inicio</h1>
+        <h1>
+            <img src="welcome-image.png" alt="¡Hola, bienvenido!" class="welcome-image">
+        </h1>
+        <div class="stats-container">
+            <div class="stat">
+                <i class="fas fa-dollar-sign icon"></i>
+                <div>
+                  <h2>15M</h2>
+                  <p>De dólares en importaciones</p>
+                </div>                
+            </div>
+            <div class="stat">
+                <i class="fas fa-smile-beam icon"></i>
+                <h2>5K</h2>
+                <p>Clientes satisfechos</p>
+            </div>
+            <div class="stat">
+                <i class="fas fa-cogs icon"></i>
+                <h2>11C</h2>
+                <p>CRM vendidos</p>
+            </div>
+            <div class="stat">
+                <i class="fas fa-shipping-fast icon"></i>
+                <h2>10K</h2>
+                <p>Contenedores importantes</p>
+            </div>
         </div>
-      </div>
     </div><!-- /.container-fluid -->
   </section>
   <!-- /.content -->
@@ -1683,3 +1705,60 @@
   </div><!-- /.modal-dialog -->
   <?php echo form_close(); ?>
 </div><!-- /. Modal booking -->
+
+<style>
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.welcome-image {
+    width: 500px; /* Ajusta el tamaño de la imagen */
+    height: 350px;
+    vertical-align: middle;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.stat {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.icon {
+    font-size: 5.5em;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.stat h2 {
+    font-size: 5em;
+    margin: 10px 0;
+    color: #333;
+}
+
+.stat p {
+    font-size: 1em;
+    color: #666;
+    margin: 0;
+}
+</style>

@@ -1,181 +1,203 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="color-scheme" content="light dark">
-    <!-- Favicon and touch icons -->
-    <!--====== Favicon Icon ======-->
-    <link rel="shortcut icon" href="<?php echo base_url("assets/ico/favicon.ico?ver=10.0.0"); ?>">
-    <link rel="apple-touch-icon-precomposed" sizes="192x192" href="<?php echo base_url("assets/ico/android-chrome-512x512.png?ver=10.0.0"); ?>">
-    <link rel="apple-touch-icon-precomposed" sizes="192x192" href="<?php echo base_url("assets/ico/android-chrome-192x192.png?ver=10.0.0"); ?>">
-    <link rel="apple-touch-icon-precomposed" sizes="32x32" href="<?php echo base_url("assets/ico/favicon-32x32.png?ver=10.0.0"); ?>">
-    <link rel="apple-touch-icon-precomposed" sizes="16x16" href="<?php echo base_url("assets/ico/favicon-16x16.png?ver=10.0.0"); ?>">
-    <link rel="apple-touch-icon-precomposed" sizes="16x16" href="<?php echo base_url("assets/ico/apple-touch-icon.png?ver=10.0.0"); ?>">
-    <link rel="manifest" href="<?php echo base_url("assets/ico/site.webmanifest"); ?>">
-    <link rel="shortcut icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
-	  <link rel="icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
-    
-    <title>ProBusiness | Login</title>
-    <meta name="author" content="Ecxlae">
-    <meta name="Subject" content="Creamos soluciones innovadoras">
-    <meta name="Copyright" content="Copyright © Ecxlae. Todos los derechos reservados.">
-    <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="<?php echo base_url("bower_components/bootstrap/dist/css/bootstrap.min.css"); ?>">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="<?php echo base_url("bower_components/font-awesome/css/font-awesome.min.css"); ?>">
-    <!-- Selected -->
-    <!-- <link rel="stylesheet" href="<?php echo base_url("bower_components/select2/dist/css/select2.min.css"); ?>"> -->
-    <!-- Ecxlae -->
-    <link rel="stylesheet" href="<?php echo base_url("assets/css/login.css?ver=5.32.0"); ?>">
-    
-    <meta name="theme-color" content="#FF6700">
-		<meta name="msapplication-navbutton-color" content="#FF6700"/>
-		<meta name="apple-mobile-web-app-capable" content="yes"/>
-		<meta name="msapplication-navbutton-color" content="#FF6700" />
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCDF3CNLJC"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-HCDF3CNLJC');
-</script>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark">
+  <!-- Favicon and touch icons -->
+  <!--====== Favicon Icon ======-->
+  <link rel="shortcut icon" href="<?php echo base_url("assets/ico/favicon.ico?ver=10.0.0"); ?>">
+  <link rel="apple-touch-icon-precomposed" sizes="192x192" href="<?php echo base_url("assets/ico/android-chrome-512x512.png?ver=10.0.0"); ?>">
+  <link rel="apple-touch-icon-precomposed" sizes="192x192" href="<?php echo base_url("assets/ico/android-chrome-192x192.png?ver=10.0.0"); ?>">
+  <link rel="apple-touch-icon-precomposed" sizes="32x32" href="<?php echo base_url("assets/ico/favicon-32x32.png?ver=10.0.0"); ?>">
+  <link rel="apple-touch-icon-precomposed" sizes="16x16" href="<?php echo base_url("assets/ico/favicon-16x16.png?ver=10.0.0"); ?>">
+  <link rel="apple-touch-icon-precomposed" sizes="16x16" href="<?php echo base_url("assets/ico/apple-touch-icon.png?ver=10.0.0"); ?>">
+  <link rel="manifest" href="<?php echo base_url("assets/ico/site.webmanifest"); ?>">
+  <link rel="shortcut icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
+  <link rel="icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
+
+   <!-- Google Font: Epilogue -->
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <title>ProBusiness | Login</title>
+  <meta name="author" content="Ecxlae">
+  <meta name="Subject" content="Creamos soluciones innovadoras">
+  <meta name="Copyright" content="Copyright © Ecxlae. Todos los derechos reservados.">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="<?php echo base_url("bower_components/bootstrap/dist/css/bootstrap.min.css"); ?>">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="<?php echo base_url("bower_components/font-awesome/css/font-awesome.min.css"); ?>">
+  <!-- Selected -->
+  <!-- <link rel="stylesheet" href="<?php echo base_url("bower_components/select2/dist/css/select2.min.css"); ?>"> -->
+  <!-- Ecxlae -->
+  <link rel="stylesheet" href="<?php echo base_url("assets/css/login.css?ver=5.32.0"); ?>">
+
+  <meta name="theme-color" content="#FF6700">
+  <meta name="msapplication-navbutton-color" content="#FF6700" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="msapplication-navbutton-color" content="#FF6700" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCDF3CNLJC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-HCDF3CNLJC');
+  </script>
 </head>
 <body>
   <div class="fondo_pantalla">
     <div class="container-fluid">
-        <div class="row">
-        <div class="d-none d-md-flex col-sm-12 col-md-6 col-lg-6 bg-image" alt="Portada ProBusiness" title="Portada ProBusiness"></div>
-        <div class="col-sm-12 col-md-6 col-lg-6" style="margin-top: 9%;">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <div class="row row-login-logo">
-                  <div class="col-md-12 col-lg-12 text-center">
-                    <img class="img-logo" src="<?php echo base_url("assets/img/logos/logo_probusiness.png?ver=4.0.0") ?>" alt="Logo ProBusiness" title="Logo ProBusiness">
+      <div class="row">
+        <div class="bg-image" alt="Portada ProBusiness" title="Portada ProBusiness"></div>
+        <div class="panel-container">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="row row-login-logo">
+                <div class="col-md-12 col-lg-12 text-center">
+                  <img class="img-logo" src="<?php echo base_url("assets/img/logos/logo_probusiness.png?ver=4.0.0") ?>" alt="Logo ProBusiness" title="Logo ProBusiness">
+                </div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <?php
+              $attributes = array('id' => 'form-login');
+              echo form_open('', $attributes, '');
+              ?>
+
+              <div id="div-login" class="row">
+                <div class="Welcome" style="text-align: center;">
+                  <div><h2>¡Bienvenido de nuevo!</h2></div>
+                  <p>Ingresa tu correo y contraseña para acceder a tu cuenta</p><br>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user fa-lg" aria-hidden="true"></i></span>
+                      <input type="text" id="txt-usuario" name="No_Usuario" inputmode="email" class="form-control inputBgOpaque input-Minuscula input-username" autocomplete="on" autocorrect="off" autocapitalize="none" placeholder="Ingresa tu correo">
+                    </div>
+                    <span class="help-block" id="error"></span>
+                  </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                      <input type="password" id="txt-password" name="No_Password" class="form-control pwd inputBgOpaque" autocomplete="on" placeholder="Ingresa tu contraseña">
+                      <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                    </div>
+                    <span class="help-block" id="error"></span>
+                  </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="form-group">
+                    <div class="div-msg"></div>
+                    <button type="button" id="btn-recuperar_cuenta" class="btn btn-link btn-md btn-block">Recuperar contraseña</button><br>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="form-group">
+                    <button type="submit" id="btn-login" class="btn btn-success btn-md btn-block">Iniciar sesión</button>
+                    
+                    <!--
+                          <button type="button" id="btn-crear_cuenta" class="btn btn-default btn-md btn-block">Crear cuenta</button>
+                          <button type="button" id="btn-recuperar_cuenta" class="btn btn-link btn-md btn-block">Recuperar contraseña</button>-->
                   </div>
                 </div>
               </div>
-              <div class="panel-body">
-                    <?php
-                    $attributes = array('id' => 'form-login');
-                    echo form_open('', $attributes, '');
-                    ?>
-                        <div id="div-login" class="row">
-                      <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
-                          <div class="form-group">
-                          <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-user fa-lg" aria-hidden="true"></i></span>
-                            <input type="text" id="txt-usuario" name="No_Usuario" inputmode="email" class="form-control inputBgOpaque input-Minuscula input-username" autocomplete="on" autocorrect="off" autocapitalize="none" placeholder="Ingresar correo">
-                          </div>
-                          <span class="help-block" id="error"></span>
-                        </div>
-                      </div>
-                      
-                      <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
-                          <div class="form-group">
-                          <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-                            <input type="password" id="txt-password" name="No_Password" class="form-control pwd inputBgOpaque" autocomplete="on" placeholder="Ingresar contraseña">
-                            <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
-                          </div>
-                          <span class="help-block" id="error"></span>
-                        </div>
-                      </div>
-                      
-                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                          <div class="form-group">
-                                    <div class="div-msg"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                          <div class="form-group">
-                          <button type="submit" id="btn-login" class="btn btn-success btn-md btn-block">Iniciar sesión</button>
-                          <button type="button" id="btn-recuperar_cuenta" class="btn btn-link btn-md btn-block">Recuperar contraseña</button>
-                          <!--
-                          <button type="button" id="btn-crear_cuenta" class="btn btn-default btn-md btn-block">Crear cuenta</button>
-                          <button type="button" id="btn-recuperar_cuenta" class="btn btn-link btn-md btn-block">Recuperar contraseña</button>-->
-                        </div>
-                      </div>
-                    </div>
-                    <?php
-                    echo form_close();
-                    $attributes = array('id' => 'form-login_empresa');
-                    echo form_open('', $attributes, ''); ?>
-                        <div id="div-empresa" class="row">
-                            <input type="hidden" id="txt-usuario_empresa" name="No_Usuario" class="form-control">
-                            <input type="hidden" id="txt-password_empresa" name="No_Password" class="form-control">
-                      
-                            <div class="col-sm-12">
-                          <div class="form-group">
-                                    <label>Empresa</label>
-                          <select id="cbo-Empresas" name="ID_Empresa" class="form-control required" style="width: 100%;"></select>
-                                    <span class="help-block" id="error"></span>
-                        </div>
-                      </div>
+              <?php
+              echo form_close();
+              $attributes = array('id' => 'form-login_empresa');
+              echo form_open('', $attributes, ''); ?>
+              <div id="div-empresa" class="row">
+                <div class="Welcome" style="text-align: center;">
+                  <div><h2>¡Bienvenido de nuevo!</h2></div>
+                  <p>Ingresa tu correo y contraseña para acceder a tu cuenta</p><br>
+                </div>
+                <input type="hidden" id="txt-usuario_empresa" name="No_Usuario" class="form-control">
+                <input type="hidden" id="txt-password_empresa" name="No_Password" class="form-control">
 
-                            <div class="col-sm-12">
-                          <div class="form-group">
-                                    <label>Organización</label>
-                          <select id="cbo-organizacion" name="ID_Organizacion" class="form-control required" style="width: 100%;"></select>
-                                    <span class="help-block" id="error"></span>
-                        </div>
-                      </div>
-                      
-                      <div class="col-sm-12">
-                          <div class="form-group">
-                                    <div class="div-msg"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-sm-12">
-                          <div class="form-group">
-                          <button type="submit" id="btn-login_empresa" class="btn btn-success btn-md btn-block">Entrar</button>
-                          <button type="button" class="btn btn-link btn-md btn-block btn-login_return">Regresar al login</button>
-                        </div>
-                      </div>
-                    </div>
-                    <?php
-                    echo form_close();
-                    $attributes = array('id' => 'form-recuperar_cuenta');
-                    echo form_open('', $attributes, '');?>
-                        <div id="div-recuperar_cuenta" class="row">
-                      <div class="col-sm-12">
-                          <div class="form-group">
-                          <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></span>
-                            <input type="text" id="txt-email" name="Txt_Email_Recovery" inputmode="email" class="form-control" autocorrect="off" autocapitalize="none" placeholder="Ingresar correo">
-                          </div>
-                          <span class="help-block" id="error"></span>
-                        </div>
-                      </div>
-                      
-                      <div class="col-sm-12">
-                          <div class="form-group">
-                                    <div class="div-msg"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-sm-12">
-                          <div class="form-group">
-                          <button type="submit" id="btn-send_correo" class="btn btn-success btn-md btn-block">Recuperar cuenta</button>
-                          <button type="button" class="btn btn-link btn-md btn-block btn-login_return">Regresar al login</button>
-                        </div>
-                      </div>
-                    </div>
-                    <?php echo form_close(); ?>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label>Empresa</label>
+                    <select id="cbo-Empresas" name="ID_Empresa" class="form-control required" style="width: 100%;"></select>
+                    <span class="help-block" id="error"></span>
+                  </div>
+                </div>
+
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label>Organización</label>
+                    <select id="cbo-organizacion" name="ID_Organizacion" class="form-control required" style="width: 100%;"></select>
+                    <span class="help-block" id="error"></span>
+                  </div>
+                </div>
+
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <div class="div-msg"></div>
+                  </div>
+                </div>
+
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <button type="submit" id="btn-login_empresa" class="btn btn-success btn-md btn-block">Entrar</button>
+                    <button type="button" class="btn btn-link btn-md btn-block btn-login_return">Regresar al login</button>
+                  </div>
                 </div>
               </div>
+              <?php
+              echo form_close();
+              $attributes = array('id' => 'form-recuperar_cuenta');
+              echo form_open('', $attributes, ''); ?>
+              <div id="div-recuperar_cuenta" class="row">
+                <div class="Welcome" style="text-align: center;">
+                  <div><h2>Recuperar Cuenta</h2></div>
+                  <p>Ingresa tu correo para mandar un enlace de recuperación</p><br>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></span>
+                      <input type="text" id="txt-email" name="Txt_Email_Recovery" inputmode="email" class="form-control" autocorrect="off" autocapitalize="none" placeholder="Ingresar correo">
+                    </div>
+                    <span class="help-block" id="error"></span>
+                  </div>
+                </div>
+
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <div class="div-msg"></div>
+                  </div>
+                </div>
+
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <button type="submit" id="btn-send_correo" class="btn btn-success btn-md btn-block">Recuperar cuenta</button>
+                    <button type="button" class="btn btn-link btn-md btn-block btn-login_return">Regresar al login</button>
+                  </div>
+                </div>
+              </div>
+              <?php echo form_close(); ?>
+            </div>
           </div>
         </div>
+      </div>
     </div>
   </div>
   <script type="text/javascript" src="<?php echo base_url("assets/js/jquery-3.2.1.min.js"); ?>"></script>
@@ -183,5 +205,59 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   <script type="text/javascript" src="<?php echo base_url("assets/js/jquery.validate.min.js"); ?>"></script>
   <script type="text/javascript" src="<?php echo base_url("plugins/input-mask/jquery.inputmask.js"); ?>"></script>
   <script type="text/javascript" src="<?php echo base_url("assets/js/inicio.js?ver=2.5.20"); ?>"></script>
-  <script> var base_url = '<?php echo base_url(); ?>'; </script>
+  <script>
+    var base_url = '<?php echo base_url(); ?>';
+  </script>
 </body>
+<style>
+  *{
+    font-family: Epilogue;
+  }
+
+  .img-logo{
+    width: 70%;
+  }
+  .panel-container{
+  background-color: white;
+  position: absolute;
+  right: 7%;
+  top: 10%;
+  width: 35%;
+  height: 80%;
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  /* .panel-container{
+    width: 100%;
+    right: 0%;
+    top: 0%;
+  } */
+  
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .panel-container{
+    width: 100%;
+    right: 0%;
+    top: 0%;}
+}
+@media (min-width: 576px) and (max-width: 767px) {
+  .panel-container{
+    width: 100%;
+    right: 0%;
+    top: 0%;
+  }
+}
+@media (max-width: 575px) {
+  .panel-container{
+    width: 100%;
+    right: 0%;
+    top: 0%;
+  }
+}
+#btn-recuperar_cuenta{
+  color: #585858;
+  text-align: start;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+</style>

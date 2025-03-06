@@ -1,6 +1,6 @@
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
-  <section class="content-header">
+  <section class="content-header" id="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-7">
@@ -10,7 +10,9 @@
           </h1>
         </div>
         <div class="col-6 col-sm-2">
-          <button type="button" id="btn-buscar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+          <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+          </div>
         </div>
         <div class="col-6 col-sm-1">
           <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-upload"></i> Exportar</button>
@@ -18,32 +20,32 @@
         <div class="col-6 col-sm-1">
           <button type="button" id="btn-filtrar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-filter"></i> Filtro</button>
         </div>
-        <?php if($this->user->No_Grupo=="Coordinación"){  ?>
-        <div class="col-6 col-sm-1">
-          <button type="button" id="btn-crear" class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Crear<i class="fa fa-plus"></i> </button>
-        </div>
+        <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
+          <div class="col-6 col-sm-1">
+            <button type="button" id="btn-crear" class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Crear<i class="fa fa-plus"></i> </button>
+          </div>
         <?php } ?>
       </div>
-    </div><!-- /.container-fluid -->
+    </div><!-- /.container-fluid desactivate for a moment-->
   </section>
   <section class="content" id="main-container">
     <div class="container-fluid">
       <div class="row">
-        <div class="col-6 col-sm-2">
+        <div class="col-6 col-sm-2" style="display: none;">
           <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
           <div class="form-group">
             <input type="text" id="txt-Fe_Inicio_Carga" class="form-control  input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
-        <div class="col-6 col-sm-2">
+        <div class="col-6 col-sm-2" style="display: none;">
           <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
           <div class="form-group">
             <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
-        <div class="col-6 col-sm-3">
+        <div class="col-6 col-sm-3" style="display: none;">
           <label>Estado</label>
           <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
             <option value="0" selected>Todos</option>
@@ -52,9 +54,9 @@
             <option value="COMPLETADO">COMPLETADO</option>
           </select>
         </div>
-      
 
-      
+
+
       </div>
       <div class="table-responsive div-Listar">
         <table id="table-contenedor" class="table table-hover">
@@ -90,60 +92,78 @@
       </div>
     </div>
   </section>
+
+  <!-- Cotizaciones -->
   <section class="content" id="cotizacion-container">
     <div class="container-fluid ">
+      <!-- Header de la tabla -->
       <div class="row mb-2">
-
-        <div class="col-12 col-md-4">
-          <label>&nbsp;</label>
+        <div class="col-12 col-md-1">
+          <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+        </div>
+        <div class="col-sm-5"></div>
+        <div class="col-6 col-sm-2">
+          <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          </div>
+        </div>
+        <div class="col-6 col-sm-1">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-exportar" data-type="html"><i class="fa fa-upload"></i> Exportar</button>
+        </div>
+        <div class="col-6 col-sm-1">
+          <button type="button" id="btn-filtrar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-filtrar" data-type="html"><i class="fa fa-filter"></i> Filtro</button>
+        </div>
+        <div class="col-12 col-md-2">
           <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-            <button type="button" id="btn-crear-cotizacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
+            <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
           <?php } ?>
         </div>
         <div class="col-12 col-md-4">
           <label>&nbsp;</label>
-
-
-        </div>
-        <div class="col-12 col-md-3">
-        </div>
-        <div class="col-12 col-md-1">
-          <label>&nbsp;</label>
-          <button type="button" class="btn btn-outline-primary btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> </button>
         </div>
       </div>
-      <div class="row mb-2">
 
-        <div class="col-12 col-md-3">
-          <label>CBM Total Peru</label>
-          <div class="input-group mb-3">
-            <input type="number" id="txt-CBM_Total_Peru" class="form-control input-report" disabled>
+
+      <div class="row mb-2" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
+        <div class="d-flex align-items-center" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
+          <span>Consolidado #</span>
+          <div class="col-md-1">
+            <input id="cotizacion_name" disabled>
           </div>
         </div>
-        <div class="col-12 col-md-3">
-          <label>CBM Total China</label>
-          <div class="input-group mb-3">
-            <input type="number" id="txt-CBM_Total_China" class="form-control input-report" disabled>
+
+        <div class="col-12 col-md-2 d-flex align-items-center">
+          <i class="fas fa-flag px-2"></i>
+          <span>CBM Total Peru:</span>
+          <div class="col-md-1">
+            <strong><input type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></strong>
+          </div>
+        </div>
+        <div class="col-12 col-md-2 d-flex align-items-center">
+          <i class="fas fa-flag px-2"></i>
+          <span>CBM Total China:</span>
+          <div class="col-md-1">
+            <strong><input type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></strong>
           </div>
         </div>
         <?php if ($this->user->No_Grupo == "ContenedorAlmacen") {  ?>
 
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-2">
             <label>Packing List</label>
             <div class="input-group mb-3" id="packing-list-container">
             </div>
           </div>
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-2">
             <label>BL File</label>
             <div class="input-group mb-3" id="bl-file-container">
             </div>
           </div>
         <?php } ?>
       </div>
-
+      <!-- Body de la tabla -->
       <div class="table-responsive">
-        <table id="table-cotizacion-prospectos" class="table table-bordered table-hover table-striped">
-          <thead class="thead-light">
+        <table id="table-cotizacion-prospectos" class="table table-hover dataTable no-footer">
+          <thead class="thead-default">
             <tr>
               <th>N°</th>
               <th>Fecha</th>
@@ -167,43 +187,41 @@
             </tr>
           </thead>
         </table>
-        <table id="table-cotizacion-embarque" class="table table-bordered table-hover table-striped">
-          <thead class="thead-light">
+        <table id="table-cotizacion-embarque" class="table table-hover dataTable no-footer embarque">
+          <thead class="thead-default">
             <tr>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 <th>Asesor</th>
               <?php } ?>
               <th style="min-width: 8em;" class="no-sort">Status</th>
               <th class="orderable">N.</th>
-              <th>Buyer</th>
+              <th style="min-width: 14em;">Buyer</th>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                <th>Whatsapp</th>
+                <th style="min-width: 8em;">Whatsapp</th>
                 <th
                   style="min-width: 10em;">Estado</th>
               <?php } ?>
 
               <th
-                style="min-width: 10em;">Productos</th>
+                style="min-width: 8em;">Productos</th>
               <th
-                style="min-width: 3em;">Qty Box.</th>
+                style="min-width: 4em;">Qty Box</th>
               <th
-                style="min-width: 4em;">CBM Total</th>
+                style="min-width: 4em;">CBM t.</th>
               <th
                 style="min-width: 4em;">Weight</th>
               <th
-                style="min-width: 5em;">Supplier</th>
+                style="min-width: 6em;">Supplier</th>
               <th
-                style="min-width: 5em;">Code Supplier</th>
+                style="min-width: 6em;">C. Supplier</th>
               <th
-                style="min-width: 7em;">Phone Number</th>
+                style="min-width: 7em;">P. Number</th>
               <th
-                style="min-width: 3em;">Qty Box.</th>
+                style="min-width: 4em;">Qty Box.</th>
               <th
-                style="min-width: 3em;">CBM China </th>
+                style="min-width: 6em;">CBM China </th>
               <th
-                style="min-width: 5em;">Arrive Date </th>
-              <th> Ver </th>
-
+                style="min-width: 6em;">Arrive Date </th>
               <th> Acciones </th>
 
 
@@ -213,84 +231,76 @@
       </div>
     </div>
   </section>
-  <section class="content" id="clientes-container">
-    <div class="row mb-2">
-      <!--select estado  with TODOS PENDIENTE,COTIZADO,PAGADO Y ENTREGADO OPTIOONS-->
-      <div class="col-12 col-md-4">
-        <label>Estado</label>
-        <select id="txt-ID_Estado_Cliente" name="ID_Estado" class="form-control input-estado">
-          <option value="0" selected>Todos</option>
-          <option value="RESERVADO">RESERVADO</option>
-          <option value="NO RESERVADO">NO RESERVADO</option>
-          <option value="DOCUMENTACION">DOCUMENTACION</option>
-          <option value="C FINAL">C FINAL</option>
-          <option value="FACTURADO">FACTURADO</option>
-        </select>
-      </div>
 
-      <div class="col-12 col-md-4">
-        <label>&nbsp;</label>
-        <button type="button" id="btn-buscar-clientes-general" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-search"></i> Buscar</button>
+
+  <!-- Clientes View -->
+
+  <section class="content" id="clientes-container">
+    <!-- header de la tabla -->
+    <div class="row mb-2">
+      <div class="col-12 col-md-1">
+        <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
-      <div class="col-12 col-md-3">
+      <div class="col-sm-3"></div>
+      <div class="col-6 col-sm-1">
       </div>
       <div class="col-12 col-md-1">
+      </div>
+      <div class="col-12 col-md-3">
         <label>&nbsp;</label>
-        <button type="button" class="btn-back-cotizacion btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i> </button>
+      </div>
+      <div class="col-6 col-sm-2">
+        <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+        </div>
+      </div>
+      <div class="col-6 col-sm-1">
+        <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-exportar" data-type="html"><i class="fa fa-upload"></i> Exportar</button>
       </div>
     </div>
-    <div class="row mb-2">
-      <!-- monto total, cbm total_china-->
-      <div class="col-12 col-md-3">
-        <label>Monto Total</label>
-        <div class="input-group mb-3">
-          <input type="number" id="txt-Monto_Total" class="form-control input-report" disabled>
-        </div>
-      </div>
-      <div class="col-12 col-md-3">
-        <label>CBM Total China</label>
-        <div class="input-group mb-3">
-          <input type="number" id="txt-CBM_Total_China_Clientes" class="form-control input-report" disabled>
-        </div>
-      </div>
-      <div class="table-responsive" class="table table-bordered table-hover table-striped">
-        <table id="table-clientes-general" class="table table-bordered table-hover table-striped">
-          <thead class="thead-light">
-            <tr>
-              <th>N°</th>
-              <th>Nombre</th>
-              <th>DNI/RUC</th>
-              <th>Correo</th>
-              <th>Whatsapp</th>
-              <th>T. Cliente</th>
-              <th>Volumen</th>
-              <th>Monto</th>
-              <th>Tarifa</th>
 
-              <th>Ver</th>
-              <th>Estados</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-        </table>
-        <table id="table-clientes-variacion" class="table table-bordered table-hover table-striped">
-          <thead class="thead-light">
-            <tr>
-              <th>N°</th>
-              <th>Nombre</th>
-              <th>DNI/RUC</th>
-              <th>T. Cliente</th>
-              <th>Tarifa</th>
-              <th>Vol. Cot</th>
-              <th>Vol. China</th>
-              <th>Vol. Doc</th>
-              <th>Valor Cot</th>
-              <th>Valor Doc</th>
-              <th>Variación</th>
-            </tr>
-          </thead>
-        </table>
+    <div class="table-responsive" class="table table-bordered table-hover table-striped">
+      <div class="row pl-3 mb-2" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
+        <div class="d-flex align-items-center" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
+          <span>Clientes</span>
+        </div>
       </div>
+      <table id="table-clientes-general" class="table table-hover dataTable no-footer">
+        <thead class="thead-default">
+          <tr>
+            <th>N°</th>
+            <th>Nombre</th>
+            <th>DNI/RUC</th>
+            <th>Correo</th>
+            <th>Whatsapp</th>
+            <th>T. Cliente</th>
+            <th>Volumen</th>
+            <th>Monto</th>
+            <th>Tarifa</th>
+
+            <th>Estados</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+      </table>
+      <table id="table-clientes-variacion" class="table table-hover dataTable no-footer">
+        <thead class="thead-default">
+          <tr>
+            <th>N°</th>
+            <th>Nombre</th>
+            <th>DNI/RUC</th>
+            <th>T. Cliente</th>
+            <th>Tarifa</th>
+            <th>Vol. Cot</th>
+            <th>Vol. China</th>
+            <th>Vol. Doc</th>
+            <th>Valor Cot</th>
+            <th>Valor Doc</th>
+            <th>Variación</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
   </section>
   <section class="content card px-4 py-3" id="clientes-documentation-container">
 
@@ -413,26 +423,47 @@
   </section>
   <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
-    <div class="row mb-2 bg-white shadow-sm px-4 py-4 mx-3">
-      <div class="col-12 col-md-8">
-        <div class="d-flex flex-row">
-          <h1 id="client-title" style="margin-right: 2em;"></h1>
-          <h1 id="client-supplier-code"></h1>
-        </div>
+    <div class="row mb-2">
+      <div class="col-12 col-md-1">
+        <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 mx-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" id="btn-back-cotizacion-almacen"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
-      <div class="col-12 col-md-4 d-flex justify-content-end  ">
-        <div class="btn btn-outline-primary " data-type="html" id="btn-back-cotizacion-almacen"><i class="fa fa-arrow-left"></i> </div>
+      <div class="col-sm-5"></div>
+      <div class="col-6 col-sm-4">
+      </div>
+      <div class="col-12 col-md-1">
+        <button type="button" id="btn-crear-cotizacion" class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Guardar <i class="fas fa-save"></i></button>
+      </div>
+      <div class="col-12 col-md-4">
+        <label>&nbsp;</label>
       </div>
     </div>
+
+
+    <div class="row mb-2 ml-2" style="border-bottom: #DFDFDF solid 2px;">
+      <div class="d-flex col-12 col-md-1 align-items-center" style="border-right: #DFDFDF solid 2px; max-width:12%; padding:15px 10px">
+        <span>Consolidado #</span>
+        <div class="col-md-1">
+          <input id="cotizacion_name" disabled="">
+        </div>
+      </div>
+      <div class="col-12 col-md-1 pl-4 d-flex align-items-center" style="border-right: #DFDFDF solid 2px;">
+        <span id="client-title"></span>
+      </div>
+      <div class="col-12 col-md-1 pl-4 d-flex align-items-center">
+        <span id="client-supplier-code"></span>
+      </div>
+    </div>
+
     <div class="row mb-2">
       <div class="container mx-auto px-4 py-8 file-section-container col-12 col-md-8">
         <div>
-          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Documents
+          <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
+            <h2>Crear carga consolidada <i class="fas fa-boxes"></i></h2>
             <button data-toggle="modal" data-target="#uploadModal" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <i class="fas fa-plus"></i>
               <span>Nuevo</span>
             </button>
-          </h2>
+          </div>
 
         </div>
         <div id="drag-drop-container"
@@ -515,24 +546,30 @@
     <div class="steps-buttons">
     </div>
   </section>
-  <section class="content card px-4 py-3" id="documentation-container">
-    <div class="row">
-      <div class="col-12 col-md-2 ">
-        <button type="button" id="btn-documentacion-factura" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i>Factura General</button>
-      </div>
-      <div class="col-12 col-md-2">
-        <button type="button" id="btn-documentacion-zip" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i>Zip</button>
-      </div>
-      <div class="col-12 col-md-3">
-        <button type="button" id="btn-documentacion-new" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-upload"></i> Nuevo documento</button>
-      </div>
-      <div class="col-12 col-md-3">
-      </div>
-      <div class="col-12 col-md-2">
-        <button type="button" class="btn btn-outline-primary btn-block btn-reporte btn-back-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> </button>
-      </div>
-    </div>
-    <div class="row documentation-files-container
+  <section class="content" id="documentation-container">
+    <!-- header -->
+    <div class="row mb-2">
+        <div class="col-12 col-md-1">
+          <button type="button" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte btn-back-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+        </div>
+        <div class="col-sm-3"></div>
+        <div class="col-6 col-sm-2"></div>
+        <div class="col-6 col-sm-2">
+          <button type="button" id="btn-documentacion-factura" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fas fa-file-invoice"></i>Factura General</button>
+        </div>
+        <div class="col-6 col-sm-2">
+        <button type="button" id="btn-documentacion-zip" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i>Descargar todo</button>
+        </div>
+        <div class="col-12 col-md-2">
+          <button type="button" id="btn-documentacion-new" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html">Nuevo documento<i class="fa fa-plus"></i></button>
+        </div>
+        <div class="mx-10" style="border-bottom: #DFDFDF solid 2px; width:100%">
+          <label>&nbsp;</label>
+        </div>
+    </div>        
+
+    <!-- body -->
+    <div class="row m-20 documentation-files-container
       grid grid-cols-2   gap-4 text-lg font-semibold bg-white shadow p-3 rounded-lg">
     </div>
 
@@ -596,8 +633,8 @@
       justify-end
       
       ">
-          <!--3 empty divs-->
-       
+        <!--3 empty divs-->
+
         <!--button back-->
         <button
           id="btn-back-factura-guia"
@@ -669,7 +706,7 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Subir Prospecto</h5>
+          <h5 class="modal-title">Crear Prospecto</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -678,28 +715,65 @@
           <form id="form-crear-cotizacion" class="form-horizontal" method="post">
             <div class="row">
 
-              <div class="col-12 col-sm-12">
-                <div class="form-group
-                  ">
-                  <label>Cotizacion <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required">
-                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+              <div class="col-12 col-sm-12" id="single-file-upload">
+                <div class="form-group">
+                  <div class="file-upload-box">
+                    <input type="file" id="file-inpute" class="file-input" accept=".xlsx" />
+                    <label for="file-inpute" class="file-label d-flex">
+                      <i class="fas fa-upload"></i>
+                      <div class="file-group-text">
+                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                        <span class="file-format">Formatos: .xlsx</span>
+                      </div>
+                      <button class="upload-button" type="button">Subir archivo</button>
+                    </label>
 
+                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                    <div class="file-info-box hidden">
+                      <div class="file-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                          <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
+                          <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
+                          <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
+                          <rect width="16" height="9" x="12" y="15" fill="#3fa071"></rect>
+                          <path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z"></path>
+                          <path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z"></path>
+                          <path d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z" opacity=".05"></path>
+                          <path d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z" opacity=".07"></path>
+                          <path d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z" opacity=".09"></path>
+                          <linearGradient id="flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1" x1="4.725" x2="23.055" y1="14.725" y2="33.055" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#18884f"></stop>
+                            <stop offset="1" stop-color="#0b6731"></stop>
+                          </linearGradient>
+                          <path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path>
+                          <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
+                        </svg>
+                        <span class="file-name"></span>
+                        <span class="file-size"></span>
+                        <button class="remove-file-button">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                  <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
+                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                 </div>
               </div>
             </div>
           </form>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            <button type="button" id="btn-actualizar-cotizacion" class="btn btn-primary">Actualizar</button>
-            <button type="button" id="btn-guardar-cotizacion" class="btn btn-primary">Guardar</button>
+            <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-5 border border-transparent hover:border-orange-600 rounded" data-dismiss="modal">Cancelar</button>
+            <button type="button" id="btn-actualizar-cotizacion" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Actualizar</button>
+            <button type="button" id="btn-guardar-cotizacion" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Guardar</button>
           </div>
         </div>
       </div>
     </div>
   </div>
   <div class="modal fade" id="modal-crear" tabindex="-1" role="dialog" aria-labelledby="modal-crear" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Crear Carga Consolidada</h5>
@@ -710,7 +784,25 @@
         <div class="modal-body">
           <form id="form-crear" class="form-horizontal" method="post">
             <div class="row">
-              <div class="col-6 col-sm-6">
+              <div class="col-6 col-sm-6"> <!--carga -->
+                <div class="form-group">
+                  <label>Carga <span class="label-advertencia text-danger"> *</span></label>
+                  <select type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
+                  </select>
+                  <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
+                </div>
+              </div>
+              <div class="col-6 col-sm-6 fech"> <!--fecha arribo -->
+                <div class="form-group">
+                  <div class="cont-fech">
+                    <div>Fecha Arribo <span class="label-advertencia text-danger"> *</span></div>
+                    <input type="text" name="f_puerto" required id="txt-Fe_Puerto" placeholder="00/00/0000" class="form-control input-report required input-date">
+                  </div>
+                  <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
+                </div>
+              </div>
+
+              <div class="col-6 col-sm-6"> <!--mes -->
                 <label>Mes <span class="label-advertencia text-danger"> *</span></label>
                 <div class="form-group">
                   <select id="txt-Mes" required name="mes" class="form-control input-report required">
@@ -718,15 +810,16 @@
                   <span class="invalid-feedback" id="error-mes">El mes es requerido</span>
                 </div>
               </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group
-                  ">
-                  <label>F. Cierre <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_cierre" required id="txt-Fe_Cierre" class="form-control input-report required input-date">
+              <div class="col-6 col-sm-6 fech"> <!--fecha cierre -->
+                <div class="form-group">
+                  <div class="cont-fech">
+                    <div>Fecha Cierre <span class="label-advertencia text-danger"> *</span></div>
+                    <input type="text" name="f_cierre" required id="txt-Fe_Cierre" placeholder="00/00/0000" class="form-control input-report required input-date">
+                  </div>
                   <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
                 </div>
               </div>
-              <div class="col-6 col-sm-6">
+              <div class="col-6 col-sm-6"> <!--pais -->
                 <div class="form-group">
                   <label>Pais <span class="label-advertencia text-danger"> *</span></label>
                   <select id="txt-ID_Pais" required name="id_pais" class="form-control input-report required">
@@ -736,35 +829,19 @@
                     <input type="hidden" id="txt-ID_Carga_Consolidada" name="id" value="0"> -->
                 </div>
               </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group
-                  ">
-                  <label>F. Arribo <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" class="form-control input-report required input-date">
-                  <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
-                </div>
-              </div>
-              <div class="col-6 col-sm-6">
-                <div class="form-group">
-                  <label>Carga <span class="label-advertencia text-danger"> *</span></label>
-                  <select type="text" id="txt-No_Carga" required name="carga" class="form-control input-report required">
-                  </select>
-                  <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
-                </div>
-              </div>
-
-
-              <div class="col-6 col-sm-6">
+              <div class="col-6 col-sm-6 fech"> <!--fecha entrega -->
                 <div class="form-group" id="div-Fe_Entrega">
-                  <label>F. Entrega <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" required name="f_entrega" id="txt-Fe_Entrega" class="form-control input-report required input-date">
+                  <div class="cont-fech">
+                    <div>Fecha Entrega <span class="label-advertencia text-danger"> *</span></div>
+                    <input type="text" required name="f_entrega" id="txt-Fe_Entrega" placeholder="00/00/0000" class="form-control input-report required input-date">
+                  </div>
                   <span class="invalid-feedback" id="error-f-entrega">La fecha entrega es requerida</span>
                 </div>
               </div>
-              <div class="col-6 col-sm-6">
+              <div class="col-6 col-sm-6"> <!--empresa -->
                 <div class="form-group ">
                   <label>Empresa <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" required name="empresa" id="txt-Empresa" class="form-control input-report required">
+                  <input type="text" required name="empresa" id="txt-Empresa" placeholder="Ingresa el nombre de la empresa" class="form-control input-report required text">
                   <span class="invalid-feedback" id="error-empresa">La empresa es requerida</span>
                 </div>
               </div>
@@ -772,9 +849,9 @@
         </div>
         </form>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-          <button type="button" id="btn-actualizar" class="btn btn-primary">Actualizar</button>
-          <button type="button" id="btn-guardar" class="btn btn-primary">Guardar</button>
+          <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-5 border border-transparent hover:border-orange-600 rounded" data-dismiss="modal">Cancelar</button>
+          <button type="button" id="btn-actualizar" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Actualizar</button>
+          <button type="button" id="btn-guardar" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Guardar</button>
         </div>
       </div>
     </div>
@@ -782,6 +859,14 @@
 </div>
 
 <style scoped>
+  * {
+    font-family: Epilogue;
+  }
+
+  p {
+    font-size: 14px;
+  }
+
   #steps {
     display: flex;
     flex-wrap: wrap;
@@ -1116,51 +1201,426 @@
     100% {
       opacity: 1;
     }
-  }.btn-block{
-  font-size: 14px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-.bg-orange{
-  background-color: #FF500B !important;
-  color: #fff !important;
-}
-#table-contenedor tbody{
-  background-color: white !important;
-}
-.table tr.odd>td, tr.even>td{
-  border-top: 4px solid #f4f6f9;
-  border-bottom: 4px solid #f4f6f9;
-  vertical-align: bottom !important;
-}
-th.sorting_disabled{
-  font-weight: normal !important;
-}
-.table thead th {
-    vertical-align: bottom !important;
+  }
+
+  .btn-block {
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .bg-orange {
+    background-color: #FF500B !important;
+    color: #fff !important;
+  }
+
+  .table.table-hover.dataTable.no-footer tbody {
+    background-color: white;
+  }
+
+  tr.odd>td,
+  tr.even>td {
+    border-top: 4px solid #f4f6f9;
+    border-bottom: 4px solid #f4f6f9;
+    vertical-align: middle !important;
+    padding-bottom: 20px;
+    height: 3vh;
+  }
+
+  th.sorting_disabled {
+    font-weight: normal !important;
+  }
+
+  .table thead th {
+    /* vertical-align: bottom !important; */
     border-bottom: 0px solid #dee2e6 !important;
     border-top: 0px solid #dee2e6;
-}
-#table-contenedor_info{
-  display: none;
-}
+  }
 
-div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+  #table-contenedor_info {
+    display: none;
+  }
+
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     margin: 2px 0;
     white-space: nowrap;
     justify-content: flex-start;
-}
-div#table-contenedor_length{
-  display: none;
-}
+  }
 
-.page-item.active .page-link {
-  background-color: #FF500B;
-  border-color: #FF500B;
-}
-.page-link {
-  color: #585858;
-}
+  div#table-contenedor_length {
+    display: none;
+  }
 
+  .page-item.active .page-link {
+    background-color: #FF500B;
+    border-color: #FF500B;
+  }
+
+  .page-link {
+    color: #585858;
+  }
+
+  .step-icon {
+    padding-top: 10px;
+    display: flex;
+    width: 70px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  div:where(.swal2-container) h2:where(.swal2-title) {
+    font-weight: 400;
+    font-size: 28px !important;
+    line-height: 30px;
+    color: #272A30;
+  }
+
+  button.swal2-confirm.swal2-styled.swal2-default-outline {
+    color: #585858;
+  }
+
+  div:where(.swal2-container) h2:where(.swal2-title) {
+    padding-bottom: 3em;
+  }
+
+  button.swal2-confirm.swal2-styled.swal2-default-outline,
+  button.swal2-cancel.swal2-styled.swal2-default-outline {
+    margin-top: -4em;
+    padding: .8em 2.8em;
+  }
+
+  .btn-primary {
+    background-color: #FF500B;
+    border-color: #FF500B;
+  }
+
+  .btn-primary:hover {
+    background-color: #FF500B;
+    border-color: #FF500B;
+  }
+
+  h5.modal-title {
+    text-align: center;
+    width: 100%;
+    font-weight: 500;
+    font-size: 25px !important;
+  }
+
+  label:not(.form-check-label):not(.custom-file-label) {
+    font-weight: normal;
+  }
+
+  @media (min-width: 576px) {
+    .modal-content {
+      padding: 20px 70px;
+    }
+  }
+
+  input#txt-Fe_Puerto,
+  input#txt-Fe_Cierre,
+  input#txt-Fe_Entrega {
+    width: 115px;
+  }
+
+  .col-6.col-sm-6.fech {
+    padding-left: 5%;
+    padding-top: 5%;
+  }
+
+  .cont-fech {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .form-control.input-report.required.input-date::placeholder {
+    text-align: center;
+    color: #495057;
+  }
+
+  #txt-Empresa::placeholder {
+    color: #495057;
+  }
+
+
+
+
+
+
+
+
+
+
+
+  .file-upload-box {
+    border: 2px dashed #cccccc;
+    padding: 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+
+  .file-upload-box:hover {
+    border-color: #cccccc;
+  }
+
+  .file-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .file-input {
+    display: none;
+    /* Oculta el input de archivo por defecto */
+  }
+
+  .file-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .file-text {
+    font-size: 1rem;
+    color: #333333;
+  }
+
+  .file-format {
+    font-size: 0.9rem;
+    color: #666666;
+    margin-bottom: 1rem;
+  }
+
+  .upload-button {
+    width: 55%;
+    padding: 0.75rem;
+    background-color: #F0F4F9;
+    color: #272A30;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .upload-button:hover {
+    background-color: #F0F4F9;
+  }
+
+  .table.embarque th {
+    padding: .55rem;
+  }
+
+  /* Estilos para el cuadro de información del archivo subido */
+  .file-info-box {
+    border: 1px solid #cccccc;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    margin-top: 1rem;
+    text-align: left;
+  }
+
+  .file-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .file-name {
+    font-size: 1rem;
+    color: #333333;
+  }
+
+  .file-size {
+    font-size: 0.9rem;
+    color: #666666;
+  }
+
+  .remove-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ff4d4d;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+
+  .remove-button:hover {
+    color: #cc0000;
+  }
+
+  /* Clase para ocultar elementos */
+  .hidden {
+    display: none;
+  }
 </style>
+<script>
+  // script.js
+  function setupSingleFileUpload(containerId) {
+    const container = document.getElementById(containerId);
+    const fileInput = container.querySelector('.file-input');
+    const fileLabel = container.querySelector('.file-label');
+    const fileInfoBox = container.querySelector('.file-info-box');
+    const fileNameElement = container.querySelector('.file-name');
+    const fileSizeElement = container.querySelector('.file-size');
+    const removeFileButton = container.querySelector('.remove-file-button');
+    const selectFileButton = container.querySelector('.upload-button');
+
+    // Abrir el diálogo de selección de archivos al hacer clic en el botón
+    selectFileButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      fileInput.click();
+    });
+
+    // Mostrar la información del archivo seleccionado
+    fileInput.addEventListener('change', (e) => {
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        if (file.name.endsWith('.xlsx')) {
+          // Mostrar el cuadro de información del archivo
+          fileInfoBox.classList.remove('hidden');
+
+          // Mostrar el nombre y el tamaño del archivo
+          fileNameElement.textContent = file.name;
+          fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+        } else {
+          alert("Solo se permiten archivos .xlsx");
+          fileInput.value = ""; // Limpia el input
+        }
+      } else {
+        fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
+      }
+    });
+
+    // Manejar el botón de tacho de basura para quitar el archivo
+    removeFileButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      fileInput.value = ""; // Limpia el input
+      fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
+    });
+
+    // Manejar el arrastre de archivos
+    fileLabel.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#007bff';
+    });
+
+    fileLabel.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
+    });
+
+    fileLabel.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
+      if (e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (file.name.endsWith('.xlsx')) {
+          fileInput.files = e.dataTransfer.files; // Asigna el archivo arrastrado al input
+
+          // Mostrar la información del archivo
+          fileInput.dispatchEvent(new Event('change'));
+        } else {
+          alert("Solo se permiten archivos .xlsx");
+        }
+      }
+    });
+  }
+
+  function setupMultiFileUpload(containerId) {
+    const container = document.getElementById(containerId);
+    const fileInput = container.querySelector('.file-input');
+    const fileLabel = container.querySelector('.file-label');
+    const fileList = container.querySelector('.file-list');
+    const selectFileButton = container.querySelector('.upload-button');
+
+    // Abrir el diálogo de selección de archivos al hacer clic en el botón
+    selectFileButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      fileInput.click();
+    });
+
+    // Mostrar la lista de archivos seleccionados
+    fileInput.addEventListener('change', (e) => {
+      if (fileInput.files.length > 0) {
+        fileList.classList.remove('hidden');
+        fileList.innerHTML = ""; // Limpiar la lista antes de agregar nuevos archivos
+
+        // Recorrer los archivos seleccionados
+        Array.from(fileInput.files).forEach((file, index) => {
+          if (file.name.endsWith('.xlsx')) {
+            // Crear un elemento de lista para cada archivo
+            const fileItem = document.createElement('div');
+            fileItem.classList.add('file-list-item');
+
+            // Mostrar el nombre y el tamaño del archivo
+            fileItem.innerHTML = `
+                        <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                        <button class="remove-file-button" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+
+            // Agregar el elemento a la lista
+            fileList.appendChild(fileItem);
+          } else {
+            alert(`El archivo "${file.name}" no es un archivo .xlsx válido.`);
+          }
+        });
+      } else {
+        fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
+      }
+    });
+
+    // Manejar la eliminación de archivos individuales
+    fileList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-file-button') || e.target.closest('.remove-file-button')) {
+        const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
+
+        // Convertir FileList a un array para poder eliminar el archivo
+        const files = Array.from(fileInput.files);
+        files.splice(index, 1); // Eliminar el archivo del array
+
+        // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
+        const dataTransfer = new DataTransfer();
+        files.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+
+        // Volver a mostrar la lista de archivos actualizada
+        fileInput.dispatchEvent(new Event('change'));
+      }
+    });
+
+    // Manejar el arrastre de archivos
+    fileLabel.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#007bff';
+    });
+
+    fileLabel.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
+    });
+
+    fileLabel.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
+      if (e.dataTransfer.files.length > 0) {
+        // Asignar los archivos arrastrados al input
+        fileInput.files = e.dataTransfer.files;
+
+        // Mostrar la lista de archivos
+        fileInput.dispatchEvent(new Event('change'));
+      }
+    });
+  }
+
+  // Configurar los contenedores
+  setupSingleFileUpload('single-file-upload');
+</script>
