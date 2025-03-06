@@ -1038,7 +1038,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
         }
         if ($listaEmbarque != null && $blFile != null) {
-            $this->db->set('estado', 'COMPLETADO');
+            $this->db->set('estado_china', 'COMPLETADO');
         } else if ($estado == "DATOS PROVEEDOR") {
         } else {
             if($this->user->No_Grupo=='Coordinación'){
