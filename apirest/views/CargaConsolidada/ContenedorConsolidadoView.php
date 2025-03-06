@@ -543,7 +543,7 @@
               <th>Whatsapp</th>
               <th>T. Cliente</th>
               <th>Volumen</th>
-              <th>Monto</th>
+              <th>Precio Cbm</th>
               <th>Tarifa</th>
               <th>Cotizacion</th>
               <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
@@ -657,7 +657,7 @@
               <th>Whatsapp</th>
               <th>T. Cliente</th>
               <th>Volumen</th>
-              <th>Monto</th>
+              <th>Precio Cbm</th>
               <th>Tarifa</th>
 
               <th>Ver</th>

@@ -2454,11 +2454,13 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     function validateToSendInspectionMessage($idProveedor)
     {
         //find if exists more two files type image and one type video
-        $this->db->select('id,file_path')
-            ->from($this->table_contenedor_almacen_inspection)
-            ->where('id_proveedor', $idProveedor)
-            ->where('file_type', 'image/jpeg')
-            ->or_where('file_type', 'image/png');
+        $this->db->select('id, file_path')
+         ->from($this->table_contenedor_almacen_inspection)
+         ->where('id_proveedor', $idProveedor)
+         ->group_start() // Agrupa las condiciones de file_type
+         ->where('file_type', 'image/jpeg')
+         ->or_where('file_type', 'image/png')
+         ->group_end(); // 
         $query = $this->db->get();
         $imagesUrls = $query->result();
         $images = $query->num_rows();
@@ -2480,12 +2482,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $qtyBox = $query->row()->qty_box;
         $idCotizacion = $query->row()->id_cotizacion;
                 //from table cotizacion get volumen valor_cot y id_contenedor
-        $this->db->select('volumen,valor_cot,id_contenedor')
+        $this->db->select('volumen,monto,id_contenedor')
             ->from($this->table_contenedor_cotizacion)
             ->where('id', $idCotizacion);
         $query = $this->db->get();
         $volumen = $query->row()->volumen;
-        $valorCot = $query->row()->valor_cot;
+        $valorCot = $query->row()->monto;
         $idContenedor = $query->row()->id_contenedor;
         //from  contenedor get f_cierre
         $this->db->select('f_cierre')
