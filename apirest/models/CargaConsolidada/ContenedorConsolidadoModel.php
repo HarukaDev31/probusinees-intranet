@@ -1952,6 +1952,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     $dompdf->render();
                     $pdfContent = $dompdf->output();
                     $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
+                    unlink($tempFilePath);
                     file_put_contents($tempFilePath, $pdfContent);
                     try {
                         // $this->sendMail(
@@ -1964,11 +1965,11 @@ class ContenedorConsolidadoModel extends CI_Model
                         //         $tempFilePath
                         //     ]
                         // );   
-                        //     $data=$this->sendDataItem(
-                        //     "
-                        //     Producto: {$products}
-                        //     Código de proveedor: {$supplierCode}
-                        // ", $tempFilePath);
+                            $data=$this->sendDataItem(
+                            "
+                            Producto: {$products}
+                            Código de proveedor: {$supplierCode}
+                        ", $tempFilePath);
                         // $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
                         // $sendRotulado = $this->sendDatosProveedor($mediaId, $supplierCode,$products);
                     } catch (Exception $e) {
@@ -1989,12 +1990,12 @@ class ContenedorConsolidadoModel extends CI_Model
                 // $pdfContent = $dompdf->output();
                 // $tempFilePath = sys_get_temp_dir() . "/temp_document_data_{$supplierCode}.pdf";
                 // file_put_contents($tempFilePath, $pdfContent);
-                $this->sendMail(
-                    $email,
-                    "Datos Cliente",
-                    $htmlDataContent,
-                    []
-                );
+                // $this->sendMail(
+                //     $email,
+                //     "Datos Cliente",
+                //     $htmlDataContent,
+                //     []
+                // );
                 unlink($tempFilePath);
                                 $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
