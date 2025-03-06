@@ -1768,7 +1768,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 if ($this->db->affected_rows() > 0) {
                     $idFolder = $this->db->insert_id();
                     //insert file in table contenedor_consolidado_documentacion_files
-                    $this->db->insert($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'file_url' => $fileUrl]);
+                    $this->db->insert($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'file_url' => $fileUrl,
+                        'id_contenedor' => $idContenedor]);
                     if ($this->db->affected_rows() > 0) {
                         return ['status' => "success", 'error' => false];
                     }

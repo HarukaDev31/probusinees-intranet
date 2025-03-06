@@ -1124,7 +1124,7 @@ async function showDocumentacionDocumentacionContainer(id) {
                 <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria}">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <i class="bi bi-file-text text-blue-500 text-xl"></i>
+            <i class="bi bi-${file.b_icon} text-blue-500 text-xl"></i>
             <div>
               <h3 class="font-medium text-gray-800">${file.folder_name}</h3>
               <p class="text-sm text-gray-500">Ver documento</p>
@@ -1133,7 +1133,7 @@ async function showDocumentacionDocumentacionContainer(id) {
           <a class="download-btn text-blue-500 hover:text-blue-700"
           href="${file.file_url}" target="_blank" download>
                 
-            <i class="${file.b_icon ?? `bi bi-download`}"></i>
+            <i class="${ `bi bi-download`}"></i>
           </a>
         </div>
       </div>`);
@@ -1148,30 +1148,65 @@ async function showDocumentacionDocumentacionContainer(id) {
                     <h3 class="font-medium text-gray-800">${file.folder_name}</h3>
                     <p class="text-sm text-red-500">Documento no subido</p>
                 </div>
-                <!-- button to upload file -->
-                <label class="btn btn-sm btn-outline-primary" for="file-input"
-                id="file-input-doc-${file.id}-label">
-                
-                    <i class="bi bi-upload"></i>
-                    Subir
-                </label>
-                <input type="file" id="file-input-doc-${file.id}" class="hidden" />
-
             </div>
-           
+              <span class="download-btn text-blue-500 hover:text-blue-700"
+                id="file-input-doc-${file.id}-label">
+                <i class="${file.b_icon ?? `bi bi-upload`}"></i>
+                 </span>
+                          <input type="file" id="file-input-doc-${file.id}" class="hidden" />
         </div>
     </div>`);
     // Add event listener to file input
     $(`#file-input-doc-${file.id}-label`).off('click');
     $(`#file-input-doc-${file.id}-label`).on('click', function () {
-        $(`#file-input-doc-${file.id}`).click();
+        //show swall for upload
+        Swal.fire({
+            title: 'Subir documento',
+            input: 'file',
+            inputAttributes: {
+                'accept': //all files
+                    '*',
+                'aria-label': 'Sube tu archivo'
+
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Subir',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debes elegir un archivo!'
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const fileI = result.value;
+                const formData = new FormData();
+                formData.append('file', fileI);
+                formData.append('idFolder', file.id);
+                formData.append('idContenedor', idContenedor);
+                url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadFileDocumentation";
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        const result = JSON.parse(response);
+                        if (result.status == "success") {
+                            Swal.fire("Correcto!", result.message, "success");
+                            showDocumentacionDocumentacionContainer(idContenedor);
+                        } else {
+                            Swal.fire("Error!", result.message, "error");
+                        }
+                    },
+                });
+            }
+        }
+        );
     });
 
-    $(`#file-input-doc-${file.id}`).off('change');
-    $(`#file-input-doc-${file.id}`).on('change', function () {
-        uploadDocumentationFile(file.id, this.files[0]);
-        
-    });
+    
         }
     
     });
@@ -3117,7 +3152,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
     } else {
         $("#documentacion-peru-documents").append(` <div class="flex items-center p-4 bg-gray-50 rounded-lg">
       <div class="p-3 bg-red-100 rounded-full">
-        <i class="fa fa-file-x text-red-600" style="font-size: 1.5rem;"></i>
+        <i class="fa fa-file text-red-600" style="font-size: 1.5rem;"></i>
       </div>
       <div class="ml-4 flex-grow">
         <div class="text-title font-medium text-gray-700">F. Comercial</div>
@@ -3132,7 +3167,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
 
         <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
         <div class="p-3 bg-green-100 rounded-full">
-            <i class="fa fa-file-text text-green-600" style="font-size: 1.5rem;"></i>
+            <i class="fa fa-file-excel text-green-600" style="font-size: 1.5rem;"></i>
         </div>
         <div class="ml-4 flex-grow">
             <div class="text-title font-medium text-gray-700">Excel Confirmación</div>
@@ -3149,7 +3184,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
     } else {
         $("#documentacion-peru-documents").append(`<div class="flex items-center p-4 bg-gray-50 rounded-lg">
       <div class="p-3 bg-red-100 rounded-full">
-        <i class="fa fa-file-x text-red-600" style="font-size: 1.5rem;"></i>
+        <i class="fa fa-file-excel text-red-600" style="font-size: 1.5rem;"></i>
       </div>
       <div class="ml-4 flex-grow">
         <div class="text-title font-medium text-gray-700">Excel Confirmación</div>

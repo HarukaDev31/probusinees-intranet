@@ -978,7 +978,7 @@
               <th>Whatsapp</th>
               <th>T. Cliente</th>
               <th>Volumen F</th>
-              <th>Monto F</th>
+              <th>Precio Cbm</th>
               <th>Tarifa F</th>
               <th>Estados</th>
               <th>C Final</th>
