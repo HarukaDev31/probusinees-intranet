@@ -289,6 +289,7 @@ async function getClientesHeader() {
 async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, clientName) {
     //hide table cotizacion embarque
     cotizacionContainer.hide();
+    contentHeader.hide();
     cotizacionAlmacenContainer.show();
     currentProveedor = idProveedor;
     currentCotizacion = idCotizacion;
@@ -297,26 +298,26 @@ async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, cl
     $("#client-title").text(clientName);
     $("#client-supplier-code").text(supplierCode);
     $("#cotizacion_name").text(idContenedor);
-    fileManager = new FileManager({
-        fileGrid: "#file-grid",
-        fileInput: "#file-input-modal",
-        uploadBtn: "#btn-upload",
-        dragDropContainer: "#drag-drop-container",
-        searchInput: "#search-input",
-        pendingFileList: "#pending-file-list",
-        onFileUpload: (file) => uploadFileDocument(file, fileManager),
-        onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
-    });
-    fileManagerInspection = new FileManager({
-        fileGrid: "#file-grid-inspection",
-        fileInput: "#file-input-modal-inspection",
-        uploadBtn: "#btn-upload-inspection",
-        dragDropContainer: "#drag-drop-container-inspection",
-        searchInput: "#search-input-inspection",
-        pendingFileList: "#pending-file-list-inspection",
-        onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
-        onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
-    });
+    // fileManager = new FileManager({
+    //     fileGrid: "#file-grid",
+    //     fileInput: "#file-input-modal",
+    //     uploadBtn: "#btn-upload",
+    //     dragDropContainer: "#drag-drop-container",
+    //     searchInput: "#search-input",
+    //     pendingFileList: "#pending-file-list",
+    //     onFileUpload: (file) => uploadFileDocument(file, fileManager),
+    //     onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
+    // });
+    // fileManagerInspection = new FileManager({
+    //     fileGrid: "#file-grid-inspection",
+    //     fileInput: "#file-input-modal-inspection",
+    //     uploadBtn: "#btn-upload-inspection",
+    //     dragDropContainer: "#drag-drop-container-inspection",
+    //     searchInput: "#search-input-inspection",
+    //     pendingFileList: "#pending-file-list-inspection",
+    //     onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
+    //     onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
+    // });
     //fectch getNotes
     url = base_url + "CargaConsolidada/ContenedorConsolidado/getNotes/" + idProveedor;
     const response = await fetch(url);
@@ -990,6 +991,7 @@ async function viewSteps(id) {
             if (currentPrivilege == "ContenedorAlmacen") {
                 openStepFunction(1, id);
                 mainContainer.hide();
+                contentHeader.hide();
                 return;
             }
             mainContainer.hide();
@@ -1038,7 +1040,7 @@ async function hideSteps() {
     stepsContainer.hide();
     contentHeader.show();
     mainContainer.show();
-    table_Entidad.ajax.reload();
+    table_Entidad.ajax. reload();
 }
 async function deleteCarga(id) {
     Swal.fire({
@@ -2046,6 +2048,7 @@ const openStepFunction = async (step, id) => {
     $(".btn-back-cotizacion").on("click", function () {
         if (currentPrivilege == "ContenedorAlmacen") {
             mainContainer.show();
+            contentHeader.show();
             cotizacionContainer.hide();
             stepsContainer.hide();
         } else {
@@ -2619,14 +2622,12 @@ async function deleteDocumentacionFile(id) {
         text: "¡No podrás revertir esto!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminarlo",
+        confirmButtonText: "Sí  , eliminarlo",
         cancelButtonText: "No, cancelar",
     }).then((result) => {
         if (result.isConfirmed) {
             url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteDocumentacionFile/" + id;
             $.ajax({
-                url: url,
-                type: "GET",
                 success: function (response) {
                     const result = JSON.parse(response);
                     if (result.status == "success") {
@@ -3473,6 +3474,7 @@ $(document).ready(async function () {
     })
     $("#btn-back-cotizacion-almacen").click(function () {
         cotizacionAlmacenContainer.hide();
+        contentHeader.hide();
         cotizacionContainer.show();
     })
     $("#btn-back-factura-guia").click(function () {
