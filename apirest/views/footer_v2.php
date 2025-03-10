@@ -475,3 +475,12 @@ function fetchNotifications() {
 
 </body>
 </html>
+
+<style>
+  @media (min-width: 768px) {
+    body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-wrapper, body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-footer, body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-header {
+        margin-left: 13%;
+    }
+  }
+
+</style>

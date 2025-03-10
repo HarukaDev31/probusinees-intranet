@@ -274,6 +274,9 @@ div.footerNode a, div.footerNode span {
 }
 
 .bg-image {
+  display: flex;
+  float: inline-start;
+  width: 100%;
   background-image: url(../img/backgrounds/portada_probusiness.png?ver=3.0.0);
   background-size: cover;
   background-position: left;
@@ -281,6 +284,7 @@ div.footerNode a, div.footerNode span {
   height: 100vh;
   box-shadow: 14px 0 20px 5px rgb(210, 210, 210);
   border-color: transparent;
+
 }
 
 .panel {

@@ -213,29 +213,15 @@
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <aside class="main-sidebar sidebar-light-primary">
       <!-- Brand Logo -->
-      <a href="<?php echo base_url() . 'InicioController'; ?>" class="brand-link">
-        <img src="<?php echo base_url() . 'dist_v2/img/logos/probusiness.png?ver=2.0.0'; ?>" alt="ProBusiness" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light"><strong>ProBusiness</strong></span>
-      </a>
+        <a href="<?php echo base_url() . 'InicioController'; ?>" class="brand-link">
+          <span class="brand-text font-weight-light"><strong><b>probusiness</b></strong></span>
+          <img src="<?php echo base_url() . 'dist_v2/img/logos/probusiness.png?ver=2.0.0'; ?>" alt="ProBusiness" class="brand-image img-circle elevation-3" style="opacity: .8">
+        </a>
 
       <!-- Sidebar -->
       <div class="sidebar">
-        <!-- Sidebar user (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" class="img-circle elevation-2" alt="User Image">
-          </div>
-          <div class="info">
-            <a href="#" class="d-block">
-              <?php echo $this->user->No_Nombres_Apellidos; ?>
-              <br>
-              <span class="badge bg-success"><?php echo $this->user->No_Grupo; ?></span>
-            </a>
-          </div>
-        </div>
-
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -310,11 +296,61 @@
 	          <?php endforeach; ?>
           </ul>
         </nav>
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
+            <li class="nav-header">Preferencias</li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" title="Notificaciones" data-target="#modal-notification" id="verNotificaciones"
+              data-toggle="modal" aria-expanded="false" >
+                <i class="nav-icon far fa-bell"></i>
+                <p>&nbsp;Notificaciones</p>
+                <span class="badge badge-danger navbar-badge " id="counter-notifacions"><?php echo $iCantidadNotificaciones; ?></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" title="Modo Oscuro" href="#" >
+                <i class="nav-icon far fa-moon"></i>
+                <p>&nbsp;Modo oscuro</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- Sidebar user (optional) -->
+        <nav class="user-panel mt-3 pb-3 mb-3 d-flex">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="" href="#" aria-expanded="false" title="Notificaciones" style="display:flex; gap: 20px;">
+                <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" class="img-circle" alt="User Image">
+                <div class="info-user">
+                  <p>&nbsp;<?php echo $this->user->No_Nombres_Apellidos; ?></p><br>
+                  <p class="badge bg-success"><?php echo $this->user->No_Grupo; ?></p>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </nav>
         <!-- /.sidebar-menu -->
+        
+        <!-- Log out -->
+        <div class="user-logout mt-3 pb-3 mb-3 d-flex">
+            
+          <div class="info nav nav-pills nav-sidebar flex-column">
+            <li class="nav-item">
+              <a href="<?php echo base_url().'LoginController/logout';?>" class="nav-link">
+                <i class="nav-icon fa fa-sign-out-alt"></i>
+                <p>&nbsp;Cerrar Sesión</p>
+              </a>
+            </li>
+          </div>
+        </div>
+        <!-- /. log out -->
       </div>
       <!-- /.sidebar -->
     </aside>
   <style>
+    .sidebar{
+      font-size: 14px;
+    }
     .backdrop {
       z-index: 10000;
       position: absolute;
@@ -323,15 +359,56 @@
       width: 100%;
       display: flex;
       align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
-    pointer-events: none;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      pointer-events: none;
     }
     .spinner-border {
     width: 4em;
     height: 4em;
     line-height: 10em;
     /* font-weight: 500; */
-    font-size: 2em;
+    font-size: 2em !important;
     }
+
+    [class*=sidebar-light] .mt-2 {
+    border-bottom: 2px solid #DFDFDF;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    }
+    .brand-link {
+    display: flex;
+    font-size: 1.25rem !important;
+    min-height: 10vh;
+    line-height: 1.5;
+    padding: .8125rem .5rem;
+    transition: width .3sease-in-out;
+    white-space: nowrap;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 0px !important;
+    }
+
+    .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active, .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active, a.nav-link.\31 .nav-item.active.nav-item.active.menu-open,[class*=sidebar-light-] .nav-treeview>.nav-item>.nav-link.active:hover{
+      background-color: rgba(0, 0, 0, .1);
+      color: #ff500b !important;
+    }
+    .user-panel {
+    padding-top: 220%;
+    align-items: end;
+  }
+  
+  nav.main-header.navbar.navbar-expand.navbar-dark{
+    display: none;
+  }
+  
+  @media (min-width: 768px) {
+    body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-wrapper{
+      padding-top: 2%;
+      padding-bottom: 1%;
+    }
+  }
+
   </style>
