@@ -455,16 +455,11 @@
     </div>
 
     <div class="row mb-2">
-      <div class="container mx-auto px-4 py-8 file-section-container col-12 col-md-8">
+      <div class="px-4 py-8 file-section-container col-12 col-md-5  ">
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
-            <h2>Crear carga consolidada <i class="fas fa-boxes"></i></h2>
-            <button data-toggle="modal" data-target="#uploadModal" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <i class="fas fa-plus"></i>
-              <span>Nuevo</span>
-            </button>
+            <h2>Documentación <i class="far fa-folder-open"></i></h2>              
           </div>
-
         </div>
         <div id="drag-drop-container"
           class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden bg-white rounded-lg shadow">
@@ -477,11 +472,33 @@
               Soporta: PDF, JPG, PNG, DOCX (Máximo 10MB)
             </p>
           </div>
-
         </div>
-
-        <div id="file-grid" class="grid grid-cols-4 gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
-
+        <div id="file-grid" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
+            
+            <form class="form-horizontal" method="post">
+              <div class="row">
+                <div class="col-12 col-sm-12" id="multiple-file-upload">
+                  <div class="form-group">
+                    <div class="file-upload-box">
+                      <input type="file" id="file-inpute" class="file-input" accept=".xlsx" />
+                      <label for="file-inpute" class="file-label d-flex">
+                        <i class="fas fa-upload"></i>
+                        <div class="file-group-text">
+                          <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                          <span class="file-format">Formatos: .xlsx</span>
+                        </div>
+                        <button class="upload-button" type="button">Subir archivo</button>
+                      </label>
+                    </div>
+                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                    <div class="file-lista hidden">
+                      </div>
+                    <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
+                    <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                  </div>
+                </div>
+              </div>
+            </form>
           <!-- Existing and uploaded files will appear here -->
         </div>
         <div id="pending-files" class="hidden d-none">
@@ -491,7 +508,46 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-4 px-4 py-8 note-container-container">
+      <div class="col-12 col-md-4">
+        <div class="container px-4 py-8 file-section-container col-12 col-md-12">
+        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
+        </h2>
+
+        <div id="file-grid-inspection" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
+            <form class="form-horizontal" method="post">
+              <div class="row">
+                <div class="col-12 col-sm-12" id="multiple-file-upload-image">
+                  <div class="form-group">
+                    <div class="file-upload-box">
+                      <input type="file" id="file-inpute" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
+                      <label for="file-inpute" class="file-label d-flex">
+                        <i class="fas fa-upload"></i>
+                        <div class="file-group-text">
+                          <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                          <span class="file-format">Formatos: .jpeg .png .mp4</span>
+                        </div>
+                        <button class="upload-button" type="button">Subir archivo</button>
+                      </label>
+                    </div>
+                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                    <div class="file-lista hidden">
+                      </div>
+                    <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
+                    <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                  </div>
+                </div>
+              </div>
+            </form>
+        </div>
+        <div id="pending-files-inspection hidden" class="mb-4 hidden">
+          <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
+          <div id="pending-file-list-inspection" class="space-y-2">
+            <!-- Los archivos pendientes aparecerán aquí -->
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="col-12 col-md-3 px-4 py-8 note-container-container">
         <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas
           <button onclick="addNote()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <i class="fas fa-save  float-right"></i>
@@ -505,39 +561,7 @@
         </div>
       </div>
     </div>
-    <div class="row my-2">
-      <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
-        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
-          <button data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i>
-            <span>Nuevo</span>
-          </button>
-        </h2>
 
-        <div id="drag-drop-container-inspection"
-          class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4 hidden">
-          <div id="drop-message">
-            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
-            <p class="text-gray-600">
-              Arrastra y suelta archivos aquí
-            </p>
-            <p class="text-xs text-gray-500 mt-2">
-              Soporta: PDF, JPG, PNG, DOCX (Máximo 10MB)
-            </p>
-          </div>
-
-        </div>
-
-        <div id="file-grid-inspection" class="grid grid-cols-4 gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
-        </div>
-        <div id="pending-files-inspection hidden" class="mb-4">
-          <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
-          <div id="pending-file-list-inspection" class="space-y-2">
-            <!-- Los archivos pendientes aparecerán aquí -->
-          </div>
-        </div>
-      </div>
-    </div>
 
   </section>
   <section id="steps" class="content">
@@ -1442,6 +1466,40 @@
     color: #666666;
   }
 
+  /* Lista de archivos seleccionados */
+.file-lista {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.file-lista.hidden {
+    display: none;
+}
+
+.file-lista-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.file-lista-item svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.file-lista-item span {
+    font-size: 14px;
+    color: #333;
+    flex-grow: 1;
+}
+
+
   .remove-button {
     background: none;
     border: none;
@@ -1454,6 +1512,26 @@
   .remove-button:hover {
     color: #cc0000;
   }
+
+  .file-list {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.file-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.file-list-item:last-child {
+    border-bottom: none;
+}
 
   /* Clase para ocultar elementos */
   .hidden {
@@ -1533,94 +1611,145 @@
     });
   }
 
+  // Funcion para subir archivos multiples
+
   function setupMultiFileUpload(containerId) {
     const container = document.getElementById(containerId);
     const fileInput = container.querySelector('.file-input');
     const fileLabel = container.querySelector('.file-label');
-    const fileList = container.querySelector('.file-list');
-    const selectFileButton = container.querySelector('.upload-button');
+    const fileList = container.querySelector('.file-lista');
+    const uploadButton = container.querySelector('.upload-button');
 
     // Abrir el diálogo de selección de archivos al hacer clic en el botón
-    selectFileButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      fileInput.click();
+    uploadButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.click();
     });
 
     // Mostrar la lista de archivos seleccionados
     fileInput.addEventListener('change', (e) => {
-      if (fileInput.files.length > 0) {
-        fileList.classList.remove('hidden');
-        fileList.innerHTML = ""; // Limpiar la lista antes de agregar nuevos archivos
+        if (fileInput.files.length > 0) {
+            fileList.classList.remove('hidden');
 
-        // Recorrer los archivos seleccionados
-        Array.from(fileInput.files).forEach((file, index) => {
-          if (file.name.endsWith('.xlsx')) {
-            // Crear un elemento de lista para cada archivo
-            const fileItem = document.createElement('div');
-            fileItem.classList.add('file-list-item');
+            // Recorrer los archivos seleccionados
+            Array.from(fileInput.files).forEach((file, index) => {
+                // Crear un elemento de lista para cada archivo
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('file-list-item');
 
-            // Mostrar el nombre y el tamaño del archivo
-            fileItem.innerHTML = `
-                        <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
-                        <button class="remove-file-button" data-index="${index}">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                // Definir el ícono según el tipo de archivo
+                let icon = '';
+                if (file.name.endsWith('.jpeg') || file.name.endsWith('.jpg')) {
+                    icon = `
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                          <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                          <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                          <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
+                        </svg>
                     `;
+                } else if (file.name.endsWith('.png')) {
+                    icon = `
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                          <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                          <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                          <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
+                        </svg>
+                    `;
+                } else if (file.name.endsWith('.xlsx')) {
+                        icon = `
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                              <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
+                              <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
+                              <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
+                              <rect width="16" height="9" x="12" y="15" fill="#3fa071"></rect>
+                              <path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z"></path>
+                              <path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z"></path>
+                              <path d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z" opacity=".05"></path>
+                              <path d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z" opacity=".07"></path>
+                              <path d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z" opacity=".09"></path>
+                              <linearGradient id="flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1" x1="4.725" x2="23.055" y1="14.725" y2="33.055" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#18884f"></stop>
+                                <stop offset="1" stop-color="#0b6731"></stop>
+                              </linearGradient>
+                              <path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path>
+                              <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
+                            </svg>
+                        `;
+                } else if (file.name.endsWith('.mp4')) {
+                    icon = `
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                          <path fill="#ff7043" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                          <path fill="#bf360c" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                          <path fill="#fff" d="M19,32V16l12,8L19,32z"></path>
+                        </svg>
+                    `;
+                } else {
+                    alert(`El archivo "${file.name}" no es un archivo válido`);
+                    return; // Salir si el archivo no es válido
+                }
 
-            // Agregar el elemento a la lista
-            fileList.appendChild(fileItem);
-          } else {
-            alert(`El archivo "${file.name}" no es un archivo .xlsx válido.`);
-          }
-        });
-      } else {
-        fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
-      }
+                // Mostrar el nombre y el tamaño del archivo
+                fileItem.innerHTML = `
+                    ${icon}
+                    <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                    <button class="remove-file-button" data-index="${index}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+
+                // Agregar el elemento a la lista
+                fileList.appendChild(fileItem);
+            });
+        } else {
+            fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
+        }
     });
 
     // Manejar la eliminación de archivos individuales
     fileList.addEventListener('click', (e) => {
-      if (e.target.classList.contains('remove-file-button') || e.target.closest('.remove-file-button')) {
-        const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
+        if (e.target.classList.contains('remove-file-button') || e.target.closest('.remove-file-button')) {
+            const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
 
-        // Convertir FileList a un array para poder eliminar el archivo
-        const files = Array.from(fileInput.files);
-        files.splice(index, 1); // Eliminar el archivo del array
+            // Convertir FileList a un array para poder eliminar el archivo
+            const files = Array.from(fileInput.files);
+            files.splice(index, 1); // Eliminar el archivo del array
 
-        // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
-        const dataTransfer = new DataTransfer();
-        files.forEach(file => dataTransfer.items.add(file));
-        fileInput.files = dataTransfer.files;
+            // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
+            const dataTransfer = new DataTransfer();
+            files.forEach(file => dataTransfer.items.add(file));
+            fileInput.files = dataTransfer.files;
 
-        // Volver a mostrar la lista de archivos actualizada
-        fileInput.dispatchEvent(new Event('change'));
-      }
+            // Volver a mostrar la lista de archivos actualizada
+            fileInput.dispatchEvent(new Event('change'));
+        }
     });
 
     // Manejar el arrastre de archivos
     fileLabel.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#007bff';
+        e.preventDefault();
+        fileLabel.style.borderColor = '#007bff';
     });
 
     fileLabel.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#cccccc';
+        e.preventDefault();
+        fileLabel.style.borderColor = '#cccccc';
     });
 
     fileLabel.addEventListener('drop', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#cccccc';
-      if (e.dataTransfer.files.length > 0) {
-        // Asignar los archivos arrastrados al input
-        fileInput.files = e.dataTransfer.files;
+        e.preventDefault();
+        fileLabel.style.borderColor = '#cccccc';
+        if (e.dataTransfer.files.length > 0) {
+            // Asignar los archivos arrastrados al input
+            fileInput.files = e.dataTransfer.files;
 
-        // Mostrar la lista de archivos
-        fileInput.dispatchEvent(new Event('change'));
-      }
+            // Mostrar la lista de archivos
+            fileInput.dispatchEvent(new Event('change'));
+        }
     });
-  }
+}
 
   // Configurar los contenedores
   setupSingleFileUpload('single-file-upload');
+  setupMultiFileUpload('multiple-file-upload');
+  setupMultiFileUpload('multiple-file-upload-image');
 </script>

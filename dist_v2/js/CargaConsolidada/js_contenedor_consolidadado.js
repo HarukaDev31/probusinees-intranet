@@ -289,6 +289,7 @@ async function getClientesHeader() {
 async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, clientName) {
     //hide table cotizacion embarque
     cotizacionContainer.hide();
+    contentHeader.hide();
     cotizacionAlmacenContainer.show();
     currentProveedor = idProveedor;
     currentCotizacion = idCotizacion;
@@ -297,26 +298,26 @@ async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, cl
     $("#client-title").text(clientName);
     $("#client-supplier-code").text(supplierCode);
     $("#cotizacion_name").text(idContenedor);
-    fileManager = new FileManager({
-        fileGrid: "#file-grid",
-        fileInput: "#file-input-modal",
-        uploadBtn: "#btn-upload",
-        dragDropContainer: "#drag-drop-container",
-        searchInput: "#search-input",
-        pendingFileList: "#pending-file-list",
-        onFileUpload: (file) => uploadFileDocument(file, fileManager),
-        onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
-    });
-    fileManagerInspection = new FileManager({
-        fileGrid: "#file-grid-inspection",
-        fileInput: "#file-input-modal-inspection",
-        uploadBtn: "#btn-upload-inspection",
-        dragDropContainer: "#drag-drop-container-inspection",
-        searchInput: "#search-input-inspection",
-        pendingFileList: "#pending-file-list-inspection",
-        onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
-        onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
-    });
+    // fileManager = new FileManager({
+    //     fileGrid: "#file-grid",
+    //     fileInput: "#file-input-modal",
+    //     uploadBtn: "#btn-upload",
+    //     dragDropContainer: "#drag-drop-container",
+    //     searchInput: "#search-input",
+    //     pendingFileList: "#pending-file-list",
+    //     onFileUpload: (file) => uploadFileDocument(file, fileManager),
+    //     onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
+    // });
+    // fileManagerInspection = new FileManager({
+    //     fileGrid: "#file-grid-inspection",
+    //     fileInput: "#file-input-modal-inspection",
+    //     uploadBtn: "#btn-upload-inspection",
+    //     dragDropContainer: "#drag-drop-container-inspection",
+    //     searchInput: "#search-input-inspection",
+    //     pendingFileList: "#pending-file-list-inspection",
+    //     onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
+    //     onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
+    // });
     //fectch getNotes
     url = base_url + "CargaConsolidada/ContenedorConsolidado/getNotes/" + idProveedor;
     const response = await fetch(url);
@@ -990,6 +991,7 @@ async function viewSteps(id) {
             if (currentPrivilege == "ContenedorAlmacen") {
                 openStepFunction(1, id);
                 mainContainer.hide();
+                contentHeader.hide();
                 return;
             }
             mainContainer.hide();
@@ -1038,7 +1040,7 @@ async function hideSteps() {
     stepsContainer.hide();
     contentHeader.show();
     mainContainer.show();
-    table_Entidad.ajax.reload();
+    table_Entidad.ajax. reload();
 }
 async function deleteCarga(id) {
     Swal.fire({
@@ -2046,6 +2048,7 @@ const openStepFunction = async (step, id) => {
     $(".btn-back-cotizacion").on("click", function () {
         if (currentPrivilege == "ContenedorAlmacen") {
             mainContainer.show();
+            contentHeader.show();
             cotizacionContainer.hide();
             stepsContainer.hide();
         } else {
@@ -2340,8 +2343,7 @@ async function viewDocumentacion() {
                                                 <path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path>
                                                 <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
                                             </svg>
-                                            <span class="file-name"></span>
-                                            <span class="file-size"></span>
+                                            <span class="file-name">${file.folder_name}</span>
                                             
                                             <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
                                             <i class="fas fa-download"></i>
@@ -2352,7 +2354,7 @@ async function viewDocumentacion() {
                                         </div>
                                 ` :
                                 `
-                                    <input type="file" id="file-inputo" class="file-input" accept=".xlsx"/>
+                                    <input type="file" id="file-input-${file.id}" class="file-input" accept=".xlsx"/>
                                     <label for="file-inputo" class="file-label d-flex">
                                         <i class="fas fa-upload"></i>
                                         <div class="file-group-text">
@@ -2620,14 +2622,12 @@ async function deleteDocumentacionFile(id) {
         text: "¡No podrás revertir esto!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminarlo",
+        confirmButtonText: "Sí  , eliminarlo",
         cancelButtonText: "No, cancelar",
     }).then((result) => {
         if (result.isConfirmed) {
             url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteDocumentacionFile/" + id;
             $.ajax({
-                url: url,
-                type: "GET",
                 success: function (response) {
                     const result = JSON.parse(response);
                     if (result.status == "success") {
@@ -2642,9 +2642,8 @@ async function deleteDocumentacionFile(id) {
     });
 }
 async function openUploadFileDocumentation(idFolder) {
-    const fileInput = document.querySelector('.file-input');
-    const file = fileInput.files[0];
-
+    const file = $(`#file-input-${idFolder}`)[0].files[0];
+    console.log(file)
     if (!file) {
         Swal.fire({
             icon: 'error',
@@ -3475,6 +3474,7 @@ $(document).ready(async function () {
     })
     $("#btn-back-cotizacion-almacen").click(function () {
         cotizacionAlmacenContainer.hide();
+        contentHeader.hide();
         cotizacionContainer.show();
     })
     $("#btn-back-factura-guia").click(function () {
