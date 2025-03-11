@@ -69,7 +69,7 @@
 
 
         <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
-          <div class="col-6 col-sm-1">
+          <div class="col-12 col-sm-12">
             <button type="button" id="btn-crear" class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Crear<i class="fa fa-plus"></i> </button>
           </div>
         <?php } ?>
@@ -78,39 +78,15 @@
   </section>
   <section class="content" id="main-container">
     <div class="container-fluid">
-      <div class="row">
-        <div class="col-6 col-sm-2">
-          <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
-          <div class="form-group">
-            <input type="text" id="txt-Fe_Inicio_Carga" class="form-control  input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
-            <span class="help-block text-danger" id="error"></span>
-          </div>
-        </div>
-        <div class="col-6 col-sm-2">
-          <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
-          <div class="form-group">
-            <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
-            <span class="help-block text-danger" id="error"></span>
-          </div>
-        </div>
-        <div class="col-6 col-sm-3">
-          <label>Estado</label>
-          <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
-            <option value="0" selected>Todos</option>
-            <option value="PENDIENTE">PENDIENTE</option>
-            <option value="RECIBIENDO">RECIBIENDO</option>
-            <option value="COMPLETADO">COMPLETADO</option>
-          </select>
-        </div>
-
-
-
-      </div>
+          
       <div class="table-responsive div-Listar">
         <table id="table-contenedor" class="table table-hover">
           <thead class="thead-default">
             <tr>
-              <?php if ($this->user->No_Grupo == "Coordinación") {
+              <?php if (
+                $this->user->No_Grupo == "Coordinación"
+                || $this->user->No_Grupo == "Documentacion"
+              ) {
               ?>
                 <th>Carga</th>
                 <th>Mes </th>
@@ -124,6 +100,7 @@
                 <th>Estado</th>
                 <th>Acciones
                 </th>
+
               <?php } else { ?>
                 <th>Month</th>
                 <th>Country</th>
@@ -140,8 +117,392 @@
       </div>
     </div>
   </section>
+  <section class="bg-gradient-to-br from-gray-50 to-gray-100 p-8"
+    id="documentacion-container">
+    <div class="row mb-2">
+      <div class="col-10">
+        &nbsp;
+      </div>
+      <div class="col-2"
+        id="btn-back-documentacion-profile">
 
-  <!-- Cotizaciones -->
+        <button type="button" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i> </button>
+      </div>
+    </div>
+    <div class="max-w-4xl mx-auto space-y-6">
+      <!-- Providers Section -->
+      <div class="providers flex gap-4 mb-8">
+        <button class="provider-btn px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-md bg-orange-500 text-white">JS - 1</button>
+        <button class="provider-btn px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-md bg-gray-200 text-gray-700">JS - 2</button>
+        <button class="provider-btn px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-md bg-gray-200 text-gray-700">JS - 3</button>
+      </div>
+
+      <!-- Peru Documentation -->
+      <div class="bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+        <h2 class="text-lg font-semibold mb-6 bg-gradient-to-r from-gray-200 to-gray-100 p-3 rounded-lg flex items-center">
+          <i class="bi bi-flag text-xl mr-2"></i>
+          DOCUMENTACIÓN PERÚ
+        </h2>
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="flex items-center gap-4">
+                <label class="font-medium flex items-center">
+                  <i class="bi bi-file-text mr-2"></i>
+                  Vol. Doc:
+                </label>
+                <input type="text"
+                  id="txt-Vol_Doc"
+                  class="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all duration-300">
+              </div>
+              <div class="flex items-center gap-4">
+                <label class="font-medium flex items-center">
+                  <i class="bi bi-currency-dollar mr-2"></i>
+                  Valor Doc:
+                </label>
+                <input type="text"
+                  id="txt-Valor_Doc"
+                  class="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all duration-300">
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mt-4"
+            id="documentacion-peru-documents">
+            <!-- <button class="download-btn comercial-download flex items-center gap-3 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:bg-gray-100 group">
+                        <i class="bi bi-file-earmark-text text-2xl text-gray-600 transition-colors duration-300"></i>
+                        <div class="text-left">
+                            <div class="text-title font-medium text-gray-700 transition-colors duration-300">F. Comercial</div>
+                            <div class="text-sm text-gray-500">Descargar documento</div>
+                        </div>
+                    </button> -->
+            <!-- <button class="download-btn excel-download flex items-center gap-3 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:bg-gray-100 group">
+                        <i class="bi bi-file-earmark-excel text-2xl text-gray-600 transition-colors duration-300"></i>
+                        <div class="text-left">
+                            <div class="text-title font-medium text-gray-700 transition-colors duration-300">Excel confirmación</div>
+                            <div class="text-sm text-gray-500">Descargar archivo</div>
+                        </div>
+                    </button> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- China Documentation -->
+      <div class="bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+        <h2 class="text-lg font-semibold mb-6 bg-gradient-to-r from-gray-200 to-gray-100 p-3 rounded-lg flex items-center">
+          <i class="bi bi-globe-asia-australia text-xl mr-2"></i>
+          DOCUMENTACIÓN CHINA
+        </h2>
+        <div class="grid grid-cols-2 gap-4 mt-4"
+          id="documentacion-china">
+        </div>
+      </div>
+
+      <!-- Inspection -->
+      <div class="bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+        <h2 class="text-lg font-semibold mb-6 bg-gradient-to-r from-gray-200 to-gray-100 p-3 rounded-lg flex items-center">
+          <i class="bi bi-clipboard-check text-xl mr-2"></i>
+          INSPECCIÓN
+        </h2>
+        <div class="grid grid-cols-2 gap-4"
+          id="documentacion-inspeccion">
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="bg-white rounded-xl shadow-lg p-8"
+    id="documentacion-documentacion-container">
+    <div class="row">
+      <div class="col-10">
+        <h2 class="text-xl font-bold mb-6 text-gray-800 border-b pb-4">
+          <i class="bi bi-folder me-2"></i>
+          DOCUMENTACIÓN
+        </h2>
+      </div>
+      <div class="col-1">
+        <button type="button" id="btn-crear-documentacion-documentacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i></button>
+      </div>
+      <div class="col-1">
+        <button type="button" id="btn-back-documentacion-documentacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i></button>
+      </div>
+    </div>
+
+    <!--button with plus icon to add new document-->
+
+    <!-- Document Filter -->
+    <div class="mb-8">
+      <div class="flex space-x-4 bg-gray-100 p-2 rounded-lg">
+        <button class="doc-filter active px-4 py-2 rounded-md transition-all duration-300" data-filter="todos">Todos</button>
+        <button class="doc-filter px-4 py-2 rounded-md transition-all duration-300" data-filter="ENVIO">Envío</button>
+        <button class="doc-filter px-4 py-2 rounded-md transition-all duration-300" data-filter="COMERCIAL">Comercial</button>
+        <button class="doc-filter px-4 py-2 rounded-md transition-all duration-300" data-filter="LEGAL">Legal</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="documentacion-documentacion">
+      <!-- Document Cards -->
+      <!-- <div class="doc-card opacity-0 bg-blue-50 p-4 rounded-lg transition-all duration-300" data-type="envio">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i class="bi bi-file-text text-blue-500 text-xl"></i>
+            <div>
+              <h3 class="font-medium text-gray-800">Packing China</h3>
+              <p class="text-sm text-gray-500">Ver documento</p>
+            </div>
+          </div>
+          <button class="download-btn text-blue-500 hover:text-blue-700">
+            <i class="bi bi-download"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="doc-card opacity-0 bg-blue-50 p-4 rounded-lg transition-all duration-300" data-type="envio">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i class="bi bi-check-circle text-blue-500 text-xl"></i>
+            <div>
+              <h3 class="font-medium text-gray-800">Pre confirmación</h3>
+              <p class="text-sm text-gray-500">Ver documento</p>
+            </div>
+          </div>
+          <button class="download-btn text-blue-500 hover:text-blue-700">
+            <i class="bi bi-download"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="doc-card opacity-0 bg-green-50 p-4 rounded-lg transition-all duration-300" data-type="comercial">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i class="bi bi-receipt text-green-500 text-xl"></i>
+            <div>
+              <h3 class="font-medium text-gray-800">Factura comercial</h3>
+              <p class="text-sm text-gray-500">Ver documento</p>
+            </div>
+          </div>
+          <button class="download-btn text-green-500 hover:text-green-700">
+            <i class="bi bi-download"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="doc-card opacity-0 bg-yellow-50 p-4 rounded-lg transition-all duration-300" data-type="legal">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i class="bi bi-file-earmark-text text-yellow-500 text-xl"></i>
+            <div>
+              <h3 class="font-medium text-gray-800">Declaración Jurada</h3>
+              <p class="text-sm text-gray-500">Ver documento</p>
+            </div>
+          </div>
+          <button class="download-btn text-yellow-500 hover:text-yellow-700">
+            <i class="bi bi-download"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="doc-card opacity-0 bg-green-50 p-4 rounded-lg transition-all duration-300" data-type="comercial">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i class="bi bi-list-check text-green-500 text-xl"></i>
+            <div>
+              <h3 class="font-medium text-gray-800">Packing list</h3>
+              <p class="text-sm text-gray-500">Ver documento</p>
+            </div>
+          </div>
+          <button class="download-btn text-green-500 hover:text-green-700">
+            <i class="bi bi-download"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="doc-card opacity-0 bg-yellow-50 p-4 rounded-lg transition-all duration-300" data-type="legal">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i class="bi bi-envelope text-yellow-500 text-xl"></i>
+            <div>
+              <h3 class="font-medium text-gray-800">Carta Aclaratoria</h3>
+              <p class="text-sm text-gray-500">Ver documento</p>
+            </div>
+          </div>
+          <button class="download-btn text-yellow-500 hover:text-yellow-700">
+            <i class="bi bi-download"></i>
+          </button>
+        </div>
+      </div> -->
+    </div>
+  </section>
+  <section class="bg-gray-50"
+    id="documentacion-aduana-container">
+    <div class="max-w-7xl mx-auto p-6">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-800">Formulario de Aduana</h1>
+          <p class="text-gray-500 mt-1">Complete la información para el trámite aduanero</p>
+        </div>
+        <div class="text-gray-600 bg-gray-100 px-4 py-2 rounded-lg">
+          <button type="button" id="btn-back-documentacion-aduana" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i> </button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex space-x-4 mb-8">
+        <button class="tab-btn active flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100" data-tab="general">
+          <i class="bi bi-box-seam"></i>
+          <span>Información General</span>
+        </button>
+        <button class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100" data-tab="dates">
+          <i class="bi bi-calendar"></i>
+          <span>Fechas y Plazos</span>
+        </button>
+        <button class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100" data-tab="values">
+          <i class="bi bi-currency-dollar"></i>
+          <span>Valores y Costos</span>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <div class="bg-white rounded-xl shadow-sm p-8">
+        <form id="customsForm" class="space-y-6">
+          <!-- General Information Tab -->
+          <div class="tab-content active" id="general">
+            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Naviera</label>
+                <select name="naviera" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="">Seleccione una naviera</option>
+                  <option value="MAERSK">MAERSK</option>
+                  <option value="ONE">ONE</option>
+                  <option value="COSCO">COSCO</option>
+                  <option value="EVERGREEN">EVERGREEN</option>
+                  <option value="MSC">MSC</option>
+                  <option value="HAPAG LLOYD">HAPAG LLOYD</option>
+                  <option value="CMA CGM">CMA CGM</option>
+                  <option value="YANG MING">YANG MING</option>
+                  <option value="ZIM">ZIM</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Tipo de Contenedor</label>
+                <select name="tipo_contenedor" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="">Seleccione tipo</option>
+                  <option value="LCL">LCL</option>
+                  <option value="20 GP">20 GP</option>
+                  <option value="40 NOR">40 NOR</option>
+                  <option value="40 GP">40 GP</option>
+                  <option value="40 HQ">40 HQ</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Canal de Control</label>
+                <div class="relative">
+                  <select name="canal_control" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="controlChannel">
+                    <option value="">Seleccione canal</option>
+                    <option value="Verde">Verde</option>
+                    <option value="Naranja">Naranja</option>
+                    <option value="Rojo">Rojo</option>
+                  </select>
+                  <div class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full" id="channelIndicator"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Número DUA</label>
+                <input name="numero_dua" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- Dates Tab -->
+          <div class="tab-content hidden" id="dates">
+            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">F. ZARPE</label>
+                <input name="fecha_zarpe" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">F. ARRIBO</label>
+                <input name="fecha_arribo" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">F. DECLARACIÓN</label>
+                <input name="fecha_declaracion" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">F. LEVANTE</label>
+                <input name="fecha_levante" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- Values Tab -->
+          <div class="tab-content hidden" id="values">
+            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">VALOR FOB</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="valor_fob" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">VALOR FLETE</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="valor_flete" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">COSTO DESTINO</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="costo_destino" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">AJUSTE DE VALOR</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="ajuste_valor" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">MULTA</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="multa" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">OBSERVACIONES</label>
+                <textarea name="observaciones" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex justify-between pt-6 border-t mt-6">
+           
+            <button type="submit" class="px-6 py-2 text-white bg-black rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </section>
   <section class="content" id="cotizacion-container">
     <div class="container-fluid ">
       <!-- Header de la tabla -->
@@ -221,7 +582,7 @@
               <th>Whatsapp</th>
               <th>T. Cliente</th>
               <th>Volumen</th>
-              <th>Monto</th>
+              <th>Precio Cbm</th>
               <th>Tarifa</th>
               <th>Cotizacion</th>
               <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
@@ -238,13 +599,16 @@
         <table id="table-cotizacion-embarque" class="table table-hover dataTable no-footer embarque">
           <thead class="thead-default">
             <tr>
-              <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              <?php if (
+                $this->user->No_Grupo != "ContenedorAlmacen"
+                && $this->user->No_Grupo != "Documentacion"
+              ) {  ?>
                 <th>Asesor</th>
               <?php } ?>
               <th style="min-width: 8em;" class="no-sort">Status</th>
               <th class="orderable">N.</th>
               <th style="min-width: 14em;">Buyer</th>
-              <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              <?php if ($this->user->No_Grupo != "ContenedorAlmacen" && $this->user->No_Grupo != "Documentacion") {  ?>
                 <th style="min-width: 8em;">Whatsapp</th>
                 <th
                   style="min-width: 10em;">Estado</th>
@@ -485,6 +849,17 @@
         <label>&nbsp;</label>
       </div>
     </div>
+    <div class="row mb-2">
+      <div class="container mx-auto px-4 py-8 file-section-container col-12 col-md-8">
+        <div>
+          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Documents
+            <button
+            id="btn-upload-document-cotizacion"
+            data-toggle="modal" data-target="#uploadModal" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <i class="fas fa-plus"></i>
+              <span>Nuevo</span>
+            </button>
+          </h2>
 
 
     <div class="row mb-2 ml-2" style="border-bottom: #DFDFDF solid 2px;">
@@ -609,6 +984,16 @@
         </div>
       </div>
     </div>
+    <div class="row my-2">
+      <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
+        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
+          <button 
+          id="btn-upload-inspection-cotizacion"
+          data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus"></i>
+            <span>Nuevo</span>
+          </button>
+        </h2>
 
 
   </section>
@@ -688,7 +1073,7 @@
               <th>Whatsapp</th>
               <th>T. Cliente</th>
               <th>Volumen F</th>
-              <th>Monto F</th>
+              <th>Precio Cbm</th>
               <th>Tarifa F</th>
               <th>Estados</th>
               <th>C Final</th>
@@ -864,30 +1249,29 @@
                   <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
                 </div>
               </div>
-              <div class="col-6 col-sm-6 fech"> <!--fecha arribo -->
+              <div class="col-6 col-sm-6"> <!--fecha arribo -->
                 <div class="form-group">
-                  <div class="cont-fech">
-                    <div>Fecha Arribo <span class="label-advertencia text-danger"> *</span></div>
-                    <input type="text" name="f_puerto" required id="txt-Fe_Puerto" placeholder="00/00/0000" class="form-control input-report required input-date">
-                  </div>
+                  
+                    <label>Fecha Arribo <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text" name="f_puerto" required id="txt-Fe_Puerto" placeholder="00/00/0000" class="form-control input-report required input-date w-100">
                   <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
                 </div>
               </div>
 
               <div class="col-6 col-sm-6"> <!--mes -->
-                <label>Mes <span class="label-advertencia text-danger"> *</span></label>
                 <div class="form-group">
-                  <select id="txt-Mes" required name="mes" class="form-control input-report required">
+                <label>Mes <span class="label-advertencia text-danger"> *</span></label>
+
+                  <select id="txt-Mes" required name="mes" class=" w-100 form-control input-report required">
                   </select>
                   <span class="invalid-feedback" id="error-mes">El mes es requerido</span>
                 </div>
               </div>
-              <div class="col-6 col-sm-6 fech"> <!--fecha cierre -->
+              <div class="col-6 col-sm-6"> <!--fecha cierre -->
                 <div class="form-group">
-                  <div class="cont-fech">
-                    <div>Fecha Cierre <span class="label-advertencia text-danger"> *</span></div>
-                    <input type="text" name="f_cierre" required id="txt-Fe_Cierre" placeholder="00/00/0000" class="form-control input-report required input-date">
-                  </div>
+            
+                    <label>Fecha Cierre <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text" name="f_cierre" required id="txt-Fe_Cierre" placeholder="00/00/0000" class=" w-100 form-control input-report required input-date">
                   <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
                 </div>
               </div>
@@ -901,12 +1285,14 @@
                     <input type="hidden" id="txt-ID_Carga_Consolidada" name="id" value="0"> -->
                 </div>
               </div>
-              <div class="col-6 col-sm-6 fech"> <!--fecha entrega -->
+             
+      
+
+              <div class="col-6 col-sm-6">
                 <div class="form-group" id="div-Fe_Entrega">
-                  <div class="cont-fech">
-                    <div>Fecha Entrega <span class="label-advertencia text-danger"> *</span></div>
-                    <input type="text" required name="f_entrega" id="txt-Fe_Entrega" placeholder="00/00/0000" class="form-control input-report required input-date">
-                  </div>
+             
+                    <label>Fecha Entrega <span class="label-advertencia text-danger"> *</span></label>
+                    <input type="text" required name="f_entrega" id="txt-Fe_Entrega" placeholder="00/00/0000" class="w-100 form-control input-report required input-date">
                   <span class="invalid-feedback" id="error-f-entrega">La fecha entrega es requerida</span>
                 </div>
               </div>
@@ -1416,16 +1802,6 @@
   #txt-Empresa::placeholder {
     color: #495057;
   }
-
-
-
-
-
-
-
-
-
-
 
   .file-upload-box {
     border: 2px dashed #cccccc;

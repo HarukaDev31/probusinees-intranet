@@ -89,9 +89,10 @@ var cotizacionFinalContainer = null;
 var tableCotizacionFinal = null;
 var facturaGuiaContainer = null;
 var tableFacturaGuia = null;
-
-
-
+var documentationContainerProfile = null;
+var documentacionSelectedProvider = 0;
+var documentacionDocumentacionContainer = null;
+var documentacionAduanaContainer = null;
 
 async function descargarBoletaPDF(idCotizacionFinal) {
     spinner.show();
@@ -126,6 +127,27 @@ async function descargarBoletaPDF(idCotizacionFinal) {
         },
     });
 };
+async function updateEstadoDocumentacion(id) {
+    const estado = $(`#estado-documentacion-${id}`).val();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoDocumentacion";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {
+            id: id,
+            estado: estado
+        },
+        success: function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+                Swal.fire("Correcto!", result.message, "success");
+            } else {
+                Swal.fire("Error!", result.message, "error");
+            }
+            table_Entidad.ajax.reload();
+        },
+    });
+}
 async function updateEstado(id) {
     const estado = $(`#estado-${id}`).val();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstado";
@@ -324,8 +346,8 @@ async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, cl
     const result = await response.json();
     $("#txt-Id_Carga_Consolidada").val(result.nota);
     if (currentPrivilege != "ContenedorAlmacen") {
-        $(".file-section-container").css("pointer-events", "none");
-        $(".note-container-container").css("pointer-events", "none");
+        $("#btn-upload-document-cotizacion").css("pointer-events", "none");
+        $("#btn-upload-inspection-cotizacion").css("pointer-events", "none");
     }
 
     spinner.hide();
@@ -684,7 +706,7 @@ async function uploadFacturaGeneral(idCotizacion) {
         input: 'file',
         inputAttributes: {
             'accept': //excel
-                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+                '*',
             'aria-label': 'Sube tu archivo'
 
         },
@@ -726,8 +748,8 @@ async function uploadGuiaRemision(idCotizacion) {
         title: 'Subir Guia de Remisión',
         input: 'file',
         inputAttributes: {
-            'accept': //excel
-                '.xlsx, .xls,.xlsm, .xlsb, .xltx, .xltm, .xlam, .xla, .xlw',
+            'accept': //all files
+                '*',
             'aria-label': 'Sube tu archivo'
 
         },
@@ -1087,6 +1109,173 @@ async function getTipoCliente() {
         );
     });
 }
+async function showDocumentacionDocumentacionContainer(id) {
+    documentacionDocumentacionContainer.show();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/getDocumentationFolderFiles/" + idContenedor;
+    spinner.show();
+    const response = await fetch(url);
+    const result = await response.json();
+    spinner.hide();
+    $("#documentacion-documentacion").empty();
+
+    result.forEach((file) => {
+        let color = "bg-blue-50";
+        if (file.categoria == "DEFAULT") {
+            color = "bg-blue-50";
+        } else if (file.categoria == "ENVIO") {
+            color = "bg-green-50";
+        } else if (file.categoria == "COMERCIAL") {
+            color = "bg-yellow-50";
+        } else if (file.categoria == "LEGAL") {
+            color = "bg-red-50";
+        } else if (file.categoria == "OTROS") {
+            color = "bg-purple-50";
+        }
+
+        if (file.file_url) {
+            $("#documentacion-documentacion").append(`
+                <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria}">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i class="bi bi-${file.b_icon} text-blue-500 text-xl"></i>
+            <div>
+              <h3 class="font-medium text-gray-800">${file.folder_name}</h3>
+              <p class="text-sm text-gray-500">Ver documento</p>
+            </div>
+          </div>
+          <a class="download-btn text-blue-500 hover:text-blue-700"
+          href="${file.file_url}" target="_blank" download>
+                
+            <i class="${ `bi bi-download`}"></i>
+          </a>
+        </div>
+      </div>`);
+        } else {
+            $("#documentacion-documentacion").append(`
+                <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria}">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="bi bi-file
+                text-blue-500 text-xl"></i>
+                <div>
+                    <h3 class="font-medium text-gray-800">${file.folder_name}</h3>
+                    <p class="text-sm text-red-500">Documento no subido</p>
+                </div>
+            </div>
+              <span class="download-btn text-blue-500 hover:text-blue-700"
+                id="file-input-doc-${file.id}-label">
+                <i class="${file.b_icon ?? `bi bi-upload`}"></i>
+                 </span>
+                          <input type="file" id="file-input-doc-${file.id}" class="hidden" />
+        </div>
+    </div>`);
+    // Add event listener to file input
+    $(`#file-input-doc-${file.id}-label`).off('click');
+    $(`#file-input-doc-${file.id}-label`).on('click', function () {
+        //show swall for upload
+        Swal.fire({
+            title: 'Subir documento',
+            input: 'file',
+            inputAttributes: {
+                'accept': //all files
+                    '*',
+                'aria-label': 'Sube tu archivo'
+
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Subir',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debes elegir un archivo!'
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const fileI = result.value;
+                const formData = new FormData();
+                formData.append('file', fileI);
+                formData.append('idFolder', file.id);
+                formData.append('idContenedor', idContenedor);
+                url = base_url + "CargaConsolidada/ContenedorConsolidado/uploadFileDocumentation";
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        const result = JSON.parse(response);
+                        if (result.status == "success") {
+                            Swal.fire("Correcto!", result.message, "success");
+                            showDocumentacionDocumentacionContainer(idContenedor);
+                        } else {
+                            Swal.fire("Error!", result.message, "error");
+                        }
+                    },
+                });
+            }
+        }
+        );
+    });
+
+    
+        }
+    
+    });
+    $('.input-group').on('focusin', 'input', function () {
+        $(this).parent().addClass('ring-2 ring-blue-500');
+        $(this).prev('label').addClass('text-blue-600');
+    });
+
+    $('.input-group').on('focusout', 'input', function () {
+        $(this).parent().removeClass('ring-2 ring-blue-500');
+        if (!$(this).val()) {
+            $(this).prev('label').removeClass('text-blue-600');
+        }
+    });
+
+    // Document card hover effects
+    $('.doc-card').hover(
+        function () {
+            $(this).addClass('transform -translate-y-1');
+        },
+        function () {
+            $(this).removeClass('transform -translate-y-1');
+        }
+    );
+
+    // Document filter functionality
+    $('.doc-filter').click(function () {
+        const filter = $(this).data('filter');
+
+        // Update active filter button
+        $('.doc-filter').removeClass('active bg-white shadow-md');
+        $(this).addClass('active bg-white shadow-md');
+
+        if (filter === 'todos') {
+            $('.doc-card').fadeIn();
+        } else {
+            $('.doc-card').hide();
+            $(`.doc-card[data-type="${filter}"]`).fadeIn();
+        }
+    });
+
+    // Download button hover effect
+    $('.download-btn').hover(
+        function () {
+            $(this).find('.bi-download').addClass('transform -translate-y-1');
+        },
+        function () {
+            $(this).find('.bi-download').removeClass('transform -translate-y-1');
+        }
+    );
+
+    // Initial animations
+    $('.input-group, .doc-card').each(function (index) {
+        $(this).delay(index * 100).animate({ opacity: 1 }, 500);
+    });
+}
 async function deleteCotizacionFile(id) {
     Swal.fire({
         title: "¿Estás seguro?",
@@ -1142,6 +1331,197 @@ async function deleteCotizacion(id) {
             });
         }
     });
+}
+async function viewFormularioAduana() {
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/viewFormularioAduana/" + idContenedor;
+    spinner.show();
+    const response = await fetch(url);
+    const result = await response.json();
+    spinner.hide();
+    documentacionAduanaContainer.show();
+    $('.tab-btn').click(function () {
+        const tab = $(this).data('tab');
+        $('.tab-btn').removeClass('active bg-gray-100');
+        $(this).addClass('active bg-gray-100');
+        $('.tab-content').removeClass('active').addClass('hidden');
+        $(`#${tab}`).removeClass('hidden').addClass('active');
+    });
+
+    // Control channel color indicator
+    function updateChannelIndicator() {
+        const channel = $('#controlChannel').val();
+        const indicator = $('#channelIndicator');
+
+        switch (channel) {
+            case 'Verde':
+                indicator.css('background-color', '#22c55e');
+                break;
+            case 'Naranja':
+                indicator.css('background-color', '#f97316');
+                break;
+            case 'Rojo':
+                indicator.css('background-color', '#ef4444');
+                break;
+            default:
+                indicator.css('background-color', '#d1d5db');
+                break;
+        }
+    }
+
+    $('#controlChannel').change(updateChannelIndicator);
+
+    // Form field focus effects
+    $('.form-group input, .form-group select, .form-group textarea').on('focus', function () {
+        $(this).parent().find('label').addClass('text-blue-600');
+    }).on('blur', function () {
+        if (!$(this).val()) {
+            $(this).parent().find('label').removeClass('text-blue-600');
+        }
+    });
+
+    // Form validation function
+    function validateForm($form) {
+        const errors = [];
+
+        // Validar campos del tab General
+        if (!$form.find('[name="naviera"]').val()) {
+            errors.push({ field: 'naviera', tab: 'general' });
+        }
+        if (!$form.find('[name="tipo_contenedor"]').val()) {
+            errors.push({ field: 'tipo_contenedor', tab: 'general' });
+        }
+        if (!$form.find('[name="canal_control"]').val()) {
+            errors.push({ field: 'canal_control', tab: 'general' });
+        }
+        if (!$form.find('[name="numero_dua"]').val()) {
+            errors.push({ field: 'numero_dua', tab: 'general' });
+        }
+
+        // Validar campos del tab Dates
+        if (!$form.find('[name="fecha_zarpe"]').val()) {
+            errors.push({ field: 'fecha_zarpe', tab: 'dates' });
+        }
+        if (!$form.find('[name="fecha_arribo"]').val()) {
+            errors.push({ field: 'fecha_arribo', tab: 'dates' });
+        }
+        if (!$form.find('[name="fecha_declaracion"]').val()) {
+            errors.push({ field: 'fecha_declaracion', tab: 'dates' });
+        }
+        if (!$form.find('[name="fecha_levante"]').val()) {
+            errors.push({ field: 'fecha_levante', tab: 'dates' });
+        }
+
+        // Validar campos del tab Values
+        if (!$form.find('[name="valor_fob"]').val()) {
+            errors.push({ field: 'valor_fob', tab: 'values' });
+        }
+        if (!$form.find('[name="valor_flete"]').val()) {
+            errors.push({ field: 'valor_flete', tab: 'values' });
+        }
+        if (!$form.find('[name="costo_destino"]').val()) {
+            errors.push({ field: 'costo_destino', tab: 'values' });
+        }
+        if (!$form.find('[name="ajuste_valor"]').val()) {
+            errors.push({ field: 'ajuste_valor', tab: 'values' });
+        }
+        if (!$form.find('[name="multa"]').val()) {
+            errors.push({ field: 'multa', tab: 'values' });
+        }
+
+        return errors;
+    }
+
+    // Get tab name for error messages
+    function getTabName(tabId) {
+        const tabNames = {
+            'general': 'Información General',
+            'dates': 'Fechas y Plazos',
+            'values': 'Valores y Costos'
+        };
+
+        return tabNames[tabId] || tabId;
+    }
+    const form = $('#customsForm')[0];
+    // Iterar sobre las claves del objeto
+    Object.keys(result[0]).forEach(key => {
+        // Buscar el elemento del formulario que coincida con la clave
+        const input = form.elements[key];
+        console.log(key, input);
+
+        // Si el elemento existe, asignar el valor correspondiente
+        if (input) {
+            // Si es un select, buscar la opción que coincida con el valor
+            if (input.tagName === 'SELECT') {
+              const option = Array.from(input.options).find(opt => opt.value === result[0][key]);
+              if (option) {
+                option.selected = true;
+              }
+            } else {
+              // Para inputs y textareas, asignar el valor directamente
+              input.value = result[0][key];
+            }
+          }
+    });
+    // Form submission with validation
+    $('#customsForm').on('submit', function (e) {
+        e.preventDefault();
+
+        // Validar el formulario
+        const $form = $(this);
+        const errors = validateForm($form);
+
+        if (errors.length > 0) {
+            // Ir al tab con el primer error
+            const firstErrorTab = errors[0].tab;
+
+            // Cambiar al tab con el error
+            $('.tab-btn').removeClass('active bg-gray-100');
+            $(`.tab-btn[data-tab="${firstErrorTab}"]`).addClass('active bg-gray-100');
+            $('.tab-content').removeClass('active').addClass('hidden');
+            $(`#${firstErrorTab}`).removeClass('hidden').addClass('active');
+
+            // Mostrar mensaje de error
+            Swal.fire(
+                "Error!",
+                `Por favor complete todos los campos obligatorios en la sección ${getTabName(firstErrorTab)}`,
+                "error"
+            );
+
+            // Enfocar el primer campo con error
+            $form.find(`[name="${errors[0].field}"]`).focus();
+
+            return false;
+        }
+
+        // Si no hay errores, continuar con el envío del formulario
+        const formData = new FormData(this);
+        formData.append('idContainer', idContenedor);
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/updateFormularioAduana";
+        spinner.show();
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const result = JSON.parse(response);
+                if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                } else {
+                    Swal.fire("Error!", result.message, "error");
+                }
+                spinner.hide();
+            },
+            error: function () {
+                Swal.fire("Error!", "Ha ocurrido un error en la comunicación con el servidor", "error");
+                spinner.hide();
+            }
+        });
+    });
+    updateChannelIndicator(); // Initial state
+
 }
 async function deleteCliente(idCotizacion) {
     Swal.fire({
@@ -1258,9 +1638,11 @@ const openStepFunction = async (step, id) => {
     spinner.show();
     stepsContainer.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-    if (stepIndex == 1) {
+    if (stepIndex == 1 && currentPrivilege != "Documentacion") {
         cotizacionContainer.show();
-        if (currentPrivilege == "ContenedorAlmacen") {
+        if (currentPrivilege == "ContenedorAlmacen"
+            || currentPrivilege == "Documentacion"
+        ) {
             $("#table-cotizacion-prospectos").attr("style", "display:none");
             if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
                 reloadTableCotizacionEmbarque();
@@ -1272,71 +1654,71 @@ const openStepFunction = async (step, id) => {
                         "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-                    buttons: [
-                        {
-                            extend: "excel",
-                            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                            titleAttr: "Excel",
-                            action: function () {
-                                url = base_url + "CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/" + idContenedor;
-                                //AJAX MULTIPART FOR EXCEL
-                                $.ajax({
-                                    url: url,
-                                    type: "GET",
-                                    xhrFields: {
-                                        responseType: 'blob'
-                                    },
-                                    success: function (response) {
-                                        //excel
-                                        var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                                        var link = document.createElement('a');
-                                        link.href = window.URL.createObjectURL(blob);
-                                        link.download = `Cotizacion-${idContenedor}.xlsx`;
-                                        link.click();
+                    // buttons: [
+                    //     {
+                    //         extend: "excel",
+                    //         text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                    //         titleAttr: "Excel",
+                    //         action: function () {
+                    //             url = base_url + "CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/" + idContenedor;
+                    //             //AJAX MULTIPART FOR EXCEL
+                    //             $.ajax({
+                    //                 url: url,
+                    //                 type: "GET",
+                    //                 xhrFields: {
+                    //                     responseType: 'blob'
+                    //                 },
+                    //                 success: function (response) {
+                    //                     //excel
+                    //                     var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    //                     var link = document.createElement('a');
+                    //                     link.href = window.URL.createObjectURL(blob);
+                    //                     link.download = `Cotizacion-${idContenedor}.xlsx`;
+                    //                     link.click();
 
-                                    },
-                                    error: function () {
-                                        Swal.fire("Error!", "Hubo un error", "error");
-                                    }
-                                });
+                    //                 },
+                    //                 error: function () {
+                    //                     Swal.fire("Error!", "Hubo un error", "error");
+                    //                 }
+                    //             });
 
-                            }
-                        },
-                        {
-                            extend: "colvis",
-                            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-                            titleAttr: "Columnas",
-                            exportOptions: {
-                                columns: ":visible",
-                            },
-                        },
-                        {
-                            text: "Por Embarcar",
-                            className: "btn btn-light",
-                            action: function () {
-                                if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
-                                    $("#table-cotizacion-prospectos").attr("style", "display:none");
-                                    $("#table-cotizacion-prospectos_wrapper").hide();
-                                }
-                                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+                    //         }
+                    //     },
+                    //     {
+                    //         extend: "colvis",
+                    //         text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+                    //         titleAttr: "Columnas",
+                    //         exportOptions: {
+                    //             columns: ":visible",
+                    //         },
+                    //     },
+                    //     {
+                    //         text: "Por Embarcar",
+                    //         className: "btn btn-light",
+                    //         action: function () {
+                    //             if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+                    //                 $("#table-cotizacion-prospectos").attr("style", "display:none");
+                    //                 $("#table-cotizacion-prospectos_wrapper").hide();
+                    //             }
+                    //             if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
 
-                                    $("#table-cotizacion-embarque").attr("style", "");
+                    //                 $("#table-cotizacion-embarque").attr("style", "");
 
-                                } else {
-                                    $("#table-cotizacion-embarque").attr("style", "");
-                                }
-                                $(".input-date").datepicker({
-                                    autoclose: true,
-                                    startDate: new Date(fYear, fToday.getMonth(), fDay),
-                                    todayHighlight: true,
-                                    format: "dd/mm/yyyy",
-                                    dateFormat: "dd/mm/yyyy",
-                                });
-                                currentTableCotizacion = "embarque";
-                            }
-                        },
+                    //             } else {
+                    //                 $("#table-cotizacion-embarque").attr("style", "");
+                    //             }
+                    //             $(".input-date").datepicker({
+                    //                 autoclose: true,
+                    //                 startDate: new Date(fYear, fToday.getMonth(), fDay),
+                    //                 todayHighlight: true,
+                    //                 format: "dd/mm/yyyy",
+                    //                 dateFormat: "dd/mm/yyyy",
+                    //             });
+                    //             currentTableCotizacion = "embarque";
+                    //         }
+                    //     },
 
-                    ],
+                    // ],
                     paging: true,
                     lengthChange: true,
                     searching: true,
@@ -1368,6 +1750,7 @@ const openStepFunction = async (step, id) => {
                             visible: false,
                         },
                         {
+                            className: "text-center",
                             targets: "no-sort",
                             orderable: false,
                         },
@@ -1633,6 +2016,7 @@ const openStepFunction = async (step, id) => {
                                                 visible: false,
                                             },
                                             {
+                                                className: "text-center",
                                                 targets: "no-sort",
                                                 orderable: false,
                                             },
@@ -1738,6 +2122,7 @@ const openStepFunction = async (step, id) => {
                             visible: false,
                         },
                         {
+                            className: "text-center",
                             targets: "no-sort",
                             orderable: false,
                         },
@@ -1759,7 +2144,13 @@ const openStepFunction = async (step, id) => {
         }
 
 
-    } else if (stepIndex == 2) {
+    }
+    else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
+        showDocumentacionDocumentacionContainer(id);
+    }
+    else if (stepIndex == 2
+        || (currentPrivilege == "Documentacion" && stepIndex == 1)
+    ) {
         await getClientesHeader();
         url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
         clientesContainer.show();
@@ -1813,14 +2204,15 @@ const openStepFunction = async (step, id) => {
                         },
                         className: "btn btn-light"
                     },
-                    {
-                        text: "Variación",
-                        action: function () {
-                            if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-                                $("#table-clientes-general").attr("style", "display:none");
-                                $("#table-clientes-general_wrapper").hide();
-                            }
-                            if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+                    currentPrivilege != "Documentacion" ?
+                        {
+                            text: "Variación",
+                            action: function () {
+                                if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+                                    $("#table-clientes-general").attr("style", "display:none");
+                                    $("#table-clientes-general_wrapper").hide();
+                                }
+                                if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
 
                                 $("#table-clientes-variacion").attr("style", "");
                                 $("#table-clientes-variacion_wrapper").show();
@@ -1844,143 +2236,146 @@ const openStepFunction = async (step, id) => {
                                                 if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
                                                     $("#table-clientes-general_wrapper").show();
 
-                                                    $("#table-clientes-general").attr("style", "");
-                                                    reloadTableClientesGeneral();
+                                                        $("#table-clientes-general").attr("style", "");
+                                                        reloadTableClientesGeneral();
 
 
-                                                } else {
-                                                    $("#table-clientes-general").attr("style", "");
-                                                    reloadTableClientesGeneral();
+                                                    } else {
+                                                        $("#table-clientes-general").attr("style", "");
+                                                        reloadTableClientesGeneral();
 
+                                                    }
+                                                },
+                                            },
+                                            {
+                                                text: "Variación",
+                                                className: "btn btn-light",
+                                                action: function () {
+                                                    if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+                                                        $("#table-clientes-general").attr("style", "display:none");
+                                                        $("#table-clientes-general_wrapper").hide();
+                                                    }
+                                                    if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+
+                                                        $("#table-clientes-variacion").attr("style", "");
+
+                                                    } else {
+                                                        $("#table-clientes-variacion").attr("style", "");
+                                                    }
                                                 }
                                             },
-                                        },
-                                        {
-                                            text: "Variación",
-                                            className: "btn btn-light",
-                                            action: function () {
-                                                if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-                                                    $("#table-clientes-general").attr("style", "display:none");
-                                                    $("#table-clientes-general_wrapper").hide();
-                                                }
-                                                if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
-
-                                                    $("#table-clientes-variacion").attr("style", "");
-
-                                                } else {
-                                                    $("#table-clientes-variacion").attr("style", "");
-                                                }
+                                            // {
+                                            //     text: "<i class='fa fa-upload'></i> Lista de embarque",
+                                            //     action: function () {
+                                            //         Swal.fire({
+                                            //             title: "Subir lista de embarque",
+                                            //             input: "file",
+                                            //             inputAttributes: {
+                                            //                 accept: "*",
+                                            //                 "aria-label": "Sube tu archivo",
+                                            //             },
+                                            //             showCancelButton: true,
+                                            //             confirmButtonText: "Subir",
+                                            //             showLoaderOnConfirm: true,
+                                            //             preConfirm: (file) => {
+                                            //                 const formData = new FormData();
+                                            //                 formData.append("file", file);
+                                            //                 formData.append("idContenedor", idContenedor);
+                                            //                 formData.append("idCotizacion", idCotizacion);
+                                            //                 return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadListaEmbarque", {
+                                            //                     method: "POST",
+                                            //                     body: formData,
+                                            //                 })
+                                            //                     .then((response) => {
+                                            //                         return response.json();
+                                            //                     })
+                                            //                     .catch((error) => {
+                                            //                         Swal.showValidationMessage(
+                                            //                             `Request failed: ${error}`
+                                            //                         );
+                                            //                     });
+                                            //             },
+                                            //             allowOutsideClick: () => !Swal.isLoading(),
+                                            //         }).then((result) => {
+                                            //             if (result.value) {
+                                            //                 if (result.value.status == "success") {
+                                            //                     Swal.fire("Correcto", result.value.message, "success");
+                                            //                     reloadTableClientesVariacion();
+                                            //                 } else {
+                                            //                     Swal.fire("Error", result.value.message, "error");
+                                            //                 }
+                                            //             }
+                                            //         });
+                                            //     },
+                                            //     className: "btn btn-secondary btn-lista-embarque"
+                                            // }
+                                        ],
+                                        columnDefs: [
+                                            {
+                                                targets: "no-hidden",
+                                                visible: false,
+                                            },
+                                            {
+                                                className: "text-center",
+                                                targets: "no-sort",
+                                                orderable: false,
+                                            },
+                                            {
+                                                targets: "",
+                                                orderable: false,
+                                            },
+                                            {
+                                                targets: "sorting_asc",
+                                                orderable: false,
                                             }
+                                        ],
+                                        paging: true,
+                                        lengthChange: true,
+                                        searching: true,
+                                        ordering: true,
+                                        info: true,
+                                        autoWidth: false,
+                                        responsive: false,
+                                        serverSide: false,
+                                        pagingType: "full_numbers",
+                                        oLanguage: {
+                                            sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                                            sLengthMenu: "_MENU_",
+                                            sSearch: "Buscar por: ",
+                                            sSearchPlaceholder: "",
+                                            sZeroRecords: "No se encontraron registros",
+                                            sInfoEmpty: "No hay registros",
+                                            sLoadingRecords: "Cargando...",
+                                            sProcessing: "Procesando...",
+                                            oPaginate: {
+                                                sFirst: "<<",
+                                                sLast: ">>",
+                                                sPrevious: "<",
+                                                sNext: ">",
+                                            },
                                         },
-                                        // {
-                                        //     text: "<i class='fa fa-upload'></i> Lista de embarque",
-                                        //     action: function () {
-                                        //         Swal.fire({
-                                        //             title: "Subir lista de embarque",
-                                        //             input: "file",
-                                        //             inputAttributes: {
-                                        //                 accept: "*",
-                                        //                 "aria-label": "Sube tu archivo",
-                                        //             },
-                                        //             showCancelButton: true,
-                                        //             confirmButtonText: "Subir",
-                                        //             showLoaderOnConfirm: true,
-                                        //             preConfirm: (file) => {
-                                        //                 const formData = new FormData();
-                                        //                 formData.append("file", file);
-                                        //                 formData.append("idContenedor", idContenedor);
-                                        //                 formData.append("idCotizacion", idCotizacion);
-                                        //                 return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadListaEmbarque", {
-                                        //                     method: "POST",
-                                        //                     body: formData,
-                                        //                 })
-                                        //                     .then((response) => {
-                                        //                         return response.json();
-                                        //                     })
-                                        //                     .catch((error) => {
-                                        //                         Swal.showValidationMessage(
-                                        //                             `Request failed: ${error}`
-                                        //                         );
-                                        //                     });
-                                        //             },
-                                        //             allowOutsideClick: () => !Swal.isLoading(),
-                                        //         }).then((result) => {
-                                        //             if (result.value) {
-                                        //                 if (result.value.status == "success") {
-                                        //                     Swal.fire("Correcto", result.value.message, "success");
-                                        //                     reloadTableClientesVariacion();
-                                        //                 } else {
-                                        //                     Swal.fire("Error", result.value.message, "error");
-                                        //                 }
-                                        //             }
-                                        //         });
-                                        //     },
-                                        //     className: "btn btn-secondary btn-lista-embarque"
-                                        // }
-                                    ],
-                                    columnDefs: [
-                                        {
-                                            targets: "no-hidden",
-                                            visible: false,
-                                        },
-                                        {
-                                            className: "text-center",
-                                            targets: "no-sort",
-                                            orderable: false,
-                                        },
-                                        {
-                                            targets: "",
-                                            orderable: false,
-                                        },
-                                        {
-                                            targets: "sorting_asc",
-                                            orderable: false,
+                                        ajax: {
+                                            url: url,
+                                            type: "POST",
+                                            dataType: "JSON",
+                                            data: function (data) {
+                                                data.stepIndex = stepIndex;
+                                                data.idContenedor = idContenedor;
+                                                data.tipoTabla = "variacion";
+                                                data.estado = $("#txt-ID_Estado").val();
+                                                validateListEmbarque(idContenedor);
+                                            }
                                         }
-                                    ],
-                                    paging: true,
-                                    lengthChange: true,
-                                    searching: true,
-                                    ordering: true,
-                                    info: true,
-                                    autoWidth: false,
-                                    responsive: false,
-                                    serverSide: false,
-                                    pagingType: "full_numbers",
-                                    oLanguage: {
-                                        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-                                        sLengthMenu: "_MENU_",
-                                        sSearch: "Buscar por: ",
-                                        sSearchPlaceholder: "",
-                                        sZeroRecords: "No se encontraron registros",
-                                        sInfoEmpty: "No hay registros",
-                                        sLoadingRecords: "Cargando...",
-                                        sProcessing: "Procesando...",
-                                        oPaginate: {
-                                            sFirst: "<<",
-                                            sLast: ">>",
-                                            sPrevious: "<",
-                                            sNext: ">",
-                                        },
-                                    },
-                                    ajax: {
-                                        url: url,
-                                        type: "POST",
-                                        dataType: "JSON",
-                                        data: function (data) {
-                                            data.stepIndex = stepIndex;
-                                            data.idContenedor = idContenedor;
-                                            data.tipoTabla = "variacion";
-                                            data.estado = $("#txt-ID_Estado").val();
-                                            validateListEmbarque(idContenedor);
-                                        }
-                                    }
-                                });
-                            }
+                                    });
+                                }
 
-                        },
-                    },
+                            },
+                        } : null
 
-                ],
+                ]
+                    //filter null
+                    .filter(Boolean)
+                ,
                 paging: true,
                 lengthChange: true,
                 searching: true,
@@ -2037,7 +2432,12 @@ const openStepFunction = async (step, id) => {
                 }
             });
         }
-    } else if (stepIndex == 3) {
+    }
+    else if (stepIndex == 3 && currentPrivilege == "Documentacion") {
+        viewFormularioAduana();
+    }
+
+    else if (stepIndex == 3) {
         viewDocumentacion();
     } else if (stepIndex == 4) {
         viewCotizacionFinal();
@@ -2823,6 +3223,183 @@ async function uploadCotizacionFile(id) {
         }
     }
 }
+async function viewDocumentacionByDocumentacionProfile(idCotizacion) {
+    clientesContainer.hide();
+    documentationContainerProfile.show();
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/showClientesDocumentacionByDoc/" + idCotizacion;
+    spinner.show();
+    const response = await fetch(url);
+    const result = await response.json();
+    //foreach row in result add  button <button class="provider-btn px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-md bg-orange-500 text-white">PROVEEDOR 1</button> to .providers container
+    const proveedores_documentacion = result.proveedores_documentacion;
+    $(".providers").empty();
+    const parsed_proveedores_documentacion = JSON.parse(proveedores_documentacion);
+    parsed_proveedores_documentacion.forEach((row,
+        index
+    ) => {
+        $(".providers").append(`
+        <button class="provider-btn px-6 py-3 
+        rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-md bg-orange-500 text-white"
+         id="tab-${index}"
+        >${row.code_supplier} </button>
+       
+        `);
+        $("#tab-" + index).off("click");
+        $("#tab-" + index).on("click", function () {
+            loadProviderData(index, parsed_proveedores_documentacion);
+        });
+
+    });
+    loadProviderData(0, parsed_proveedores_documentacion);
+    spinner.hide();
+
+}
+async function loadProviderData(index, parsed_proveedores_documentacion) {
+    console.log(index, parsed_proveedores_documentacion);
+    firstProvider = parsed_proveedores_documentacion[index];
+    documentacionPeru = firstProvider.documentacion_peru;
+    documentacionChina = firstProvider.documentacion_china;
+    documentosAdicionales = firstProvider.documentos_adicionales;
+    inspeccion = firstProvider.inspeccion;
+    $("#txt-Vol_Doc").val(documentacionPeru.volumen_doc);
+    $("#txt-Valor_Doc").val(documentacionPeru.valor_doc);
+    const facturaComercial = documentacionPeru.factura_comercial;
+    const excelConfirmacion = documentacionPeru.excel_confirmacion;
+    $("#documentacion-peru-documents").empty();
+    if (facturaComercial) {
+        $("#documentacion-peru-documents").append(`
+            <div class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="p-3 bg-green-100 rounded-full">
+                <i class="fa fa-file-text text-green-600" style="font-size: 1.5rem;"></i>
+            </div>
+            <div class="ml-4 flex-grow">
+                <div class="text-title font-medium text-gray-700">F. Comercial</div>
+                <div class="text-sm text-gray-500">Descargar documento</div>
+            </div>
+           
+            </div>
+             <div class="flex gap-2">
+                <a href="${facturaComercial}" target="_blank" class="download-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                Descargar
+                </a>
+            </div>
+    </div>
+    
+        `);
+    } else {
+        $("#documentacion-peru-documents").append(` <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+      <div class="p-3 bg-red-100 rounded-full">
+        <i class="fa fa-file text-red-600" style="font-size: 1.5rem;"></i>
+      </div>
+      <div class="ml-4 flex-grow">
+        <div class="text-title font-medium text-gray-700">F. Comercial</div>
+        <div class="text-sm text-red-500">Documento no disponible</div>
+      </div>
+   
+    </div>`);
+    }
+    if (excelConfirmacion) {
+        $("#documentacion-peru-documents").append(`
+                        <div class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+
+        <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+        <div class="p-3 bg-green-100 rounded-full">
+            <i class="fa fa-file-excel text-green-600" style="font-size: 1.5rem;"></i>
+        </div>
+        <div class="ml-4 flex-grow">
+            <div class="text-title font-medium text-gray-700">Excel Confirmación</div>
+            <div class="text-sm text-gray-500">Descargar documento</div>
+        </div>
+            </div>
+               <div class="flex gap-2">
+            <a href="${excelConfirmacion}" target="_blank" class="download-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+            Descargar
+            </a>
+        </div>
+        </div>
+        `);
+    } else {
+        $("#documentacion-peru-documents").append(`<div class="flex items-center p-4 bg-gray-50 rounded-lg">
+      <div class="p-3 bg-red-100 rounded-full">
+        <i class="fa fa-file-excel text-red-600" style="font-size: 1.5rem;"></i>
+      </div>
+      <div class="ml-4 flex-grow">
+        <div class="text-title font-medium text-gray-700">Excel Confirmación</div>
+        <div class="text-sm text-red-500">Documento no disponible</div>
+      </div>
+     
+    </div>`);
+    }
+    if (documentosAdicionales) {
+        documentosAdicionales.forEach((data) => {
+            $("#documentacion-peru-documents").append(`
+            <div class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="p-3 bg-green-100 rounded-full">
+                    <i class="fa fa-file-text text-green-600" style="font-size: 1.5rem;"></i>
+                </div>
+            <div class="ml-4 flex-grow">
+                <div class="text-title font-medium text-gray-700">${data.name}</div>
+                <div class="text-sm text-gray-500">Descargar documento</div>
+            </div>
+           
+            </div>
+             <div class="flex gap-2">
+                <a href="${data.file_url}" target="_blank" class="download-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                Descargar
+                </a>
+            </div>
+        </div>`);
+        });
+    }
+    $("#documentacion-china").empty();
+    if (documentacionChina) {
+        documentacionChina.forEach((data) => {
+            $("#documentacion-china").append(`
+                            <div class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+
+                <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+        <div class="p-3 bg-green-100 rounded-full">
+            <i class="fa fa-file-text text-green-600" style="font-size: 1.5rem;"></i>
+        </div>
+        <div class="ml-4 flex-grow">
+            <div class="text-title font-medium text-gray-700">${data.name}</div>
+            <div class="text-sm text-gray-500">Descargar documento</div>
+        </div>
+       </div>
+        <div class="flex gap-2">
+            <a href="${data.file_url}" target="_blank" class="download-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+            Descargar
+            </a>
+        </div>
+        </div>`);
+        });
+    }
+    $("#documentacion-inspeccion").empty();
+    if (inspeccion) {
+        inspeccion.forEach((data) => {
+            $("#documentacion-inspeccion").append(`
+          <div class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+
+                <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+        <div class="p-3 bg-green-100 rounded-full">
+            <i class="fa fa-file-text text-green-600" style="font-size: 1.5rem;"></i>
+        </div>
+        <div class="ml-4 flex-grow">
+            <div class="text-title font-medium text-gray-700">${data.name}</div>
+            <div class="text-sm text-gray-500">Descargar documento</div>
+        </div>
+       </div>
+        <div class="flex gap-2">
+            <a href="${data.file_url}" target="_blank" class="download-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+            Descargar
+            </a>
+        </div>
+        </div>`);
+        });
+    }
+}
 async function viewClientesDocumentacion(id) {
     idCotizacion = id;
     clientesContainer.hide();
@@ -3101,6 +3678,12 @@ $(document).ready(async function () {
     facturaGuiaContainer.hide();
     tableFacturaGuia = $("#table-factura-guia");
     tableFacturaGuia.hide();
+    documentationContainerProfile = $("#documentacion-container");
+    documentationContainerProfile.hide();
+    documentacionDocumentacionContainer = $("#documentacion-documentacion-container");
+    documentacionDocumentacionContainer.hide();
+    documentacionAduanaContainer = $("#documentacion-aduana-container");
+    documentacionAduanaContainer.hide();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
 
     table_Entidad = $("#table-contenedor").DataTable({
@@ -3109,34 +3692,34 @@ $(document).ready(async function () {
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
         buttons: [
-            {
-                extend: "excel",
-                text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                titleAttr: "Excel",
-                exportOptions: {
-                    columns: ":visible",
-                },
-            },
-            {
-                extend: "pdf",
-                text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-                titleAttr: "PDF",
-                exportOptions: {
-                    columns: ":visible",
-                },
-            },
-            {
-                extend: "colvis",
-                text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-                titleAttr: "Columnas",
-                exportOptions: {
-                    columns: ":visible",
-                },
-            },
+            // {
+            //     extend: "excel",
+            //     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+            //     titleAttr: "Excel",
+            //     exportOptions: {
+            //         columns: ":visible",
+            //     },
+            // },
+            // {
+            //     extend: "pdf",
+            //     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+            //     titleAttr: "PDF",
+            //     exportOptions: {
+            //         columns: ":visible",
+            //     },
+            // },
+            // {
+            //     extend: "colvis",
+            //     text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+            //     titleAttr: "Columnas",
+            //     exportOptions: {
+            //         columns: ":visible",
+            //     },
+            // },
         ],
         paging: true,
         lengthChange: true,
-        searching: true,
+        searching: false,
         ordering: false,
         info: true,
         autoWidth: false,
@@ -3204,7 +3787,212 @@ $(document).ready(async function () {
     $("#upload-input-inspection").change(function () {
         handleFileUpload(this.files, "inspection");
     });
+    $("#btn-back-documentacion-profile").click(() => {
+        documentationContainerProfile.hide();
+        clientesContainer.show();
+    });
+    $("#btn-crear-documentacion-documentacion").click(() => {
+        //show swall with file name file input category select envio comercial legal and list with all boostrap icons to select
+        Swal.fire({
+            title: "Crear nueva documentación",
+            html: `
+              <div class="mb-3">
+                <input type="text" id="document-name" class="form-control" placeholder="Nombre del documento" required>
+                <div id="document-name-error" class="invalid-feedback">Este campo es obligatorio</div>
+              </div>
+              <div class="mb-3">
+                <input type="file" id="file-input-documentacion" class="form-control" required>
+                <div id="file-input-error" class="invalid-feedback">Debe seleccionar un archivo</div>
+              </div>
+              <div class="mb-3">
+                <select id="category" class="form-control" required>
+                  <option value="">Seleccione una categoría</option>
+                  <option value="ENVIO">Envio</option>
+                  <option value="COMERCIAL">Comercial</option>
+                  <option value="LEGAL">Legal</option>
+                </select>
+                <div id="category-error" class="invalid-feedback">Debe seleccionar una categoría</div>
+              </div>
+              <div class="mb-3">
+                <label for="icon-selection">Icono seleccionado: </label>
+                <span id="selected-icon"><i class="bi bi-file-earmark-text"></i></span>
+                <input type="hidden" id="icon-value" value="file-earmark-text">
+              </div>
+              <div class="mb-3">
+                <button id="show-icons" class="btn btn-outline-secondary btn-sm">Mostrar iconos</button>
+                <div id="icons-table-container" style="display: none;">
+                  ${generateIconsTable()}
+                </div>
+              </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                // Validar todos los campos antes de confirmar
+                let isValid = true;
 
+                // Validar nombre del documento
+                const documentName = document.getElementById('document-name');
+                if (!documentName.value.trim()) {
+                    documentName.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    documentName.classList.remove('is-invalid');
+                }
+
+                // Validar archivo
+                const fileInput = document.getElementById('file-input-documentacion');
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    fileInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    fileInput.classList.remove('is-invalid');
+                }
+
+                // Validar categoría
+                const category = document.getElementById('category');
+                if (!category.value) {
+                    category.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    category.classList.remove('is-invalid');
+                }
+
+                // Si hay errores, cancelar la confirmación
+                if (!isValid) {
+                    Swal.showValidationMessage('Por favor complete todos los campos obligatorios');
+                    return false;
+                }
+
+                // Devolver los valores para usarlos en el then()
+                return {
+                    documentName: documentName.value,
+                    file: fileInput.files[0],
+                    category: category.value,
+                    icon: document.getElementById('icon-value').value
+                };
+            },
+            didOpen: () => {
+                // Mostrar/ocultar la tabla de iconos
+                const showIconsBtn = document.getElementById('show-icons');
+                const iconsContainer = document.getElementById('icons-table-container');
+
+                showIconsBtn.addEventListener('click', () => {
+                    iconsContainer.style.display = iconsContainer.style.display === 'none' ? 'block' : 'none';
+                    showIconsBtn.textContent = iconsContainer.style.display === 'none' ? 'Mostrar iconos' : 'Ocultar iconos';
+                });
+
+                // Manejar la selección de iconos
+                const iconElements = document.querySelectorAll('.icon-select');
+                const selectedIcon = document.getElementById('selected-icon');
+                const iconValue = document.getElementById('icon-value');
+
+                iconElements.forEach(icon => {
+                    icon.addEventListener('click', () => {
+                        const iconName = icon.getAttribute('data-icon');
+                        selectedIcon.innerHTML = `<i class="bi bi-${iconName}"></i>`;
+                        iconValue.value = iconName;
+                        iconsContainer.style.display = 'none';
+                        showIconsBtn.textContent = 'Mostrar iconos';
+                    });
+                });
+
+                // Limpiar errores al escribir o cambiar valores
+                document.getElementById('document-name').addEventListener('input', function () {
+                    this.classList.remove('is-invalid');
+                });
+
+                document.getElementById('file-input-documentacion').addEventListener('change', function () {
+                    this.classList.remove('is-invalid');
+                });
+
+                document.getElementById('category').addEventListener('change', function () {
+                    this.classList.remove('is-invalid');
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Usar los valores validados devueltos por preConfirm
+                console.log('Nombre del documento:', result.value.documentName);
+                console.log('Archivo:', result.value.file);
+                console.log('Categoría:', result.value.category);
+                console.log('Icono seleccionado:', `bi bi-${result.value.icon}`);
+                spinner.show();
+                const formData = new FormData();
+                formData.append('idContenedor', idContenedor);
+                formData.append('name', result.value.documentName);
+                formData.append('categoria', result.value.category);
+                formData.append('icon', result.value.icon);
+                formData.append('file', result.value.file);
+                url = base_url + "CargaConsolidada/ContenedorConsolidado/createDocumentacionFolder";
+                $.ajax({
+                    url,
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        const data = JSON.parse(response);
+                        if (data.status === "success") {
+                            Swal.fire("Correcto", data.message, "success");
+                            showDocumentacionDocumentacionContainer(idContenedor);
+                        } else {
+                            Swal.fire("Error", data.message, "error");
+                        }
+                        spinner.hide();
+                    },
+                    error: function () {
+                        Swal.fire("Error", "Ocurrió un error al subir el archivo", "error");
+                        spinner.hide();
+                    }
+                });
+            }
+        })
+
+    });
+
+    function generateIconsTable() {
+        // Lista de iconos populares de Bootstrap (puedes agregar más según necesites)
+        const bootstrapIcons = [
+            "alarm", "archive", "arrow-left", "arrow-right", "bag", "bell", "bookmark",
+            "calendar", "camera", "chat", "check", "clipboard", "cloud", "code", "cog",
+            "collection", "credit-card", "dash", "database", "download", "envelope",
+            "exclamation-circle", "eye", "file", "folder", "gear", "graph-up", "heart",
+            "house", "image", "info-circle", "key", "laptop", "lock", "map", "mic",
+            "music-note", "paperclip", "pencil", "people", "person", "phone", "pie-chart",
+            "pin", "plus", "printer", "question-circle", "search", "shield", "shop",
+            "star", "tags", "trash", "trophy", "upload", "wallet", "x", "zoom-in"
+        ];
+
+        // Crear la estructura de la tabla
+        let tableHTML = '<div style="max-height: 200px; overflow-y: auto; margin-top: 15px;"><table class="table table-bordered">';
+        tableHTML += '<tbody>';
+
+        // Número de columnas en la tabla
+        const columns = 8;
+
+        // Crear filas y celdas
+        for (let i = 0; i < bootstrapIcons.length; i += columns) {
+            tableHTML += '<tr>';
+
+            for (let j = 0; j < columns; j++) {
+                if (i + j < bootstrapIcons.length) {
+                    const icon = bootstrapIcons[i + j];
+                    // Cada celda contiene un icono clickeable
+                    tableHTML += `<td><i class="bi bi-${icon} icon-select" data-icon="${icon}" style="font-size: 1.2rem; cursor: pointer;"></i></td>`;
+                } else {
+                    tableHTML += '<td></td>';
+                }
+            }
+
+            tableHTML += '</tr>';
+        }
+
+        tableHTML += '</tbody></table></div>';
+
+        return tableHTML;
+    }
     // Función para manejar la subida de archivos
     function handleFileUpload(files, section) {
         const formData = new FormData();
@@ -3403,7 +4191,9 @@ $(document).ready(async function () {
         const validContainers = await fetch(base_url + "CargaConsolidada/ContenedorConsolidado/getValidContainers");
         const parsedContainer = await validContainers.json();
         console.log(parsedContainer);
-        $("#txt-No_Carga").append('<option value="" disabled selected>Seleccione una consolidad</option>');
+        $("#txt-No_Carga").empty();
+
+        $("#txt-No_Carga").append('<option value="" disabled selected>Seleccione un consolidado</option>');
         // $("#txt-No_Carga").empty();
         parsedContainer.forEach((container) => {
             $("#txt-No_Carga").append(
@@ -3671,6 +4461,7 @@ $(document).ready(async function () {
                 formData.append("name", result.value.name);
                 formData.append("file", result.value.file);
                 formData.append("id", idCotizacion);
+                formData.append("idProveedor", currentProveedor);
                 $.ajax({
                     url: base_url + "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
                     type: "POST",
@@ -3901,7 +4692,7 @@ $(document).ready(async function () {
             if (result.isConfirmed) {
                 if (result.value.status == "success") {
                     Swal.fire("Correcto", result.value.message, "success");
-                    tableClientesGeneral.ajax.reload();
+                    tableCotizacionFinal.ajax.reload();
                 } else {
                     Swal.fire("Error", result.value.message, "error");
                 }
@@ -3939,7 +4730,7 @@ $(document).ready(async function () {
         Swal.fire({
             title: 'Subir Factura Final',
             input: 'file',
-            inputAttributes: {
+            inputAttributes: {//excel file
                 accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
             },
@@ -3988,11 +4779,16 @@ $(document).ready(async function () {
         returnToSteps();
 
     })
+    $("#btn-back-documentacion-documentacion").click(function () {
+        documentacionDocumentacionContainer.hide();
+        returnToSteps();
+    })
+    $("#btn-back-documentacion-aduana").click(function () {
+        documentacionAduanaContainer.hide();
+        returnToSteps();
+    })
     /*End of Listeners */
 });
-
-
-
 /**Sockets Config */
 window.addEventListener('load', () => {
     socket.onmessage = function (event) {

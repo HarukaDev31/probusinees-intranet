@@ -300,6 +300,7 @@ class PedidosGarantizados extends CI_Controller
     public function generarCotizacionChina($ID)
     {   
         
+        ob_end_clean();
         $data = $this->PedidosGarantizadosModel->get_by_id_excel($this->security->xss_clean($ID));
 
         $this->load->library('PHPExcel');
