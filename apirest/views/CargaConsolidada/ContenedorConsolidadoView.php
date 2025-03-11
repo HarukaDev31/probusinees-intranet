@@ -2183,7 +2183,7 @@
     display: none;
   }
 
-  #table-contenedor_wrapper .dt-buttons.btn-group.flex-wrap {
+  #table-contenedor_wrapper.dt-buttons.btn-group.flex-wrap {
     display: none;
   }
 </style>
@@ -2297,7 +2297,7 @@
           let icon = '';
           if (file.name.endsWith('.jpeg') || file.name.endsWith('.jpg')) {
             icon = `
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
@@ -2305,7 +2305,7 @@
                     `;
           } else if (file.name.endsWith('.png')) {
             icon = `
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
@@ -2313,7 +2313,7 @@
                     `;
           } else if (file.name.endsWith('.xlsx')) {
             icon = `
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                            <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                               <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
                               <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
                               <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
@@ -2333,7 +2333,7 @@
                         `;
           } else if (file.name.endsWith('.mp4')) {
             icon = `
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#ff7043" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#bf360c" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M19,32V16l12,8L19,32z"></path>
@@ -2347,7 +2347,9 @@
           // Mostrar el nombre y el tamaño del archivo
           fileItem.innerHTML = `
                     ${icon}
-                    <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                    <span
+                    style="width:70%"
+                    >${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
                     <button class="remove-file-button" data-index="${index}">
                         <i class="fas fa-trash"></i>
                     </button>

@@ -191,7 +191,7 @@ async function saveInspection() {
           spinner.hide();
           //clear input and file-lista
           fileInput.value = "";
-          $(".file-lista-inspection").html("");
+          $("#file-lista-inspection").html("");
           getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
             (files) => {
               files.forEach((file) =>

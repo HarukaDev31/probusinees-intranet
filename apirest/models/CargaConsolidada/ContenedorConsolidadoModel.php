@@ -2572,17 +2572,18 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     function validateToSendInspectionMessage($idProveedor)
     {
         //find if exists more two files type image and one type video
-        $this->db->select('id, file_path')
+        $this->db->select('id, file_path,file_type')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor)
             ->group_start() // Agrupa las condiciones de file_type
             ->where('file_type', 'image/jpeg')
             ->or_where('file_type', 'image/png')
+            ->or_where('file_type', 'image/jpg')
             ->group_end(); // 
         $query = $this->db->get();
         $imagesUrls = $query->result();
         $images = $query->num_rows();
-        $this->db->select('id,file_path')
+        $this->db->select('id,file_path,file_type')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor)
             ->where('file_type', 'video/mp4');
@@ -2675,10 +2676,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             // Inspección: ' . $message);
             //for each images and video send media
             foreach ($imagesUrls as $image) {
-                $this->sendMedia($image->file_path, 'image/jpeg');
+                $this->sendMedia($image->file_path, $image->file_type);
             }
             foreach ($videosUrls as $video) {
-                $this->sendMedia($video->file_path, 'video/mp4');
+                $this->sendMedia($video->file_path, $video->file_type);
             }
             return true;
         }
