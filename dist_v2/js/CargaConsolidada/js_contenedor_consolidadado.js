@@ -92,114 +92,120 @@ var documentationContainerProfile = null;
 var documentacionSelectedProvider = 0;
 var documentacionDocumentacionContainer = null;
 var documentacionAduanaContainer = null;
-async function saveDocumentation(){
-    event.preventDefault();
-    //show confirm swall
-    Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¡No podrás revertir esto!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, guardar",
-        cancelButtonText: "No, cancelar",
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // upload add idCotizacion and get files from #file-inpute 
-            const formData = new FormData();
-            formData.append('idCotizacion', currentCotizacion);
-            formData.append('idProveedor', currentProveedor);
-            const fileInput = $("#file-input-documentacion")[0];
-            const files = fileInput.files;
-            for (let i = 0; i < files.length; i++) {
-                formData.append('files[]', files[i]);
+async function saveDocumentation() {
+  event.preventDefault();
+  //show confirm swall
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡No podrás revertir esto!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, guardar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // upload add idCotizacion and get files from #file-inpute
+      const formData = new FormData();
+      formData.append("idCotizacion", currentCotizacion);
+      formData.append("idProveedor", currentProveedor);
+      const fileInput = $("#file-input-documentacion")[0];
+      const files = fileInput.files;
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files[]", files[i]);
+      }
+      spinner.show();
+      url =
+        base_url + "CargaConsolidada/ContenedorConsolidado/saveDocumentation";
+      $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          const result = JSON.parse(response);
+          if (result.status == "success") {
+            Swal.fire("Correcto!", result.message, "success");
+            reloadTableCotizacionEmbarque();
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+          spinner.hide();
+          //clear input and file-lista
+          fileInput.value = "";
+          $("#file-lista-documentacion").html("");
+          getFilesAlmacenDocument(currentProveedor, currentCotizacion).then(
+            (files) => {
+              files.forEach((file) =>
+                addFileToList(file, null, "file-lista-documentacion")
+              );
             }
-            spinner.show();
-            url = base_url + "CargaConsolidada/ContenedorConsolidado/saveDocumentation";
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    const result = JSON.parse(response);
-                    if (result.status == "success") {
-                        Swal.fire("Correcto!", result.message, "success");
-                        reloadTableCotizacionEmbarque();
-                    } else {
-                        Swal.fire("Error!", result.message, "error");
-                    }
-                    spinner.hide();
-                    //clear input and file-lista
-                    fileInput.value = "";
-                    $("#file-lista-documentacion").html("");
-                    getFilesAlmacenDocument(currentProveedor, currentCotizacion).then((files) => {
-                        files.forEach(file => addFileToList(file,null,'file-lista-documentacion'));
-                    });
-                },
-                error: function () {
-                    spinner.hide();
-                }
-            });
-        }
-    });
+          );
+        },
+        error: function () {
+          spinner.hide();
+        },
+      });
+    }
+  });
 }
-async function saveInspection(){
-    event.preventDefault();
-   //show confirm swall
-    Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¡No podrás revertir esto!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, guardar",
-        cancelButtonText: "No, cancelar",
-    }).then((result) => {
-    console.log(result)
-        if (result.isConfirmed) {
-            // upload add idCotizacion and get files from #file-inpute 
-            const formData = new FormData();
-            formData.append('idCotizacion', currentCotizacion);
-            formData.append('idProveedor', currentProveedor);
-            const fileInput = $("#file-input-inspeccion")[0];
-            const files = fileInput.files;
-            for (let i = 0; i < files.length; i++) {
-                formData.append('files[]', files[i]);
+async function saveInspection() {
+  event.preventDefault();
+  //show confirm swall
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡No podrás revertir esto!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, guardar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    console.log(result);
+    if (result.isConfirmed) {
+      // upload add idCotizacion and get files from #file-inpute
+      const formData = new FormData();
+      formData.append("idCotizacion", currentCotizacion);
+      formData.append("idProveedor", currentProveedor);
+      const fileInput = $("#file-input-inspeccion")[0];
+      const files = fileInput.files;
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files[]", files[i]);
+      }
+
+      spinner.show();
+      url = base_url + "CargaConsolidada/ContenedorConsolidado/saveInspection";
+      $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          const result = JSON.parse(response);
+          if (result.status == "success") {
+            Swal.fire("Correcto!", result.message, "success");
+            reloadTableCotizacionEmbarque();
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+          spinner.hide();
+          //clear input and file-lista
+          fileInput.value = "";
+          $(".file-lista-inspection").html("");
+          getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
+            (files) => {
+              files.forEach((file) =>
+                addFileToList(file, null, "file-lista-inspection")
+              );
             }
-
-            spinner.show();
-            url = base_url + "CargaConsolidada/ContenedorConsolidado/saveInspection";
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    const result = JSON.parse(response);
-                    if (result.status == "success") {
-                        Swal.fire("Correcto!", result.message, "success");
-                        reloadTableCotizacionEmbarque();
-                    } else {
-                        Swal.fire("Error!", result.message, "error");
-                    }
-                    spinner.hide();
-                    //clear input and file-lista
-                    fileInput.value = "";
-                    $(".file-lista-inspection").html("");
-                    getFilesAlmacenInspection(currentProveedor, currentCotizacion).then((files) => {
-                        files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
-                    });
-                    
-
-                },
-                error: function () {
-                    spinner.hide();
-                }
-            });
-        }
-    });
-      
+          );
+        },
+        error: function () {
+          spinner.hide();
+        },
+      });
+    }
+  });
 }
 async function descargarBoletaPDF(idCotizacionFinal) {
   spinner.show();
@@ -385,32 +391,32 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
   });
 }
 function deleteFile(fileId, cardElement) {
-    $.ajax({
-        url: base_url + "CargaConsolidada/ContenedorConsolidado/deleteFile/" + fileId,
-        type: "GET",
-        success: function (response) {
-            const data = JSON.parse(response);
-            if (data.status === "success") {
-                cardElement.remove();
-            } else {
-                alert("Error deleting file: " + data.message);
-            }
-        },
-        error: function () {
-            alert("An error occurred while deleting the file.");
-        },
-    });
+  $.ajax({
+    url:
+      base_url + "CargaConsolidada/ContenedorConsolidado/deleteFile/" + fileId,
+    type: "GET",
+    success: function (response) {
+      const data = JSON.parse(response);
+      if (data.status === "success") {
+        cardElement.remove();
+      } else {
+        alert("Error deleting file: " + data.message);
+      }
+    },
+    error: function () {
+      alert("An error occurred while deleting the file.");
+    },
+  });
 }
-function addFileToList(file,fileList=null,id=null) {
-    if (fileList == null) {
-        fileList = $(".file-lista");
-    }
-    if(id!=null){
-        fileList = $(`#${id}`);
-
-    }
-    const isImage = file?.file_ext.startsWith('image');
-    const fileItem = $(`
+function addFileToList(file, fileList = null, id = null) {
+  if (fileList == null) {
+    fileList = $(".file-lista");
+  }
+  if (id != null) {
+    fileList = $(`#${id}`);
+  }
+  const isImage = file?.file_ext.startsWith("image");
+  const fileItem = $(`
         <div class="file-item">
             <div class="file-preview"><span>📄</span>
                 <span>${file.file_name}</span>
@@ -426,59 +432,64 @@ function addFileToList(file,fileList=null,id=null) {
         </div>
     `);
 
-    // Botón de descarga
-    fileItem.find('.download-btn').on('click', function () {
-        event.preventDefault();
-        const url = $(this).data('url');
-        window.open(url, '_blank');
-    });
+  // Botón de descarga
+  fileItem.find(".download-btn").on("click", function () {
+    event.preventDefault();
+    const url = $(this).data("url");
+    window.open(url, "_blank");
+  });
 
-    // Botón de eliminar
-    fileItem.find('.delete-btn').on('click', function () {
-        event.preventDefault();
-        const id = $(this).data('id');
-        deleteFile(id, fileItem);
-    });
-    //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
-    if (isImage) {
-        const viewBtn = $(`
+  // Botón de eliminar
+  fileItem.find(".delete-btn").on("click", function () {
+    event.preventDefault();
+    const id = $(this).data("id");
+    deleteFile(id, fileItem);
+  });
+  //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
+  if (isImage) {
+    const viewBtn = $(`
             <button class="btn btn-primary btn-sm view-btn">👁️</button>
         `);
-        viewBtn.on('click', function () {
-            event.preventDefault();
-            const url = file.file_url;
-            const fileExt = file.file_ext;
-            viewFile(url, fileExt);
-        });
-        fileItem.find('.file-actions').append(viewBtn);
-    }
-    fileList.append(fileItem);
-    //remove class hidden
-    fileList.removeClass("hidden");
+    viewBtn.on("click", function () {
+      event.preventDefault();
+      const url = file.file_url;
+      const fileExt = file.file_ext;
+      viewFile(url, fileExt);
+    });
+    fileItem.find(".file-actions").append(viewBtn);
+  }
+  fileList.append(fileItem);
+  //remove class hidden
+  fileList.removeClass("hidden");
 }
 function viewFile(url, fileExt) {
-    const isImage = fileExt.startsWith('image');
-    const isVideo = fileExt.startsWith('video');
-    const isPdf = fileExt.startsWith('application/pdf');
-    const isWord = fileExt.startsWith('application/msword') || fileExt.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    const isExcel = fileExt.startsWith('application/vnd.ms-excel') || fileExt.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  const isImage = fileExt.startsWith("image");
+  const isVideo = fileExt.startsWith("video");
+  const isPdf = fileExt.startsWith("application/pdf");
+  const isWord =
+    fileExt.startsWith("application/msword") ||
+    fileExt.startsWith(
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    );
+  const isExcel =
+    fileExt.startsWith("application/vnd.ms-excel") ||
+    fileExt.startsWith(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
 
-    if (isImage) {
-        $('#image-preview').attr('src', url);
-        $('#image-modal').modal('show');
-    }
-    else if (isVideo) {
-        $('#video-preview').attr('src', url);
-        $('#video-modal').modal('show');
-    }
-    else if (isPdf || isWord || isExcel) {
-        // Configura el iframe dentro del modal para mostrar el archivo
-        $('#file-preview').attr('src', url);
-        $('#file-modal').modal('show');
-    }
-    else {
-        Swal.fire("Error!", "Formato de archivo no válido", "error");
-    }
+  if (isImage) {
+    $("#image-preview").attr("src", url);
+    $("#image-modal").modal("show");
+  } else if (isVideo) {
+    $("#video-preview").attr("src", url);
+    $("#video-modal").modal("show");
+  } else if (isPdf || isWord || isExcel) {
+    // Configura el iframe dentro del modal para mostrar el archivo
+    $("#file-preview").attr("src", url);
+    $("#file-modal").modal("show");
+  } else {
+    Swal.fire("Error!", "Formato de archivo no válido", "error");
+  }
 }
 
 async function getClientesHeader() {
@@ -495,60 +506,67 @@ async function getClientesHeader() {
   console.log(result);
   spinner.hide();
 }
-async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, clientName) {
-    //hide table cotizacion embarque
-    cotizacionContainer.hide();
-    contentHeader.hide();
-    cotizacionAlmacenContainer.show();
-    currentProveedor = idProveedor;
-    currentCotizacion = idCotizacion;
-    // Función para inicializar la lista al cargar la página
-    spinner.show();
-    $("#client-title").text(clientName);
-    $("#client-supplier-code").text(supplierCode);
-    $("#cotizacion_name").text(idContenedor);
-    $("#file-lista-documentacion").empty();
-    getFilesAlmacenDocument(idProveedor, idCotizacion).then((files) => {
-        files.forEach(file => addFileToList(file,null,'file-lista-documentacion'));
-    });
-    $("#file-lista-inspection").empty();
-    getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
-        files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
-    });
-    
-    // fileManager = new FileManager({
-    //     fileGrid: "#file-grid",
-    //     fileInput: "#file-input-modal",
-    //     uploadBtn: "#btn-upload",
-    //     dragDropContainer: "#drag-drop-container",
-    //     searchInput: "#search-input",
-    //     pendingFileList: "#pending-file-list",
-    //     onFileUpload: (file) => uploadFileDocument(file, fileManager),
-    //     onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
-    // });
-    // fileManagerInspection = new FileManager({
-    //     fileGrid: "#file-grid-inspection",
-    //     fileInput: "#file-input-modal-inspection",
-    //     uploadBtn: "#btn-upload-inspection",
-    //     dragDropContainer: "#drag-drop-container-inspection",
-    //     searchInput: "#search-input-inspection",
-    //     pendingFileList: "#pending-file-list-inspection",
-    //     onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
-    //     onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
-    // });
-    //fectch getNotes
-    url = base_url + "CargaConsolidada/ContenedorConsolidado/getNotes/" + idProveedor;
-    const response = await fetch(url);
-    const result = await response.json();
-    $("#txt-Id_Carga_Consolidada").val(result.nota);
-    if (currentPrivilege != "ContenedorAlmacen") {
-        $("#btn-upload-document-cotizacion").css("pointer-events", "none");
-        $("#btn-upload-inspection-cotizacion").css("pointer-events", "none");
-    }
+async function verCotizacionEmbarque(
+  idProveedor,
+  idCotizacion,
+  supplierCode,
+  clientName
+) {
+  //hide table cotizacion embarque
+  cotizacionContainer.hide();
+  contentHeader.hide();
+  cotizacionAlmacenContainer.show();
+  currentProveedor = idProveedor;
+  currentCotizacion = idCotizacion;
+  // Función para inicializar la lista al cargar la página
+  spinner.show();
+  $("#client-title").text(clientName);
+  $("#client-supplier-code").text(supplierCode);
+  $("#cotizacion_name").text(idContenedor);
+  $("#file-lista-documentacion").empty();
+  getFilesAlmacenDocument(idProveedor, idCotizacion).then((files) => {
+    files.forEach((file) =>
+      addFileToList(file, null, "file-lista-documentacion")
+    );
+  });
+  $("#file-lista-inspection").empty();
+  getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
+    files.forEach((file) => addFileToList(file, null, "file-lista-inspection"));
+  });
 
-    spinner.hide();
-    // Función para agregar un archivo a la lista con vista previa y botones
+  // fileManager = new FileManager({
+  //     fileGrid: "#file-grid",
+  //     fileInput: "#file-input-modal",
+  //     uploadBtn: "#btn-upload",
+  //     dragDropContainer: "#drag-drop-container",
+  //     searchInput: "#search-input",
+  //     pendingFileList: "#pending-file-list",
+  //     onFileUpload: (file) => uploadFileDocument(file, fileManager),
+  //     onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
+  // });
+  // fileManagerInspection = new FileManager({
+  //     fileGrid: "#file-grid-inspection",
+  //     fileInput: "#file-input-modal-inspection",
+  //     uploadBtn: "#btn-upload-inspection",
+  //     dragDropContainer: "#drag-drop-container-inspection",
+  //     searchInput: "#search-input-inspection",
+  //     pendingFileList: "#pending-file-list-inspection",
+  //     onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
+  //     onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
+  // });
+  //fectch getNotes
+  url =
+    base_url + "CargaConsolidada/ContenedorConsolidado/getNotes/" + idProveedor;
+  const response = await fetch(url);
+  const result = await response.json();
+  $("#txt-Id_Carga_Consolidada").val(result.nota);
+  if (currentPrivilege != "ContenedorAlmacen") {
+    $("#btn-upload-document-cotizacion").css("pointer-events", "none");
+    $("#btn-upload-inspection-cotizacion").css("pointer-events", "none");
+  }
 
+  spinner.hide();
+  // Función para agregar un archivo a la lista con vista previa y botones
 
   spinner.hide();
   // Función para agregar un archivo a la lista con vista previa y botones
@@ -2637,11 +2655,21 @@ const openStepFunction = async (step, id) => {
       mainContainer.show();
       contentHeader.show();
       cotizacionContainer.hide();
+      clientesDocumentacionContainer.hide();
+
       stepsContainer.hide();
     } else {
       returnToSteps();
     }
   });
+  $(".btn-back-cotizacion-documentacion").off("click");
+    $(".btn-back-cotizacion-documentacion").on("click", function () {
+        clientesContainer.show();
+        cotizacionContainer.hide();
+        clientesDocumentacionContainer.hide();
+        stepsContainer.hide();
+
+    });
 
   spinner.hide();
 };
@@ -3673,53 +3701,151 @@ async function viewClientesDocumentacion(id) {
   spinner.show();
   const response = await fetch(url);
   const result = await response.json();
-  $("#txt-Vol_Doc").val(result[0].volumen_doc);
-  $("#txt-Valor_Doc").val(result[0].valor_doc);
+  spinner.hide();
+  $("#txt-Vol_Doc").val(parseFloat(result[0].volumen_doc));
+  $("#txt-Valor_Doc").val(parseFloat(result[0].valor_doc));
   //set txt-F_Comercial href
   const facturaComercial = result[0].factura_comercial;
   const excelConfirmacion = result[0].excel_confirmacion;
-  if (facturaComercial) {
-    $("#factura-comercial").empty();
-    const facturaDiv = `
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <a href="${facturaComercial}" target="_blank" class="btn btn-outline-primary">
-                <i class="fa fa-download"></i>
-                Descargar
-                </a>
-           </div>
-            <div class="btn btn-outline-danger" onclick="deleteFacturaComercial(${idCotizacion})">
-            <i class="fa fa-trash " ></i>
+  $("#documentos-clientes-documentacion").empty();
+  let facturaDiv = "";
+  let excelDiv = "";
+  if (!facturaComercial) {
+    facturaDiv = `
+    Factura Comercial
+    <div class="col-12 col-sm-12" id="single-file-upload-factura">
+        <div class="form-group">
+            <div class="file-upload-box">
+                <input type="file" id="file-input-factura" class="file-input" name="file_comercial"
+                    accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
+                <label for="file-input-factura" class="file-label d-flex">
+                    <i class="fas fa-upload"></i>
+                    <div class="file-group-text">
+                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                        <span class="file-format">Formatos: .xlsx</span>
+                    </div>
+                    <button class="upload-button" type="button">Subir archivo</button>
+                </label>
+
+                <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                <div class="file-info-box hidden">
+                    <div class="file-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                            <!-- SVG content -->
+                        </svg>
+                        <span class="file-name"></span>
+                        <span class="file-size"></span>
+                        <button class="remove-file-button
+                        
+                        ">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>  
-        `;
-    $("#factura-comercial").append(facturaDiv);
+        </div>
+    </div>`;
   } else {
-    $("#factura-comercial").empty();
-    $("#factura-comercial").append(
-      `<input type="file" id="txt-F_Comercial" name="file_comercial" class="form-control" required>`
+    // Si existe el enlace de la factura, mostrar el contenedor con la información del archivo
+    facturaDiv = `
+    Factura Comercial
+    <div class="col-12 col-sm-12" id="single-file-upload-factura">
+        <div class="form-group">
+            <div class="file-upload-box">
+                <div class="file-info-box">
+                    <div class="file-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                            <!-- SVG content -->
+                        </svg>
+                        <span class="file-name">Factura Comercial</span>
+                        <a href="${facturaComercial}" target="_blank" class="file-link">Ver archivo</a>
+                        <button class="remove-file-button"
+                        onclick="deleteFacturaComercial(${result[0].id})"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+  }
+
+  $("#documentos-clientes-documentacion").append(facturaDiv);
+  //   setupSingleFileUpload("single-file-upload-factura", "file-input-factura");
+
+  // Repetir el mismo proceso para el Excel de confirmación
+  if (!excelConfirmacion) {
+    excelDiv = `
+    Excel Confirmación
+    <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
+        <div class="form-group">
+            <div class="file-upload-box">
+                <input type="file" id="file-input-confirmacion" class="file-input" name="excel_confirmacion"
+                    accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
+                <label for="file-input-confirmacion" class="file-label d-flex">
+                    <i class="fas fa-upload"></i>
+                    <div class="file-group-text">
+                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                        <span class="file-format">Formatos: .xlsx</span>
+                    </div>
+                    <button class="upload-button" type="button">Subir archivo</button>
+                </label>
+
+                <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                <div class="file-info-box hidden">
+                    <div class="file-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                            <!-- SVG content -->
+                        </svg>
+                        <span class="file-name"></span>
+                        <span class="file-size"></span>
+                        <button class="remove-file-button"
+                                                onclick="deleteExcelConfirmacion(${result[0].id})"
+
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+  } else {
+    // Si existe el enlace del Excel de confirmación, mostrar el contenedor con la información del archivo
+    excelDiv = `
+    Excel Confirmación
+    <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
+        <div class="form-group">
+            <div class="file-upload-box">
+                <div class="file-info-box">
+                    <div class="file-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                            <!-- SVG content -->
+                        </svg>
+                        <span class="file-name">Excel Confirmación</span>
+                        <a href="${excelConfirmacion}" target="_blank" class="file-link">Ver archivo</a>
+                        <button class="remove-file-button">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+  }
+
+  $("#documentos-clientes-documentacion").append(excelDiv);
+  if (!facturaComercial) {
+    setupSingleFileUpload(
+      "single-file-upload-confirmacion",
+      "file-input-confirmacion"
     );
   }
-  if (excelConfirmacion) {
-    $("#excel-confirmacion").empty();
-    const facturaDiv = `
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <a href="${excelConfirmacion}" target="_blank" class="btn btn-outline-primary">
-                <i class="fa fa-download"></i>
-                Descargar
-                </a>
-           </div>
-            <div class="btn btn-outline-danger" onclick="deleteExcelConfirmacion(${idCotizacion})">
-            <i class="fa fa-trash " ></i>
-            </div>
-        </div>  
-        `;
-    $("#excel-confirmacion").append(facturaDiv);
-  } else {
-    $("#excel-confirmacion").empty();
-    $("#excel-confirmacion").append(
-      `<input type="file" id="txt-F_Comercial" name="excel_confirmacion" class="form-control" required>`
+  if (!excelConfirmacion) {
+    setupSingleFileUpload(
+      "single-file-upload-confirmacion",
+      "file-input-confirmacion"
     );
   }
   //clean .aditional-file
@@ -3767,17 +3893,17 @@ async function viewClientesDocumentacion(id) {
     result[0].cotizacion_file_url
   );
   clientesDocumentacionContainer.show();
-  fileManagerInspectionCoordinacion = new FileManager({
-    fileGrid: "#file-grid-inspection-coordinacion",
-    fileInput: "#file-input-modal-inspection-coordinacion",
-    uploadBtn: "#btn-upload-inspection-coordinacion",
-    dragDropContainer: "#drag-drop-container-inspection-coordinacion",
-    searchInput: "#search-input-inspection-coordinacion",
-    pendingFileList: "#pending-file-list-inspection-coordinacion",
-    onFileUpload: (file) =>
-      uploadFileAlmacenInspection(file, fileManagerInspectionCoordinacion),
-    // onLoadFiles:()=>getFilesAlmacenInspection(idProveedor,idCotizacion),
-  });
+  //   fileManagerInspectionCoordinacion = new FileManager({
+  //     fileGrid: "#file-grid-inspection-coordinacion",
+  //     fileInput: "#file-input-modal-inspection-coordinacion",
+  //     uploadBtn: "#btn-upload-inspection-coordinacion",
+  //     dragDropContainer: "#drag-drop-container-inspection-coordinacion",
+  //     searchInput: "#search-input-inspection-coordinacion",
+  //     pendingFileList: "#pending-file-list-inspection-coordinacion",
+  //     onFileUpload: (file) =>
+  //       uploadFileAlmacenInspection(file, fileManagerInspectionCoordinacion),
+  //     // onLoadFiles:()=>getFilesAlmacenInspection(idProveedor,idCotizacion),
+  //   });
   spinner.hide();
 }
 async function validateListEmbarque(id) {
@@ -3831,6 +3957,7 @@ async function updateVolSelected(idCotizacion, type) {
   });
 }
 async function deleteFacturaComercial(id) {
+  event.preventDefault();
   Swal.fire({
     title: "¿Estás seguro?",
     text: "¡No podrás revertir esto!",
@@ -3861,6 +3988,7 @@ async function deleteFacturaComercial(id) {
   });
 }
 async function deleteExcelConfirmacion(id) {
+  event.preventDefault();
   Swal.fire({
     title: "¿Estás seguro?",
     text: "¡No podrás revertir esto!",
@@ -3891,6 +4019,7 @@ async function deleteExcelConfirmacion(id) {
   });
 }
 const deleteClienteDocumentacionFile = (id) => {
+  event.preventDefault();
   Swal.fire({
     title: "¿Estás seguro?",
     text: "¡No podrás revertir esto!",
@@ -3997,7 +4126,7 @@ $(document).ready(async function () {
           columns: ":visible",
         },
         attr: {
-            id: "export-excel-main",
+          id: "export-excel-main",
         },
       },
       {
@@ -4008,8 +4137,8 @@ $(document).ready(async function () {
           columns: ":visible",
         },
         attr: {
-            id: "export-pdf-main",
-        }
+          id: "export-pdf-main",
+        },
       },
       {
         extend: "colvis",
@@ -4079,8 +4208,11 @@ $(document).ready(async function () {
     ],
   });
 
-  configurarBuscador('table-contenedor','search-input-filter','table-contenedor_filter');
-  
+  configurarBuscador(
+    "table-contenedor",
+    "search-input-filter",
+    "table-contenedor_filter"
+  );
 
   $("#upload-documents").click(() => $("#upload-input-documents").click());
   $("#upload-inspection").click(() => $("#upload-input-inspection").click());
@@ -4430,13 +4562,13 @@ $(document).ready(async function () {
         window.open(fileUrl, "_blank");
       });
 
-            // Eliminar archivo
-            card.find(".delete-btn").click(function () {
-                const fileId = $(this).data("id");
-                deleteFile(fileId, card);
-            });
-        });
-    }
+      // Eliminar archivo
+      card.find(".delete-btn").click(function () {
+        const fileId = $(this).data("id");
+        deleteFile(fileId, card);
+      });
+    });
+  }
   const fillSelects = async () => {
     $("#txt-ID_Pais").empty();
     $("#txt-Mes").empty();
@@ -4553,6 +4685,8 @@ $(document).ready(async function () {
     cotizacionAlmacenContainer.hide();
     contentHeader.hide();
     cotizacionContainer.show();
+    
+    
   });
   $("#btn-back-factura-guia").click(function () {
     returnToSteps();
@@ -5069,7 +5203,7 @@ $(document).ready(async function () {
   $("#btn-back-documentacion-documentacion").click(function () {
     documentacionDocumentacionContainer.hide();
     returnToSteps();
-  });   
+  });
   $("#btn-back-documentacion-aduana").click(function () {
     documentacionAduanaContainer.hide();
     returnToSteps();
@@ -5172,6 +5306,6 @@ window.addEventListener("load", () => {
     }
   };
 });
-setupSingleFileUpload('single-file-upload','file-input-prospecto');
-setupMultiFileUpload('multiple-file-upload-image','file-input-inspeccion');
-setupMultiFileUpload('multiple-file-upload','file-input-documentacion');
+setupSingleFileUpload("single-file-upload", "file-input-prospecto");
+setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion");
+setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");
