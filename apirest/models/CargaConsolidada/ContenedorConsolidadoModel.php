@@ -208,47 +208,43 @@ class ContenedorConsolidadoModel extends CI_Model
     public function getContenedorCotizacionProveedores($idContenedor)
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
-        try {
-            $this->db->select("main.*,
-                U.No_Usuario,
-                (
-                    SELECT CONCAT('[', GROUP_CONCAT(
-                        CONCAT(
-                            '{\"id\":', proveedores.id, 
-                            ',\"qty_box\":', proveedores.qty_box, 
-                            ',\"peso\":', proveedores.peso, 
-                            ',\"cbm_total\":', proveedores.cbm_total, 
-                            ',\"supplier\":\"', proveedores.supplier, 
-                            '\",\"code_supplier\":\"', proveedores.code_supplier, 
-                            '\",\"estados_proveedor\":\"', proveedores.estados_proveedor, 
-                            '\",\"estados\":\"', proveedores.estados, 
-                            '\",\"supplier_phone\":\"', proveedores.supplier_phone, 
-                            '\",\"cbm_total_china\":', proveedores.cbm_total_china, 
-                            ',\"qty_box_china\":', proveedores.qty_box_china, 
-                            ',\"id_proveedor\":', proveedores.id, 
-                            ',\"products\":\"', proveedores.products, 
-                            '\",\"estado_china\":\"', proveedores.estado_china, 
-                            '\",\"arrive_date_china\":\"', proveedores.arrive_date_china, '\"}'
-                        )
-                    ), ']')
-                    FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
-                    WHERE proveedores.id_cotizacion = main.id
-                ) as proveedores")
-                ->from($this->table_contenedor_cotizacion . " as main")
-                ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
-                ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
-                ->where('main.id_contenedor', $idContenedor)
-                ->order_by('main.id', 'asc');
-
-            if ($this->user->No_Grupo != "Cotizador") {
-                $this->db->where('main.estado_cotizador', 'CONFIRMADO');
-            }
-            $query = $this->db->get();
-            return $query->result();
-        } catch (Exception $e) {
-            log_message('error', 'Error en deleteGuiaRemisionFile: ' . $e->getMessage());
+        $this->db->select("main.*,
+        U.No_Usuario,
+        (
+            SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id', proveedores.id,
+                    'qty_box', proveedores.qty_box,
+                    'peso', proveedores.peso,
+                    'cbm_total', proveedores.cbm_total,
+                    'supplier', proveedores.supplier,
+                    'code_supplier', proveedores.code_supplier,
+                    'estados_proveedor', proveedores.estados_proveedor,
+                    'estados', proveedores.estados,
+                    'supplier_phone', proveedores.supplier_phone,
+                    'cbm_total_china', proveedores.cbm_total_china,
+                    'qty_box_china', proveedores.qty_box_china,
+                    'id_proveedor', proveedores.id,
+                    'products',proveedores.products,
+                    'estado_china',proveedores.estado_china,
+                    'arrive_date_china',proveedores.arrive_date_china
+                )
+            )
+            FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
+            WHERE proveedores.id_cotizacion = main.id
+        ) as proveedores")
+            ->from($this->table_contenedor_cotizacion . " as main")
+            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
+            ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
+            ->where('main.id_contenedor', $idContenedor)
+            ->order_by('main.id', 'asc');
+        if ($this->user->No_Grupo != "Cotizador") {
+            $this->db->where('main.estado_cotizador', 'CONFIRMADO');
         }
+        $query = $this->db->get();
+        return $query->result();
     }
+
     public function downloadContenedorCotizacionProveedoresExcel($idContenedor)
     {
         $data = $this->getContenedorCotizacionProveedores($idContenedor);
@@ -552,7 +548,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 'assets/images/agentecompra/'
             );
             $dataToInsert = $this->getCotizacionData($cotizacion);
-
+            log_message('error', 'Data to insert: ' . json_encode($dataToInsert));
             $dataToInsert['cotizacion_file_url'] = $fileUrl;
             $dataToInsert['id_contenedor'] = $data['id_contenedor'];
             $dataToInsert['id_usuario'] = $this->user->ID_Usuario;
@@ -565,6 +561,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $dataToInsert['id_cotizacion'] = $idCotizacion;
                 $dataEmbarque = $this->getEmbarqueData($cotizacion, $dataToInsert);
                 //insert in tabla proveedores 
+                log_message('error', 'Data embarque: ' . json_encode($dataEmbarque));
                 $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
                 //if db error return error
                 if ($this->db->error()['code'] != 0) {
@@ -597,6 +594,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
             return false;
         } catch (Exception $e) {
+            log_message('error', 'Error en storeCotizacion: ' . $e->getMessage());
             return [
                 'status' => "error",
                 'message' => $e->getMessage()
@@ -2269,7 +2267,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'R']);
                 //sum all provider cbm_total_china and set volumen_china in cotizacion table
 
-
+                //clean query
+              
                 $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
                 $ids = array_column($usuariosAlmacen, 'ID_Usuario');
                 $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado RECIBIDO";
@@ -2723,6 +2722,8 @@ $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . 
          * where g.No_Grupo ="Cliente" and u.Nu_Estado =1
          */
         try {
+            $this->db->reset_query();
+
             $this->db->select('u.ID_Usuario')
                 ->from('usuario u')
                 ->join('grupo_usuario gu', 'gu.ID_Usuario = u.ID_Usuario')
@@ -4278,6 +4279,7 @@ $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . 
                 'assets/cargaconsolidada/cotizacionesFinales'
             );
             $dataToUpdate = $this->getCotizacionData($file);
+            log_message('error', 'DataToUpdate: ' . json_encode($dataToUpdate));
             $dataToUpdate['cotizacion_final_url'] = $fileUrl;
                 //change key telefono for whatsapp
 

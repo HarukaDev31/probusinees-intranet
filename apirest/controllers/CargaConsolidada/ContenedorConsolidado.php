@@ -196,6 +196,15 @@ class ContenedorConsolidado extends CI_Controller
 			"currentPrivilege" => $this->user->No_Grupo
 		]);
 	}
+	public function updateProveedorData()
+	{
+		$data = $this->input->post('data');
+		$idProveedor = $this->input->post('idProveedor');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateProveedorData($data, $idProveedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 	public function step()
 	{
 		$stepIndex = $this->input->post('stepIndex');
@@ -208,7 +217,7 @@ class ContenedorConsolidado extends CI_Controller
 			} else {
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
 			}
-
+			log_message('error', 'ContenedorConsolidado : step() => ' . json_encode($arrResponse));
 			$data  = [];
 			$index = 1;
 			foreach ($arrResponse as $row) {
@@ -396,8 +405,8 @@ class ContenedorConsolidado extends CI_Controller
 						id="estado-' . $row->id . '-' . $proveedor->id_proveedor . '"
 						name="estado" onchange="updateEstadoCotizacionProveedor(' . $row->id . ',' . $proveedor->id . ',' . $row->estados . ')">
 							<option value="DEFAULT" ' . ($proveedor->estados == "" ? "selected disabled"  : "") . '>Seleccionar</option>
-							<option value="ROTULADO" ' . ($proveedor->estados == "ROTULADO" ? "selected" : "") . '>RO</option>
-							<option value="DATOS PROVEEDOR" ' . ($proveedor->estados == "DATOS PROVEEDOR" ? "selected disabled" : "disabled") . '>DP</option>
+							<option value="ROTULADO" ' . ($proveedor->estados == "ROTULADO" ? "selected" : "") . '>ROTULADO</option>
+							<option value="DATOS PROVEEDOR" ' . ($proveedor->estados == "DATOS PROVEEDOR" ? "selected disabled" : "disabled") . '>DATOS PROVEEDOR</option>
 							<option value="INSPECCIONADO" ' . ($proveedor->estados == "INSPECCIONADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? " disabled" : "") . '		>INSPECCIONADO</option>
 							<option value="RESERVADO" ' . ($proveedor->estados == "RESERVADO" ? "selected" : "") . '>RESERVADO</option>
 							<option value="EMBARCADO" ' . ($proveedor->estados == "EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '
@@ -459,7 +468,7 @@ class ContenedorConsolidado extends CI_Controller
 						
 
 					}
-					$subdata[] = $proveedoresSelect;
+						$subdata[] = $proveedoresSelect;
 						$subdata[] = $index;
 						$subdata[] = $row->nombre;
 						if ($this->user->No_Grupo != "ContenedorAlmacen") {
@@ -477,18 +486,18 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $divInputCBMChina;
 						$subdata[] = $divInputArriveDateChina;
 						$subdata[] = $divAcciones;
-					
+						$data[]    = $subdata;
+						$index++;
 				}
-				$data[]    = $subdata;
-					$index++;
-					
+				
+				$output = [
+					"data" => $data,
+				];
+		
 				
 			}
-			$output = [
-				"data" => $data,
-			];
 			echo json_encode($output);
-	
+
 			// echo json_encode(['data' => $arrResponse,'status' => "success"]);
 		} else if ($stepIndex == 2 || ($stepIndex == 1 && $this->user->No_Grupo == "Documentacion")) {
 			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorClientes($idContenedor);

@@ -302,7 +302,7 @@ async function getClientesHeader() {
     const response = await fetch(url);
     const result = await response.json();
     $("#txt-Monto_Total").val(result.monto);
-    $("#cotizacion_name").val(result.idContenedor);
+    $("#cotizacion_name").val(result.carga);
     $("#txt-CBM_Total_China_Clientes").val(result.cbm_total_china);
     console.log(result);
     spinner.hide();
@@ -1654,7 +1654,7 @@ const openStepFunction = async (step, id) => {
                         "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-                    // buttons: [
+                     buttons: [
                     //     {
                     //         extend: "excel",
                     //         text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
@@ -1718,7 +1718,7 @@ const openStepFunction = async (step, id) => {
                     //         }
                     //     },
 
-                    // ],
+                    ],
                     paging: true,
                     lengthChange: true,
                     searching: true,
@@ -4293,6 +4293,7 @@ $(document).ready(async function () {
 
         });
     });
+    $("#btn-guardar-cotizacion").off("click");
     $("#btn-guardar-cotizacion").click(function (e) {
         e.preventDefault();
         const formData = new FormData($("#form-crear-cotizacion")[0]);
@@ -4891,3 +4892,6 @@ window.addEventListener('load', () => {
 
     };
 });
+setupSingleFileUpload('single-file-upload');
+setupMultiFileUpload('multiple-file-upload-image');
+setupMultiFileUpload('multiple-file-upload');

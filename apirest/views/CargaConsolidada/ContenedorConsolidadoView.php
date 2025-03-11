@@ -849,17 +849,7 @@
         <label>&nbsp;</label>
       </div>
     </div>
-    <div class="row mb-2">
-      <div class="container mx-auto px-4 py-8 file-section-container col-12 col-md-8">
-        <div>
-          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Documents
-            <button
-            id="btn-upload-document-cotizacion"
-            data-toggle="modal" data-target="#uploadModal" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <i class="fas fa-plus"></i>
-              <span>Nuevo</span>
-            </button>
-          </h2>
+    
 
 
     <div class="row mb-2 ml-2" style="border-bottom: #DFDFDF solid 2px;">
@@ -903,7 +893,7 @@
                 <div class="col-12 col-sm-12" id="multiple-file-upload">
                   <div class="form-group">
                     <div class="file-upload-box">
-                      <input type="file" id="file-inpute" class="file-input" accept=".xlsx" />
+                      <input type="file" id="file-input" class="file-input" accept=".xlsx" />
                       <label for="file-inpute" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
@@ -984,17 +974,7 @@
         </div>
       </div>
     </div>
-    <div class="row my-2">
-      <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
-        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
-          <button 
-          id="btn-upload-inspection-cotizacion"
-          data-toggle="modal" data-target="#uploadModalInspection" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i>
-            <span>Nuevo</span>
-          </button>
-        </h2>
-
+  
 
   </section>
   <section id="steps" class="content">
@@ -1175,7 +1155,9 @@
               <div class="col-12 col-sm-12" id="single-file-upload">
                 <div class="form-group">
                   <div class="file-upload-box">
-                    <input type="file" id="file-inpute" class="file-input" accept=".xlsx" />
+                    <input type="file" id="file-inpute" class="file-input"  name="cotizacion"
+                    accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt"
+                    />
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
@@ -1984,7 +1966,7 @@
     fileInput.addEventListener('change', (e) => {
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        if (file.name.endsWith('.xlsx')) {
+        if (file.name.endsWith('.xlsx')   || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
           // Mostrar el cuadro de información del archivo
           fileInfoBox.classList.remove('hidden');
 
