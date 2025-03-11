@@ -25,7 +25,7 @@
         <!-- Contenedor Principal de Filtros-->
         <div class=" col-6 col-sm-1 dropdown">
           <!-- Botón de Filtros -->
-          <button class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-filter"></i>Filtros
           </button>
           <!-- Menú Desplegable -->
@@ -61,12 +61,12 @@
           
           <div class="dropdown-divider"></div>
           <!-- Botones -->
-          <div class="d-flex justify-content-between">
-                <button class="btn btn-secondary" id="cancelar-btn">Cancelar</button>
-                <button class="btn btn-primary" id="aplicar-btn">Aplicar</button>
+          <div class="d-flex justify-content-around">
+                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
+                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
             </div>
         </div>
-
+      </div>
 
         <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
           <div class="col-6 col-sm-1">
@@ -145,6 +145,7 @@
   <section class="content" id="cotizacion-container">
     <div class="container-fluid ">
       <!-- Header de la tabla -->
+      <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
       <div class="row mb-2">
         <div class="col-12 col-md-1">
           <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
@@ -161,10 +162,40 @@
         <div class="col-6 col-sm-1">
           <button type="button" id="btn-filtrar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-filtrar" data-type="html"><i class="fa fa-filter"></i> Filtro</button>
         </div>
-        <div class="col-12 col-md-2">
-          <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+        <div class="col-12 col-md-2">     
             <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
-          <?php } ?>
+        </div>
+        <div class="col-12 col-md-4">
+          <label>&nbsp;</label>
+        </div>
+      </div>
+      <?php } ?>
+      <div class="row mb-2">
+        <div class="col-12 col-md-1">
+          <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+        </div>
+        <div class="col-sm-5"></div>
+        <div class="col-12 col-md-2"></div>
+        <div class="col-6 col-sm-2">
+          <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          </div>
+        </div>
+        <!-- Contenedor Principal de Cargar-->
+        <div class="col-6 col-sm-1 dropdown">
+          <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Cargar</button>
+          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-cargar-carga">
+            <div class="dropdown-item btn-block" id ="packing-list-container"></div>
+            <div class="dropdown-item btn-block" id="bl-file-container"></div>
+          </div>
+        </div>
+        <!-- Contenedor Principal de Exportar-->
+        <div class="col-6 col-sm-1 dropdown">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> Exportar</button>
+          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+            <!-- <button class="dropdown-item btn-block" id="export-pdf" ><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button> -->
+            <button class="dropdown-item btn-block" id="export-excel"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+          </div>
         </div>
         <div class="col-12 col-md-4">
           <label>&nbsp;</label>
@@ -173,12 +204,14 @@
 
 
       <div class="row mb-2" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
-        <div class="d-flex align-items-center" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
-          <span>Consolidado #</span>
-          <div class="col-md-1">
-            <input id="cotizacion_name" disabled>
+        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+          <div class="d-flex align-items-center" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
+            <span>Consolidado #</span>
+            <div class="col-md-1">
+              <input id="cotizacion_name" disabled>
+            </div>
           </div>
-        </div>
+        <?php } ?>
 
         <div class="col-12 col-md-2 d-flex align-items-center">
           <i class="fas fa-flag px-2"></i>
@@ -193,20 +226,7 @@
           <div class="col-md-1">
             <strong><input type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></strong>
           </div>
-        </div>
-        <?php if ($this->user->No_Grupo == "ContenedorAlmacen") {  ?>
-
-          <div class="col-12 col-md-2">
-            <label>Packing List</label>
-            <div class="input-group mb-3" id="packing-list-container">
-            </div>
-          </div>
-          <div class="col-12 col-md-2">
-            <label>BL File</label>
-            <div class="input-group mb-3" id="bl-file-container">
-            </div>
-          </div>
-        <?php } ?>
+        </div>        
       </div>
       <!-- Body de la tabla -->
       <div class="table-responsive">
@@ -597,7 +617,7 @@
     </div>
       <div class="col-12 col-md-3 px-4 py-8 note-container-container">
         <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas
-          <button onclick="addNote()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button onclick="addNote()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
             <i class="fas fa-save  float-right"></i>
 
             <span>Guardar</span>
@@ -1585,6 +1605,11 @@
   .hidden {
     display: none;
   }
+
+/* Ocultar temporalmente el buscador */
+div#table-cotizacion-embarque_filter{
+  display: none;
+}
 </style>
 <script>
   // script.js
@@ -1796,23 +1821,9 @@
     });
 }
 
-$(document).ready(function() {
-            // Evita que el menú se cierre al hacer clic fuera de él
-            $('.dropdown-menu').on('click', function(event) {
-                event.stopPropagation(); // Evita que el evento se propague
-            });
+setupSingleFileUpload('single-file-upload');
+setupMultiFileUpload('multiple-file-upload-image');
+setupMultiFileUpload('multiple-file-upload');
 
-            // Cierra el menú al hacer clic en "Cancelar" o "Aplicar"
-            $('#cancelar-btn, #aplicar-btn').on('click', function() {
-                $('#filtros-btn').dropdown('hide'); // Cierra el menú
-            });
-
-            // Cierra el menú al hacer clic en el botón "Filtros" si ya está abierto
-            $('#filtros-btn').on('click', function(event) {
-                if ($(this).attr('aria-expanded') === 'true') {
-                    $(this).dropdown('hide'); // Cierra el menú si ya está abierto
-                }
-            });
-        });
 
 </script>
