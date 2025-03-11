@@ -136,6 +136,10 @@ async function saveInspection(){
                     //clear input and file-lista
                     fileInput.value = "";
                     $(".file-lista").html("");
+                    getFilesAlmacenInspection(currentProveedor, currentCotizacion).then((files) => {
+                        files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
+                    });
+                    
 
                 },
                 error: function () {
@@ -319,38 +323,103 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
         },
     });
 }
-function addFileToList(file,fileList=null) {
+function deleteFile(fileId, cardElement) {
+    $.ajax({
+        url: base_url + "CargaConsolidada/ContenedorConsolidado/deleteFile/" + fileId,
+        type: "GET",
+        success: function (response) {
+            const data = JSON.parse(response);
+            if (data.status === "success") {
+                cardElement.remove();
+            } else {
+                alert("Error deleting file: " + data.message);
+            }
+        },
+        error: function () {
+            alert("An error occurred while deleting the file.");
+        },
+    });
+}
+function addFileToList(file,fileList=null,id=null) {
     if (fileList == null) {
         fileList = $(".file-lista");
     }
-    const isImage = file.file_ext.startsWith('image');
+    if(id!=null){
+        fileList = $(`#${id}`);
+
+    }
+    const isImage = file?.file_ext.startsWith('image');
     const fileItem = $(`
         <div class="file-item">
-            <div class="file-preview">
-                ${isImage ? `<img src="${file.file_url}" alt="${file.file_name}">` : `<span>📄</span>`}
+            <div class="file-preview"><span>📄</span>
                 <span>${file.file_name}</span>
             </div>
-            <div class="file-actions">
-                <button class="btn btn-primary btn-sm download-btn" data-url="${file.file_url}">Descargar</button>
-                <button class="btn btn-danger btn-sm delete-btn" data-id="${file.id}">Eliminar</button>
+            <div class="file-actions d-flex flex-row">
+                <button class="btn btn-primary btn-sm download-btn" data-url="${file.file_url}">
+                <i class="fas fa-download"></i> 
+                </button>
+                <button class="btn btn-danger btn-sm delete-btn" data-id="${file.id}">
+                <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
     `);
 
     // Botón de descarga
     fileItem.find('.download-btn').on('click', function () {
+        event.preventDefault();
         const url = $(this).data('url');
         window.open(url, '_blank');
     });
 
     // Botón de eliminar
     fileItem.find('.delete-btn').on('click', function () {
+        event.preventDefault();
         const id = $(this).data('id');
         deleteFile(id, fileItem);
     });
-
+    //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
+    if (isImage) {
+        const viewBtn = $(`
+            <button class="btn btn-primary btn-sm view-btn">👁️</button>
+        `);
+        viewBtn.on('click', function () {
+            event.preventDefault();
+            const url = file.file_url;
+            const fileExt = file.file_ext;
+            viewFile(url, fileExt);
+        });
+        fileItem.find('.file-actions').append(viewBtn);
+    }
     fileList.append(fileItem);
+    //remove class hidden
+    fileList.removeClass("hidden");
 }
+function viewFile(url, fileExt) {
+    const isImage = fileExt.startsWith('image');
+    const isVideo = fileExt.startsWith('video');
+    const isPdf = fileExt.startsWith('application/pdf');
+    const isWord = fileExt.startsWith('application/msword') || fileExt.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    const isExcel = fileExt.startsWith('application/vnd.ms-excel') || fileExt.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+    if (isImage) {
+        $('#image-preview').attr('src', url);
+        $('#image-modal').modal('show');
+    }
+    else if (isVideo) {
+        $('#video-preview').attr('src', url);
+        $('#video-modal').modal('show');
+    }
+    else if (isPdf || isWord || isExcel) {
+        // Configura el iframe dentro del modal para mostrar el archivo
+        $('#file-preview').attr('src', url);
+        $('#file-modal').modal('show');
+    }
+    else {
+        Swal.fire("Error!", "Formato de archivo no válido", "error");
+    }
+}
+
 async function getClientesHeader() {
     spinner.show();
     url = base_url + "CargaConsolidada/ContenedorConsolidado/getClientesHeader/" + idContenedor;
@@ -379,7 +448,7 @@ async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, cl
         files.forEach(file => addFileToList(file));
     });
     getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
-        files.forEach(file => addFileToList(file));
+        files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
     });
     
     // fileManager = new FileManager({
@@ -4123,23 +4192,7 @@ $(document).ready(async function () {
     }
 
     // Función para eliminar archivos
-    function deleteFile(fileId, cardElement) {
-        $.ajax({
-            url: base_url + "CargaConsolidada/ContenedorConsolidado/deleteFile/" + fileId,
-            type: "GET",
-            success: function (response) {
-                const data = JSON.parse(response);
-                if (data.status === "success") {
-                    cardElement.remove();
-                } else {
-                    alert("Error deleting file: " + data.message);
-                }
-            },
-            error: function () {
-                alert("An error occurred while deleting the file.");
-            },
-        });
-    }
+   
 
 
     // function initDropZone(dropZoneId, inputId, fileListId) {
