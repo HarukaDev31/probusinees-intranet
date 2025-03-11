@@ -4183,12 +4183,8 @@ $(document).ready(async function () {
           columns: ":visible",
         },
         attr: {
-<<<<<<< HEAD
             id: "export-excel-main",
             class: "hidden",
-=======
-          id: "export-excel-main",
->>>>>>> feature/agente-compra-new
         },
       },
       {
