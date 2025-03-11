@@ -189,7 +189,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $query = $this->db->get();
             return $query->result();
         } catch (Exception $e) {
-            log_message('error',$e->getMessage());
+            log_message('error', $e->getMessage());
             throw new Exception($e->getMessage());
         }
     }
@@ -209,42 +209,46 @@ class ContenedorConsolidadoModel extends CI_Model
     public function getContenedorCotizacionProveedores($idContenedor)
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
-        $this->db->select("main.*,
-    U.No_Usuario,
-    (
-        SELECT CONCAT('[', GROUP_CONCAT(
-            CONCAT(
-                '{\"id\":', proveedores.id, 
-                ',\"qty_box\":', proveedores.qty_box, 
-                ',\"peso\":', proveedores.peso, 
-                ',\"cbm_total\":', proveedores.cbm_total, 
-                ',\"supplier\":\"', proveedores.supplier, 
-                '\",\"code_supplier\":\"', proveedores.code_supplier, 
-                '\",\"estados_proveedor\":\"', proveedores.estados_proveedor, 
-                '\",\"estados\":\"', proveedores.estados, 
-                '\",\"supplier_phone\":\"', proveedores.supplier_phone, 
-                '\",\"cbm_total_china\":', proveedores.cbm_total_china, 
-                ',\"qty_box_china\":', proveedores.qty_box_china, 
-                ',\"id_proveedor\":', proveedores.id, 
-                ',\"products\":\"', proveedores.products, 
-                '\",\"estado_china\":\"', proveedores.estado_china, 
-                '\",\"arrive_date_china\":\"', proveedores.arrive_date_china, '\"}'
-            )
-        ), ']')
-        FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
-        WHERE proveedores.id_cotizacion = main.id
-    ) as proveedores")
-    ->from($this->table_contenedor_cotizacion . " as main")
-    ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
-    ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
-    ->where('main.id_contenedor', $idContenedor)
-    ->order_by('main.id', 'asc');
+        try {
+            $this->db->select("main.*,
+                U.No_Usuario,
+                (
+                    SELECT CONCAT('[', GROUP_CONCAT(
+                        CONCAT(
+                            '{\"id\":', proveedores.id, 
+                            ',\"qty_box\":', proveedores.qty_box, 
+                            ',\"peso\":', proveedores.peso, 
+                            ',\"cbm_total\":', proveedores.cbm_total, 
+                            ',\"supplier\":\"', proveedores.supplier, 
+                            '\",\"code_supplier\":\"', proveedores.code_supplier, 
+                            '\",\"estados_proveedor\":\"', proveedores.estados_proveedor, 
+                            '\",\"estados\":\"', proveedores.estados, 
+                            '\",\"supplier_phone\":\"', proveedores.supplier_phone, 
+                            '\",\"cbm_total_china\":', proveedores.cbm_total_china, 
+                            ',\"qty_box_china\":', proveedores.qty_box_china, 
+                            ',\"id_proveedor\":', proveedores.id, 
+                            ',\"products\":\"', proveedores.products, 
+                            '\",\"estado_china\":\"', proveedores.estado_china, 
+                            '\",\"arrive_date_china\":\"', proveedores.arrive_date_china, '\"}'
+                        )
+                    ), ']')
+                    FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
+                    WHERE proveedores.id_cotizacion = main.id
+                ) as proveedores")
+                ->from($this->table_contenedor_cotizacion . " as main")
+                ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
+                ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
+                ->where('main.id_contenedor', $idContenedor)
+                ->order_by('main.id', 'asc');
 
-if ($this->user->No_Grupo != "Cotizador") {
-    $this->db->where('main.estado_cotizador', 'CONFIRMADO');
-}
-        $query = $this->db->get();
-        return $query->result();
+            if ($this->user->No_Grupo != "Cotizador") {
+                $this->db->where('main.estado_cotizador', 'CONFIRMADO');
+            }
+            $query = $this->db->get();
+            return $query->result();
+        } catch (Exception $e) {
+            log_message('error', 'Error en deleteGuiaRemisionFile: ' . $e->getMessage());
+        }
     }
 
     public function downloadContenedorCotizacionProveedoresExcel($idContenedor)
@@ -2052,10 +2056,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 echo $e->getMessage();
                 log_message('error', 'Error: ' . $e->getMessage());
             }
-        }else if ($estado == "COBRANDO") {
+        } else if ($estado == "COBRANDO") {
             // Obtener URLs de imágenes
-           
-        
+
+
             // Obtener estado de China, código de proveedor, cantidad de cajas, etc.
             $this->db->select('estados_proveedor, code_supplier, qty_box_china, qty_box, id_cotizacion')
                 ->from($this->table_contenedor_cotizacion_proveedores)
@@ -2067,7 +2071,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $qtyBoxChina = $row->qty_box_china;
             $qtyBox = $row->qty_box;
             $idCotizacion = $row->id_cotizacion;
-        
+
             // Obtener volumen, monto e ID del contenedor
             $this->db->select('volumen, monto, id_contenedor')
                 ->from($this->table_contenedor_cotizacion)
@@ -2077,31 +2081,51 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $volumen = $row->volumen;
             $valorCot = $row->monto;
             $idContenedor = $row->id_contenedor;
-        
+
             // Obtener fecha de cierre
             $this->db->select('f_cierre')
                 ->from($this->table)
                 ->where('id', $idContenedor);
             $query = $this->db->get();
             $fCierre = $query->row()->f_cierre;
-        
+
             // Formatear fecha de cierre
             $fCierre = date('d F', strtotime($fCierre));
             $fCierre = str_replace([
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
             ], [
-                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                'Enero',
+                'Febrero',
+                'Marzo',
+                'Abril',
+                'Mayo',
+                'Junio',
+                'Julio',
+                'Agosto',
+                'Septiembre',
+                'Octubre',
+                'Noviembre',
+                'Diciembre'
             ], $fCierre);
-        
+
             // Obtener nombre del cliente
             $this->db->select('nombre')
                 ->from($this->table_contenedor_cotizacion)
                 ->where('id', $idCotizacion);
             $query = $this->db->get();
             $cliente = $query->row()->nombre;
-        
+
             // Construir el mensaje
             $message = "Reserva de espacio: Consolidado #01-2025\n\n" .
                 "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
@@ -2111,10 +2135,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 "⚠ Nota: Realizar el pago antes del llenado del contenedor.\n\n" .
                 "📦 En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final.\n\n" .
                 "Apenas haga el pago, envíe por este medio para hacer la reserva.";
-        
+
             // Enviar el mensaje
             $this->sendMessage($message);
-        
+
             // Enviar imagen de pagos
             $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
             $data = $this->sendMedia($pagosUrl, 'image/jpg');
@@ -3084,7 +3108,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         try {
             foreach ($data as $key => $value) {
                 $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-                
+
                 $result = $this->getFinalCotizacionExcelv2($objPHPExcel, $value, $idContainer);
                 $excelFileName = $result['excel_file_name'];
                 $excelFilePath = $result['excel_file_path'];
