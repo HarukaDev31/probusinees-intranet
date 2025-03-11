@@ -189,6 +189,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $query = $this->db->get();
             return $query->result();
         } catch (Exception $e) {
+            log_message('error',$e->getMessage());
             throw new Exception($e->getMessage());
         }
     }
@@ -209,38 +210,39 @@ class ContenedorConsolidadoModel extends CI_Model
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
         $this->db->select("main.*,
-        U.No_Usuario,
-        (
-            SELECT JSON_ARRAYAGG(
-                JSON_OBJECT(
-                    'id', proveedores.id,
-                    'qty_box', proveedores.qty_box,
-                    'peso', proveedores.peso,
-                    'cbm_total', proveedores.cbm_total,
-                    'supplier', proveedores.supplier,
-                    'code_supplier', proveedores.code_supplier,
-                    'estados_proveedor', proveedores.estados_proveedor,
-                    'estados', proveedores.estados,
-                    'supplier_phone', proveedores.supplier_phone,
-                    'cbm_total_china', proveedores.cbm_total_china,
-                    'qty_box_china', proveedores.qty_box_china,
-                    'id_proveedor', proveedores.id,
-                    'products',proveedores.products,
-                    'estado_china',proveedores.estado_china,
-                    'arrive_date_china',proveedores.arrive_date_china
-                )
+    U.No_Usuario,
+    (
+        SELECT CONCAT('[', GROUP_CONCAT(
+            CONCAT(
+                '{\"id\":', proveedores.id, 
+                ',\"qty_box\":', proveedores.qty_box, 
+                ',\"peso\":', proveedores.peso, 
+                ',\"cbm_total\":', proveedores.cbm_total, 
+                ',\"supplier\":\"', proveedores.supplier, 
+                '\",\"code_supplier\":\"', proveedores.code_supplier, 
+                '\",\"estados_proveedor\":\"', proveedores.estados_proveedor, 
+                '\",\"estados\":\"', proveedores.estados, 
+                '\",\"supplier_phone\":\"', proveedores.supplier_phone, 
+                '\",\"cbm_total_china\":', proveedores.cbm_total_china, 
+                ',\"qty_box_china\":', proveedores.qty_box_china, 
+                ',\"id_proveedor\":', proveedores.id, 
+                ',\"products\":\"', proveedores.products, 
+                '\",\"estado_china\":\"', proveedores.estado_china, 
+                '\",\"arrive_date_china\":\"', proveedores.arrive_date_china, '\"}'
             )
-            FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
-            WHERE proveedores.id_cotizacion = main.id
-        ) as proveedores")
-            ->from($this->table_contenedor_cotizacion . " as main")
-            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
-            ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
-            ->where('main.id_contenedor', $idContenedor)
-            ->order_by('main.id', 'asc');
-        if ($this->user->No_Grupo != "Cotizador") {
-            $this->db->where('main.estado_cotizador', 'CONFIRMADO');
-        }
+        ), ']')
+        FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
+        WHERE proveedores.id_cotizacion = main.id
+    ) as proveedores")
+    ->from($this->table_contenedor_cotizacion . " as main")
+    ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
+    ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
+    ->where('main.id_contenedor', $idContenedor)
+    ->order_by('main.id', 'asc');
+
+if ($this->user->No_Grupo != "Cotizador") {
+    $this->db->where('main.estado_cotizador', 'CONFIRMADO');
+}
         $query = $this->db->get();
         return $query->result();
     }

@@ -1655,69 +1655,6 @@ const openStepFunction = async (step, id) => {
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
                      buttons: [
-                    //     {
-                    //         extend: "excel",
-                    //         text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                    //         titleAttr: "Excel",
-                    //         action: function () {
-                    //             url = base_url + "CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/" + idContenedor;
-                    //             //AJAX MULTIPART FOR EXCEL
-                    //             $.ajax({
-                    //                 url: url,
-                    //                 type: "GET",
-                    //                 xhrFields: {
-                    //                     responseType: 'blob'
-                    //                 },
-                    //                 success: function (response) {
-                    //                     //excel
-                    //                     var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    //                     var link = document.createElement('a');
-                    //                     link.href = window.URL.createObjectURL(blob);
-                    //                     link.download = `Cotizacion-${idContenedor}.xlsx`;
-                    //                     link.click();
-
-                    //                 },
-                    //                 error: function () {
-                    //                     Swal.fire("Error!", "Hubo un error", "error");
-                    //                 }
-                    //             });
-
-                    //         }
-                    //     },
-                    //     {
-                    //         extend: "colvis",
-                    //         text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-                    //         titleAttr: "Columnas",
-                    //         exportOptions: {
-                    //             columns: ":visible",
-                    //         },
-                    //     },
-                    //     {
-                    //         text: "Por Embarcar",
-                    //         className: "btn btn-light",
-                    //         action: function () {
-                    //             if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
-                    //                 $("#table-cotizacion-prospectos").attr("style", "display:none");
-                    //                 $("#table-cotizacion-prospectos_wrapper").hide();
-                    //             }
-                    //             if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
-
-                    //                 $("#table-cotizacion-embarque").attr("style", "");
-
-                    //             } else {
-                    //                 $("#table-cotizacion-embarque").attr("style", "");
-                    //             }
-                    //             $(".input-date").datepicker({
-                    //                 autoclose: true,
-                    //                 startDate: new Date(fYear, fToday.getMonth(), fDay),
-                    //                 todayHighlight: true,
-                    //                 format: "dd/mm/yyyy",
-                    //                 dateFormat: "dd/mm/yyyy",
-                    //             });
-                    //             currentTableCotizacion = "embarque";
-                    //         }
-                    //     },
-
                     ],
                     paging: true,
                     lengthChange: true,
@@ -1812,51 +1749,11 @@ const openStepFunction = async (step, id) => {
                         });
                     }
                 });
-                // Obtener la instancia de DataTable
-                var table = $('#table-cotizacion-embarque').DataTable();
 
-                // Escuchar el evento "input" en tu buscador personalizado
-                $('#search-table').on('input', function () {
-                    var searchTerm = $(this).val(); // Obtener el valor del buscador
-                    table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
-                });
-
-                // Actualizar el mensaje de información después de cada búsqueda
-                table.on('draw', function () {
-                    var info = table.page.info();
-                    $('#table-cotizacion-embarque_info').html(
-                        `Mostrando ${info.start + 1} a ${info.end} de ${info.recordsTotal} registros`
-                    );
-                });
-
-
-
-                $("#export-excel").on("click", function () {
-                    // URL para descargar el archivo Excel
-                    var url = base_url + "CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/" + idContenedor;
-                
-                    // Realizar la solicitud AJAX
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        xhrFields: {
-                            responseType: 'blob' // Indicar que la respuesta es un archivo binario
-                        },
-                        success: function (response) {
-                            // Crear un Blob con el archivo Excel
-                            var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                
-                            // Crear un enlace temporal para descargar el archivo
-                            var link = document.createElement('a');
-                            link.href = window.URL.createObjectURL(blob);
-                            link.download = `Cotizacion-${idContenedor}.xlsx`; // Nombre del archivo
-                            link.click(); // Simular clic en el enlace para iniciar la descarga
-                        },
-                        error: function () {
-                            Swal.fire("Error!", "Hubo un error al descargar el archivo Excel", "error");
-                        }
-                    });
-                });
+                // FUNCION PARA CONFIGURAR EL BUSCADOR
+                configurarBuscador('table-cotizacion-embarque', 'search-table', 'table-cotizacion-embarque_info');
+                //Funcion para exportar a excel
+                configurarExportarExcel('export-excel', url, 'Cotizacion-' + idContenedor);
 
             }
             spinner.hide();
@@ -1874,31 +1771,7 @@ const openStepFunction = async (step, id) => {
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
                     buttons: [
-                        // {
-                        //     extend: "excel",
-                        //     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                        //     titleAttr: "Excel",
-                        //     exportOptions: {
-                        //         columns: ":visible",
-                        //     },
-                        // },
-
-                        // {
-                        //     extend: "pdf",
-                        //     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-                        //     titleAttr: "PDF",
-                        //     exportOptions: {
-                        //         columns: ":visible",
-                        //     },
-                        // },
-                        // {
-                        //     extend: "colvis",
-                        //     text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-                        //     titleAttr: "Columnas",
-                        //     exportOptions: {
-                        //         columns: ":visible",
-                        //     },
-                        // },
+ 
                         {
                             text: "Prospectos",
                             action: function () {
@@ -1943,42 +1816,6 @@ const openStepFunction = async (step, id) => {
                                             "<'row'<'col-sm-12'tr>>" +
                                             "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
                                         buttons: [
-                                            // {
-                                            //      extend: "excel",
-                                            //     text: '<i class="fa fa-file-excel color_icon_excel"></i> Exceel',
-                                            //     titleAttr: "Excel",
-                                            //     action: function () {
-                                            //         url=base_url+"CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/"+idContenedor;
-                                            //         //AJAX MULTIPART FOR EXCEL
-                                            //         $.ajax({
-                                            //             url: url,
-                                            //             type: "GET",
-                                            //             xhrFields: {
-                                            //                 responseType: 'blob'
-                                            //             },
-                                            //             success: function (response) {
-                                            //             //excel
-                                            //                 var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                                            //                 var link = document.createElement('a');
-                                            //                 link.href = window.URL.createObjectURL(blob);
-                                            //                 link.download = `Cotizacion-${idContenedor}.xlsx`;
-                                            //                 link.click();
-                                            //             },
-                                            //             error:function(){
-                                            //                 Swal.fire("Error!", "Hubo un error", "error");
-                                            //             }
-                                            //         });
-                                            //     }
-                                            // },
-
-                                            // {
-                                            //     extend: "colvis",
-                                            //     text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-                                            //     titleAttr: "Columnas",
-                                            //     exportOptions: {
-                                            //         columns: ":visible",
-                                            //     },
-                                            // },
                                             {
                                                 text: "Prospectos",
                                                 action: function () {
@@ -2504,6 +2341,52 @@ const openStepFunction = async (step, id) => {
 
     spinner.hide();
 }
+
+function configurarExportarExcel(buttonId, url, fileName) {
+    $('#' + buttonId).on('click', function () {
+        $.ajax({
+            url: url,
+            type: "GET",
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function (response) {
+                var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = fileName + '.xlsx';
+                link.click();
+            },
+            error: function () {
+                Swal.fire("Error!", "Hubo un error al descargar el archivo Excel", "error");
+            }
+        });
+    });
+}
+
+async function configurarBuscador(tableId, searchInputId, infoContainerId) {
+    // Obtener la instancia de DataTable
+    var table = $('#' + tableId).DataTable();
+    console.log(table);
+
+    // Escuchar el evento "input" en el buscador
+    $('#' + searchInputId).on('input', function () {
+        var searchTerm = $(this).val(); // Obtener el valor del buscador
+        table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
+        console.log(searchTerm);
+    });
+
+    // Actualizar el mensaje de información después de cada búsqueda
+    table.on('draw', function () {
+        var info = table.page.info();
+        if (infoContainerId) {
+            $('#' + infoContainerId).html(
+                `Mostrando ${info.start + 1} a ${info.end} de ${info.recordsTotal} registros`
+            );
+        }
+    });
+}
+
 async function viewFacturaGuia() {
     facturaGuiaContainer.show();
     spinner.show();
@@ -3761,7 +3644,7 @@ $(document).ready(async function () {
         ],
         paging: true,
         lengthChange: true,
-        searching: false,
+        searching: true,
         ordering: false,
         info: true,
         autoWidth: false,
@@ -3818,6 +3701,8 @@ $(document).ready(async function () {
             [10, 100, 1000, "Todos"],
         ],
     });
+    configurarBuscador();
+    configurarExportarExcel();
     $("#upload-documents").click(() => $("#upload-input-documents").click());
     $("#upload-inspection").click(() => $("#upload-input-inspection").click());
 
