@@ -17,15 +17,13 @@
             <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
-        <!-- Contenedor Principal de Exportar-->
-        <!-- <div class="col-6 col-sm-1 dropdown">
+        <div class="col-6 col-sm-1 dropdown">
           <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
             <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
             <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
           </div>
-        </div> -->
-        <!-- Contenedor Principal de Filtros-->
+        </div>
         <div class=" col-6 col-sm-1 dropdown">
           <!-- Botón de Filtros -->
           <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -69,7 +67,7 @@
             </div>
           </div>
         </div>
-        <div class="col-6 col-sm-2">
+        <div class="col-6 col-sm-1">
             <button type="button" id="btn-crear" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
           </div>
         <?php } else { ?>
