@@ -1332,6 +1332,15 @@ class ContenedorConsolidado extends CI_Controller
         $arrResponse = $this->ContenedorConsolidadoModel->getCotizacionEmbarqueHeaders($idContenedor);
         echo json_encode($arrResponse);
     }
+	public function saveInspection(){
+		$idProveedor = $this->input->post('idProveedor');
+		$idCotizacion = $this->input->post('idCotizacion');
+		$files = $_FILES;
+		$arrResponse = $this->ContenedorConsolidadoModel->saveInspection($idProveedor, $idCotizacion, $files);
+		echo json_encode([
+			'status' => $arrResponse,
+		]);
+	}
 	function convertDateFormat($date)
 	{
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);

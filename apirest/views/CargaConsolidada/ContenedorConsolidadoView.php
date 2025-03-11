@@ -925,7 +925,12 @@
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
         <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
         </h2>
-
+        <!--Button para guardar-->
+        <div class="col-12 col-md-12">
+          <div id="btn-guardar-inspection" 
+          onclick="saveInspection()"
+          class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> Guardar</div>
+        </div>
         <div id="file-grid-inspection" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
             <form class="form-horizontal" method="post">
               <div class="row">

@@ -4690,4 +4690,39 @@ $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . 
             return false;
         }
     }
+    public function saveInspection($idProveedor,$idCotizacion,$files){
+        try{
+            $index=0;
+            foreach ($files['files']['tmp_name'] as $key => $tmp_name) {
+                $fileUrl=$this->uploadSingleFile(
+                    [
+                        "name" => $files['files']['name'][$key],
+                        "type" => $files['files']['type'][$key],
+                        "tmp_name" => $files['files']['tmp_name'][$key],
+                        "error" => $files['files']['error'][$key],
+                        "size" => $files['files']['size'][$key]
+                    ],
+                    'assets/cargaconsolidada/inspecciones'
+                );
+                $data = [
+                    'id_cotizacion' => $idCotizacion,
+                    'id_proveedor' => $idProveedor,
+                    'file_name' => $files['files']['name'][$key],
+                    'file_path' => $fileUrl,
+                    'file_type' => $files['files']['type'][$key],
+                    'file_size' => $files['files']['size'][$key],
+                ];
+                $this->db->insert($this->table_contenedor_almacen_inspection, $data);
+                if ($this->db->error()['code'] != 0) {
+                    log_message('error', 'Error en saveInspection: ' . $this->db->error()['message']);
+                    return false;
+                }
+                $index++;
+            }
+            return "success";
+        }catch(Exception $e){
+            log_message('error', 'Error en saveInspection: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

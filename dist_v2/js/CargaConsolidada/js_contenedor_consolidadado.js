@@ -93,7 +93,59 @@ var documentationContainerProfile = null;
 var documentacionSelectedProvider = 0;
 var documentacionDocumentacionContainer = null;
 var documentacionAduanaContainer = null;
+async function saveInspection(){
+    event.preventDefault();
+   //show confirm swall
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, guardar",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+    console.log(result)
+        if (result.isConfirmed) {
+            // upload add idCotizacion and get files from #file-inpute 
+            const formData = new FormData();
+            formData.append('idCotizacion', currentCotizacion);
+            formData.append('idProveedor', currentProveedor);
+            const fileInput = $("#file-inpute")[0];
+            const files = fileInput.files;
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
 
+            spinner.show();
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/saveInspection";
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Correcto!", result.message, "success");
+                        reloadTableCotizacionEmbarque();
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    spinner.hide();
+                    //clear input and file-lista
+                    fileInput.value = "";
+                    $(".file-lista").html("");
+
+                },
+                error: function () {
+                    spinner.hide();
+                }
+            });
+        }
+    });
+      
+}
 async function descargarBoletaPDF(idCotizacionFinal) {
     spinner.show();
     $.ajax({
@@ -267,7 +319,10 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
         },
     });
 }
-function addFileToList(file) {
+function addFileToList(file,fileList=null) {
+    if (fileList == null) {
+        fileList = $(".file-lista");
+    }
     const isImage = file.file_ext.startsWith('image');
     const fileItem = $(`
         <div class="file-item">
@@ -320,6 +375,13 @@ async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, cl
     $("#client-title").text(clientName);
     $("#client-supplier-code").text(supplierCode);
     $("#cotizacion_name").text(idContenedor);
+    getFilesAlmacenDocument(idProveedor, idCotizacion).then((files) => {
+        files.forEach(file => addFileToList(file));
+    });
+    getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
+        files.forEach(file => addFileToList(file));
+    });
+    
     // fileManager = new FileManager({
     //     fileGrid: "#file-grid",
     //     fileInput: "#file-input-modal",
