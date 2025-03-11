@@ -102,13 +102,14 @@
                 </th>
 
               <?php } else { ?>
+                <th>Cargo.</th>
                 <th>Month</th>
                 <th>Country</th>
-                <th>Cargo.</th>
                 <th>Cut off</th>
                 <th>Company</th>
-                <th>Check</th>
                 <th>Status</th>
+
+                <th>Check</th>
 
               <?php } ?>
             </tr>
@@ -891,7 +892,11 @@
       <div class="px-4 py-8 file-section-container col-12 col-md-5  ">
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
-            <h2>Documentación <i class="far fa-folder-open"></i></h2>
+            <h2
+            class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
+            <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
+            </div>
+          </h2>
           </div>
         </div>
         <div id="drag-drop-container"
@@ -899,6 +904,7 @@
           <div id="drop-message">
             <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
             <p class="text-gray-600">
+              
               Arrastra y suelta archivos aquí
             </p>
             <p class="text-xs text-gray-500 mt-2">
@@ -913,7 +919,7 @@
               <div class="col-12 col-sm-12" id="multiple-file-upload">
                 <div class="form-group">
                   <div class="file-upload-box">
-                    <input type="file" id="file-input" class="file-input" accept=".xlsx" />
+                    <input type="file" id="file-input-documentacion" class="file-input"  multiple accept="*/*" />
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
@@ -924,7 +930,7 @@
                     </label>
                   </div>
                   <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
-                  <div class="file-lista hidden">
+                  <div class="file-lista hidden" id="file-lista-documentacion">
                   </div>
                   <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
                   <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
@@ -948,7 +954,7 @@
           text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
-              class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> Guardar
+              class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
             </div>
           </h2>
           <!--Button para guardar-->
@@ -959,7 +965,7 @@
                 <div class="col-12 col-sm-12" id="multiple-file-upload-image">
                   <div class="form-group">
                     <div class="file-upload-box">
-                      <input type="file" id="file-inpute" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
+                      <input type="file" id="file-input-inspeccion" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
                       <label for="file-inpute" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
@@ -1216,7 +1222,7 @@
               <div class="col-12 col-sm-12" id="single-file-upload">
                 <div class="form-group">
                   <div class="file-upload-box">
-                    <input type="file" id="file-inpute" class="file-input" name="cotizacion"
+                    <input type="file" id="file-input-prospecto" class="file-input" name="cotizacion"
                       accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
@@ -2011,9 +2017,9 @@ div#table-cotizacion-embarque_filter{
 </style>
 <script>
   // script.js
-  function setupSingleFileUpload(containerId) {
+  function setupSingleFileUpload(containerId,inputId) {
     const container = document.getElementById(containerId);
-    const fileInput = container.querySelector('.file-input');
+    const fileInput = $(`#${inputId}`)[0];
     const fileLabel = container.querySelector('.file-label');
     const fileInfoBox = container.querySelector('.file-info-box');
     const fileNameElement = container.querySelector('.file-name');
@@ -2084,9 +2090,9 @@ div#table-cotizacion-embarque_filter{
 
   // Funcion para subir archivos multiples
 
-  function setupMultiFileUpload(containerId) {
+  function setupMultiFileUpload(containerId,inputId) {
     const container = document.getElementById(containerId);
-    const fileInput = container.querySelector('.file-input');
+    const fileInput = $(`#${inputId}`)[0];
     const fileLabel = container.querySelector('.file-label');
     const fileList = container.querySelector('.file-lista');
     const uploadButton = container.querySelector('.upload-button');

@@ -93,6 +93,58 @@ var documentationContainerProfile = null;
 var documentacionSelectedProvider = 0;
 var documentacionDocumentacionContainer = null;
 var documentacionAduanaContainer = null;
+async function saveDocumentation(){
+    event.preventDefault();
+    //show confirm swall
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, guardar",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // upload add idCotizacion and get files from #file-inpute 
+            const formData = new FormData();
+            formData.append('idCotizacion', currentCotizacion);
+            formData.append('idProveedor', currentProveedor);
+            const fileInput = $("#file-input-documentacion")[0];
+            const files = fileInput.files;
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
+            spinner.show();
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/saveDocumentation";
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Correcto!", result.message, "success");
+                        reloadTableCotizacionEmbarque();
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    spinner.hide();
+                    //clear input and file-lista
+                    fileInput.value = "";
+                    $("#file-lista-documentacion").html("");
+                    getFilesAlmacenDocument(currentProveedor, currentCotizacion).then((files) => {
+                        files.forEach(file => addFileToList(file,null,'file-lista-documentacion'));
+                    });
+                },
+                error: function () {
+                    spinner.hide();
+                }
+            });
+        }
+    });
+}
 async function saveInspection(){
     event.preventDefault();
    //show confirm swall
@@ -110,7 +162,7 @@ async function saveInspection(){
             const formData = new FormData();
             formData.append('idCotizacion', currentCotizacion);
             formData.append('idProveedor', currentProveedor);
-            const fileInput = $("#file-inpute")[0];
+            const fileInput = $("#file-input-inspeccion")[0];
             const files = fileInput.files;
             for (let i = 0; i < files.length; i++) {
                 formData.append('files[]', files[i]);
@@ -135,7 +187,7 @@ async function saveInspection(){
                     spinner.hide();
                     //clear input and file-lista
                     fileInput.value = "";
-                    $(".file-lista").html("");
+                    $(".file-lista-inspection").html("");
                     getFilesAlmacenInspection(currentProveedor, currentCotizacion).then((files) => {
                         files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
                     });
@@ -444,9 +496,11 @@ async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, cl
     $("#client-title").text(clientName);
     $("#client-supplier-code").text(supplierCode);
     $("#cotizacion_name").text(idContenedor);
+    $("#file-lista-documentacion").empty();
     getFilesAlmacenDocument(idProveedor, idCotizacion).then((files) => {
-        files.forEach(file => addFileToList(file));
+        files.forEach(file => addFileToList(file,null,'file-lista-documentacion'));
     });
+    $("#file-lista-inspection").empty();
     getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
         files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
     });
@@ -1963,6 +2017,7 @@ const openStepFunction = async (step, id) => {
 
 
                 $("#export-excel").on("click", function () {
+                    spinner.show();
                     // URL para descargar el archivo Excel
                     var url = base_url + "CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/" + idContenedor;
                 
@@ -1987,6 +2042,7 @@ const openStepFunction = async (step, id) => {
                             Swal.fire("Error!", "Hubo un error al descargar el archivo Excel", "error");
                         }
                     });
+                    spinner.hide();
                 });
 
             }
@@ -2628,6 +2684,7 @@ const openStepFunction = async (step, id) => {
             contentHeader.show();
             cotizacionContainer.hide();
             stepsContainer.hide();
+            table_Entidad.reload();
         } else {
             returnToSteps();
         }
@@ -2643,7 +2700,6 @@ async function viewFacturaGuia() {
         tableFacturaGuia.ajax.reload();
     } else {
         tableFacturaGuia.show();
-
         tableFacturaGuia = $('#table-factura-guia').DataTable({
             dom:
                 "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -5049,6 +5105,6 @@ window.addEventListener('load', () => {
 
     };
 });
-setupSingleFileUpload('single-file-upload');
-setupMultiFileUpload('multiple-file-upload-image');
-setupMultiFileUpload('multiple-file-upload');
+setupSingleFileUpload('single-file-upload','file-input-prospecto');
+setupMultiFileUpload('multiple-file-upload-image','file-input-inspeccion');
+setupMultiFileUpload('multiple-file-upload','file-input-documentacion');

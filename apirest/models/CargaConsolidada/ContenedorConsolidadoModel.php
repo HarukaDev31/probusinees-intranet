@@ -4805,4 +4805,42 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             return false;
         }
     }
+    public function saveDocumentation($idProveedor, $idCotizacion, $files)
+    {
+        try {
+            $this->setAllowedExtensionsImagesOfficeFiles();
+            $this->maxFileSize = 1000000;
+            $index = 0;
+            foreach ($files['files']['tmp_name'] as $key => $tmp_name) {
+                $fileUrl = $this->uploadSingleFile(
+                    [
+                        "name" => $files['files']['name'][$key],
+                        "type" => $files['files']['type'][$key],
+                        "tmp_name" => $files['files']['tmp_name'][$key],
+                        "error" => $files['files']['error'][$key],
+                        "size" => $files['files']['size'][$key]
+                    ],
+                    'assets/cargaconsolidada/documentacion'
+                );
+                $data = [
+                    'id_cotizacion' => $idCotizacion,
+                    'id_proveedor' => $idProveedor,
+                    'file_name' => $files['files']['name'][$key],
+                    'file_path' => $fileUrl,
+                    'file_ext' => $files['files']['type'][$key],
+                ];
+                $this->db->insert($this->table_contenedor_almacen_documentacion, $data);
+                if ($this->db->error()['code'] != 0) {
+                    log_message('error', 'Error en saveDocumentation: ' . $this->db->error()['message']);
+                    return false;
+                }
+                $index++;
+            }
+            // $this->validateToSendDocumentationMessage($idProveedor);
+            return "success";
+        } catch (Exception $e) {
+            log_message('error', 'Error en saveDocumentation: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
