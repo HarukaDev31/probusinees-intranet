@@ -153,8 +153,10 @@ class CCotizaciones extends CI_Controller
                     //convert this excel to phpoject
                     $this->load->library('PHPExcel');
                     $objPHPExcel = PHPExcel_IOFactory::load($fileTmpPath);
+                    ob_end_clean();
+                    // Generate the ZIP file containing the Excel files
                     $zipFilePath = $this->CCotizacionesModel->generateMassiveExcelPayrolls($objPHPExcel, $tarifas, $expirationDate);
-                //    echo json_encode($zipFilePath);
+                    //    echo json_encode($zipFilePath);
                     // Assuming $zipFilePath is the path to the generated ZIP file
                     if (file_exists($zipFilePath)) {
                         header('Content-Type: application/zip');
@@ -166,18 +168,26 @@ class CCotizaciones extends CI_Controller
                     } else {
                         // Handle error if file generation failed
                         echo "Error: Unable to generate the ZIP file.";
+                        unlink($zipFilePath);
                     }
                 } else {
                     echo "Error: Invalid file extension.";
+
                 }
             }catch(Exception $e){
+                log_message('error', 'Error en uploadExcelMassive: ' . $e->getMessage());
                 echo "Error: " . $e->getMessage();
+                unlink($zipFilePath);
+
             }   
         } else {
             echo "Error: " . $_FILES['file']['error'];
+            
         }
     }catch(Exception $e){
         echo "Error: " . $e->getMessage();
+        unlink($zipFilePath);
+
     }
 
     }

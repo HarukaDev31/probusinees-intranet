@@ -27,6 +27,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $roleCotizador = "Cotizador";
     private $roleCoordinacion = "Coordinación";
     private $roleContenedorAlmacen = "ContenedorAlmacen";
+    private $roleDocumentacion = "Documentacion";
     private $aNewContainer = "new-container";
     private $aNewCotizacion = "new-cotizacion";
     private $cambioEstadoProveedor = "cambio-estado-proveedor";
@@ -36,19 +37,29 @@ class ContenedorConsolidadoModel extends CI_Model
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
     public function __construct()
     {
-        parent::__construct();
+        try {
+            parent::__construct();
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+        }
     }
     public function index()
     {
-        $this->db->select("*")
-            ->from($this->table)
-            ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
-        if ($this->input->post('Filtro_Estado') != "0") {
-            $this->db->where('estado', $this->input->post('Filtro_Estado'));
+        try {
+
+            $this->db->select("*")
+                ->from($this->table)
+                ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
+            if ($this->input->post('Filtro_Estado') != "0") {
+                $this->db->where('estado', $this->input->post('Filtro_Estado'));
+            }
+            $this->db->order_by('carga', 'desc');
+            $query = $this->db->get();
+            return $query->result();
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            return false;
         }
-        $this->db->order_by('carga', 'desc');
-        $query = $this->db->get();
-        return $query->result();
     }
     public function getPaises()
     {
@@ -79,6 +90,11 @@ class ContenedorConsolidadoModel extends CI_Model
     public function store($data)
     {
         //set data in table 
+        //if field carga not exists in data add tipo carga field "G. IMPORTACION"
+        if (!array_key_exists('carga', $data)) {
+            $data['tipo_carga'] = "G. IMPORTACION";
+        }
+
         $this->db->insert($this->table, $data);
         if ($this->db->affected_rows() > 0) {
             //{"project": "0", "role": "Cotizador", "user": "0", "message": "Prueba de comunicación en tiempo real","action":"new-container"}
@@ -137,9 +153,10 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         return false;
     }
-    public function generateSteps($steps)
+    public function generateSteps($steps, $stepsDocumentacion)
     {
         $this->db->insert_batch($this->table_contenedor_steps, $steps);
+        $this->db->insert_batch($this->table_contenedor_steps, $stepsDocumentacion);
         if ($this->db->affected_rows() > 0) {
             return true;
         }
@@ -161,6 +178,13 @@ class ContenedorConsolidadoModel extends CI_Model
             if ($this->user->No_Grupo == "Cotizador") {
                 //limit to 2 steps
                 $this->db->limit(2);
+            }
+            if ($this->user->No_Grupo == "Documentacion") {
+                //limit to 3 last steps
+                $this->db->where('tipo', 'DOCUMENTACION');
+            } else {
+                //limit to 3 last steps
+                $this->db->where('tipo', 'COTIZADOR');
             }
             $query = $this->db->get();
             return $query->result();
@@ -184,47 +208,43 @@ class ContenedorConsolidadoModel extends CI_Model
     public function getContenedorCotizacionProveedores($idContenedor)
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
-        try {
-            $this->db->select("main.*,
-                U.No_Usuario,
-                (
-                    SELECT CONCAT('[', GROUP_CONCAT(
-                        CONCAT(
-                            '{\"id\":', proveedores.id, 
-                            ',\"qty_box\":', proveedores.qty_box, 
-                            ',\"peso\":', proveedores.peso, 
-                            ',\"cbm_total\":', proveedores.cbm_total, 
-                            ',\"supplier\":\"', proveedores.supplier, 
-                            '\",\"code_supplier\":\"', proveedores.code_supplier, 
-                            '\",\"estados_proveedor\":\"', proveedores.estados_proveedor, 
-                            '\",\"estados\":\"', proveedores.estados, 
-                            '\",\"supplier_phone\":\"', proveedores.supplier_phone, 
-                            '\",\"cbm_total_china\":', proveedores.cbm_total_china, 
-                            ',\"qty_box_china\":', proveedores.qty_box_china, 
-                            ',\"id_proveedor\":', proveedores.id, 
-                            ',\"products\":\"', proveedores.products, 
-                            '\",\"estado_china\":\"', proveedores.estado_china, 
-                            '\",\"arrive_date_china\":\"', proveedores.arrive_date_china, '\"}'
-                        )
-                    ), ']')
-                    FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
-                    WHERE proveedores.id_cotizacion = main.id
-                ) as proveedores")
-                ->from($this->table_contenedor_cotizacion . " as main")
-                ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
-                ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
-                ->where('main.id_contenedor', $idContenedor)
-                ->order_by('main.id', 'asc');
-
-            if ($this->user->No_Grupo != "Cotizador") {
-                $this->db->where('main.estado_cotizador', 'CONFIRMADO');
-            }
-            $query = $this->db->get();
-            return $query->result();
-        } catch (Exception $e) {
-            log_message('error', 'Error en deleteGuiaRemisionFile: ' . $e->getMessage());
+        $this->db->select("main.*,
+        U.No_Usuario,
+        (
+            SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id', proveedores.id,
+                    'qty_box', proveedores.qty_box,
+                    'peso', proveedores.peso,
+                    'cbm_total', proveedores.cbm_total,
+                    'supplier', proveedores.supplier,
+                    'code_supplier', proveedores.code_supplier,
+                    'estados_proveedor', proveedores.estados_proveedor,
+                    'estados', proveedores.estados,
+                    'supplier_phone', proveedores.supplier_phone,
+                    'cbm_total_china', proveedores.cbm_total_china,
+                    'qty_box_china', proveedores.qty_box_china,
+                    'id_proveedor', proveedores.id,
+                    'products',proveedores.products,
+                    'estado_china',proveedores.estado_china,
+                    'arrive_date_china',proveedores.arrive_date_china
+                )
+            )
+            FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
+            WHERE proveedores.id_cotizacion = main.id
+        ) as proveedores")
+            ->from($this->table_contenedor_cotizacion . " as main")
+            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
+            ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
+            ->where('main.id_contenedor', $idContenedor)
+            ->order_by('main.id', 'asc');
+        if ($this->user->No_Grupo != "Cotizador") {
+            $this->db->where('main.estado_cotizador', 'CONFIRMADO');
         }
+        $query = $this->db->get();
+        return $query->result();
     }
+
     public function downloadContenedorCotizacionProveedoresExcel($idContenedor)
     {
         $data = $this->getContenedorCotizacionProveedores($idContenedor);
@@ -528,7 +548,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 'assets/images/agentecompra/'
             );
             $dataToInsert = $this->getCotizacionData($cotizacion);
-
+            log_message('error', 'Data to insert: ' . json_encode($dataToInsert));
             $dataToInsert['cotizacion_file_url'] = $fileUrl;
             $dataToInsert['id_contenedor'] = $data['id_contenedor'];
             $dataToInsert['id_usuario'] = $this->user->ID_Usuario;
@@ -541,6 +561,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $dataToInsert['id_cotizacion'] = $idCotizacion;
                 $dataEmbarque = $this->getEmbarqueData($cotizacion, $dataToInsert);
                 //insert in tabla proveedores 
+                log_message('error', 'Data embarque: ' . json_encode($dataEmbarque));
                 $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
                 //if db error return error
                 if ($this->db->error()['code'] != 0) {
@@ -573,6 +594,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
             return false;
         } catch (Exception $e) {
+            log_message('error', 'Error en storeCotizacion: ' . $e->getMessage());
             return [
                 'status' => "error",
                 'message' => $e->getMessage()
@@ -740,6 +762,16 @@ class ContenedorConsolidadoModel extends CI_Model
             log_message('error', $e->getMessage());
             return false;
         }
+    }
+    public function updateEstadoDocumentacion($id, $estado)
+    {
+        $this->db->set('estado_documentacion', $estado);
+        $this->db->where('id', $id);
+        $this->db->update($this->table);
+        if ($this->db->affected_rows() > 0) {
+            return "success";
+        }
+        return false;
     }
     public function showClientesDocumentacion($id)
     {
@@ -1020,10 +1052,13 @@ class ContenedorConsolidadoModel extends CI_Model
             }
         }
         if ($listaEmbarque != null && $blFile != null) {
-            $this->db->set('estado', 'COMPLETADO');
+            $this->db->set('estado_china', 'COMPLETADO');
         } else if ($estado == "DATOS PROVEEDOR") {
         } else {
-            $this->db->set('estado', 'RECIBIENDO');
+            if($this->user->No_Grupo=='Coordinación'){
+                $this->db->set('estado', 'RECIBIENDO');
+
+            }
         }
         $this->db->where('id', $idcontenedor);
         $this->db->update($this->table);
@@ -1102,10 +1137,19 @@ class ContenedorConsolidadoModel extends CI_Model
         //select * from folders where id_cotizacion is null or $id and left join files where id_folder = id
         $this->db->select("main.*,files.id AS id_file,files.file_url")
             ->from($this->table_contenedor_documentacion_folders . " as main")
-            ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id 
-            and files.id_contenedor = ' . $id, 'left')
+            ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id and files.id_contenedor = ' . $id, 'left');
+
+        // First group: (main.id_contenedor = [id] OR main.id_contenedor IS NULL)
+        $this->db->group_start()
             ->where('main.id_contenedor', $id)
-            ->or_where('main.id_contenedor', null);
+            ->or_where('main.id_contenedor', null)
+            ->group_end();
+
+        // AND main.only_doc_profile = 0
+        if ($this->user->No_Grupo != $this->roleDocumentacion) {
+            $this->db->where('main.only_doc_profile', 0);
+        }
+
         $query = $this->db->get();
         return $query->result();
     }
@@ -1515,6 +1559,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                     }
                 } else {
+                    
                     $startIndex = $startColumn;
                     $highestSheetRow = $sheet->getHighestRow();
                     for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
@@ -1710,7 +1755,7 @@ class ContenedorConsolidadoModel extends CI_Model
         }
     }
 
-    public function createDocumentacionFolder($name, $idContenedor, $file)
+    public function createDocumentacionFolder($name, $idContenedor, $file, $categoria = null, $icon = null)
     {
         try {
             $this->maxFileSize = 1000000;
@@ -1725,12 +1770,21 @@ class ContenedorConsolidadoModel extends CI_Model
                 ],
                 'assets/images/agentecompra/'
             );
+            $isDocumentationProfile = $this->user->No_Grupo == $this->roleDocumentacion;
             if ($fileUrl) {
-                $this->db->insert($this->table_contenedor_documentacion_folders, ['id_contenedor' => $idContenedor, 'folder_name' => $name]);
+                $this->db->insert($this->table_contenedor_documentacion_folders, [
+                    'id_contenedor' => $idContenedor,
+                    'folder_name' => $name,
+                    'categoria' => $categoria,
+                    'b_icon' => $icon,
+                    'only_doc_profile' => $isDocumentationProfile,
+                ]);
+
                 if ($this->db->affected_rows() > 0) {
                     $idFolder = $this->db->insert_id();
                     //insert file in table contenedor_consolidado_documentacion_files
-                    $this->db->insert($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'file_url' => $fileUrl]);
+                    $this->db->insert($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'file_url' => $fileUrl,
+                        'id_contenedor' => $idContenedor]);
                     if ($this->db->affected_rows() > 0) {
                         return ['status' => "success", 'error' => false];
                     }
@@ -1876,9 +1930,10 @@ class ContenedorConsolidadoModel extends CI_Model
                 // $uuid=uniqid();
                 // $tempFilePath = sys_get_temp_dir() . "/temp_document_{$uuid}.pdf";
                 // file_put_contents($tempFilePath, $pdfContent);
-                $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
-                $this->email->clear(TRUE);
-
+                // $this->sendMail($email, "Welcome to Consolidado", $htmlWelcomeContent, []);
+                //$this->email->clear(TRUE);
+                $response=$this->sendWelcome($carga);
+                // log_message('error', 'response: '.$response);
                 // unlink($tempFilePath);
 
                 $zip = new ZipArchive();
@@ -1913,22 +1968,29 @@ class ContenedorConsolidadoModel extends CI_Model
                     $dompdf->render();
                     $pdfContent = $dompdf->output();
                     $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
+                    unlink($tempFilePath);
                     file_put_contents($tempFilePath, $pdfContent);
                     try {
-                        $this->sendMail(
-                            $email,
-                            "Datos Item",
-                            `Producto: {$products}
-                            Código de proveedor: {$supplierCode}
-                            `,
-                            [
-                                $tempFilePath
-                            ]
-                        );
+                        // $this->sendMail(
+                        //     $email,
+                        //     "Datos Item",
+                        //     `Producto: {$products}
+                        //     Código de proveedor: {$supplierCode}
+                        //     `,
+                        //     [
+                        //         $tempFilePath
+                        //     ]
+                        // );   
+                            $data=$this->sendDataItem(
+                            "
+Producto: {$products}
+Código de proveedor: {$supplierCode}
+                        ", $tempFilePath);
                         // $mediaId = $this->uploadDocument($tempFilePath, 'application/pdf');
                         // $sendRotulado = $this->sendDatosProveedor($mediaId, $supplierCode,$products);
                     } catch (Exception $e) {
                         echo 'Error: ' . $e->getMessage();
+                        log_message('error', 'Error: ' . $e->getMessage());
                     } finally {
                         // Eliminar el archivo temporal
                         $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
@@ -1944,14 +2006,23 @@ class ContenedorConsolidadoModel extends CI_Model
                 // $pdfContent = $dompdf->output();
                 // $tempFilePath = sys_get_temp_dir() . "/temp_document_data_{$supplierCode}.pdf";
                 // file_put_contents($tempFilePath, $pdfContent);
-                $this->sendMail(
-                    $email,
-                    "Datos Cliente",
-                    $htmlDataContent,
-                    []
-                );
+                // $this->sendMail(
+                //     $email,
+                //     "Datos Cliente",
+                //     $htmlDataContent,
+                //     []
+                // );
                 unlink($tempFilePath);
+                                $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
+➡ Datos del proveedor: (Usted lo llena)
+
+☑ Nombre del producto:
+☑ Nombre del vendedor:
+☑ Celular del vendedor:
+
+Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
+                ");
                 header('Content-Type: application/zip');
                 header('Content-Disposition: attachment; filename="Rotulado.zip"');
                 header('Content-Length: ' . filesize($zipFileName));
@@ -1967,6 +2038,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 exit;
             } catch (Exception $e) {
                 echo $e->getMessage();
+                log_message('error', 'Error: ' . $e->getMessage());
             }
         }
         return "success";
@@ -2195,7 +2267,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'R']);
                 //sum all provider cbm_total_china and set volumen_china in cotizacion table
 
-
+                //clean query
+              
                 $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
                 $ids = array_column($usuariosAlmacen, 'ID_Usuario');
                 $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado RECIBIDO";
@@ -2398,27 +2471,63 @@ class ContenedorConsolidadoModel extends CI_Model
     function validateToSendInspectionMessage($idProveedor)
     {
         //find if exists more two files type image and one type video
-        $this->db->select('id')
-            ->from($this->table_contenedor_almacen_inspection)
-            ->where('id_proveedor', $idProveedor)
-            ->where('file_type', 'image/jpeg')
-            ->or_where('file_type', 'image/png');
+        $this->db->select('id, file_path')
+         ->from($this->table_contenedor_almacen_inspection)
+         ->where('id_proveedor', $idProveedor)
+         ->group_start() // Agrupa las condiciones de file_type
+         ->where('file_type', 'image/jpeg')
+         ->or_where('file_type', 'image/png')
+         ->group_end(); // 
         $query = $this->db->get();
+        $imagesUrls = $query->result();
         $images = $query->num_rows();
-        $this->db->select('id')
+        $this->db->select('id,file_path')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor)
             ->where('file_type', 'video/mp4');
         $query = $this->db->get();
+        $videosUrls = $query->result();
         $videos = $query->num_rows();
         //get current estado_china from proveedor
-        $this->db->select('estados_proveedor,code_supplier')
+        $this->db->select('estados_proveedor,code_supplier,qty_box_china,qty_box,id_cotizacion')
             ->from($this->table_contenedor_cotizacion_proveedores)
             ->where('id', $idProveedor);
         $query = $this->db->get();
         $estadoChina = $query->row()->estados_proveedor;
         $supplierCode = $query->row()->code_supplier;
-        if ($images >= 2 && $videos >= 1 && $estadoChina != "INSPECTION") {
+        $qtyBoxChina = $query->row()->qty_box_china;
+        $qtyBox = $query->row()->qty_box;
+        $idCotizacion = $query->row()->id_cotizacion;
+                //from table cotizacion get volumen valor_cot y id_contenedor
+        $this->db->select('volumen,monto,id_contenedor')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $idCotizacion);
+        $query = $this->db->get();
+        $volumen = $query->row()->volumen;
+        $valorCot = $query->row()->monto;
+        $idContenedor = $query->row()->id_contenedor;
+        //from  contenedor get f_cierre
+        $this->db->select('f_cierre')
+            ->from($this->table)
+            ->where('id', $idContenedor);
+        $query = $this->db->get();
+        $fCierre = $query->row()->f_cierre;
+        //if fcierre is date format to 10 febrero
+        $fCierre = date('d F', strtotime($fCierre));
+        //convert month in english to spanish
+        $fCierre = str_replace('January', 'Enero', $fCierre);
+        $fCierre = str_replace('February', 'Febrero', $fCierre);
+        $fCierre = str_replace('March', 'Marzo', $fCierre);
+        $fCierre = str_replace('April', 'Abril', $fCierre);
+        $fCierre = str_replace('May', 'Mayo', $fCierre);
+        $fCierre = str_replace('June', 'Junio', $fCierre);
+        $fCierre = str_replace('July', 'Julio', $fCierre);
+        $fCierre = str_replace('August', 'Agosto', $fCierre);
+        $fCierre = str_replace('September', 'Septiembre', $fCierre);
+        $fCierre = str_replace('October', 'Octubre', $fCierre);
+        $fCierre = str_replace('November', 'Noviembre', $fCierre);
+        $fCierre = str_replace('December', 'Diciembre', $fCierre);
+        if ($estadoChina != "INSPECTION") {
             //set estado_china to INSPECTION
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, [
@@ -2441,8 +2550,38 @@ class ContenedorConsolidadoModel extends CI_Model
                 "action" => $this->cambioEstadoProveedor,
                 "message" => $message,
             ]);
+            //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
+            $this->db->select('nombre')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $cliente = $query->row()->nombre;
+            //message = cliente code supplieer qtyboxchina??qtybox
+            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
+            '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n" ;
+            // 'Reserva de espacio: Consolidado #01-2025 ' . "\n\n" .
+            // 'Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor. ' . "\n\n" .
+            // '☑ CBM Preliminar: cbm. ' . $volumen . ' ' . "\n" .
+            // '☑ Costo CBM: $.' . $valorCot . ' ' . "\n" .
+            // '☑ Fecha Limite de pago: ' . $fCierre . ' ' . "\n\n" .
+            // '⚠Nota: Realizar el pago antes del llenado del contenedor. ' . "\n\n" .
+            // '📦En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final. ' . "\n\n" .
+            // 'Apenas haga el pago me envía por este medio para hacer la reserva.';
+
+$this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
+            
+//             $this->sendMessage('Hola buen día 🙋🏻‍♀
+// Inspección: ' . $message);
+            //for each images and video send media
+            foreach ($imagesUrls as $image) {
+                $this->sendMedia($image->file_path, 'image/jpeg');
+            }
+            foreach ($videosUrls as $video) {
+                $this->sendMedia($video->file_path, 'video/mp4');
+            }
             return true;
         }
+
         return false;
     }
     public function getClientesHeader($idContenedor)
@@ -2583,6 +2722,8 @@ class ContenedorConsolidadoModel extends CI_Model
          * where g.No_Grupo ="Cliente" and u.Nu_Estado =1
          */
         try {
+            $this->db->reset_query();
+
             $this->db->select('u.ID_Usuario')
                 ->from('usuario u')
                 ->join('grupo_usuario gu', 'gu.ID_Usuario = u.ID_Usuario')
@@ -4138,6 +4279,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 'assets/cargaconsolidada/cotizacionesFinales'
             );
             $dataToUpdate = $this->getCotizacionData($file);
+            log_message('error', 'DataToUpdate: ' . json_encode($dataToUpdate));
             $dataToUpdate['cotizacion_final_url'] = $fileUrl;
                 //change key telefono for whatsapp
 
@@ -4430,6 +4572,70 @@ class ContenedorConsolidadoModel extends CI_Model
             return false;
         }
     }
+    public function showClientesDocumentacionByDoc($idCotizacion)
+    {
+        //query from  contenedor_consolidado_cotizacion where id=idCotizacion use array agg to get documentacion peru key with fields , fields excel confirmacion f.comercial vol doc and valor doc from table contenedor_consolidado_cotizacion
+        // and row from contenedor_consolidado_cotizacion_documentacion where id_cotizacion=idCotizacion 
+        //use alias
+        try {
+            $this->db->select([
+                "JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'code_supplier', contenedor_consolidado_cotizacion_proveedores.code_supplier,
+                    'id_cotizacion', contenedor_consolidado_cotizacion.id,
+                    'documentacion_peru', JSON_OBJECT(
+                        'factura_comercial', contenedor_consolidado_cotizacion.factura_comercial,
+                        'excel_confirmacion', contenedor_consolidado_cotizacion.excel_confirmacion,
+                        'volumen_doc', ifnull(contenedor_consolidado_cotizacion.volumen_doc,0),
+                        'valor_doc', contenedor_consolidado_cotizacion.valor_doc
+                    ),
+                    'documentos_adicionales', (
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                            'name', name,
+                            'file_url', file_url
+                        ))
+                        FROM contenedor_consolidado_cotizacion_documentacion
+                        WHERE id_cotizacion = contenedor_consolidado_cotizacion.id
+                    ),
+                    'documentacion_china', (
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                            'name', file_name,
+                            'file_url', file_path
+                        ))
+                        FROM contenedor_consolidado_almacen_documentacion
+                        WHERE id_cotizacion = contenedor_consolidado_cotizacion.id 
+                        and id_proveedor=contenedor_consolidado_cotizacion_proveedores.id
+                        AND code_supplier = contenedor_consolidado_cotizacion_proveedores.code_supplier
+                    ),
+                    'inspeccion', (
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                            'name', file_name,
+                            'file_url', file_path
+                        ))
+                        FROM contenedor_consolidado_almacen_inspection
+                        WHERE id_cotizacion = contenedor_consolidado_cotizacion.id 
+                        and id_proveedor=contenedor_consolidado_cotizacion_proveedores.id
+
+                        AND code_supplier = contenedor_consolidado_cotizacion_proveedores.code_supplier
+                    )
+                )
+            ) as proveedores_documentacion"
+            ])
+                ->from($this->table_contenedor_cotizacion)
+                ->join($this->table_contenedor_cotizacion_proveedores, 'contenedor_consolidado_cotizacion.id = contenedor_consolidado_cotizacion_proveedores.id_cotizacion')
+                ->where('contenedor_consolidado_cotizacion.id', $idCotizacion)
+                ->group_by('contenedor_consolidado_cotizacion.id');
+            $query = $this->db->get();
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en showClientesDocumentacionByDoc: ' . $this->db->error()['message']);
+                return false;
+            }
+            return $query->row();
+        } catch (Exception $e) {
+            log_message('error', 'Error en showClientesDocumentacionByDoc: ' . $e->getMessage());
+            return false;
+        }
+    }
     public function deleteGuiaRemisionFile($idCotizacion)
     {
         try {
@@ -4456,6 +4662,31 @@ class ContenedorConsolidadoModel extends CI_Model
             }
         } catch (Exception $e) {
             log_message('error', 'Error en deleteGuiaRemisionFile: ' . $e->getMessage());
+            return false;
+        }
+    }
+    public function viewFormularioAduana($idContenedor){
+        //get all data from carga_consolidada_contenedor
+        $this->db->select('*')
+            ->from($this->table)
+            ->where('id', $idContenedor);
+        $query = $this->db->get();
+        return $query->result();
+    }
+    public function updateFormularioAduana($idContenedor,$data){
+        try {
+            //remove idContainer from data
+            unset($data['idContainer']);
+            $this->db->where('id', $idContenedor);
+            $this->db->update($this->table, $data);
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en updateFormularioAduana: ' . $this->db->error()['message']);
+                return false;
+            } else {
+                return "success";
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en updateFormularioAduana: ' . $e->getMessage());
             return false;
         }
     }

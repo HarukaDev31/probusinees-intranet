@@ -1133,7 +1133,10 @@ class CCotizacionesModel extends CI_Model
             $excelFilePath = 'assets/downloads/' . $excelFileName;
             $objWriter->save($excelFilePath);
             $this->zip->read_file($excelFilePath, $excelFileName); // Add the Excel file to the ZIP
-            unlink($excelFilePath); // Remove the Excel file after adding it to the ZIP
+            unlink($excelFilePath);
+            $objPHPExcel->disconnectWorksheets(); // Desconectar las hojas de trabajo
+            unset($objPHPExcel); // Liberar la instancia de PHPExcel
+            gc_collect_cycles();  // Remove the Excel file after adding it to the ZIP
         }
 
         // Save the ZIP file

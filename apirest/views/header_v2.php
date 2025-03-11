@@ -14,6 +14,7 @@
   <link rel="manifest" href="<?php echo base_url("assets/ico/site.webmanifest"); ?>">
   <link rel="shortcut icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
   <link rel="icon" href="<?php echo base_url("assets/ico/favicon.png?ver=10.0.0"); ?>" type="image/png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <title>ProBusiness | Admin</title>
   
