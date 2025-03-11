@@ -1943,6 +1943,52 @@ const openStepFunction = async (step, id) => {
                         });
                     }
                 });
+                // Obtener la instancia de DataTable
+                var table = $('#table-cotizacion-embarque').DataTable();
+
+                // Escuchar el evento "input" en tu buscador personalizado
+                $('#search-table').on('input', function () {
+                    var searchTerm = $(this).val(); // Obtener el valor del buscador
+                    table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
+                });
+
+                // Actualizar el mensaje de información después de cada búsqueda
+                table.on('draw', function () {
+                    var info = table.page.info();
+                    $('#table-cotizacion-embarque_info').html(
+                        `Mostrando ${info.start + 1} a ${info.end} de ${info.recordsTotal} registros`
+                    );
+                });
+
+
+
+                $("#export-excel").on("click", function () {
+                    // URL para descargar el archivo Excel
+                    var url = base_url + "CargaConsolidada/ContenedorConsolidado/downloadContenedorCotizacionProveedoresExcel/" + idContenedor;
+                
+                    // Realizar la solicitud AJAX
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        xhrFields: {
+                            responseType: 'blob' // Indicar que la respuesta es un archivo binario
+                        },
+                        success: function (response) {
+                            // Crear un Blob con el archivo Excel
+                            var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                
+                            // Crear un enlace temporal para descargar el archivo
+                            var link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = `Cotizacion-${idContenedor}.xlsx`; // Nombre del archivo
+                            link.click(); // Simular clic en el enlace para iniciar la descarga
+                        },
+                        error: function () {
+                            Swal.fire("Error!", "Hubo un error al descargar el archivo Excel", "error");
+                        }
+                    });
+                });
+
             }
             spinner.hide();
         } else {
@@ -2967,12 +3013,11 @@ async function getTableCotizacionEmbarqueHeaders() {
     if (result.lista_embarque_url) {
         $("#packing-list-container").empty();
         $("#packing-list-container").append(`
-        <a href="${result.lista_embarque_url}" target="_blank" class="btn btn-outline-primary">
-        <i class="fa fa-download"></i>
-        Descargar
+        <a href="${result.lista_embarque_url}" target="_blank" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block">
+        <i class="fas fa-file-alt"></i>Packing List
         </a>
-        <button class="btn btn-outline-danger" onclick="deleteListaEmbarque()">
-        <i class="fa fa-trash " ></i>
+        <button class="btn text-danger" onclick="deleteListaEmbarque()">
+        <i class="fa fa-trash"></i>
         </button>
         `);
         //add event for delete 
@@ -2980,11 +3025,10 @@ async function getTableCotizacionEmbarqueHeaders() {
     } else {
         $("#packing-list-container").empty();
         $("#packing-list-container").append(`
-        <button class="btn btn-outline-primary"
+        <button class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block"
         id="btn-upload-lista-embarque"
         >
-        <i class="fa fa-upload"></i>
-        Subir
+        <i class="fa fa-upload"></i>Packing List
         </button>
    
         `);
@@ -3032,22 +3076,20 @@ async function getTableCotizacionEmbarqueHeaders() {
     if (result.bl_file_url) {
         $("#bl-file-container").empty();
         $("#bl-file-container").append(`
-        <a href="${result.bl_file_url}" target="_blank" class="btn btn-outline-primary">
-        <i class="fa fa-download"></i>
-        Descargar
+        <a href="${result.bl_file_url}" target="_blank" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block">
+        <i class="fas fa-file-alt"></i>BL File
         </a>
-        <button class="btn btn-outline-danger" onclick="deleteBL()">
-        <i class="fa fa-trash " ></i>
+        <button class="btn text-danger" onclick="deleteBL()">
+        <i class="fa fa-trash"></i>
         </button>
         `);
 
     } else {
         $("#bl-file-container").empty();
         $("#bl-file-container").append(`
-            <button class="btn btn-outline-primary"
+            <button class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block"
             id="btn-upload-bl" >
-            <i class="fa fa-upload"></i>
-            Subir
+            <i class="fa fa-upload"></i>BL File
         </button>
        
         `);

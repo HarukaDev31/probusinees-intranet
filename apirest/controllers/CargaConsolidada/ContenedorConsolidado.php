@@ -408,6 +408,7 @@ class ContenedorConsolidado extends CI_Controller
 							<option value="ROTULADO" ' . ($proveedor->estados == "ROTULADO" ? "selected" : "") . '>ROTULADO</option>
 							<option value="DATOS PROVEEDOR" ' . ($proveedor->estados == "DATOS PROVEEDOR" ? "selected disabled" : "disabled") . '>DATOS PROVEEDOR</option>
 							<option value="INSPECCIONADO" ' . ($proveedor->estados == "INSPECCIONADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? " disabled" : "") . '		>INSPECCIONADO</option>
+							<option value="COBRANDO" ' . ($proveedor->estados == "COBRANDO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "Coordinación" ? " disabled" : "") . '		>COBRANDO</option>
 							<option value="RESERVADO" ' . ($proveedor->estados == "RESERVADO" ? "selected" : "") . '>RESERVADO</option>
 							<option value="EMBARCADO" ' . ($proveedor->estados == "EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '
 							>EMBARCADO</option>

@@ -1850,6 +1850,10 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estado]);
+        } else if ($estado == "COBRANDO") {
+            $this->db->where('id_cotizacion', $idCotizacion);
+            $this->db->where('id', $idProveedor);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
         }
         // Manejo de otros estados
         else {
@@ -1987,8 +1991,8 @@ class ContenedorConsolidadoModel extends CI_Model
                         // );   
                         $data = $this->sendDataItem(
                             "
-Producto: {$products}
-Código de proveedor: {$supplierCode}
+            Producto: {$products}
+            Código de proveedor: {$supplierCode}
                         ",
                             $tempFilePath
                         );
@@ -2046,6 +2050,72 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 echo $e->getMessage();
                 log_message('error', 'Error: ' . $e->getMessage());
             }
+        }else if ($estado == "COBRANDO") {
+            // Obtener URLs de imágenes
+           
+        
+            // Obtener estado de China, código de proveedor, cantidad de cajas, etc.
+            $this->db->select('estados_proveedor, code_supplier, qty_box_china, qty_box, id_cotizacion')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id', $idProveedor);
+            $query = $this->db->get();
+            $row = $query->row(); // Obtener la fila como objeto
+            $estadoChina = $row->estados_proveedor;
+            $supplierCode = $row->code_supplier;
+            $qtyBoxChina = $row->qty_box_china;
+            $qtyBox = $row->qty_box;
+            $idCotizacion = $row->id_cotizacion;
+        
+            // Obtener volumen, monto e ID del contenedor
+            $this->db->select('volumen, monto, id_contenedor')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $row = $query->row(); // Obtener la fila como objeto
+            $volumen = $row->volumen;
+            $valorCot = $row->monto;
+            $idContenedor = $row->id_contenedor;
+        
+            // Obtener fecha de cierre
+            $this->db->select('f_cierre')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $fCierre = $query->row()->f_cierre;
+        
+            // Formatear fecha de cierre
+            $fCierre = date('d F', strtotime($fCierre));
+            $fCierre = str_replace([
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ], [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ], $fCierre);
+        
+            // Obtener nombre del cliente
+            $this->db->select('nombre')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $cliente = $query->row()->nombre;
+        
+            // Construir el mensaje
+            $message = "Reserva de espacio: Consolidado #01-2025\n\n" .
+                "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
+                "☑ CBM Preliminar: " . $volumen . " cbm\n" .
+                "☑ Costo CBM: $" . $valorCot . "\n" .
+                "☑ Fecha Limite de pago: " . $fCierre . "\n\n" .
+                "⚠ Nota: Realizar el pago antes del llenado del contenedor.\n\n" .
+                "📦 En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final.\n\n" .
+                "Apenas haga el pago, envíe por este medio para hacer la reserva.";
+        
+            // Enviar el mensaje
+            $this->sendMessage($message);
+        
+            // Enviar imagen de pagos
+            $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
+            $data = $this->sendMedia($pagosUrl, 'image/jpg');
         }
         return "success";
     }
@@ -2982,17 +3052,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     }
     public function generateMassiveExcelPayrolls($objPHPExcel, $idContainer)
     {
-        //init more memory
         $originalMemoryLimit = ini_get('memory_limit');
-        //set memory limit to 512M
         ini_set('memory_limit', '2048M');
         $this->load->library('PHPExcel');
         $this->load->library('zip');
-        // Create a new PHPExcel object
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
-        //get tarifa for each  cotizacion from table cotizaciones where id_contenedor = $idContainer
-        log_message('error', json_encode($data));
         $result = $this->db->select('id,tarifa,nombre,correo')
             ->from($this->table_contenedor_cotizacion)
             ->where('id_contenedor', $idContainer);
@@ -3017,7 +3082,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         try {
             foreach ($data as $key => $value) {
                 $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
-
+                
                 $result = $this->getFinalCotizacionExcelv2($objPHPExcel, $value, $idContainer);
                 $excelFileName = $result['excel_file_name'];
                 $excelFilePath = $result['excel_file_path'];
@@ -3139,8 +3204,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
                 $totalRows++;
                 $cbmTotal += $producto['cbm'];
-                $pesoTotal += $producto['peso'];
             }
+            $pesoTotal = $data['cliente']['productos'][0]['peso'];
 
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
             $tipoCliente = trim($data['cliente']["tipo"]);
