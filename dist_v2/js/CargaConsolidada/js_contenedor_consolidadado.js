@@ -92,7 +92,115 @@ var documentationContainerProfile = null;
 var documentacionSelectedProvider = 0;
 var documentacionDocumentacionContainer = null;
 var documentacionAduanaContainer = null;
+async function saveDocumentation(){
+    event.preventDefault();
+    //show confirm swall
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, guardar",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // upload add idCotizacion and get files from #file-inpute 
+            const formData = new FormData();
+            formData.append('idCotizacion', currentCotizacion);
+            formData.append('idProveedor', currentProveedor);
+            const fileInput = $("#file-input-documentacion")[0];
+            const files = fileInput.files;
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
+            spinner.show();
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/saveDocumentation";
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Correcto!", result.message, "success");
+                        reloadTableCotizacionEmbarque();
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    spinner.hide();
+                    //clear input and file-lista
+                    fileInput.value = "";
+                    $("#file-lista-documentacion").html("");
+                    getFilesAlmacenDocument(currentProveedor, currentCotizacion).then((files) => {
+                        files.forEach(file => addFileToList(file,null,'file-lista-documentacion'));
+                    });
+                },
+                error: function () {
+                    spinner.hide();
+                }
+            });
+        }
+    });
+}
+async function saveInspection(){
+    event.preventDefault();
+   //show confirm swall
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, guardar",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+    console.log(result)
+        if (result.isConfirmed) {
+            // upload add idCotizacion and get files from #file-inpute 
+            const formData = new FormData();
+            formData.append('idCotizacion', currentCotizacion);
+            formData.append('idProveedor', currentProveedor);
+            const fileInput = $("#file-input-inspeccion")[0];
+            const files = fileInput.files;
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
 
+            spinner.show();
+            url = base_url + "CargaConsolidada/ContenedorConsolidado/saveInspection";
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    const result = JSON.parse(response);
+                    if (result.status == "success") {
+                        Swal.fire("Correcto!", result.message, "success");
+                        reloadTableCotizacionEmbarque();
+                    } else {
+                        Swal.fire("Error!", result.message, "error");
+                    }
+                    spinner.hide();
+                    //clear input and file-lista
+                    fileInput.value = "";
+                    $(".file-lista-inspection").html("");
+                    getFilesAlmacenInspection(currentProveedor, currentCotizacion).then((files) => {
+                        files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
+                    });
+                    
+
+                },
+                error: function () {
+                    spinner.hide();
+                }
+            });
+        }
+    });
+      
+}
 async function descargarBoletaPDF(idCotizacionFinal) {
   spinner.show();
   $.ajax({
@@ -276,43 +384,103 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
     },
   });
 }
-function addFileToList(file) {
-  const isImage = file.file_ext.startsWith("image");
-  const fileItem = $(`
+function deleteFile(fileId, cardElement) {
+    $.ajax({
+        url: base_url + "CargaConsolidada/ContenedorConsolidado/deleteFile/" + fileId,
+        type: "GET",
+        success: function (response) {
+            const data = JSON.parse(response);
+            if (data.status === "success") {
+                cardElement.remove();
+            } else {
+                alert("Error deleting file: " + data.message);
+            }
+        },
+        error: function () {
+            alert("An error occurred while deleting the file.");
+        },
+    });
+}
+function addFileToList(file,fileList=null,id=null) {
+    if (fileList == null) {
+        fileList = $(".file-lista");
+    }
+    if(id!=null){
+        fileList = $(`#${id}`);
+
+    }
+    const isImage = file?.file_ext.startsWith('image');
+    const fileItem = $(`
         <div class="file-item">
-            <div class="file-preview">
-                ${
-                  isImage
-                    ? `<img src="${file.file_url}" alt="${file.file_name}">`
-                    : `<span>📄</span>`
-                }
+            <div class="file-preview"><span>📄</span>
                 <span>${file.file_name}</span>
             </div>
-            <div class="file-actions">
-                <button class="btn btn-primary btn-sm download-btn" data-url="${
-                  file.file_url
-                }">Descargar</button>
-                <button class="btn btn-danger btn-sm delete-btn" data-id="${
-                  file.id
-                }">Eliminar</button>
+            <div class="file-actions d-flex flex-row">
+                <button class="btn btn-primary btn-sm download-btn" data-url="${file.file_url}">
+                <i class="fas fa-download"></i> 
+                </button>
+                <button class="btn btn-danger btn-sm delete-btn" data-id="${file.id}">
+                <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
     `);
 
-  // Botón de descarga
-  fileItem.find(".download-btn").on("click", function () {
-    const url = $(this).data("url");
-    window.open(url, "_blank");
-  });
+    // Botón de descarga
+    fileItem.find('.download-btn').on('click', function () {
+        event.preventDefault();
+        const url = $(this).data('url');
+        window.open(url, '_blank');
+    });
 
-  // Botón de eliminar
-  fileItem.find(".delete-btn").on("click", function () {
-    const id = $(this).data("id");
-    deleteFile(id, fileItem);
-  });
-
-  fileList.append(fileItem);
+    // Botón de eliminar
+    fileItem.find('.delete-btn').on('click', function () {
+        event.preventDefault();
+        const id = $(this).data('id');
+        deleteFile(id, fileItem);
+    });
+    //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
+    if (isImage) {
+        const viewBtn = $(`
+            <button class="btn btn-primary btn-sm view-btn">👁️</button>
+        `);
+        viewBtn.on('click', function () {
+            event.preventDefault();
+            const url = file.file_url;
+            const fileExt = file.file_ext;
+            viewFile(url, fileExt);
+        });
+        fileItem.find('.file-actions').append(viewBtn);
+    }
+    fileList.append(fileItem);
+    //remove class hidden
+    fileList.removeClass("hidden");
 }
+function viewFile(url, fileExt) {
+    const isImage = fileExt.startsWith('image');
+    const isVideo = fileExt.startsWith('video');
+    const isPdf = fileExt.startsWith('application/pdf');
+    const isWord = fileExt.startsWith('application/msword') || fileExt.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    const isExcel = fileExt.startsWith('application/vnd.ms-excel') || fileExt.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+    if (isImage) {
+        $('#image-preview').attr('src', url);
+        $('#image-modal').modal('show');
+    }
+    else if (isVideo) {
+        $('#video-preview').attr('src', url);
+        $('#video-modal').modal('show');
+    }
+    else if (isPdf || isWord || isExcel) {
+        // Configura el iframe dentro del modal para mostrar el archivo
+        $('#file-preview').attr('src', url);
+        $('#file-modal').modal('show');
+    }
+    else {
+        Swal.fire("Error!", "Formato de archivo no válido", "error");
+    }
+}
+
 async function getClientesHeader() {
   spinner.show();
   url =
@@ -327,53 +495,60 @@ async function getClientesHeader() {
   console.log(result);
   spinner.hide();
 }
-async function verCotizacionEmbarque(
-  idProveedor,
-  idCotizacion,
-  supplierCode,
-  clientName
-) {
-  //hide table cotizacion embarque
-  cotizacionContainer.hide();
-  contentHeader.hide();
-  cotizacionAlmacenContainer.show();
-  currentProveedor = idProveedor;
-  currentCotizacion = idCotizacion;
-  // Función para inicializar la lista al cargar la página
-  spinner.show();
-  $("#client-title").text(clientName);
-  $("#client-supplier-code").text(supplierCode);
-  $("#cotizacion_name").text(idContenedor);
-  // fileManager = new FileManager({
-  //     fileGrid: "#file-grid",
-  //     fileInput: "#file-input-modal",
-  //     uploadBtn: "#btn-upload",
-  //     dragDropContainer: "#drag-drop-container",
-  //     searchInput: "#search-input",
-  //     pendingFileList: "#pending-file-list",
-  //     onFileUpload: (file) => uploadFileDocument(file, fileManager),
-  //     onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
-  // });
-  // fileManagerInspection = new FileManager({
-  //     fileGrid: "#file-grid-inspection",
-  //     fileInput: "#file-input-modal-inspection",
-  //     uploadBtn: "#btn-upload-inspection",
-  //     dragDropContainer: "#drag-drop-container-inspection",
-  //     searchInput: "#search-input-inspection",
-  //     pendingFileList: "#pending-file-list-inspection",
-  //     onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
-  //     onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
-  // });
-  //fectch getNotes
-  url =
-    base_url + "CargaConsolidada/ContenedorConsolidado/getNotes/" + idProveedor;
-  const response = await fetch(url);
-  const result = await response.json();
-  $("#txt-Id_Carga_Consolidada").val(result.nota);
-  if (currentPrivilege != "ContenedorAlmacen") {
-    $("#btn-upload-document-cotizacion").css("pointer-events", "none");
-    $("#btn-upload-inspection-cotizacion").css("pointer-events", "none");
-  }
+async function verCotizacionEmbarque(idProveedor, idCotizacion, supplierCode, clientName) {
+    //hide table cotizacion embarque
+    cotizacionContainer.hide();
+    contentHeader.hide();
+    cotizacionAlmacenContainer.show();
+    currentProveedor = idProveedor;
+    currentCotizacion = idCotizacion;
+    // Función para inicializar la lista al cargar la página
+    spinner.show();
+    $("#client-title").text(clientName);
+    $("#client-supplier-code").text(supplierCode);
+    $("#cotizacion_name").text(idContenedor);
+    $("#file-lista-documentacion").empty();
+    getFilesAlmacenDocument(idProveedor, idCotizacion).then((files) => {
+        files.forEach(file => addFileToList(file,null,'file-lista-documentacion'));
+    });
+    $("#file-lista-inspection").empty();
+    getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
+        files.forEach(file => addFileToList(file,null,'file-lista-inspection'));
+    });
+    
+    // fileManager = new FileManager({
+    //     fileGrid: "#file-grid",
+    //     fileInput: "#file-input-modal",
+    //     uploadBtn: "#btn-upload",
+    //     dragDropContainer: "#drag-drop-container",
+    //     searchInput: "#search-input",
+    //     pendingFileList: "#pending-file-list",
+    //     onFileUpload: (file) => uploadFileDocument(file, fileManager),
+    //     onLoadFiles: () => getFilesAlmacenDocument(idProveedor, idCotizacion),
+    // });
+    // fileManagerInspection = new FileManager({
+    //     fileGrid: "#file-grid-inspection",
+    //     fileInput: "#file-input-modal-inspection",
+    //     uploadBtn: "#btn-upload-inspection",
+    //     dragDropContainer: "#drag-drop-container-inspection",
+    //     searchInput: "#search-input-inspection",
+    //     pendingFileList: "#pending-file-list-inspection",
+    //     onFileUpload: (file) => uploadFileAlmacenInspection(file, fileManagerInspection),
+    //     onLoadFiles: () => getFilesAlmacenInspection(idProveedor, idCotizacion),
+    // });
+    //fectch getNotes
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/getNotes/" + idProveedor;
+    const response = await fetch(url);
+    const result = await response.json();
+    $("#txt-Id_Carga_Consolidada").val(result.nota);
+    if (currentPrivilege != "ContenedorAlmacen") {
+        $("#btn-upload-document-cotizacion").css("pointer-events", "none");
+        $("#btn-upload-inspection-cotizacion").css("pointer-events", "none");
+    }
+
+    spinner.hide();
+    // Función para agregar un archivo a la lista con vista previa y botones
+
 
   spinner.hide();
   // Función para agregar un archivo a la lista con vista previa y botones
@@ -4255,110 +4430,13 @@ $(document).ready(async function () {
         window.open(fileUrl, "_blank");
       });
 
-      // Eliminar archivo
-      card.find(".delete-btn").click(function () {
-        const fileId = $(this).data("id");
-        deleteFile(fileId, card);
-      });
-    });
-  }
-
-  // Función para eliminar archivos
-  function deleteFile(fileId, cardElement) {
-    $.ajax({
-      url:
-        base_url +
-        "CargaConsolidada/ContenedorConsolidado/deleteFile/" +
-        fileId,
-      type: "GET",
-      success: function (response) {
-        const data = JSON.parse(response);
-        if (data.status === "success") {
-          cardElement.remove();
-        } else {
-          alert("Error deleting file: " + data.message);
-        }
-      },
-      error: function () {
-        alert("An error occurred while deleting the file.");
-      },
-    });
-  }
-
-  // function initDropZone(dropZoneId, inputId, fileListId) {
-  //     const dropZone = $(`#${dropZoneId}`);
-  //     const fileInput = $(`#${inputId}`);
-  //
-
-  //     // Maneja el evento de clic
-  //     dropZone.on('click', function () {
-  //         fileInput.click();
-  //     });
-
-  //     // Maneja el cambio del input de archivos
-  //     fileInput.on('change', function (event) {
-  //         handleFiles(event.target.files, fileList);
-  //     });
-
-  //     // Maneja arrastrar y soltar
-  //     dropZone.on('dragover', function (event) {
-  //         event.preventDefault();
-  //         dropZone.addClass('dragover');
-  //     });
-
-  //     dropZone.on('dragleave', function () {
-  //         dropZone.removeClass('dragover');
-  //     });
-
-  //     dropZone.on('drop', function (event) {
-  //         event.preventDefault();
-  //         dropZone.removeClass('dragover');
-  //         const files = event.originalEvent.dataTransfer.files;
-  //         handleFiles(files, fileList);
-  //     });
-
-  //     // Maneja los archivos subidos
-  //     function handleFiles(files, fileList) {
-  //         const uploadedFiles = Array.from(files);
-  //         uploadedFiles.forEach(file => {
-  //             const listItem = $('<div>')
-  //                 .addClass('file-list-item text-secondary')
-  //                 .text(file.name);
-  //             fileList.append(listItem);
-  //         });
-
-  //         // Realiza la subida con AJAX
-  //         uploadFiles(uploadedFiles);
-  //     }
-
-  //     // Función para subir archivos con AJAX
-  //     function uploadFiles(files) {
-  //         const formData = new FormData();
-  //         formData.append('idProveedor', idProveedor);
-  //         files.forEach(file => {
-  //             formData.append('files[]', file); // Asegúrate de usar el nombre esperado por tu backend
-  //         });
-  //         url=base_url + "CargaConsolidada/ContenedorConsolidado/uploadFileInspection";
-  //         $.ajax({
-  //             url,
-  //             type: 'POST',
-  //             data: formData,
-  //             processData: false,
-  //             contentType: false,
-  //             success: function (response) {
-  //                 console.log('Archivos subidos con éxito:', response);
-  //             },
-  //             error: function (error) {
-  //                 console.error('Error al subir archivos:', error);
-  //             }
-  //         });
-  //     }
-  // }
-
-  // // Inicializa las zonas para Documents y Inspection
-  // initDropZone('documents-dropzone', 'documents-input', 'documents-list');
-  // initDropZone('inspection-dropzone', 'inspection-input', 'inspection-list');
-
+            // Eliminar archivo
+            card.find(".delete-btn").click(function () {
+                const fileId = $(this).data("id");
+                deleteFile(fileId, card);
+            });
+        });
+    }
   const fillSelects = async () => {
     $("#txt-ID_Pais").empty();
     $("#txt-Mes").empty();
@@ -4991,7 +5069,7 @@ $(document).ready(async function () {
   $("#btn-back-documentacion-documentacion").click(function () {
     documentacionDocumentacionContainer.hide();
     returnToSteps();
-  });
+  });   
   $("#btn-back-documentacion-aduana").click(function () {
     documentacionAduanaContainer.hide();
     returnToSteps();
@@ -5094,6 +5172,6 @@ window.addEventListener("load", () => {
     }
   };
 });
-setupSingleFileUpload("single-file-upload");
-setupMultiFileUpload("multiple-file-upload-image");
-setupMultiFileUpload("multiple-file-upload");
+setupSingleFileUpload('single-file-upload','file-input-prospecto');
+setupMultiFileUpload('multiple-file-upload-image','file-input-inspeccion');
+setupMultiFileUpload('multiple-file-upload','file-input-documentacion');

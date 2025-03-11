@@ -408,15 +408,16 @@ class ContenedorConsolidado extends CI_Controller
 							<option value="ROTULADO" ' . ($proveedor->estados == "ROTULADO" ? "selected" : "") . '>ROTULADO</option>
 							<option value="DATOS PROVEEDOR" ' . ($proveedor->estados == "DATOS PROVEEDOR" ? "selected disabled" : "disabled") . '>DATOS PROVEEDOR</option>
 							<option value="INSPECCIONADO" ' . ($proveedor->estados == "INSPECCIONADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? " disabled" : "") . '		>INSPECCIONADO</option>
+							<option value="COBRANDO" ' . ($proveedor->estados == "COBRANDO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "Coordinación" ? " disabled" : "") . '		>COBRANDO</option>
 							<option value="RESERVADO" ' . ($proveedor->estados == "RESERVADO" ? "selected" : "") . '>RESERVADO</option>
 							<option value="EMBARCADO" ' . ($proveedor->estados == "EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '
 							>EMBARCADO</option>
 							<option value="NO EMBARCADO" ' . ($proveedor->estados == "NO EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '>NO EMBARCADO</option>
 						</select>';
 
-							$qtyBoxDiv .= '<div>' . ($proveedor->qty_box ?? 0) . '</div>';
-							$cbmTotalDiv .= '<div>' . ($proveedor->cbm_total ?? 0) . '</div>';
-							$pesoTotalDiv .= '<div>' . ($proveedor->peso ?? 0) . '</div>';
+							$qtyBoxDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->qty_box ?? 0) . '"></input></div>';
+							$cbmTotalDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->cbm_total ?? 0) . '"></input></div>';
+							$pesoTotalDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->peso ?? 0) . '"></input></div>';
 							//add inputs to supplier
 							$divInputsSupplier .= '<div class="d-flex flex-row mb-1">
 						<input type="text" class="form-control"' . ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . '
@@ -462,8 +463,7 @@ class ContenedorConsolidado extends CI_Controller
 								</div>';
 							}
 
-
-						'</div>';
+							$divAcciones .='</div>';
 						
 						
 
@@ -1332,6 +1332,24 @@ class ContenedorConsolidado extends CI_Controller
         $arrResponse = $this->ContenedorConsolidadoModel->getCotizacionEmbarqueHeaders($idContenedor);
         echo json_encode($arrResponse);
     }
+	public function saveInspection(){
+		$idProveedor = $this->input->post('idProveedor');
+		$idCotizacion = $this->input->post('idCotizacion');
+		$files = $_FILES;
+		$arrResponse = $this->ContenedorConsolidadoModel->saveInspection($idProveedor, $idCotizacion, $files);
+		echo json_encode([
+			'status' => $arrResponse,
+		]);
+	}
+	public function saveDocumentation(){
+		$idProveedor = $this->input->post('idProveedor');
+		$idCotizacion = $this->input->post('idCotizacion');
+		$files = $_FILES;
+		$arrResponse = $this->ContenedorConsolidadoModel->saveDocumentation($idProveedor, $idCotizacion, $files);
+		echo json_encode([
+			'status' => $arrResponse,
+		]);
+	}
 	function convertDateFormat($date)
 	{
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);

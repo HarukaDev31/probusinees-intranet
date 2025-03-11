@@ -51,14 +51,14 @@
               <div class="d-flex align-items-center p-2" style="width:300px;">
                 <div class="d-flex" style="width:60%">Estado</div>
                 <div style="width: 200px;">
-                  <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
+                  <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
                     <option value="0" selected>Todos</option>
                     <option value="PENDIENTE">PENDIENTE</option>
                     <option value="RECIBIENDO">RECIBIENDO</option>
                     <option value="COMPLETADO">COMPLETADO</option>
                   </select>
                 </div>
-                
+
               </div>
           </div>         
           <div class="dropdown-divider"></div>
@@ -141,7 +141,7 @@
   </section>
   <section class="content" id="main-container">
     <div class="container-fluid">
-          
+
       <div class="table-responsive div-Listar">
         <table id="table-contenedor" class="table table-hover">
           <thead class="thead-default">
@@ -165,13 +165,14 @@
                 </th>
 
               <?php } else { ?>
+                <th>Cargo.</th>
                 <th>Month</th>
                 <th>Country</th>
-                <th>Cargo.</th>
                 <th>Cut off</th>
                 <th>Company</th>
-                <th>Check</th>
                 <th>Status</th>
+
+                <th>Check</th>
 
               <?php } ?>
             </tr>
@@ -556,7 +557,7 @@
 
           <!-- Buttons -->
           <div class="flex justify-between pt-6 border-t mt-6">
-           
+
             <button type="submit" class="px-6 py-2 text-white bg-black rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900">
               Guardar
             </button>
@@ -932,7 +933,7 @@
         <label>&nbsp;</label>
       </div>
     </div>
-    
+
 
 
     <div class="row mb-2 ml-2" style="border-bottom: #DFDFDF solid 2px;">
@@ -954,7 +955,11 @@
       <div class="px-4 py-8 file-section-container col-12 col-md-5  ">
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
-            <h2>Documentación <i class="far fa-folder-open"></i></h2>              
+            <h2
+            class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
+            <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
+            </div>
+          </h2>
           </div>
         </div>
         <div id="drag-drop-container"
@@ -962,6 +967,7 @@
           <div id="drop-message">
             <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
             <p class="text-gray-600">
+              
               Arrastra y suelta archivos aquí
             </p>
             <p class="text-xs text-gray-500 mt-2">
@@ -970,31 +976,31 @@
           </div>
         </div>
         <div id="file-grid" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
-            
-            <form class="form-horizontal" method="post">
-              <div class="row">
-                <div class="col-12 col-sm-12" id="multiple-file-upload">
-                  <div class="form-group">
-                    <div class="file-upload-box">
-                      <input type="file" id="file-input" class="file-input" accept=".xlsx" />
-                      <label for="file-inpute" class="file-label d-flex">
-                        <i class="fas fa-upload"></i>
-                        <div class="file-group-text">
-                          <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                          <span class="file-format">Formatos: .xlsx</span>
-                        </div>
-                        <button class="upload-button" type="button">Subir archivo</button>
-                      </label>
-                    </div>
-                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
-                    <div class="file-lista hidden">
+
+          <form class="form-horizontal" method="post">
+            <div class="row">
+              <div class="col-12 col-sm-12" id="multiple-file-upload">
+                <div class="form-group">
+                  <div class="file-upload-box">
+                    <input type="file" id="file-input-documentacion" class="file-input"  multiple accept="*/*" />
+                    <label for="file-inpute" class="file-label d-flex">
+                      <i class="fas fa-upload"></i>
+                      <div class="file-group-text">
+                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                        <span class="file-format">Formatos: .xlsx</span>
                       </div>
-                    <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
-                    <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                      <button class="upload-button" type="button">Subir archivo</button>
+                    </label>
                   </div>
+                  <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                  <div class="file-lista hidden" id="file-lista-documentacion">
+                  </div>
+                  <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
+                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                 </div>
               </div>
-            </form>
+            </div>
+          </form>
           <!-- Existing and uploaded files will appear here -->
         </div>
         <div id="pending-files" class="hidden d-none">
@@ -1006,16 +1012,23 @@
       </div>
       <div class="col-12 col-md-4">
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
-        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
-        </h2>
+          <h2 class="
+          
+          text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
+            <div id="btn-guardar-inspection"
+              onclick="saveInspection()"
+              class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
+            </div>
+          </h2>
+          <!--Button para guardar-->
 
-        <div id="file-grid-inspection" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
+          <div id="file-grid-inspection" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
             <form class="form-horizontal" method="post">
               <div class="row">
                 <div class="col-12 col-sm-12" id="multiple-file-upload-image">
                   <div class="form-group">
                     <div class="file-upload-box">
-                      <input type="file" id="file-inpute" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
+                      <input type="file" id="file-input-inspeccion" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
                       <label for="file-inpute" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
@@ -1026,23 +1039,23 @@
                       </label>
                     </div>
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
-                    <div class="file-lista hidden">
-                      </div>
+                    <div class="file-lista hidden" id="file-lista-inspection">
+                    </div>
                     <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
                     <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                   </div>
                 </div>
               </div>
             </form>
-        </div>
-        <div id="pending-files-inspection hidden" class="mb-4 hidden">
-          <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
-          <div id="pending-file-list-inspection" class="space-y-2">
-            <!-- Los archivos pendientes aparecerán aquí -->
+          </div>
+          <div id="pending-files-inspection hidden" class="mb-4 hidden">
+            <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
+            <div id="pending-file-list-inspection" class="space-y-2">
+              <!-- Los archivos pendientes aparecerán aquí -->
+            </div>
           </div>
         </div>
       </div>
-    </div>
       <div class="col-12 col-md-3 px-4 py-8 note-container-container">
         <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas
           <button onclick="addNote()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
@@ -1057,7 +1070,7 @@
         </div>
       </div>
     </div>
-  
+
 
   </section>
   <section id="steps" class="content">
@@ -1069,24 +1082,24 @@
   <section class="content" id="documentation-container">
     <!-- header -->
     <div class="row mb-2">
-        <div class="col-12 col-md-1">
-          <button type="button" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte btn-back-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
-        </div>
-        <div class="col-sm-3"></div>
-        <div class="col-6 col-sm-2"></div>
-        <div class="col-6 col-sm-2">
-          <button type="button" id="btn-documentacion-factura" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fas fa-file-invoice"></i>Factura General</button>
-        </div>
-        <div class="col-6 col-sm-2">
+      <div class="col-12 col-md-1">
+        <button type="button" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte btn-back-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+      </div>
+      <div class="col-sm-3"></div>
+      <div class="col-6 col-sm-2"></div>
+      <div class="col-6 col-sm-2">
+        <button type="button" id="btn-documentacion-factura" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fas fa-file-invoice"></i>Factura General</button>
+      </div>
+      <div class="col-6 col-sm-2">
         <button type="button" id="btn-documentacion-zip" class="bg-white text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-download"></i>Descargar todo</button>
-        </div>
-        <div class="col-12 col-md-2">
-          <button type="button" id="btn-documentacion-new" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html">Nuevo documento<i class="fa fa-plus"></i></button>
-        </div>
-        <div class="mx-10" style="border-bottom: #DFDFDF solid 2px; width:100%">
-          <label>&nbsp;</label>
-        </div>
-    </div>        
+      </div>
+      <div class="col-12 col-md-2">
+        <button type="button" id="btn-documentacion-new" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html">Nuevo documento<i class="fa fa-plus"></i></button>
+      </div>
+      <div class="mx-10" style="border-bottom: #DFDFDF solid 2px; width:100%">
+        <label>&nbsp;</label>
+      </div>
+    </div>
 
     <!-- body -->
     <div class="row m-20 documentation-files-container
@@ -1221,7 +1234,41 @@
       </div>
     </div>
   </div>
+  <!-- Modal para imágenes -->
+  <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <img id="image-preview" src="" style="width: 100%;">
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Modal para videos -->
+  <div class="modal fade" id="video-modal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <video id="video-preview" controls style="width: 100%;">
+            <source src="" type="video/mp4">
+            Tu navegador no soporta la reproducción de videos.
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para archivos (PDF, Word, Excel) -->
+  <div class="modal fade" id="file-modal" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <iframe id="file-preview" src="" style="width: 100%; height: 500px;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal fade" id="modal-crear-cotizacion" tabindex="-1" role="dialog" aria-labelledby="modal-cotizacion" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -1238,9 +1285,8 @@
               <div class="col-12 col-sm-12" id="single-file-upload">
                 <div class="form-group">
                   <div class="file-upload-box">
-                    <input type="file" id="file-inpute" class="file-input"  name="cotizacion"
-                    accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt"
-                    />
+                    <input type="file" id="file-input-prospecto" class="file-input" name="cotizacion"
+                      accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
@@ -1316,16 +1362,16 @@
               </div>
               <div class="col-6 col-sm-6"> <!--fecha arribo -->
                 <div class="form-group">
-                  
-                    <label>Fecha Arribo <span class="label-advertencia text-danger"> *</span></label>
-                    <input type="text" name="f_puerto" required id="txt-Fe_Puerto" placeholder="00/00/0000" class="form-control input-report required input-date w-100">
+
+                  <label>Fecha Arribo <span class="label-advertencia text-danger"> *</span></label>
+                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" placeholder="00/00/0000" class="form-control input-report required input-date w-100">
                   <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
                 </div>
               </div>
 
               <div class="col-6 col-sm-6"> <!--mes -->
                 <div class="form-group">
-                <label>Mes <span class="label-advertencia text-danger"> *</span></label>
+                  <label>Mes <span class="label-advertencia text-danger"> *</span></label>
 
                   <select id="txt-Mes" required name="mes" class=" w-100 form-control input-report required">
                   </select>
@@ -1334,9 +1380,9 @@
               </div>
               <div class="col-6 col-sm-6"> <!--fecha cierre -->
                 <div class="form-group">
-            
-                    <label>Fecha Cierre <span class="label-advertencia text-danger"> *</span></label>
-                    <input type="text" name="f_cierre" required id="txt-Fe_Cierre" placeholder="00/00/0000" class=" w-100 form-control input-report required input-date">
+
+                  <label>Fecha Cierre <span class="label-advertencia text-danger"> *</span></label>
+                  <input type="text" name="f_cierre" required id="txt-Fe_Cierre" placeholder="00/00/0000" class=" w-100 form-control input-report required input-date">
                   <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
                 </div>
               </div>
@@ -1350,14 +1396,14 @@
                     <input type="hidden" id="txt-ID_Carga_Consolidada" name="id" value="0"> -->
                 </div>
               </div>
-             
-      
+
+
 
               <div class="col-6 col-sm-6">
                 <div class="form-group" id="div-Fe_Entrega">
-             
-                    <label>Fecha Entrega <span class="label-advertencia text-danger"> *</span></label>
-                    <input type="text" required name="f_entrega" id="txt-Fe_Entrega" placeholder="00/00/0000" class="w-100 form-control input-report required input-date">
+
+                  <label>Fecha Entrega <span class="label-advertencia text-danger"> *</span></label>
+                  <input type="text" required name="f_entrega" id="txt-Fe_Entrega" placeholder="00/00/0000" class="w-100 form-control input-report required input-date">
                   <span class="invalid-feedback" id="error-f-entrega">La fecha entrega es requerida</span>
                 </div>
               </div>
@@ -1953,16 +1999,16 @@
   }
 
   /* Lista de archivos seleccionados */
-.file-lista {
+  .file-lista {
     margin-top: 20px;
     text-align: left;
-}
+  }
 
-.file-lista.hidden {
+  .file-lista.hidden {
     display: none;
-}
+  }
 
-.file-lista-item {
+  .file-lista-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1971,19 +2017,19 @@
     border-radius: 5px;
     margin-bottom: 10px;
     background-color: #f9f9f9;
-}
+  }
 
-.file-lista-item svg {
+  .file-lista-item svg {
     width: 30px;
     height: 30px;
     margin-right: 10px;
-}
+  }
 
-.file-lista-item span {
+  .file-lista-item span {
     font-size: 14px;
     color: #333;
     flex-grow: 1;
-}
+  }
 
 
   .remove-button {
@@ -2005,19 +2051,19 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #fff;
-}
+  }
 
-.file-list-item {
+  .file-list-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px;
     border-bottom: 1px solid #eee;
-}
+  }
 
-.file-list-item:last-child {
+  .file-list-item:last-child {
     border-bottom: none;
-}
+  }
 
 div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
   display: none;
@@ -2030,9 +2076,9 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
 </style>
 <script>
   // script.js
-  function setupSingleFileUpload(containerId) {
+  function setupSingleFileUpload(containerId,inputId) {
     const container = document.getElementById(containerId);
-    const fileInput = container.querySelector('.file-input');
+    const fileInput = $(`#${inputId}`)[0];
     const fileLabel = container.querySelector('.file-label');
     const fileInfoBox = container.querySelector('.file-info-box');
     const fileNameElement = container.querySelector('.file-name');
@@ -2050,7 +2096,7 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
     fileInput.addEventListener('change', (e) => {
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        if (file.name.endsWith('.xlsx')   || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
+        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
           // Mostrar el cuadro de información del archivo
           fileInfoBox.classList.remove('hidden');
 
@@ -2103,50 +2149,50 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
 
   // Funcion para subir archivos multiples
 
-  function setupMultiFileUpload(containerId) {
+  function setupMultiFileUpload(containerId,inputId) {
     const container = document.getElementById(containerId);
-    const fileInput = container.querySelector('.file-input');
+    const fileInput = $(`#${inputId}`)[0];
     const fileLabel = container.querySelector('.file-label');
     const fileList = container.querySelector('.file-lista');
     const uploadButton = container.querySelector('.upload-button');
 
     // Abrir el diálogo de selección de archivos al hacer clic en el botón
     uploadButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        fileInput.click();
+      e.preventDefault();
+      fileInput.click();
     });
 
     // Mostrar la lista de archivos seleccionados
     fileInput.addEventListener('change', (e) => {
-        if (fileInput.files.length > 0) {
-            fileList.classList.remove('hidden');
+      if (fileInput.files.length > 0) {
+        fileList.classList.remove('hidden');
 
-            // Recorrer los archivos seleccionados
-            Array.from(fileInput.files).forEach((file, index) => {
-                // Crear un elemento de lista para cada archivo
-                const fileItem = document.createElement('div');
-                fileItem.classList.add('file-list-item');
+        // Recorrer los archivos seleccionados
+        Array.from(fileInput.files).forEach((file, index) => {
+          // Crear un elemento de lista para cada archivo
+          const fileItem = document.createElement('div');
+          fileItem.classList.add('file-list-item');
 
-                // Definir el ícono según el tipo de archivo
-                let icon = '';
-                if (file.name.endsWith('.jpeg') || file.name.endsWith('.jpg')) {
-                    icon = `
+          // Definir el ícono según el tipo de archivo
+          let icon = '';
+          if (file.name.endsWith('.jpeg') || file.name.endsWith('.jpg')) {
+            icon = `
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
                         </svg>
                     `;
-                } else if (file.name.endsWith('.png')) {
-                    icon = `
+          } else if (file.name.endsWith('.png')) {
+            icon = `
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
                         </svg>
                     `;
-                } else if (file.name.endsWith('.xlsx')) {
-                        icon = `
+          } else if (file.name.endsWith('.xlsx')) {
+            icon = `
                             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                               <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
                               <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
@@ -2165,21 +2211,21 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
                               <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
                             </svg>
                         `;
-                } else if (file.name.endsWith('.mp4')) {
-                    icon = `
+          } else if (file.name.endsWith('.mp4')) {
+            icon = `
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#ff7043" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#bf360c" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M19,32V16l12,8L19,32z"></path>
                         </svg>
                     `;
-                } else {
-                    alert(`El archivo "${file.name}" no es un archivo válido`);
-                    return; // Salir si el archivo no es válido
-                }
+          } else {
+            alert(`El archivo "${file.name}" no es un archivo válido`);
+            return; // Salir si el archivo no es válido
+          }
 
-                // Mostrar el nombre y el tamaño del archivo
-                fileItem.innerHTML = `
+          // Mostrar el nombre y el tamaño del archivo
+          fileItem.innerHTML = `
                     ${icon}
                     <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
                     <button class="remove-file-button" data-index="${index}">
@@ -2187,60 +2233,75 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
                     </button>
                 `;
 
-                // Agregar el elemento a la lista
-                fileList.appendChild(fileItem);
-            });
-        } else {
-            fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
-        }
+          // Agregar el elemento a la lista
+          fileList.appendChild(fileItem);
+        });
+      } else {
+        fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
+      }
     });
 
     // Manejar la eliminación de archivos individuales
     fileList.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remove-file-button') || e.target.closest('.remove-file-button')) {
-            const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
+      if (e.target.classList.contains('remove-file-button') || e.target.closest('.remove-file-button')) {
+        const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
 
-            // Convertir FileList a un array para poder eliminar el archivo
-            const files = Array.from(fileInput.files);
-            files.splice(index, 1); // Eliminar el archivo del array
+        // Convertir FileList a un array para poder eliminar el archivo
+        const files = Array.from(fileInput.files);
+        files.splice(index, 1); // Eliminar el archivo del array
 
-            // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
-            const dataTransfer = new DataTransfer();
-            files.forEach(file => dataTransfer.items.add(file));
-            fileInput.files = dataTransfer.files;
+        // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
+        const dataTransfer = new DataTransfer();
+        files.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
 
-            // Volver a mostrar la lista de archivos actualizada
-            fileInput.dispatchEvent(new Event('change'));
-        }
+        // Volver a mostrar la lista de archivos actualizada
+        fileInput.dispatchEvent(new Event('change'));
+      }
     });
 
     // Manejar el arrastre de archivos
     fileLabel.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        fileLabel.style.borderColor = '#007bff';
+      e.preventDefault();
+      fileLabel.style.borderColor = '#007bff';
     });
 
     fileLabel.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        fileLabel.style.borderColor = '#cccccc';
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
     });
 
     fileLabel.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileLabel.style.borderColor = '#cccccc';
-        if (e.dataTransfer.files.length > 0) {
-            // Asignar los archivos arrastrados al input
-            fileInput.files = e.dataTransfer.files;
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
+      if (e.dataTransfer.files.length > 0) {
+        // Asignar los archivos arrastrados al input
+        fileInput.files = e.dataTransfer.files;
 
-            // Mostrar la lista de archivos
-            fileInput.dispatchEvent(new Event('change'));
-        }
+        // Mostrar la lista de archivos
+        fileInput.dispatchEvent(new Event('change'));
+      }
     });
-}
+  }
 
-setupSingleFileUpload('single-file-upload');
-setupMultiFileUpload('multiple-file-upload-image');
-setupMultiFileUpload('multiple-file-upload');
+  $(document).ready(function() {
+    // Evita que el menú se cierre al hacer clic fuera de él
+    $('.dropdown-menu').on('click', function(event) {
+      event.stopPropagation(); // Evita que el evento se propague
+    });
 
+    // Cierra el menú al hacer clic en "Cancelar" o "Aplicar"
+    $('#cancelar-btn, #aplicar-btn').on('click', function() {
+      $('#filtros-btn').dropdown('hide'); // Cierra el menú
+    });
 
+    // Cierra el menú al hacer clic en el botón "Filtros" si ya está abierto
+    $('#filtros-btn').on('click', function(event) {
+      if ($(this).attr('aria-expanded') === 'true') {
+        $(this).dropdown('hide'); // Cierra el menú si ya está abierto
+      }
+    });
+  });
 </script>
+
+
