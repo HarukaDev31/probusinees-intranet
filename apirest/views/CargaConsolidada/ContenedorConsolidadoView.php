@@ -14,12 +14,60 @@
             <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
-        <div class="col-6 col-sm-1">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-upload"></i> Exportar</button>
+        <!-- Contenedor Principal de Exportar-->
+        <div class="col-6 col-sm-1 dropdown">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
+          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+            <button class="dropdown-item btn-block" href="#"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
+            <button class="dropdown-item btn-block" href="#"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+          </div>
         </div>
-        <div class="col-6 col-sm-1">
-          <button type="button" id="btn-filtrar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><i class="fa fa-filter"></i> Filtro</button>
+        <!-- Contenedor Principal de Filtros-->
+        <div class=" col-6 col-sm-1 dropdown">
+          <!-- Botón de Filtros -->
+          <button class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-filter"></i>Filtros
+          </button>
+          <!-- Menú Desplegable -->
+          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
+            <div class="form-group">
+              <div class="d-flex align-items-center p-2">
+                <div class="d-flex" style="width:60%">Fecha Inicio</div>
+                <div style="width: 200px;">
+                  <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                  <span class="help-block text-danger" id="error"></span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center p-2">
+                <div class="d-flex" style="width:60%">Fecha Fin</div>
+                <div style="width: 200px;">
+                  <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
+                  <span class="help-block text-danger" id="error"></span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center p-2" style="width:300px;">
+                <div class="d-flex" style="width:60%">Estado</div>
+                <div style="width: 200px;">
+                  <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
+                    <option value="0" selected>Todos</option>
+                    <option value="PENDIENTE">PENDIENTE</option>
+                    <option value="RECIBIENDO">RECIBIENDO</option>
+                    <option value="COMPLETADO">COMPLETADO</option>
+                  </select>
+                </div>
+                
+              </div>
+          </div>
+          
+          <div class="dropdown-divider"></div>
+          <!-- Botones -->
+          <div class="d-flex justify-content-between">
+                <button class="btn btn-secondary" id="cancelar-btn">Cancelar</button>
+                <button class="btn btn-primary" id="aplicar-btn">Aplicar</button>
+            </div>
         </div>
+
+
         <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
           <div class="col-6 col-sm-1">
             <button type="button" id="btn-crear" class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Crear<i class="fa fa-plus"></i> </button>
@@ -31,21 +79,21 @@
   <section class="content" id="main-container">
     <div class="container-fluid">
       <div class="row">
-        <div class="col-6 col-sm-2" style="display: none;">
+        <div class="col-6 col-sm-2">
           <label>F. Inicio <span class="label-advertencia text-danger"> *</span></label>
           <div class="form-group">
             <input type="text" id="txt-Fe_Inicio_Carga" class="form-control  input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
-        <div class="col-6 col-sm-2" style="display: none;">
+        <div class="col-6 col-sm-2">
           <label>F. Fin <span class="label-advertencia text-danger"> *</span></label>
           <div class="form-group">
             <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
             <span class="help-block text-danger" id="error"></span>
           </div>
         </div>
-        <div class="col-6 col-sm-3" style="display: none;">
+        <div class="col-6 col-sm-3">
           <label>Estado</label>
           <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
             <option value="0" selected>Todos</option>
@@ -1748,8 +1796,23 @@
     });
 }
 
-  // Configurar los contenedores
-  setupSingleFileUpload('single-file-upload');
-  setupMultiFileUpload('multiple-file-upload');
-  setupMultiFileUpload('multiple-file-upload-image');
+$(document).ready(function() {
+            // Evita que el menú se cierre al hacer clic fuera de él
+            $('.dropdown-menu').on('click', function(event) {
+                event.stopPropagation(); // Evita que el evento se propague
+            });
+
+            // Cierra el menú al hacer clic en "Cancelar" o "Aplicar"
+            $('#cancelar-btn, #aplicar-btn').on('click', function() {
+                $('#filtros-btn').dropdown('hide'); // Cierra el menú
+            });
+
+            // Cierra el menú al hacer clic en el botón "Filtros" si ya está abierto
+            $('#filtros-btn').on('click', function(event) {
+                if ($(this).attr('aria-expanded') === 'true') {
+                    $(this).dropdown('hide'); // Cierra el menú si ya está abierto
+                }
+            });
+        });
+
 </script>
