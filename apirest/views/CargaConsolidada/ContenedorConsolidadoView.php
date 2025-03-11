@@ -13,8 +13,8 @@
 
         <!-- Buscador de la tabla -->
         <div class="col-6 col-sm-2">
-          <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+          <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="tumama2" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
         <!-- Contenedor Principal de Exportar-->
@@ -79,16 +79,16 @@
 
         <!-- Buscador de la tabla -->
         <div class="col-6 col-sm-2">
-          <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+          <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-input-filter" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
         <!-- Contenedor Principal de Exportar-->
         <div class="col-6 col-sm-1 dropdown">
           <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block" href="#"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-            <button class="dropdown-item btn-block" href="#"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+            <button class="dropdown-item btn-block" id="export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
+            <button class="dropdown-item btn-block" id="export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
           </div>
         </div>
         <!-- Contenedor Principal de Filtros-->
@@ -576,8 +576,8 @@
         </div>
         <div class="col-sm-5"></div>
         <div class="col-6 col-sm-2">
-          <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="tumama3" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
           </div>
         </div>
         <div class="col-6 col-sm-1">
@@ -601,8 +601,8 @@
         <div class="col-sm-5"></div>
         <div class="col-12 col-md-2"></div>
         <div class="col-6 col-sm-2">
-          <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-table-almacen-contenedor" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
           </div>
         </div>
         <!-- Contenedor Principal de Cargar-->
@@ -745,8 +745,8 @@
         <label>&nbsp;</label>
       </div>
       <div class="col-6 col-sm-2">
-        <div id="table-contenedor_filter" class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+        <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-cliente" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
         </div>
       </div>
       <div class="col-6 col-sm-1">
@@ -1761,9 +1761,6 @@
     border-top: 0px solid #dee2e6;
   }
 
-  #table-contenedor_info {
-    display: none;
-  }
 
   div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     margin: 2px 0;
@@ -2022,10 +2019,13 @@
     border-bottom: none;
 }
 
-div#table-cotizacion-embarque_filter{
+div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
   display: none;
 }
 
+.dt-buttons.btn-group.flex-wrap{
+  display: none;
+}
 
 </style>
 <script>
