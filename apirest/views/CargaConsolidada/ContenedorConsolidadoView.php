@@ -14,15 +14,15 @@
         <!-- Buscador de la tabla -->
         <div class="col-6 col-sm-2">
           <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="tumama2" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
         <!-- Contenedor Principal de Exportar-->
         <div class="col-6 col-sm-1 dropdown">
           <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block" href="#"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-            <button class="dropdown-item btn-block" href="#"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+            <button class="dropdown-item btn-block export-pdf-main-content" ><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
+            <button class="dropdown-item btn-block export-excel-main-content" ><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
           </div>
         </div>
         <!-- Contenedor Principal de Filtros-->
@@ -80,15 +80,15 @@
         <!-- Buscador de la tabla -->
         <div class="col-6 col-sm-2">
           <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-input-filter" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
         <!-- Contenedor Principal de Exportar-->
         <div class="col-6 col-sm-1 dropdown">
           <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block" id="export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-            <button class="dropdown-item btn-block" id="export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
+            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
           </div>
         </div>
         <!-- Contenedor Principal de Filtros-->
@@ -576,16 +576,63 @@
           <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
         </div>
         <div class="col-sm-5"></div>
+        <!-- Buscador de la tabla -->
         <div class="col-6 col-sm-2">
           <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="tumama3" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
           </div>
         </div>
-        <div class="col-6 col-sm-1">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-exportar" data-type="html"><i class="fa fa-upload"></i> Exportar</button>
+        <!-- Contenedor Principal de Exportar-->
+        <div class="col-6 col-sm-1 dropdown">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
+          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
+            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+          </div>
         </div>
-        <div class="col-6 col-sm-1">
-          <button type="button" id="btn-filtrar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-filtrar" data-type="html"><i class="fa fa-filter"></i> Filtro</button>
+        <!-- Contenedor Principal de Filtros-->
+        <div class=" col-6 col-sm-1 dropdown">
+          <!-- Botón de Filtros -->
+          <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-filter"></i>Filtros
+          </button>
+          <!-- Menú Desplegable -->
+          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
+            <div class="form-group">
+              <div class="d-flex align-items-center p-2">
+                <div class="d-flex" style="width:60%">Fecha Inicio</div>
+                <div style="width: 200px;">
+                  <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                  <span class="help-block text-danger" id="error"></span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center p-2">
+                <div class="d-flex" style="width:60%">Fecha Fin</div>
+                <div style="width: 200px;">
+                  <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
+                  <span class="help-block text-danger" id="error"></span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center p-2" style="width:300px;">
+                <div class="d-flex" style="width:60%">Estado</div>
+                <div style="width: 200px;">
+                  <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
+                    <option value="0" selected>Todos</option>
+                    <option value="PENDIENTE">PENDIENTE</option>
+                    <option value="RECIBIENDO">RECIBIENDO</option>
+                    <option value="COMPLETADO">COMPLETADO</option>
+                  </select>
+                </div>
+                
+              </div>
+          </div>         
+          <div class="dropdown-divider"></div>
+          <!-- Botones -->
+          <div class="d-flex justify-content-around">
+                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
+                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
+            </div>
+          </div>
         </div>
         <div class="col-12 col-md-2">     
             <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
@@ -594,7 +641,7 @@
           <label>&nbsp;</label>
         </div>
       </div>
-      <?php } ?>
+      <?php } else{ ?>
       <div class="row mb-2">
         <div class="col-12 col-md-1">
           <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
@@ -603,7 +650,7 @@
         <div class="col-12 col-md-2"></div>
         <div class="col-6 col-sm-2">
           <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-table-almacen-contenedor" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
           </div>
         </div>
         <!-- Contenedor Principal de Cargar-->
@@ -618,7 +665,6 @@
         <div class="col-6 col-sm-1 dropdown">
           <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> Exportar</button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <!-- <button class="dropdown-item btn-block" id="export-pdf" ><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button> -->
             <button class="dropdown-item btn-block" id="export-excel"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
           </div>
         </div>
@@ -626,6 +672,7 @@
           <label>&nbsp;</label>
         </div>
       </div>
+      <?php } ?>
 
 
       <div class="row mb-2" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
@@ -731,7 +778,7 @@
 
   <!-- Clientes View -->
 
-  <section class="content" id="clientes-container">
+  <section class="content px-3" id="clientes-container">
     <!-- header de la tabla -->
     <div class="row mb-2">
       <div class="col-12 col-md-1">
@@ -747,17 +794,22 @@
       </div>
       <div class="col-6 col-sm-2">
         <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded" id="search-cliente" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
         </div>
       </div>
-      <div class="col-6 col-sm-1">
-        <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-exportar" data-type="html"><i class="fa fa-upload"></i> Exportar</button>
+        <!-- Contenedor Principal de Exportar-->
+      <div class="col-6 col-sm-1 dropdown">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> Exportar</button>
+          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+            <button class="dropdown-item btn-block export-pdf-main-content" ><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
+            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+          </div>
       </div>
     </div>
 
     <div class="table-responsive" class="table table-bordered table-hover table-striped">
-      <div class="row pl-3 mb-2" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
-        <div class="d-flex align-items-center" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
+      <div class="row pl-3 mb-4" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
+        <div class="d-flex align-items-center" style="width:10%; padding:15px 10px">
           <span>Clientes</span>
         </div>
       </div>
@@ -1079,7 +1131,7 @@
     <div class="steps-buttons">
     </div>
   </section>
-  <section class="content" id="documentation-container">
+  <section class="content px-3" id="documentation-container">
     <!-- header -->
     <div class="row mb-2">
       <div class="col-12 col-md-1">
@@ -2065,13 +2117,11 @@
     border-bottom: none;
   }
 
-div#table-cotizacion-embarque_filter,div#table-contenedor_filter{
-  display: none;
+div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clientes-general_filter,div#table-cotizacion-inspection_filter,div#table-cotizacion-inspection-coordinacion_filter,div#table-clientes-variacion_filter {
+    display: none;
 }
 
-.dt-buttons.btn-group.flex-wrap{
-  display: none;
-}
+
 
 </style>
 <script>

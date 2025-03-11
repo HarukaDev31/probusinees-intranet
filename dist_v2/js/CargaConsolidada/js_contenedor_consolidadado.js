@@ -1998,7 +1998,7 @@ const openStepFunction = async (step, id) => {
         // FUNCION PARA CONFIGURAR EL BUSCADOR
         configurarBuscador(
           "table-cotizacion-embarque",
-          "search-table-almacen-contenedor",
+          "search-table",
           "table-cotizacion-embarque_info"
         );
         //Funcion para exportar a excel
@@ -2019,37 +2019,39 @@ const openStepFunction = async (step, id) => {
       ) {
         reloadTableCotizacion();
       } else if (currentTableCotizacion == "prospectos") {
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
         tableCotizacion = $("#table-cotizacion-prospectos").DataTable({
           dom:
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
           buttons: [
-            // {
-            //     extend: "excel",
-            //     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-            //     titleAttr: "Excel",
-            //     exportOptions: {
-            //         columns: ":visible",
-            //     },
-            // },
+            {
+                extend: "excel",
+                text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                titleAttr: "Excel",
+                exportOptions: {
+                    columns: ":visible",
+                },
+                attr: {
+                    id: "export-excel-main",
+                    class: "hidden",
+                },
+            },
 
-            // {
-            //     extend: "pdf",
-            //     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-            //     titleAttr: "PDF",
-            //     exportOptions: {
-            //         columns: ":visible",
-            //     },
-            // },
-            // {
-            //     extend: "colvis",
-            //     text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-            //     titleAttr: "Columnas",
-            //     exportOptions: {
-            //         columns: ":visible",
-            //     },
-            // },
+            {
+                extend: "pdf",
+                text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+                titleAttr: "PDF",
+                exportOptions: {
+                    columns: ":visible",
+                },
+                attr: {
+                    id: "export-pdf-main",
+                    class: "hidden",
+                },
+
+            },
             {
               text: "Prospectos",
               action: function () {
@@ -2069,6 +2071,7 @@ const openStepFunction = async (step, id) => {
                   $("#table-cotizacion-prospectos_wrapper").show();
                   reloadTableCotizacion();
                 }
+                
                 currentTableCotizacion = "prospectos";
               },
               className: "btn btn-light",
@@ -2237,7 +2240,13 @@ const openStepFunction = async (step, id) => {
                       });
                     },
                   });
+                  configurarBuscador(
+                    "table-cotizacion-embarque",
+                    "search-table",
+                    "table-cotizacion-embarque_info"
+                  );
                   await getTableCotizacionEmbarqueHeaders();
+                  
                 }
                 currentTableCotizacion = "embarque";
                 $(".input-date").datepicker({
@@ -2317,6 +2326,12 @@ const openStepFunction = async (step, id) => {
           ],
         });
       }
+      configurarBuscador(
+        "table-cotizacion-prospectos",
+        "search-table",
+        "table-cotizacion-prospectos_info"
+      );
+
       await getTipoCliente();
     }
   } else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
@@ -2332,30 +2347,25 @@ const openStepFunction = async (step, id) => {
       reloadTableClientesGeneral();
     } else {
       tableClientesGeneral.show();
-
+        
       tableClientesGeneral = $("#table-clientes-general").DataTable({
         dom:
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
         buttons: [
-          // {
-          //     extend: "excel",
-          //     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-          //     titleAttr: "Excel",
-          //     exportOptions: {
-          //         columns: ":visible",
-          //     },
-          // },
-
-          // {
-          //     extend: "colvis",
-          //     text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-          //     titleAttr: "Columnas",
-          //     exportOptions: {
-          //         columns: ":visible",
-          //     },
-          // },
+          {
+              extend: "excel",
+              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+              titleAttr: "Excel",
+              exportOptions: {
+                  columns: ":visible",
+              },
+              attr: {
+                    id: "export-excel-main",
+                    class: "hidden",
+                },
+          },
           {
             text: "General",
             action: function () {
@@ -2400,6 +2410,30 @@ const openStepFunction = async (step, id) => {
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
                       buttons: [
+                        {
+                            extend: "excel",
+                            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                            titleAttr: "Excel",
+                            exportOptions: {
+                              columns: ":visible",
+                            },
+                            attr: {
+                                id: "export-excel-main",
+                                class: "hidden",
+                            }
+                          },
+                          {
+                            extend: "pdf",
+                            text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+                            titleAttr: "PDF",
+                            exportOptions: {
+                              columns: ":visible",
+                            },
+                            attr: {
+                                id: "export-pdf-main",
+                                class: "hidden",
+                            },
+                          },
                         {
                           text: "General",
                           action: function () {
@@ -2559,6 +2593,11 @@ const openStepFunction = async (step, id) => {
                         },
                       },
                     });
+                    configurarBuscador(
+                        "table-clientes-variacion",
+                        "search-table",
+                        "table-clientes-variacion_info"
+                    );
                   }
                 },
               }
@@ -2620,7 +2659,14 @@ const openStepFunction = async (step, id) => {
             data.estado = "0";
           },
         },
+        
       });
+        configurarBuscador(
+            "table-clientes-general",
+            "search-table",
+            "table-clientes-general_info"
+        );
+      
     }
   } else if (stepIndex == 3 && currentPrivilege == "Documentacion") {
     viewFormularioAduana();
@@ -2674,13 +2720,13 @@ function configurarExportarExcel(buttonId, url, fileName) {
   });
 }
 
-async function configurarBuscador(tableId, searchInputId, infoContainerId) {
+async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
   // Obtener la instancia de DataTable
   var table = $("#" + tableId).DataTable();
   console.log(table);
 
   // Escuchar el evento "input" en el buscador
-  $("#" + searchInputId).on("input", function () {
+  $("." + searchInputClass).on("input", function () {
     var searchTerm = $(this).val(); // Obtener el valor del buscador
     table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
     console.log(searchTerm);
@@ -3973,15 +4019,26 @@ $(document).ready(async function () {
   documentacionAduanaContainer.hide();
   url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
   try {
-    $("#export-pdf-main-content").off("click");
-    $("#export-pdf-main-content").on("click", function () {
-      // Simular clic en el botón de Excel
+    $(".export-pdf-main-content").off("click");
+    $(".export-pdf-main-content").on("click", function () {
+      // Simular clic en el botón de PDF
       console.log("click");
       $("#export-pdf-main").click();
     });
   } catch (error) {
     console.log(error);
   }
+  try {
+    $(".export-excel-main-content").off("click");
+    $(".export-excel-main-content").on("click", function () {
+      // Simular clic en el botón de Excel
+      console.log("click");
+      $("#export-excel-main").click();
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  
 
   table_Entidad = $("#table-contenedor").DataTable({
     dom:
@@ -3998,6 +4055,7 @@ $(document).ready(async function () {
         },
         attr: {
             id: "export-excel-main",
+            class: "hidden",
         },
       },
       {
@@ -4009,6 +4067,7 @@ $(document).ready(async function () {
         },
         attr: {
             id: "export-pdf-main",
+            class: "hidden",
         }
       },
       {
@@ -4018,6 +4077,9 @@ $(document).ready(async function () {
         exportOptions: {
           columns: ":visible",
         },
+        attr: {
+            class: "hidden",
+        }
       },
     ],
     paging: true,
@@ -4079,7 +4141,7 @@ $(document).ready(async function () {
     ],
   });
 
-  configurarBuscador('table-contenedor','search-input-filter','table-contenedor_filter');
+  configurarBuscador('table-contenedor','search-table','table-contenedor_filter');
   
 
   $("#upload-documents").click(() => $("#upload-input-documents").click());
