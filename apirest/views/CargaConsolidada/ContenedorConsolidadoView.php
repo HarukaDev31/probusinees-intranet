@@ -68,14 +68,13 @@
                 <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
             </div>
           </div>
-        </div>
           <!-- Botón crear consolidados -->
           <div class="col-12 col-sm-1">
             <button type="button" id="btn-crear" class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Crear<i class="fa fa-plus"></i> </button>
           </div>
-        <?php }else{ ?>
+        <?php } else { ?>
 
-        <div class="col-12 col-sm-1"></div>
+          <div class="col-12 col-sm-1"></div>
 
         <!-- Buscador de la tabla -->
         <div class="col-6 col-sm-2">
@@ -134,8 +133,59 @@
                 <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
             </div>
           </div>
-        </div>
-        <?php }?>
+          <!-- Contenedor Principal de Exportar-->
+          <div class="col-6 col-sm-1 dropdown">
+            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
+            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+              <button class="dropdown-item btn-block" id="export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
+              <button class="dropdown-item btn-block" id="export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+            </div>
+          </div>
+          <!-- Contenedor Principal de Filtros-->
+          <div class=" col-6 col-sm-1 dropdown">
+            <!-- Botón de Filtros -->
+            <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-filter"></i>Filtros
+            </button>
+            <!-- Menú Desplegable -->
+            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
+              <div class="form-group">
+                <div class="d-flex align-items-center p-2">
+                  <div class="d-flex" style="width:60%">Fecha Inicio</div>
+                  <div style="width: 200px;">
+                    <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                    <span class="help-block text-danger" id="error"></span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center p-2">
+                  <div class="d-flex" style="width:60%">Fecha Fin</div>
+                  <div style="width: 200px;">
+                    <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
+                    <span class="help-block text-danger" id="error"></span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center p-2" style="width:300px;">
+                  <div class="d-flex" style="width:60%">Estado</div>
+                  <div style="width: 200px;">
+                    <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
+                      <option value="0" selected>Todos</option>
+                      <option value="PENDIENTE">PENDIENTE</option>
+                      <option value="RECIBIENDO">RECIBIENDO</option>
+                      <option value="COMPLETADO">COMPLETADO</option>
+                    </select>
+                  </div>
+
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <!-- Botones -->
+              <div class="d-flex justify-content-around">
+                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
+                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
+              </div>
+            </div>
+          </div>
+        <?php } ?>
       </div>
     </div><!-- /.container-fluid desactivate for a moment-->
   </section>
@@ -657,7 +707,7 @@
         <div class="col-6 col-sm-1 dropdown">
           <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Cargar</button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-cargar-carga">
-            <div class="dropdown-item btn-block" id ="packing-list-container"></div>
+            <div class="dropdown-item btn-block" id="packing-list-container"></div>
             <div class="dropdown-item btn-block" id="bl-file-container"></div>
           </div>
         </div>
@@ -698,7 +748,7 @@
           <div class="col-md-1">
             <strong><input type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></strong>
           </div>
-        </div>        
+        </div>
       </div>
       <!-- Body de la tabla -->
       <div class="table-responsive">
@@ -850,9 +900,123 @@
       </table>
     </div>
   </section>
-  <section class="content card px-4 py-3" id="clientes-documentation-container">
+  <section class="content  px-4 py-3" id="clientes-documentation-container">
+    <div class="row mb-2">
+      <div class="col-12 col-md-1">
+        <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+      </div>
+      <div class="col-sm-9"></div>
 
-    <div class="col col-12 my-2" id="clientes-documentacion">
+      <div class="col-12 col-md-2">
+        <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Guardar</button>
+      </div>
+
+    </div>
+    <div class="container mx-auto px-4 py-8 max-w-75">
+      <div class="grid grid-cols-3 md:grid-cols-3 gap-8">
+        <!-- Sección de Documentación -->
+        <div class="bg-white p-6 rounded-lg shadow-md
+        col-span-2
+        ">
+          <div class="flex items-center gap-2 mb-6">
+            <h2 class="text-xl font-semibold">Documentación</h2>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <line x1="10" y1="9" x2="8" y2="9" />
+            </svg>
+          </div>
+
+          <form id="form-documentacion" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Volumen documento</label>
+                <input type="number" id="txt-Vol_Doc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="volumen_doc">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Valor documento</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2">$</span>
+                  <input type="number" id="txt-Valor_Doc" class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="valor_doc">
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4" id="documentos-clientes-documentacion">
+
+              <!--               
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Factura comercial</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div class="text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <p class="mt-1 text-sm text-gray-600">Selecciona o arrastra tu archivo aquí</p>
+                    <p class="text-xs text-gray-500">Formatos: xlsx</p>
+                  </div>
+                  <input type="file" class="hidden" id="facturaInput" accept=".xlsx">
+                </div>
+                <button class="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors" id="subirFactura">Subir archivo</button>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Excel confirmación</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div class="text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <p class="mt-1 text-sm text-gray-600">Selecciona o arrastra tu archivo aquí</p>
+                    <p class="text-xs text-gray-500">Formatos: xlsx</p>
+                  </div>
+                  <input type="file" class="hidden" id="excelInput" accept=".xlsx">
+                </div>
+                <button class="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors" id="subirExcel">Subir archivo</button>
+              </div> -->
+            </div>
+          </form>
+        </div>
+
+        <!-- Sección de Cotizaciones -->
+        <div class="bg-white p-6 rounded-lg shadow-md
+        col-span-1
+        "
+          style="height: 40%;">
+          <div class="flex items-center gap-2 mb-6">
+            <h2 class="text-xl font-semibold">Cotizaciones</h2>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </div>
+
+          <div class="space-y-4">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+              <span class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Descargar cotización inicial
+              </span>
+            </button>
+
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+              <span class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Descargar cotización final
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="col col-12 my-2" id="clientes-documentacion">
       <h3
         class="d-flex w-100 row documentation-title">
         <span
@@ -931,15 +1095,15 @@
         </div>
       </div>
     </div>
-    <div class="col col-12 my-2" id="clientes-inpection">
-      <h3
+    <div class="col col-12 my-2" id="clientes-inpection"> -->
+    <!-- <h3
         data-toggle="collapse"
         href="#collapse-inspection"
         role="button"
         aria-expanded="false"
         aria-controls="collapse-inspection"
-        class="documentation-title">Inpection</h3>
-      <div class="collapse show row row-cols-4 " id="collapse-inspection">
+        class="documentation-title">Inpection</h3> -->
+    <!-- <div class="collapse show row row-cols-4 " id="collapse-inspection">
         <div class="mx-auto px-4 py-8 file-section-container col-12 col-md-12">
           <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
 
@@ -962,11 +1126,10 @@
           <div id="pending-files-inspection-coordinacion hidden" class="mb-4">
             <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
             <div id="pending-file-list-inspection-coordinacion" class="space-y-2">
-              <!-- Los archivos pendientes aparecerán aquí -->
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
   </section>
   <section class="content" id="cotizacion-almacen">
@@ -1008,10 +1171,10 @@
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
             <h2
-            class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
-            <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
-            </div>
-          </h2>
+              class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
+              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
+              </div>
+            </h2>
           </div>
         </div>
         <div id="drag-drop-container"
@@ -1019,7 +1182,7 @@
           <div id="drop-message">
             <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
             <p class="text-gray-600">
-              
+
               Arrastra y suelta archivos aquí
             </p>
             <p class="text-xs text-gray-500 mt-2">
@@ -1034,7 +1197,7 @@
               <div class="col-12 col-sm-12" id="multiple-file-upload">
                 <div class="form-group">
                   <div class="file-upload-box">
-                    <input type="file" id="file-input-documentacion" class="file-input"  multiple accept="*/*" />
+                    <input type="file" id="file-input-documentacion" class="file-input" multiple accept="*/*" />
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
@@ -2123,83 +2286,93 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
 
 
 
+  #table-contenedor_wrapper.dt-buttons.btn-group.flex-wrap {
+    display: none;
+  }
 </style>
 <script>
   // script.js
-  function setupSingleFileUpload(containerId,inputId) {
-    const container = document.getElementById(containerId);
-    const fileInput = $(`#${inputId}`)[0];
-    const fileLabel = container.querySelector('.file-label');
-    const fileInfoBox = container.querySelector('.file-info-box');
-    const fileNameElement = container.querySelector('.file-name');
-    const fileSizeElement = container.querySelector('.file-size');
-    const removeFileButton = container.querySelector('.remove-file-button');
-    const selectFileButton = container.querySelector('.upload-button');
-
-    // Abrir el diálogo de selección de archivos al hacer clic en el botón
-    selectFileButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      fileInput.click();
-    });
-
-    // Mostrar la información del archivo seleccionado
-    fileInput.addEventListener('change', (e) => {
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
-          // Mostrar el cuadro de información del archivo
-          fileInfoBox.classList.remove('hidden');
-
-          // Mostrar el nombre y el tamaño del archivo
-          fileNameElement.textContent = file.name;
-          fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
-        } else {
-          alert("Solo se permiten archivos .xlsx");
-          fileInput.value = ""; // Limpia el input
-        }
-      } else {
-        fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
+  function setupSingleFileUpload(containerId, inputId) {
+    try {
+      const container = document.getElementById(containerId);
+      const fileInput = $(`#${inputId}`)[0];
+      const fileLabel = container.querySelector('.file-label');
+      const fileInfoBox = container.querySelector('.file-info-box');
+      const fileNameElement = container.querySelector('.file-name');
+      const fileSizeElement = container.querySelector('.file-size');
+      const removeFileButton = container.querySelector('.remove-file-button');
+      const selectFileButton = container.querySelector('.upload-button');
+      if (selectFileButton) {
+        // Abrir el diálogo de selección de archivos al hacer clic en el botón
+        selectFileButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          fileInput.click();
+        });
       }
-    });
+      // Abrir el diálogo de selección de archivos al hacer clic en el botón
 
-    // Manejar el botón de tacho de basura para quitar el archivo
-    removeFileButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      fileInput.value = ""; // Limpia el input
-      fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
-    });
 
-    // Manejar el arrastre de archivos
-    fileLabel.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#007bff';
-    });
+      // Mostrar la información del archivo seleccionado
+      fileInput.addEventListener('change', (e) => {
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
+            // Mostrar el cuadro de información del archivo
+            fileInfoBox.classList.remove('hidden');
 
-    fileLabel.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#cccccc';
-    });
-
-    fileLabel.addEventListener('drop', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#cccccc';
-      if (e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        if (file.name.endsWith('.xlsx')) {
-          fileInput.files = e.dataTransfer.files; // Asigna el archivo arrastrado al input
-
-          // Mostrar la información del archivo
-          fileInput.dispatchEvent(new Event('change'));
+            // Mostrar el nombre y el tamaño del archivo
+            fileNameElement.textContent = file.name;
+            fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+          } else {
+            alert("Solo se permiten archivos .xlsx");
+            fileInput.value = ""; // Limpia el input
+          }
         } else {
-          alert("Solo se permiten archivos .xlsx");
+          fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
         }
-      }
-    });
+      });
+
+      // Manejar el botón de tacho de basura para quitar el archivo
+      removeFileButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.value = ""; // Limpia el input
+        fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
+      });
+
+      // Manejar el arrastre de archivos
+      fileLabel.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileLabel.style.borderColor = '#007bff';
+      });
+
+      fileLabel.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        fileLabel.style.borderColor = '#cccccc';
+      });
+
+      fileLabel.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileLabel.style.borderColor = '#cccccc';
+        if (e.dataTransfer.files.length > 0) {
+          const file = e.dataTransfer.files[0];
+          if (file.name.endsWith('.xlsx')) {
+            fileInput.files = e.dataTransfer.files; // Asigna el archivo arrastrado al input
+
+            // Mostrar la información del archivo
+            fileInput.dispatchEvent(new Event('change'));
+          } else {
+            alert("Solo se permiten archivos .xlsx");
+          }
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   // Funcion para subir archivos multiples
 
-  function setupMultiFileUpload(containerId,inputId) {
+  function setupMultiFileUpload(containerId, inputId) {
     const container = document.getElementById(containerId);
     const fileInput = $(`#${inputId}`)[0];
     const fileLabel = container.querySelector('.file-label');
@@ -2227,7 +2400,7 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
           let icon = '';
           if (file.name.endsWith('.jpeg') || file.name.endsWith('.jpg')) {
             icon = `
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
@@ -2235,7 +2408,7 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
                     `;
           } else if (file.name.endsWith('.png')) {
             icon = `
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
@@ -2243,7 +2416,7 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
                     `;
           } else if (file.name.endsWith('.xlsx')) {
             icon = `
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                            <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                               <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
                               <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
                               <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
@@ -2263,7 +2436,7 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
                         `;
           } else if (file.name.endsWith('.mp4')) {
             icon = `
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
                           <path fill="#ff7043" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#bf360c" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
                           <path fill="#fff" d="M19,32V16l12,8L19,32z"></path>
@@ -2277,7 +2450,9 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
           // Mostrar el nombre y el tamaño del archivo
           fileItem.innerHTML = `
                     ${icon}
-                    <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                    <span
+                    style="width:70%"
+                    >${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
                     <button class="remove-file-button" data-index="${index}">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -2353,5 +2528,3 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
     });
   });
 </script>
-
-
