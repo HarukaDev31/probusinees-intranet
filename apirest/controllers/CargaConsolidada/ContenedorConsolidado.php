@@ -1350,6 +1350,12 @@ class ContenedorConsolidado extends CI_Controller
 			'status' => $arrResponse,
 		]);
 	}
+	public function deleteFileInspection($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteFileInspection($id);
+		echo json_encode([
+			'status' => $arrResponse,
+		]);
+	}
 	function convertDateFormat($date)
 	{
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);

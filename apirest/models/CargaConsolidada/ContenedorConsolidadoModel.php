@@ -4792,6 +4792,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     public function saveInspection($idProveedor, $idCotizacion, $files)
     {
         try {
+            $this->setAllowedExtensionsImagesOfficeFilesVideos();
+            $this->maxFileSize = 1000000;
             $index = 0;
             foreach ($files['files']['tmp_name'] as $key => $tmp_name) {
                 $fileUrl = $this->uploadSingleFile(
@@ -4861,6 +4863,34 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             return "success";
         } catch (Exception $e) {
             log_message('error', 'Error en saveDocumentation: ' . $e->getMessage());
+            return false;
+        }
+    }
+    public function deleteFileInspection($idFile)
+    {
+        try {
+            //get file_path from table where id=idFile and try to unlink and delete row
+            $this->db->select('file_path');
+            $this->db->from($this->table_contenedor_almacen_inspection);
+            $this->db->where('id', $idFile);
+            $query = $this->db->get();
+            $file = $query->row();
+            if ($file) {
+                $filePath = $file->file_path;
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+            $this->db->where('id', $idFile);
+            $this->db->delete($this->table_contenedor_almacen_inspection);
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en deleteFileInspection: ' . $this->db->error()['message']);
+                return false;
+            } else {
+                return "success";
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en deleteFileInspection: ' . $e->getMessage());
             return false;
         }
     }

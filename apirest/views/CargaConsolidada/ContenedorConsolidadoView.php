@@ -1482,9 +1482,9 @@
                         </svg>
                         <span class="file-name"></span>
                         <span class="file-size"></span>
-                        <button class="remove-file-button">
+                        <div class="remove-file-button">
                           <i class="fas fa-trash"></i>
-                        </button>
+                        </div>
                       </div>
                     </div>
 
@@ -2327,7 +2327,7 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
     const fileLabel = container.querySelector('.file-label');
     const fileList = container.querySelector('.file-lista');
     const uploadButton = container.querySelector('.upload-button');
-
+    const removeFileButton = container.querySelector('.remove-file-button');
     // Abrir el diálogo de selección de archivos al hacer clic en el botón
     uploadButton.addEventListener('click', (e) => {
       e.preventDefault();
@@ -2402,16 +2402,16 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
                     <span
                     style="width:70%"
                     >${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
-                    <button class="remove-file-button" data-index="${index}">
+                    <div class="remove-file-button" data-index="${index}">
                         <i class="fas fa-trash"></i>
-                    </button>
+                    </div>
                 `;
 
           // Agregar el elemento a la lista
           fileList.appendChild(fileItem);
         });
       } else {
-        fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
+        // fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
       }
     });
 
@@ -2431,6 +2431,8 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
 
         // Volver a mostrar la lista de archivos actualizada
         fileInput.dispatchEvent(new Event('change'));
+        //remove from file list
+        $(e.target).closest('.file-list-item').remove();
       }
     });
 
@@ -2455,6 +2457,13 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
         // Mostrar la lista de archivos
         fileInput.dispatchEvent(new Event('change'));
       }
+    });
+    removeFileButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log(e.target,"removeFileButton");
+      //remove most close file input and remove this from input file
+      $(e.target).closest('.file-item').remove();
+
     });
   }
 
