@@ -393,7 +393,7 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
 }
 async function saveBoth() {
   await saveDocumentation();
-  await saveInspection();
+  await addNote();
 }
 function deleteFile(fileId, cardElement) {
   $.ajax({
