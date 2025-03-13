@@ -189,51 +189,7 @@
             </div>
           </div>
           <!-- Contenedor Principal de Filtros-->
-          <div class=" col-6 col-sm-1 dropdown">
-            <!-- Botón de Filtros -->
-            <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-filter"></i>Filtros
-            </button>
-            <!-- Menú Desplegable -->
-            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
-              <div class="form-group">
-                <div class="d-flex align-items-center p-2">
-                  <div class="d-flex" style="width:60%">Fecha Inicio</div>
-                  <div style="width: 200px;">
-                    <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
-                    <span class="help-block text-danger" id="error"></span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center p-2">
-                  <div class="d-flex" style="width:60%">Fecha Fin</div>
-                  <div style="width: 200px;">
-                    <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
-                    <span class="help-block text-danger" id="error"></span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center p-2" style="width:300px;">
-                  <div class="d-flex" style="width:60%">Estado</div>
-                  <div style="width: 200px;">
-                    <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
-                      <option value="0" selected>Todos</option>
-                      <option value="PENDIENTE">PENDIENTE</option>
-                      <option value="RECIBIENDO">RECIBIENDO</option>
-                      <option value="COMPLETADO">COMPLETADO</option>
-                    </select>
-                  </div>
-
-                </div>
-              </div>
-              <div class="dropdown-divider"></div>
-              <!-- Botones -->
-              <div class="d-flex justify-content-around">
-                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
-                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
-              </div>
-            </div>
-            <!-- Contenedor Principal de Exportar-->
-
-          </div>
+        
         <?php } ?>
       </div>
     </div><!-- /.container-fluid desactivate for a moment-->
