@@ -1,4 +1,3 @@
-
 let spinner = null;
 var table_Entidad = null;
 var idContenedor = 0;
@@ -424,11 +423,9 @@ function addFileToList(file, fileList = null, id = null) {
             </div>
             <div class="file-actions d-flex flex-row">
                 <button class="btn btn-primary btn-sm download-btn" data-url="${file.file_url}">
-                <i class="fas fa-download"></i>
+                <i class="fas fa-download"></i> 
                 </button>
-                <button class="btn btn-danger btn-sm delete-btn" data-id="${file.id}"
-                onclick="deleteFileInspection(${file.id}, $(this).closest('.file-item'))"
-                >
+                <button class="btn btn-danger btn-sm delete-btn" data-id="${file.id}">
                 <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -443,11 +440,11 @@ function addFileToList(file, fileList = null, id = null) {
   });
 
   // Botón de eliminar
-//   fileItem.find(".delete-btn").on("click", function () {
-//     event.preventDefault();
-//     const id = $(this).data("id");
-//     deleteFile(id, fileItem);
-//   });
+  fileItem.find(".delete-btn").on("click", function () {
+    event.preventDefault();
+    const id = $(this).data("id");
+    deleteFile(id, fileItem);
+  });
   //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
   if (isImage) {
     const viewBtn = $(`
@@ -573,42 +570,6 @@ async function verCotizacionEmbarque(
 
   spinner.hide();
   // Función para agregar un archivo a la lista con vista previa y botones
-}
-async function deleteFileInspection(id, cardElement) {
-    event.preventDefault();
-    Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¡No podrás revertir esto!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, eliminarlo",
-        cancelButtonText: "No, cancelar",
-        iconColor: "#FF0000",
-        color: "#FF0000",
-    }).then((result) => {
-        if (result.isConfirmed) {
-            spinner.show();
-        url =
-            base_url +
-            "CargaConsolidada/ContenedorConsolidado/deleteFileInspection/" +
-            id;
-        $.ajax({
-            url: url,
-            type: "GET",
-
-            success: function (response) {
-            const result = JSON.parse(response);
-            if (result.status == "success") {
-                cardElement.remove();
-                Swal.fire("Eliminado!", result.message, "success");
-            } else {
-                Swal.fire("Error!", result.message, "error");
-            }
-            spinner.hide();
-            },
-        });
-        }
-    });
 }
 async function getFilesAlmacenDocument(idProveedor, idCotizacion) {
   spinner.show();
@@ -1421,7 +1382,7 @@ async function showDocumentacionDocumentacionContainer(id) {
           </div>
           <a class="download-btn text-blue-500 hover:text-blue-700"
           href="${file.file_url}" target="_blank" download>
-
+                
             <i class="${`bi bi-download`}"></i>
           </a>
         </div>
@@ -1869,7 +1830,7 @@ const stepTemplate = (step, i) => {
         <div class="step-icon">
         <img src="${step.iconURL}" style="widht:100%;height:100%" /></div><br>
         <span class="step">${stepname}</span>
-
+        
         </div>
     `;
   return stepHTML;
@@ -2128,7 +2089,7 @@ const openStepFunction = async (step, id) => {
                   $("#table-cotizacion-prospectos_wrapper").show();
                   reloadTableCotizacion();
                 }
-
+                
                 currentTableCotizacion = "prospectos";
               },
               className: "btn btn-light",
@@ -2303,7 +2264,7 @@ const openStepFunction = async (step, id) => {
                     "table-cotizacion-embarque_info"
                   );
                   await getTableCotizacionEmbarqueHeaders();
-
+                  
                 }
                 currentTableCotizacion = "embarque";
                 $(".input-date").datepicker({
@@ -2404,7 +2365,7 @@ const openStepFunction = async (step, id) => {
       reloadTableClientesGeneral();
     } else {
       tableClientesGeneral.show();
-
+        
       tableClientesGeneral = $("#table-clientes-general").DataTable({
         dom:
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -2716,14 +2677,14 @@ const openStepFunction = async (step, id) => {
             data.estado = "0";
           },
         },
-
+        
       });
         configurarBuscador(
             "table-clientes-general",
             "search-table",
             "table-clientes-general_info"
         );
-
+      
     }
   } else if (stepIndex == 3 && currentPrivilege == "Documentacion") {
     viewFormularioAduana();
@@ -3078,7 +3039,7 @@ async function viewDocumentacion() {
                             ${
                               file.id_contenedor
                                 ? `<div class="badge badge-danger text-white delete-folder-button
-
+                                
                                 " onclick="deleteDocumentacionFolder(${file.id})">
                                 X
                                 </div>`
@@ -3108,7 +3069,7 @@ async function viewDocumentacion() {
                                                 <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
                                             </svg>
                                             <span class="file-name">${file.folder_name}</span>
-
+                                            
                                             <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
                                             <i class="fas fa-download"></i>
                                             </button>
@@ -3157,10 +3118,10 @@ async function viewDocumentacion() {
                                             </button>
                                         </div>
                                     </div>
-                                    <script>   setupSingleFileUpload('single-${file.folder_name}'); </script>
+                                    <script>   setupSingleFileUpload('single-${file.folder_name}'); </script>    
                                 `
                                 }
-                        </div>
+                        </div>    
                     </div>
                 `);
       });
@@ -3215,7 +3176,7 @@ async function getTableCotizacionEmbarqueHeaders() {
         >
         <i class="fa fa-upload"></i>Packing List
         </button>
-
+   
         `);
 
     $("#btn-upload-lista-embarque").off("click");
@@ -3274,7 +3235,7 @@ async function getTableCotizacionEmbarqueHeaders() {
             id="btn-upload-bl" >
             <i class="fa fa-upload"></i>BL File
         </button>
-
+       
         `);
 
     $("#btn-upload-bl").off("click");
@@ -3614,11 +3575,11 @@ async function viewDocumentacionByDocumentacionProfile(idCotizacion) {
   );
   parsed_proveedores_documentacion.forEach((row, index) => {
     $(".providers").append(`
-        <button class="provider-btn px-6 py-3
+        <button class="provider-btn px-6 py-3 
         rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-md bg-orange-500 text-white"
          id="tab-${index}"
         >${row.code_supplier} </button>
-
+       
         `);
     $("#tab-" + index).off("click");
     $("#tab-" + index).on("click", function () {
@@ -3651,7 +3612,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
                 <div class="text-title font-medium text-gray-700">F. Comercial</div>
                 <div class="text-sm text-gray-500">Descargar documento</div>
             </div>
-
+           
             </div>
              <div class="flex gap-2">
                 <a href="${facturaComercial}" target="_blank" class="download-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
@@ -3659,7 +3620,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
                 </a>
             </div>
     </div>
-
+    
         `);
   } else {
     $("#documentacion-peru-documents")
@@ -3671,7 +3632,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
         <div class="text-title font-medium text-gray-700">F. Comercial</div>
         <div class="text-sm text-red-500">Documento no disponible</div>
       </div>
-
+   
     </div>`);
   }
   if (excelConfirmacion) {
@@ -3704,7 +3665,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
         <div class="text-title font-medium text-gray-700">Excel Confirmación</div>
         <div class="text-sm text-red-500">Documento no disponible</div>
       </div>
-
+     
     </div>`);
   }
   if (documentosAdicionales) {
@@ -3719,7 +3680,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
                 <div class="text-title font-medium text-gray-700">${data.name}</div>
                 <div class="text-sm text-gray-500">Descargar documento</div>
             </div>
-
+           
             </div>
              <div class="flex gap-2">
                 <a href="${data.file_url}" target="_blank" class="download-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
@@ -3821,7 +3782,7 @@ async function viewClientesDocumentacion(id) {
                         <span class="file-name"></span>
                         <span class="file-size"></span>
                         <button class="remove-file-button
-
+                        
                         ">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -3952,7 +3913,7 @@ async function viewClientesDocumentacion(id) {
             <div class="btn btn-outline-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
             <i class="fa fa-trash " ></i>
             </div>
-        </div>
+        </div>  
         </div>
         `).insertBefore(".col-guardar-documentacion");
   });
@@ -3967,8 +3928,8 @@ async function viewClientesDocumentacion(id) {
                 Descargar
                 </a>
                </div>
-
-            </div>
+               
+            </div>  
             </div>
             `).insertBefore(".col-guardar-documentacion");
   });
@@ -4206,7 +4167,7 @@ $(document).ready(async function () {
   } catch (error) {
     console.log(error);
   }
-
+  
 
   table_Entidad = $("#table-contenedor").DataTable({
     dom:
@@ -4310,7 +4271,7 @@ $(document).ready(async function () {
   });
 
   configurarBuscador('table-contenedor','search-table','table-contenedor_filter');
-
+  
 
   $("#upload-documents").click(() => $("#upload-input-documents").click());
   $("#upload-inspection").click(() => $("#upload-input-inspection").click());
@@ -4323,7 +4284,6 @@ $(document).ready(async function () {
   $("#upload-input-inspection").change(function () {
     handleFileUpload(this.files, "inspection");
   });
-  
   $("#btn-back-documentacion-profile").click(() => {
     documentationContainerProfile.hide();
     clientesContainer.show();
@@ -4646,7 +4606,7 @@ $(document).ready(async function () {
                         <button class="btn btn-sm btn-primary download-btn" data-url="${
                           file.file_url
                         }">Download</button>
-                        <button class="btn btn-sm btn-danger" data-id="${
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${
                           file.id
                         }">Delete</button>
                     </div>
@@ -4662,10 +4622,10 @@ $(document).ready(async function () {
       });
 
       // Eliminar archivo
-    //   card.find(".delete-btn").click(function () {
-    //     const fileId = $(this).data("id");
-    //     deleteFile(fileId, card);
-    //   });
+      card.find(".delete-btn").click(function () {
+        const fileId = $(this).data("id");
+        deleteFile(fileId, card);
+      });
     });
   }
   const fillSelects = async () => {
@@ -4784,8 +4744,8 @@ $(document).ready(async function () {
     cotizacionAlmacenContainer.hide();
     contentHeader.hide();
     cotizacionContainer.show();
-
-
+    
+    
   });
   $("#btn-back-factura-guia").click(function () {
     returnToSteps();
@@ -5405,9 +5365,6 @@ window.addEventListener("load", () => {
     }
   };
 });
-async function test(){
-    console.log("Test function")
-}
 setupSingleFileUpload("single-file-upload", "file-input-prospecto");
-setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion",);
+setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion");
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");

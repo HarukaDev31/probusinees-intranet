@@ -51,9 +51,9 @@
                 <div style="width: 200px;">
                   <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
                     <option value="0" selected>Todos</option>
-                    <option value="PENDIENTE">PENDIENTE</option>
-                    <option value="RECIBIENDO">RECIBIENDO</option>
-                    <option value="COMPLETADO">COMPLETADO</option>
+                    <option value="PENDIENTE">WAITING</option>
+                    <option value="RECIBIENDO">RECEIVING</option>
+                    <option value="COMPLETADO">FINISH</option>
                   </select>
                 </div>
                 
@@ -116,9 +116,9 @@
                 <div style="width: 200px;">
                   <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
                     <option value="0" selected>Todos</option>
-                    <option value="PENDIENTE">PENDIENTE</option>
-                    <option value="RECIBIENDO">RECIBIENDO</option>
-                    <option value="COMPLETADO">COMPLETADO</option>
+                    <option value="PENDIENTE">WAITING</option>
+                    <option value="RECIBIENDO">RECEIVING</option>
+                    <option value="COMPLETADO">FINISH</option>
                   </select>
                 </div>
                 
@@ -617,9 +617,9 @@
                 <div style="width: 200px;">
                   <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
                     <option value="0" selected>Todos</option>
-                    <option value="PENDIENTE">PENDIENTE</option>
-                    <option value="RECIBIENDO">RECIBIENDO</option>
-                    <option value="COMPLETADO">COMPLETADO</option>
+                    <option value="PENDIENTE">WAITING</option>
+                    <option value="RECIBIENDO">RECEIVING</option>
+                    <option value="COMPLETADO">FINISH</option>
                   </select>
                 </div>
                 
@@ -741,11 +741,11 @@
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen" && $this->user->No_Grupo != "Documentacion") {  ?>
                 <th style="min-width: 8em;">Whatsapp</th>
                 <th
-                  style="min-width: 10em;">Estado</th>
+                  style="min-width: 9em;">Estado</th>
               <?php } ?>
 
               <th
-                style="min-width: 8em;">Productos</th>
+                style="min-width: 7em;">Productos</th>
               <th
                 style="min-width: 4em;">Qty Box</th>
               <th
@@ -757,13 +757,13 @@
               <th
                 style="min-width: 6em;">C. Supplier</th>
               <th
-                style="min-width: 7em;">P. Number</th>
+                style="min-width: 8em;">P. Number</th>
               <th
                 style="min-width: 4em;">Qty Box.</th>
               <th
-                style="min-width: 6em;">CBM China </th>
+                style="min-width: 4em;">CBM Ch.</th>
               <th
-                style="min-width: 6em;">Arrive Date </th>
+                style="min-width: 8em;">Arrive Date </th>
               <th> Acciones </th>
 
 
@@ -1091,7 +1091,7 @@
       <div class="col-6 col-sm-4">
       </div>
       <div class="col-12 col-md-1">
-        <button type="button" id="btn-crear-cotizacion" class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Guardar <i class="fas fa-save"></i></button>
+        <button type="button" id="btn-guardar-doc-not" onclick="saveboth()" class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Guardar <i class="fas fa-save"></i></button>
       </div>
       <div class="col-12 col-md-4">
         <label>&nbsp;</label>
@@ -1119,9 +1119,8 @@
       <div class="px-4 py-8 file-section-container col-12 col-md-5  ">
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
-            <h2
-              class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
-              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
+            <h2 class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
+              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
               </div>
             </h2>
           </div>
@@ -1176,9 +1175,7 @@
       </div>
       <div class="col-12 col-md-4">
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
-          <h2 class="
-          
-          text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
+          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
               class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
@@ -1222,7 +1219,7 @@
       </div>
       <div class="col-12 col-md-3 px-4 py-8 note-container-container">
         <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas
-          <button onclick="addNote()" class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
+          <button onclick="addNote()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
             <i class="fas fa-save  float-right"></i>
 
             <span>Guardar</span>
@@ -1524,15 +1521,15 @@
                   <span class="invalid-feedback" id="error-carga">La carga es requerida</span>
                 </div>
               </div>
-              <div class="col-6 col-sm-6"> <!--fecha arribo -->
+
+              <div class="col-6 col-sm-6"> <!--fecha cierre -->
                 <div class="form-group">
 
-                  <label>Fecha Arribo <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" placeholder="00/00/0000" class="form-control input-report required input-date w-100">
-                  <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
+                  <label>Fecha Cierre <span class="label-advertencia text-danger"> *</span></label>
+                  <input type="text" name="f_cierre" required id="txt-Fe_Cierre" placeholder="00/00/0000" class=" w-100 form-control input-report required input-date">
+                  <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
                 </div>
               </div>
-
               <div class="col-6 col-sm-6"> <!--mes -->
                 <div class="form-group">
                   <label>Mes <span class="label-advertencia text-danger"> *</span></label>
@@ -1542,12 +1539,12 @@
                   <span class="invalid-feedback" id="error-mes">El mes es requerido</span>
                 </div>
               </div>
-              <div class="col-6 col-sm-6"> <!--fecha cierre -->
+              <div class="col-6 col-sm-6"> <!--fecha arribo -->
                 <div class="form-group">
 
-                  <label>Fecha Cierre <span class="label-advertencia text-danger"> *</span></label>
-                  <input type="text" name="f_cierre" required id="txt-Fe_Cierre" placeholder="00/00/0000" class=" w-100 form-control input-report required input-date">
-                  <span class="invalid-feedback" id="error-f-cierre">La fecha de Cierre es requerida</span>
+                  <label>Fecha Arribo <span class="label-advertencia text-danger"> *</span></label>
+                  <input type="text" name="f_puerto" required id="txt-Fe_Puerto" placeholder="00/00/0000" class="form-control input-report required input-date w-100">
+                  <span class="invalid-feedback" id="error-f-puerto">La fecha Arribo es requerida</span>
                 </div>
               </div>
               <div class="col-6 col-sm-6"> <!--pais -->
@@ -2241,6 +2238,11 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
 </style>
 <script>
   // script.js
+  function saveBoth() {
+    saveDocumentation();
+    saveInspection();
+  }
+
   function setupSingleFileUpload(containerId, inputId) {
     try {
       const container = document.getElementById(containerId);
@@ -2251,6 +2253,7 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
       const fileSizeElement = container.querySelector('.file-size');
       const removeFileButton = container.querySelector('.remove-file-button');
       const selectFileButton = container.querySelector('.upload-button');
+
       if (selectFileButton) {
         // Abrir el diálogo de selección de archivos al hacer clic en el botón
         selectFileButton.addEventListener('click', (e) => {
@@ -2258,8 +2261,6 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
           fileInput.click();
         });
       }
-      // Abrir el diálogo de selección de archivos al hacer clic en el botón
-
 
       // Mostrar la información del archivo seleccionado
       fileInput.addEventListener('change', (e) => {
@@ -2314,6 +2315,13 @@ div#table-cotizacion-embarque_filter,div#table-contenedor_filter,div#table-clien
           }
         }
       });
+
+      // Restablecer el estado del cuadro de información cuando el modal se oculta
+      $('#modal-crear-cotizacion').on('hidden.bs.modal', function () {
+        fileInput.value = ""; // Limpia el input
+        fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
+      });
+
     } catch (e) {
       console.log(e);
     }

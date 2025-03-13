@@ -7,12 +7,13 @@
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
-  <section class="content-header">
+  <section class="content-header px-4" style="
+    height: 93vh;">
     <!-- Hero Section -->
     <div class="hero-section position-relative mb-n5">
         <div class="overlay"></div>
         <div class="container position-relative d-flex align-items-center mx-4" style="height: 100%;">
-            <div class="text-white display-4 py-5">¡Hola, bienvenido!</div>
+            <div class="text-white display-4 py-5" style="font-weight: 400;">¡Hola, bienvenido!</div>
         </div>
     </div>
 
@@ -1762,7 +1763,7 @@
     background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80');
     background-size: cover;
     background-position: center;
-    height: 400px;
+    height: 450px;
     border-bottom-left-radius: 2rem;
     border-top-right-radius: 2rem;
     border-top-left-radius: 2rem;

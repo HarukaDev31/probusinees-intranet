@@ -62,7 +62,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
   <div class="fondo_pantalla">
     <div class="container-fluid">
       <div class="row">
-        <div class="bg-image" alt="Portada ProBusiness" title="Portada ProBusiness"></div>
+        <div class="bg-image" alt="Portada ProBusiness" title="Portada ProBusiness">
+          <img src="<?php echo base_url("assets/img/backgrounds/portada_probusiness.png?ver=3.0.0") ?>"  class="image" alt="Portada ProBusiness" title="Portada ProBusiness">
+        </div>
         <div class="panel-container">
           <div class="panel panel-default">
             <div class="panel-heading">

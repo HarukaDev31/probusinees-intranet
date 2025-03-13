@@ -1,6 +1,6 @@
 <?php $iControlVersionDashboard = '1.2.6'; ?>
 <!-- /.content-wrapper -->
-  <footer class="main-footer">
+  <footer class="main-footer" style="display: none;">
     <div class="float-right d-none d-sm-block">
       <b>Version</b> <?php echo $iControlVersionDashboard; ?>
     </div>

@@ -122,7 +122,7 @@
 
   <input type="hidden" id="hidden-id_menu" class="form-control" value="<?php echo (isset($this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu) ? $this->MenuModel->verificarAccesoMenuCRUD()->ID_Menu : 0); ?>">
   
-  <div class="wrapper" style="position: relative;">
+  <div class="wrapper" style="position: relative; min-height:100vh;">
     <!-- Navbar -->
     <div class="backdrop">
       <div class="spinner-border text-primary" role="status">
@@ -214,7 +214,7 @@
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-light-primary">
+    <aside class="main-sidebar sidebar-light-primary d-flex flex-column">
       <!-- Brand Logo -->
         <a href="<?php echo base_url() . 'InicioController'; ?>" class="brand-link">
           <span class="brand-text font-weight-light"><strong><b>probusiness</b></strong></span>
@@ -222,129 +222,136 @@
         </a>
 
       <!-- Sidebar -->
-      <div class="sidebar">
-        <!-- Sidebar Menu -->
-        <nav class="mt-2">
-          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <li class="nav-header">Menú</li>
-            <?php
+      <div class="sidebar d-flex flex-column justify-content-between">
+        <div class="menu-top">
+          <!-- Sidebar Menu -->
+          <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+              <li class="nav-header">Menú</li>
+              <?php
 
-            foreach($this->menu as $arrMenuPadre):
-              $menu_padre = explode('/', $this->router->directory);
-              $menu_pdre = $menu_padre[0];
-              $No_Class_Li_Padre = "nav-item";
-              $No_Class_A_Padre_Active = "";
-              if ($menu_padre != $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
+              foreach($this->menu as $arrMenuPadre):
+                $menu_padre = explode('/', $this->router->directory);
+                $menu_pdre = $menu_padre[0];
                 $No_Class_Li_Padre = "nav-item";
                 $No_Class_A_Padre_Active = "";
-              } else if ($menu_padre == $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
-                $No_Class_Li_Padre = "nav-item active menu-open";
-                $No_Class_A_Padre_Active = "active";
-              } else if ($this->router->class == $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre == 0) {
-                $No_Class_Li_Padre = "nav-item active menu-open";
-                $No_Class_A_Padre_Active = "active";
-              }
-            ?>
-            <li class="<?php echo $No_Class_Li_Padre; ?>">
-              <?php if ($arrMenuPadre->ID_Padre == 0){ ?>
-                <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
-                  <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
-                  <p>&nbsp;<?php echo $arrMenuPadre->No_Menu; ?></p>
+                if ($menu_padre != $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
+                  $No_Class_Li_Padre = "nav-item";
+                  $No_Class_A_Padre_Active = "";
+                } else if ($menu_padre == $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
+                  $No_Class_Li_Padre = "nav-item active menu-open";
+                  $No_Class_A_Padre_Active = "active";
+                } else if ($this->router->class == $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre == 0) {
+                  $No_Class_Li_Padre = "nav-item active menu-open";
+                  $No_Class_A_Padre_Active = "active";
+                }
+              ?>
+              <li class="<?php echo $No_Class_Li_Padre; ?>">
+                <?php if ($arrMenuPadre->ID_Padre == 0){ ?>
+                  <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
+                    <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
+                    <p>&nbsp;<?php echo $arrMenuPadre->No_Menu; ?></p>
+                    <?php if($arrMenuPadre->Nu_Cantidad_Menu_Padre > 0): ?>
+                      <i class="right fas fa-angle-left"></i>
+                    <?php endif; ?>
+                  </a>
                   <?php if($arrMenuPadre->Nu_Cantidad_Menu_Padre > 0): ?>
-                    <i class="right fas fa-angle-left"></i>
-                  <?php endif; ?>
-                </a>
-                <?php if($arrMenuPadre->Nu_Cantidad_Menu_Padre > 0): ?>
-                <ul class="nav nav-treeview">
-                  <?php
-                  foreach($arrMenuPadre->Hijos as $arrHijos):
-                  
-                    $No_Class_Li = "nav-item";
-                    if ($this->router->directory != $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
+                  <ul class="nav nav-treeview">
+                    <?php
+                    foreach($arrMenuPadre->Hijos as $arrHijos):
+                    
                       $No_Class_Li = "nav-item";
-                    else if ($this->router->directory == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
-                      $No_Class_Li = "nav-item active  menu-open";
-                    else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0)
-                      $No_Class_Li = "nav-item active  menu-open"; ?>
-                    <li class="<?php echo $No_Class_Li; ?>">
-                      <a class="nav-link 1 <?php echo ($this->router->class == $arrHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
-                        <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
-                        <p>&nbsp;<?php echo $arrHijos->No_Menu; ?></p>
+                      if ($this->router->directory != $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
+                        $No_Class_Li = "nav-item";
+                      else if ($this->router->directory == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
+                        $No_Class_Li = "nav-item active  menu-open";
+                      else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0)
+                        $No_Class_Li = "nav-item active  menu-open"; ?>
+                      <li class="<?php echo $No_Class_Li; ?>">
+                        <a class="nav-link 1 <?php echo ($this->router->class == $arrHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
+                          <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
+                          <p>&nbsp;<?php echo $arrHijos->No_Menu; ?></p>
+                          <?php if($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
+                          <i class="right fas fa-angle-left"></i>
+                          <?php endif; ?>
+                        </a>
                         <?php if($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
-                        <i class="right fas fa-angle-left"></i>
+                        <ul class="nav nav-treeview">
+                          <?php foreach($arrHijos->SubHijos as $arrSubHijos): ?>
+                          <li class="<?php 
+                            echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>">
+                            <a class="nav-link 2 <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
+                              <i class="<?php echo $arrSubHijos->Txt_Css_Icons; ?>"></i>
+                              <p>&nbsp;<?php echo $arrSubHijos->No_Menu; ?></p>
+                            </a>
+                          </li>
+                          <?php endforeach; ?>
+                        </ul>
                         <?php endif; ?>
-                      </a>
-                      <?php if($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
-                      <ul class="nav nav-treeview">
-                        <?php foreach($arrHijos->SubHijos as $arrSubHijos): ?>
-                        <li class="<?php 
-                          echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>">
-                          <a class="nav-link 2 <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
-                            <i class="<?php echo $arrSubHijos->Txt_Css_Icons; ?>"></i>
-                            <p>&nbsp;<?php echo $arrSubHijos->No_Menu; ?></p>
-                          </a>
-                        </li>
-                        <?php endforeach; ?>
-                      </ul>
-                      <?php endif; ?>
-                    </li>
-                  <?php
-                  endforeach; ?>
-                </ul>
-                <?php endif; ?>
-              <?php } ?>
-            </li>
-	          <?php endforeach; ?>
-          </ul>
-        </nav>
-        <nav class="mt-2">
-          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
-            <li class="nav-header">Preferencias</li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" title="Notificaciones" data-target="#modal-notification" id="verNotificaciones"
-              data-toggle="modal" aria-expanded="false" >
-                <i class="nav-icon far fa-bell"></i>
-                <p>&nbsp;Notificaciones</p>
-                <span class="badge badge-danger navbar-badge " id="counter-notifacions"><?php echo $iCantidadNotificaciones; ?></span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" title="Modo Oscuro" href="#" >
-                <i class="nav-icon far fa-moon"></i>
-                <p>&nbsp;Modo oscuro</p>
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <!-- Sidebar user (optional) -->
-        <nav class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="" href="#" aria-expanded="false" title="Notificaciones" style="display:flex; gap: 20px;">
-                <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" class="img-circle" alt="User Image">
-                <div class="info-user">
-                  <p>&nbsp;<?php echo $this->user->No_Nombres_Apellidos; ?></p><br>
-                  <p class="badge bg-success"><?php echo $this->user->No_Grupo; ?></p>
-                </div>
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <!-- /.sidebar-menu -->
-        
-        <!-- Log out -->
-        <div class="user-logout mt-3 pb-3 mb-3 d-flex">
-            
-          <div class="info nav nav-pills nav-sidebar flex-column">
-            <li class="nav-item">
-              <a href="<?php echo base_url().'LoginController/logout';?>" class="nav-link">
-                <i class="nav-icon fa fa-sign-out-alt"></i>
-                <p>&nbsp;Cerrar Sesión</p>
-              </a>
-            </li>
-          </div>
+                      </li>
+                    <?php
+                    endforeach; ?>
+                  </ul>
+                  <?php endif; ?>
+                <?php } ?>
+              </li>
+              <?php endforeach; ?>
+            </ul>
+          </nav>
+          <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
+              <li class="nav-header">Preferencias</li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" title="Notificaciones" data-target="#modal-notification" id="verNotificaciones"
+                data-toggle="modal" aria-expanded="false" >
+                  <i class="nav-icon far fa-bell"></i>
+                  <p>&nbsp;Notificaciones</p>
+                  <span class="badge badge-danger navbar-badge " id="counter-notifacions"><?php echo $iCantidadNotificaciones; ?></span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" title="Modo Oscuro" href="#" >
+                  <i class="nav-icon far fa-moon"></i>
+                  <p>&nbsp;Modo oscuro</p>
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
-        <!-- /. log out -->
+        <div>
+          <!-- Sidebar user (optional) -->
+          <nav class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="" href="#" aria-expanded="false" title="Notificaciones" style="display:flex; gap: 20px;">
+                  <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" class="img-circle" alt="User Image">
+                  <div class="info-user">
+                    <p>&nbsp;<?php echo $this->user->No_Nombres_Apellidos; ?></p><br>
+                    <p class="badge bg-success"><?php echo $this->user->No_Grupo; ?></p>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <!-- /.sidebar-menu -->
+          
+          <!-- Log out -->
+          <div class="user-logout mt-3 pb-3 mb-3 d-flex">
+              
+            <div class="info nav nav-pills nav-sidebar flex-column">
+              <li class="nav-item">
+                <a href="<?php echo base_url().'LoginController/logout';?>" class="nav-link">
+                  <i class="nav-icon fa fa-sign-out-alt"></i>
+                  <p>&nbsp;Cerrar Sesión</p>
+                </a>
+              </li>
+            </div>
+          </div>
+          <!-- /. log out -->
+        </div>
+
+
+
       </div>
       <!-- /.sidebar -->
     </aside>
@@ -397,7 +404,6 @@
       color: #ff500b !important;
     }
     .user-panel {
-    padding-top: 220%;
     align-items: end;
   }
   
@@ -410,6 +416,10 @@
       padding-top: 2%;
       padding-bottom: 1%;
     }
+  }
+
+  body:not(.layout-fixed) .main-sidebar{
+    height: -webkit-fill-available;
   }
 
   </style>

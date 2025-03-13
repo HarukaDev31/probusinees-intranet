@@ -1911,3 +1911,8 @@ function copyText() {
   }
 })();
 
+//remove content-wrapper styles 
+$(document).ready(function() {
+  //remove content-wrapper styles
+  $('.content-wrapper').removeAttr('style');
+});

@@ -67,9 +67,9 @@ class ContenedorConsolidado extends CI_Controller
 					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
 					($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .
 					($row->estado_china == "COMPLETADO" ? "bg-success" : "") . '">
-					<option value="PENDIENTE" ' . ($row->estado_china == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
-					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>Recibiendo</option>
-					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>Completado</option>
+					<option value="PENDIENTE" ' . ($row->estado_china == "PENDIENTE" ? "selected" : "") . '>WAITING</option>
+					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>RECEIVING</option>
+					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>FINISH</option>
 				</select>';
 			} else if ($this->user->No_Grupo == "Documentacion") {
 				$divEstado = '<select 
@@ -265,9 +265,9 @@ class ContenedorConsolidado extends CI_Controller
 
 						" id="estado-cotizador-' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizador(' . $row->id_cotizacion . ')">
 							<option
-							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
+							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>WAITING</option>
 
-							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>CONFIRMADO</option>
+							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>COMPLETE</option>
 						</select>';
 						$subdata[] = $divEstadoCotizador;
 						if ($row->estado_cotizador == "PENDIENTE") {

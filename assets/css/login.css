@@ -57,6 +57,7 @@ select:-webkit-autofill:focus {
   height: 100vh;
   /*background: url(../img/backgrounds/fondo_v2.png?ver=1.0);*/
   background-size: cover;/* cubre toda la pagina */
+  background-color: #FF500B;
   /*verflow: hidden; /* no tenga ningun scroll w y h */
   z-index: -1;
   /*background-color: #2d2d2d; /* Used if the image is unavailable */
@@ -277,14 +278,18 @@ div.footerNode a, div.footerNode span {
   display: flex;
   float: inline-start;
   width: 100%;
-  background-image: url(../img/backgrounds/portada_probusiness.png?ver=3.0.0);
-  background-size: cover;
+  background-size: auto;
   background-position: left;
   background-repeat: no-repeat;
   height: 100vh;
   box-shadow: 14px 0 20px 5px rgb(210, 210, 210);
   border-color: transparent;
+  align-items: center;
+}
 
+.image{
+  width: 60%;
+  height: 65%;
 }
 
 .panel {
