@@ -15,6 +15,7 @@ var currentPrivilege = "";
 var fileManager = null;
 var fileManagerInspection = null;
 var fileManagerInspectionCoordinacion = null;
+var currentCargaNumber = 0;
 var meses = [
   {
     id: "ENERO",
@@ -571,6 +572,45 @@ async function verCotizacionEmbarque(
   spinner.hide();
   // Función para agregar un archivo a la lista con vista previa y botones
 }
+<<<<<<< HEAD
+=======
+async function deleteFileInspection(id, cardElement) {
+  event.preventDefault();
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡No podrás revertir esto!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminarlo",
+    cancelButtonText: "No, cancelar",
+    iconColor: "#FF0000",
+    color: "#FF0000",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      spinner.show();
+      url =
+        base_url +
+        "CargaConsolidada/ContenedorConsolidado/deleteFileInspection/" +
+        id;
+      $.ajax({
+        url: url,
+        type: "GET",
+
+        success: function (response) {
+          const result = JSON.parse(response);
+          if (result.status == "success") {
+            cardElement.remove();
+            Swal.fire("Eliminado!", result.message, "success");
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+          spinner.hide();
+        },
+      });
+    }
+  });
+}
+>>>>>>> feature/agente-compra-new
 async function getFilesAlmacenDocument(idProveedor, idCotizacion) {
   spinner.show();
 
@@ -1226,7 +1266,8 @@ async function view(id) {
   $("#btn-actualizar").show();
   currentCarga = result.id;
 }
-async function viewSteps(id) {
+async function viewSteps(id, carga) {
+  currentCargaNumber = carga;
   url = base_url + "CargaConsolidada/ContenedorConsolidado/steps/" + id;
   idContenedor = id;
   spinner.show();
@@ -2045,30 +2086,29 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
           buttons: [
             {
-                extend: "excel",
-                text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                titleAttr: "Excel",
-                exportOptions: {
-                    columns: ":visible",
-                },
-                attr: {
-                    id: "export-excel-main",
-                    class: "hidden",
-                },
+              extend: "excel",
+              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+              titleAttr: "Excel",
+              exportOptions: {
+                columns: ":visible",
+              },
+              attr: {
+                id: "export-excel-main",
+                class: "hidden",
+              },
             },
 
             {
-                extend: "pdf",
-                text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-                titleAttr: "PDF",
-                exportOptions: {
-                    columns: ":visible",
-                },
-                attr: {
-                    id: "export-pdf-main",
-                    class: "hidden",
-                },
-
+              extend: "pdf",
+              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+              titleAttr: "PDF",
+              exportOptions: {
+                columns: ":visible",
+              },
+              attr: {
+                id: "export-pdf-main",
+                class: "hidden",
+              },
             },
             {
               text: "Prospectos",
@@ -2264,7 +2304,14 @@ const openStepFunction = async (step, id) => {
                     "table-cotizacion-embarque_info"
                   );
                   await getTableCotizacionEmbarqueHeaders();
+<<<<<<< HEAD
                   
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 53542463560d466cb98085250d9040c10e0ca0b7
+>>>>>>> feature/agente-compra-new
                 }
                 currentTableCotizacion = "embarque";
                 $(".input-date").datepicker({
@@ -2373,16 +2420,16 @@ const openStepFunction = async (step, id) => {
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
         buttons: [
           {
-              extend: "excel",
-              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-              titleAttr: "Excel",
-              exportOptions: {
-                  columns: ":visible",
-              },
-              attr: {
-                    id: "export-excel-main",
-                    class: "hidden",
-                },
+            extend: "excel",
+            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+            titleAttr: "Excel",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-excel-main",
+              class: "hidden",
+            },
           },
           {
             text: "General",
@@ -2429,29 +2476,29 @@ const openStepFunction = async (step, id) => {
                         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
                       buttons: [
                         {
-                            extend: "excel",
-                            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                            titleAttr: "Excel",
-                            exportOptions: {
-                              columns: ":visible",
-                            },
-                            attr: {
-                                id: "export-excel-main",
-                                class: "hidden",
-                            }
+                          extend: "excel",
+                          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                          titleAttr: "Excel",
+                          exportOptions: {
+                            columns: ":visible",
                           },
-                          {
-                            extend: "pdf",
-                            text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-                            titleAttr: "PDF",
-                            exportOptions: {
-                              columns: ":visible",
-                            },
-                            attr: {
-                                id: "export-pdf-main",
-                                class: "hidden",
-                            },
+                          attr: {
+                            id: "export-excel-main",
+                            class: "hidden",
                           },
+                        },
+                        {
+                          extend: "pdf",
+                          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+                          titleAttr: "PDF",
+                          exportOptions: {
+                            columns: ":visible",
+                          },
+                          attr: {
+                            id: "export-pdf-main",
+                            class: "hidden",
+                          },
+                        },
                         {
                           text: "General",
                           action: function () {
@@ -2612,9 +2659,9 @@ const openStepFunction = async (step, id) => {
                       },
                     });
                     configurarBuscador(
-                        "table-clientes-variacion",
-                        "search-table",
-                        "table-clientes-variacion_info"
+                      "table-clientes-variacion",
+                      "search-table",
+                      "table-clientes-variacion_info"
                     );
                   }
                 },
@@ -2709,13 +2756,12 @@ const openStepFunction = async (step, id) => {
     }
   });
   $(".btn-back-cotizacion-documentacion").off("click");
-    $(".btn-back-cotizacion-documentacion").on("click", function () {
-        clientesContainer.show();
-        cotizacionContainer.hide();
-        clientesDocumentacionContainer.hide();
-        stepsContainer.hide();
-
-    });
+  $(".btn-back-cotizacion-documentacion").on("click", function () {
+    clientesContainer.show();
+    cotizacionContainer.hide();
+    clientesDocumentacionContainer.hide();
+    stepsContainer.hide();
+  });
 
   spinner.hide();
 };
@@ -2774,6 +2820,9 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
 }
 
 async function viewFacturaGuia() {
+  $("#factura-guia-title").html(`
+    Cotizacion #${currentCargaNumber}
+    Factura Guia`);
   facturaGuiaContainer.show();
   spinner.show();
   url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
@@ -2870,6 +2919,9 @@ async function viewFacturaGuia() {
 }
 async function viewCotizacionFinal() {
   cotizacionFinalContainer.show();
+  $("#cotizacion-final-title").html(`
+    Cotizacion #${currentCargaNumber}
+    Cotización Final`);
   spinner.show();
   url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
   if ($.fn.DataTable.isDataTable("#table-cotizacion-final")) {
@@ -4167,7 +4219,14 @@ $(document).ready(async function () {
   } catch (error) {
     console.log(error);
   }
+<<<<<<< HEAD
   
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 53542463560d466cb98085250d9040c10e0ca0b7
+>>>>>>> feature/agente-compra-new
 
   table_Entidad = $("#table-contenedor").DataTable({
     dom:
@@ -4183,8 +4242,8 @@ $(document).ready(async function () {
           columns: ":visible",
         },
         attr: {
-            id: "export-excel-main",
-            class: "hidden",
+          id: "export-excel-main",
+          class: "hidden",
         },
       },
       {
@@ -4195,9 +4254,9 @@ $(document).ready(async function () {
           columns: ":visible",
         },
         attr: {
-            id: "export-pdf-main",
-            class: "hidden",
-        }
+          id: "export-pdf-main",
+          class: "hidden",
+        },
       },
       {
         extend: "colvis",
@@ -4207,8 +4266,8 @@ $(document).ready(async function () {
           columns: ":visible",
         },
         attr: {
-            class: "hidden",
-        }
+          class: "hidden",
+        },
       },
     ],
     paging: true,
@@ -4744,8 +4803,11 @@ $(document).ready(async function () {
     cotizacionAlmacenContainer.hide();
     contentHeader.hide();
     cotizacionContainer.show();
+<<<<<<< HEAD
     
     
+=======
+>>>>>>> feature/agente-compra-new
   });
   $("#btn-back-factura-guia").click(function () {
     returnToSteps();
@@ -5365,6 +5427,10 @@ window.addEventListener("load", () => {
     }
   };
 });
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/agente-compra-new
 setupSingleFileUpload("single-file-upload", "file-input-prospecto");
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion");
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");

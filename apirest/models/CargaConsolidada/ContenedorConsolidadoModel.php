@@ -32,7 +32,40 @@ class ContenedorConsolidadoModel extends CI_Model
     private $aNewCotizacion = "new-cotizacion";
     private $cambioEstadoProveedor = "cambio-estado-proveedor";
     private $table_contenedor_cotizacion_final = "contenedor_consolidado_cotizacion_final";
-
+    private $providerOrderStatus = [
+        "NC" => 0,
+        "C" => 1,
+        "R" => 2,
+        "NS" => 3,
+        "INSPECTION" => 4,
+        'LOADED' => 5,
+        'NO LOADED' => 6
+    ];
+    private $providerCoordinacionOrderStatus = [
+        "ROTULADO" => 0,
+        'DATOS PROVEEDOR' => 1,
+        'COBRANDO' => 2,
+        'INSPECCIONADO' => 3,
+        'RESERVADO' => 4,
+        'NO RESERVADO' => 5,
+        'EMBARCADO' => 6,
+        'NO EMBARCADO' => 7,
+    ];
+    private $STATUS_NOT_CONTACTED = "NC";
+    private $STATUS_CONTACTED = "C";
+    private $STATUS_RECIVED = "R";
+    private $STATUS_NOT_SELECTED = "NS";
+    private $STATUS_INSPECTION = "INSPECTION";
+    private $STATUS_LOADED = "LOADED";
+    private $STATUS_NO_LOADED = "NO LOADED";
+    private $STATUS_ROTULADO = "ROTULADO";
+    private $STATUS_DATOS_PROVEEDOR = "DATOS PROVEEDOR";
+    private $STATUS_COBRANDO = "COBRANDO";
+    private $STATUS_INSPECCIONADO = "INSPECCIONADO";
+    private $STATUS_RESERVADO = "RESERVADO";
+    private $STATUS_NO_RESERVADO = "NO RESERVADO";
+    private $STATUS_EMBARCADO = "EMBARCADO";
+    private $STATUS_NO_EMBARCADO = "NO EMBARCADO";
     private $table_contenedor_cotizacion_proveedores_documentacion = "contenedor_consolidado_proveedores_documentacion";
     var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
     public function __construct()
@@ -89,7 +122,7 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function store($data)
     {
-        //set data in table 
+        //set data in table
         //if field carga not exists in data add tipo carga field "G. IMPORTACION"
         if (!array_key_exists('carga', $data)) {
             $data['tipo_carga'] = "G. IMPORTACION";
@@ -231,7 +264,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     'arrive_date_china',proveedores.arrive_date_china
                 )
             )
-            FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores 
+            FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores
             WHERE proveedores.id_cotizacion = main.id
         ) as proveedores")
             ->from($this->table_contenedor_cotizacion . " as main")
@@ -368,7 +401,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $fecha = $this->convertDateFormat($fecha);
             }
 
-            //get tipo cliente for e11 
+            //get tipo cliente for e11
             $tipoCliente = $sheet->getCell('E11')->getValue();
             //find if exists in table contenedor_consolidado_tipo_cliente with name = $tipoCliente else create new and get id
             $idTipoCliente = $this->db->select('id')
@@ -560,7 +593,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $idCotizacion = $this->db->insert_id();
                 $dataToInsert['id_cotizacion'] = $idCotizacion;
                 $dataEmbarque = $this->getEmbarqueData($cotizacion, $dataToInsert);
-                //insert in tabla proveedores 
+                //insert in tabla proveedores
                 log_message('error', 'Data embarque: ' . json_encode($dataEmbarque));
                 $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
                 //if db error return error
@@ -782,14 +815,14 @@ class ContenedorConsolidadoModel extends CI_Model
             '[',
             GROUP_CONCAT(
                 CONCAT(
-                    '{\"id\":', docs.id, 
-                    ',\"file_url\":\"', docs.file_url, 
+                    '{\"id\":', docs.id,
+                    ',\"file_url\":\"', docs.file_url,
                     '\",\"folder_name\":\"', docs.name, '\"}'
                 )
             ),
             ']'
         )
-        FROM " . $this->table_contenedor_cotizacion_documentacion . " docs 
+        FROM " . $this->table_contenedor_cotizacion_documentacion . " docs
         WHERE docs.id_cotizacion = main.id
     ) as files,
     (
@@ -797,14 +830,14 @@ class ContenedorConsolidadoModel extends CI_Model
             '[',
             GROUP_CONCAT(
                 CONCAT(
-                    '{\"id\":', docs.id, 
-                    ',\"file_url\":\"', docs.file_path, 
+                    '{\"id\":', docs.id,
+                    ',\"file_url\":\"', docs.file_path,
                     '\",\"folder_name\":\"', docs.file_name, '\"}'
                 )
             ),
             ']'
         )
-        FROM " . $this->table_contenedor_almacen_documentacion . " docs 
+        FROM " . $this->table_contenedor_almacen_documentacion . " docs
         WHERE docs.id_cotizacion = main.id
     ) as files_almacen_documentacion
 ")
@@ -1365,7 +1398,7 @@ class ContenedorConsolidadoModel extends CI_Model
         if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
             return ['status' => "error", 'message' => "La Lista de Partidas no es un archivo de excel"];
         }
-        //get object PHPExcel from factura 
+        //get object PHPExcel from factura
         //sanitize file url
         $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $facturaComercial); // Extraer ruta relativa
         $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
@@ -1536,7 +1569,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         // $sheet->setCellValue('V' . $row, $volumen_doc);
                         $sheet->setCellValue('C' . $row, $tipoCliente);
                         if (trim($itemN) == "TOTAL FOB PRICE") {
-                            //unmerge cell 
+                            //unmerge cell
 
                             $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
                             // //MERGE FROM D TO K
@@ -1726,12 +1759,12 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
             $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
 
-            //set  d column auto size                
+            //set  d column auto size
             $sheet0->getStyle('D')->getAlignment()->setWrapText(true);
             $sheet0->getColumnDimension('C')->setWidth(30);
 
             $sheet0->getColumnDimension('D')->setWidth(60);
-            //SET WIDTH TO COLUMNS 
+            //SET WIDTH TO COLUMNS
             $sheet0->getColumnDimension('R')->setWidth(20);
             $sheet0->getColumnDimension('S')->setWidth(25);
             $sheet0->getColumnDimension('T')->setWidth(15);
@@ -1897,29 +1930,30 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
     {
+        $this->db->select('nombre,id_contenedor')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $idCotizacion);
+        $query = $this->db->get();
+
+        $cliente = $query->row()->nombre;
+        $idContenedor = $query->row()->id_contenedor;
+        $this->db->close();
+        $this->db->initialize();
+        $this->db->select('code_supplier,products')
+            ->from($this->table_contenedor_cotizacion_proveedores)
+            ->where('id_cotizacion', $idCotizacion); // Cambiado a `id_cotizacion`
+        $query = $this->db->get();
+        $proveedores = $query->result_array();
+
+        $this->db->select('carga')
+            ->from($this->table)
+            ->where('id', $idContenedor);
+        $query = $this->db->get();
+        $carga = $query->row()->carga;
         if ($estado == "ROTULADO") {
             try {
                 $email = "harukakasugano31@gmail.com";
-                $this->db->select('nombre,id_contenedor')
-                    ->from($this->table_contenedor_cotizacion)
-                    ->where('id', $idCotizacion);
-                $query = $this->db->get();
 
-                $cliente = $query->row()->nombre;
-                $idContenedor = $query->row()->id_contenedor;
-                $this->db->close();
-                $this->db->initialize();
-                $this->db->select('code_supplier,products')
-                    ->from($this->table_contenedor_cotizacion_proveedores)
-                    ->where('id_cotizacion', $idCotizacion); // Cambiado a `id_cotizacion`
-                $query = $this->db->get();
-                $proveedores = $query->result_array();
-
-                $this->db->select('carga')
-                    ->from($this->table)
-                    ->where('id', $idContenedor);
-                $query = $this->db->get();
-                $carga = $query->row()->carga;
                 $htmlWelcomePath = 'assets/downloads/Welcome_Consolidado_Template.html';
                 $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
                 $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
@@ -1988,7 +2022,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         //     [
                         //         $tempFilePath
                         //     ]
-                        // );   
+                        // );
                         $data = $this->sendDataItem(
                             "
             Producto: {$products}
@@ -2121,7 +2155,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $cliente = $query->row()->nombre;
 
             // Construir el mensaje
-            $message = "Reserva de espacio: Consolidado #01-2025\n\n" .
+            $message = "Reserva de espacio: Consolidado #" . $carga . "-2025\n\n" .
                 "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
                 "☑ CBM Preliminar: " . $volumen . " cbm\n" .
                 "☑ Costo CBM: $" . $valorCot . "\n" .
@@ -2278,152 +2312,188 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
         return false;
     }
-    public function updateProveedorData($data, $idProveedor)
+    public function updateProveedorData($data, $idProveedor, $idCotizacion)
     {
+        try {
+            $this->db->select('estados,estados_proveedor,id_contenedor,code_supplier,id_cotizacion')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id', $idProveedor);
+            //get estados list from tracking list
 
-        $this->db->select('estados,estados_proveedor,id_contenedor,code_supplier,id_cotizacion')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id', $idProveedor);
-        $query = $this->db->get();
-        $estado = $query->row()->estados;
-        $estadoProveedor = $query->row()->estados_proveedor;
-        $idContenedor = $query->row()->id_contenedor;
-        $idCotizacion = $query->row()->id_cotizacion;
-        $supplierCode = $query->row()->code_supplier;
-        if (isset($data['supplier_phone']) || isset($data['supplier'])) {
-            //CHECK CURRENT STATUS IS EQUAL TO ROTULADO CHANGE TO DATOS PROVEEDOR
+            $query = $this->db->get();
+            $estado = $query->row()->estados;
+            $estadoProveedor = $query->row()->estados_proveedor;
+            $idContenedor = $query->row()->id_contenedor;
+            $idCotizacion = $query->row()->id_cotizacion;
+            $supplierCode = $query->row()->code_supplier;
 
-            if ($estado == "ROTULADO" || !$estado) {
-                $this->db->where('id', $idProveedor);
-                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'DATOS PROVEEDOR']);
-                $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, ['id_proveedor' => $idProveedor, 'estado' => 'DATOS PROVEEDOR']);
-            }
-            $this->verifyContainerIsCompleted($idContenedor);
-            $usuariosAlmacen = $this->getUsersByGrupo($this->roleContenedorAlmacen);
-            $ids = array_column($usuariosAlmacen, 'ID_Usuario');
-            $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado DATOS PROVEEDOR";
-            $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
-            foreach ($ids as $id) {
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => 0,
-                    "user" => $id,
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
-            }
-        }
+            if ((isset($data['supplier_phone']) || isset($data['supplier']))) {
+                $statusToUpdate = $this->providerCoordinacionOrderStatus[$this->STATUS_DATOS_PROVEEDOR] ?? 0;
+                $estadoProveedorOrder = $this->providerCoordinacionOrderStatus[$estadoProveedor] ?? 0;
+                if ($estadoProveedorOrder < $statusToUpdate) {
+                    $this->db->where('id', $idProveedor);
+                    $this->db->update($this->table_contenedor_cotizacion_proveedores, [
+                        'estados' => $this->STATUS_DATOS_PROVEEDOR,
+                        'supplier_phone' => $data['supplier_phone'] ?? null,
+                        'supplier' => $data['supplier'] ?? null
+                    ]);
+                }
+                //if estado ROTULADO NOT IN statesHistoryCotizacion update al provedor to rotulado where id_cotizacion
+                // if (!in_array("ROTULADO", $statesHistoryCotizacion)) {
+                //     $this->db->where('id_cotizacion', $idCotizacion);
+                //     $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'ROTULADO']);
+                //     //for each provider insert into table contenedor_proveedor_estados_tracking with estado ROTULADO and id_cotizacion and id_proveedor
+                //     $providers = $this->db->select('id')->from($this->table_contenedor_cotizacion_proveedores)->where('id_cotizacion', $idCotizacion)->get()->result_array();
+                //     foreach ($providers as $provider) {
+                //         $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, [
+                //             'id_cotizacion' => $idCotizacion,
+                //             'id_proveedor' => $provider['id'],
+                //             'estado' => 'ROTULADO'
+                //         ]);
+                //     }
+                // }
 
-        if (isset($data['arrive_date_china'])) {
-            $data['arrive_date_china'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['arrive_date_china'])));
-            if ($estadoProveedor == "NC") {
-                $this->db->where('id', $idProveedor);
-                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'C']);
-                $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
+
+                $this->verifyContainerIsCompleted($idContenedor);
+                $usuariosAlmacen = $this->getUsersByGrupo($this->roleContenedorAlmacen);
                 $ids = array_column($usuariosAlmacen, 'ID_Usuario');
-
-                $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado CONTACTADO";
+                $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado DATOS PROVEEDOR";
                 $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCoordinacion,
-                    "user" => 0,
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCotizador,
-                    "user" => 0,
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
-            } else {
-                $message = "Se ha actualizado la fecha de llegada de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['arrive_date_china'];
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCoordinacion,
-                    "user" => "0",
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCotizador,
-                    "user" => "0",
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
+                foreach ($ids as $id) {
+                    $socketResponse = $this->sendEvent([
+                        "project" => "intranet",
+                        "role" => 0,
+                        "user" => $id,
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
+                    ]);
+                }
             }
+
+            if (
+                isset($data['arrive_date_china']) &&
+                (!isset($data['qty_box_china']) && !isset($data['cbm_total_china']))
+            ) {
+                $data['arrive_date_china'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['arrive_date_china'])));
+                $estadoProveedorOrder = $this->providerOrderStatus[$estadoProveedor] ?? 0;
+                $estadoProvedorToUpdate = $this->providerOrderStatus[$this->STATUS_CONTACTED] ?? 0;
+                if ($estadoProveedorOrder < $estadoProvedorToUpdate) {
+                    $this->db->where('id', $idProveedor);
+                    $this->db->update($this->table_contenedor_cotizacion_proveedores, [
+                        'estados_proveedor' => $this->STATUS_CONTACTED,
+                        'arrive_date_china' => $data['arrive_date_china']
+                    ]);
+                    //INSERT INTO TABLE contenedor_proveedor_estados_tracking with estado CONTACTED and id_cotizacion and id_proveedor
+                    $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, [
+                        'id_cotizacion' => $idCotizacion,
+                        'id_proveedor' => $idProveedor,
+                        'estado' => $this->STATUS_CONTACTED
+                    ]);
+                    $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
+                    $ids = array_column($usuariosAlmacen, 'ID_Usuario');
+
+                    $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado CONTACTADO";
+                    $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
+                    $socketResponse = $this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleCoordinacion,
+                        "user" => 0,
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
+                    ]);
+                    $socketResponse = $this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleCotizador,
+                        "user" => 0,
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
+                    ]);
+                }
+                $this->verifyContainerIsCompleted($idContenedor);
+            }
+            if (isset($data['qty_box_china']) && isset($data['cbm_total_china'])) {
+                $estadoProveedorOrder = $this->providerOrderStatus[$estadoProveedor] ?? 0;
+                $estadoProvedorToUpdate = $this->providerOrderStatus[$this->STATUS_RECIVED] ?? 0;
+                if ($estadoProveedorOrder < $estadoProvedorToUpdate) {
+                    $this->db->where('id', $idProveedor);
+                    $this->db->update($this->table_contenedor_cotizacion_proveedores, [
+                        'estados_proveedor' =>
+                        $this->STATUS_RECIVED,
+                        'qty_box_china' => $data['qty_box_china'],
+                        'cbm_total_china' => $data['cbm_total_china']
+                    ]);
+                    //insert into table contenedor_proveedor_estados_tracking with estado STATE_RECIVED and id_cotizacion and id_proveedor
+                    $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, [
+                        'id_cotizacion' => $idCotizacion,
+                        'id_proveedor' => $idProveedor,
+                        'estado' => $this->STATUS_RECIVED
+                    ]);
+
+
+
+                    $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
+                    $ids = array_column($usuariosAlmacen, 'ID_Usuario');
+                    $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado RECIBIDO";
+                    $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
+                    $socketResponse = $this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleCoordinacion,
+                        "user" => "0",
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
+                    ]);
+                    $socketResponse = $this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleCotizador,
+                        "user" => "0",
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
+                    ]);
+                } else {
+                    $message = "Se ha actualizado la cantidad de cajas y volumen total de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['qty_box_china'] . " cajas y " . $data['cbm_total_china'] . " m3";
+                    $socketResponse = $this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleCoordinacion,
+                        "user" => 0,
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
+                    ]);
+                    $socketResponse = $this->sendEvent([
+                        "project" => "intranet",
+                        "role" => $this->roleCotizador,
+                        "user" => 0,
+                        "action" => $this->cambioEstadoProveedor,
+                        "message" => $message
+                    ]);
+                }
+            }
+            $this->db->where('id', $idProveedor);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
+            $this->db->close();
+            $this->db->initialize();
+            $this->db->select('SUM(ifnull(cbm_total_china,0)) as volumen_china')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id_cotizacion', $idCotizacion)
+                ->where('estados_proveedor', "LOADED");
+            $query = $this->db->get();
+            $volumenChina = $query->row()->volumen_china;
+
+            $this->db->where('id', $idCotizacion);
+            $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $volumenChina]);
             $this->verifyContainerIsCompleted($idContenedor);
-        }
-        if (isset($data['qty_box_china']) && isset($data['cbm_total_china'])) {
-            if ($estadoProveedor == "NC" || $estadoProveedor == "C") {
-                $this->db->where('id', $idProveedor);
-                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => 'R']);
-                //sum all provider cbm_total_china and set volumen_china in cotizacion table
 
-                //clean query
-
-                $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
-                $ids = array_column($usuariosAlmacen, 'ID_Usuario');
-                $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado RECIBIDO";
-                $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCoordinacion,
-                    "user" => "0",
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCotizador,
-                    "user" => "0",
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
+            if ($this->db->error()->code != 0) {
+                log_message('error', 'Error: ' . $this->db->error()['message']);
+                return ['status' => "error", 'error' => $this->db->error()];
             } else {
-                $message = "Se ha actualizado la cantidad de cajas y volumen total de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['qty_box_china'] . " cajas y " . $data['cbm_total_china'] . " m3";
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCoordinacion,
-                    "user" => 0,
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
-                $socketResponse = $this->sendEvent([
-                    "project" => "intranet",
-                    "role" => $this->roleCotizador,
-                    "user" => 0,
-                    "action" => $this->cambioEstadoProveedor,
-                    "message" => $message
-                ]);
+                return "success";
             }
+
+            return false;
+        } catch (Exception $e) {
+            log_message('error', 'Error: ' . $e->getMessage());
+            return ['status' => "error", 'error' => $e->getMessage()];
         }
-        $this->db->where('id', $idProveedor);
-        $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
-        $this->db->close();
-        $this->db->initialize();
-        $this->db->select('SUM(ifnull(cbm_total_china,0)) as volumen_china')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id_cotizacion', $idCotizacion)
-            ->where('estados_proveedor', "LOADED");
-        $query = $this->db->get();
-        $volumenChina = $query->row()->volumen_china;
-
-        $this->db->where('id', $idCotizacion);
-        $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $volumenChina]);
-        $this->verifyContainerIsCompleted($idContenedor);
-
-        if ($this->db->error()->code != 0) {
-
-            return ['status' => "error", 'error' => $this->db->error()];
-        } else {
-            return "success";
-        }
-
-        return false;
     }
     public function uploadFileDocument($file, $idProveedor, $idCotizacion)
     {
@@ -2579,7 +2649,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ->where('file_type', 'image/jpeg')
             ->or_where('file_type', 'image/png')
             ->or_where('file_type', 'image/jpg')
-            ->group_end(); // 
+            ->group_end(); //
         $query = $this->db->get();
         $imagesUrls = $query->result();
         $images = $query->num_rows();
@@ -2819,8 +2889,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     public function getUsersByGrupo($grupo)
     {
         /**
-         * select u.ID_Usuario from usuario  u left  join grupo_usuario gu  on gu.ID_Usuario =u.ID_Usuario 
-         * join grupo g on g.ID_Grupo =gu.ID_Grupo 
+         * select u.ID_Usuario from usuario  u left  join grupo_usuario gu  on gu.ID_Usuario =u.ID_Usuario
+         * join grupo g on g.ID_Grupo =gu.ID_Grupo
          * where g.No_Grupo ="Cliente" and u.Nu_Estado =1
          */
         try {
@@ -3113,7 +3183,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 //upload and return the file path
 
                 $result['cotizacion_final_url'] = $fileUrl;
-                //remove excel_file_name and excel_file_path 
+                //remove excel_file_name and excel_file_path
                 unset($result['excel_file_name']);
                 unset($result['excel_file_path']);
                 unset($result['whatsapp']);
@@ -4672,7 +4742,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     public function showClientesDocumentacionByDoc($idCotizacion)
     {
         //query from  contenedor_consolidado_cotizacion where id=idCotizacion use array agg to get documentacion peru key with fields , fields excel confirmacion f.comercial vol doc and valor doc from table contenedor_consolidado_cotizacion
-        // and row from contenedor_consolidado_cotizacion_documentacion where id_cotizacion=idCotizacion 
+        // and row from contenedor_consolidado_cotizacion_documentacion where id_cotizacion=idCotizacion
         //use alias
         try {
             $this->db->select([
@@ -4700,7 +4770,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                             'file_url', file_path
                         ))
                         FROM contenedor_consolidado_almacen_documentacion
-                        WHERE id_cotizacion = contenedor_consolidado_cotizacion.id 
+                        WHERE id_cotizacion = contenedor_consolidado_cotizacion.id
                         and id_proveedor=contenedor_consolidado_cotizacion_proveedores.id
                         AND code_supplier = contenedor_consolidado_cotizacion_proveedores.code_supplier
                     ),
@@ -4710,7 +4780,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                             'file_url', file_path
                         ))
                         FROM contenedor_consolidado_almacen_inspection
-                        WHERE id_cotizacion = contenedor_consolidado_cotizacion.id 
+                        WHERE id_cotizacion = contenedor_consolidado_cotizacion.id
                         and id_proveedor=contenedor_consolidado_cotizacion_proveedores.id
 
                         AND code_supplier = contenedor_consolidado_cotizacion_proveedores.code_supplier

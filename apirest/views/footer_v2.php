@@ -425,7 +425,7 @@ function fetchNotifications() {
         <span aria-hidden="true">×</span>
         </button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" id="modal-notification-body">
         <?php if($this->user->Nu_Notificacion==1) { ?>
           <?php if($this->notificaciones['status']=='success') {
             $iCantidadNotificaciones = 0;

@@ -40,7 +40,7 @@ class HelperImportacionModel extends CI_Model
 			["name" => "FACTURA Y GUIA", "iconURL" => base_url() . "assets/icons/factura.png"]
 		);
 		$this->defaultDocumentacion = array(
-			["name" => "COTIZACION", "iconURL" => base_url() . "assets/icons/cotizacion.png"],
+			["name" => "CLIENTES", "iconURL" => base_url() . "assets/icons/cotizacion.png"],
 			["name" => "DOCUMENTACION", "iconURL" => base_url() . "assets/icons/cdocumentacion.png"],
 			["name" => "ADUANA", "iconURL" => base_url() . "assets/icons/aduana.png"],
 		);

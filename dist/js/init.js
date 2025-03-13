@@ -1910,6 +1910,13 @@ function copyText() {
     };
   }
 })();
+$(document).ready(function(){
+
+  $("#btn-save-delete").click(function(){
+    $('#btn-save-delete').attr('disabled', true);
+    $('#modal-notification-body').html('');
+  });
+});
 
 //remove content-wrapper styles 
 $(document).ready(function() {
