@@ -1,37 +1,86 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <section class="content-header">
-    <div class="container-fluid">
-        <h1>
-            <img src="welcome-image.png" alt="¡Hola, bienvenido!" class="welcome-image">
-        </h1>
-        <div class="stats-container">
-            <div class="stat">
-                <i class="fas fa-dollar-sign icon"></i>
-                <div>
-                  <h2>15M</h2>
-                  <p>De dólares en importaciones</p>
-                </div>                
+    <!-- Hero Section -->
+    <div class="hero-section position-relative mb-n5">
+        <div class="overlay"></div>
+        <div class="container position-relative d-flex align-items-center mx-4" style="height: 100%;">
+            <div class="text-white display-4 py-5">¡Hola, bienvenido!</div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="container">
+        <div class="row g-4">
+            <!-- Dollar Stats -->
+            <div class="col-md-6 col-lg-3">
+          <div class="card stat-card">
+              <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="icon-container">
+                <i class="bi bi-currency-dollar stat-icon"></i>
             </div>
-            <div class="stat">
-                <i class="fas fa-smile-beam icon"></i>
-                <h2>5K</h2>
-                <p>Clientes satisfechos</p>
+            <div class="">
+              <div class="display-2 fw-bold">15M</div>
+              <p class="text-muted"><small>De dólares en importaciones</small></p>
             </div>
-            <div class="stat">
-                <i class="fas fa-cogs icon"></i>
-                <h2>11C</h2>
-                <p>CRM vendidos</p>
+              </div>
+          </div>
             </div>
-            <div class="stat">
-                <i class="fas fa-shipping-fast icon"></i>
-                <h2>10K</h2>
-                <p>Contenedores importantes</p>
+
+            <!-- Users Stats -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card stat-card">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="icon-container">
+                <i class="bi bi-people stat-icon"></i>
+            </div>
+            <div class="">
+              <div class="display-2 fw-bold">5K</div>
+              <p class="text-muted"><small>Clientes satisfechos</small></p>
+            </div>
+          </div>
+              </div>
+            </div>
+
+            <!-- Package Stats -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card stat-card">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="icon-container">
+                <i class="bi bi-box-seam stat-icon"></i>
+            </div>
+            <div class="">
+              <div class="display-2 fw-bold">1100</div>
+              <p class="text-muted"><small>CBM vendidos</small></p>
+            </div>
+          </div>
+              </div>
+            </div>
+
+            <!-- Container Stats -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card stat-card">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="icon-container">
+                <i class="fas fa-ship stat-icon"></i>
+            </div>
+            <div class="">
+              <div class="display-2 fw-bold">10K</div>
+              <p class="text-muted"><small>Contenedores importados</small></p>
+            </div>
+          </div>
+              </div>
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+
+    </div>
   </section>
   <!-- /.content -->
 </div>
@@ -1707,58 +1756,71 @@
 </div><!-- /. Modal booking -->
 
 <style>
-h1 {
-    font-size: 2.5em;
-    margin-bottom: 40px;
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+/* Hero Section Styles */
+.hero-section {
+    margin-top: 4rem;
+    background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 400px;
+    border-bottom-left-radius: 2rem;
+    border-top-right-radius: 2rem;
+    border-top-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    position: relative;
 }
 
-.welcome-image {
-    width: 500px; /* Ajusta el tamaño de la imagen */
-    height: 350px;
-    vertical-align: middle;
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(13, 110, 253, 0.3);
+    border-bottom-left-radius: 2rem;
+    border-top-right-radius: 2rem;
+    border-top-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
 }
 
-.stats-container {
-    display: flex;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-    gap: 5px;
+/* Stats Card Styles */
+.stat-card {
+    background: white;
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s;
+    margin-top: 3rem;
 }
 
-.stat {
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    padding: 20px;
-    width: 280px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.stat:hover {
+.stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.icon {
-    font-size: 5.5em;
-    color: #007bff;
-    margin-bottom: 10px;
+.stat-icon {
+    font-size: 5rem;
+    color: #FF7F50;
+    margin-bottom: 1rem;
 }
 
-.stat h2 {
-    font-size: 5em;
-    margin: 10px 0;
-    color: #333;
+.display-2.fw-bold{
+  font-family: 'Sora', sans-serif;
 }
-
-.stat p {
-    font-size: 1em;
-    color: #666;
-    margin: 0;
+.icon-container {
+          width: 80px;
+          height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        height: 250px;
+    }
+    
+    .stat-card {
+        margin-top: 1.5rem;
+    }
 }
 </style>
