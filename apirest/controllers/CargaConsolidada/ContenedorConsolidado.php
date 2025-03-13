@@ -19,7 +19,6 @@ class ContenedorConsolidado extends CI_Controller
 			if (!isset($this->session->userdata['usuario'])) {
 				redirect('');
 			}
-			log_message('error', 'ContenedorConsolidado : __construct()');
 		} catch (Exception $e) {
 			log_message('error', 'ContenedorConsolidado : __construct() => ' . $e->getMessage());
 		}
@@ -48,7 +47,11 @@ class ContenedorConsolidado extends CI_Controller
 	{
 		$arrData = $this->ContenedorConsolidadoModel->index();
 		$data    = [];
-
+		usort($arrData, function ($a, $b) {
+			$numA = (int)$a->carga;
+			$numB = (int)$b->carga;
+			return $numB - $numA; 
+		});
 		foreach ($arrData as $row) {
 			$subdata   = [];
 			$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : $row->tipo_carga . " #" . $row->carga;
@@ -67,9 +70,9 @@ class ContenedorConsolidado extends CI_Controller
 					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
 					($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .
 					($row->estado_china == "COMPLETADO" ? "bg-success" : "") . '">
-					<option value="PENDIENTE" ' . ($row->estado_china == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
-					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>Recibiendo</option>
-					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>Completado</option>
+					<option value="PENDIENTE" ' . ($row->estado_china == "PENDIENTE" ? "selected" : "") . '>PENDING</option>
+					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>RECEIVING</option>
+					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>FINISH</option>
 				</select>';
 			} else if ($this->user->No_Grupo == "Documentacion") {
 				$divEstado = '<select 
@@ -105,7 +108,8 @@ class ContenedorConsolidado extends CI_Controller
 
 			$divAcciones = '<div>';
 
-			$divAcciones .='<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ')"></i>';
+			$divAcciones .='<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+			' . $row->carga . ')"></i>';
 				//if user is coordinacion show
 				if ($this->user->No_Grupo == "Coordinación") {
 				$divAcciones .= '<i class="fas fa-edit text-warning" style="cursor:pointer; padding:10px;" onclick="view(' . $row->id . ')"></i>';
@@ -117,11 +121,7 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $divAcciones;
 			$data[] = $subdata;
 		}
-		usort($data, function ($a, $b) {
-			$numA = (int) substr($a['carga'], 1); // Elimina el '#' y convierte a número
-			$numB = (int) substr($b['carga'], 1); // Elimina el '#' y convierte a número
-			return $numB - $numA; // Orden descendente
-		});
+		
 		$output = array(
 			"data" => $data
 		);
@@ -200,7 +200,8 @@ class ContenedorConsolidado extends CI_Controller
 	{
 		$data = $this->input->post('data');
 		$idProveedor = $this->input->post('idProveedor');
-		$arrResponse = $this->ContenedorConsolidadoModel->updateProveedorData($data, $idProveedor);
+		$idCotizacion = $this->input->post('idCotizacion');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateProveedorData($data, $idProveedor,$idCotizacion);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
@@ -487,9 +488,9 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $divInputArriveDateChina;
 						$subdata[] = $divAcciones;
 						$data[]    = $subdata;
-						$index++;
 				}
-				
+				$index++;
+
 				$output = [
 					"data" => $data,
 				];
@@ -1346,6 +1347,12 @@ class ContenedorConsolidado extends CI_Controller
 		$idCotizacion = $this->input->post('idCotizacion');
 		$files = $_FILES;
 		$arrResponse = $this->ContenedorConsolidadoModel->saveDocumentation($idProveedor, $idCotizacion, $files);
+		echo json_encode([
+			'status' => $arrResponse,
+		]);
+	}
+	public function deleteFileInspection($id){
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteFileInspection($id);
 		echo json_encode([
 			'status' => $arrResponse,
 		]);
