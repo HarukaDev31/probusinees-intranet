@@ -5415,6 +5415,7 @@ window.addEventListener("load", () => {
     }
   };
 });
+
 setupSingleFileUpload("single-file-upload", "file-input-prospecto");
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion",);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");
