@@ -394,7 +394,7 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
 function deleteFile(fileId, cardElement) {
   $.ajax({
     url:
-      base_url + "CargaConsolidada/ContenedorConsolidado/deleteFile/" + fileId,
+      base_url + "CargaConsolidada/ContenedorConsolidado/deleteFileInspection/" + fileId,
     type: "GET",
     success: function (response) {
       const data = JSON.parse(response);
@@ -4664,10 +4664,10 @@ $(document).ready(async function () {
       });
 
       // Eliminar archivo
-      card.find(".delete-btn").click(function () {
-        const fileId = $(this).data("id");
-        deleteFile(fileId, card);
-      });
+      // card.find(".delete-btn").click(function () {
+      //   const fileId = $(this).data("id");
+      //   deleteFile(fileId, card);
+      // });
     });
   }
   const fillSelects = async () => {

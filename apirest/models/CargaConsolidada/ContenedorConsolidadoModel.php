@@ -2708,20 +2708,20 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 'estados_proveedor' => 'INSPECTION'
             ]);
             $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado INSPECCIONADO";
-            $socketResponse = $this->sendEvent([
-                "project" => "0",
-                "role" => $this->roleCotizador,
-                "user" => "0",
-                "action" => $this->cambioEstadoProveedor,
-                "message" => $message,
-            ]);
-            $socketResponse = $this->sendEvent([
-                "project" => "0",
-                "role" => $this->roleCoordinacion,
-                "user" => "0",
-                "action" => $this->cambioEstadoProveedor,
-                "message" => $message,
-            ]);
+            // $socketResponse = $this->sendEvent([
+            //     "project" => "0",
+            //     "role" => $this->roleCotizador,
+            //     "user" => "0",
+            //     "action" => $this->cambioEstadoProveedor,
+            //     "message" => $message,
+            // ]);
+            // $socketResponse = $this->sendEvent([
+            //     "project" => "0",
+            //     "role" => $this->roleCoordinacion,
+            //     "user" => "0",
+            //     "action" => $this->cambioEstadoProveedor,
+            //     "message" => $message,
+            // ]);
             //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
             $this->db->select('nombre')
                 ->from($this->table_contenedor_cotizacion)
@@ -2731,15 +2731,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             //message = cliente code supplieer qtyboxchina??qtybox
             $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
                 '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
-            // 'Reserva de espacio: Consolidado #01-2025 ' . "\n\n" .
-            // 'Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor. ' . "\n\n" .
-            // '☑ CBM Preliminar: cbm. ' . $volumen . ' ' . "\n" .
-            // '☑ Costo CBM: $.' . $valorCot . ' ' . "\n" .
-            // '☑ Fecha Limite de pago: ' . $fCierre . ' ' . "\n\n" .
-            // '⚠Nota: Realizar el pago antes del llenado del contenedor. ' . "\n\n" .
-            // '📦En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final. ' . "\n\n" .
-            // 'Apenas haga el pago me envía por este medio para hacer la reserva.';
-
+           
             $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
 
             //             $this->sendMessage('Hola buen día 🙋🏻‍♀
