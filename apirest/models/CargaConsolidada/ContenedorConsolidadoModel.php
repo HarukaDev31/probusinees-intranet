@@ -4874,7 +4874,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         "error" => $files['files']['error'][$key],
                         "size" => $files['files']['size'][$key]
                     ],
-                    'assets/cargaconsolidada/inspecciones'
+                    'assets/images/'
                 );
                 $data = [
                     'id_cotizacion' => $idCotizacion,
