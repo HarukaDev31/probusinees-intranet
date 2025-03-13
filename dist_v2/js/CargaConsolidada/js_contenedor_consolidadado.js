@@ -391,6 +391,10 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
     },
   });
 }
+async function saveBoth() {
+  await saveDocumentation();
+  await saveInspection();
+}
 function deleteFile(fileId, cardElement) {
   $.ajax({
     url:
@@ -4319,6 +4323,9 @@ $(document).ready(async function () {
   $("#upload-inspection").click(() => $("#upload-input-inspection").click());
 
   // Listeners para subir archivos
+  $('#btn-guardar-doc-nota').click(async() => {
+    await saveBoth();
+  });
   $("#upload-input-documents").change(function () {
     handleFileUpload(this.files, "documents");
   });

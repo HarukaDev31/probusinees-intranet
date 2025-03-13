@@ -1099,7 +1099,7 @@
       <div class="col-6 col-sm-4">
       </div>
       <div class="col-12 col-md-1">
-        <button type="button" id="btn-guardar-doc-not" onclick="saveboth()" class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Guardar <i class="fas fa-save"></i></button>
+        <button type="button" id="btn-guardar-doc-not"  class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Guardar <i class="fas fa-save"></i></button>
       </div>
       <div class="col-12 col-md-4">
         <label>&nbsp;</label>
@@ -2253,10 +2253,7 @@
 </style>
 <script>
   // script.js
-  function saveBoth() {
-    saveDocumentation();
-    saveInspection();
-  }
+ 
 
   function setupSingleFileUpload(containerId, inputId) {
     try {
