@@ -1,3 +1,4 @@
+
 let spinner = null;
 var table_Entidad = null;
 var idContenedor = 0;
@@ -443,11 +444,11 @@ function addFileToList(file, fileList = null, id = null) {
   });
 
   // Botón de eliminar
-  //   fileItem.find(".delete-btn").on("click", function () {
-  //     event.preventDefault();
-  //     const id = $(this).data("id");
-  //     deleteFile(id, fileItem);
-  //   });
+//   fileItem.find(".delete-btn").on("click", function () {
+//     event.preventDefault();
+//     const id = $(this).data("id");
+//     deleteFile(id, fileItem);
+//   });
   //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
   if (isImage) {
     const viewBtn = $(`
@@ -2303,6 +2304,10 @@ const openStepFunction = async (step, id) => {
                     "table-cotizacion-embarque_info"
                   );
                   await getTableCotizacionEmbarqueHeaders();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 53542463560d466cb98085250d9040c10e0ca0b7
                 }
                 currentTableCotizacion = "embarque";
                 $(".input-date").datepicker({
@@ -2715,12 +2720,14 @@ const openStepFunction = async (step, id) => {
             data.estado = "0";
           },
         },
+
       });
-      configurarBuscador(
-        "table-clientes-general",
-        "search-table",
-        "table-clientes-general_info"
-      );
+        configurarBuscador(
+            "table-clientes-general",
+            "search-table",
+            "table-clientes-general_info"
+        );
+
     }
   } else if (stepIndex == 3 && currentPrivilege == "Documentacion") {
     viewFormularioAduana();
@@ -4208,6 +4215,10 @@ $(document).ready(async function () {
   } catch (error) {
     console.log(error);
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 53542463560d466cb98085250d9040c10e0ca0b7
 
   table_Entidad = $("#table-contenedor").DataTable({
     dom:
@@ -4310,11 +4321,8 @@ $(document).ready(async function () {
     ],
   });
 
-  configurarBuscador(
-    "table-contenedor",
-    "search-table",
-    "table-contenedor_filter"
-  );
+  configurarBuscador('table-contenedor','search-table','table-contenedor_filter');
+
 
   $("#upload-documents").click(() => $("#upload-input-documents").click());
   $("#upload-inspection").click(() => $("#upload-input-inspection").click());
@@ -4327,7 +4335,7 @@ $(document).ready(async function () {
   $("#upload-input-inspection").change(function () {
     handleFileUpload(this.files, "inspection");
   });
-
+  
   $("#btn-back-documentacion-profile").click(() => {
     documentationContainerProfile.hide();
     clientesContainer.show();
@@ -4666,10 +4674,10 @@ $(document).ready(async function () {
       });
 
       // Eliminar archivo
-      //   card.find(".delete-btn").click(function () {
-      //     const fileId = $(this).data("id");
-      //     deleteFile(fileId, card);
-      //   });
+    //   card.find(".delete-btn").click(function () {
+    //     const fileId = $(this).data("id");
+    //     deleteFile(fileId, card);
+    //   });
     });
   }
   const fillSelects = async () => {
@@ -5407,9 +5415,6 @@ window.addEventListener("load", () => {
     }
   };
 });
-async function test() {
-  console.log("Test function");
-}
 setupSingleFileUpload("single-file-upload", "file-input-prospecto");
-setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion");
+setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion",);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");

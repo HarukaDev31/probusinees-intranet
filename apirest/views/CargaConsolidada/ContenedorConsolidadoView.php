@@ -2468,7 +2468,7 @@
     });
     removeFileButton.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log(e.target, "removeFileButton");
+      console.log(e.target,"removeFileButton");
       //remove most close file input and remove this from input file
       $(e.target).closest('.file-item').remove();
 
