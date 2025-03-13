@@ -4323,7 +4323,7 @@ $(document).ready(async function () {
   $("#upload-inspection").click(() => $("#upload-input-inspection").click());
 
   // Listeners para subir archivos
-  $('#btn-guardar-doc-nota').click(async() => {
+  $('#btn-guardar-doc-not').click(async() => {
     await saveBoth();
   });
   $("#upload-input-documents").change(function () {
