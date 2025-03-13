@@ -572,8 +572,6 @@ async function verCotizacionEmbarque(
   spinner.hide();
   // Función para agregar un archivo a la lista con vista previa y botones
 }
-<<<<<<< HEAD
-=======
 async function deleteFileInspection(id, cardElement) {
   event.preventDefault();
   Swal.fire({
@@ -610,7 +608,6 @@ async function deleteFileInspection(id, cardElement) {
     }
   });
 }
->>>>>>> feature/agente-compra-new
 async function getFilesAlmacenDocument(idProveedor, idCotizacion) {
   spinner.show();
 
@@ -2304,14 +2301,7 @@ const openStepFunction = async (step, id) => {
                     "table-cotizacion-embarque_info"
                   );
                   await getTableCotizacionEmbarqueHeaders();
-<<<<<<< HEAD
-                  
-=======
-<<<<<<< HEAD
-=======
 
->>>>>>> 53542463560d466cb98085250d9040c10e0ca0b7
->>>>>>> feature/agente-compra-new
                 }
                 currentTableCotizacion = "embarque";
                 $(".input-date").datepicker({
@@ -4219,14 +4209,7 @@ $(document).ready(async function () {
   } catch (error) {
     console.log(error);
   }
-<<<<<<< HEAD
-  
-=======
-<<<<<<< HEAD
-=======
 
->>>>>>> 53542463560d466cb98085250d9040c10e0ca0b7
->>>>>>> feature/agente-compra-new
 
   table_Entidad = $("#table-contenedor").DataTable({
     dom:
@@ -4803,11 +4786,8 @@ $(document).ready(async function () {
     cotizacionAlmacenContainer.hide();
     contentHeader.hide();
     cotizacionContainer.show();
-<<<<<<< HEAD
     
     
-=======
->>>>>>> feature/agente-compra-new
   });
   $("#btn-back-factura-guia").click(function () {
     returnToSteps();
@@ -5427,10 +5407,6 @@ window.addEventListener("load", () => {
     }
   };
 });
-<<<<<<< HEAD
-=======
-
->>>>>>> feature/agente-compra-new
 setupSingleFileUpload("single-file-upload", "file-input-prospecto");
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion");
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");
