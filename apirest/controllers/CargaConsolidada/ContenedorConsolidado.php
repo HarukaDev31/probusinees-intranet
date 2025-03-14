@@ -578,7 +578,7 @@ onchange="updateEstado(' . $row->id . ')"
 					$divVolChina = '<div class="d-flex flex-row gap-2">
 					<div class="d-flex flex-row gap-2">
 					' . (($volSelected != "volumen_china")
-						? '<button class="px-3 py-2 bg-orange rounded-sm border-0" onclick="updateVolSelected(' . $row->id_cotizacion . ',\'volumen_china\')">' . ($row->volumen ?? 0) . '</button>'
+						? '<button class="px-3 py-2 bg-orange rounded-sm border-0" onclick="updateVolSelected(' . $row->id_cotizacion . ',\'volumen_china\')">' . ($row->volumen_china ?? 0) . '</button>'
 						: '<span class="px-3 py-2 bg-light rounded-sm">' . ($row->volumen_china ?? 0) . '</span>') . '
 					</div>
 				</div>';
