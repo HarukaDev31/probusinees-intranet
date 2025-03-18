@@ -1,3 +1,7 @@
+<script>
+    var currentPrivilege="<?php echo $this->user->No_Grupo; ?>";
+    localStorage.setItem("currentPrivilege", currentPrivilege);
+  </script>
 <div class="content-wrapper">
   <!--set js variable = php variable-->
   <script>
@@ -1094,10 +1098,10 @@
       </div>
       <div class="col-12 col-md-4">
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
-          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">Inspection
+          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top"><label>Inspection  <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
-              class="new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
+              class="bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html">Guardar &nbsp; <i class="fa fa-save"></i> 
             </div>
           </h2>
           <!--Button para guardar-->

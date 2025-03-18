@@ -13,7 +13,7 @@
     <div class="hero-section position-relative mb-n5">
         <div class="overlay"></div>
         <div class="container position-relative d-flex align-items-center mx-4" style="height: 100%;">
-            <div class="text-white display-4 py-5" style="font-weight: 400;">¡Hola, bienvenido!</div>
+            <div class="text-white display-4 py-5" style="font-weight: 400;z-index: 3">¡Hola, bienvenido!</div>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
                 <i class="bi bi-currency-dollar stat-icon"></i>
             </div>
             <div class="">
-              <div class="display-2 fw-bold">15M</div>
+              <div class="display-2 fw-bold" id="Dolars import">0M</div>
               <p class="text-muted"><small>De dólares en importaciones</small></p>
             </div>
               </div>
@@ -43,7 +43,7 @@
                 <i class="bi bi-people stat-icon"></i>
             </div>
             <div class="">
-              <div class="display-2 fw-bold">5K</div>
+              <div class="display-2 fw-bold" id="Clients satisfied">0K</div>
               <p class="text-muted"><small>Clientes satisfechos</small></p>
             </div>
           </div>
@@ -58,7 +58,7 @@
                 <i class="bi bi-box-seam stat-icon"></i>
             </div>
             <div class="">
-              <div class="display-2 fw-bold">1100</div>
+              <div class="display-2 fw-bold" id="CBM sells">0</div>
               <p class="text-muted"><small>CBM vendidos</small></p>
             </div>
           </div>
@@ -73,7 +73,7 @@
                 <i class="fas fa-ship stat-icon"></i>
             </div>
             <div class="">
-              <div class="display-2 fw-bold">10K</div>
+              <div class="display-2 fw-bold" id="Containers imported">0K</div>
               <p class="text-muted"><small>Contenedores importados</small></p>
             </div>
           </div>
@@ -1760,7 +1760,7 @@
 /* Hero Section Styles */
 .hero-section {
     margin-top: 4rem;
-    background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80');
+    background-image: url('https://s3-alpha-sig.figma.com/img/7d8f/0b91/5a3a33a0472028e8d94e6e7239995ba9?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=cQYa7ts6qcmn-3gMGt1Z~5j0CRM-4Bb5GOlVhuO8Wu8ayhPSq83gjVMUEZ9AZ49us8eYIJ8yFa3W~boDYLAeDLqsPtgi5Vie1SNiZyGkZV0GXP~1LMMOyec82PElpVYVAnwgoG1TRHq3toMdzPqCHomMCwC2N681B6MLNQ2X0K5LTLVwj1qDr4JoK77q7AuuUgwciPRFW1OVU4ef-EIj74rNJBJaUzbL~SUVQDjGPU1JiZROznMl67wtug~niempNPBFpTqnmjDRfXZuihRTEwawkj8XuC7VNgisMKdVBfpKRRre0r0nRJ8E2BfgCRnolgYuEfls30vOgdVZyfEWWw__');
     background-size: cover;
     background-position: center;
     height: 450px;
@@ -1769,6 +1769,7 @@
     border-top-left-radius: 2rem;
     border-bottom-right-radius: 2rem;
     position: relative;
+    z-index: 2;
 }
 
 .overlay {
@@ -1777,11 +1778,13 @@
     left: 0;
     right: 0;
     bottom: 0;
+    margin-top: 100px;
     background-color: rgba(13, 110, 253, 0.3);
     border-bottom-left-radius: 2rem;
     border-top-right-radius: 2rem;
     border-top-left-radius: 2rem;
     border-bottom-right-radius: 2rem;
+    z-index: 1;
 }
 
 /* Stats Card Styles */
@@ -1825,3 +1828,36 @@
     }
 }
 </style>
+<script>
+  function animateNumber(containerId, targetNumber, duration) {
+    const element = document.getElementById(containerId);
+      const content = element.textContent;
+
+      // Extrae el número y el sufijo usando una expresión regular
+      const match = content.match(/^(\d+)(\D*)$/);
+      if (!match) {
+        console.error("El contenido no contiene un número válido.");
+        return;
+      }
+
+      const startNumber = parseInt(match[1], 10); // Número inicial
+      const suffix = match[2]; // Sufijo (letras o símbolos)
+      const increment = (targetNumber - startNumber) / (duration / 16); // Incremento por frame
+      let currentNumber = startNumber;
+
+      const interval = setInterval(() => {
+        currentNumber += increment;
+        if (currentNumber >= targetNumber) {
+          clearInterval(interval);
+          currentNumber = targetNumber; // Asegura que llegue al número exacto
+        }
+        element.textContent = Math.round(currentNumber) + suffix; // Actualiza el contenido
+      }, 16); // 16ms por frame
+    }
+
+    animateNumber("Dolars import", 15, 2000);
+    animateNumber("Clients satisfied", 5, 2000);
+    animateNumber("CBM sells", 1100, 2000);
+    animateNumber("Containers imported", 10, 2000);
+
+</script>

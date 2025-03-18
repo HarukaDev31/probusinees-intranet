@@ -11,9 +11,7 @@ var currentCarga = 0;
 var currentProveedor = 0;
 var currentCotizacion;
 var currentTableCotizacion = "prospectos";
-var currentPrivilege = //local storage
-  localStorage.getItem("currentPrivilege") == null? "": localStorage.getItem("currentPrivilege");
-console.log(currentPrivilege);
+var currentPrivilege = localStorage.getItem("currentPrivilege") == null? "": localStorage.getItem("currentPrivilege");
 var fileManager = null;
 var fileManagerInspection = null;
 var fileManagerInspectionCoordinacion = null;
@@ -96,16 +94,57 @@ var documentationContainerProfile = null;
 var documentacionSelectedProvider = 0;
 var documentacionDocumentacionContainer = null;
 var documentacionAduanaContainer = null;
+
+function getSwalConfig(type, privilege) {
+  const isEnglish = privilege === "ContenedorAlmacen";
+
+  const messages = {
+    confirmDelete: {
+      title: isEnglish ? "Are you sure?" : "¿Estás seguro?",
+      text: isEnglish ? "You won't be able to revert this!" : "¡No podrás revertir esto!",
+      confirmButtonText: isEnglish ? "Yes, delete it" : "Sí, eliminarlo",
+      cancelButtonText: isEnglish ? "No, cancel" : "No, cancelar",
+    },
+    confirmSave: {
+      title: isEnglish ? "Are you sure you want to save?" : "¿Estás seguro de que deseas guardar?",
+      text: isEnglish ? "This action will save the changes." : "Esta acción guardará los cambios.",
+      confirmButtonText: isEnglish ? "Yes, save it" : "Sí, guardarlo",
+      cancelButtonText: isEnglish ? "No, cancel" : "No, cancelar",
+    },
+    successDelete: {
+      title: isEnglish ? "Deleted!" : "Eliminado!",
+      text: isEnglish ? "The file has been deleted." : "El archivo ha sido eliminado.",
+    },
+    successSave: {
+      title: isEnglish ? "Saved!" : "¡Guardado!",
+      text: isEnglish ? "The changes have been saved successfully." : "Los cambios se han guardado correctamente.",
+    },
+    error: {
+      title: isEnglish ? "Error!" : "¡Error!",
+      text: isEnglish ? "An error occurred." : "Ocurrió un error.",
+    },
+  };
+
+  return messages[type];
+}
+
+  // Obtener configuración de Swal para guardar
+  const swalConfig = getSwalConfig("confirmSave", currentPrivilege);
+  const successConfig = getSwalConfig("successSave", currentPrivilege);
+  const errorConfig = getSwalConfig("error", currentPrivilege);
+
+
 async function saveDocumentation() {
   event.preventDefault();
+
   //show confirm swall
   Swal.fire({
-    title: "¿Estás seguro?",
-    text: "¡No podrás revertir esto!",
-    icon: "warning",
+    title: swalConfig.title,
+    text: swalConfig.text,
+    icon: swalConfig.icon,
     showCancelButton: true,
-    confirmButtonText: "Sí, guardar",
-    cancelButtonText: "No, cancelar",
+    confirmButtonText: swalConfig.confirmButtonText,
+    cancelButtonText: swalConfig.cancelButtonText,
   }).then((result) => {
     if (result.isConfirmed) {
       // upload add idCotizacion and get files from #file-inpute
@@ -129,10 +168,10 @@ async function saveDocumentation() {
         success: function (response) {
           const result = JSON.parse(response);
           if (result.status == "success") {
-            Swal.fire("Correcto!", result.message, "success");
+            Swal.fire(successConfig.title, result.message, "success");
             reloadTableCotizacionEmbarque();
           } else {
-            Swal.fire("Error!", result.message, "error");
+            Swal.fire(errorConfig.title, result.message, "error");
           }
           spinner.hide();
           //clear input and file-lista
@@ -157,12 +196,12 @@ async function saveInspection() {
   event.preventDefault();
   //show confirm swall
   Swal.fire({
-    title: "¿Estás seguro?",
-    text: "¡No podrás revertir esto!",
-    icon: "warning",
+    title: swalConfig.title,
+    text: swalConfig.text,
+    icon: swalConfig.icon,
     showCancelButton: true,
-    confirmButtonText: "Sí, guardar",
-    cancelButtonText: "No, cancelar",
+    confirmButtonText: swalConfig.confirmButtonText,
+    cancelButtonText: swalConfig.cancelButtonText,
   }).then((result) => {
     console.log(result);
     if (result.isConfirmed) {
@@ -187,10 +226,10 @@ async function saveInspection() {
         success: function (response) {
           const result = JSON.parse(response);
           if (result.status == "success") {
-            Swal.fire("Correcto!", result.message, "success");
+            Swal.fire(successConfig.title, result.message, "success");
             reloadTableCotizacionEmbarque();
           } else {
-            Swal.fire("Error!", result.message, "error");
+            Swal.fire(errorConfig.title, result.message, "error");
           }
           spinner.hide();
           //clear input and file-lista
@@ -242,7 +281,7 @@ async function descargarBoletaPDF(idCotizacionFinal) {
       spinner.hide();
     },
     error: function (errorThrown) {
-      Swal.fire("Error!", "Hubo un error", "error");
+      Swal.fire(errorConfig.title, "Hubo un error", "error");
       console.error("Error al descargar el archivo Excel: " + errorThrown);
       spinner.hide();
     },
@@ -263,9 +302,9 @@ async function updateEstadoDocumentacion(id) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
       } else {
-        Swal.fire("Error!", result.message, "error");
+        Swal.fire(errorConfig.title, result.message, "error");
       }
       table_Entidad.ajax.reload();
     },
@@ -284,9 +323,9 @@ async function updateEstado(id) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
       } else {
-        Swal.fire("Error!", result.message, "error");
+        Swal.fire(errorConfig.title, result.message, "error");
       }
       table_Entidad.ajax.reload();
     },
@@ -336,7 +375,8 @@ async function uploadCotizacionFinal(id) {
   }
 }
 async function deleteCotizacionFinalFile(id) {
-  Swal.fire({
+  Swal.fire(
+    {
     title: "¿Estás seguro?",
     text: "¡No podrás revertir esto!",
     icon: "warning",
@@ -426,15 +466,15 @@ function addFileToList(file, fileList = null, id = null) {
   const isImage = file?.file_ext.startsWith("image");
   const fileItem = $(`
         <div class="file-item">
-            <div class="file-preview"><span>📄</span>
-                <span>${file.file_name}</span>
+            <div class="file-preview d-flex"><i class="fas fa-video pr-2"></i>&nbsp;
+                <p>${file.file_name}</p>
             </div>
             <div class="file-actions d-flex flex-row">
-                <button class="btn btn-primary btn-sm download-btn" data-url="${file.file_url}">
+                <button class="btn-sm download-btn" data-url="${file.file_url}">
                 <i class="fas fa-download"></i> 
                 </button>
-                <button class="btn btn-danger btn-sm delete-btn" data-id="${file.id}">
-                <i class="fas fa-trash"></i>
+                <button class="btn-sm delete-btn" data-id="${file.id}">
+                <i class="far fa-trash-alt"></i>
                 </button>
             </div>
         </div>
@@ -455,8 +495,9 @@ function addFileToList(file, fileList = null, id = null) {
   });
   //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
   if (isImage) {
+    const imageicon = $(`<i class="far fa-file-image pr-2"></i>`);
     const viewBtn = $(`
-            <button class="btn btn-primary btn-sm view-btn">👁️</button>
+            <button class="btn-sm view-btn"><i class="far fa-eye"></i></button>
         `);
     viewBtn.on("click", function () {
       event.preventDefault();
@@ -464,39 +505,98 @@ function addFileToList(file, fileList = null, id = null) {
       const fileExt = file.file_ext;
       viewFile(url, fileExt);
     });
+    fileItem.find(".file-preview i").replaceWith(imageicon);
     fileItem.find(".file-actions").append(viewBtn);
   }
   fileList.append(fileItem);
   //remove class hidden
   fileList.removeClass("hidden");
 }
+
+
 function viewFile(url, fileExt) {
-  const isImage = fileExt.startsWith("image");
-  const isVideo = fileExt.startsWith("video");
-  const isPdf = fileExt.startsWith("application/pdf");
-  const isWord =
+  spinner.show(); // Mostrar el spinner antes de cargar el archivo
+
+  // Mapeo de tipos de archivo a selectores y eventos
+  const fileHandlers = {
+    image: {
+      selector: "#image-preview",
+      modal: "#image-modal",
+      event: "load",
+    },
+    video: {
+      selector: "#video-preview",
+      modal: "#video-modal",
+      event: "canplay",
+    },
+    pdf: {
+      selector: "#file-preview",
+      modal: "#file-modal",
+      event: null, // No hay evento confiable para iframes
+    },
+    word: {
+      selector: "#file-preview",
+      modal: "#file-modal",
+      event: null,
+    },
+    excel: {
+      selector: "#file-preview",
+      modal: "#file-modal",
+      event: null,
+    },
+  };
+
+  // Determinar el tipo de archivo
+  let fileType = null;
+  if (fileExt.startsWith("image")) fileType = "image";
+  else if (fileExt.startsWith("video")) fileType = "video";
+  else if (fileExt.startsWith("application/pdf")) fileType = "pdf";
+  else if (
     fileExt.startsWith("application/msword") ||
     fileExt.startsWith(
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    );
-  const isExcel =
+    )
+  )
+    fileType = "word";
+  else if (
     fileExt.startsWith("application/vnd.ms-excel") ||
     fileExt.startsWith(
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
+    )
+  )
+    fileType = "excel";
 
-  if (isImage) {
-    $("#image-preview").attr("src", url);
-    $("#image-modal").modal("show");
-  } else if (isVideo) {
-    $("#video-preview").attr("src", url);
-    $("#video-modal").modal("show");
-  } else if (isPdf || isWord || isExcel) {
-    // Configura el iframe dentro del modal para mostrar el archivo
-    $("#file-preview").attr("src", url);
-    $("#file-modal").modal("show");
+  // Manejo del archivo según su tipo
+  if (fileType && fileHandlers[fileType]) {
+    const handler = fileHandlers[fileType];
+    const element = $(handler.selector);
+
+    // Configurar la URL del archivo
+    element.attr("src", url);
+
+    // Si hay un evento asociado, manejarlo
+    if (handler.event) {
+      element.off(handler.event); // Eliminar eventos previos
+      element.on(handler.event, function () {
+        spinner.hide(); // Ocultar el spinner cuando el archivo esté listo
+        $(handler.modal).modal("show"); // Mostrar el modal
+      });
+
+      // Manejar errores de carga
+      element.on("error", function () {
+        spinner.hide();
+        Swal.fire("Error!", result.message, "error");
+      });
+    } else {
+      // Para iframes (PDF, Word, Excel), usar un retraso para ocultar el spinner
+      setTimeout(() => {
+        spinner.hide();
+        $(handler.modal).modal("show");
+      }, 1000);
+    }
   } else {
-    Swal.fire("Error!", "Formato de archivo no válido", "error");
+    spinner.hide();
+    Swal.fire("Error!", result.message, "error");
   }
 }
 
@@ -580,12 +680,12 @@ async function verCotizacionEmbarque(
 async function deleteFileInspection(id, cardElement) {
   event.preventDefault();
   Swal.fire({
-    title: "¿Estás seguro?",
-    text: "¡No podrás revertir esto!",
-    icon: "warning",
+    title: swalConfig.title,
+    text: swalConfig.text,
+    icon: swalConfig.icon,
     showCancelButton: true,
-    confirmButtonText: "Sí, eliminarlo",
-    cancelButtonText: "No, cancelar",
+    confirmButtonText: swalConfig.confirmButtonText,
+    cancelButtonText: swalConfig.cancelButtonText,
     iconColor: "#FF0000",
     color: "#FF0000",
   }).then((result) => {
@@ -603,9 +703,9 @@ async function deleteFileInspection(id, cardElement) {
           const result = JSON.parse(response);
           if (result.status == "success") {
             cardElement.remove();
-            Swal.fire("Eliminado!", result.message, "success");
+            Swal.fire(successConfig.title, result.message, "success");
           } else {
-            Swal.fire("Error!", result.message, "error");
+            Swal.fire(errorConfig.title, result.message, "error");
           }
           spinner.hide();
         },
@@ -828,10 +928,10 @@ async function updateProveedor($idProveedor) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
         reloadTableCotizacionEmbarque();
       } else {
-        Swal.fire("Error!", result.message, "error");
+        Swal.fire(errorConfig.title, result.message, "error");
       }
     },
   });
@@ -850,10 +950,10 @@ async function updateQtyChina($idProveedor) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
         reloadTableCotizacionEmbarque();
       } else {
-        Swal.fire("Error!", result.message, "error");
+        Swal.fire(errorConfig.title, result.message, "error");
       }
     },
   });
@@ -873,7 +973,7 @@ async function updateCBMChina($idProveedor) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
         reloadTableCotizacionEmbarque();
       } else {
         Swal.fire("Error!", result.message, "error");
@@ -927,7 +1027,7 @@ async function updateProveedorData(idCotizacion, idProveedor) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
         reloadTableCotizacionEmbarque();
       } else {
         Swal.fire("Error!", result.message, "error");
@@ -954,7 +1054,7 @@ async function updateArriveDateChina($idProveedor) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
         reloadTableCotizacionEmbarque();
       } else {
         Swal.fire("Error!", result.message, "error");
@@ -1128,7 +1228,7 @@ async function updateProductos($idProveedor, idCotizacion) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
         reloadTableCotizacionEmbarque();
       } else {
         Swal.fire("Error!", result.message, "error");
@@ -1153,7 +1253,7 @@ async function updateEstadoProveedor($idCotizacion, $idProveedor) {
     success: function (response) {
       const result = JSON.parse(response);
       if (result.status == "success") {
-        Swal.fire("Correcto!", result.message, "success");
+        Swal.fire(successConfig.title, result.message, "success");
         reloadTableCotizacionEmbarque();
       } else {
         Swal.fire("Error!", result.message, "error");
@@ -1222,7 +1322,8 @@ async function updateEstadoCotizacionProveedor(
       error: function () {
         //set current select previous status
         $(`#estado-${idCotizacion}-${idProveedor}`).val(previousStatus);
-        Swal.fire("Error!", "Hubo un error", "error");
+        Swal.fire("Error!", result.message, "error");
+        spinner.hide();
       },
     });
   } else {
@@ -3338,6 +3439,7 @@ async function deleteBL() {
     cancelButtonText: "No, cancelar",
   }).then((result) => {
     if (result.isConfirmed) {
+      spinner.show(); // Mostrar spinner
       url =
         base_url +
         "CargaConsolidada/ContenedorConsolidado/deleteBL/" +
@@ -3352,7 +3454,12 @@ async function deleteBL() {
           } else {
             Swal.fire("Error!", result.message, "error");
           }
-          getTableCotizacionEmbarqueHeaders();
+        },
+        error: function () {
+          Swal.fire("Error!", "Hubo un error en la solicitud", "error");
+        },
+        complete: function () {
+          spinner.hide(); // Ocultar spinner siempre
         },
       });
     }
