@@ -140,15 +140,8 @@ async function saveDocumentation() {
   event.preventDefault();
 
   //show confirm swall
-  Swal.fire({
-    title: swalConfig.title,
-    text: swalConfig.text,
-    icon: swalConfig.icon,
-    showCancelButton: true,
-    confirmButtonText: swalConfig.confirmButtonText,
-    cancelButtonText: swalConfig.cancelButtonText,
-  }).then((result) => {
-    if (result.isConfirmed) {
+ 
+
       // upload add idCotizacion and get files from #file-inpute
       const formData = new FormData();
       formData.append("idCotizacion", currentCotizacion);
@@ -171,7 +164,6 @@ async function saveDocumentation() {
           const result = JSON.parse(response);
           if (result.status == "success") {
             Swal.fire(successConfig.title, result.message, "success");
-            reloadTableCotizacionEmbarque();
           } else {
             Swal.fire(errorConfig.title, result.message, "error");
           }
@@ -191,8 +183,8 @@ async function saveDocumentation() {
           spinner.hide();
         },
       });
-    }
-  });
+    
+  
 }
 async function saveInspection() {
   event.preventDefault();
@@ -446,8 +438,12 @@ async function saveBoth() {
     cancelButtonText: swalConfig.cancelButtonText,
   }).then((result) => {
     if (result.isConfirmed) {
-      saveDocumentation();
-      addNote();
+      try{
+         saveDocumentation();
+         addNote();
+      }catch(e){
+        console.error(e);
+      }
     }
   });
 }
@@ -3237,9 +3233,9 @@ async function viewDocumentacion() {
                                             <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
                                             <i class="fas fa-download"></i>
                                             </button>
-                                            <button class="remove-file-button" onclick="deleteDocumentacionFile(${file.id_file})">
+                                            <div  onclick="deleteDocumentacionFile(${file.id_file})">
                                             <i class="fas fa-trash"></i>
-                                            </button>
+                                            </div>
                                         </div>
                                 `
                                     : `
@@ -3510,6 +3506,7 @@ async function deleteListaEmbarque() {
 }
 
 async function deleteDocumentacionFile(id) {
+  event.preventDefault();
   Swal.fire({
     title: "¿Estás seguro?",
     text: "¡No podrás revertir esto!",
@@ -3519,11 +3516,10 @@ async function deleteDocumentacionFile(id) {
     cancelButtonText: "No, cancelar",
   }).then((result) => {
     if (result.isConfirmed) {
-      url =
-        base_url +
-        "CargaConsolidada/ContenedorConsolidado/deleteDocumentacionFile/" +
-        id;
+      url =base_url +"CargaConsolidada/ContenedorConsolidado/deleteDocumentacionFile/" +id;
       $.ajax({
+        url: url,
+        type: "GET",
         success: function (response) {
           const result = JSON.parse(response);
           if (result.status == "success") {
@@ -5906,7 +5902,7 @@ function setupMultiFileUpload(containerId, inputId) {
 }
 
 setupSingleFileUpload("single-file-upload", "file-input-prospecto");
-setupSingleFileUpload("single-file-upload", "file-input-prospecto");
+
 
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion");
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");

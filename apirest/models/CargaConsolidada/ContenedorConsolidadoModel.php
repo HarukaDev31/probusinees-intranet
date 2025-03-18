@@ -2008,13 +2008,18 @@ return $result;
     }
     public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
     {
-        $this->db->select('nombre,id_contenedor')
+        $this->db->select('nombre,id_contenedor,telefono')
             ->from($this->table_contenedor_cotizacion)
             ->where('id', $idCotizacion);
         $query = $this->db->get();
 
         $cliente = $query->row()->nombre;
         $idContenedor = $query->row()->id_contenedor;
+        $telefono = $query->row()->telefono;
+        //remove spaces from telefono
+        $telefono = preg_replace('/\s+/', '', $telefono);
+        $telefono.= $telefono ? '@c.us' : '';
+        $this->phoneNumberId = $telefono;
         $this->db->close();
         $this->db->initialize();
         $this->db->select('code_supplier,products')
@@ -2187,12 +2192,16 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ], $fCierre);
 
             // Obtener nombre del cliente
-            $this->db->select('nombre')
+            $this->db->select('nombre,telefono')
                 ->from($this->table_contenedor_cotizacion)
                 ->where('id', $idCotizacion);
             $query = $this->db->get();
             $cliente = $query->row()->nombre;
-
+            $telefono = $query->row()->telefono;
+            //remove spaces from telefono
+            $telefono = preg_replace('/\s+/', '', $telefono);
+            $telefono.= $telefono ? '@c.us' : '';
+            $this->phoneNumberId = $telefono;
             // Construir el mensaje
             $message = "Reserva de espacio: Consolidado #" . $carga . "-2025\n\n" .
                 "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
@@ -2284,6 +2293,18 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             if ($estados_proveedor == "LOADED") {
                 $this->db->where('id', $idProveedor);
                 $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
+                //verify if in tracking exists RESERVADO ELSE TRUE SET estado_cliente in tablee cotizacion TO RESERVADO
+                $this->db->select('estado')
+                    ->from($this->table_conteneodr_proveedor_estados_tracking)
+                    ->where('id_cotizacion', $idCotizacion)
+                    ->where('estado', 'RESERVADO');
+                $query = $this->db->get();
+                if (!$query->row()) {
+                    $this->db->where('id', $idCotizacion);
+                    $this->db->update($this->table_contenedor_cotizacion, ['estado_cliente' => 'RESERVADO']);
+                }
+                
+                
             }
             return "success";
         }
@@ -2763,11 +2784,16 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             //     "message" => $message,
             // ]);
             //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
-            $this->db->select('nombre')
+            $this->db->select('nombre,telefono')
                 ->from($this->table_contenedor_cotizacion)
                 ->where('id', $idCotizacion);
             $query = $this->db->get();
             $cliente = $query->row()->nombre;
+            $telefono = $query->row()->telefono;
+            //remove spaces from telefono
+            $telefono = preg_replace('/\s+/', '', $telefono);
+            $telefono.= $telefono ? '@c.us' : '';
+            $this->phoneNumberId = $telefono;
             //message = cliente code supplieer qtyboxchina??qtybox
             $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
                 '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
