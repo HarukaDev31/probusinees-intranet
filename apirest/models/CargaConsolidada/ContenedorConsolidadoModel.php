@@ -2203,7 +2203,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $telefono.= $telefono ? '@c.us' : '';
             $this->phoneNumberId = $telefono;
             // Construir el mensaje
-            $message = "Reserva de espacio: Consolidado #" . $carga . "-2025\n\n" .
+            $message = "Reserva de espacio:\n\n" .
+                "*Consolidado #" . $carga . "-2025*\n\n" .
                 "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
                 "☑ CBM Preliminar: " . $volumen . " cbm\n" .
                 "☑ Costo CBM: $" . $valorCot . "\n" .
