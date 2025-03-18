@@ -102,12 +102,14 @@ function getSwalConfig(type, privilege) {
     confirmDelete: {
       title: isEnglish ? "Are you sure?" : "¿Estás seguro?",
       text: isEnglish ? "You won't be able to revert this!" : "¡No podrás revertir esto!",
+      icon: "warning",
       confirmButtonText: isEnglish ? "Yes, delete it" : "Sí, eliminarlo",
       cancelButtonText: isEnglish ? "No, cancel" : "No, cancelar",
     },
     confirmSave: {
       title: isEnglish ? "Are you sure you want to save?" : "¿Estás seguro de que deseas guardar?",
       text: isEnglish ? "This action will save the changes." : "Esta acción guardará los cambios.",
+      icon: "warning",
       confirmButtonText: isEnglish ? "Yes, save it" : "Sí, guardarlo",
       cancelButtonText: isEnglish ? "No, cancel" : "No, cancelar",
     },
@@ -435,8 +437,19 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
   });
 }
 async function saveBoth() {
-  await saveDocumentation();
-  await addNote();
+  Swal.fire({
+    title: swalConfig.title,
+    text: swalConfig.text,
+    icon: swalConfig.icon,
+    showCancelButton: true,
+    confirmButtonText: swalConfig.confirmButtonText,
+    cancelButtonText: swalConfig.cancelButtonText,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      saveDocumentation();
+      addNote();
+    }
+  });
 }
 function deleteFile(fileId, cardElement) {
   $.ajax({

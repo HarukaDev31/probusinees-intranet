@@ -590,14 +590,19 @@
     <div class="container-fluid ">
       <!-- Header de la tabla -->
       <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-        <div class="row mb-2">
+        <div class="row mb-2 d-flex justify-content-between">
           <div class="col-12 col-md-1">
             <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
           </div>
+        <div class="col-12 col-md-8 d-flex gap-2 justify-content-end">
+          <!-- Buscador -->
+        <div class="dataTables_filter">
+          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+        </div>
       
         
         <!-- Contenedor Principal de Exportar-->
-        <div class="col-6 col-sm-1 dropdown">
+        <div class="col-6 col-sm-2 dropdown">
           <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
             <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
@@ -605,7 +610,7 @@
           </div>
         </div>
         <!-- Contenedor Principal de Filtros-->
-        <div class=" col-6 col-sm-1 dropdown">
+        <div class=" col-6 col-sm-2 dropdown">
           <!-- Botón de Filtros -->
           <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-filter"></i>Filtros
@@ -649,12 +654,10 @@
           </div>
           <!-- Contenedor Principal de Exportar-->
         </div>
-          <div class="col-12 col-md-2">
+          <div class="col-12 col-md-3">
             <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
           </div>
-          <div class="col-12 col-md-4">
-            <label>&nbsp;</label>
-          </div>
+      </div>
       
         </div>
       <?php } else { ?>
@@ -702,14 +705,14 @@
         <?php } ?>
 
         <div class="col-12 col-md-2 d-flex align-items-center">
-          <i class="fas fa-flag px-2"></i>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
           <span>CBM Total Peru:</span>
           <div class="col-md-1">
             <strong><input type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></strong>
           </div>
         </div>
         <div class="col-12 col-md-2 d-flex align-items-center">
-          <i class="fas fa-flag px-2"></i>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
           <span>CBM Total China:</span>
           <div class="col-md-1">
             <strong><input type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></strong>
@@ -1522,6 +1525,13 @@
     font-size: 14px;
   }
 
+  .country-icons{
+    width: 24px;
+    height: 16px;
+    margin-right: 5px;
+    margin-top: -4px;
+  }
+
   #steps {
     display: flex;
     flex-wrap: wrap;
@@ -2156,7 +2166,8 @@
   div#table-clientes-general_filter,
   div#table-cotizacion-inspection_filter,
   div#table-cotizacion-inspection-coordinacion_filter,
-  div#table-clientes-variacion_filter {
+  div#table-clientes-variacion_filter,
+  div#table-cotizacion-prospectos_filter {
     display: none;
   }
 
