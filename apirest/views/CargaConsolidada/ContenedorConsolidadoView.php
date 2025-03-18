@@ -1,4 +1,9 @@
 <div class="content-wrapper">
+  <!--set js variable = php variable-->
+  <script>
+    var currentPrivilege="<?php echo $this->user->No_Grupo; ?>";
+    localStorage.setItem("currentPrivilege", currentPrivilege);
+  </script>
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">
@@ -869,110 +874,16 @@
       </div>
 
     </div>
-    <div class="container mx-auto px-4 py-8 max-w-75">
-      <div class="grid grid-cols-3 md:grid-cols-3 gap-8">
-        <!-- Sección de Documentación -->
-        <div class="bg-white p-6 rounded-lg shadow-md
-        col-span-2
-        ">
-          <div class="flex items-center gap-2 mb-6">
-            <h2 class="text-xl font-semibold">Documentación</h2>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
-              <line x1="10" y1="9" x2="8" y2="9" />
-            </svg>
-          </div>
-
-          <form id="form-documentacion" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Volumen documento</label>
-                <input type="number" id="txt-Vol_Doc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="volumen_doc">
+    <div class="documentos-clientes-tabs">
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Valor documento</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-2">$</span>
-                  <input type="number" id="txt-Valor_Doc" class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="valor_doc">
-                </div>
-              </div>
+              <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75">
+                
+            
             </div>
-
-            <div class="space-y-4" id="documentos-clientes-documentacion">
-
-              <!--               
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Factura comercial</label>
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <div class="text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    <p class="mt-1 text-sm text-gray-600">Selecciona o arrastra tu archivo aquí</p>
-                    <p class="text-xs text-gray-500">Formatos: xlsx</p>
-                  </div>
-                  <input type="file" class="hidden" id="facturaInput" accept=".xlsx">
-                </div>
-                <button class="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors" id="subirFactura">Subir archivo</button>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Excel confirmación</label>
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <div class="text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    <p class="mt-1 text-sm text-gray-600">Selecciona o arrastra tu archivo aquí</p>
-                    <p class="text-xs text-gray-500">Formatos: xlsx</p>
-                  </div>
-                  <input type="file" class="hidden" id="excelInput" accept=".xlsx">
-                </div>
-                <button class="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors" id="subirExcel">Subir archivo</button>
-              </div> -->
-            </div>
-          </form>
-        </div>
-
-        <!-- Sección de Cotizaciones -->
-        <div class="bg-white p-6 rounded-lg shadow-md
-        col-span-1
-        "
-          style="height: 40%;">
-          <div class="flex items-center gap-2 mb-6">
-            <h2 class="text-xl font-semibold">Cotizaciones</h2>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-          </div>
-
-          <div class="space-y-4">
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-              <span class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                Descargar cotización inicial
-              </span>
-            </button>
-
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-              <span class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                Descargar cotización final
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              
+    <!-- <div class="container ">
+      
+    </div> -->
     <!-- <div class="col col-12 my-2" id="clientes-documentacion">
       <h3
         class="d-flex w-100 row documentation-title">
@@ -1160,7 +1071,7 @@
                         <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
                         <span class="file-format">Formatos: .xlsx</span>
                       </div>
-                      <button class="upload-button" type="button">Subir archivo</button>
+                      <button class="upload-button upload-button-documentacion" type="button">Subir archivo</button>
                     </label>
                   </div>
                   <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
@@ -1204,7 +1115,7 @@
                           <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
                           <span class="file-format">Formatos: .jpeg .png .mp4</span>
                         </div>
-                        <button class="upload-button" type="button">Subir archivo</button>
+                        <button class="upload-button upload-button-inspeccion" type="button">Subir archivo</button>
                       </label>
                     </div>
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
@@ -2249,260 +2160,29 @@
 
   #table-contenedor_wrapper.dt-buttons.btn-group.flex-wrap {
     display: none;
+  }.tab-cliente-documentacion{
+    padding: 1em;
+    border-radius: 0.5em;
+    margin-bottom: 1em;
+    width: 100%;
+    background-color: #f9f9f9;
+    color:black;
+    text-align: center;
+    cursor: pointer;
+    
+  }
+  .tab-cliente-documentacion.active{
+    background-color: #FF500B!important;
+    color: white;
+
+  }.documentos-clientes-tabs{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1em;
+    margin:1em 2em;
   }
 </style>
 <script>
   // script.js
- 
 
-  function setupSingleFileUpload(containerId, inputId) {
-    try {
-      const container = document.getElementById(containerId);
-      const fileInput = $(`#${inputId}`)[0];
-      const fileLabel = container.querySelector('.file-label');
-      const fileInfoBox = container.querySelector('.file-info-box');
-      const fileNameElement = container.querySelector('.file-name');
-      const fileSizeElement = container.querySelector('.file-size');
-      const removeFileButton = container.querySelector('.remove-file-button');
-      const selectFileButton = container.querySelector('.upload-button');
-
-      if (selectFileButton) {
-        // Abrir el diálogo de selección de archivos al hacer clic en el botón
-        selectFileButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          fileInput.click();
-        });
-      }
-
-      // Mostrar la información del archivo seleccionado
-      fileInput.addEventListener('change', (e) => {
-        if (fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
-            // Mostrar el cuadro de información del archivo
-            fileInfoBox.classList.remove('hidden');
-
-            // Mostrar el nombre y el tamaño del archivo
-            fileNameElement.textContent = file.name;
-            fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
-          } else {
-            alert("Solo se permiten archivos .xlsx");
-            fileInput.value = ""; // Limpia el input
-          }
-        } else {
-          fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
-        }
-      });
-
-      // Manejar el botón de tacho de basura para quitar el archivo
-      removeFileButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        fileInput.value = ""; // Limpia el input
-        fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
-      });
-
-      // Manejar el arrastre de archivos
-      fileLabel.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        fileLabel.style.borderColor = '#007bff';
-      });
-
-      fileLabel.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        fileLabel.style.borderColor = '#cccccc';
-      });
-
-      fileLabel.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileLabel.style.borderColor = '#cccccc';
-        if (e.dataTransfer.files.length > 0) {
-          const file = e.dataTransfer.files[0];
-          if (file.name.endsWith('.xlsx')) {
-            fileInput.files = e.dataTransfer.files; // Asigna el archivo arrastrado al input
-
-            // Mostrar la información del archivo
-            fileInput.dispatchEvent(new Event('change'));
-          } else {
-            alert("Solo se permiten archivos .xlsx");
-          }
-        }
-      });
-
-      // Restablecer el estado del cuadro de información cuando el modal se oculta
-      $('#modal-crear-cotizacion').on('hidden.bs.modal', function () {
-        fileInput.value = ""; // Limpia el input
-        fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
-      });
-
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  // Funcion para subir archivos multiples
-
-  function setupMultiFileUpload(containerId, inputId) {
-    const container = document.getElementById(containerId);
-    const fileInput = $(`#${inputId}`)[0];
-    const fileLabel = container.querySelector('.file-label');
-    const fileList = container.querySelector('.file-lista');
-    const uploadButton = container.querySelector('.upload-button');
-    const removeFileButton = container.querySelector('.remove-file-button');
-    // Abrir el diálogo de selección de archivos al hacer clic en el botón
-    uploadButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      fileInput.click();
-    });
-
-    // Mostrar la lista de archivos seleccionados
-    fileInput.addEventListener('change', (e) => {
-      if (fileInput.files.length > 0) {
-        fileList.classList.remove('hidden');
-
-        // Recorrer los archivos seleccionados
-        Array.from(fileInput.files).forEach((file, index) => {
-          // Crear un elemento de lista para cada archivo
-          const fileItem = document.createElement('div');
-          fileItem.classList.add('file-list-item');
-
-          // Definir el ícono según el tipo de archivo
-          let icon = '';
-          if (file.name.endsWith('.jpeg') || file.name.endsWith('.jpg')) {
-            icon = `
-                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                          <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
-                          <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
-                          <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
-                        </svg>
-                    `;
-          } else if (file.name.endsWith('.png')) {
-            icon = `
-                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                          <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
-                          <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
-                          <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
-                        </svg>
-                    `;
-          } else if (file.name.endsWith('.xlsx')) {
-            icon = `
-                            <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                              <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
-                              <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
-                              <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
-                              <rect width="16" height="9" x="12" y="15" fill="#3fa071"></rect>
-                              <path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z"></path>
-                              <path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z"></path>
-                              <path d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z" opacity=".05"></path>
-                              <path d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z" opacity=".07"></path>
-                              <path d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z" opacity=".09"></path>
-                              <linearGradient id="flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1" x1="4.725" x2="23.055" y1="14.725" y2="33.055" gradientUnits="userSpaceOnUse">
-                                <stop offset="0" stop-color="#18884f"></stop>
-                                <stop offset="1" stop-color="#0b6731"></stop>
-                              </linearGradient>
-                              <path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path>
-                              <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
-                            </svg>
-                        `;
-          } else if (file.name.endsWith('.mp4')) {
-            icon = `
-                        <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                          <path fill="#ff7043" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
-                          <path fill="#bf360c" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
-                          <path fill="#fff" d="M19,32V16l12,8L19,32z"></path>
-                        </svg>
-                    `;
-          } else {
-            alert(`El archivo "${file.name}" no es un archivo válido`);
-            return; // Salir si el archivo no es válido
-          }
-
-          // Mostrar el nombre y el tamaño del archivo
-          fileItem.innerHTML = `
-                    ${icon}
-                    <span
-                    style="width:70%"
-                    >${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
-                    <div class="remove-file-button" data-index="${index}">
-                        <i class="fas fa-trash"></i>
-                    </div>
-                `;
-
-          // Agregar el elemento a la lista
-          fileList.appendChild(fileItem);
-        });
-      } else {
-        // fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
-      }
-    });
-
-    // Manejar la eliminación de archivos individuales
-    fileList.addEventListener('click', (e) => {
-      if (e.target.classList.contains('remove-file-button') || e.target.closest('.remove-file-button')) {
-        const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
-
-        // Convertir FileList a un array para poder eliminar el archivo
-        const files = Array.from(fileInput.files);
-        files.splice(index, 1); // Eliminar el archivo del array
-
-        // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
-        const dataTransfer = new DataTransfer();
-        files.forEach(file => dataTransfer.items.add(file));
-        fileInput.files = dataTransfer.files;
-
-        // Volver a mostrar la lista de archivos actualizada
-        fileInput.dispatchEvent(new Event('change'));
-        //remove from file list
-        $(e.target).closest('.file-list-item').remove();
-      }
-    });
-
-    // Manejar el arrastre de archivos
-    fileLabel.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#007bff';
-    });
-
-    fileLabel.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#cccccc';
-    });
-
-    fileLabel.addEventListener('drop', (e) => {
-      e.preventDefault();
-      fileLabel.style.borderColor = '#cccccc';
-      if (e.dataTransfer.files.length > 0) {
-        // Asignar los archivos arrastrados al input
-        fileInput.files = e.dataTransfer.files;
-
-        // Mostrar la lista de archivos
-        fileInput.dispatchEvent(new Event('change'));
-      }
-    });
-    removeFileButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log(e.target,"removeFileButton");
-      //remove most close file input and remove this from input file
-      $(e.target).closest('.file-item').remove();
-
-    });
-  }
-
-  $(document).ready(function() {
-    // Evita que el menú se cierre al hacer clic fuera de él
-    $('.dropdown-menu').on('click', function(event) {
-      event.stopPropagation(); // Evita que el evento se propague
-    });
-
-    // Cierra el menú al hacer clic en "Cancelar" o "Aplicar"
-    $('#cancelar-btn, #aplicar-btn').on('click', function() {
-      $('#filtros-btn').dropdown('hide'); // Cierra el menú
-    });
-
-    // Cierra el menú al hacer clic en el botón "Filtros" si ya está abierto
-    $('#filtros-btn').on('click', function(event) {
-      if ($(this).attr('aria-expanded') === 'true') {
-        $(this).dropdown('hide'); // Cierra el menú si ya está abierto
-      }
-    });
-  });
 </script>

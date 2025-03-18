@@ -1,4 +1,4 @@
-let spinner = null;
+var spinner = null;
 var table_Entidad = null;
 var idContenedor = 0;
 var btnCrear = null;
@@ -11,11 +11,14 @@ var currentCarga = 0;
 var currentProveedor = 0;
 var currentCotizacion;
 var currentTableCotizacion = "prospectos";
-var currentPrivilege = "";
+var currentPrivilege = //local storage
+  localStorage.getItem("currentPrivilege") == null? "": localStorage.getItem("currentPrivilege");
+console.log(currentPrivilege);
 var fileManager = null;
 var fileManagerInspection = null;
 var fileManagerInspectionCoordinacion = null;
 var currentCargaNumber = 0;
+var selectedTabDocumentacionId=0;
 var meses = [
   {
     id: "ENERO",
@@ -573,8 +576,6 @@ async function verCotizacionEmbarque(
   spinner.hide();
   // Función para agregar un archivo a la lista con vista previa y botones
 
-  spinner.hide();
-  // Función para agregar un archivo a la lista con vista previa y botones
 }
 async function deleteFileInspection(id, cardElement) {
   event.preventDefault();
@@ -1166,6 +1167,7 @@ async function updateEstadoCotizacionProveedor(
   idProveedor,
   previousStatus
 ) {
+  console.log(spinner)
   const estado = $(`#estado-${idCotizacion}-${idProveedor}`).val();
   //set this previous status
   previousStatus = $(`#estado-${idCotizacion}-${idProveedor}`).data("previous");
@@ -1177,10 +1179,10 @@ async function updateEstadoCotizacionProveedor(
       isValid = false;
     }
   });
+  spinner.show()
   url =
     base_url +
     "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
-  spinner.show();
   if (estado == "ROTULADO") {
     if (!isValid) {
       Swal.fire("Error!", "Debe ingresar todos los productos", "error");
@@ -1190,10 +1192,12 @@ async function updateEstadoCotizacionProveedor(
       spinner.hide();
       return;
     }
+    
+
     url =
       base_url +
       "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
-    $.ajax({
+   await  $.ajax({
       url: url,
       type: "POST",
       data: {
@@ -1219,14 +1223,13 @@ async function updateEstadoCotizacionProveedor(
         //set current select previous status
         $(`#estado-${idCotizacion}-${idProveedor}`).val(previousStatus);
         Swal.fire("Error!", "Hubo un error", "error");
-        spinner.hide();
       },
     });
   } else {
     url =
       base_url +
       "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionProveedor";
-    $.ajax({
+    await $.ajax({
       url: url,
       type: "POST",
       data: {
@@ -1238,6 +1241,7 @@ async function updateEstadoCotizacionProveedor(
 
       success: function (response) {
         //manage blob
+        spinner.hide();
         const result = JSON.parse(response);
         if (result.status == "success") {
           Swal.fire("Correcto!", result.message, "success");
@@ -3132,7 +3136,7 @@ async function viewDocumentacion() {
                                             <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
                                             <span class="file-format">Formatos: .xlsx</span>
                                         </div>
-                                        <button class="upload-button" type="button">Subir archivo</button>
+                                        <button class="upload-button-documentacion-peru-${file.id}" type="button">Subir archivo</button>
                                     </label>
                                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
                                     <div class="file-info-box hidden">
@@ -3164,7 +3168,7 @@ async function viewDocumentacion() {
                                             </button>
                                         </div>
                                     </div>
-                                    <script>   setupSingleFileUpload('single-${file.folder_name}'); </script>    
+                                    <script>   setupSingleFileUpload('single-${file.folder_name}', 'file-input-${file.id}', '.upload-button-documentacion-peru-${file.id}')</script>
                                 `
                                 }
                         </div>    
@@ -3794,152 +3798,266 @@ async function viewClientesDocumentacion(id) {
   const response = await fetch(url);
   const result = await response.json();
   spinner.hide();
-  $("#txt-Vol_Doc").val(parseFloat(result[0].volumen_doc));
-  $("#txt-Valor_Doc").val(parseFloat(result[0].valor_doc));
-  //set txt-F_Comercial href
-  const facturaComercial = result[0].factura_comercial;
-  const excelConfirmacion = result[0].excel_confirmacion;
-  $("#documentos-clientes-documentacion").empty();
-  let facturaDiv = "";
-  let excelDiv = "";
-  if (!facturaComercial) {
-    facturaDiv = `
-    Factura Comercial
-    <div class="col-12 col-sm-12" id="single-file-upload-factura">
-        <div class="form-group">
-            <div class="file-upload-box">
-                <input type="file" id="file-input-factura" class="file-input" name="file_comercial"
-                    accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
-                <label for="file-input-factura" class="file-label d-flex">
-                    <i class="fas fa-upload"></i>
-                    <div class="file-group-text">
-                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                        <span class="file-format">Formatos: .xlsx</span>
-                    </div>
-                    <button class="upload-button" type="button">Subir archivo</button>
-                </label>
+  $("#clientes-documentation-container").show();
+  const providers=JSON.parse(result.providers);
+  $(".documentos-clientes-tabs").empty();
+  $(".documentos-clientes-content").empty();
 
-                <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
-                <div class="file-info-box hidden">
-                    <div class="file-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                            <!-- SVG content -->
-                        </svg>
-                        <span class="file-name"></span>
-                        <span class="file-size"></span>
-                        <button class="remove-file-button
-                        
-                        ">
-                            <i class="fas fa-trash"></i>
-                        </button>
+  //FOR EACH PROVIDER ADD TAB WITH DATA-ID=provider.id
+  providers.forEach((provider) => {
+    $(".documentos-clientes-tabs").append(`
+        <div class="tab-cliente-documentacion" data-id="${provider.id}">
+          ${provider.code_supplier}
+        </div>`);
+  }); 
+  //ADD EVENT LISTENER TO EACH TAB
+  //default select first
+  selectedTabDocumentacionId = providers[0].id;
+  $(".tab-cliente-documentacion").on("click", function () {
+    const id = $(this).data("id");
+    const provider = providers.find((p) => p.id == id);
+    selectedTabDocumentacionId = id;
+    $(".tab-cliente-documentacion").removeClass("active");
+    $(this).addClass("active");
+    $(".documentos-clientes-content").empty();
+    $(".documentos-clientes-content").append(`<div class="grid grid-cols-3 md:grid-cols-3 gap-8">
+        <!-- Sección de Documentación -->
+        <div class="bg-white p-6 rounded-lg shadow-md
+        col-span-2
+        ">
+          <div class="flex items-center gap-2 mb-6">
+            <h2 class="text-xl font-semibold">Documentación</h2>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <line x1="10" y1="9" x2="8" y2="9" />
+            </svg>
+          </div>
+
+          <form id="form-documentacion" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Volumen documento</label>
+                <input type="number"
+                value="${provider.volumen_doc}"
+                id="txt-Vol_Doc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="volumen_doc">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Valor documento</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2">$</span>
+                  <input type="number"
+                  value="${provider.valor_doc}"
+                  id="txt-Valor_Doc" class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="valor_doc">
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4" id="documentos-clientes-documentacion">
+           
+           
+            </div>
+          </form>
+        </div>
+
+        <!-- Sección de Cotizaciones -->
+        <div class="bg-white p-6 rounded-lg shadow-md
+        col-span-1
+        "
+          style="height: 40%;min-height: 300px;">
+          <div class="flex items-center gap-2 mb-6">
+            <h2 class="text-xl font-semibold">Cotizaciones</h2>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </div>
+
+          <div class="space-y-4">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+              <span class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Descargar cotización inicial
+              </span>
+            </button>
+
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+              <span class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Descargar cotización final
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>`);
+      let facturaDiv = "";
+      let excelDiv = "";
+      let facturaComercial = provider.factura_comercial;
+      let excelConfirmacion = provider.excel_confirmacion;
+      if (!facturaComercial) {
+        facturaDiv = `
+        Factura Comercial
+        <div class="col-12 col-sm-12" id="single-file-upload-factura">
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <input type="file" id="file-input-factura" class="file-input" name="file_comercial"
+                        accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
+                    <label for="file-input-factura" class="file-label d-flex">
+                        <i class="fas fa-upload"></i>
+                        <div class="file-group-text">
+                            <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                            <span class="file-format">Formatos: .xlsx</span>
+                        </div>
+                        <button class="upload-button" type="button">Subir archivo</button>
+                    </label>
+    
+                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                    <div class="file-info-box hidden">
+                        <div class="file-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                                <!-- SVG content -->
+                            </svg>
+                            <span class="file-name"></span>
+                            <span class="file-size"></span>
+                            <button class="remove-file-button
+                            
+                            ">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>`;
-  } else {
-    // Si existe el enlace de la factura, mostrar el contenedor con la información del archivo
-    facturaDiv = `
-    Factura Comercial
-    <div class="col-12 col-sm-12" id="single-file-upload-factura">
-        <div class="form-group">
-            <div class="file-upload-box">
-                <div class="file-info-box">
-                    <div class="file-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                            <!-- SVG content -->
-                        </svg>
-                        <span class="file-name">Factura Comercial</span>
-                        <a href="${facturaComercial}" target="_blank" class="file-link">Ver archivo</a>
-                        <button class="remove-file-button"
-                        onclick="deleteFacturaComercial(${result[0].id})"
-                        >
-                            <i class="fas fa-trash"></i>
-                        </button>
+        </div>`;
+      } else {
+        // Si existe el enlace de la factura, mostrar el contenedor con la información del archivo
+        facturaDiv = `
+        Factura Comercial
+        <div class="col-12 col-sm-12" id="single-file-upload-factura">
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <div class="file-info-box">
+                        <div class="file-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                                <!-- SVG content -->
+                            </svg>
+                            <span class="file-name">Factura Comercial</span>
+                            <a href="${facturaComercial}" target="_blank" class="file-link">Ver archivo</a>
+                            <button class="remove-file-button"
+                            onclick="deleteFacturaComercial(${provider.id})"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>`;
-  }
-
-  $("#documentos-clientes-documentacion").append(facturaDiv);
-  //   setupSingleFileUpload("single-file-upload-factura", "file-input-factura");
-
-  // Repetir el mismo proceso para el Excel de confirmación
-  if (!excelConfirmacion) {
-    excelDiv = `
-    Excel Confirmación
-    <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
-        <div class="form-group">
-            <div class="file-upload-box">
-                <input type="file" id="file-input-confirmacion" class="file-input" name="excel_confirmacion"
-                    accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
-                <label for="file-input-confirmacion" class="file-label d-flex">
-                    <i class="fas fa-upload"></i>
-                    <div class="file-group-text">
-                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                        <span class="file-format">Formatos: .xlsx</span>
-                    </div>
-                    <button class="upload-button" type="button">Subir archivo</button>
-                </label>
-
-                <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
-                <div class="file-info-box hidden">
-                    <div class="file-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                            <!-- SVG content -->
-                        </svg>
-                        <span class="file-name"></span>
-                        <span class="file-size"></span>
-                        <button class="remove-file-button"
-                                                onclick="deleteExcelConfirmacion(${result[0].id})"
-
-                        >
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`;
-  } else {
-    // Si existe el enlace del Excel de confirmación, mostrar el contenedor con la información del archivo
-    excelDiv = `
-    Excel Confirmación
-    <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
-        <div class="form-group">
-            <div class="file-upload-box">
-                <div class="file-info-box">
-                    <div class="file-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                            <!-- SVG content -->
-                        </svg>
-                        <span class="file-name">Excel Confirmación</span>
-                        <a href="${excelConfirmacion}" target="_blank" class="file-link">Ver archivo</a>
-                        <button class="remove-file-button">
-                            <i class="fas fa-trash"></i>
-                        </button>
+        </div>`;
+      }
+    
+      $("#documentos-clientes-documentacion").append(facturaDiv);
+      //   setupSingleFileUpload("single-file-upload-factura", "file-input-factura");
+    
+      // Repetir el mismo proceso para el Excel de confirmación
+      if (!excelConfirmacion) {
+        excelDiv = `
+        Excel Confirmación
+        <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <input type="file" id="file-input-confirmacion" class="file-input" name="excel_confirmacion"
+                        accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
+                    <label for="file-input-confirmacion" class="file-label d-flex">
+                        <i class="fas fa-upload"></i>
+                        <div class="file-group-text">
+                            <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                            <span class="file-format">Formatos: .xlsx</span>
+                        </div>
+                        <button class="upload-button" type="button">Subir archivo</button>
+                    </label>
+    
+                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                    <div class="file-info-box hidden">
+                        <div class="file-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                                <!-- SVG content -->
+                            </svg>
+                            <span class="file-name"></span>
+                            <span class="file-size"></span>
+                            <button class="remove-file-button"
+                                                    onclick="deleteExcelConfirmacion(${provider.id})"
+    
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>`;
-  }
-
-  $("#documentos-clientes-documentacion").append(excelDiv);
-  if (!facturaComercial) {
-    setupSingleFileUpload(
-      "single-file-upload-confirmacion",
-      "file-input-confirmacion"
-    );
-  }
-  if (!excelConfirmacion) {
-    setupSingleFileUpload(
-      "single-file-upload-confirmacion",
-      "file-input-confirmacion"
-    );
-  }
+        </div>`;
+      } else {
+        // Si existe el enlace del Excel de confirmación, mostrar el contenedor con la información del archivo
+        excelDiv = `
+        Excel Confirmación
+        <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <div class="file-info-box">
+                        <div class="file-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                                <!-- SVG content -->
+                            </svg>
+                            <span class="file-name">Excel Confirmación</span>
+                            <a href="${excelConfirmacion}" target="_blank" class="file-link">Ver archivo</a>
+                            <button class="remove-file-button"
+                            onclick="deleteExcelConfirmacion(${provider.id})"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+      }
+    
+      $("#documentos-clientes-documentacion").append(excelDiv);
+      if (!facturaComercial) {
+        setupSingleFileUpload(
+          "single-file-upload-factura",
+          "file-input-factura"
+        );
+      }
+      if (!excelConfirmacion) {
+        setupSingleFileUpload(
+          "single-file-upload-confirmacion",
+          "file-input-confirmacion"
+        );
+      }
+  });
+  $(".tab-cliente-documentacion").first().click();
+  // $("#txt-Vol_Doc").val(parseFloat(result[0].volumen_doc));
+  // $("#txt-Valor_Doc").val(parseFloat(result[0].valor_doc));
+  // //set txt-F_Comercial href
+  // const facturaComercial = result[0].factura_comercial;
+  // const excelConfirmacion = result[0].excel_confirmacion;
+  $("#btn-descargar-cotizacion-inicial").attr(
+    "href",
+    result.cotizacion_file_url
+  );
+  spinner.hide();
+  return;
   //clean .aditional-file
   $(".aditional-file").remove();
   const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
@@ -3980,10 +4098,7 @@ async function viewClientesDocumentacion(id) {
             `).insertBefore(".col-guardar-documentacion");
   });
 
-  $("#btn-descargar-cotizacion-inicial").attr(
-    "href",
-    result[0].cotizacion_file_url
-  );
+  
   clientesDocumentacionContainer.show();
   //   fileManagerInspectionCoordinacion = new FileManager({
   //     fileGrid: "#file-grid-inspection-coordinacion",
@@ -4149,6 +4264,23 @@ const returnToSteps = () => {
   stepsContainer.show();
 };
 $(document).ready(async function () {
+  $('.dropdown-menu').on('click', function(event) {
+    event.stopPropagation(); // Evita que el evento se propague
+  });
+
+  // Cierra el menú al hacer clic en "Cancelar" o "Aplicar"
+  $('#cancelar-btn, #aplicar-btn').on('click', function() {
+    $('#filtros-btn').dropdown('hide'); // Cierra el menú
+  });
+
+  // Cierra el menú al hacer clic en el botón "Filtros" si ya está abierto
+  $('#filtros-btn').on('click', function(event) {
+    if ($(this).attr('aria-expanded') === 'true') {
+      $(this).dropdown('hide'); // Cierra el menú si ya está abierto
+    }
+  });
+  console.log("waos",currentPrivilege);
+
   spinner = $(".backdrop");
   stepsContainer = $("#steps");
   contentHeader = $("#content-header");
@@ -5030,6 +5162,7 @@ $(document).ready(async function () {
       return;
     }
     formData.append("id", idCotizacion);
+    formData.append("idProveedor", selectedTabDocumentacionId);
     //f
     $.ajax({
       url:
@@ -5414,6 +5547,246 @@ window.addEventListener("load", () => {
     }
   };
 });
+ 
+
+function setupSingleFileUpload(containerId, inputId,selectInputId='.upload-button') {
+  try {
+    const container = document.getElementById(containerId);
+    const fileInput = $(`#${inputId}`)[0];
+    const fileLabel = container.querySelector('.file-label');
+    const fileInfoBox = container.querySelector('.file-info-box');
+    const fileNameElement = container.querySelector('.file-name');
+    const fileSizeElement = container.querySelector('.file-size');
+    const removeFileButton = container.querySelector('.remove-file-button');
+    const selectFileButton = container.querySelector(selectInputId);
+
+    if (selectFileButton) {
+      // Abrir el diálogo de selección de archivos al hacer clic en el botón
+      selectFileButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.click();
+      });
+    }
+
+    // Mostrar la información del archivo seleccionado
+    fileInput.addEventListener('change', (e) => {
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
+          // Mostrar el cuadro de información del archivo
+          fileInfoBox.classList.remove('hidden');
+
+          // Mostrar el nombre y el tamaño del archivo
+          fileNameElement.textContent = file.name;
+          fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+        } else {
+          alert("Solo se permiten archivos .xlsx");
+          fileInput.value = ""; // Limpia el input
+        }
+      } else {
+        fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
+      }
+    });
+    if(removeFileButton){
+      removeFileButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      fileInput.value = ""; // Limpia el input
+      fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
+    });
+    }
+    // Manejar el botón de tacho de basura para quitar el archivo
+    
+
+    // Manejar el arrastre de archivos
+    fileLabel.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#007bff';
+    });
+
+    fileLabel.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
+    });
+
+    fileLabel.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#cccccc';
+      if (e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (file.name.endsWith('.xlsx')) {
+          fileInput.files = e.dataTransfer.files; // Asigna el archivo arrastrado al input
+
+          // Mostrar la información del archivo
+          fileInput.dispatchEvent(new Event('change'));
+        } else {
+          alert("Solo se permiten archivos .xlsx");
+        }
+      }
+    });
+
+    // Restablecer el estado del cuadro de información cuando el modal se oculta
+    $('#modal-crear-cotizacion').on('hidden.bs.modal', function () {
+      fileInput.value = ""; // Limpia el input
+      fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
+    });
+
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+// Funcion para subir archivos multiples
+
+function setupMultiFileUpload(containerId, inputId) {
+  const container = document.getElementById(containerId);
+  const fileInput = $(`#${inputId}`)[0];
+  const fileLabel = container.querySelector('.file-label');
+  const fileList = container.querySelector('.file-lista');
+  const uploadButton = container.querySelector('.upload-button');
+  const removeFileButton = container.querySelector('.remove-file-button');
+  // Abrir el diálogo de selección de archivos al hacer clic en el botón
+  uploadButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    fileInput.click();
+  });
+
+  // Mostrar la lista de archivos seleccionados
+  fileInput.addEventListener('change', (e) => {
+    if (fileInput.files.length > 0) {
+      fileList.classList.remove('hidden');
+
+      // Recorrer los archivos seleccionados
+      Array.from(fileInput.files).forEach((file, index) => {
+        // Crear un elemento de lista para cada archivo
+        const fileItem = document.createElement('div');
+        fileItem.classList.add('file-list-item');
+
+        // Definir el ícono según el tipo de archivo
+        let icon = '';
+        if (file.name.endsWith('.jpeg') || file.name.endsWith('.jpg')) {
+          icon = `
+                      <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                        <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                        <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
+                      </svg>
+                  `;
+        } else if (file.name.endsWith('.png')) {
+          icon = `
+                      <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <path fill="#90caf9" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                        <path fill="#1565c0" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                        <path fill="#fff" d="M24,14c-5.523,0-10,4.477-10,10s4.477,10,10,10s10-4.477,10-10S29.523,14,24,14z M24,30c-3.314,0-6-2.686-6-6	s2.686-6,6-6s6,2.686,6,6S27.314,30,24,30z"></path>
+                      </svg>
+                  `;
+        } else if (file.name.endsWith('.xlsx')) {
+          icon = `
+                          <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                            <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
+                            <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
+                            <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
+                            <rect width="16" height="9" x="12" y="15" fill="#3fa071"></rect>
+                            <path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z"></path>
+                            <path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z"></path>
+                            <path d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z" opacity=".05"></path>
+                            <path d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z" opacity=".07"></path>
+                            <path d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z" opacity=".09"></path>
+                            <linearGradient id="flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1" x1="4.725" x2="23.055" y1="14.725" y2="33.055" gradientUnits="userSpaceOnUse">
+                              <stop offset="0" stop-color="#18884f"></stop>
+                              <stop offset="1" stop-color="#0b6731"></stop>
+                            </linearGradient>
+                            <path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path>
+                            <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
+                          </svg>
+                      `;
+        } else if (file.name.endsWith('.mp4')) {
+          icon = `
+                      <svg style="width:20%" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                        <path fill="#ff7043" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                        <path fill="#bf360c" d="M40,42H8c-1.105,0-2-0.895-2-2V8c0-1.105,0.895-2,2-2h32c1.105,0,2,0.895,2,2v32C42,41.105,41.105,42,40,42z"></path>
+                        <path fill="#fff" d="M19,32V16l12,8L19,32z"></path>
+                      </svg>
+                  `;
+        } else {
+          alert(`El archivo "${file.name}" no es un archivo válido`);
+          return; // Salir si el archivo no es válido
+        }
+
+        // Mostrar el nombre y el tamaño del archivo
+        fileItem.innerHTML = `
+                  ${icon}
+                  <span
+                  style="width:70%"
+                  >${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                  <div class="remove-file-button" data-index="${index}">
+                      <i class="fas fa-trash"></i>
+                  </div>
+              `;
+
+        // Agregar el elemento a la lista
+        fileList.appendChild(fileItem);
+      });
+    } else {
+      // fileList.classList.add('hidden'); // Ocultar la lista si no hay archivos seleccionados
+    }
+  });
+
+  // Manejar la eliminación de archivos individuales
+  fileList.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-file-button') || e.target.closest('.remove-file-button')) {
+      const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
+
+      // Convertir FileList a un array para poder eliminar el archivo
+      const files = Array.from(fileInput.files);
+      files.splice(index, 1); // Eliminar el archivo del array
+
+      // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
+      const dataTransfer = new DataTransfer();
+      files.forEach(file => dataTransfer.items.add(file));
+      fileInput.files = dataTransfer.files;
+
+      // Volver a mostrar la lista de archivos actualizada
+      fileInput.dispatchEvent(new Event('change'));
+      //remove from file list
+      $(e.target).closest('.file-list-item').remove();
+    }
+  });
+
+  // Manejar el arrastre de archivos
+  fileLabel.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#007bff';
+  });
+
+  fileLabel.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#cccccc';
+  });
+
+  fileLabel.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#cccccc';
+    if (e.dataTransfer.files.length > 0) {
+      // Asignar los archivos arrastrados al input
+      fileInput.files = e.dataTransfer.files;
+
+      // Mostrar la lista de archivos
+      fileInput.dispatchEvent(new Event('change'));
+    }
+  });
+  if(removeFileButton){
+  removeFileButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log(e.target,"removeFileButton");
+    //remove most close file input and remove this from input file
+    $(e.target).closest('.file-item').remove();
+
+  });
+}
+}
+
 setupSingleFileUpload("single-file-upload", "file-input-prospecto");
+setupSingleFileUpload("single-file-upload", "file-input-prospecto");
+
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion");
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion");

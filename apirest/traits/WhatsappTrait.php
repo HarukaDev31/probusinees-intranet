@@ -12,7 +12,7 @@ trait WhatsappTrait
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'mensaje' => '
-Hola 🙋🏻‍♀, te escribe Meliza del área de importaciones de Pro Business, 
+Hola 🙋🏻‍♀, te escribe el área de coordinación de probusiness, 
 yo me encargaré de ayudarte en tu importación del *consolidado #' . $carga . '*.
 
 📢 Preste atención al siguiente paso: Rotulado 👇🏼
