@@ -89,7 +89,7 @@ Nota: No cambiar ninguno de los datos, en caso tu proveedor tenga alguna consult
             return json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT);
         }
     }
-    public function sendMedia($filePath, $mimeType)
+    public function sendMedia($filePath, $mimeType,$message=null)
     {
         try {
             // Check if file is a URL
@@ -139,7 +139,7 @@ Nota: No cambiar ninguno de los datos, en caso tu proveedor tenga alguna consult
             // Create a proper multipart/form-data request
             $postData = [
                 'numero' => $this->phoneNumberId,
-                'mensaje' => '', // Optional message
+                'mensaje' => $message,
                 'archivo' => new CURLFile($filePath, $mimeType, $fileName)
             ];
 

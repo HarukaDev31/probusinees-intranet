@@ -2105,7 +2105,7 @@ Código de proveedor: {$supplierCode}
              
                 unlink($tempFilePath);
                 $direccionUrl=base_url('assets/downloads/Direccion.jpg');
-                $data = $this->sendMedia($direccionUrl, 'image/jpg');
+                $data = $this->sendMedia($direccionUrl, 'image/jpg','🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China');
                 $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
 ➡ Datos del proveedor: (Usted lo llena)
