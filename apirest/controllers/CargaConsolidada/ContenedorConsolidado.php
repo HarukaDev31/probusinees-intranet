@@ -66,7 +66,7 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->empresa;
 			if ($this->user->No_Grupo == "ContenedorAlmacen") {
 				$divEstado = '<select
-onchange="updateEstado(' . $row->id . ')"
+		onchange="updateEstado(' . $row->id . ')"
 				
 			class="form-control
 					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
@@ -268,9 +268,9 @@ onchange="updateEstado(' . $row->id . ')"
 
 						" id="estado-cotizador-' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizador(' . $row->id_cotizacion . ')">
 							<option
-							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>WAITING</option>
+							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
 
-							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>COMPLETE</option>
+							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>COMPLETADO</option>
 						</select>';
 						$subdata[] = $divEstadoCotizador;
 						if ($row->estado_cotizador == "PENDIENTE") {
