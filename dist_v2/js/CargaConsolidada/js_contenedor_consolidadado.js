@@ -472,56 +472,98 @@ function addFileToList(file, fileList = null, id = null) {
   if (id != null) {
     fileList = $(`#${id}`);
   }
-  const isImage = file?.file_ext.startsWith("image");
+
+  // Diccionario de íconos según el tipo de archivo
+  const iconDictionary = {
+    image: '<i class="far fa-image"></i>',
+    video: '<i class="fas fa-video"></i>',
+    pdf: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+    `,
+    word: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-word">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <path d="M9 12l1.5 6 1.5-6 1.5 6 1.5-6"></path>
+      </svg>
+    `,
+    excel: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-excel">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <path d="M10 12l2 2 2-2"></path>
+        <path d="M12 14l-2 2 2 2"></path>
+      </svg>
+    `,
+    text: '<i class="far fa-file-alt"></i>',
+    default: '<i class="far fa-file"></i>',
+  };
+
+  // Determinar el tipo de archivo y asignar el ícono correspondiente
+  let fileType = "default";
+  if (file.file_ext.startsWith("image")) fileType = "image";
+  else if (file.file_ext.startsWith("video")) fileType = "video";
+  else if (file.file_ext.startsWith("application/pdf")) fileType = "pdf";
+  else if (
+    file.file_ext.startsWith("application/msword") ||
+    file.file_ext.startsWith(
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+  )
+    fileType = "word";
+  else if (
+    file.file_ext.startsWith("application/vnd.ms-excel") ||
+    file.file_ext.startsWith(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+  )
+    fileType = "excel";
+  else if (file.file_ext.startsWith("text")) fileType = "text";
+
+  const fileIcon = iconDictionary[fileType] || iconDictionary.default;
+
+  // Crear el elemento HTML para el archivo
   const fileItem = $(`
         <div class="file-item">
-            <div class="file-preview d-flex"><i class="fas fa-video pr-2"></i>&nbsp;
+            <div class="file-preview d-flex">
+                ${fileIcon}&nbsp;
                 <p>${file.file_name}</p>
             </div>
             <div class="file-actions d-flex flex-row">
                 <button class="btn-sm download-btn" data-url="${file.file_url}">
-                <i class="fas fa-download"></i> 
+                    <i class="fas fa-download"></i> 
                 </button>
                 <button class="btn-sm delete-btn" data-id="${file.id}">
-                <i class="far fa-trash-alt"></i>
+                    <i class="far fa-trash-alt"></i>
                 </button>
             </div>
         </div>
     `);
 
   // Botón de descarga
-  fileItem.find(".download-btn").on("click", function () {
+  fileItem.find(".download-btn").on("click", function (event) {
     event.preventDefault();
     const url = $(this).data("url");
     window.open(url, "_blank");
   });
 
   // Botón de eliminar
-  fileItem.find(".delete-btn").on("click", function () {
+  fileItem.find(".delete-btn").on("click", function (event) {
     event.preventDefault();
     const id = $(this).data("id");
     deleteFile(id, fileItem);
   });
-  //add icon eye button and add event to view image or video preview in other modal,only show icon if video or image
-  if (isImage) {
-    const imageicon = $(`<i class="far fa-file-image pr-2"></i>`);
-    const viewBtn = $(`
-            <button class="btn-sm view-btn"><i class="far fa-eye"></i></button>
-        `);
-    viewBtn.on("click", function () {
-      event.preventDefault();
-      const url = file.file_url;
-      const fileExt = file.file_ext;
-      viewFile(url, fileExt);
-    });
-    fileItem.find(".file-preview i").replaceWith(imageicon);
-    fileItem.find(".file-actions").append(viewBtn);
-  }
+
   fileList.append(fileItem);
-  //remove class hidden
+  // Remover clase "hidden" si está presente
   fileList.removeClass("hidden");
 }
-
 
 function viewFile(url, fileExt) {
   spinner.show(); // Mostrar el spinner antes de cargar el archivo
