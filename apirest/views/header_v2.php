@@ -323,11 +323,10 @@
           <nav class="user-panel mt-3 pb-3 mb-3 d-flex">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
               <li class="nav-item">
-                <a class="nav-link" data-toggle="" href="#" aria-expanded="false" title="Notificaciones" style="display:flex; gap: 20px;">
-                  <img src="<?php echo base_url() . 'dist_v2/img/user_all.png?ver=1.0.0'; ?>" class="img-circle" alt="User Image">
+                <a class="nav-link d-flex align-items-center gap-3" data-toggle="" href="#" aria-expanded="false" title="Notificaciones">
+                  <i class="far fa-user text-lg"></i>
                   <div class="info-user">
                     <p>&nbsp;<?php echo $this->user->No_Nombres_Apellidos; ?></p><br>
-                    <p class="badge bg-success"><?php echo $this->user->No_Grupo; ?></p>
                   </div>
                 </a>
               </li>
