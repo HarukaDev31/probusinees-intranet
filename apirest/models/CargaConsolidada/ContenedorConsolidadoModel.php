@@ -2108,7 +2108,7 @@ Código de proveedor: {$supplierCode}
                 $data = $this->sendMedia($direccionUrl, 'image/jpg','🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China');
                 $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
-➡ Datos del proveedor: (Usted lo llena)
+➡ *Datos del proveedor: (Usted lo llena)*
 
 ☑ Nombre del producto:
 ☑ Nombre del vendedor:

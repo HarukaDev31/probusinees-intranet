@@ -15,7 +15,8 @@ trait WhatsappTrait
 Hola 🙋🏻‍♀, te escribe el área de coordinación de probusiness, 
 yo me encargaré de ayudarte en tu importación del *consolidado #' . $carga . '*.
 
-📢 Preste atención al siguiente paso: Rotulado 👇🏼
+📢 Preste atención al siguiente paso: 
+*Rotulado* 👇🏼
 Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.
 
 ☑ El documento está en idioma chino, solo debes enviarle a tu proveedor 📤
