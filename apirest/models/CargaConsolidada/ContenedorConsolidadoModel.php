@@ -381,7 +381,8 @@ class ContenedorConsolidadoModel extends CI_Model
         $dateObject = DateTime::createFromFormat('d/m/Y', $date);
         return $dateObject ? $dateObject->format('Y-m-d') : null; // Devuelve null si la fecha no es válida
     }
-    public function getCotizacionDataFinal($cotizacion){
+    public function getCotizacionDataFinal($cotizacion)
+    {
         try {
             $objPHPExcel = PHPExcel_IOFactory::load($cotizacion['tmp_name']);
             //find sheet 1 and get cell b8 as nombre,cell b9 as documento,cell b10 as correo,cell b11 as telefono,i11 as volumen,e9 as fecha
@@ -516,6 +517,103 @@ class ContenedorConsolidadoModel extends CI_Model
 
         return $newColumn;
     }
+    public function getEmbarqueDataModified($cotizacion, $data)
+    {
+        try {
+            $objPHPExcel = PHPExcel_IOFactory::load($cotizacion['tmp_name']);
+            $rowProveedores = 4;
+            $nameCliente = $objPHPExcel->getSheet(0)->getCell('B8')->getValue();
+            $sheet2 = $objPHPExcel->getSheet(1);
+            $columnStart = "C";
+            $columnTotales = "";
+            //if data if associative array convert to object
+            if (is_array($data)) {
+                $data = (object)$data;
+            }
+            $idContenedor = $data->id_contenedor;
+            //get carga field from table with id=$idContenedor
+            $this->db->select('carga')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $carga = $query->row()->carga;
+            //complete to 0 to 2 digits if can converted to number else use last to chars
+            $count = is_numeric($carga) ? str_pad($carga, 2, "0", STR_PAD_LEFT) : substr($carga, -2);
+            $stop = false;
+
+            while (!$stop) {
+                $cell = $sheet2->getCell($columnStart . "3")->getValue();
+                if (strtoupper(trim($cell)) == "TOTALES") {
+                    $columnTotales = $columnStart;
+                    $stop = true;
+                } else {
+                    $columnStart = $this->incrementColumn($columnStart);
+                }
+            }
+            $rowCodeSupplier = 3;
+            $rowCajasProveedor = 5;
+            $rowPesoProveedor = 6;
+            $rowVolProveedor = 8;
+            //iterate from C TO $columnTotales and get values from row 5,6,8
+            $columnStart = "C"; // Columna inicial
+            $stop = false;
+            $provider = 1;
+            $currentRange = null;
+            $processedRanges = []; // Almacena los rangos procesados
+            $proveedores = []; // Lista de proveedores
+
+            while (!$stop) {
+                // Verifica si la columna actual es la última
+                if ($columnStart == $columnTotales) {
+                    $stop = true;
+                } else {
+                    // Obtiene el rango combinado de la celda actual
+                    $cell = $sheet2->getCell($columnStart . $rowProveedores);
+                    $currentRange = $cell->getMergeRange();
+
+                    // Si el rango ya fue procesado, pasa a la siguiente columna
+                    if ($currentRange && in_array($currentRange, $processedRanges)) {
+                        $columnStart = $this->incrementColumn($columnStart);
+                        continue;
+                    }
+
+                    // Agrega el rango actual a los rangos procesados
+                    if ($currentRange) {
+                        $processedRanges[] = $currentRange;
+                    }
+
+                    // Genera el código del proveedor
+                    $codeSupplier=$sheet2->getCell($columnStart . $rowCodeSupplier)->getValue();
+                    if(!$codeSupplier|| $codeSupplier==''){
+                        $codeSupplier=$this->generateCodeSupplier($nameCliente, $count, $provider, $idContenedor);
+
+
+                    }
+                    // Agrega los datos del proveedor
+                    $proveedores[] = [
+                        'qty_box' => $sheet2->getCell($columnStart . $rowCajasProveedor)->getValue(),
+                        'peso' => $sheet2->getCell($columnStart . $rowPesoProveedor)->getValue(),
+                        'cbm_total' => $sheet2->getCell($columnStart . $rowVolProveedor)->getValue(),
+                        'id_cotizacion' => $data->id_cotizacion,
+                        'id_contenedor' => $data->id_contenedor,
+                        'code_supplier' => $codeSupplier,
+                    ];
+
+                    // Incrementa la columna y el contador del proveedor
+                    $columnStart = $this->incrementColumn($columnStart);
+                    $provider++;
+                }
+            }
+
+            return $proveedores;
+        } catch (Exception $e) {
+            return [
+                "status" => "error",
+                "message" => $e->getMessage()
+            ];
+        }
+    }
+
     public function getEmbarqueData($cotizacion, $data)
     {
         try {
@@ -746,6 +844,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $query = $this->db->get();
             $data = $query->row();
             $fileUrl = $data->cotizacion_file_url;
+            $idCotizacion = $data->id;
             unlink($fileUrl);
             $fileUrl = $this->uploadSingleFile(
                 [
@@ -764,18 +863,75 @@ class ContenedorConsolidadoModel extends CI_Model
             //truncate all data in table contenedor_consolidado_cotizacion_proveedores where id_cotizacion=$id
 
             if ($this->db->affected_rows() > 0) {
-                $this->db->where('id_cotizacion', $id);
-                $this->db->delete($this->table_contenedor_cotizacion_proveedores);
-                $dataEmbarque = $this->getEmbarqueData($file, $data);
+                // $this->db->where('id_cotizacion', $id);
+                // $this->db->delete($this->table_contenedor_cotizacion_proveedores);
+                $dataToInsert['id_cotizacion'] = $idCotizacion;
+                $dataToInsert['id_contenedor'] = $data->id_contenedor;
+                //get code_supplier from all rows in table_contenedor_cotizacion_proveedores where id_cotizacion=$id
+                
+                // Crear un array con los code_supplier de dataEmbarque
+                // Obtener los code_supplier de la base de datos
+                $this->db->select('code_supplier')
+                    ->from($this->table_contenedor_cotizacion_proveedores)
+                    ->where('id_cotizacion', $id);
+                $query = $this->db->get();
+                $codeSupplier = $query->result();
+
+                // Convertir el resultado a un array de code_supplier
+                $codeSupplier = array_map(function ($item) {
+                    return $item->code_supplier;
+                }, $codeSupplier);
+
+                // Obtener los datos de embarque
+                $dataEmbarque = $this->getEmbarqueDataModified($file, $dataToInsert);
+
+                // Crear un array con los code_supplier de dataEmbarque
+                $codeSupplierEmbarque = array_column($dataEmbarque, 'code_supplier');
+                log_message('error', 'Code supplier embarque: ' . json_encode($codeSupplierEmbarque));
+                log_message('error', 'Code supplier db: ' . json_encode($codeSupplier));
+                // Recorrer los code_supplier de la base de datos
+                foreach ($codeSupplier as $code) {
+                    if (in_array($code, $codeSupplierEmbarque)) {
+                        // Si existe en dataEmbarque, actualizar
+                        $key = array_search($code, $codeSupplierEmbarque);
+                        $dataToUpdate = $dataEmbarque[$key];
+                        $this->db->where('code_supplier', $code)
+                            ->where('id_cotizacion', $id)
+                            ->update($this->table_contenedor_cotizacion_proveedores, $dataToUpdate);
+                    } else {
+                        // Si no existe en dataEmbarque, eliminar
+                        $this->db->where('code_supplier', $code)
+                            ->where('id_cotizacion', $id)
+                            ->delete($this->table_contenedor_cotizacion_proveedores);
+                    }
+                }
+
+                // Recorrer los code_supplier de dataEmbarque para insertar los nuevos
+                foreach ($dataEmbarque as $data) {
+                    if (!in_array($data['code_supplier'], $codeSupplier)) {
+                        // Si no existe en la base de datos, insertar
+                        $this->db->insert($this->table_contenedor_cotizacion_proveedores, $data);
+                    }
+                }
+                //foreach in codesupplier if exists in dataEmbarque update else insert and if exists in codesupplier but not in dataEmbarque delete
+
+
+                // foreach ($dataEmbarque as $key => $value) {
+                //     $dataEmbarque[$key]['id_cotizacion'] = $id;
+                //     $dataEmbarque[$key]['id_contenedor'] = $data->id_contenedor;
+                //     //find if e
+                // }
                 //insert in tabla proveedores
-                $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
+                // $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
                 if ($this->db->affected_rows() > 0) {
                     return "success";
                 }
+                log_message('error', 'Error en uploadCotizacionFile: ' . $this->db->error()['message']);
                 return false;
             }
             return false;
         } catch (Exception $e) {
+            log_message('error', 'Error en uploadCotizacionFile: ' . $e->getMessage());
             return false;
         }
     }
@@ -901,14 +1057,14 @@ class ContenedorConsolidadoModel extends CI_Model
         WHERE prov.id_cotizacion = main.id
     ) as providers
 ")
-->from($this->table_contenedor_cotizacion . " as main")
-->where('main.id', $id)
-->where('main.estado is not null');
+            ->from($this->table_contenedor_cotizacion . " as main")
+            ->where('main.id', $id)
+            ->where('main.estado is not null');
 
-$query = $this->db->get();
-$result = $query->row();
+        $query = $this->db->get();
+        $result = $query->row();
 
-return $result;
+        return $result;
     }
     public function createClienteDocumentacion($id, $name, $file)
     {
@@ -1000,7 +1156,7 @@ return $result;
             unset($data['id']);
             $idProveedor = $data['idProveedor'];
             unset($data['idProveedor']);
-            $this->db->where('id',$idProveedor );
+            $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
             //get sum of all valor_doc and all valor_doc and update table cotizacion
             $this->db->select('SUM(valor_doc) as total_valor_doc, SUM(volumen_doc) as total_volumen_doc')
@@ -1010,7 +1166,7 @@ return $result;
             $result = $query->row();
             $this->db->where('id', $idCotizacion);
             $this->db->update($this->table_contenedor_cotizacion, ['valor_doc' => $result->total_valor_doc, 'volumen_doc' => $result->total_volumen_doc]);
-            
+
             if ($this->db->affected_rows() > 0) {
                 return "success";
             }
@@ -2018,7 +2174,7 @@ return $result;
         $telefono = $query->row()->telefono;
         //remove spaces from telefono
         $telefono = preg_replace('/\s+/', '', $telefono);
-        $telefono.= $telefono ? '@c.us' : '';
+        $telefono .= $telefono ? '@c.us' : '';
         $this->phoneNumberId = $telefono;
         $this->db->close();
         $this->db->initialize();
@@ -2041,10 +2197,10 @@ return $result;
                 $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
                 $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
                 $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
-                
+
                 $response = $this->sendWelcome($carga);
                 // log_message('error', 'response: '.$response);
-               
+
 
                 $zip = new ZipArchive();
                 $zipFileName = 'assets/downloads/Rotulado.zip';
@@ -2082,7 +2238,7 @@ return $result;
                     unlink($tempFilePath);
                     file_put_contents($tempFilePath, $pdfContent);
                     try {
-                      
+
                         $data = $this->sendDataItem(
                             "
 Producto: {$products}
@@ -2090,7 +2246,6 @@ Código de proveedor: {$supplierCode}
                         ",
                             $tempFilePath
                         );
-                       
                     } catch (Exception $e) {
                         echo 'Error: ' . $e->getMessage();
                         log_message('error', 'Error: ' . $e->getMessage());
@@ -2102,10 +2257,10 @@ Código de proveedor: {$supplierCode}
                 $zip->close();
                 $htmlDataPath = 'assets/downloads/Data_Rotulado_Template.html';
                 $htmlDataContent = file_get_contents($htmlDataPath);
-             
+
                 unlink($tempFilePath);
-                $direccionUrl=base_url('assets/downloads/Direccion.jpg');
-                $data = $this->sendMedia($direccionUrl, 'image/jpg','🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China');
+                $direccionUrl = base_url('assets/downloads/Direccion.jpg');
+                $data = $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China');
                 $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
 ➡ *Datos del proveedor: (Usted lo llena)*
@@ -2200,7 +2355,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $telefono = $query->row()->telefono;
             //remove spaces from telefono
             $telefono = preg_replace('/\s+/', '', $telefono);
-            $telefono.= $telefono ? '@c.us' : '';
+            $telefono .= $telefono ? '@c.us' : '';
             $this->phoneNumberId = $telefono;
             // Construir el mensaje
             $message = "Reserva de espacio:\n" .
@@ -2219,7 +2374,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             // Enviar imagen de pagos
             $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
             $data = $this->sendMedia($pagosUrl, 'image/jpg');
-      
         }
         return "success";
     }
@@ -2304,8 +2458,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     $this->db->where('id', $idCotizacion);
                     $this->db->update($this->table_contenedor_cotizacion, ['estado_cliente' => 'RESERVADO']);
                 }
-                
-                
             }
             return "success";
         }
@@ -2793,12 +2945,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $telefono = $query->row()->telefono;
             //remove spaces from telefono
             $telefono = preg_replace('/\s+/', '', $telefono);
-            $telefono.= $telefono ? '@c.us' : '';
+            $telefono .= $telefono ? '@c.us' : '';
             $this->phoneNumberId = $telefono;
             //message = cliente code supplieer qtyboxchina??qtybox
             $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
                 '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
-           
+
             $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
 
             //             $this->sendMessage('Hola buen día 🙋🏻‍♀
@@ -3466,8 +3618,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '18')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '19')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
 
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', $producto["antidumping"]* $producto["cantidad"] == "-" ? 0 :$producto["antidumping"]* $producto["cantidad"]);
-                $antidumpingSum += $producto["antidumping"]* $producto["cantidad"];
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', $producto["antidumping"] * $producto["cantidad"] == "-" ? 0 : $producto["antidumping"] * $producto["cantidad"]);
+                $antidumpingSum += $producto["antidumping"] * $producto["cantidad"];
                 //set currency format with $ symbol
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '26')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '27', $producto["ad_valorem"]);
