@@ -11773,6 +11773,11 @@ body.sidebar-collapse:not(.sidebar-mini-xs):not(.sidebar-mini-md):not(.sidebar-m
   box-shadow: none !important;
 }
 
+@media screen and (max-width: 720.98px) {
+  .sidebar-collapse .main-sidebar, .sidebar-collapse .main-sidebar::before {
+    margin-left: 0px;
+  }
+}
 .sidebar-collapse .main-sidebar, .sidebar-collapse .main-sidebar::before {
   margin-left: -250px;
 }
