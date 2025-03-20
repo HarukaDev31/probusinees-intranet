@@ -583,11 +583,9 @@ class ContenedorConsolidadoModel extends CI_Model
                     }
 
                     // Genera el código del proveedor
-                    $codeSupplier=$sheet2->getCell($columnStart . $rowCodeSupplier)->getValue();
-                    if(!$codeSupplier|| $codeSupplier==''){
-                        $codeSupplier=$this->generateCodeSupplier($nameCliente, $count, $provider, $idContenedor);
-
-
+                    $codeSupplier = $sheet2->getCell($columnStart . $rowCodeSupplier)->getValue();
+                    if (!$codeSupplier || $codeSupplier == '') {
+                        $codeSupplier = $this->generateCodeSupplier($nameCliente, $count, $provider, $idContenedor);
                     }
                     // Agrega los datos del proveedor
                     $proveedores[] = [
@@ -868,7 +866,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $dataToInsert['id_cotizacion'] = $idCotizacion;
                 $dataToInsert['id_contenedor'] = $data->id_contenedor;
                 //get code_supplier from all rows in table_contenedor_cotizacion_proveedores where id_cotizacion=$id
-                
+
                 // Crear un array con los code_supplier de dataEmbarque
                 // Obtener los code_supplier de la base de datos
                 $this->db->select('code_supplier')
@@ -2071,13 +2069,13 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function updateEstadoCotizacionProveedor($idCotizacion, $idProveedor, $estado)
     {
-        if (in_array($estado, ["ROTULADO", "RESERVADO"])) {
+        if (in_array($estado, ["ROTULADO", "RESERVADO",'COBRANDO'])) {
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->group_start(); // Agrupar condiciones OR
-            $this->db->where('estados_proveedor IS NULL', null, false);
-            $this->db->or_where('estados_proveedor', 'RESERVADO');
-            $this->db->or_where('estados_proveedor', 'ROTULADO');
-            $this->db->or_where('estados_proveedor', 'DATOS PROVEEDOR');
+            $this->db->where('estados IS NULL');
+            $this->db->or_where('estados', 'RESERVADO');
+            $this->db->or_where('estados', 'ROTULADO');
+            $this->db->or_where('estados', 'DATOS PROVEEDOR');
             $this->db->group_end();
 
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
@@ -2997,32 +2995,42 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     public function getCotizacionEmbarqueHeaders($idContenedor)
     {
         //get sum of cbm_total_china and cbm_total from each cotizacion proveedor
-        $this->db->select('SUM(ifnull(cbm_total_china,0)) as cbm_total_china,SUM(ifnull(cbm_total,0)) as cbm_total')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id_contenedor', $idContenedor);
-        $query = $this->db->get();
-        $result = $query->row();
-        //get bl_file_url and lista_empaque_file_url from contenedor
-        $this->db->select('bl_file_url,lista_embarque_url')
-            ->from($this->table)
-            ->where('id', $idContenedor);
-        $query = $this->db->get();
-        $result2 = $query->row();
+        try {
+            $this->db->select('SUM(ifnull(contenedor_consolidado_cotizacion_proveedores.cbm_total_china,0)) as cbm_total_china,SUM(ifnull(contenedor_consolidado_cotizacion_proveedores.cbm_total,0)) as cbm_total')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->join($this->table_contenedor_cotizacion, 'contenedor_consolidado_cotizacion_proveedores.id_cotizacion=contenedor_consolidado_cotizacion.id')
+                ->where('contenedor_consolidado_cotizacion_proveedores.id_contenedor', $idContenedor);
 
-        if ($result) {
-            return [
-                'cbm_total_china' => $result->cbm_total_china,
-                'cbm_total' => $result->cbm_total,
-                'bl_file_url' => $result2->bl_file_url,
-                'lista_embarque_url' => $result2->lista_embarque_url
-            ];
-        } else {
-            return ['status' => "error", 'error' => false, "data" => [
-                'cbm_total_china' => 0,
-                'cbm_total' => 0,
-                'bl_file_url' => '',
-                'lista_embarque_url' => ''
-            ]];
+            $query = $this->db->get();
+            $result = $query->row();
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error: ' . $this->db->error()['message']);
+            }
+            //get bl_file_url and lista_empaque_file_url from contenedor
+            $this->db->select('bl_file_url,lista_embarque_url')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $result2 = $query->row();
+
+            if ($result) {
+                return [
+                    'cbm_total_china' => $result->cbm_total_china,
+                    'cbm_total' => $result->cbm_total,
+                    'bl_file_url' => $result2->bl_file_url,
+                    'lista_embarque_url' => $result2->lista_embarque_url
+                ];
+            } else {
+                return ['status' => "error", 'error' => false, "data" => [
+                    'cbm_total_china' => 0,
+                    'cbm_total' => 0,
+                    'bl_file_url' => '',
+                    'lista_embarque_url' => ''
+                ]];
+            }
+        } catch (Exception $e) {
+            log_message('error', '' . $e->getMessage());
+            return $e->getMessage();
         }
     }
     public function uploadBL($idContenedor, $file)

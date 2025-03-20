@@ -11,8 +11,8 @@
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-7">
+      <div class="row mb-2 gap-lg-0 gap-3 px-lg-0 px-5">
+        <div class="col-sm-12 col-xl-7">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <span id="section-title"><?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></span>
             &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
@@ -21,23 +21,43 @@
         <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion") {  ?>
 
         <!-- Buscador de la tabla -->
-        <div class="col-6 col-sm-2">
+        <div class="col-12 col-xl-2">
           <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+Buscar por
+                          <?php } else { ?>
+Search for
+                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
-        <div class="col-6 col-sm-1 dropdown">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
+        <div class="col-12 col-xl-1 dropdown">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?></button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> PDF</button>
+            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> Excel</button>
           </div>
         </div>
        
-          <div class=" col-6 col-sm-1 dropdown">
-            <!-- Botón de Filtros -->
+          <div class="col-12 col-xl-1 dropdown">
+      
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-filter"></i>Filtros
+              <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                           Filtros
+                          <?php } else { ?>
+                          Filters
+                          <?php } ?>
             </button>
             <!-- Menú Desplegable -->
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
@@ -79,32 +99,56 @@
     
           </div>
 
-          <div class="col-6 col-sm-1">
+          <div class="col-12 col-xl-1">
             <button type="button" id="btn-crear" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
           </div>
         <?php } else { ?>
 
-          <div class="col-12 col-sm-1"></div>
+          <div class="col-12 col-xl-1"></div>
 
         <!-- Buscador de la tabla -->
-        <div class="col-6 col-sm-2">
+        <div class="col-12 col-xl-1">
           <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+Buscar por
+                          <?php } else { ?>
+Search for
+                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
           </div>
         </div>
-        <!-- Contenedor Principal de Exportar-->
-        <div class="col-6 col-sm-1 dropdown">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
+        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?>-->
+        <div class="col-12 col-xl-1 dropdown">
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?></button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> PDF</button>
+            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> Excel</button>
           </div>
         </div>
-        <!-- Contenedor Principal de Filtros-->
-        <div class=" col-6 col-sm-1 dropdown">
-          <!-- Botón de Filtros -->
+
+        <div class=" col-12 col-xl-1 dropdown">
+
           <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-filter"></i>Filtros
+            <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                           Filtros
+                          <?php } else { ?>
+Filters
+                          <?php } ?>
           </button>
           <!-- Menú Desplegable -->
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
@@ -143,15 +187,35 @@
                 <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
           </div>
           
-          <!-- Contenedor Principal de Exportar-->
-          <div class="col-6 col-sm-1 dropdown">
-            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
+          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?>-->
+          <div class="col-12 col-xl-1 dropdown">
+            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?></button>
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-              <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-              <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+              <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> PDF</button>
+              <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> Excel</button>
             </div>
           </div>
-          <!-- Contenedor Principal de Filtros-->
+          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                           Filtros
+                          <?php } else { ?>
+Filters
+                          <?php } ?>-->
           </div>
         <?php } ?>
       </div>
@@ -189,7 +253,8 @@
                 <th>Country</th>
                 <th>Cut off</th>
                 <th>Company</th>
-                <th>Status</th>
+                <th style="min-width: 8em;">Status</th>
+
 
                 <th>Check</th>
 
@@ -578,7 +643,11 @@
           <div class="flex justify-between pt-6 border-t mt-6">
 
             <button type="submit" class="px-6 py-2 text-white bg-black rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900">
+              <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>  
             </button>
           </div>
         </form>
@@ -597,23 +666,55 @@
         <div class="col-12 col-md-8 d-flex gap-2 justify-content-end">
           <!-- Buscador -->
         <div class="dataTables_filter">
-          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+Buscar por
+                          <?php } else { ?>
+Search for
+                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
         </div>
       
         
-        <!-- Contenedor Principal de Exportar-->
+        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?>-->
         <div class="col-6 col-sm-2 dropdown">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Exportar</button>
+          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?></button>
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> PDF</button>
+            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> Excel</button>
           </div>
         </div>
-        <!-- Contenedor Principal de Filtros-->
+        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                           Filtros
+                          <?php } else { ?>
+Filters
+                          <?php } ?>-->
         <div class=" col-6 col-sm-2 dropdown">
-          <!-- Botón de Filtros -->
+          <!-- Botón de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                           Filtros
+                          <?php } else { ?>
+Filters
+                          <?php } ?> -->
           <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-filter"></i>Filtros
+            <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                           Filtros
+                          <?php } else { ?>
+Filters
+                          <?php } ?>
           </button>
           <!-- Menú Desplegable -->
           <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
@@ -652,7 +753,11 @@
                 <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
             </div>
           </div>
-          <!-- Contenedor Principal de Exportar-->
+          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?>-->
         </div>
           <div class="col-12 col-md-3">
             <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
@@ -661,33 +766,55 @@
       
         </div>
       <?php } else { ?>
-        <div class="row mb-2">
-          <div class="col-12 col-md-1">
+        <div class="row mb-2
+        gap-3 gap-xl-0 px-3 px-xl-0">
+          <div class="col-12 col-xl-1">
             <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
           </div>
-          <div class="col-sm-5"></div>
-          <div class="col-12 col-md-2"></div>
-          <div class="col-6 col-sm-2">
+          <div class="col-xl-6 col-0"></div>
+          <div class="col-12 col-xl-2">
             <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+Buscar por
+                          <?php } else { ?>
+Search for
+                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
             </div>
           </div>
           <!-- Contenedor Principal de Cargar-->
-          <div class="col-6 col-sm-1 dropdown">
-            <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> Cargar</button>
+          <div class="col-12 col-xl-1 dropdown">
+            <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>
+                            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Cargar
+                          <?php } else { ?>
+                            Upload
+                          <?php } ?>
+          </button>
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-cargar-carga">
               <div class="dropdown-item btn-block" id="packing-list-container"></div>
               <div class="dropdown-item btn-block" id="bl-file-container"></div>
             </div>
           </div>
-          <!-- Contenedor Principal de Exportar-->
-          <div class="col-6 col-sm-1 dropdown">
-            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> Exportar</button>
+          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?>-->
+          <div class="col-12 col-xl-1 dropdown">
+            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?></button>
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-              <button class="dropdown-item btn-block" id="export-excel"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+              <button class="dropdown-item btn-block" id="export-excel"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> Excel</button>
             </div>
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-xl-4">
             <label>&nbsp;</label>
           </div>
         </div>
@@ -704,14 +831,14 @@
           </div>
         <?php } ?>
 
-        <div class="col-12 col-md-2 d-flex align-items-center">
+        <div class="col-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
           <span>CBM Total Peru:</span>
           <div class="col-md-1">
             <strong><input type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></strong>
           </div>
         </div>
-        <div class="col-12 col-md-2 d-flex align-items-center">
+        <div class="col-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
           <span>CBM Total China:</span>
           <div class="col-md-1">
@@ -765,7 +892,11 @@
               <?php } ?>
 
               <th
-                style="min-width: 7em;">Productos</th>
+                style="min-width: 7em;"><?php if ($this->user->No_Grupo != "ContenedorAlmacen" ){  ?>
+               Productos
+              <?php }else{ ?>
+                Products
+              <?php } ?> </th>
               <th
                 style="min-width: 4em;">Qty Box</th>
               <th
@@ -784,7 +915,13 @@
                 style="min-width: 4em;">CBM Ch.</th>
               <th
                 style="min-width: 8em;">Arrive Date </th>
-              <th> Acciones </th>
+              <th> 
+              <?php if ($this->user->No_Grupo != "ContenedorAlmacen" ){  ?>
+                Acciones
+              <?php }else{ ?>
+                Actions
+              <?php } ?>    
+            </th>
 
 
             </tr>
@@ -800,28 +937,48 @@
   <section class="content px-3" id="clientes-container">
     <!-- header de la tabla -->
     <div class="row mb-2">
-      <div class="col-12 col-md-1">
+      <div class="col-12 col-md-2 col-xl-1">
         <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
-      <div class="col-sm-3"></div>
-      <div class="col-6 col-sm-1">
+      <div class="col-xl-3 col-md-2"></div>
+      <div class="col-6 col-md-0 col-xl-1">
       </div>
-      <div class="col-12 col-md-1">
+      <div class="col-12 col-md-2 col-xl-1">
       </div>
-      <div class="col-12 col-md-3">
+      <div class="col-12 col-md-2 col-xl-3">
         <label>&nbsp;</label>
       </div>
       <div class="col-6 col-sm-2">
         <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder="Buscar por: " aria-controls="table-contenedor" style="width:250px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+Buscar por
+                          <?php } else { ?>
+Search for
+                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
         </div>
       </div>
-      <!-- Contenedor Principal de Exportar-->
+      <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?>-->
       <div class="col-6 col-sm-1 dropdown">
-        <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> Exportar</button>
+        <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?></button>
         <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-          <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i>Exportar PDF</button>
-          <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i>Exportar Excel</button>
+          <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> PDF</button>
+          <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?> Excel</button>
         </div>
       </div>
     </div>
@@ -871,13 +1028,17 @@
   </section>
   <section class="content  px-4 py-3" id="clientes-documentation-container">
     <div class="row mb-2">
-      <div class="col-12 col-md-1">
+      <div class="col-12 col-md-2 col-xl-1">
         <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion-documentacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
-      <div class="col-sm-9"></div>
+      <div class="col-xl-9 col-md-8"></div>
 
       <div class="col-12 col-md-2">
-        <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Guardar</button>
+        <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>  </button>
       </div>
 
     </div>
@@ -946,7 +1107,11 @@
           <div class="col-12 col-guardar-documentacion m-2 d-flex justify-content-center align-items-center">
             <div id="btn-guardar-documentacion"
 
-              class="btn btn-primary btn-block btn-reporte col-6" data-type="html"><i class="fa fa-save"></i> Guardar</div>
+              class="btn btn-primary btn-block btn-reporte col-6" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>  </div>
           </div>
         </form>
 
@@ -1009,15 +1174,19 @@
   </section>
   <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
-    <div class="row mb-2">
-      <div class="col-12 col-md-1">
+    <div class="row mb-2 gap-3 gap-xl-0">
+      <div class="col-12 col-md-2 col-xl-1">
         <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 mx-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" id="btn-back-cotizacion-almacen"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
-      <div class="col-sm-5"></div>
-      <div class="col-6 col-sm-4">
+      <div class="col-xl-5 col-md-4"></div>
+      <div class="col-6 col-md-2 col-xl-4">
       </div>
-      <div class="col-12 col-md-1">
-        <button type="button" id="btn-guardar-doc-not"  class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html">Guardar <i class="fas fa-save"></i></button>
+      <div class="col-12 col-md-3 col-xl-1">
+        <button type="button" id="btn-guardar-doc-not"  class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>   <i class="fas fa-save"></i></button>
       </div>
       <div class="col-12 col-md-4">
         <label>&nbsp;</label>
@@ -1027,26 +1196,37 @@
 
 
     <div class="row mb-2 ml-2" style="border-bottom: #DFDFDF solid 2px;">
-      <div class="d-flex col-12 col-md-1 align-items-center" style="border-right: #DFDFDF solid 2px; max-width:12%; padding:15px 10px">
+      <div class="d-flex col-4 col-md-3 col-xl-2
+      " style="border-right: #DFDFDF solid 2px; padding:15px 10px">
         <span>Consolidado #</span>
-        <div class="col-md-1">
-          <input id="cotizacion_name" disabled="">
+        <div class="">
+          <label id="cotizacion_name" disabled=""></label>
         </div>
       </div>
-      <div class="col-12 col-md-1 pl-4 d-flex align-items-center" style="border-right: #DFDFDF solid 2px;">
+      <div class="col-6 col-xl-4 col-md-6 pl-4 d-flex align-items-center" style="border-right: #DFDFDF solid 2px;">
         <span id="client-title"></span>
       </div>
-      <div class="col-12 col-md-1 pl-4 d-flex align-items-center">
+      <div class="col-2 col-xl-1 pl-4 d-flex align-items-center">
         <span id="client-supplier-code"></span>
       </div>
     </div>
 
     <div class="row mb-2">
-      <div class="px-4 py-8 file-section-container col-12 col-md-5  ">
+      <div class="px-4 py-8 file-section-container col-12 col-xl-4  col-lg-12 col-md-12 ">
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
-            <h2 class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
-              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> Guardar
+            <h2 class="d-flex w-100 justify-content-between align-items-center"><label>
+            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Documentación
+            <?php } else { ?>
+              Documentation
+            <?php } ?>  
+            <i class="far fa-folder-open"></i></label>
+              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>  
               </div>
             </h2>
           </div>
@@ -1075,10 +1255,22 @@
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
-                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                        <span class="file-format">Formatos: .xlsx</span>
+                        <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Selecciona o arrastra tu archivo aquí
+                          <?php } else { ?>
+                            Select or drag your file here
+                          <?php } ?></span>
+                        <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Formatos
+                          <?php } else { ?>
+                            Formats
+                          <?php } ?>: .xlsx</span>
                       </div>
-                      <button class="upload-button upload-button-documentacion" type="button">Subir archivo</button>
+                      <button class="upload-button upload-button-documentacion" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Subir archivo
+                          <?php } else { ?>
+                            Upload Files
+                          <?php } ?></button>
                     </label>
                   </div>
                   <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
@@ -1099,12 +1291,16 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-xl-5 col-md-12">
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
           <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top"><label>Inspection  <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
-              class="bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html">Guardar &nbsp; <i class="fa fa-save"></i> 
+              class="bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>   &nbsp; <i class="fa fa-save"></i> 
             </div>
           </h2>
           <!--Button para guardar-->
@@ -1119,10 +1315,22 @@
                       <label for="file-inpute" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
-                          <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                          <span class="file-format">Formatos: .jpeg .png .mp4</span>
+                          <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Selecciona o arrastra tu archivo aquí
+                          <?php } else { ?>
+                            Select or drag your file here
+                          <?php } ?></span>
+                          <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Formatos
+                          <?php } else { ?>
+                            Formats
+                          <?php } ?>: .jpeg .png .mp4</span>
                         </div>
-                        <button class="upload-button upload-button-inspeccion" type="button">Subir archivo</button>
+                        <button class="upload-button upload-button-inspeccion" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Subir archivo
+                          <?php } else { ?>
+                            Upload Files
+                          <?php } ?></button>
                       </label>
                     </div>
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
@@ -1143,12 +1351,21 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-3 px-4 py-8 note-container-container">
-        <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas
+      <div class="col-12 col-xl-3 col-md-12 px-4 py-8 note-container-container">
+        <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">
+          <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            Notas
+          <?php } else { ?>
+            Notes
+          <?php } ?>
           <button onclick="addNote()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
             <i class="fas fa-save  float-right"></i>
 
-            <span>Guardar</span>
+            <span><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>  </span>
           </button>
         </h2>
         <div id="note-container" class="bg-white shadow p-4 rounded-lg">
@@ -1379,10 +1596,22 @@
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
-                        <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                        <span class="file-format">Formatos: .xlsx</span>
+                        <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Selecciona o arrastra tu archivo aquí
+                          <?php } else { ?>
+                            Select or drag your file here
+                          <?php } ?></span>
+                        <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Formatos
+                          <?php } else { ?>
+                            Formats
+                          <?php } ?>: .xlsx</span>
                       </div>
-                      <button class="upload-button" type="button">Subir archivo</button>
+                      <button class="upload-button" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Subir archivo
+                          <?php } else { ?>
+                            Upload Files
+                          <?php } ?></button>
                     </label>
 
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
@@ -1423,7 +1652,11 @@
           <div class="modal-footer">
             <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-5 border border-transparent hover:border-orange-600 rounded" data-dismiss="modal">Cancelar</button>
             <button type="button" id="btn-actualizar-cotizacion" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Actualizar</button>
-            <button type="button" id="btn-guardar-cotizacion" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Guardar</button>
+            <button type="button" id="btn-guardar-cotizacion" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>  </button>
           </div>
         </div>
       </div>
@@ -1509,7 +1742,11 @@
         <div class="modal-footer">
           <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-5 border border-transparent hover:border-orange-600 rounded" data-dismiss="modal">Cancelar</button>
           <button type="button" id="btn-actualizar" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Actualizar</button>
-          <button type="button" id="btn-guardar" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Guardar</button>
+          <button type="button" id="btn-guardar" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?>  </button>
         </div>
       </div>
     </div>

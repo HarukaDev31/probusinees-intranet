@@ -639,7 +639,7 @@ async function verCotizacionEmbarque(
   spinner.show();
   $("#client-title").text(clientName);
   $("#client-supplier-code").text(supplierCode);
-  $("#cotizacion_name").text(idContenedor);
+  $("#cotizacion_name").text(currentCargaNumber);
   $("#file-lista-documentacion").empty();
   getFilesAlmacenDocument(idProveedor, idCotizacion).then((files) => {
     files.forEach((file) =>
@@ -3313,7 +3313,7 @@ async function getTableCotizacionEmbarqueHeaders() {
 
   const response = await fetch(url);
   const result = await response.json();
-  $("#cotizacion_name").val(idContenedor);
+  $("#cotizacion_name").val(currentCargaNumber);
   $("#txt-CBM_Total_Peru").val(result.cbm_total);
   $("#txt-CBM_Total_China").val(result.cbm_total_china);
   //if result.lista_embarque_url is not null add button to download else file input with button to upload remember remove and add event listener
