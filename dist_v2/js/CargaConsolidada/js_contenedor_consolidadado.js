@@ -618,7 +618,7 @@ async function getClientesHeader() {
   const response = await fetch(url);
   const result = await response.json();
   $("#txt-Monto_Total").val(result.monto);
-  $("#cotizacion_name").val(result.carga);
+  $("#cotizacion_name").val('#'+result.carga);
   $("#txt-CBM_Total_China_Clientes").val(result.cbm_total_china);
   console.log(result);
   spinner.hide();
@@ -639,7 +639,7 @@ async function verCotizacionEmbarque(
   spinner.show();
   $("#client-title").text(clientName);
   $("#client-supplier-code").text(supplierCode);
-  $("#cotizacion_name").text(currentCargaNumber);
+  $("#cotizacion_name").text('#'+currentCargaNumber);
   $("#file-lista-documentacion").empty();
   getFilesAlmacenDocument(idProveedor, idCotizacion).then((files) => {
     files.forEach((file) =>
@@ -3313,9 +3313,9 @@ async function getTableCotizacionEmbarqueHeaders() {
 
   const response = await fetch(url);
   const result = await response.json();
-  $("#cotizacion_name").val(currentCargaNumber);
-  $("#txt-CBM_Total_Peru").val(result.cbm_total);
-  $("#txt-CBM_Total_China").val(result.cbm_total_china);
+  $("#cotizacion_name").val('#'+currentCargaNumber);
+  $("#txt-CBM_Total_Peru").html(result.cbm_total);
+  $("#txt-CBM_Total_China").html(result.cbm_total_china);
   //if result.lista_embarque_url is not null add button to download else file input with button to upload remember remove and add event listener
   if (result.lista_embarque_url) {
     $("#packing-list-container").empty();

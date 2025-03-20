@@ -11,7 +11,7 @@
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">
-      <div class="row mb-2 gap-lg-0 gap-3 px-lg-0 px-5">
+      <div class="row mb-2 gap-lg-0 gap-3 px-lg-0 px-3">
         <div class="col-sm-12 col-xl-7">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <span id="section-title"><?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></span>
@@ -821,28 +821,28 @@ Search for
       <?php } ?>
 
 
-      <div class="row mb-2" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
+      <div class="row mb-2 gap-3 gap-md-0" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
         <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
           <div class="d-flex align-items-center" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
-            <span>Consolidado #</span>
+            <span>Consolidado </span>
             <div class="col-md-1">
               <input id="cotizacion_name" disabled>
             </div>
           </div>
         <?php } ?>
 
-        <div class="col-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-12 col-sm-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
           <span>CBM Total Peru:</span>
-          <div class="col-md-1">
-            <strong><input type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></strong>
+          <div class="">
+            <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></span></strong>
           </div>
         </div>
-        <div class="col-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-12 col-sm-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
           <span>CBM Total China:</span>
-          <div class="col-md-1">
-            <strong><input type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></strong>
+          <div class="">
+            <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></span></strong>
           </div>
         </div>
       </div>
@@ -1196,17 +1196,16 @@ Search for
 
 
     <div class="row mb-2 ml-2" style="border-bottom: #DFDFDF solid 2px;">
-      <div class="d-flex col-4 col-md-3 col-xl-2
-      " style="border-right: #DFDFDF solid 2px; padding:15px 10px">
-        <span>Consolidado #</span>
+      <div class="d-flex col-4 col-md-3 col-xl-2 flex-column flex-md-row" style="border-right: #DFDFDF solid 2px;">
+        <span>Consolidado</span>
         <div class="">
           <label id="cotizacion_name" disabled=""></label>
         </div>
       </div>
-      <div class="col-6 col-xl-4 col-md-6 pl-4 d-flex align-items-center" style="border-right: #DFDFDF solid 2px;">
+      <div class="col-5 col-xl-4 col-md-6  d-flex align-items-center" style="border-right: #DFDFDF solid 2px;">
         <span id="client-title"></span>
       </div>
-      <div class="col-2 col-xl-1 pl-4 d-flex align-items-center">
+      <div class="col-3 col-xl-1  d-flex align-items-center">
         <span id="client-supplier-code"></span>
       </div>
     </div>
