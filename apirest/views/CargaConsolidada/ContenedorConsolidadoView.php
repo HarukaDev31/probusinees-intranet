@@ -1046,7 +1046,7 @@
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
             <h2 class="d-flex w-100 justify-content-between align-items-center"><label>Documentación <i class="far fa-folder-open"></i></label>
-              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="bg-orange py-2 px-5 border border-transparent rounded text-smrounded" data-type="html"><i class="fa fa-save"></i> Guardar
+              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="bg-orange py-2 px-5 border border-transparent rounded text-sm rounded" data-type="html"><i class="fa fa-save"></i> Guardar
               </div>
             </h2>
           </div>
@@ -1102,10 +1102,6 @@
       <div class="col-12 col-md-4">
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
           <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top"><label>Inspection  <i class="fas fa-images"></i></label>
-            <div id="btn-guardar-inspection"
-              onclick="saveInspection()"
-              class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html">Guardar &nbsp; <i class="fa fa-save"></i> 
-            </div>
           </h2>
           <!--Button para guardar-->
 
@@ -1144,13 +1140,7 @@
         </div>
       </div>
       <div class="col-12 col-md-3 px-4 py-8 note-container-container">
-        <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas
-          <button onclick="addNote()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
-            <i class="fas fa-save  float-right"></i>
-
-            <span>Guardar</span>
-          </button>
-        </h2>
+        <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">Notas</h2>
         <div id="note-container" class="bg-white shadow p-4 rounded-lg">
           <textarea id="txt-Id_Carga_Consolidada"
             class="form-control"></textarea>
