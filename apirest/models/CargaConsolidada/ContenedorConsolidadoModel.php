@@ -106,7 +106,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $this->db->where('id', $idProveedor);
         $this->db->update('contenedor_consolidado_cotizacion_proveedores', ['nota' => $note]);
 
-        if ($this->db->affected_rows() > 0) {
+        if ($this->db->error()['code'] == 0) {
             return "success";
         } else {
             return false;

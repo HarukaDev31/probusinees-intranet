@@ -821,7 +821,7 @@ Search for
       <?php } ?>
 
 
-      <div class="row mb-2 gap-3 gap-md-0" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
+      <div class="row mb-2 gap-xs-3 gap-md-0" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
         <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
           <div class="d-flex align-items-center" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
             <span>Consolidado </span>
@@ -831,14 +831,14 @@ Search for
           </div>
         <?php } ?>
 
-        <div class="col-12 col-sm-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-12 col-sm-12 col-md-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
           <span>CBM Total Peru:</span>
           <div class="">
             <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></span></strong>
           </div>
         </div>
-        <div class="col-12 col-sm-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
           <span>CBM Total China:</span>
           <div class="">
@@ -1221,7 +1221,7 @@ Search for
               Documentation
             <?php } ?>  
             <i class="far fa-folder-open"></i></label>
-              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class=" bg-orange py-2 px-5 border border-transparent rounded text-sm rounded" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
             <?php } else { ?>
               Save
@@ -1250,7 +1250,7 @@ Search for
               <div class="col-12 col-sm-12" id="multiple-file-upload">
                 <div class="form-group">
                   <div class="file-upload-box">
-                    <input type="file" id="file-input-documentacion" class="file-input" multiple accept="*/*" />
+                    <input type="file" id="file-input-documentacion" class="file-input" multiple accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm"/>
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
@@ -1295,7 +1295,7 @@ Search for
           <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top"><label>Inspection  <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
-              class="bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
             <?php } else { ?>
               Save
