@@ -1399,7 +1399,7 @@ class ContenedorConsolidadoModel extends CI_Model
     public function getDocumentationFolderFiles($id)
     {
         //select * from folders where id_cotizacion is null or $id and left join files where id_folder = id
-        $this->db->select("main.*,files.id AS id_file,files.file_url")
+        $this->db->select("main.*,files.id AS id_file,files.file_url,SUBSTRING_INDEX(SUBSTRING_INDEX(files.file_url, '.', -1), '/', 1) AS type")
             ->from($this->table_contenedor_documentacion_folders . " as main")
             ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id and files.id_contenedor = ' . $id, 'left');
 

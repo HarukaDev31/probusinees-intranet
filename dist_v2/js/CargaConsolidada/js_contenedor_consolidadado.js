@@ -3174,43 +3174,17 @@ async function viewDocumentacion() {
       $(".documentation-files-container").empty();
       dataParsed.forEach((file) => {
         $(".documentation-files-container").append(`
-                    <div class="col-12 col-sm-12" id="single-${
-                      file.folder_name
-                    }">
+                    <div class="col-12 col-sm-12" id="single-${file.id}">
                         <div class="form-group">
                             <label>${file.folder_name}
-                            ${
-                              file.id_contenedor
-                                ? `<div class="badge badge-danger text-white delete-folder-button
-                                
-                                " onclick="deleteDocumentacionFolder(${file.id})">
-                                X
-                                </div>`
-                                : ""
-                            }
+                              ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>`: ""}
                             </label>
                             <div class="file-upload-box">
-                                ${
-                                  file.file_url
-                                    ? `
+                                ${file.file_url ? `
                                         <div class="file-info">
-                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                                                <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
-                                                <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
-                                                <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
-                                                <rect width="16" height="9" x="12" y="15" fill="#3fa071"></rect>
-                                                <path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z"></path>
-                                                <path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z"></path>
-                                                <path d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z" opacity=".05"></path>
-                                                <path d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z" opacity=".07"></path>
-                                                <path d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z" opacity=".09"></path>
-                                                <linearGradient id="flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1" x1="4.725" x2="23.055" y1="14.725" y2="33.055" gradientUnits="userSpaceOnUse">
-                                                    <stop offset="0" stop-color="#18884f"></stop>
-                                                    <stop offset="1" stop-color="#0b6731"></stop>
-                                                </linearGradient>
-                                                <path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path>
-                                                <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
-                                            </svg>
+                                          <div class="file-iconic">
+                                            ${getIconByType(file.type)}
+                                          </div>
                                             <span class="file-name">${file.folder_name}</span>
                                             
                                             <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
@@ -3222,35 +3196,19 @@ async function viewDocumentacion() {
                                         </div>
                                 `
                                     : `
-                                    <input type="file" id="file-input-${file.id}" class="file-input" accept=".xlsx"/>
+                                    <input type="file" id="file-input-${file.id}" class="file-input" accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt"/>
                                     <label for="file-inputo" class="file-label d-flex">
                                         <i class="fas fa-upload"></i>
                                         <div class="file-group-text">
                                             <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                                            <span class="file-format">Formatos: .xlsx</span>
+                                            <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt</span>
                                         </div>
                                         <button class="upload-button upload-button-documentacion-peru-${file.id}" type="button">Subir archivo</button>
                                     </label>
                                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
                                     <div class="file-info-box hidden">
                                         <div class="file-info">
-                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                                                <rect width="16" height="9" x="28" y="15" fill="#21a366"></rect>
-                                                <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path>
-                                                <rect width="16" height="9" x="28" y="24" fill="#107c42"></rect>
-                                                <rect width="16" height="9" x="12" y="15" fill="#3fa071"></rect>
-                                                <path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z"></path>
-                                                <path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z"></path>
-                                                <path d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z" opacity=".05"></path>
-                                                <path d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z" opacity=".07"></path>
-                                                <path d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z" opacity=".09"></path>
-                                                <linearGradient id="flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1" x1="4.725" x2="23.055" y1="14.725" y2="33.055" gradientUnits="userSpaceOnUse">
-                                                    <stop offset="0" stop-color="#18884f"></stop>
-                                                    <stop offset="1" stop-color="#0b6731"></stop>
-                                                </linearGradient>
-                                                <path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path>
-                                                <path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
-                                            </svg>
+                                          <div class="file-iconic"></div>
                                             <span class="file-name"></span>
                                             <span class="file-size"></span>
                                             <button class="upload-file-button" type="button" onclick="openUploadFileDocumentation(${file.id})">
@@ -3261,7 +3219,7 @@ async function viewDocumentacion() {
                                             </button>
                                         </div>
                                     </div>
-                                    <script>   setupSingleFileUpload('single-${file.folder_name}', 'file-input-${file.id}', '.upload-button-documentacion-peru-${file.id}')</script>
+                                    <script>   setupSingleFileUpload('single-${file.id}', 'file-input-${file.id}', ['xlsx', 'xls', 'csv', 'xlsm','pdf','docx','doc'], '.upload-button-documentacion-peru-${file.id}')</script>
                                 `
                                 }
                         </div>    
@@ -3527,6 +3485,8 @@ async function openUploadFileDocumentation(idFolder) {
     });
     return;
   }
+  const fileExtension = file.name.split('.').pop().toLowerCase(); // Obtener la extensión del archivo
+  const fileType = file.type; // Tipo MIME completo
 
   const formData = new FormData();
   formData.append("file", file);
@@ -3549,13 +3509,20 @@ async function openUploadFileDocumentation(idFolder) {
     if (result.status === "success" || result.file_url) {
       const fileName = result.file_name || file.name;
       const fileSize = result.file_size || file.size;
+      const fileIcon = getIconByType(fileType || fileExtension);
+      console.log("Icono del archivo:", fileIcon); // Depuración
 
       const fileContainer = document.getElementById(`single-${idFolder}`);
+      console.log(fileContainer,"fileContainer"); // Depuración
       if (fileContainer) {
+        const fileIconElement = fileContainer.querySelector(".file-iconic");
         const fileNameElement = fileContainer.querySelector(".file-name");
         const fileSizeElement = fileContainer.querySelector(".file-size");
+        console.log("Elementos encontrados:", fileIconElement, fileNameElement, fileSizeElement); // Depuración
 
-        if (fileNameElement && fileSizeElement) {
+        if (fileIconElement && fileNameElement && fileSizeElement) {
+          console.log("Elementos encontrados:", fileIconElement, fileNameElement, fileSizeElement); // Depuración
+          fileIconElement.innerHTML = fileIcon;
           fileNameElement.textContent = fileName;
           fileSizeElement.textContent = `${(fileSize / 1024).toFixed(2)} KB`;
         }
@@ -3594,46 +3561,6 @@ async function openUploadFileDocumentation(idFolder) {
             `,
     });
   }
-
-  // Swal.fire({
-  //     title: "Subir archivo",
-  //     input: "file",
-  //     inputAttributes: {
-  //         accept: "*",
-  //         "aria-label": "Sube tu archivo",
-  //     },
-  //     showCancelButton: true,
-  //     confirmButtonText: "Subir",
-  //     showLoaderOnConfirm: true,
-  //     preConfirm: (file) => {
-  //         const formData = new FormData();
-  //         formData.append("file", file);
-  //         formData.append("idFolder", idFolder);
-  //         formData.append("idContenedor", idContenedor);
-  //         return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadFileDocumentation", {
-  //             method: "POST",
-  //             body: formData,
-  //         })
-  //             .then((response) => {
-  //                 return response.json();
-  //             })
-  //             .catch((error) => {
-  //                 Swal.showValidationMessage(
-  //                     `Request failed: ${error}`
-  //                 );
-  //             });
-  //     },
-  //     allowOutsideClick: () => !Swal.isLoading(),
-  // }).then((result) => {
-  //     if (result.value) {
-  //         if (result.value.status == "success") {
-  //             Swal.fire("Correcto", result.value.message, "success");
-  //             viewDocumentacion();
-  //         } else {
-  //             Swal.fire("Error", result.value.message, "error");
-  //         }
-  //     }
-  // });
 }
 async function viewCotizacion(id) {
   url =
@@ -4011,12 +3938,12 @@ async function viewClientesDocumentacion(id) {
             <div class="form-group">
                 <div class="file-upload-box">
                     <input type="file" id="file-input-factura" class="file-input" name="file_comercial"
-                        accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
+                        accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt" />
                     <label for="file-input-factura" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
                             <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                            <span class="file-format">Formatos: .xlsx</span>
+                            <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt</span>
                         </div>
                         <button class="upload-button" type="button">Subir archivo</button>
                     </label>
@@ -4066,7 +3993,6 @@ async function viewClientesDocumentacion(id) {
       }
     
       $("#documentos-clientes-documentacion").append(facturaDiv);
-      //   setupSingleFileUpload("single-file-upload-factura", "file-input-factura");
     
       // Repetir el mismo proceso para el Excel de confirmación
       if (!excelConfirmacion) {
@@ -4076,12 +4002,12 @@ async function viewClientesDocumentacion(id) {
             <div class="form-group">
                 <div class="file-upload-box">
                     <input type="file" id="file-input-confirmacion" class="file-input" name="excel_confirmacion"
-                        accept=".xlsx,.xls,.csv,.xlsb,.xlsm,.xltx,.xltm,.xls,.xlt" />
+                        accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt" />
                     <label for="file-input-confirmacion" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
                             <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                            <span class="file-format">Formatos: .xlsx</span>
+                            <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt</span>
                         </div>
                         <button class="upload-button" type="button">Subir archivo</button>
                     </label>
@@ -4135,13 +4061,15 @@ async function viewClientesDocumentacion(id) {
       if (!facturaComercial) {
         setupSingleFileUpload(
           "single-file-upload-factura",
-          "file-input-factura"
+          "file-input-factura",
+        ["xlsx","xls","csv","xlsb","xlsm","doc","docx","pdf"]
         );
       }
       if (!excelConfirmacion) {
         setupSingleFileUpload(
           "single-file-upload-confirmacion",
-          "file-input-confirmacion"
+          "file-input-confirmacion",
+          ["xlsx","xls","csv","xlsb","xlsm","doc","docx","pdf"]
         );
       }
   });
@@ -5683,11 +5611,19 @@ function getIconByType(typeOrExtension) {
         <polyline points="14 2 14 8 20 8"></polyline>
       </svg>
     `,
+    
   };
 
   const mimeToIcon = {
     'application/pdf': 'pdf',
     'application/msword': 'word',
+    'doc': 'word',
+    'docx': 'word',
+    'pdf': 'pdf',
+    'xls': 'excel',
+    'xlsx': 'excel',
+    'xlsb': 'excel',
+    'xlsm': 'excel',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'word',
     'application/vnd.ms-excel': 'excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'excel',
@@ -5695,6 +5631,10 @@ function getIconByType(typeOrExtension) {
     'application/vnd.ms-excel.sheet.macroenabled.12': 'excel', // Tipo MIME para .xlsm
     'image/png': 'image',
     'image/jpeg': 'image',
+    'jpg': 'image',
+    'jpeg': 'image',
+    'png': 'image',
+    'image/gif': 'image',
     'video/mp4': 'video',
   };
   // Normalizar el tipo o extensión
@@ -5714,7 +5654,7 @@ function getIconByType(typeOrExtension) {
   return icons.default;
 }
 
-function setupSingleFileUpload(containerId, inputId,selectInputId='.upload-button') {
+function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], selectInputId='.upload-button') {
   try {
     const container = document.getElementById(containerId);
     const fileInput = $(`#${inputId}`)[0];
@@ -5722,6 +5662,7 @@ function setupSingleFileUpload(containerId, inputId,selectInputId='.upload-butto
     const fileInfoBox = container.querySelector('.file-info-box');
     const fileNameElement = container.querySelector('.file-name');
     const fileSizeElement = container.querySelector('.file-size');
+    const fileIconElement = container.querySelector('.file-iconic'); // Elemento para el ícono
     const removeFileButton = container.querySelector('.remove-file-button');
     const selectFileButton = container.querySelector(selectInputId);
 
@@ -5737,21 +5678,36 @@ function setupSingleFileUpload(containerId, inputId,selectInputId='.upload-butto
     fileInput.addEventListener('change', (e) => {
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv') || file.name.endsWith('.xlsb') || file.name.endsWith('.xlsm') || file.name.endsWith('.xltx') || file.name.endsWith('.xlt')) {
-          // Mostrar el cuadro de información del archivo
-          fileInfoBox.classList.remove('hidden');
+        const fileExtension = file.name.split('.').pop().toLowerCase(); // Obtener la extensión del archivo
+        const fileType = file.type; // Tipo MIME completo
 
-          // Mostrar el nombre y el tamaño del archivo
-          fileNameElement.textContent = file.name;
-          fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
-        } else {
-          alert("Solo se permiten archivos .xlsx");
+        // Verificar si el archivo está en la lista de tipos permitidos
+        if (!allowedFileTypes.includes(fileType) && !allowedFileTypes.includes(fileExtension)) {
+          alert(`El archivo "${file.name}" no está permitido. Solo se permiten: ${allowedFileTypes.join(', ')}`);
           fileInput.value = ""; // Limpia el input
+          return;
         }
+
+        // Obtener el ícono correspondiente
+        const fileIcon = getIconByType(fileType || fileExtension);
+        console.log('Ícono obtenido:', fileIcon); // Depuración
+
+        // Mostrar el cuadro de información del archivo
+        fileInfoBox.classList.remove('hidden');
+
+        // Mostrar el ícono, nombre y tamaño del archivo
+        if (fileIconElement) {
+          fileIconElement.innerHTML = fileIcon; // Asegúrate de que el elemento exista
+        } else {
+          console.warn('El elemento .file-iconic no se encontró en el contenedor.');
+        }
+        fileNameElement.textContent = file.name;
+        fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
       } else {
         fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
       }
     });
+    // Manejar el botón de tacho de basura para quitar el archivo
     if(removeFileButton){
       removeFileButton.addEventListener('click', (e) => {
       e.preventDefault();
@@ -5759,7 +5715,6 @@ function setupSingleFileUpload(containerId, inputId,selectInputId='.upload-butto
       fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
     });
     }
-    // Manejar el botón de tacho de basura para quitar el archivo
     
 
     // Manejar el arrastre de archivos
@@ -5778,15 +5733,19 @@ function setupSingleFileUpload(containerId, inputId,selectInputId='.upload-butto
       fileLabel.style.borderColor = '#cccccc';
       if (e.dataTransfer.files.length > 0) {
         const file = e.dataTransfer.files[0];
-        if (file.name.endsWith('.xlsx')) {
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        // Verificar si el archivo está en la lista de tipos permitidos
+        if (!allowedFileTypes.includes(fileExtension)) {
+          alert(`El archivo "${file.name}" no está permitido. Solo se permiten: ${allowedFileTypes.join(', ')}`);
+          return;
+        }
+
           fileInput.files = e.dataTransfer.files; // Asigna el archivo arrastrado al input
 
           // Mostrar la información del archivo
           fileInput.dispatchEvent(new Event('change'));
-        } else {
-          alert("Solo se permiten archivos .xlsx");
-        }
-      }
+        } 
     });
 
     // Restablecer el estado del cuadro de información cuando el modal se oculta
@@ -5913,7 +5872,7 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = []) {
 }
 }
 
-setupSingleFileUpload("single-file-upload", "file-input-prospecto");
+setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt']);
 
 
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg','jpeg','mp4']);
