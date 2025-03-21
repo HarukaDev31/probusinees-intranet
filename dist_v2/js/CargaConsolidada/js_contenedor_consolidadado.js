@@ -5712,9 +5712,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
         fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
       }
     });
-    if(automaticUpload){
-      saveDocumentation();
-    }
+    
     // Manejar el botón de tacho de basura para quitar el archivo
     if(removeFileButton){
       removeFileButton.addEventListener('click', (e) => {
@@ -5817,9 +5815,7 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [],automa
 
         // Agregar el elemento a la lista
         fileList.appendChild(fileItem);
-        if(automaticUpload){
-          saveDocumentation();
-        }
+        
       });
     }
   });
