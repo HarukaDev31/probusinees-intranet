@@ -3219,7 +3219,7 @@ async function viewDocumentacion() {
                                             </button>
                                         </div>
                                     </div>
-                                    <script>   setupSingleFileUpload('single-${file.id}', 'file-input-${file.id}', ['xlsx', 'xls', 'csv', 'xlsm','pdf','docx','doc'], '.upload-button-documentacion-peru-${file.id}')</script>
+                                    <script>   setupSingleFileUpload('single-${file.id}', 'file-input-${file.id}', ['xlsx', 'xls', 'csv', 'xlsm','pdf','docx','doc'], '.upload-button-documentacion-peru-${file.id}',true)</script>
                                 `
                                 }
                         </div>    
@@ -5654,7 +5654,7 @@ function getIconByType(typeOrExtension) {
   return icons.default;
 }
 
-function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], selectInputId='.upload-button') {
+function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], selectInputId='.upload-button',automaticUpload=false) {
   try {
     const container = document.getElementById(containerId);
     const fileInput = $(`#${inputId}`)[0];
@@ -5707,6 +5707,9 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
         fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
       }
     });
+    if(automaticUpload){
+      saveDocumentation();
+    }
     // Manejar el botón de tacho de basura para quitar el archivo
     if(removeFileButton){
       removeFileButton.addEventListener('click', (e) => {

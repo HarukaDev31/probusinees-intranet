@@ -49,9 +49,9 @@ Search for
                           <?php } ?> Excel</button>
           </div>
         </div>
-       
+
           <div class="col-12 col-xl-1 dropdown">
-      
+
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
@@ -96,7 +96,7 @@ Search for
                 <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
               </div>
             </div>
-    
+
           </div>
 
           <div class="col-12 col-xl-1">
@@ -177,16 +177,16 @@ Filters
                     <option value="COMPLETADO">FINISH</option>
                   </select>
                 </div>
-                
+
               </div>
-          </div>         
+          </div>
           <div class="dropdown-divider"></div>
           <!-- Botones -->
           <div class="d-flex justify-content-around">
                 <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
                 <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
           </div>
-          
+
           <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                             Exportar
                           <?php } else { ?>
@@ -647,7 +647,7 @@ Filters
               Guardar
             <?php } else { ?>
               Save
-            <?php } ?>  
+            <?php } ?>
             </button>
           </div>
         </form>
@@ -672,8 +672,8 @@ Buscar por
 Search for
                           <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
         </div>
-      
-        
+
+
         <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                             Exportar
                           <?php } else { ?>
@@ -743,9 +743,9 @@ Filters
                     <option value="COMPLETADO">FINISH</option>
                   </select>
                 </div>
-                
+
               </div>
-          </div>         
+          </div>
           <div class="dropdown-divider"></div>
           <!-- Botones -->
           <div class="d-flex justify-content-around">
@@ -763,7 +763,7 @@ Filters
             <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
           </div>
       </div>
-      
+
         </div>
       <?php } else { ?>
         <div class="row mb-2
@@ -915,12 +915,12 @@ Search for
                 style="min-width: 4em;">CBM Ch.</th>
               <th
                 style="min-width: 8em;">Arrive Date </th>
-              <th> 
+              <th>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen" ){  ?>
                 Acciones
               <?php }else{ ?>
                 Actions
-              <?php } ?>    
+              <?php } ?>
             </th>
 
 
@@ -1045,12 +1045,12 @@ Search for
     <div class="documentos-clientes-tabs">
               </div>
               <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75">
-                
-            
+
+
             </div>
-              
+
     <!-- <div class="container ">
-      
+
     </div> -->
     <!-- <div class="col col-12 my-2" id="clientes-documentacion">
       <h3
@@ -1219,14 +1219,9 @@ Search for
               Documentación
             <?php } else { ?>
               Documentation
-            <?php } ?>  
+            <?php } ?>
             <i class="far fa-folder-open"></i></label>
-              <div id="btn-guardar-documentation" onclick="saveDocumentation()" class=" bg-orange py-2 px-5 border border-transparent rounded text-sm rounded" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Guardar
-            <?php } else { ?>
-              Save
-            <?php } ?>  
-              </div>
+              
             </h2>
           </div>
         </div>
@@ -1299,7 +1294,7 @@ Search for
               Guardar
             <?php } else { ?>
               Save
-            <?php } ?>   &nbsp; <i class="fa fa-save"></i> 
+            <?php } ?>   &nbsp; <i class="fa fa-save"></i>
             </div>
           </h2>
           <!--Button para guardar-->
@@ -1465,10 +1460,10 @@ Search for
     <div class="min-h-screen bg-gray-50 p-8">
       <h1 class="text-3xl font-bold text-gray-800 mb-6"
       id="factura-guia-title"></h1>
-      <div class="flex 
+      <div class="flex
       w-full gap-4 mb-8
       justify-end
-      
+
       ">
         <!--3 empty divs-->
 
@@ -2404,7 +2399,7 @@ Search for
     color:black;
     text-align: center;
     cursor: pointer;
-    
+
   }
   .tab-cliente-documentacion.active{
     background-color: #FF500B!important;

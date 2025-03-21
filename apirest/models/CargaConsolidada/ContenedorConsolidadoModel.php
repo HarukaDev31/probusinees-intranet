@@ -2069,6 +2069,11 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function updateEstadoCotizacionProveedor($idCotizacion, $idProveedor, $estado)
     {
+        //get id_contenedor from id_cotizacion
+        $idContenedor = $this->db->select('id_contenedor')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $idCotizacion)
+            ->get()->row()->id_contenedor;
         if (in_array($estado, ["ROTULADO", "RESERVADO",'COBRANDO'])) {
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->group_start(); // Agrupar condiciones OR
@@ -2109,6 +2114,29 @@ class ContenedorConsolidadoModel extends CI_Model
 
             $this->db->where('id', $idCotizacion);
             $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $volumenChina]);
+            //get status of all providers with id_cotizacion=idCotizacion
+            $this->db->where('
+            id_cotizacion', $idCotizacion);
+            $this->db->select('estados_proveedor')
+                ->from($this->table_contenedor_cotizacion_proveedores);
+            $query = $this->db->get();
+            //validate if all providers has status loaded   
+            $estados_proveedor = $query->result_array();
+            if (count($estados_proveedor) > 0) {
+                $allLoaded = true;
+                foreach ($estados_proveedor as $estado) {
+                    if ($estado['estados_proveedor'] != 'LOADED') {
+                        $allLoaded = false;
+                        break;
+                    }
+                }
+                if ($allLoaded) {
+                    //update estado_china to COMPLETADO from table carga_consolidada_contenedor
+                    $this->db->where('id', $idContenedor);
+                    $this->db->update($this->table, ['estado_china'=> "COMPLETADO"]);
+ 
+                }
+            }   
         }
         // Manejo de los estados específicos en array
         else if (in_array($estado, ["NC", "C", "R", "NS", "NO LOADED", "INSPECTION"])) {
@@ -2620,6 +2648,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         "action" => $this->cambioEstadoProveedor,
                         "message" => $message
                     ]);
+                    //if contenedor estado_china is PENDIENTE UPDATE TO RECIBIENDO
+                    $contenedorEstado= $this->db->select('estado_china')->from($this->table)->where('id',$idContenedor)->get()->row()->estado_china;
+                    if($contenedorEstado=="PENDIENTE"){
+                        $this->db->where('id', $idContenedor);
+                        $this->db->update($this->table, ['estado_china' => "RECIBIENDO"]);
+                    }
                 }
                 $this->verifyContainerIsCompleted($idContenedor);
             }
