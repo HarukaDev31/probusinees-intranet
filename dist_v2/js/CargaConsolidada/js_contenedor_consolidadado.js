@@ -3219,7 +3219,7 @@ async function viewDocumentacion() {
                                             </button>
                                         </div>
                                     </div>
-                                    <script>   setupSingleFileUpload('single-${file.id}', 'file-input-${file.id}', ['xlsx', 'xls', 'csv', 'xlsm','pdf','docx','doc'], '.upload-button-documentacion-peru-${file.id}',true)</script>
+                                    <script>   setupSingleFileUpload('single-${file.id}', 'file-input-${file.id}', ['xlsx', 'xls', 'csv', 'xlsm','pdf','docx','doc'], '.upload-button-documentacion-peru-${file.id}')</script>
                                 `
                                 }
                         </div>    
@@ -5879,4 +5879,4 @@ setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'doc
 
 
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg','jpeg','mp4']);
-setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt']);
+setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt'],true);
