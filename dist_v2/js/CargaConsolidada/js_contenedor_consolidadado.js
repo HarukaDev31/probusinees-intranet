@@ -4867,6 +4867,11 @@ $(document).ready(async function () {
   };
   await fillSelects();
   /**Start of Listeners */
+  //on change file-input-documentacion save documentation and clean file input
+  $("#file-input-documentacion").change(async function () {
+    await saveDocumentation();
+    $(this).val("");
+  });
   btnCrear = $("#btn-crear");
   btnCrear.on("click", async function () {
     $("#modal-crear").modal("show");
