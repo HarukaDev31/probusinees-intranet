@@ -5764,7 +5764,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
 // Funcion para subir archivos multiples
 
-function setupMultiFileUpload(containerId, inputId, allowedFileTypes = []) {
+function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [],automaticUpload=false) {
   const container = document.getElementById(containerId);
   const fileInput = $(`#${inputId}`)[0];
   const fileLabel = container.querySelector('.file-label');
@@ -5812,6 +5812,9 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = []) {
 
         // Agregar el elemento a la lista
         fileList.appendChild(fileItem);
+        if(automaticUpload){
+          saveDocumentation();
+        }
       });
     }
   });
@@ -5879,4 +5882,4 @@ setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'doc
 
 
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg','jpeg','mp4']);
-setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt'],true);
+setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt']);
