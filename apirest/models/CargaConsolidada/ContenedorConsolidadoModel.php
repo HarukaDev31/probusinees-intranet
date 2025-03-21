@@ -2691,11 +2691,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         "action" => $this->cambioEstadoProveedor,
                         "message" => $message
                     ]);
-                    $contenedorEstado= $this->db->select('estado_china')->from($this->table)->where('id',$idContenedor)->get()->row()->estado_china;
-                    if($contenedorEstado=="PENDIENTE"){
-                        $this->db->where('id', $idContenedor);
-                        $this->db->update($this->table, ['estado_china' => "RECIBIENDO"]);
-                    }
+                    
                 } else {
                     $message = "Se ha actualizado la cantidad de cajas y volumen total de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['qty_box_china'] . " cajas y " . $data['cbm_total_china'] . " m3";
                     $socketResponse = $this->sendEvent([
@@ -2713,6 +2709,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         "message" => $message
                     ]);
                 }
+                $contenedorEstado= $this->db->select('estado_china')->from($this->table)->where('id',$idContenedor)->get()->row()->estado_china;
+                    if($contenedorEstado=="PENDIENTE"){
+                        $this->db->where('id', $idContenedor);
+                        $this->db->update($this->table, ['estado_china' => "RECIBIENDO"]);
+                    }
             }
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
