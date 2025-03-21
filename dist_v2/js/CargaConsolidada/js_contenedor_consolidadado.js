@@ -501,39 +501,34 @@ function addFileToList(file, fileList = null, id = null) {
     deleteFile(id, fileItem);
   });
 
- // Agregar funcionalidad de vista previa si es una imagen
-if (file.file_ext.startsWith("image")) {
+ // Agregar funcionalidad de vista previa para imágenes y videos
+ if (file.file_ext.startsWith("image/") || file.file_ext.startsWith("video/")) {
   fileItem.find(".file-preview").css("cursor", "pointer");
   fileItem.find(".file-preview").on("click", function () {
-    const modal = document.getElementById("image-modal");
-    const modalImage = modal.querySelector("#image-preview");
+    if (file.file_ext.startsWith("image/")) {
+      // Mostrar la imagen en el modal
+      const modal = document.getElementById("image-modal");
+      const modalImage = modal.querySelector("#image-preview");
+      modalImage.src = file.file_url;
+      const bootstrapModal = new bootstrap.Modal(modal);
+      bootstrapModal.show();
+    } else if (file.file_ext.startsWith("video/")) {
+      // Mostrar el video en el modal
+      const modal = document.getElementById("video-modal");
+      const modalVideo = modal.querySelector("#video-preview");
+      modalVideo.src = file.file_url;
+      modalVideo.load(); // Cargar el video
+      const bootstrapModal = new bootstrap.Modal(modal);
+      bootstrapModal.show();
 
-    // Mostrar el spinner mientras se carga la imagen
-    spinner.show();
-
-    // Verificar si el archivo es válido
-    if (file.file_url) {
-        // Asignar directamente la URL al atributo src del modal
-        modalImage.src = file.file_url;
-
-        // Manejar el evento de carga de la imagen
-        modalImage.onload = () => {
-          spinner.hide(); // Ocultar el spinner cuando la imagen esté cargada
-          const bootstrapModal = new bootstrap.Modal(modal);
-          bootstrapModal.show(); // Mostrar el modal
-        };
-
-        // Manejar errores al cargar la imagen
-        modalImage.onerror = () => {
-          spinner.hide();
-          Swal.fire("Error", "No se pudo cargar la imagen.", "error");
-        };
-      } else {
-        spinner.hide();
-        Swal.fire("Error", "No se encontró la URL del archivo.", "error");
-      }
-    });
-  }
+      // Detener el video cuando se cierre el modal
+      modal.addEventListener("hidden.bs.modal", () => {
+        modalVideo.pause(); // Pausar el video
+        modalVideo.currentTime = 0; // Reiniciar el video al inicio
+      });
+    }
+  });
+}
 
   fileList.append(fileItem);
   // Remover clase "hidden" si está presente
@@ -5849,21 +5844,33 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = []) {
         // Agregar el elemento a la lista
         fileList.appendChild(fileItem);
 
-        // Agregar funcionalidad de vista previa si es una imagen
-        if (fileType.startsWith('image/')) {
+        // Agregar funcionalidad de vista previa para imágenes y videos
+        if (fileType.startsWith('image/') || fileType.startsWith('video/')) {
           const fileIconElement = fileItem.querySelector('.file-icon');
           fileIconElement.style.cursor = 'pointer';
           fileIconElement.addEventListener('click', () => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            if (fileType.startsWith('image/')) {
               // Mostrar la imagen en el modal
-            const modal = document.getElementById('image-modal');
-            const modalImage = modal.querySelector('#image-preview');
-            modalImage.src = e.target.result;
-            const bootstrapModal = new bootstrap.Modal(modal);
-            bootstrapModal.show();
-            };
-            reader.readAsDataURL(file);
+              const modal = document.getElementById('image-modal');
+              const modalImage = modal.querySelector('#image-preview');
+              modalImage.src = URL.createObjectURL(file);
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+            } else if (fileType.startsWith('video/')) {
+              // Mostrar el video en el modal
+              const modal = document.getElementById('video-modal');
+              const modalVideo = modal.querySelector('#video-preview');
+              modalVideo.src = URL.createObjectURL(file);
+              modalVideo.load(); // Cargar el video
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+
+              // Detener el video cuando se cierre el modal
+              modal.addEventListener('hidden.bs.modal', () => {
+                modalVideo.pause(); // Pausar el video
+                modalVideo.currentTime = 0; // Reiniciar el video al inicio
+              });
+            }
           });
         }
       });
