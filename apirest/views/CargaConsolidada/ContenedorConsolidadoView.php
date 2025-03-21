@@ -2411,8 +2411,10 @@ Search for
     gap: 1em;
     margin:1em 2em;
   }
-</style>
-<script>
-  // script.js
 
-</script>
+  .file-icon-container {
+    display: flex;
+    justify-content: space-between;
+    width: -webkit-fill-available;
+  }
+</style>

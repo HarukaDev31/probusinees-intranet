@@ -501,6 +501,40 @@ function addFileToList(file, fileList = null, id = null) {
     deleteFile(id, fileItem);
   });
 
+ // Agregar funcionalidad de vista previa si es una imagen
+if (file.file_ext.startsWith("image")) {
+  fileItem.find(".file-preview").css("cursor", "pointer");
+  fileItem.find(".file-preview").on("click", function () {
+    const modal = document.getElementById("image-modal");
+    const modalImage = modal.querySelector("#image-preview");
+
+    // Mostrar el spinner mientras se carga la imagen
+    spinner.show();
+
+    // Verificar si el archivo es válido
+    if (file.file_url) {
+        // Asignar directamente la URL al atributo src del modal
+        modalImage.src = file.file_url;
+
+        // Manejar el evento de carga de la imagen
+        modalImage.onload = () => {
+          spinner.hide(); // Ocultar el spinner cuando la imagen esté cargada
+          const bootstrapModal = new bootstrap.Modal(modal);
+          bootstrapModal.show(); // Mostrar el modal
+        };
+
+        // Manejar errores al cargar la imagen
+        modalImage.onerror = () => {
+          spinner.hide();
+          Swal.fire("Error", "No se pudo cargar la imagen.", "error");
+        };
+      } else {
+        spinner.hide();
+        Swal.fire("Error", "No se encontró la URL del archivo.", "error");
+      }
+    });
+  }
+
   fileList.append(fileItem);
   // Remover clase "hidden" si está presente
   fileList.removeClass("hidden");
@@ -5803,15 +5837,35 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = []) {
 
         // Mostrar el nombre y el tamaño del archivo
         fileItem.innerHTML = `
-          ${fileIcon}
-          <p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
-          <div class="remove-file-button" data-index="${index}">
-            <i class="fas fa-trash"></i>
+          <div class="file-icon-container"> 
+            <div class="file-icon" style="cursor: pointer;">${fileIcon}</div>
+            <p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
+            <div class="remove-file-button" data-index="${index}">
+              <i class="fas fa-trash"></i>
+            </div>
           </div>
         `;
 
         // Agregar el elemento a la lista
         fileList.appendChild(fileItem);
+
+        // Agregar funcionalidad de vista previa si es una imagen
+        if (fileType.startsWith('image/')) {
+          const fileIconElement = fileItem.querySelector('.file-icon');
+          fileIconElement.style.cursor = 'pointer';
+          fileIconElement.addEventListener('click', () => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              // Mostrar la imagen en el modal
+            const modal = document.getElementById('image-modal');
+            const modalImage = modal.querySelector('#image-preview');
+            modalImage.src = e.target.result;
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+            };
+            reader.readAsDataURL(file);
+          });
+        }
       });
     }
   });
