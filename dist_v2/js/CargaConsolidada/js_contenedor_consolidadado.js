@@ -5882,4 +5882,4 @@ setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'doc
 
 
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg','jpeg','mp4']);
-setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt']);
+setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt'],true);
