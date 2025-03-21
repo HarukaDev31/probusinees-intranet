@@ -3253,7 +3253,7 @@ async function viewDocumentacion() {
                                             </button>
                                         </div>
                                     </div>
-                                    <script>   setupSingleFileUpload('single-${file.id}', 'file-input-${file.id}', ['xlsx', 'xls', 'csv', 'xlsm','pdf','docx','doc'], '.upload-button-documentacion-peru-${file.id}',true)</script>
+                                    <script>   setupSingleFileUpload('single-${file.id}', 'file-input-${file.id}', ['xlsx', 'xls', 'csv', 'xlsm','pdf','docx','doc'], '.upload-button-documentacion-peru-${file.id}')</script>
                                 `
                                 }
                         </div>    
@@ -4901,6 +4901,11 @@ $(document).ready(async function () {
   };
   await fillSelects();
   /**Start of Listeners */
+  //on change file-input-documentacion save documentation and clean file input
+  $("#file-input-documentacion").change(async function () {
+    await saveDocumentation();
+    $(this).val("");
+  });
   btnCrear = $("#btn-crear");
   btnCrear.on("click", async function () {
     $("#modal-crear").modal("show");
@@ -5741,9 +5746,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
         fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
       }
     });
-    if(automaticUpload){
-      saveDocumentation();
-    }
+    
     // Manejar el botón de tacho de basura para quitar el archivo
     if(removeFileButton){
       removeFileButton.addEventListener('click', (e) => {
@@ -5798,7 +5801,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
 // Funcion para subir archivos multiples
 
-function setupMultiFileUpload(containerId, inputId, allowedFileTypes = []) {
+function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [],automaticUpload=false) {
   const container = document.getElementById(containerId);
   const fileInput = $(`#${inputId}`)[0];
   const fileLabel = container.querySelector('.file-label');
@@ -5933,4 +5936,4 @@ setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'doc
 
 
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg','jpeg','mp4']);
-setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt']);
+setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls','doc','xlsm','csv','xlsb','xltx','xlt'],true);
