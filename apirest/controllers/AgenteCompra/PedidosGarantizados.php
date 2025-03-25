@@ -239,7 +239,7 @@ class PedidosGarantizados extends CI_Controller
         echo json_encode($this->PedidosGarantizadosModel->actualizarElegirItemProductos($this->input->post(), $_FILES));
     }
 
-    public function cambiarEstado($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China)
+    public function cambiarEstado($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China,$a=null)
     {
         if (!$this->input->is_ajax_request()) {
             exit('No se puede eliminar y acceder');

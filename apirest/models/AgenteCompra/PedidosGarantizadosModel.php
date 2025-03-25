@@ -459,12 +459,11 @@ class PedidosGarantizadosModel extends CI_Model
         return array('status' => 'error', 'message' => 'Error al seleccionar proveedor');
     }
 
-    public function cambiarEstado($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China)
+    public function cambiarEstado($ID, $Nu_Estado, $ID_Usuario_Interno_Empresa_China,$a=null)
     {
         $where = array('ID_Pedido_Cabecera' => $ID);
         $data = array(
             'Nu_Estado' => $Nu_Estado,
-            'ID_Usuario_Interno_China' => $ID_Usuario_Interno_Empresa_China,
         );
 
         if ($Nu_Estado == 5 || $Nu_Estado == 3) {
