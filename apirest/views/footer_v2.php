@@ -467,7 +467,7 @@ function fetchNotifications() {
       </div>
       <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-outline-secondary col" data-dismiss="modal">Salir</button>
-        <button type="button" id="btn-save-delete" class="btn btn-primary col">Aceptar</button>
+        <button type="button" id="btn-save-delete-notifications" class="btn btn-primary col">Aceptar</button>
       </div>
     </div>
   </div>

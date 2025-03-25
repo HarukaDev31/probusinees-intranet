@@ -118,5 +118,9 @@ function validateCodigoBarra(){
 
 $(document).ready(function(){
   $(".backdrop").hide();
-  
+  $("#btn-save-delete-notifications").click(function(){
+    $('#btn-save-delete-notifications').attr('disabled', true);
+    console.log("delete notification")
+    $('#modal-notification-body').html('');
+  });
 });
