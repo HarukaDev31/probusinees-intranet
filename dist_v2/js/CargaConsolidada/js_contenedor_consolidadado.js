@@ -3997,12 +3997,9 @@ async function viewClientesDocumentacion(id) {
                 <div class="file-upload-box">
                     <div class="file-info-box">
                         <div class="file-info">
-                            <div class="file-iconic"></div>
+                            <div class="file-iconic"><a href="javascript:void(0)" class="file-icon-link">${getIconByType(facturaComercial.split('.').pop().toLowerCase())}</a></div>
                             <span class="file-name">Factura Comercial</span>
-                            <a href="${facturaComercial}" target="_blank" class="file-link">Ver archivo</a>
-                            <button class="remove-file-button"
-                            onclick="deleteFacturaComercial(${provider.id})"
-                            >
+                            <button class="remove-file-button" onclick="deleteFacturaComercial(${provider.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -4010,9 +4007,34 @@ async function viewClientesDocumentacion(id) {
                 </div>
             </div>
         </div>`;
+        $("#documentos-clientes-documentacion").append(facturaDiv);
+        // Agregar funcionalidad de vista previa si es una imagen
+        const facturaContainer = document.getElementById('single-file-upload-factura');
+        console.log(facturaContainer,"facturaContainer");
+        if (facturaContainer) {
+          const fileIconLink = facturaContainer.querySelector('.file-icon-link');
+          if (fileIconLink) {
+              const fileExtension = facturaComercial.split('.').pop().toLowerCase();
+              if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+                  // Agregar estilo de cursor: pointer
+                  fileIconLink.style.cursor = 'pointer';
+      
+                  // Agregar evento de clic para mostrar la vista previa
+                  fileIconLink.addEventListener('click', (event) => {
+                      event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+      
+                      // Mostrar la imagen en el modal
+                      const modal = document.getElementById('image-modal');
+                      const modalImage = modal.querySelector('#image-preview');
+                      modalImage.src = facturaComercial;
+                      const bootstrapModal = new bootstrap.Modal(modal);
+                      bootstrapModal.show();
+                  });
+                }
+            }
+        }
       }
     
-      $("#documentos-clientes-documentacion").append(facturaDiv);
     
       // Repetir el mismo proceso para el Excel de confirmación
       if (!excelConfirmacion) {
@@ -4058,12 +4080,11 @@ async function viewClientesDocumentacion(id) {
                 <div class="file-upload-box">
                     <div class="file-info-box">
                         <div class="file-info">
-                            <div class="file-iconic"></div>
+                            <div class="file-iconic">
+                                <a href="javascript:void(0)" class="file-icon-link">${getIconByType(excelConfirmacion.split('.').pop().toLowerCase())}</a>
+                            </div>
                             <span class="file-name">Excel Confirmación</span>
-                            <a href="${excelConfirmacion}" target="_blank" class="file-link">Ver archivo</a>
-                            <button class="remove-file-button"
-                            onclick="deleteExcelConfirmacion(${provider.id})"
-                            >
+                            <button class="remove-file-button" onclick="deleteExcelConfirmacion(${provider.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -4074,6 +4095,36 @@ async function viewClientesDocumentacion(id) {
       }
     
       $("#documentos-clientes-documentacion").append(excelDiv);
+
+      // Agregar funcionalidad de vista previa si es una imagen
+    const excelContainer = document.getElementById('single-file-upload-confirmacion');
+    if (excelContainer) {
+        const fileIconLink = excelContainer.querySelector('.file-icon-link');
+        if (fileIconLink) {
+            const fileExtension = excelConfirmacion.split('.').pop().toLowerCase();
+            if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+                // Agregar estilo de cursor: pointer
+                fileIconLink.style.cursor = 'pointer';
+
+                // Agregar evento de clic para mostrar la vista previa
+                fileIconLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+
+                    // Mostrar la imagen en el modal
+                    const modal = document.getElementById('image-modal');
+                    const modalImage = modal.querySelector('#image-preview');
+                    modalImage.src = excelConfirmacion;
+                    const bootstrapModal = new bootstrap.Modal(modal);
+                    bootstrapModal.show();
+                });
+            } else {
+                // Si no es una imagen, redirigir al archivo
+                fileIconLink.href = excelConfirmacion;
+                fileIconLink.target = '_blank';
+            }
+        }
+    }
+
       if (!facturaComercial) {
         setupSingleFileUpload(
           "single-file-upload-factura",
