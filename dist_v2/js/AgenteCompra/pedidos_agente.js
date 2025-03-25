@@ -111,7 +111,7 @@ $(function () {
     'searching'   : false,
     'bStateSave'  : true,
     'processing'  : true,
-    'serverSide'  : true,
+    'serverSide'  : false,
     'info'        : true,
     'autoWidth'   : false,
     'pagingType'  : 'full_numbers',
