@@ -37,16 +37,12 @@ class PedidosAgenteModel extends CI_Model{
 
 		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
 
-		if(isset($this->order)) {
-			$order = $this->order;
-			$this->db->order_by(key($order), $order[key($order)]);
-		}
+		
     }
     
     function get_datatables(){
         $this->_get_datatables_query();
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
+   
         $query = $this->db->get();
         return $query->result();
     }
