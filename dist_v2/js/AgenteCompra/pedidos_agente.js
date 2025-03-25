@@ -109,10 +109,10 @@ $(function () {
       }
     }],
     'searching'   : false,
-    'bStateSave'  : true,
-    'processing'  : true,
+    'bStateSave'  : false,
+    'processing'  : false,
     'serverSide'  : false,
-    'info'        : true,
+    'info'        : false,
     'autoWidth'   : false,
     'pagingType'  : 'full_numbers',
     'oLanguage' : {
