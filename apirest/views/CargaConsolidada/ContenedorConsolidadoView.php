@@ -863,7 +863,9 @@ Search for
               <th>Tarifa</th>
               <th>Cotizacion</th>
               <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
-                <th>Estado</th>
+                <th
+                style="min-width: 8em;"
+                >Estado</th>
               <?php } ?>
               <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
 

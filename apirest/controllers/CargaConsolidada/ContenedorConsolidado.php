@@ -50,7 +50,7 @@ class ContenedorConsolidado extends CI_Controller
 		usort($arrData, function ($a, $b) {
 			$numA = (int)$a->carga;
 			$numB = (int)$b->carga;
-			return $numB - $numA; 
+			return $numB - $numA;
 		});
 		foreach ($arrData as $row) {
 			$subdata   = [];
@@ -110,20 +110,20 @@ class ContenedorConsolidado extends CI_Controller
 
 			$divAcciones = '<div>';
 
-			$divAcciones .='<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+			$divAcciones .= '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
 			' . $row->carga . ')"></i>';
-				//if user is coordinacion show
-				if ($this->user->No_Grupo == "Coordinación") {
+			//if user is coordinacion show
+			if ($this->user->No_Grupo == "Coordinación") {
 				$divAcciones .= '<i class="fas fa-edit text-warning" style="cursor:pointer; padding:10px;" onclick="view(' . $row->id . ')"></i>';
-				$divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="deleteCarga(' . $row->id . ')"></i>';	
-				}
-				
+				$divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="deleteCarga(' . $row->id . ')"></i>';
+			}
+
 			$divAcciones .= '</div>';
 
 			$subdata[] = $divAcciones;
 			$data[] = $subdata;
 		}
-		
+
 		$output = array(
 			"data" => $data
 		);
@@ -203,7 +203,7 @@ class ContenedorConsolidado extends CI_Controller
 		$data = $this->input->post('data');
 		$idProveedor = $this->input->post('idProveedor');
 		$idCotizacion = $this->input->post('idCotizacion');
-		$arrResponse = $this->ContenedorConsolidadoModel->updateProveedorData($data, $idProveedor,$idCotizacion);
+		$arrResponse = $this->ContenedorConsolidadoModel->updateProveedorData($data, $idProveedor, $idCotizacion);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
@@ -270,7 +270,7 @@ class ContenedorConsolidado extends CI_Controller
 							<option
 							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
 
-							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>COMPLETADO</option>
+							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>CONFIRMADO</option>
 						</select>';
 						$subdata[] = $divEstadoCotizador;
 						if ($row->estado_cotizador == "PENDIENTE") {
@@ -347,17 +347,17 @@ class ContenedorConsolidado extends CI_Controller
 								<option value="NO LOADED" ' . ($proveedor->estados_proveedor == "NO LOADED" ? "selected" : "") . '>NO LOADED</option>
 
 							</select>';
-								$divInputQtyChina .= '<div class="d-flex flex-row gap-2">
+							$divInputQtyChina .= '<div class="d-flex flex-row gap-2">
 							<input type="text" class="form-control mb-1" id="qty-china-' . $proveedor->id_proveedor . '" name="qty" value="' . $proveedor->qty_box_china . '">
 
 							</div>';
-								$divInputCBMChina .= '<div class="d-flex flex-row gap-2">
+							$divInputCBMChina .= '<div class="d-flex flex-row gap-2">
 							<input type="text" class="form-control mb-1" id="cbm-china-' . $proveedor->id_proveedor . '" name="cbm" value="' . $proveedor->cbm_total_china . '">
 
 							</div>';
-								$divInputArriveDateChina .= '<div class="d-flex flex-row gap-2">
+							$divInputArriveDateChina .= '<div class="d-flex flex-row gap-2">
 							<input type="text" class="form-control input-date mb-1"  id="arrive-date-china-' . $proveedor->id_proveedor . '" name="arrive-date" value="' .
-									($proveedor->arrive_date_china ? date("d-m-Y", strtotime($proveedor->arrive_date_china)) : $proveedor->arrive_date_china) . '">
+								($proveedor->arrive_date_china ? date("d-m-Y", strtotime($proveedor->arrive_date_china)) : $proveedor->arrive_date_china) . '">
 							</div>';
 						} else {
 							$proveedoresSelect .= '<select class="form-control mb-1
@@ -387,17 +387,17 @@ class ContenedorConsolidado extends CI_Controller
 
 							</select>';
 
-								$divInputQtyChina .= '<div>
+							$divInputQtyChina .= '<div>
 							<input disabled  class="form-control mb-1"
 								value="' . ($proveedor->qty_box_china ?? 0) . '"
 							></input>
 							</div>';
-								$divInputCBMChina .= '<div>
+							$divInputCBMChina .= '<div>
 							<input disabled  class="form-control mb-1"
 								value="' . ($proveedor->cbm_total_china ?? 0) . '"
 							></input>
 							</div>';
-								$divInputArriveDateChina .= '<div>
+							$divInputArriveDateChina .= '<div>
 							<input disabled  class="form-control mb-1"
 								value="' . ($proveedor->arrive_date_china ? date("d-m-Y", strtotime($proveedor->arrive_date_china)) : $proveedor->arrive_date_china) . '"
 							</div>';
@@ -418,30 +418,30 @@ class ContenedorConsolidado extends CI_Controller
 							<option value="NO EMBARCADO" ' . ($proveedor->estados == "NO EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '>NO EMBARCADO</option>
 						</select>';
 
-							$qtyBoxDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->qty_box ?? 0) . '"></input></div>';
-							$cbmTotalDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->cbm_total ?? 0) . '"></input></div>';
-							$pesoTotalDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->peso ?? 0) . '"></input></div>';
-							//add inputs to supplier
-							$divInputsSupplier .= '<div class="d-flex flex-row mb-1">
+						$qtyBoxDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->qty_box ?? 0) . '"></input></div>';
+						$cbmTotalDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->cbm_total ?? 0) . '"></input></div>';
+						$pesoTotalDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->peso ?? 0) . '"></input></div>';
+						//add inputs to supplier
+						$divInputsSupplier .= '<div class="d-flex flex-row mb-1">
 						<input type="text" class="form-control"' . ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . '
 
 						id="proveedor-' . $proveedor->id_proveedor . '" name="proveedor" value="' . $proveedor->supplier . '"
 						' . ($this->user->No_Grupo == "ContenedorAlmacen" ? "disabled" : "") . '>
 
 						</div>';
-							$divInputsCodeSupplier .= '<div class="d-flex flex-row mb-1">
+						$divInputsCodeSupplier .= '<div class="d-flex flex-row mb-1">
 						<input type="text" class="form-control"' . ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . ' id="codigo-' . $proveedor->id_proveedor . '" name="codigo" value="' . $proveedor->code_supplier . '"
 						' . ($this->user->No_Grupo == "ContenedorAlmacen" ? "disabled" : "") . '>
 
 						</div>';
-							$divInputsPhoneNumberSupplier .= '<div class="d-flex flex-row mb-1">
+						$divInputsPhoneNumberSupplier .= '<div class="d-flex flex-row mb-1">
 						<input type="text" class="form-control"'
-								. ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . '
+							. ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . '
 						id="telefono-' . $proveedor->id_proveedor . '" name="telefono" value="' . $proveedor->supplier_phone . '"
 						' . ($this->user->No_Grupo == "ContenedorAlmacen" ? "disabled" : "") . '>
 
 						</div>';
-							$divProductos .= '<div class="d-flex flex-row gap-2 mb-1">
+						$divProductos .= '<div class="d-flex flex-row gap-2 mb-1">
 						<input type="text" class="form-control cotizacion-products-' . $row->id . '"
 
 						id="productos-' . $proveedor->id_proveedor . '" name="productos" value="' . $proveedor->products . '"
@@ -450,54 +450,49 @@ class ContenedorConsolidado extends CI_Controller
 						</input>
 
 						</div>';
-							$divAcciones .=
-								'<div class="d-flex flex-row gap-1">';
+						$divAcciones .=
+							'<div class="d-flex flex-row gap-1">';
 
-							$divAcciones .= '<div class="mb-1" onclick="verCotizacionEmbarque(' . $proveedor->id_proveedor . ',' . $row->id . ',\'' . addslashes($proveedor->code_supplier) . '\',\'' . addslashes($row->nombre) . '\')">
+						$divAcciones .= '<div class="mb-1" onclick="verCotizacionEmbarque(' . $proveedor->id_proveedor . ',' . $row->id . ',\'' . addslashes($proveedor->code_supplier) . '\',\'' . addslashes($row->nombre) . '\')">
 								<i class="far fa-eye" style="cursor:pointer;padding:10px;" "></i>
 								</div>';
 
-							$divAcciones .= '<div class="mb-1"  onclick="updateProveedorData(' . $row->id . ',' . $proveedor->id_proveedor . ')">
+						$divAcciones .= '<div class="mb-1"  onclick="updateProveedorData(' . $row->id . ',' . $proveedor->id_proveedor . ')">
 								<i class="far fa-save" style="cursor:pointer;padding:10px;"></i>
 								</div>';
-							if ($this->user->No_Grupo == "Coordinación") {
-								$divAcciones .= '<div class="mb-1" onclick="deleteCotizacion(' . $row->id . ',' . $proveedor->id_proveedor . ')">
+						if ($this->user->No_Grupo == "Coordinación") {
+							$divAcciones .= '<div class="mb-1" onclick="deleteCotizacion(' . $row->id . ',' . $proveedor->id_proveedor . ')">
 									<i class="far fa-trash-alt text-danger" style="cursor:pointer;padding:10px;"></i>
 								</div>';
-							}
-
-							$divAcciones .='</div>';
-						
-						
-
-					}
-						$subdata[] = $proveedoresSelect;
-						$subdata[] = $index;
-						$subdata[] = $row->nombre;
-						if ($this->user->No_Grupo != "ContenedorAlmacen") {
-							$subdata[] = $row->telefono;
-							$subdata[] = $estadoSelect;
 						}
-						$subdata[] = $divProductos;
-						$subdata[] = $qtyBoxDiv;
-						$subdata[] = $cbmTotalDiv;
-						$subdata[] = $pesoTotalDiv;
-						$subdata[] = $divInputsSupplier;
-						$subdata[] = $divInputsCodeSupplier;
-						$subdata[] = $divInputsPhoneNumberSupplier;
-						$subdata[] = $divInputQtyChina;
-						$subdata[] = $divInputCBMChina;
-						$subdata[] = $divInputArriveDateChina;
-						$subdata[] = $divAcciones;
-						$data[]    = $subdata;
+
+						$divAcciones .= '</div>';
+					}
+					$subdata[] = $proveedoresSelect;
+					$subdata[] = $index;
+					$subdata[] = $row->nombre;
+					if ($this->user->No_Grupo != "ContenedorAlmacen") {
+						$subdata[] = $row->telefono;
+						$subdata[] = $estadoSelect;
+					}
+					$subdata[] = $divProductos;
+					$subdata[] = $qtyBoxDiv;
+					$subdata[] = $cbmTotalDiv;
+					$subdata[] = $pesoTotalDiv;
+					$subdata[] = $divInputsSupplier;
+					$subdata[] = $divInputsCodeSupplier;
+					$subdata[] = $divInputsPhoneNumberSupplier;
+					$subdata[] = $divInputQtyChina;
+					$subdata[] = $divInputCBMChina;
+					$subdata[] = $divInputArriveDateChina;
+					$subdata[] = $divAcciones;
+					$data[]    = $subdata;
 				}
 				$index++;
 
 				$output = [
 					"data" => $data,
 				];
-		
-				
 			}
 			echo json_encode($output);
 
@@ -927,6 +922,13 @@ class ContenedorConsolidado extends CI_Controller
 			"status" => $arrResponse
 		]);
 	}
+	public function deleteFileDocumentation($idFile)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteFileDocumentation($idFile);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 	public function deleteDocumentacionFolder($id)
 	{
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteDocumentacionFolder($id);
@@ -1331,11 +1333,12 @@ class ContenedorConsolidado extends CI_Controller
 		]);
 	}
 	public function getCotizacionEmbarqueHeaders($idContenedor)
-    {
-        $arrResponse = $this->ContenedorConsolidadoModel->getCotizacionEmbarqueHeaders($idContenedor);
-        echo json_encode($arrResponse);
-    }
-	public function saveInspection(){
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->getCotizacionEmbarqueHeaders($idContenedor);
+		echo json_encode($arrResponse);
+	}
+	public function saveInspection()
+	{
 		$idProveedor = $this->input->post('idProveedor');
 		$idCotizacion = $this->input->post('idCotizacion');
 		$files = $_FILES;
@@ -1344,7 +1347,8 @@ class ContenedorConsolidado extends CI_Controller
 			'status' => $arrResponse,
 		]);
 	}
-	public function saveDocumentation(){
+	public function saveDocumentation()
+	{
 		$idProveedor = $this->input->post('idProveedor');
 		$idCotizacion = $this->input->post('idCotizacion');
 		$files = $_FILES;
@@ -1353,7 +1357,8 @@ class ContenedorConsolidado extends CI_Controller
 			'status' => $arrResponse,
 		]);
 	}
-	public function deleteFileInspection($id){
+	public function deleteFileInspection($id)
+	{
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteFileInspection($id);
 		echo json_encode([
 			'status' => $arrResponse,

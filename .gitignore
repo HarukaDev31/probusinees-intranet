@@ -8,3 +8,5 @@ assets/img/*
 apirest/config/database.php
 assets/agente_compra/
 assets/uploads/
+assets/*
+assets/downloads/*

@@ -921,7 +921,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 // }
                 //insert in tabla proveedores
                 // $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
-                if ($this->db->affected_rows() > 0) {
+                if ($this->db->error()['code'] == 0) {
                     return "success";
                 }
                 log_message('error', 'Error en uploadCotizacionFile: ' . $this->db->error()['message']);
@@ -2074,7 +2074,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion)
             ->where('id', $idCotizacion)
             ->get()->row()->id_contenedor;
-        if (in_array($estado, ["ROTULADO", "RESERVADO",'COBRANDO'])) {
+        if (in_array($estado, ["ROTULADO", "RESERVADO", 'COBRANDO'])) {
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->group_start(); // Agrupar condiciones OR
             $this->db->where('estados IS NULL');
@@ -2133,10 +2133,9 @@ class ContenedorConsolidadoModel extends CI_Model
                 if ($allLoaded) {
                     //update estado_china to COMPLETADO from table carga_consolidada_contenedor
                     $this->db->where('id', $idContenedor);
-                    $this->db->update($this->table, ['estado_china'=> "COMPLETADO"]);
- 
+                    $this->db->update($this->table, ['estado_china' => "COMPLETADO"]);
                 }
-            }   
+            }
         }
         // Manejo de los estados específicos en array
         else if (in_array($estado, ["NC", "C", "R", "NS", "NO LOADED", "INSPECTION"])) {
@@ -2204,7 +2203,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $this->phoneNumberId = $telefono;
         $this->db->close();
         $this->db->initialize();
-        $this->db->select('code_supplier,products')
+        $this->db->select('code_supplier,products,send_rotulado_status,id')
             ->from($this->table_contenedor_cotizacion_proveedores)
             ->where('id_cotizacion', $idCotizacion); // Cambiado a `id_cotizacion`
         $query = $this->db->get();
@@ -2217,15 +2216,23 @@ class ContenedorConsolidadoModel extends CI_Model
         $carga = $query->row()->carga;
         if ($estado == "ROTULADO") {
             try {
-                $email = "harukakasugano31@gmail.com";
 
                 $htmlWelcomePath = 'assets/downloads/Welcome_Consolidado_Template.html';
                 $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
                 $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
                 $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
-
+                //if exists any provider with send_rotulado_status==SENDED NOT SEND MESSAGE
+                $providersHasSended = array_filter($proveedores, function ($proveedor) {
+                    return $proveedor['send_rotulado_status'] == 'SENDED';
+                });
+                if (count($providersHasSended) == 0) {
                 $response = $this->sendWelcome($carga);
+                }
                 // log_message('error', 'response: '.$response);
+                $providersHasNoSended = array_filter($proveedores,
+                function ($proveedor) {
+                    return $proveedor['send_rotulado_status'] == 'PENDING';
+                });
 
 
                 $zip = new ZipArchive();
@@ -2243,7 +2250,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $options->set('isFontSubsettingEnabled', true);
                 $options->set('isRemoteEnabled', true);
 
-                foreach ($proveedores as $proveedor) {
+                foreach ($providersHasNoSended as $proveedor) {
                     $supplierCode = $proveedor['code_supplier'];
                     $products = $proveedor['products'];
                     $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
@@ -2272,11 +2279,12 @@ Código de proveedor: {$supplierCode}
                         ",
                             $tempFilePath
                         );
+                        //update send_rotulado_status to SENDED
+                        $this->db->update($this->table_contenedor_cotizacion_proveedores,["send_rotulado_status"=>"SENDED"],["id"=>$proveedor['id']]);
                     } catch (Exception $e) {
                         echo 'Error: ' . $e->getMessage();
                         log_message('error', 'Error: ' . $e->getMessage());
                     } finally {
-                        // Eliminar el archivo temporal
                         $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
                     }
                 }
@@ -2649,7 +2657,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         "message" => $message
                     ]);
                     //if contenedor estado_china is PENDIENTE UPDATE TO RECIBIENDO
-                    
+
                 }
                 $this->verifyContainerIsCompleted($idContenedor);
             }
@@ -2691,7 +2699,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         "action" => $this->cambioEstadoProveedor,
                         "message" => $message
                     ]);
-                    
                 } else {
                     $message = "Se ha actualizado la cantidad de cajas y volumen total de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['qty_box_china'] . " cajas y " . $data['cbm_total_china'] . " m3";
                     $socketResponse = $this->sendEvent([
@@ -2709,11 +2716,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         "message" => $message
                     ]);
                 }
-                $contenedorEstado= $this->db->select('estado_china')->from($this->table)->where('id',$idContenedor)->get()->row()->estado_china;
-                    if($contenedorEstado=="PENDIENTE"){
-                        $this->db->where('id', $idContenedor);
-                        $this->db->update($this->table, ['estado_china' => "RECIBIENDO"]);
-                    }
+                $contenedorEstado = $this->db->select('estado_china')->from($this->table)->where('id', $idContenedor)->get()->row()->estado_china;
+                if ($contenedorEstado == "PENDIENTE") {
+                    $this->db->where('id', $idContenedor);
+                    $this->db->update($this->table, ['estado_china' => "RECIBIENDO"]);
+                }
             }
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, $data);
@@ -2875,6 +2882,28 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         } catch (Exception $e) {
             log_message('error', 'Error: ' . $e->getMessage());
             return ['status' => "error", 'error' => $e->getMessage()];
+        }
+    }
+    public function deleteFileDocumentation($idFile)
+    {
+        //from table_contenedor_almacen_documentacion unlink and delete file row
+        try {
+            $this->db->select('file_path')
+                ->from($this->table_contenedor_almacen_documentacion)
+                ->where('id', $idFile);
+            $query = $this->db->get();
+            $result = $query->result();
+            unlink($result[0]->file_path);
+            $this->db->where('id', $idFile);
+            $this->db->delete($this->table_contenedor_almacen_documentacion);
+            if(($this->db->error()['code'] != 0)){
+                log_message('error', 'Error: ' . $this->db->error()['message']);
+                return "false";
+            }
+            return  "success";
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            return ['status' => 'error', 'error' => $e->getMessage()];
         }
     }
     public function getFilesAlmacenInspection($idProveedor)
