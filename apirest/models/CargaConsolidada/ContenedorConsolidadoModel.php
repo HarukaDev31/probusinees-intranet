@@ -1165,10 +1165,10 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id', $idCotizacion);
             $this->db->update($this->table_contenedor_cotizacion, ['valor_doc' => $result->total_valor_doc, 'volumen_doc' => $result->total_volumen_doc]);
 
-            if ($this->db->affected_rows() > 0) {
-                return "success";
+            if ($this->db->error()['code']!=0){
+                return false;
             }
-            return false;
+            return "success";
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
             return false;

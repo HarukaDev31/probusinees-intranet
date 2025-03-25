@@ -836,7 +836,8 @@ class ContenedorConsolidado extends CI_Controller
 	}
 	public function createClienteDocumentacion()
 	{
-		$id_cotizacion = $this->input->post('id');
+		$id_cotizacion = $this->input->post('id_cotizacion');
+		$id_proveedor= $this->input->post('id_proveedor');
 		$name = $this->input->post('name');
 		$file = $_FILES['file'];
 		$arrResponse = $this->ContenedorConsolidadoModel->createClienteDocumentacion($id_cotizacion, $name, $file);

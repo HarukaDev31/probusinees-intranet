@@ -506,37 +506,37 @@ function addFileToList(file, fileList = null, id = null) {
     deleteFile(id, fileItem, listId);
   });
 
- // Agregar funcionalidad de vista previa para imágenes y videos
- if (file.file_ext.startsWith("image/") || file.file_ext.startsWith("video/")) {
-  fileItem.find(".file-preview").css("cursor", "pointer");
-  fileItem.find(".file-preview").on("click", function () {
-    if (file.file_ext.startsWith("image/")) {
-      // Mostrar la imagen en el modal
-      const modal = document.getElementById("image-modal");
-      const modalImage = modal.querySelector("#image-preview");
-      modalImage.src = file.file_url;
-      const bootstrapModal = new bootstrap.Modal(modal);
-      bootstrapModal.show();
-    } else if (file.file_ext.startsWith("video/")) {
-      // Mostrar el video en el modal
-      const modal = document.getElementById("video-modal");
-      const modalVideo = modal.querySelector("#video-preview");
-      modalVideo.src = file.file_url;
-      modalVideo.load(); // Cargar el video
-      const bootstrapModal = new bootstrap.Modal(modal);
-      bootstrapModal.show();
+  // Agregar funcionalidad de vista previa para imágenes y videos
+  if (file.file_ext.startsWith("image/") || file.file_ext.startsWith("video/")) {
+    fileItem.find(".file-preview").css("cursor", "pointer");
+    fileItem.find(".file-preview").on("click", function () {
+      if (file.file_ext.startsWith("image/")) {
+        // Mostrar la imagen en el modal
+        const modal = document.getElementById("image-modal");
+        const modalImage = modal.querySelector("#image-preview");
+        modalImage.src = file.file_url;
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+      } else if (file.file_ext.startsWith("video/")) {
+        // Mostrar el video en el modal
+        const modal = document.getElementById("video-modal");
+        const modalVideo = modal.querySelector("#video-preview");
+        modalVideo.src = file.file_url;
+        modalVideo.load(); // Cargar el video
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
 
-      // Detener el video cuando se cierre el modal
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) { // Verifica si el clic fue en el fondo del modal
-          modalVideo.pause(); // Pausar el video
-          modalVideo.currentTime = 0; // Reiniciar el video al inicio
-          bootstrapModal.hide(); // Cerrar el modal
-        }
-      });
-    }
-  });
-}
+        // Detener el video cuando se cierre el modal
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) { // Verifica si el clic fue en el fondo del modal
+            modalVideo.pause(); // Pausar el video
+            modalVideo.currentTime = 0; // Reiniciar el video al inicio
+            bootstrapModal.hide(); // Cerrar el modal
+          }
+        });
+      }
+    });
+  }
 
   fileList.append(fileItem);
   // Remover clase "hidden" si está presente
@@ -2884,7 +2884,7 @@ const openStepFunction = async (step, id) => {
     cotizacionContainer.hide();
     clientesDocumentacionContainer.hide();
     stepsContainer.hide();
-    selectedTabDocumentacionId=null;
+    selectedTabDocumentacionId = null;
   });
 
   spinner.hide();
@@ -3861,17 +3861,15 @@ async function viewClientesDocumentacion(id) {
   $(".documentos-clientes-tabs").empty();
   $(".documentos-clientes-content").empty();
 
-  //FOR EACH PROVIDER ADD TAB WITH DATA-ID=provider.id
   providers.forEach((provider) => {
     $(".documentos-clientes-tabs").append(`
         <div class="tab-cliente-documentacion" data-id="${provider.id}">
           ${provider.code_supplier}
         </div>`);
   });
-  //ADD EVENT LISTENER TO EACH TAB
-  //default select first
-  selectedTabDocumentacionId = !selectedTabDocumentacionId?providers[0].id:selectedTabDocumentacionId;
-  console.log(selectedTabDocumentacionId);
+
+  selectedTabDocumentacionId = !selectedTabDocumentacionId ? providers[0].id : selectedTabDocumentacionId;
+
   $(".tab-cliente-documentacion").on("click", function () {
     const id = $(this).data("id");
     const provider = providers.find((p) => p.id == id);
@@ -3880,11 +3878,18 @@ async function viewClientesDocumentacion(id) {
     $(this).addClass("active");
     $(".documentos-clientes-content").empty();
     $(".documentos-clientes-content").append(`<div class="flex gap-8">
-        <!-- Sección de Documentación -->
         <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
-          <div class="flex items-center gap-2 mb-6">
+          <div class="flex items-center gap-2 mb-6
+          justify-between">
+          <div>
             <h2 class="text-lg">Documentación</h2>
             <i class="far fa-folder-open"></i>
+          </div>
+              <div id="btn-crear-documentacion-cliente" 
+              data-id="${provider.id}"
+              class="bg-orange py-2 px-5 border border-transparent rounded text-sm btn-crear-documentacion-cliente" data-type="html">
+              Nuevo Documento
+              </div>
           </div>
 
           <form id="form-documentacion" class="space-y-4">
@@ -3950,8 +3955,47 @@ async function viewClientesDocumentacion(id) {
               </span>
             </button>
           </div>
-        </div>
-      </div>`);
+        </div></div>`);
+    $(".btn-crear-documentacion-cliente").off("click");
+    $(".btn-crear-documentacion-cliente").on("click", function () {
+      const providerId = $(this).data("id");
+      Swal.fire({
+        title: "Crear nuevo documento",
+        html: `
+                <input type="text" id="swal-input1" class="swal2-input" placeholder="Nombre del documento">
+                <input type="file" id="swal-input2" class="swal2-file" accept=".pdf, .doc, .docx, .xls, .xlsx, .png, .jpg, .jpeg" placeholder="Selecciona un archivo">
+            `,
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        preConfirm: async () => {
+          const name = document.getElementById("swal-input1").value;
+          const file = document.getElementById("swal-input2").files[0];
+          if (!name || !file) {
+            Swal.showValidationMessage("Por favor, completa todos los campos");
+          }
+          const formData = new FormData();
+          formData.append("name", name);
+          formData.append("file", file);
+          formData.append("id_cotizacion", idCotizacion);
+          formData.append("id_proveedor", providerId);
+          const response = await fetch(
+            base_url +
+            "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          const result = await response.json();
+          if (result.status === "success") {
+            Swal.fire("¡Documento subido!", result.message, "success");
+            viewClientesDocumentacion(idCotizacion);
+          } else {
+            Swal.fire("Error", result.message, "error");
+          }
+        },
+      });
+    });
     let facturaDiv = "";
     let excelDiv = "";
     let facturaComercial = provider.factura_comercial;
@@ -4079,7 +4123,7 @@ async function viewClientesDocumentacion(id) {
       setupSingleFileUpload(
         "single-file-upload-factura",
         "file-input-factura",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "doc", "docx", "pdf"]
+        ["xlsx", "xls", "csv", "xlsb", "xlsm", "doc", "docx", "pdf", "jpg", "png", "jpeg"]
       );
     }
     if (!excelConfirmacion) {
@@ -4099,33 +4143,57 @@ async function viewClientesDocumentacion(id) {
     "href",
     result.cotizacion_file_url
   );
-  spinner.hide();
-  return;
+  
+  
   //clean .aditional-file
   $(".aditional-file").remove();
-  const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
-  const files = JSON.parse(result[0].files ?? "[]");
+  // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
+  const files = JSON.parse(result.files ?? "[]");
+  console.log(files);
   //for each file add a col with a link to download and delete icon  in collapse-documentacion
   files.forEach((file) => {
-    $(`
-        <div class="col-3 aditional-file d-flex flex-column mb-1">
-        <label>${file.folder_name}</label>
-        <div class="d-flex flex-row gap-1">
-        <div>
-            <a href="${file.file_url}" target="_blank" class="btn btn-outline-primary">
-            <i class="fa fa-download"></i>
-            Descargar
-            </a>
-           </div>
-            <div class="btn btn-outline-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
-            <i class="fa fa-trash " ></i>
+    //  $("#form-documentacion").append(`
+    //     <div class="col-3 aditional-file d-flex flex-column mb-1">
+    //     <label>${file.folder_name}</label>
+    //     <div class="d-flex flex-row gap-1">
+    //     <div>
+    //         <a href="${file.file_url}" target="_blank" class="btn btn-outline-primary">
+    //         <i class="fa fa-download"></i>
+    //         Descargar
+    //         </a>
+    //        </div>
+    //         <div class="btn btn-outline-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
+    //         <i class="fa fa-trash " ></i>
+    //         </div>
+    //     </div>  
+    //   </div>`);
+    $("#form-documentacion").append(`
+       
+        ${file.folder_name}
+        <div class="col-12 col-sm-12" id="single-file-upload-factura">
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <div class="file-info-box">
+                        <div class="file-info">
+                            <div class="file-iconic"></div>
+                            <span class="file-name">Factura Comercial</span>
+                            <a href="${file.file_url}" target="_blank" class="file-link">Ver archivo</a>
+                            <button class="remove-file-button"
+                            onclick="deleteClienteDocumentacionFile(${file.id})"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>  
-        </div>
-        `).insertBefore(".col-guardar-documentacion");
+        </div>`
+    );
   });
+  spinner.hide();
+  return;
   filesDoc.forEach((file) => {
-    $(`
+    $(".documentos-clientes-documentacion").append(`
             <div class="col-3 aditional-file d-flex flex-column mb-1">
             <label>Documentacion Almacen:${file.folder_name}</label>
             <div class="d-flex flex-row gap-1">
@@ -4138,7 +4206,7 @@ async function viewClientesDocumentacion(id) {
                
             </div>  
             </div>
-            `).insertBefore(".col-guardar-documentacion");
+            `)
   });
 
 
@@ -5680,7 +5748,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
     const fileInfoBox = container.querySelector('.file-info-box');
     const fileNameElement = container.querySelector('.file-name');
     const fileSizeElement = container.querySelector('.file-size');
-    const fileIconElement = container.querySelector('.file-iconic'); // Elemento para el ícono
+    const fileIconElement = container.querySelector('.file-iconic');
     const removeFileButton = container.querySelector('.remove-file-button');
     const selectFileButton = container.querySelector(selectInputId);
 
@@ -5712,7 +5780,6 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
         // Mostrar el cuadro de información del archivo
         fileInfoBox.classList.remove('hidden');
-
         // Mostrar el ícono, nombre y tamaño del archivo
         if (fileIconElement) {
           fileIconElement.innerHTML = fileIcon; // Asegúrate de que el elemento exista
