@@ -31,9 +31,8 @@ class PedidosAgenteModel extends CI_Model{
 		CLI.No_Contacto as No_Contacto_CLI, CLI.Nu_Celular_Contacto as Nu_Celular_Contacto_CLI, CLI.Txt_Email_Entidad as Txt_Email_Entidad_CLI, CLI.ID_Entidad AS ID_Entidad_Cliente')//, USRINTERNO.No_Usuario
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
-    	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
+    	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'left')
     	//->join($this->table_usuario_intero . ' AS USRINTERNO', 'USRINTERNO.ID_Usuario  = ' . $this->table . '.ID_Usuario_Interno_Empresa', 'left')
-    	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa)
 		->where($this->table . '.Nu_Estado=', 1);
 
 		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . "' AND '" . $this->input->post('Filtro_Fe_Fin') . "'");
