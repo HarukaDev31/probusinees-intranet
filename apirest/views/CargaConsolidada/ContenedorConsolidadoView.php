@@ -11,8 +11,8 @@
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">
-      <div class="row mb-2 gap-lg-0 gap-3 px-lg-0 px-3">
-        <div class="col-sm-12 col-xl-7">
+      <div class="row mb-2 gap-2 px-lg-0 px-3">
+        <div class="col-sm-12 col-xl-6">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <span id="section-title"><?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></span>
             &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
@@ -1036,7 +1036,7 @@ Search for
       <div class="col-xl-9 col-md-8"></div>
 
       <div class="col-12 col-md-2">
-        <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+        <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
             <?php } else { ?>
               Save
@@ -1046,7 +1046,7 @@ Search for
     </div>
     <div class="documentos-clientes-tabs">
               </div>
-              <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75">
+              <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
 
 
             </div>
