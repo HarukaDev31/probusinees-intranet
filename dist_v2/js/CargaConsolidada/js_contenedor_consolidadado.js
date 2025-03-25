@@ -522,9 +522,12 @@ function addFileToList(file, fileList = null, id = null) {
       bootstrapModal.show();
 
       // Detener el video cuando se cierre el modal
-      modal.addEventListener("hidden.bs.modal", () => {
-        modalVideo.pause(); // Pausar el video
-        modalVideo.currentTime = 0; // Reiniciar el video al inicio
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) { // Verifica si el clic fue en el fondo del modal
+          modalVideo.pause(); // Pausar el video
+          modalVideo.currentTime = 0; // Reiniciar el video al inicio
+          bootstrapModal.hide(); // Cerrar el modal
+        }
       });
     }
   });
@@ -3875,37 +3878,29 @@ async function viewClientesDocumentacion(id) {
     $(".tab-cliente-documentacion").removeClass("active");
     $(this).addClass("active");
     $(".documentos-clientes-content").empty();
-    $(".documentos-clientes-content").append(`<div class="grid grid-cols-3 md:grid-cols-3 gap-8">
+    $(".documentos-clientes-content").append(`<div class="flex gap-8">
         <!-- Sección de Documentación -->
-        <div class="bg-white p-6 rounded-lg shadow-md
-        col-span-2
-        ">
+        <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
           <div class="flex items-center gap-2 mb-6">
-            <h2 class="text-xl font-semibold">Documentación</h2>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
-              <line x1="10" y1="9" x2="8" y2="9" />
-            </svg>
+            <h2 class="text-lg">Documentación</h2>
+            <i class="far fa-folder-open"></i>
           </div>
 
           <form id="form-documentacion" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
+            <div class="flex justify-between align-items-center gap-4">
+              <div class="flex align-items-center justify-flex-start gap-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Volumen documento</label>
                 <input type="number"
                 value="${provider.volumen_doc}"
-                id="txt-Vol_Doc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="volumen_doc">
+                id="txt-Vol_Doc" class="w-25 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="volumen_doc">
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Valor documento</label>
+              <div class="flex align-items-center justify-flex-start gap-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1 w-full">Valor documento</label>
                 <div class="relative">
                   <span class="absolute left-3 top-2">$</span>
                   <input type="number"
                   value="${provider.valor_doc}"
-                  id="txt-Valor_Doc" class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="valor_doc">
+                  id="txt-Valor_Doc" class="w-75 pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="valor_doc">
                 </div>
               </div>
             </div>
@@ -3918,21 +3913,21 @@ async function viewClientesDocumentacion(id) {
         </div>
 
         <!-- Sección de Cotizaciones -->
-        <div class="bg-white p-6 rounded-lg shadow-md
-        col-span-1
-        "
+        <div class="bg-white p-6 rounded-lg shadow-md"
           style="height: 40%;min-height: 300px;">
           <div class="flex items-center gap-2 mb-6">
-            <h2 class="text-xl font-semibold">Cotizaciones</h2>
+            <h2 class="text-lg">Cotizaciones</h2>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <line x1="10" y1="9" x2="8" y2="9" />
             </svg>
           </div>
 
           <div class="space-y-4">
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
               <span class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -3943,7 +3938,7 @@ async function viewClientesDocumentacion(id) {
               </span>
             </button>
 
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
               <span class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -3967,12 +3962,12 @@ async function viewClientesDocumentacion(id) {
             <div class="form-group">
                 <div class="file-upload-box">
                     <input type="file" id="file-input-factura" class="file-input" name="file_comercial"
-                        accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt" />
+                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" />
                     <label for="file-input-factura" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
                             <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                            <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt</span>
+                            <span class="file-format">Formatos: .xlsx, .png, .jpg, .jpeg</span>
                         </div>
                         <button class="upload-button" type="button">Subir archivo</button>
                     </label>
@@ -3980,9 +3975,7 @@ async function viewClientesDocumentacion(id) {
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
                     <div class="file-info-box hidden">
                         <div class="file-info">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                                <!-- SVG content -->
-                            </svg>
+                            <div class="file-iconic"></div>
                             <span class="file-name"></span>
                             <span class="file-size"></span>
                             <button class="remove-file-button
@@ -4004,9 +3997,7 @@ async function viewClientesDocumentacion(id) {
                 <div class="file-upload-box">
                     <div class="file-info-box">
                         <div class="file-info">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                                <!-- SVG content -->
-                            </svg>
+                            <div class="file-iconic"></div>
                             <span class="file-name">Factura Comercial</span>
                             <a href="${facturaComercial}" target="_blank" class="file-link">Ver archivo</a>
                             <button class="remove-file-button"
@@ -4031,12 +4022,12 @@ async function viewClientesDocumentacion(id) {
             <div class="form-group">
                 <div class="file-upload-box">
                     <input type="file" id="file-input-confirmacion" class="file-input" name="excel_confirmacion"
-                        accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt" />
+                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" />
                     <label for="file-input-confirmacion" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
                             <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
-                            <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt</span>
+                            <span class="file-format">Formatos: .xlsx, .png, .jpg, .jpeg</span>
                         </div>
                         <button class="upload-button" type="button">Subir archivo</button>
                     </label>
@@ -4044,9 +4035,7 @@ async function viewClientesDocumentacion(id) {
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
                     <div class="file-info-box hidden">
                         <div class="file-info">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                                <!-- SVG content -->
-                            </svg>
+                            <div class="file-iconic"></div>
                             <span class="file-name"></span>
                             <span class="file-size"></span>
                             <button class="remove-file-button"
@@ -4069,9 +4058,7 @@ async function viewClientesDocumentacion(id) {
                 <div class="file-upload-box">
                     <div class="file-info-box">
                         <div class="file-info">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
-                                <!-- SVG content -->
-                            </svg>
+                            <div class="file-iconic"></div>
                             <span class="file-name">Excel Confirmación</span>
                             <a href="${excelConfirmacion}" target="_blank" class="file-link">Ver archivo</a>
                             <button class="remove-file-button"
@@ -4091,14 +4078,14 @@ async function viewClientesDocumentacion(id) {
         setupSingleFileUpload(
           "single-file-upload-factura",
           "file-input-factura",
-        ["xlsx","xls","csv","xlsb","xlsm","doc","docx","pdf"]
+        ["xlsx","xls","csv","xlsb","xlsm","jpg","png","jpeg"]
         );
       }
       if (!excelConfirmacion) {
         setupSingleFileUpload(
           "single-file-upload-confirmacion",
           "file-input-confirmacion",
-          ["xlsx","xls","csv","xlsb","xlsm","doc","docx","pdf"]
+          ["xlsx","xls","csv","xlsb","xlsm","jpg","png","jpeg"]
         );
       }
   });
@@ -5737,6 +5724,38 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
         }
         fileNameElement.textContent = file.name;
         fileSizeElement.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+
+        // Agregar funcionalidad de vista previa para imágenes y videos
+        if (fileType.startsWith('image/') || fileType.startsWith('video/')) {
+          fileIconElement.style.cursor = 'pointer';
+          fileIconElement.addEventListener('click', () => {
+            if (fileType.startsWith('image/')) {
+              // Mostrar la imagen en el modal
+              const modal = document.getElementById('image-modal');
+              const modalImage = modal.querySelector('#image-preview');
+              modalImage.src = URL.createObjectURL(file);
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+            } else if (fileType.startsWith('video/')) {
+              // Mostrar el video en el modal
+              const modal = document.getElementById('video-modal');
+              const modalVideo = modal.querySelector('#video-preview');
+              modalVideo.src = URL.createObjectURL(file);
+              modalVideo.load(); // Cargar el video
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+
+              // Detener el video cuando se haga clic fuera del modal
+              modal.addEventListener('click', (e) => {
+                if (e.target === modal) { // Verifica si el clic fue en el fondo del modal
+                  modalVideo.pause(); // Pausar el video
+                  modalVideo.currentTime = 0; // Reiniciar el video al inicio
+                  bootstrapModal.hide(); // Cerrar el modal
+                }
+              });
+            }
+          });
+        }
       } else {
         fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
       }
@@ -5868,10 +5887,13 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [],automa
               const bootstrapModal = new bootstrap.Modal(modal);
               bootstrapModal.show();
 
-              // Detener el video cuando se cierre el modal
-              modal.addEventListener('hidden.bs.modal', () => {
-                modalVideo.pause(); // Pausar el video
-                modalVideo.currentTime = 0; // Reiniciar el video al inicio
+              // Detener el video cuando se haga clic fuera del modal
+              modal.addEventListener('click', (e) => {
+                if (e.target === modal) { // Verifica si el clic fue en el fondo del modal
+                  modalVideo.pause(); // Pausar el video
+                  modalVideo.currentTime = 0; // Reiniciar el video al inicio
+                  bootstrapModal.hide(); // Cerrar el modal
+                }
               });
             }
           });
