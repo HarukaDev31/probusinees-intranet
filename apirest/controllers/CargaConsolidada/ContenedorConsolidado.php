@@ -840,7 +840,7 @@ class ContenedorConsolidado extends CI_Controller
 		$id_proveedor= $this->input->post('id_proveedor');
 		$name = $this->input->post('name');
 		$file = $_FILES['file'];
-		$arrResponse = $this->ContenedorConsolidadoModel->createClienteDocumentacion($id_cotizacion, $name, $file);
+		$arrResponse = $this->ContenedorConsolidadoModel->createClienteDocumentacion($id_cotizacion, $name, $file,$id_proveedor);
 		echo json_encode($arrResponse);
 	}
 	public function deleteClienteDocumentacionFile($id)

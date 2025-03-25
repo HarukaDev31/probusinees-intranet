@@ -1023,7 +1023,8 @@ class ContenedorConsolidadoModel extends CI_Model
             JSON_OBJECT(
                 'id', docs.id,
                 'file_url', docs.file_url,
-                'folder_name', docs.name
+                'folder_name', docs.name,
+                'id_proveedor', docs.id_proveedor
             )
         )
         FROM " . $this->table_contenedor_cotizacion_documentacion . " docs
@@ -1064,7 +1065,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
         return $result;
     }
-    public function createClienteDocumentacion($id, $name, $file)
+    public function createClienteDocumentacion($id, $name, $file,$idProveedor)
     {
         $this->maxFileSize = 1000000;
         $this->setAllowedExtensionsImagesOfficeFiles();
@@ -1078,7 +1079,9 @@ class ContenedorConsolidadoModel extends CI_Model
             ],
             'assets/images/agentecompra/'
         );
-        $this->db->insert($this->table_contenedor_cotizacion_documentacion, ['id_cotizacion' => $id, 'name' => $name, 'file_url' => $fileUrl]);
+        $this->db->insert($this->table_contenedor_cotizacion_documentacion, ['id_cotizacion' => $id, 'name' => $name, 'file_url' => $fileUrl,
+    'id_proveedor'=>$idProveedor
+    ]);
         if ($this->db->affected_rows() > 0) {
             return ['status' => "success"];
         }

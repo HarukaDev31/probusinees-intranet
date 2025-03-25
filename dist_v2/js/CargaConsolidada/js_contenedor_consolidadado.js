@@ -3846,6 +3846,7 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
   }
 }
 async function viewClientesDocumentacion(id) {
+  $(".aditional-file").remove();
   idCotizacion = id;
   clientesContainer.hide();
   url =
@@ -4042,12 +4043,9 @@ async function viewClientesDocumentacion(id) {
                 <div class="file-upload-box">
                     <div class="file-info-box">
                         <div class="file-info">
-                            <div class="file-iconic"></div>
+                            <div class="file-iconic"><a href="javascript:void(0)" class="file-icon-link">${getIconByType(facturaComercial.split('.').pop().toLowerCase())}</a></div>
                             <span class="file-name">Factura Comercial</span>
-                            <a href="${facturaComercial}" target="_blank" class="file-link">Ver archivo</a>
-                            <button class="remove-file-button"
-                            onclick="deleteFacturaComercial(${provider.id})"
-                            >
+                            <button class="remove-file-button" onclick="deleteFacturaComercial(${provider.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -4055,13 +4053,38 @@ async function viewClientesDocumentacion(id) {
                 </div>
             </div>
         </div>`;
-    }
+        // Agregar funcionalidad de vista previa si es una imagen
+        const facturaContainer = document.getElementById('single-file-upload-factura');
+        console.log(facturaContainer,"facturaContainer");
+        if (facturaContainer) {
+          const fileIconLink = facturaContainer.querySelector('.file-icon-link');
+          if (fileIconLink) {
+              const fileExtension = facturaComercial.split('.').pop().toLowerCase();
+              if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+                  // Agregar estilo de cursor: pointer
+                  fileIconLink.style.cursor = 'pointer';
+      
+                  // Agregar evento de clic para mostrar la vista previa
+                  fileIconLink.addEventListener('click', (event) => {
+                      event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+      
+                      // Mostrar la imagen en el modal
+                      const modal = document.getElementById('image-modal');
+                      const modalImage = modal.querySelector('#image-preview');
+                      modalImage.src = facturaComercial;
+                      const bootstrapModal = new bootstrap.Modal(modal);
+                      bootstrapModal.show();
+                  });
+                }
+            }
+        }
+      }
+    
+      $("#documentos-clientes-documentacion").append(facturaDiv);
 
-    $("#documentos-clientes-documentacion").append(facturaDiv);
-
-    // Repetir el mismo proceso para el Excel de confirmación
-    if (!excelConfirmacion) {
-      excelDiv = `
+      // Repetir el mismo proceso para el Excel de confirmación
+      if (!excelConfirmacion) {
+        excelDiv = `
         Excel Confirmación
         <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
             <div class="form-group">
@@ -4103,12 +4126,11 @@ async function viewClientesDocumentacion(id) {
                 <div class="file-upload-box">
                     <div class="file-info-box">
                         <div class="file-info">
-                            <div class="file-iconic"></div>
+                            <div class="file-iconic">
+                                <a href="javascript:void(0)" class="file-icon-link">${getIconByType(excelConfirmacion.split('.').pop().toLowerCase())}</a>
+                            </div>
                             <span class="file-name">Excel Confirmación</span>
-                            <a href="${excelConfirmacion}" target="_blank" class="file-link">Ver archivo</a>
-                            <button class="remove-file-button"
-                            onclick="deleteExcelConfirmacion(${provider.id})"
-                            >
+                            <button class="remove-file-button" onclick="deleteExcelConfirmacion(${provider.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -4116,24 +4138,123 @@ async function viewClientesDocumentacion(id) {
                 </div>
             </div>
         </div>`;
+      }
+    
+      $("#documentos-clientes-documentacion").append(excelDiv);
+
+      // Agregar funcionalidad de vista previa si es una imagen
+    const excelContainer = document.getElementById('single-file-upload-confirmacion');
+    if (excelContainer) {
+        const fileIconLink = excelContainer.querySelector('.file-icon-link');
+        if (fileIconLink) {
+            const fileExtension = excelConfirmacion.split('.').pop().toLowerCase();
+            if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+                // Agregar estilo de cursor: pointer
+                fileIconLink.style.cursor = 'pointer';
+
+                // Agregar evento de clic para mostrar la vista previa
+                fileIconLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+
+                    // Mostrar la imagen en el modal
+                    const modal = document.getElementById('image-modal');
+                    const modalImage = modal.querySelector('#image-preview');
+                    modalImage.src = excelConfirmacion;
+                    const bootstrapModal = new bootstrap.Modal(modal);
+                    bootstrapModal.show();
+                });
+            } else {
+                // Si no es una imagen, redirigir al archivo
+                fileIconLink.href = excelConfirmacion;
+                fileIconLink.target = '_blank';
+            }
+        }
     }
 
-    $("#documentos-clientes-documentacion").append(excelDiv);
-    if (!facturaComercial) {
-      setupSingleFileUpload(
-        "single-file-upload-factura",
-        "file-input-factura",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "doc", "docx", "pdf", "jpg", "png", "jpeg"]
-      );
-    }
-    if (!excelConfirmacion) {
-      setupSingleFileUpload(
-        "single-file-upload-confirmacion",
-        "file-input-confirmacion",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "doc", "docx", "pdf"]
-      );
-    }
+      if (!facturaComercial) {
+        setupSingleFileUpload(
+          "single-file-upload-factura",
+          "file-input-factura",
+        ["xlsx","xls","csv","xlsb","xlsm","jpg","png","jpeg"]
+        );
+      }
+      if (!excelConfirmacion) {
+        setupSingleFileUpload(
+          "single-file-upload-confirmacion",
+          "file-input-confirmacion",
+          ["xlsx","xls","csv","xlsb","xlsm","jpg","png","jpeg"]
+        );
+      }
+      $(".aditional-file").remove();
+      // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
+      const files = JSON.parse(result.files ?? "[]");
+      const filesFilter=files.filter((file)=>file.id_proveedor==selectedTabDocumentacionId);
+      //for each file add a col with a link to download and delete icon  in collapse-documentacion
+      filesFilter.forEach((file) => {
+        //  $("#form-documentacion").append(`
+        //     <div class="col-3 aditional-file d-flex flex-column mb-1">
+        //     <label>${file.folder_name}</label>
+        //     <div class="d-flex flex-row gap-1">
+        //     <div>
+        //         <a href="${file.file_url}" target="_blank" class="btn btn-outline-primary">
+        //         <i class="fa fa-download"></i>
+        //         Descargar
+        //         </a>
+        //        </div>
+        //         <div class="btn btn-outline-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
+        //         <i class="fa fa-trash " ></i>
+        //         </div>
+        //     </div>  
+        //   </div>`);
+        $("#form-documentacion").append(`
+           
+            ${file.folder_name}
+            <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
+                <div class="form-group">
+                    <div class="file-upload-box">
+                        <div class="file-info-box">
+                            <div class="file-info">
+                                <div class="file-iconic">
+                                    <a href="javascript:void(0)" class="file-icon-link" id="file-icon-link-${file.id}">${getIconByType((file.file_url).split('.').pop().toLowerCase())}</a>
+                                </div>
+                                <span class="file-name">Excel Confirmación</span>
+                                <button class="remove-file-button" onclick="deleteClienteDocumentacionFile(${file.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+        );
+        const fileIconLink =$(`#file-icon-link-${file.id}`)[0];
+        if (fileIconLink) {
+            const fileExtension = (file.file_url).split('.').pop().toLowerCase();
+            if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+                // Agregar estilo de cursor: pointer
+                fileIconLink.style.cursor = 'pointer';
+    
+                // Agregar evento de clic para mostrar la vista previa
+                fileIconLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+    
+                    // Mostrar la imagen en el modal
+                    const modal = document.getElementById('image-modal');
+                    const modalImage = modal.querySelector('#image-preview');
+                    modalImage.src =  (file.file_url);
+                    const bootstrapModal = new bootstrap.Modal(modal);
+                    bootstrapModal.show();
+                });
+            } else {
+                // Si no es una imagen, redirigir al archivo
+                fileIconLink.href = (file.file_url);
+                fileIconLink.target = '_blank';
+            }
+        }
+        
+      }); 
   });
+  
   $(`.tab-cliente-documentacion[data-id="${selectedTabDocumentacionId}"]`).click();  // $("#txt-Vol_Doc").val(parseFloat(result[0].volumen_doc));
   // $("#txt-Valor_Doc").val(parseFloat(result[0].valor_doc));
   // //set txt-F_Comercial href
@@ -4149,9 +4270,9 @@ async function viewClientesDocumentacion(id) {
   $(".aditional-file").remove();
   // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
   const files = JSON.parse(result.files ?? "[]");
-  console.log(files);
+  const filesFilter=files.filter((file)=>file.id_proveedor==selectedTabDocumentacionId);
   //for each file add a col with a link to download and delete icon  in collapse-documentacion
-  files.forEach((file) => {
+  filesFilter.forEach((file) => {
     //  $("#form-documentacion").append(`
     //     <div class="col-3 aditional-file d-flex flex-column mb-1">
     //     <label>${file.folder_name}</label>
@@ -4170,17 +4291,16 @@ async function viewClientesDocumentacion(id) {
     $("#form-documentacion").append(`
        
         ${file.folder_name}
-        <div class="col-12 col-sm-12" id="single-file-upload-factura">
+        <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
             <div class="form-group">
                 <div class="file-upload-box">
                     <div class="file-info-box">
                         <div class="file-info">
-                            <div class="file-iconic"></div>
-                            <span class="file-name">Factura Comercial</span>
-                            <a href="${file.file_url}" target="_blank" class="file-link">Ver archivo</a>
-                            <button class="remove-file-button"
-                            onclick="deleteClienteDocumentacionFile(${file.id})"
-                            >
+                            <div class="file-iconic">
+                                <a href="javascript:void(0)" class="file-icon-link" id="file-icon-link-${file.id}">${getIconByType((file.file_url).split('.').pop().toLowerCase())}</a>
+                            </div>
+                            <span class="file-name">Excel Confirmación</span>
+                            <button class="remove-file-button" onclick="deleteClienteDocumentacionFile(${file.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -4189,6 +4309,31 @@ async function viewClientesDocumentacion(id) {
             </div>
         </div>`
     );
+    const fileIconLink =$(`#file-icon-link-${file.id}`)[0];
+    if (fileIconLink) {
+        const fileExtension = (file.file_url).split('.').pop().toLowerCase();
+        if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+            // Agregar estilo de cursor: pointer
+            fileIconLink.style.cursor = 'pointer';
+
+            // Agregar evento de clic para mostrar la vista previa
+            fileIconLink.addEventListener('click', (event) => {
+                event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+
+                // Mostrar la imagen en el modal
+                const modal = document.getElementById('image-modal');
+                const modalImage = modal.querySelector('#image-preview');
+                modalImage.src =  (file.file_url);
+                const bootstrapModal = new bootstrap.Modal(modal);
+                bootstrapModal.show();
+            });
+        } else {
+            // Si no es una imagen, redirigir al archivo
+            fileIconLink.href = (file.file_url);
+            fileIconLink.target = '_blank';
+        }
+    }
+    
   });
   spinner.hide();
   return;
