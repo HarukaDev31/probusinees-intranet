@@ -2124,21 +2124,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 ->from($this->table_contenedor_cotizacion_proveedores);
             $query = $this->db->get();
             //validate if all providers has status loaded   
-            $estados_proveedor = $query->result_array();
-            if (count($estados_proveedor) > 0) {
-                $allLoaded = true;
-                foreach ($estados_proveedor as $estado) {
-                    if ($estado['estados_proveedor'] != 'LOADED') {
-                        $allLoaded = false;
-                        break;
-                    }
-                }
-                if ($allLoaded) {
-                    //update estado_china to COMPLETADO from table carga_consolidada_contenedor
-                    $this->db->where('id', $idContenedor);
-                    $this->db->update($this->table, ['estado_china' => "COMPLETADO"]);
-                }
-            }
+            
+            
         }
         // Manejo de los estados específicos en array
         else if (in_array($estado, ["NC", "C", "R", "NS", "NO LOADED", "INSPECTION"])) {
@@ -2158,9 +2145,7 @@ class ContenedorConsolidadoModel extends CI_Model
         }
 
         // Verificar si hubo una actualización exitosa
-        if ($this->db->affected_rows() > 0) {
-            // Aquí podrías registrar logs o hacer otra acción si se requiere
-        }
+       
 
         // Manejo de errores en la base de datos
         $dbError = $this->db->error();
@@ -2672,8 +2657,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     $this->db->update($this->table_contenedor_cotizacion_proveedores, [
                         'estados_proveedor' =>
                         $this->STATUS_RECIVED,
+                        'estado'=>$this->STATUS_RECIVED,
                         'qty_box_china' => $data['qty_box_china'],
-                        'cbm_total_china' => $data['cbm_total_china']
+                        'cbm_total_china' => $data['cbm_total_china'],
+                        'arrive_date_china' => $data['arrive_date_china']
+
                     ]);
                     //insert into table contenedor_proveedor_estados_tracking with estado STATE_RECIVED and id_cotizacion and id_proveedor
                     $this->db->insert($this->table_conteneodr_proveedor_estados_tracking, [
@@ -3740,7 +3728,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 //initial column 44=sum(initialcolumn16+initialcolumn40+initialcolumn32)
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                     $InitialColumn . '44',
-                    "=SUM(" . $InitialColumn . "15," . $InitialColumn . "40," . $InitialColumn . "32,(" . $InitialColumn . "26*" . $InitialColumn . "10))"
+                    "=SUM(" . $InitialColumn . "15," . $InitialColumn . "40," . $InitialColumn . "32,(" . $InitialColumn . "26" ."))"
                 );
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '44')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '45', $producto["cantidad"]);
