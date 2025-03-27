@@ -1358,7 +1358,7 @@ async function updateEstadoCotizacionProveedor(
       error: function () {
         //set current select previous status
         $(`#estado-${idCotizacion}-${idProveedor}`).val(previousStatus);
-        Swal.fire("Error!", result.message, "error");
+        Swal.fire("Error!","Algo ha fallado", "error");
         spinner.hide();
       },
     });
