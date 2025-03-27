@@ -3941,7 +3941,7 @@ async function viewClientesDocumentacion(id) {
           </div>
 
           <div class="space-y-4">
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors" id="cotizacion_file_url">
               <span class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -3952,7 +3952,7 @@ async function viewClientesDocumentacion(id) {
               </span>
             </button>
 
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors" id="cotizacion_final_url">
               <span class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -3964,6 +3964,21 @@ async function viewClientesDocumentacion(id) {
             </button>
           </div>
         </div></div>`);
+        
+        $("#cotizacion_file_url").off("click").on("click", function () {
+          if (result.cotizacion_file_url) {
+            window.open(result.cotizacion_file_url);
+          } else {
+            Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
+          }
+        });
+        $("#cotizacion_final_url").off("click").on("click", function () {
+          if (result.cotizacion_final_url) {
+            window.open(result.cotizacion_final_url);
+          } else {
+            Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
+          }
+        });
     $(".btn-crear-documentacion-cliente").off("click");
     $(".btn-crear-documentacion-cliente").on("click", function () {
       const providerId = $(this).data("id");
