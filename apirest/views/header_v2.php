@@ -308,7 +308,7 @@
               <?php endforeach; ?>
             </ul>
           </nav>
-          <?php if($this->user->Nu_Grupo != 'ContenedorAlmacen'){ ?>
+          <?php if($this->user->No_Grupo != 'ContenedorAlmacen'){ ?>
           <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
               <li class="nav-header">Preferencias</li>
@@ -356,7 +356,7 @@
                 <a href="<?php echo base_url().'LoginController/logout';?>" class="nav-link">
                   <i class="nav-icon fa fa-sign-out-alt"></i>
                   <p>&nbsp;
-                    <?php if($this->user->Nu_Grupo=='ContenedorAlmacen'){ ?>
+                    <?php if($this->user->No_Grupo=='ContenedorAlmacen'){ ?>
                       Close Session
                     <?php }else{ ?>
                       Cerrar Sesión
