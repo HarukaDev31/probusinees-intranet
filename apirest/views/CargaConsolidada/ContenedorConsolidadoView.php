@@ -1183,7 +1183,7 @@ Search for
       <div class="col-xl-5 col-md-4"></div>
       <div class="col-6 col-md-2 col-xl-4">
       </div>
-      <div class="col-12 col-md-3 col-xl-1">
+      <div class="col-12 col-md-3 col-xl-1 <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
         <button type="button" id="btn-guardar-doc-not"  class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
             <?php } else { ?>
@@ -1215,7 +1215,7 @@ Search for
     <div class="row mb-2">
       <div class="px-4 py-8 file-section-container col-12 col-xl-4  col-lg-12 col-md-12 ">
         <div>
-          <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top">
+          <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>">
             <h2 class="d-flex w-100 justify-content-between align-items-center"><label>
             <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Documentación
@@ -1248,7 +1248,7 @@ Search for
             <div class="row">
               <div class="col-12 col-sm-12" id="multiple-file-upload">
                 <div class="form-group">
-                  <div class="file-upload-box">
+                  <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
                     <input type="file" id="file-input-documentacion" class="file-input" multiple accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm"/>
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
@@ -1274,7 +1274,6 @@ Search for
                   <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
                   <div class="file-lista hidden" id="file-lista-documentacion">
                   </div>
-                  <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
                   <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                 </div>
               </div>
@@ -1291,7 +1290,7 @@ Search for
       </div>
       <div class="col-12 col-xl-5 col-md-12">
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
-          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between p-5 rounded-top"><label>Inspection  <i class="fas fa-images"></i></label>
+          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>"><label>Inspection  <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
               class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -1308,7 +1307,7 @@ Search for
               <div class="row">
                 <div class="col-12 col-sm-12" id="multiple-file-upload-image">
                   <div class="form-group">
-                    <div class="file-upload-box">
+                    <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
                       <input type="file" id="file-input-inspeccion" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
                       <label for="file-inpute" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
@@ -1334,7 +1333,6 @@ Search for
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
                     <div class="file-lista hidden" id="file-lista-inspection">
                     </div>
-                    <!-- <input type="file" id="txt-Cotizacion" name="cotizacion" required class="form-control input-report required"> -->
                     <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                   </div>
                 </div>
@@ -2163,9 +2161,6 @@ Search for
     color: #585858;
   }
 
-  div:where(.swal2-container) h2:where(.swal2-title) {
-    padding-bottom: 3em;
-  }
 
   button.swal2-confirm.swal2-styled.swal2-default-outline,
   button.swal2-cancel.swal2-styled.swal2-default-outline {

@@ -13,7 +13,7 @@
 <section class="content-header px-4" style="
     height: 93vh;">
   <!-- Hero Section -->
-  <div class="hero-section position-relative mb-n5">
+  <div class="hero-section position-relative mb-n5" style="background-image: url('<?php echo base_url().'assets/img/backgrounds/inicioview.png'?>');">
     <div class="overlay"></div>
     <div class="container position-relative d-flex align-items-center mx-4" style="height: 100%;">
       <div class="text-white display-4 py-5" style="font-weight: 400;z-index: 3">¡Hola, bienvenido!</div>
@@ -1794,7 +1794,6 @@
   /* Hero Section Styles */
   .hero-section {
     margin-top: 4rem;
-    background-image: url('https://s3-alpha-sig.figma.com/img/7d8f/0b91/5a3a33a0472028e8d94e6e7239995ba9?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=cQYa7ts6qcmn-3gMGt1Z~5j0CRM-4Bb5GOlVhuO8Wu8ayhPSq83gjVMUEZ9AZ49us8eYIJ8yFa3W~boDYLAeDLqsPtgi5Vie1SNiZyGkZV0GXP~1LMMOyec82PElpVYVAnwgoG1TRHq3toMdzPqCHomMCwC2N681B6MLNQ2X0K5LTLVwj1qDr4JoK77q7AuuUgwciPRFW1OVU4ef-EIj74rNJBJaUzbL~SUVQDjGPU1JiZROznMl67wtug~niempNPBFpTqnmjDRfXZuihRTEwawkj8XuC7VNgisMKdVBfpKRRre0r0nRJ8E2BfgCRnolgYuEfls30vOgdVZyfEWWw__');
     background-size: cover;
     background-position: center;
     height: 450px;

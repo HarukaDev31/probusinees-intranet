@@ -2279,8 +2279,6 @@ const openStepFunction = async (step, id) => {
                 if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
                   $("#table-cotizacion-embarque").attr("style", "");
                   $("#table-cotizacion-embarque_wrapper").show();
-                  // Llamar a la función para habilitar el desplazamiento automático en la tabla
-                  enableHorizontalAutoScroll("#table-cotizacion-embarque_wrapper");
                   reloadTableCotizacionEmbarque();
                 } else {
                   url =
@@ -4055,34 +4053,40 @@ async function viewClientesDocumentacion(id) {
                 </div>
             </div>
         </div>`;
-        // Agregar funcionalidad de vista previa si es una imagen
-        const facturaContainer = document.getElementById('single-file-upload-factura');
-        console.log(facturaContainer,"facturaContainer");
-        if (facturaContainer) {
-          const fileIconLink = facturaContainer.querySelector('.file-icon-link');
-          if (fileIconLink) {
-              const fileExtension = facturaComercial.split('.').pop().toLowerCase();
-              if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
-                  // Agregar estilo de cursor: pointer
-                  fileIconLink.style.cursor = 'pointer';
+    }
+    $("#documentos-clientes-documentacion").append(facturaDiv);
+
+          // Agregar funcionalidad de vista previa si es una imagen
+          const facturaContainer = document.getElementById('single-file-upload-factura');
+          console.log(facturaContainer,"facturaContainer");
+          if (facturaContainer) {
+              const fileIconLink = facturaContainer.querySelector('.file-icon-link');
+              if (fileIconLink) {
+                  const fileExtension = excelConfirmacion.split('.').pop().toLowerCase();
+                  if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+                      // Agregar estilo de cursor: pointer
+                      fileIconLink.style.cursor = 'pointer';
+
+                      // Agregar evento de clic para mostrar la vista previa
+                      fileIconLink.addEventListener('click', (event) => {
+                          event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+
+                          // Mostrar la imagen en el modal
+                          const modal = document.getElementById('image-modal');
+                          const modalImage = modal.querySelector('#image-preview');
+                          modalImage.src = facturaComercial;
+                          const bootstrapModal = new bootstrap.Modal(modal);
+                          bootstrapModal.show();
+                      });
+                  } else {
+                      // Si no es una imagen, redirigir al archivo
+                      fileIconLink.href = excelConfirmacion;
+                      fileIconLink.target = '_blank';
+                  }
+              }
+          }
       
-                  // Agregar evento de clic para mostrar la vista previa
-                  fileIconLink.addEventListener('click', (event) => {
-                      event.preventDefault(); // Evitar comportamiento predeterminado del enlace
-      
-                      // Mostrar la imagen en el modal
-                      const modal = document.getElementById('image-modal');
-                      const modalImage = modal.querySelector('#image-preview');
-                      modalImage.src = facturaComercial;
-                      const bootstrapModal = new bootstrap.Modal(modal);
-                      bootstrapModal.show();
-                  });
-                }
-            }
-        }
-      }
     
-      $("#documentos-clientes-documentacion").append(facturaDiv);
 
       // Repetir el mismo proceso para el Excel de confirmación
       if (!excelConfirmacion) {
@@ -4146,6 +4150,7 @@ async function viewClientesDocumentacion(id) {
 
       // Agregar funcionalidad de vista previa si es una imagen
     const excelContainer = document.getElementById('single-file-upload-confirmacion');
+    console.log(excelContainer,"excelContainer");
     if (excelContainer) {
         const fileIconLink = excelContainer.querySelector('.file-icon-link');
         if (fileIconLink) {
@@ -4187,27 +4192,13 @@ async function viewClientesDocumentacion(id) {
           ["xlsx","xls","csv","xlsb","xlsm","jpg","png","jpeg"]
         );
       }
+        //clean .aditional-file
       $(".aditional-file").remove();
       // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
       const files = JSON.parse(result.files ?? "[]");
       const filesFilter=files.filter((file)=>file.id_proveedor==selectedTabDocumentacionId);
       //for each file add a col with a link to download and delete icon  in collapse-documentacion
       filesFilter.forEach((file) => {
-        //  $("#form-documentacion").append(`
-        //     <div class="col-3 aditional-file d-flex flex-column mb-1">
-        //     <label>${file.folder_name}</label>
-        //     <div class="d-flex flex-row gap-1">
-        //     <div>
-        //         <a href="${file.file_url}" target="_blank" class="btn btn-outline-primary">
-        //         <i class="fa fa-download"></i>
-        //         Descargar
-        //         </a>
-        //        </div>
-        //         <div class="btn btn-outline-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
-        //         <i class="fa fa-trash " ></i>
-        //         </div>
-        //     </div>  
-        //   </div>`);
         $("#form-documentacion").append(`
            
             ${file.folder_name}
@@ -4268,75 +4259,6 @@ async function viewClientesDocumentacion(id) {
   );
   
   
-  //clean .aditional-file
-  $(".aditional-file").remove();
-  // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
-  const files = JSON.parse(result.files ?? "[]");
-  const filesFilter=files.filter((file)=>file.id_proveedor==selectedTabDocumentacionId);
-  //for each file add a col with a link to download and delete icon  in collapse-documentacion
-  filesFilter.forEach((file) => {
-    //  $("#form-documentacion").append(`
-    //     <div class="col-3 aditional-file d-flex flex-column mb-1">
-    //     <label>${file.folder_name}</label>
-    //     <div class="d-flex flex-row gap-1">
-    //     <div>
-    //         <a href="${file.file_url}" target="_blank" class="btn btn-outline-primary">
-    //         <i class="fa fa-download"></i>
-    //         Descargar
-    //         </a>
-    //        </div>
-    //         <div class="btn btn-outline-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
-    //         <i class="fa fa-trash " ></i>
-    //         </div>
-    //     </div>  
-    //   </div>`);
-    $("#form-documentacion").append(`
-       
-        ${file.folder_name}
-        <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
-            <div class="form-group">
-                <div class="file-upload-box">
-                    <div class="file-info-box">
-                        <div class="file-info">
-                            <div class="file-iconic">
-                                <a href="javascript:void(0)" class="file-icon-link" id="file-icon-link-${file.id}">${getIconByType((file.file_url).split('.').pop().toLowerCase())}</a>
-                            </div>
-                            <span class="file-name">Excel Confirmación</span>
-                            <button class="remove-file-button" onclick="deleteClienteDocumentacionFile(${file.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>`
-    );
-    const fileIconLink =$(`#file-icon-link-${file.id}`)[0];
-    if (fileIconLink) {
-        const fileExtension = (file.file_url).split('.').pop().toLowerCase();
-        if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
-            // Agregar estilo de cursor: pointer
-            fileIconLink.style.cursor = 'pointer';
-
-            // Agregar evento de clic para mostrar la vista previa
-            fileIconLink.addEventListener('click', (event) => {
-                event.preventDefault(); // Evitar comportamiento predeterminado del enlace
-
-                // Mostrar la imagen en el modal
-                const modal = document.getElementById('image-modal');
-                const modalImage = modal.querySelector('#image-preview');
-                modalImage.src =  (file.file_url);
-                const bootstrapModal = new bootstrap.Modal(modal);
-                bootstrapModal.show();
-            });
-        } else {
-            // Si no es una imagen, redirigir al archivo
-            fileIconLink.href = (file.file_url);
-            fileIconLink.target = '_blank';
-        }
-    }
-    
-  });
   spinner.hide();
   return;
   filesDoc.forEach((file) => {
@@ -6172,64 +6094,46 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   }
 }
 
-function enableHorizontalAutoScroll(tableSelector) {
-  // Seleccionar el contenedor padre con la clase table-responsive
-  const tableElement = document.querySelector(tableSelector);
-  if (!tableElement) {
-    console.error(`No se encontró el elemento con el selector: ${tableSelector}`);
-    return;
-  }
+function enableHorizontalAutoScrollForAllTables() {
+  // Seleccionar todos los contenedores con la clase .table-responsive
+  const tableWrappers = document.querySelectorAll('.table-responsive');
 
-  const tableWrapper = tableElement.closest('.table-responsive');
-  if (!tableWrapper) {
-    console.error(`No se encontró el contenedor con la clase .table-responsive para el selector: ${tableSelector}`);
-    return;
-  } else {
-    console.log('Contenedor encontrado:', tableWrapper);
-  }
+  tableWrappers.forEach((tableWrapper) => {
+    let scrollInterval;
 
-  let scrollInterval;
+    // Detectar la posición del mouse y desplazar automáticamente
+    tableWrapper.addEventListener("mousemove", (e) => {
+      const rect = tableWrapper.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left; // Posición del mouse relativa al contenedor
+      const scrollSpeed = 100; // Velocidad de desplazamiento
 
-  // Detectar la posición del mouse y desplazar automáticamente
-  tableWrapper.addEventListener("mousemove", (e) => {
-    console.log('Mouse moviéndose dentro del contenedor');
-    const rect = tableWrapper.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left; // Posición del mouse relativa al contenedor
-    const scrollSpeed = 10; // Velocidad de desplazamiento
+      // Si el mouse está cerca del borde izquierdo
+      if (mouseX < 250) {
+        clearInterval(scrollInterval);
+        scrollInterval = setInterval(() => {
+          tableWrapper.scrollLeft -= scrollSpeed;
+        }, 20);
+      }
+      // Si el mouse está cerca del borde derecho
+      else if (mouseX > rect.width - 250) {
+        clearInterval(scrollInterval);
+        scrollInterval = setInterval(() => {
+          tableWrapper.scrollLeft += scrollSpeed;
+        }, 20);
+      } else {
+        clearInterval(scrollInterval); // Detener el desplazamiento si el mouse no está cerca de los bordes
+      }
+    });
 
-    // Si el mouse está cerca del borde izquierdo
-    if (mouseX < 50) {
+    // Detener el desplazamiento cuando el mouse salga del contenedor
+    tableWrapper.addEventListener("mouseleave", () => {
       clearInterval(scrollInterval);
-      scrollInterval = setInterval(() => {
-        tableWrapper.scrollLeft -= scrollSpeed;
-      }, 20);
-    }
-    // Si el mouse está cerca del borde derecho
-    else if (mouseX > rect.width - 50) {
-      clearInterval(scrollInterval);
-      scrollInterval = setInterval(() => {
-        tableWrapper.scrollLeft += scrollSpeed;
-      }, 20);
-    } else {
-      clearInterval(scrollInterval); // Detener el desplazamiento si el mouse no está cerca de los bordes
-    }
-  });
-
-  // Detener el desplazamiento cuando el mouse salga del contenedor
-  tableWrapper.addEventListener("mouseleave", () => {
-    clearInterval(scrollInterval);
+    });
   });
 }
 
-// Llamar a la función para habilitar el desplazamiento automático en la tabla
-enableHorizontalAutoScroll("#table-cotizacion-embarque_wrapper");
-document.querySelector("#table-cotizacion-embarque_wrapper").closest('.table-responsive');
-tableWrapper.addEventListener("mousemove", (e) => {
-  console.log('Mouse moviéndose dentro del contenedor');
-  const rect = tableWrapper.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left; // Posición del mouse relativa al contenedor
-  console.log(`Posición del mouse: ${mouseX}, Ancho del contenedor: ${rect.width}`);
-});
+// Llamar a la función para aplicar el desplazamiento horizontal a todas las tablas
+enableHorizontalAutoScrollForAllTables();
 
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 
