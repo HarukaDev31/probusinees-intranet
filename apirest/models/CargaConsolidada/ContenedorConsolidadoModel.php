@@ -1065,7 +1065,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
         return $result;
     }
-    public function createClienteDocumentacion($id, $name, $file,$idProveedor)
+    public function createClienteDocumentacion($id, $name, $file, $idProveedor)
     {
         $this->maxFileSize = 1000000;
         $this->setAllowedExtensionsImagesOfficeFiles();
@@ -1079,9 +1079,12 @@ class ContenedorConsolidadoModel extends CI_Model
             ],
             'assets/images/agentecompra/'
         );
-        $this->db->insert($this->table_contenedor_cotizacion_documentacion, ['id_cotizacion' => $id, 'name' => $name, 'file_url' => $fileUrl,
-    'id_proveedor'=>$idProveedor
-    ]);
+        $this->db->insert($this->table_contenedor_cotizacion_documentacion, [
+            'id_cotizacion' => $id,
+            'name' => $name,
+            'file_url' => $fileUrl,
+            'id_proveedor' => $idProveedor
+        ]);
         if ($this->db->affected_rows() > 0) {
             return ['status' => "success"];
         }
@@ -1168,7 +1171,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id', $idCotizacion);
             $this->db->update($this->table_contenedor_cotizacion, ['valor_doc' => $result->total_valor_doc, 'volumen_doc' => $result->total_volumen_doc]);
 
-            if ($this->db->error()['code']!=0){
+            if ($this->db->error()['code'] != 0) {
                 return false;
             }
             return "success";
@@ -2124,8 +2127,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 ->from($this->table_contenedor_cotizacion_proveedores);
             $query = $this->db->get();
             //validate if all providers has status loaded   
-            
-            
+
+
         }
         // Manejo de los estados específicos en array
         else if (in_array($estado, ["NC", "C", "R", "NS", "NO LOADED", "INSPECTION"])) {
@@ -2145,7 +2148,7 @@ class ContenedorConsolidadoModel extends CI_Model
         }
 
         // Verificar si hubo una actualización exitosa
-       
+
 
         // Manejo de errores en la base de datos
         $dbError = $this->db->error();
@@ -2177,113 +2180,116 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
     {
-        $this->db->select('nombre,id_contenedor,telefono')
-            ->from($this->table_contenedor_cotizacion)
-            ->where('id', $idCotizacion);
-        $query = $this->db->get();
+        try {
+            $this->db->select('nombre,id_contenedor,telefono')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion);
+            $query = $this->db->get();
 
-        $cliente = $query->row()->nombre;
-        $idContenedor = $query->row()->id_contenedor;
-        $telefono = $query->row()->telefono;
-        //remove spaces from telefono
-        $telefono = preg_replace('/\s+/', '', $telefono);
-        $telefono .= $telefono ? '@c.us' : '';
-        $this->phoneNumberId = $telefono;
-        $this->db->close();
-        $this->db->initialize();
-        $this->db->select('code_supplier,products,send_rotulado_status,id')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id_cotizacion', $idCotizacion); // Cambiado a `id_cotizacion`
-        $query = $this->db->get();
-        $proveedores = $query->result_array();
+            $cliente = $query->row()->nombre;
+            $idContenedor = $query->row()->id_contenedor;
+            $telefono = $query->row()->telefono;
+            //remove spaces from telefono
+            $telefono = preg_replace('/\s+/', '', $telefono);
+            $telefono .= $telefono ? '@c.us' : '';
+            $this->phoneNumberId = $telefono;
+            $this->db->close();
+            $this->db->initialize();
+            $this->db->select('code_supplier,products,send_rotulado_status,id')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id_cotizacion', $idCotizacion); // Cambiado a `id_cotizacion`
+            $query = $this->db->get();
+            $proveedores = $query->result_array();
 
-        $this->db->select('carga')
-            ->from($this->table)
-            ->where('id', $idContenedor);
-        $query = $this->db->get();
-        $carga = $query->row()->carga;
-        if ($estado == "ROTULADO") {
-            try {
+            $this->db->select('carga')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $carga = $query->row()->carga;
+            if ($estado == "ROTULADO") {
+                try {
 
-                $htmlWelcomePath = 'assets/downloads/Welcome_Consolidado_Template.html';
-                $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
-                $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
-                $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
-                //if exists any provider with send_rotulado_status==SENDED NOT SEND MESSAGE
-                $providersHasSended = array_filter($proveedores, function ($proveedor) {
-                    return $proveedor['send_rotulado_status'] == 'SENDED';
-                });
-                if (count($providersHasSended) == 0) {
-                $response = $this->sendWelcome($carga);
-                }
-                // log_message('error', 'response: '.$response);
-                $providersHasNoSended = array_filter($proveedores,
-                function ($proveedor) {
-                    return $proveedor['send_rotulado_status'] == 'PENDING';
-                });
-
-
-                $zip = new ZipArchive();
-                $zipFileName = 'assets/downloads/Rotulado.zip';
-                if (file_exists($zipFileName)) {
-                    unlink($zipFileName);
-                }
-                if ($zip->open($zipFileName, ZipArchive::CREATE) !== TRUE) {
-                    echo "No se pudo crear el archivo ZIP";
-                    exit;
-                }
-
-                $options = new Dompdf\Options();
-                $options->set('isHtml5ParserEnabled', true);
-                $options->set('isFontSubsettingEnabled', true);
-                $options->set('isRemoteEnabled', true);
-
-                foreach ($providersHasNoSended as $proveedor) {
-                    $supplierCode = $proveedor['code_supplier'];
-                    $products = $proveedor['products'];
-                    $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
-                    $htmlContentTemplate = file_get_contents($htmlFilePath);
-                    $htmlContentTemplate = mb_convert_encoding($htmlContentTemplate, 'UTF-8', mb_detect_encoding($htmlContentTemplate));
-                    $htmlContent = str_replace('{{cliente}}', $cliente, $htmlContentTemplate);
-                    $htmlContent = str_replace('{{supplier_code}}', $supplierCode, $htmlContent);
-                    $htmlContent = str_replace('{{carga}}', $carga, $htmlContent);
-                    $htmlContent = str_replace('{{base_url}}', base_url(), $htmlContent);
-                    $dompdf = new Dompdf\Dompdf($options);
-                    $dompdf->loadHtml($htmlContent);
-                    $dompdf->setPaper('A4', 'portrait');
+                    $htmlWelcomePath = 'assets/downloads/Welcome_Consolidado_Template.html';
+                    $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
+                    $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
+                    $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
+                    //if exists any provider with send_rotulado_status==SENDED NOT SEND MESSAGE
+                    $providersHasSended = array_filter($proveedores, function ($proveedor) {
+                        return $proveedor['send_rotulado_status'] == 'SENDED';
+                    });
+                    if (count($providersHasSended) == 0) {
+                        $response = $this->sendWelcome($carga);
+                    }
+                    // log_message('error', 'response: '.$response);
+                    $providersHasNoSended = array_filter(
+                        $proveedores,
+                        function ($proveedor) {
+                            return $proveedor['send_rotulado_status'] == 'PENDING';
+                        }
+                    );
 
 
-                    $dompdf->render();
-                    $pdfContent = $dompdf->output();
-                    $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
-                    unlink($tempFilePath);
-                    file_put_contents($tempFilePath, $pdfContent);
-                    try {
+                    $zip = new ZipArchive();
+                    $zipFileName = 'assets/downloads/Rotulado.zip';
+                    if (file_exists($zipFileName)) {
+                        unlink($zipFileName);
+                    }
+                    if ($zip->open($zipFileName, ZipArchive::CREATE) !== TRUE) {
+                        echo "No se pudo crear el archivo ZIP";
+                        exit;
+                    }
 
-                        $data = $this->sendDataItem(
-                            "
+                    $options = new Dompdf\Options();
+                    $options->set('isHtml5ParserEnabled', true);
+                    $options->set('isFontSubsettingEnabled', true);
+                    $options->set('isRemoteEnabled', true);
+
+                    foreach ($providersHasNoSended as $proveedor) {
+                        $supplierCode = $proveedor['code_supplier'];
+                        $products = $proveedor['products'];
+                        $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
+                        $htmlContentTemplate = file_get_contents($htmlFilePath);
+                        $htmlContentTemplate = mb_convert_encoding($htmlContentTemplate, 'UTF-8', mb_detect_encoding($htmlContentTemplate));
+                        $htmlContent = str_replace('{{cliente}}', $cliente, $htmlContentTemplate);
+                        $htmlContent = str_replace('{{supplier_code}}', $supplierCode, $htmlContent);
+                        $htmlContent = str_replace('{{carga}}', $carga, $htmlContent);
+                        $htmlContent = str_replace('{{base_url}}', base_url(), $htmlContent);
+                        $dompdf = new Dompdf\Dompdf($options);
+                        $dompdf->loadHtml($htmlContent);
+                        $dompdf->setPaper('A4', 'portrait');
+
+
+                        $dompdf->render();
+                        $pdfContent = $dompdf->output();
+                        $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
+                        unlink($tempFilePath);
+                        file_put_contents($tempFilePath, $pdfContent);
+                        try {
+
+                            $data = $this->sendDataItem(
+                                "
 Producto: {$products}
 Código de proveedor: {$supplierCode}
                         ",
-                            $tempFilePath
-                        );
-                        //update send_rotulado_status to SENDED
-                        $this->db->update($this->table_contenedor_cotizacion_proveedores,["send_rotulado_status"=>"SENDED"],["id"=>$proveedor['id']]);
-                    } catch (Exception $e) {
-                        echo 'Error: ' . $e->getMessage();
-                        log_message('error', 'Error: ' . $e->getMessage());
-                    } finally {
-                        $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
+                                $tempFilePath
+                            );
+                            //update send_rotulado_status to SENDED
+                            $this->db->update($this->table_contenedor_cotizacion_proveedores, ["send_rotulado_status" => "SENDED"], ["id" => $proveedor['id']]);
+                        } catch (Exception $e) {
+                            echo 'Error: ' . $e->getMessage();
+                            log_message('error', 'Error: ' . $e->getMessage());
+                        } finally {
+                            $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
+                        }
                     }
-                }
-                $zip->close();
-                $htmlDataPath = 'assets/downloads/Data_Rotulado_Template.html';
-                $htmlDataContent = file_get_contents($htmlDataPath);
+                    $zip->close();
+                    $htmlDataPath = 'assets/downloads/Data_Rotulado_Template.html';
+                    $htmlDataContent = file_get_contents($htmlDataPath);
 
-                unlink($tempFilePath);
-                $direccionUrl = base_url('assets/downloads/Direccion.jpg');
-                $data = $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China');
-                $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
+                    unlink($tempFilePath);
+                    $direccionUrl = base_url('assets/downloads/Direccion.jpg');
+                    $data = $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China');
+                    $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
 ➡ *Datos del proveedor: (Usted lo llena)*
 
@@ -2293,111 +2299,115 @@ Código de proveedor: {$supplierCode}
 
 Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡
                 ");
-                header('Content-Type: application/zip');
-                header('Content-Disposition: attachment; filename="Rotulado.zip"');
-                header('Content-Length: ' . filesize($zipFileName));
-                readfile($zipFileName);
+                    header('Content-Type: application/zip');
+                    header('Content-Disposition: attachment; filename="Rotulado.zip"');
+                    header('Content-Length: ' . filesize($zipFileName));
+                    readfile($zipFileName);
 
-                foreach ($proveedores as $proveedor) {
-                    $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$proveedor['code_supplier']}.pdf";
-                    if (file_exists($tempFilePath)) {
-                        unlink($tempFilePath);
+                    foreach ($proveedores as $proveedor) {
+                        $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$proveedor['code_supplier']}.pdf";
+                        if (file_exists($tempFilePath)) {
+                            unlink($tempFilePath);
+                        }
                     }
+                    exit;
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                    log_message('error', 'Error: ' . $e->getMessage());
                 }
-                exit;
-            } catch (Exception $e) {
-                echo $e->getMessage();
-                log_message('error', 'Error: ' . $e->getMessage());
+            } else if ($estado == "COBRANDO") {
+                $this->db->select('estados_proveedor, code_supplier, qty_box_china, qty_box, id_cotizacion')
+                    ->from($this->table_contenedor_cotizacion_proveedores)
+                    ->where('id', $idProveedor);
+                $query = $this->db->get();
+                $row = $query->row(); // Obtener la fila como objeto
+                $estadoChina = $row->estados_proveedor;
+                $supplierCode = $row->code_supplier;
+                $qtyBoxChina = $row->qty_box_china;
+                $qtyBox = $row->qty_box;
+                $idCotizacion = $row->id_cotizacion;
+
+                // Obtener volumen, monto e ID del contenedor
+                $this->db->select('volumen, monto, id_contenedor')
+                    ->from($this->table_contenedor_cotizacion)
+                    ->where('id', $idCotizacion);
+                $query = $this->db->get();
+                $row = $query->row(); // Obtener la fila como objeto
+                $volumen = $row->volumen;
+                $valorCot = $row->monto;
+                $idContenedor = $row->id_contenedor;
+
+                // Obtener fecha de cierre
+                $this->db->select('f_cierre')
+                    ->from($this->table)
+                    ->where('id', $idContenedor);
+                $query = $this->db->get();
+                $fCierre = $query->row()->f_cierre;
+
+                // Formatear fecha de cierre
+                $fCierre = date('d F', strtotime($fCierre));
+                $fCierre = str_replace([
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December'
+                ], [
+                    'Enero',
+                    'Febrero',
+                    'Marzo',
+                    'Abril',
+                    'Mayo',
+                    'Junio',
+                    'Julio',
+                    'Agosto',
+                    'Septiembre',
+                    'Octubre',
+                    'Noviembre',
+                    'Diciembre'
+                ], $fCierre);
+
+                // Obtener nombre del cliente
+                $this->db->select('nombre,telefono')
+                    ->from($this->table_contenedor_cotizacion)
+                    ->where('id', $idCotizacion);
+                $query = $this->db->get();
+                $cliente = $query->row()->nombre;
+                $telefono = $query->row()->telefono;
+                //remove spaces from telefono
+                $telefono = preg_replace('/\s+/', '', $telefono);
+                $telefono .= $telefono ? '@c.us' : '';
+                $this->phoneNumberId = $telefono;
+                // Construir el mensaje
+                $message = "Reserva de espacio:\n" .
+                    "*Consolidado #" . $carga . "-2025*\n\n" .
+                    "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
+                    "☑ CBM Preliminar: " . $volumen . " cbm\n" .
+                    "☑ Costo CBM: $" . $valorCot . "\n" .
+                    "☑ Fecha Limite de pago: " . $fCierre . "\n\n" .
+                    "⚠ Nota: Realizar el pago antes del llenado del contenedor.\n\n" .
+                    "📦 En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final.\n\n" .
+                    "Apenas haga el pago, envíe por este medio para hacer la reserva.";
+
+                // Enviar el mensaje
+                $this->sendMessage($message);
+
+                // Enviar imagen de pagos
+                $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
+                $data = $this->sendMedia($pagosUrl, 'image/jpg');
             }
-        } else if ($estado == "COBRANDO") {
-            $this->db->select('estados_proveedor, code_supplier, qty_box_china, qty_box, id_cotizacion')
-                ->from($this->table_contenedor_cotizacion_proveedores)
-                ->where('id', $idProveedor);
-            $query = $this->db->get();
-            $row = $query->row(); // Obtener la fila como objeto
-            $estadoChina = $row->estados_proveedor;
-            $supplierCode = $row->code_supplier;
-            $qtyBoxChina = $row->qty_box_china;
-            $qtyBox = $row->qty_box;
-            $idCotizacion = $row->id_cotizacion;
-
-            // Obtener volumen, monto e ID del contenedor
-            $this->db->select('volumen, monto, id_contenedor')
-                ->from($this->table_contenedor_cotizacion)
-                ->where('id', $idCotizacion);
-            $query = $this->db->get();
-            $row = $query->row(); // Obtener la fila como objeto
-            $volumen = $row->volumen;
-            $valorCot = $row->monto;
-            $idContenedor = $row->id_contenedor;
-
-            // Obtener fecha de cierre
-            $this->db->select('f_cierre')
-                ->from($this->table)
-                ->where('id', $idContenedor);
-            $query = $this->db->get();
-            $fCierre = $query->row()->f_cierre;
-
-            // Formatear fecha de cierre
-            $fCierre = date('d F', strtotime($fCierre));
-            $fCierre = str_replace([
-                'January',
-                'February',
-                'March',
-                'April',
-                'May',
-                'June',
-                'July',
-                'August',
-                'September',
-                'October',
-                'November',
-                'December'
-            ], [
-                'Enero',
-                'Febrero',
-                'Marzo',
-                'Abril',
-                'Mayo',
-                'Junio',
-                'Julio',
-                'Agosto',
-                'Septiembre',
-                'Octubre',
-                'Noviembre',
-                'Diciembre'
-            ], $fCierre);
-
-            // Obtener nombre del cliente
-            $this->db->select('nombre,telefono')
-                ->from($this->table_contenedor_cotizacion)
-                ->where('id', $idCotizacion);
-            $query = $this->db->get();
-            $cliente = $query->row()->nombre;
-            $telefono = $query->row()->telefono;
-            //remove spaces from telefono
-            $telefono = preg_replace('/\s+/', '', $telefono);
-            $telefono .= $telefono ? '@c.us' : '';
-            $this->phoneNumberId = $telefono;
-            // Construir el mensaje
-            $message = "Reserva de espacio:\n" .
-                "*Consolidado #" . $carga . "-2025*\n\n" .
-                "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
-                "☑ CBM Preliminar: " . $volumen . " cbm\n" .
-                "☑ Costo CBM: $" . $valorCot . "\n" .
-                "☑ Fecha Limite de pago: " . $fCierre . "\n\n" .
-                "⚠ Nota: Realizar el pago antes del llenado del contenedor.\n\n" .
-                "📦 En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final.\n\n" .
-                "Apenas haga el pago, envíe por este medio para hacer la reserva.";
-
-            // Enviar el mensaje
-            $this->sendMessage($message);
-
-            // Enviar imagen de pagos
-            $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
-            $data = $this->sendMedia($pagosUrl, 'image/jpg');
+            return "success";
+        } catch (Exception $e) {
+            log_message("error", "" . $e->getMessage());
+            return ['status' => "error", 'message' => $e->getMessage()];
         }
-        return "success";
     }
     public function updateTelefonoProveedor($idProveedor, $telefono)
     {
@@ -2657,7 +2667,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     $this->db->update($this->table_contenedor_cotizacion_proveedores, [
                         'estados_proveedor' =>
                         $this->STATUS_RECIVED,
-                        'estado'=>$this->STATUS_RECIVED,
+                        'estado' => $this->STATUS_RECIVED,
                         'qty_box_china' => $data['qty_box_china'],
                         'cbm_total_china' => $data['cbm_total_china'],
                         'arrive_date_china' => $data['arrive_date_china']
@@ -2887,7 +2897,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             unlink($result[0]->file_path);
             $this->db->where('id', $idFile);
             $this->db->delete($this->table_contenedor_almacen_documentacion);
-            if(($this->db->error()['code'] != 0)){
+            if (($this->db->error()['code'] != 0)) {
                 log_message('error', 'Error: ' . $this->db->error()['message']);
                 return "false";
             }
@@ -3728,7 +3738,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 //initial column 44=sum(initialcolumn16+initialcolumn40+initialcolumn32)
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                     $InitialColumn . '44',
-                    "=SUM(" . $InitialColumn . "15," . $InitialColumn . "40," . $InitialColumn . "32,(" . $InitialColumn . "26" ."))"
+                    "=SUM(" . $InitialColumn . "15," . $InitialColumn . "40," . $InitialColumn . "32,(" . $InitialColumn . "26" . "))"
                 );
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '44')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '45', $producto["cantidad"]);
