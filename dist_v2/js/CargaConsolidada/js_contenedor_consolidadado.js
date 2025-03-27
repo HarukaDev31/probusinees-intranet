@@ -5667,7 +5667,7 @@ $(document).ready(async function () {
     formData.append("idContenedor", idContenedor);
     //swall input file
     Swal.fire({
-      title: "Subir Factura Final",
+      title: "Subir Factura General",
       input: "file",
       inputAttributes: {
         //excel file
