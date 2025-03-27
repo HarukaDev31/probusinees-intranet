@@ -243,7 +243,7 @@ class ContenedorConsolidadoModel extends CI_Model
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
         $this->db->select("main.*,
-        U.No_Usuario,
+        U.No_Nombres_Apellidos,
         (
             SELECT JSON_ARRAYAGG(
                 JSON_OBJECT(
