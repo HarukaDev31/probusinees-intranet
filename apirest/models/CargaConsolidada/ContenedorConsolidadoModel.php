@@ -2235,7 +2235,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         unlink($zipFileName);
                     }
                     if ($zip->open($zipFileName, ZipArchive::CREATE) !== TRUE) {
-                        echo "No se pudo crear el archivo ZIP";
+                        log_message('error', 'Failed to create zip file: ' . $zipFileName);
                         exit;
                     }
 
