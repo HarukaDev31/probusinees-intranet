@@ -2251,11 +2251,6 @@ protected function procesarEstadoRotulado($cliente, $carga, $proveedores, $idCot
         $providersHasSended = array_filter($proveedores, function ($proveedor) {
             return $proveedor['send_rotulado_status'] == 'SENDED';
         });
-
-        if (count($providersHasSended) == 0) {
-            $this->sendWelcome($carga);
-        }
-
         $providersHasNoSended = array_filter($proveedores, function ($proveedor) {
             return $proveedor['send_rotulado_status'] == 'PENDING';
         });
@@ -2263,6 +2258,21 @@ protected function procesarEstadoRotulado($cliente, $carga, $proveedores, $idCot
         if (empty($providersHasNoSended)) {
             throw new Exception("No hay proveedores pendientes de envío");
         }
+        if (count($providersHasSended) == 0) {
+            $this->sendWelcome($carga);
+        }else if(count($providersHasSended) > 0
+        && count($providersHasNoSended) > 0
+        )  {
+            $this->sendMessage("Hola 🙋🏻‍♀, te escribe el área de coordinación de Probusiness. 
+
+📢 Añadiste un nuevo proveedor en el Consolidado#${carga}
+
+*Rotulado: 👇🏼*  
+Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para 
+identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.");
+        }
+
+        
 
         // Configurar ZIP
         $zipFileName = 'assets/downloads/Rotulado.zip';
