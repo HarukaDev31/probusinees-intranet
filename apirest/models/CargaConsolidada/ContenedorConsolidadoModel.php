@@ -2265,7 +2265,7 @@ protected function procesarEstadoRotulado($cliente, $carga, $proveedores, $idCot
         )  {
             $this->sendMessage("Hola 🙋🏻‍♀, te escribe el área de coordinación de Probusiness. 
 
-📢 Añadiste un nuevo proveedor en el Consolidado#${carga}
+📢 Añadiste un nuevo proveedor en el *Consolidado #${carga}*
 
 *Rotulado: 👇🏼*  
 Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para 
@@ -2337,6 +2337,13 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
             }
 
             try {
+                if (!$zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf")) {
+                    log_message('error', "No se pudo añadir $tempFilePath al ZIP");
+                    continue;
+                }
+                // if (!$zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf")) {
+                //     throw new Exception("No se pudo añadir el archivo al ZIP");
+                // }
                 // Enviar documento al proveedor
                 $this->sendDataItem(
                     "Producto: {$products}\nCódigo de proveedor: {$supplierCode}",
@@ -2351,14 +2358,12 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
                 );
 
                 // Agregar al ZIP
-                $zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf");
             } catch (Exception $e) {
                 log_message('error', 'Error procesando proveedor ' . $supplierCode . ': ' . $e->getMessage());
                 continue; // Continuar con el siguiente proveedor si hay error
             } finally {
                 // Limpiar memoria
-                $dompdf->clear();
-                unset($dompdf);
+
                 gc_collect_cycles();
             }
         }
@@ -2368,10 +2373,10 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
             throw new Exception("Error al cerrar el archivo ZIP");
         }
 
-        // Verificar que el ZIP tiene contenido
-        if ($zip->numFiles == 0) {
-            throw new Exception("El archivo ZIP no contiene documentos");
-        }
+        // // Verificar que el ZIP tiene contenido
+        // if ($zip->numFiles == 0) {
+        //     throw new Exception("El archivo ZIP no contiene documentos");
+        // }
 
         // Enviar información adicional
         $direccionUrl = base_url('assets/downloads/Direccion.jpg');
