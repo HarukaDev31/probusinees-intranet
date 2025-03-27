@@ -131,17 +131,17 @@ class ContenedorConsolidadoModel extends CI_Model
         $this->db->insert($this->table, $data);
         if ($this->db->affected_rows() > 0) {
             //{"project": "0", "role": "Cotizador", "user": "0", "message": "Prueba de comunicación en tiempo real","action":"new-container"}
-            $socketResponse = $this->sendEvent([
-                "project" => "0",
-                "role" => $this->roleCotizador,
-                "user" => "0",
-                "action" => $this->aNewContainer,
-                "message" => "asdas",
-            ]);
+            // $socketResponse = $this->sendEvent([
+            //     "project" => "0",
+            //     "role" => $this->roleCotizador,
+            //     "user" => "0",
+            //     "action" => $this->aNewContainer,
+            //     "message" => "asdas",
+            // ]);
             return [
                 'id' => $this->db->insert_id(),
                 'status' => true,
-                'socketResponse' => $socketResponse
+                'socketResponse' => [''],
             ];
         }
         return false;
@@ -755,17 +755,17 @@ class ContenedorConsolidadoModel extends CI_Model
                 }
                 if ($this->db->affected_rows() > 0) {
                     //{"project": "0", "role": "Cotizador", "user": "0", "message": "Prueba de comunicación en tiempo real","action":"new-cotizacion"}
-                    $this->sendEvent([
-                        "project" => "0",
-                        "role" => $this->roleCotizador,
-                        "user" => "0",
-                        "action" => $this->aNewCotizacion,
-                        "message" => "Nueva cotización",
-                    ]);
-                    return [
-                        'id' => $idCotizacion,
-                        'status' => "success"
-                    ];
+                    // $this->sendEvent([
+                    //     "project" => "0",
+                    //     "role" => $this->roleCotizador,
+                    //     "user" => "0",
+                    //     "action" => $this->aNewCotizacion,
+                    //     "message" => "Nueva cotización",
+                    // ]);
+                    // return [
+                    //     'id' => $idCotizacion,
+                    //     'status' => "success"
+                    // ];
                 }
                 return false;
             }
@@ -2711,13 +2711,13 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                 $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado DATOS PROVEEDOR";
                 $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
                 foreach ($ids as $id) {
-                    $socketResponse = $this->sendEvent([
-                        "project" => "intranet",
-                        "role" => 0,
-                        "user" => $id,
-                        "action" => $this->cambioEstadoProveedor,
-                        "message" => $message
-                    ]);
+                    // $socketResponse = $this->sendEvent([
+                    //     "project" => "intranet",
+                    //     "role" => 0,
+                    //     "user" => $id,
+                    //     "action" => $this->cambioEstadoProveedor,
+                    //     "message" => $message
+                    // ]);
                 }
             }
 
@@ -2744,21 +2744,21 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                     $ids = array_column($usuariosAlmacen, 'ID_Usuario');
 
                     $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado CONTACTADO";
-                    $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
-                    $socketResponse = $this->sendEvent([
-                        "project" => "intranet",
-                        "role" => $this->roleCoordinacion,
-                        "user" => 0,
-                        "action" => $this->cambioEstadoProveedor,
-                        "message" => $message
-                    ]);
-                    $socketResponse = $this->sendEvent([
-                        "project" => "intranet",
-                        "role" => $this->roleCotizador,
-                        "user" => 0,
-                        "action" => $this->cambioEstadoProveedor,
-                        "message" => $message
-                    ]);
+                    // $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
+                    // $socketResponse = $this->sendEvent([
+                    //     "project" => "intranet",
+                    //     "role" => $this->roleCoordinacion,
+                    //     "user" => 0,
+                    //     "action" => $this->cambioEstadoProveedor,
+                    //     "message" => $message
+                    // ]);
+                    // $socketResponse = $this->sendEvent([
+                    //     "project" => "intranet",
+                    //     "role" => $this->roleCotizador,
+                    //     "user" => 0,
+                    //     "action" => $this->cambioEstadoProveedor,
+                    //     "message" => $message
+                    // ]);
                     //if contenedor estado_china is PENDIENTE UPDATE TO RECIBIENDO
 
                 }
@@ -2790,37 +2790,37 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                     $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
                     $ids = array_column($usuariosAlmacen, 'ID_Usuario');
                     $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado RECIBIDO";
-                    $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
-                    $socketResponse = $this->sendEvent([
-                        "project" => "intranet",
-                        "role" => $this->roleCoordinacion,
-                        "user" => "0",
-                        "action" => $this->cambioEstadoProveedor,
-                        "message" => $message
-                    ]);
-                    $socketResponse = $this->sendEvent([
-                        "project" => "intranet",
-                        "role" => $this->roleCotizador,
-                        "user" => "0",
-                        "action" => $this->cambioEstadoProveedor,
-                        "message" => $message
-                    ]);
+                    // $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
+                    // $socketResponse = $this->sendEvent([
+                    //     "project" => "intranet",
+                    //     "role" => $this->roleCoordinacion,
+                    //     "user" => "0",
+                    //     "action" => $this->cambioEstadoProveedor,
+                    //     "message" => $message
+                    // ]);
+                    // $socketResponse = $this->sendEvent([
+                    //     "project" => "intranet",
+                    //     "role" => $this->roleCotizador,
+                    //     "user" => "0",
+                    //     "action" => $this->cambioEstadoProveedor,
+                    //     "message" => $message
+                    // ]);
                 } else {
                     $message = "Se ha actualizado la cantidad de cajas y volumen total de china del proveedor con codigo de proveedor " . $supplierCode . " a " . $data['qty_box_china'] . " cajas y " . $data['cbm_total_china'] . " m3";
-                    $socketResponse = $this->sendEvent([
-                        "project" => "intranet",
-                        "role" => $this->roleCoordinacion,
-                        "user" => 0,
-                        "action" => $this->cambioEstadoProveedor,
-                        "message" => $message
-                    ]);
-                    $socketResponse = $this->sendEvent([
-                        "project" => "intranet",
-                        "role" => $this->roleCotizador,
-                        "user" => 0,
-                        "action" => $this->cambioEstadoProveedor,
-                        "message" => $message
-                    ]);
+                    // $socketResponse = $this->sendEvent([
+                    //     "project" => "intranet",
+                    //     "role" => $this->roleCoordinacion,
+                    //     "user" => 0,
+                    //     "action" => $this->cambioEstadoProveedor,
+                    //     "message" => $message
+                    // ]);
+                    // $socketResponse = $this->sendEvent([
+                    //     "project" => "intranet",
+                    //     "role" => $this->roleCotizador,
+                    //     "user" => 0,
+                    //     "action" => $this->cambioEstadoProveedor,
+                    //     "message" => $message
+                    // ]);
                 }
                 $contenedorEstado = $this->db->select('estado_china')->from($this->table)->where('id', $idContenedor)->get()->row()->estado_china;
                 if ($contenedorEstado == "PENDIENTE") {
