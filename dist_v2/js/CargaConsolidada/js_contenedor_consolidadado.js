@@ -473,6 +473,9 @@ function addFileToList(file, fileList = null, id = null) {
   // Usar la función getIconByType para obtener el ícono correspondiente
   const fileIcon = getIconByType(file.file_ext);
 
+    // Verificar si el usuario pertenece al grupo "Cotizador"
+    const isCotizador = currentPrivilege === "Cotizador";
+
 
   // Crear el elemento HTML para el archivo
   const fileItem = $(`
@@ -485,9 +488,13 @@ function addFileToList(file, fileList = null, id = null) {
                 <button class="btn-sm download-btn" data-url="${file.file_url}">
                     <i class="fas fa-download"></i> 
                 </button>
-                <button class="btn-sm delete-btn" data-id="${file.id}">
-                    <i class="far fa-trash-alt"></i>
-                </button>
+                ${
+                  !isCotizador
+                    ? `<button class="btn-sm delete-btn" data-id="${file.id}">
+                        <i class="far fa-trash-alt"></i>
+                      </button>`
+                    : ""
+                }
             </div>
         </div>
     `);
