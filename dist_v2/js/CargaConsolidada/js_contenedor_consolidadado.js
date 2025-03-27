@@ -2279,6 +2279,8 @@ const openStepFunction = async (step, id) => {
                 if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
                   $("#table-cotizacion-embarque").attr("style", "");
                   $("#table-cotizacion-embarque_wrapper").show();
+                  // Llamar a la función para habilitar el desplazamiento automático en la tabla
+                  enableHorizontalAutoScroll("#table-cotizacion-embarque_wrapper");
                   reloadTableCotizacionEmbarque();
                 } else {
                   url =
@@ -6169,6 +6171,65 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
     });
   }
 }
+
+function enableHorizontalAutoScroll(tableSelector) {
+  // Seleccionar el contenedor padre con la clase table-responsive
+  const tableElement = document.querySelector(tableSelector);
+  if (!tableElement) {
+    console.error(`No se encontró el elemento con el selector: ${tableSelector}`);
+    return;
+  }
+
+  const tableWrapper = tableElement.closest('.table-responsive');
+  if (!tableWrapper) {
+    console.error(`No se encontró el contenedor con la clase .table-responsive para el selector: ${tableSelector}`);
+    return;
+  } else {
+    console.log('Contenedor encontrado:', tableWrapper);
+  }
+
+  let scrollInterval;
+
+  // Detectar la posición del mouse y desplazar automáticamente
+  tableWrapper.addEventListener("mousemove", (e) => {
+    console.log('Mouse moviéndose dentro del contenedor');
+    const rect = tableWrapper.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left; // Posición del mouse relativa al contenedor
+    const scrollSpeed = 10; // Velocidad de desplazamiento
+
+    // Si el mouse está cerca del borde izquierdo
+    if (mouseX < 50) {
+      clearInterval(scrollInterval);
+      scrollInterval = setInterval(() => {
+        tableWrapper.scrollLeft -= scrollSpeed;
+      }, 20);
+    }
+    // Si el mouse está cerca del borde derecho
+    else if (mouseX > rect.width - 50) {
+      clearInterval(scrollInterval);
+      scrollInterval = setInterval(() => {
+        tableWrapper.scrollLeft += scrollSpeed;
+      }, 20);
+    } else {
+      clearInterval(scrollInterval); // Detener el desplazamiento si el mouse no está cerca de los bordes
+    }
+  });
+
+  // Detener el desplazamiento cuando el mouse salga del contenedor
+  tableWrapper.addEventListener("mouseleave", () => {
+    clearInterval(scrollInterval);
+  });
+}
+
+// Llamar a la función para habilitar el desplazamiento automático en la tabla
+enableHorizontalAutoScroll("#table-cotizacion-embarque_wrapper");
+document.querySelector("#table-cotizacion-embarque_wrapper").closest('.table-responsive');
+tableWrapper.addEventListener("mousemove", (e) => {
+  console.log('Mouse moviéndose dentro del contenedor');
+  const rect = tableWrapper.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left; // Posición del mouse relativa al contenedor
+  console.log(`Posición del mouse: ${mouseX}, Ancho del contenedor: ${rect.width}`);
+});
 
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 
