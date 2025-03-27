@@ -3753,11 +3753,11 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                 $InitialColumn . '14',
-                "=IF($CBMTotal<1, ROUNDUP($tarifaCellValue*0.6, 0), ROUNDUP($tarifaCellValue*0.6*$CBMTotal, 0))"
+                "=IF($CBMTotal<1, $tarifaCellValue*0.6, $tarifaCellValue*0.6*$CBMTotal)"
             );            // $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '40', "=IF($CBMTotal<1,ROUNDUP($tarifaCellValue*0.4),ROUNDUP($tarifaCellValue*0.4*$CBMTotal))");
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                 $InitialColumn . '40',
-                "=IF($CBMTotal<1, ROUNDUP($tarifaCellValue*0.4, 0), ROUNDUP($tarifaCellValue*0.4*$CBMTotal, 0))"
+                "=IF($CBMTotal<1, $tarifaCellValue*0.4,$tarifaCellValue*0.4*$CBMTotal)"
             );
             $antidumpingSum = 0;
             $InitialColumn = 'C';
@@ -3772,32 +3772,32 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
 
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '13')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                 //$initialcolumn14=round($FleteCell*$InitialColumn.'13',2)
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '14', "=ROUNDUP(" . $FleteCell . '*' . $InitialColumn . '13,2)');
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '14', "=" . $FleteCell . '*' . $InitialColumn . '13');
                 //$objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '14', '0');
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '14')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 //$initialcolumn15=roundup( $initialcolumn11+$initialcolumn14,2)
 
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '15', "=ROUNDUP(" . $InitialColumn . '11+' . $InitialColumn . '14,2)');
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '15', "=" . $InitialColumn . '11+' . $InitialColumn . '14');
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '15')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $cfrCell = $InitialColumn . '15';
                 //$initialcolumn15=roundup( $initialcolumn12+$initialcolumn14,2)
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '16', "=ROUNDUP(" . $InitialColumn . '12+' . $InitialColumn . '14,2)');
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '16', "=" . $InitialColumn . '12+' . $InitialColumn . '14');
                 $cfrvCell = $InitialColumn . '16';
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '16')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $seguroCell = $InitialColumn . '17';
                 //set currency format with dollar symbol
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '17')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 //IF COBROCELL IS GREATER THAN 5000 SET THE VALUE TO $initialcolumn17  TO roundup100/ distroCell ELSE SET roundup50/distroCell
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,ROUND(100*" . $distroCell . ",2),ROUND(50*" . $distroCell . ",2))");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,100*" . $distroCell . ",50*" . $distroCell . ")");
                 //initial18 is roundup($cfrCell+$seguroCell,2)
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', "=ROUNDUP(" . $cfrCell . '+' . $seguroCell . ",2)");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', "=" . $cfrCell . '+' . $seguroCell . "");
                 //initial19 is roundup($cfrvCell+$seguroCell,2)
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '19', "=ROUNDUP(" . $cfrvCell . '+' . $seguroCell . ",2)");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '19', "=" . $cfrvCell . '+' . $seguroCell . "");
 
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '18')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '19')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', $producto["antidumping"] * $producto["cantidad"] == "-" ? 0 : $producto["antidumping"] * $producto["cantidad"]);
+                $quantityCell = $InitialColumn . '10';
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '26', $producto["antidumping"] * $producto["cantidad"] == "-" ? 0 : "=" . $InitialColumn . '10*' . $producto["antidumping"]);
                 $antidumpingSum += $producto["antidumping"] * $producto["cantidad"];
                 //set currency format with $ symbol
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '26')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
@@ -3847,10 +3847,10 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                 );
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '44')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '45', $producto["cantidad"]);
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '46', "=ROUND(SUM(" . $InitialColumn . "44/" . $InitialColumn . "45),2)");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '46', "=SUM(" . $InitialColumn . "44/" . $InitialColumn . "45)");
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '46')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 //initial column 47=S/.initialcolumn46*3.7
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '47', "=ROUND(" . $InitialColumn . "46*3.7,2)");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '47', "=" . $InitialColumn . "46*3.7");
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '47')->getNumberFormat()->setFormatCode('"S/." #,##0.00_-');
                 $InitialColumn++;
             }
