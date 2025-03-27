@@ -3980,6 +3980,7 @@ async function viewClientesDocumentacion(id) {
           const file = document.getElementById("swal-input2").files[0];
           if (!name || !file) {
             Swal.showValidationMessage("Por favor, completa todos los campos");
+            return;
           }
           const formData = new FormData();
           formData.append("name", name);
@@ -3994,13 +3995,51 @@ async function viewClientesDocumentacion(id) {
               body: formData,
             }
           );
+
           const result = await response.json();
+
           if (result.status === "success") {
             Swal.fire("¡Documento subido!", result.message, "success");
-            viewClientesDocumentacion(idCotizacion);
-          } else {
-            Swal.fire("Error", result.message, "error");
+          console.log(name,"name");
+            // Agregar dinámicamente el nuevo documento al DOM
+          const newDocument = `
+            ${name}
+            <div class="col-12 col-sm-12 file-info-container">
+              <div class="form-group">
+                <div class="file-upload-box">
+                  <div class="file-info-box">
+                    <div class="file-info">
+                      <div class="file-iconic">
+                        ${getIconByType(file.name.split('.').pop().toLowerCase())}
+                      </div>
+                      <span class="file-name">${file.name}</span>
+                      <span class="file-size">${(file.size / 1024).toFixed(2)} KB</span>
+                   
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Validar que el HTML sea válido antes de agregarlo al DOM
+          try {
+            $("#documentos-clientes-documentacion").append(newDocument);
+
+            // Agregar funcionalidad al botón de borrar
+          
+          } catch (error) {
+            console.error("Error al procesar el HTML del nuevo documento:", error);
+            Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
           }
+        } else {
+          Swal.fire("Error", result.message, "error");
+          // Si ocurre un error en el servidor, eliminar el archivo subido
+          if (fileInput.dataset.fileId) {
+            deleteClienteDocumentacionFile(fileInput.dataset.fileId);
+          }
+
+        }
         },
       });
     });
@@ -4204,8 +4243,10 @@ async function viewClientesDocumentacion(id) {
       // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
       const files = JSON.parse(result.files ?? "[]");
       const filesFilter=files.filter((file)=>file.id_proveedor==selectedTabDocumentacionId);
+      console.log(filesFilter,"filesFilter");
       //for each file add a col with a link to download and delete icon  in collapse-documentacion
       filesFilter.forEach((file) => {
+        if(!file.file_url) return;
         $("#form-documentacion").append(`
            
             ${file.folder_name}
