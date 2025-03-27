@@ -284,7 +284,7 @@ class ContenedorConsolidado extends CI_Controller
 				} else {
 					$subdata = [];
 					if ($this->user->No_Grupo != "ContenedorAlmacen") {
-						$subdata[] = $row->No_Entidad;
+						$subdata[] = $row->No_Nombres_Apellidos;
 					}
 					$proveedores = $row->proveedores;
 					//check if is posible to decode json

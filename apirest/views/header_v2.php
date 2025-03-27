@@ -340,7 +340,7 @@
                   <i class="far fa-user text-lg"></i>
                   <div class="info-user">
                     <p>&nbsp;<?php echo $this->user->No_Nombres_Apellidos; ?></p><br>
-                    <b>&nbsp;<?php echo $this->user->No_Grupo=='ContenedorAlmacen'?'Almacen China':$this->user->No_Grupo; ?></b>
+                    <b>&nbsp;<?php echo $this->user->No_Grupo=='ContenedorAlmacen'?'China Warehouse':$this->user->No_Grupo; ?></b>
                   </div>
                 </a>
               </li>
