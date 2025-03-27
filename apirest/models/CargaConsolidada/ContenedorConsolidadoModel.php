@@ -2087,6 +2087,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->or_where('estados', 'RESERVADO');
             $this->db->or_where('estados', 'ROTULADO');
             $this->db->or_where('estados', 'DATOS PROVEEDOR');
+            $this->db->or_where('estados', 'INSPECCIONADO');
             $this->db->group_end();
 
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
@@ -2766,13 +2767,14 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             }
             if (isset($data['qty_box_china']) && isset($data['cbm_total_china'])) {
                 $estadoProveedorOrder = $this->providerOrderStatus[$estadoProveedor] ?? 0;
+                log_message('error',"llego");
                 $estadoProvedorToUpdate = $this->providerOrderStatus[$this->STATUS_RECIVED] ?? 0;
                 if ($estadoProveedorOrder < $estadoProvedorToUpdate) {
                     $this->db->where('id', $idProveedor);
                     $this->db->update($this->table_contenedor_cotizacion_proveedores, [
                         'estados_proveedor' =>
                         $this->STATUS_RECIVED,
-                        'estado' => $this->STATUS_RECIVED,
+                        
                         'qty_box_china' => $data['qty_box_china'],
                         'cbm_total_china' => $data['cbm_total_china'],
                         'arrive_date_china' => $data['arrive_date_china']
@@ -2784,6 +2786,8 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                         'id_proveedor' => $idProveedor,
                         'estado' => $this->STATUS_RECIVED
                     ]);
+                    //update estado column in table $this->table to estado RECIBIENDO where id = $idContenedor
+                  
 
 
 
@@ -2825,7 +2829,9 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                 $contenedorEstado = $this->db->select('estado_china')->from($this->table)->where('id', $idContenedor)->get()->row()->estado_china;
                 if ($contenedorEstado == "PENDIENTE") {
                     $this->db->where('id', $idContenedor);
-                    $this->db->update($this->table, ['estado_china' => "RECIBIENDO"]);
+                    $this->db->update($this->table, ['estado_china' => "RECIBIENDO",
+                    "estado" => "RECIBIENDO"]);
+                
                 }
             }
             $this->db->where('id', $idProveedor);
