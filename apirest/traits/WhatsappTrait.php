@@ -3,7 +3,7 @@
     {
     //     private $apiUrl = 'https://whatsapp.probusiness.pe/enviar-mensaje';
     //     // private $token = "EAAWycxktPLABO1mMGWamek2oZAKFcaD1fzmPa3CXjTmjZCQyBXsG6BnyZA3GGmvDAc4kTHHcgcRoZAPZBFeCoA6cFH1Yp6Pd2iMj7Wm5EHAxQqIWsteiZC65C3oAYZBEJzSvhm6jXATWZBVRxEIkAzxfjPwvCMDqTSbCHVSCZAANR5v2CcP62ya6YkTH3kXD4YgMAeFv7L2oiW4FvqQO1g5GuyXpMDvos";
-    //     private $phoneNumberId = "51912705923@c.us";
+    private $phoneNumberId = "51912705923@c.us";
     //     public function sendWelcome($carga)
     //     {
     //         try {
@@ -191,14 +191,14 @@
                 'response' => json_decode($response, true)
             ];
         }
-        public function sendWelcome($carga, $phoneNumberId = "51912705923@c.us") {
+        public function sendWelcome($carga, $phoneNumberId = $this->phoneNumberId) {
             return $this->_callApi('/welcome', [
                 'carga' => $carga,
                 'phoneNumberId' => $phoneNumberId
             ]);
         }
     
-        public function sendDataItem($message, $filePath, $phoneNumberId = "51912705923@c.us") {
+        public function sendDataItem($message, $filePath, $phoneNumberId = $this->phoneNumberId) {
             // Leer contenido del archivo y codificarlo en base64
             $fileContent = base64_encode(file_get_contents($filePath));
             
@@ -210,14 +210,14 @@
             ]);
         }
     
-        public function sendMessage($message, $phoneNumberId = "51912705923@c.us") {
+        public function sendMessage($message, $phoneNumberId = $this->phoneNumberId) {
             return $this->_callApi('/message', [
                 'message' => $message,
                 'phoneNumberId' => $phoneNumberId
             ]);
         }
     
-        public function sendMedia($filePath, $mimeType = null, $message = null, $phoneNumberId = "51912705923@c.us") {
+        public function sendMedia($filePath, $mimeType = null, $message = null, $phoneNumberId = $this->phoneNumberId) {
             $fileContent = base64_encode(file_get_contents($filePath));
             
             return $this->_callApi('/media', [
