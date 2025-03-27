@@ -762,10 +762,10 @@ class ContenedorConsolidadoModel extends CI_Model
                     //     "action" => $this->aNewCotizacion,
                     //     "message" => "Nueva cotización",
                     // ]);
-                    // return [
-                    //     'id' => $idCotizacion,
-                    //     'status' => "success"
-                    // ];
+                    return [
+                        'id' => $idCotizacion,
+                        'status' => "success"
+                    ];
                 }
                 return false;
             }
