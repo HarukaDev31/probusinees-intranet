@@ -260,7 +260,13 @@
                 <?php if ($arrMenuPadre->ID_Padre == 0){ ?>
                   <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
                     <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
-                    <p>&nbsp;<?php echo $arrMenuPadre->No_Menu; ?></p>
+                    <p>&nbsp;<?php 
+                    if($this->user->No_Grupo=='ContenedorAlmacen'){
+                      echo $arrMenuPadre->No_Menu_China;
+                    }else{
+                    echo $arrMenuPadre->No_Menu;
+                    } ?>
+                    </p>
                     <?php if($arrMenuPadre->Nu_Cantidad_Menu_Padre > 0): ?>
                       <i class="right fas fa-angle-left"></i>
                     <?php endif; ?>
@@ -280,7 +286,11 @@
                       <li class="<?php echo $No_Class_Li; ?>">
                         <a class="nav-link 1 <?php echo ($this->router->class == $arrHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
                           <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
-                          <p>&nbsp;<?php echo $arrHijos->No_Menu; ?></p>
+                          <p>&nbsp;<?php if($this->user->No_Grupo=='ContenedorAlmacen'){
+                      echo $arrMenuPadre->No_Menu_China;
+                    }else{
+                    echo $arrMenuPadre->No_Menu;
+                    } ?></p>
                           <?php if($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
                           <i class="right fas fa-angle-left"></i>
                           <?php endif; ?>
