@@ -191,15 +191,16 @@
                 'response' => json_decode($response, true)
             ];
         }
-        public function sendWelcome($carga, $phoneNumberId = null): array {
+        public function sendWelcome($carga, $phoneNumberId = null,$sleep=0): array {
             $phoneNumberId= $phoneNumberId ? $phoneNumberId : $this->phoneNumberId;
             return $this->_callApi('/welcome', [
                 'carga' => $carga,
-                'phoneNumberId' => $phoneNumberId
+                'phoneNumberId' => $phoneNumberId,
+                'sleep' => $sleep
             ]);
         }
     
-        public function sendDataItem($message, $filePath, $phoneNumberId = null) {
+        public function sendDataItem($message, $filePath, $phoneNumberId = null, $sleep= 0): array {
             $phoneNumberId= $phoneNumberId ? $phoneNumberId : $this->phoneNumberId;
             $fileContent = base64_encode(file_get_contents($filePath));
             
@@ -207,20 +208,22 @@
                 'message' => $message,
                 'fileContent' => $fileContent,
                 'fileName' => basename($filePath),
-                'phoneNumberId' => $phoneNumberId
+                'phoneNumberId' => $phoneNumberId,
+                'sleep' => $sleep
             ]);
         }
     
-        public function sendMessage($message, $phoneNumberId = null) {
+        public function sendMessage($message, $phoneNumberId = null,$sleep=0): array {
             $phoneNumberId= $phoneNumberId ? $phoneNumberId : $this->phoneNumberId;
 
             return $this->_callApi('/message', [
                 'message' => $message,
-                'phoneNumberId' => $phoneNumberId
+                'phoneNumberId' => $phoneNumberId,
+                'sleep' => $sleep
             ]);
         }
     
-        public function sendMedia($filePath, $mimeType = null, $message = null, $phoneNumberId = null) {
+        public function sendMedia($filePath, $mimeType = null, $message = null, $phoneNumberId = null,$sleep=0) {
             $phoneNumberId= $phoneNumberId ? $phoneNumberId : $this->phoneNumberId;
 
             $fileContent = base64_encode(file_get_contents($filePath));
@@ -230,7 +233,8 @@
                 'fileName' => basename($filePath),
                 'mimeType' => $mimeType,
                 'message' => $message,
-                'phoneNumberId' => $phoneNumberId
+                'phoneNumberId' => $phoneNumberId,
+                'sleep' => $sleep
             ]);
         }
     }

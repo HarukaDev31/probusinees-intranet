@@ -2301,11 +2301,12 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isFontSubsettingEnabled', true);
         $options->set('isRemoteEnabled', true);
-
+        $sleepSendMedia=3;
         // Procesar cada proveedor
         foreach ($providersHasNoSended as $proveedor) {
             $supplierCode = $proveedor['code_supplier'];
             $products = $proveedor['products'];
+            $sleepSendMedia+=1;
 
             // Procesar plantilla de rotulado
             $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
@@ -2381,8 +2382,8 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
 
         // Enviar información adicional
         $direccionUrl = base_url('assets/downloads/Direccion.jpg');
-        $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China');
-
+        $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China',null,$sleepSendMedia);
+        $sleepSendMedia+=1;
         $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
 ➡ *Datos del proveedor: (Usted lo llena)*
@@ -2391,7 +2392,7 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
 ☑ Nombre del vendedor:
 ☑ Celular del vendedor:
 
-Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡");
+Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡",null,$sleepSendMedia);
 
         // Enviar ZIP al cliente
         if (!file_exists($zipFileName)) {
@@ -3094,7 +3095,6 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             $this->db->update($this->table_contenedor_cotizacion_proveedores, [
                 'estados_proveedor' => 'INSPECTION',
                 'estados' => 'INSPECCIONADO',
-                'estados_proveedor' => 'INSPECTION'
             ]);
             $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado INSPECCIONADO";
             // $socketResponse = $this->sendEvent([
@@ -3124,7 +3124,7 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             $this->phoneNumberId = $telefono;
             //message = cliente code supplieer qtyboxchina??qtybox
             $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
-                '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
+                '📦 Tu carga del llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
 
             $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
 
@@ -3132,10 +3132,10 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             // Inspección: ' . $message);
             //for each images and video send media
             foreach ($imagesUrls as $image) {
-                $this->sendMedia($image->file_path, $image->file_type);
+                $this->sendMedia($image->file_path, $image->file_type,null,null,1);
             }
             foreach ($videosUrls as $video) {
-                $this->sendMedia($video->file_path, $video->file_type);
+                $this->sendMedia($video->file_path, $video->file_type,null,null,1);
             }
             return true;
         }
