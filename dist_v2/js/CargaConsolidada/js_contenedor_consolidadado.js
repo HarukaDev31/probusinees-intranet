@@ -3985,7 +3985,7 @@ async function viewClientesDocumentacion(id) {
           </div>
 
           <div class="space-y-4">
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors" id="cotizacion_file_url">
               <span class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -3996,7 +3996,7 @@ async function viewClientesDocumentacion(id) {
               </span>
             </button>
 
-            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+            <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors" id="cotizacion_final_url">
               <span class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -4008,8 +4008,21 @@ async function viewClientesDocumentacion(id) {
             </button>
           </div>
         </div></div>`);
-
-
+        
+        $("#cotizacion_file_url").off("click").on("click", function () {
+          if (result.cotizacion_file_url) {
+            window.open(result.cotizacion_file_url);
+          } else {
+            Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
+          }
+        });
+        $("#cotizacion_final_url").off("click").on("click", function () {
+          if (result.cotizacion_final_url) {
+            window.open(result.cotizacion_final_url);
+          } else {
+            Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
+          }
+        });
     $(".btn-crear-documentacion-cliente").off("click");
     $(".btn-crear-documentacion-cliente").on("click", function () {
       const providerId = $(this).data("id");
@@ -4026,6 +4039,7 @@ async function viewClientesDocumentacion(id) {
           const file = document.getElementById("swal-input2").files[0];
           if (!name || !file) {
             Swal.showValidationMessage("Por favor, completa todos los campos");
+            return;
           }
           const formData = new FormData();
           formData.append("name", name);
@@ -4040,13 +4054,51 @@ async function viewClientesDocumentacion(id) {
               body: formData,
             }
           );
+
           const result = await response.json();
+
           if (result.status === "success") {
             Swal.fire("¡Documento subido!", result.message, "success");
-            viewClientesDocumentacion(idCotizacion);
-          } else {
-            Swal.fire("Error", result.message, "error");
+          console.log(name,"name");
+            // Agregar dinámicamente el nuevo documento al DOM
+          const newDocument = `
+            ${name}
+            <div class="col-12 col-sm-12 file-info-container">
+              <div class="form-group">
+                <div class="file-upload-box">
+                  <div class="file-info-box">
+                    <div class="file-info">
+                      <div class="file-iconic">
+                        ${getIconByType(file.name.split('.').pop().toLowerCase())}
+                      </div>
+                      <span class="file-name">${file.name}</span>
+                      <span class="file-size">${(file.size / 1024).toFixed(2)} KB</span>
+                   
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Validar que el HTML sea válido antes de agregarlo al DOM
+          try {
+            $("#documentos-clientes-documentacion").append(newDocument);
+
+            // Agregar funcionalidad al botón de borrar
+          
+          } catch (error) {
+            console.error("Error al procesar el HTML del nuevo documento:", error);
+            Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
           }
+        } else {
+          Swal.fire("Error", result.message, "error");
+          // Si ocurre un error en el servidor, eliminar el archivo subido
+          if (fileInput.dataset.fileId) {
+            deleteClienteDocumentacionFile(fileInput.dataset.fileId);
+          }
+
+        }
         },
       });
     });
