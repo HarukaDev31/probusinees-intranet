@@ -2767,6 +2767,7 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                 $this->verifyContainerIsCompleted($idContenedor);
             }
             if (isset($data['qty_box_china']) && isset($data['cbm_total_china'])) {
+                date('Y-m-d', strtotime(str_replace('/', '-', $data['arrive_date_china'])));
                 $estadoProveedorOrder = $this->providerOrderStatus[$estadoProveedor] ?? 0;
                 log_message('error',"llego");
                 $estadoProvedorToUpdate = $this->providerOrderStatus[$this->STATUS_RECIVED] ?? 0;
