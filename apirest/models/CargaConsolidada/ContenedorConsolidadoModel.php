@@ -1305,6 +1305,7 @@ class ContenedorConsolidadoModel extends CI_Model
             // Actualiza el archivo en la tabla
             $this->db->where('id', $idContenedor);
             $this->db->update($this->table, ['lista_embarque_url' => $fileUrl]);
+            $this->verifyContainerIsCompleted($idContenedor);
 
             if ($this->db->affected_rows() > 0) {
                 return [
@@ -1312,7 +1313,6 @@ class ContenedorConsolidadoModel extends CI_Model
                     'message' => "Lista de embarque actualizada"
                 ];
             }
-            $this->verifyContainerIsCompleted($idContenedor);
             if ($this->db->error()['code'] != 0) {
                 return [
                     'status' => "error",
