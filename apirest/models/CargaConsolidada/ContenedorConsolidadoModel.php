@@ -1997,6 +1997,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
             return $objPHPExcel;
         } catch (Exception $e) {
+            log_message('error', __METHOD__ .''. $e->getMessage());
             return ['status' => "error", 'message' => $e->getMessage()];
         }
     }
