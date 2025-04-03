@@ -996,9 +996,9 @@ Search for
             <th>DNI/RUC</th>
             <th>Correo</th>
             <th>Whatsapp</th>
-          <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
+          <!-- <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
             <th>Asesor</th>
-          <?php } ?>
+          <?php } ?> -->
             <th>T. Cliente</th>
           <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
             <th>Volumen</th>
@@ -1047,8 +1047,12 @@ Search for
         <?php } ?>
       </div>
 
+      <div class="name_cliente col-12 p-6" style="border-bottom: #DFDFDF solid 2px;">
+              Nombre Cliente
+      </div>
+
     </div>
-    <div class="documentos-clientes-tabs">
+    <div class="documentos-clientes-tabs pt-6">
               </div>
               <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
 
@@ -2394,23 +2398,25 @@ Search for
   #table-contenedor_wrapper.dt-buttons.btn-group.flex-wrap {
     display: none;
   }.tab-cliente-documentacion{
-    padding: 1em;
+    padding: 0.5em;
     border-radius: 0.5em;
     margin-bottom: 1em;
     width: 100%;
-    background-color: #f9f9f9;
-    color:black;
+    border-width: 2px;
+    border-color: #CDCDCD;
+    color: #7E7E7E;
     text-align: center;
     cursor: pointer;
 
   }
   .tab-cliente-documentacion.active{
-    background-color: #FF500B!important;
-    color: white;
+    background-color: #FFFFFF;
+    color: black;
+    border-width: 0px;
 
   }.documentos-clientes-tabs{
     display:grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: 1em;
     margin:1em 2em;
   }

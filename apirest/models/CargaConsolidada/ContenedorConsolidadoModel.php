@@ -1035,7 +1035,10 @@ class ContenedorConsolidadoModel extends CI_Model
             JSON_OBJECT(
                 'id', almacen_docs.id,
                 'file_url', almacen_docs.file_path,
-                'folder_name', almacen_docs.file_name
+                'folder_name', almacen_docs.file_name,
+                'file_name', almacen_docs.file_name,
+                'id_proveedor', almacen_docs.id_proveedor,
+                'file_ext',almacen_docs.file_ext
             )
         )
         FROM " . $this->table_contenedor_almacen_documentacion . " almacen_docs
@@ -1054,7 +1057,20 @@ class ContenedorConsolidadoModel extends CI_Model
         )
         FROM " . $this->table_contenedor_cotizacion_proveedores . " prov
         WHERE prov.id_cotizacion = main.id
-    ) as providers
+    ) as providers,
+     (
+        SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                 'id', inspection_docs.id,
+                'file_url', inspection_docs.file_path,
+                'file_name', inspection_docs.file_name,
+                'id_proveedor', inspection_docs.id_proveedor,
+                'file_ext',inspection_docs.file_type
+            )
+        )
+        FROM " . $this->table_contenedor_almacen_inspection . " inspection_docs
+        WHERE inspection_docs.id_cotizacion = main.id
+    ) as files_almacen_inspection
 ")
             ->from($this->table_contenedor_cotizacion . " as main")
             ->where('main.id', $id)

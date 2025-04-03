@@ -3891,7 +3891,10 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
     });
   }
 }
-async function viewClientesDocumentacion(id) {
+async function viewClientesDocumentacion(id,nombrecliente=null) {
+  if(nombrecliente){
+    $(".name_cliente").text(nombrecliente);
+  }
   $(".aditional-file").remove();
   idCotizacion = id;
   clientesContainer.hide();
@@ -3917,6 +3920,39 @@ async function viewClientesDocumentacion(id) {
 
   selectedTabDocumentacionId = !selectedTabDocumentacionId ? providers[0].id : selectedTabDocumentacionId;
 
+  const filesAlmacenDocumentacion = JSON.parse(result.files_almacen_documentacion || "[]");
+  const filesAlmacenInspection= JSON.parse(result.files_almacen_inspection || "[]");
+  const filteredFiles = filesAlmacenDocumentacion.filter(
+    (file) => file.id_proveedor === selectedTabDocumentacionId
+  );
+  const filteredFilesInspection = filesAlmacenInspection.filter(
+    (file) => file.id_proveedor === selectedTabDocumentacionId
+  );
+
+  // Mostrar los archivos en la interfaz
+  const documentosContainer = $("#documentos-china");
+  documentosContainer.empty();
+
+  filteredFiles.forEach((file) => {
+    documentosContainer.append(`
+      <div class="file-item">
+        <div class="file-info">
+          <div class="file-iconic">
+            ${getIconByType(file.file_url.split('.').pop().toLowerCase())}
+          </div>
+          <span class="file-name">${file.folder_name}</span>
+          <div class="file-actions">
+            <a href="${file.file_url}" target="_blank" class="btn btn-primary">Ver</a>
+            <button class="btn btn-danger" onclick="deleteClienteDocumentacionFile(${file.id})">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    `);
+  });
+
+
   $(".tab-cliente-documentacion").on("click", function () {
     const id = $(this).data("id");
     const provider = providers.find((p) => p.id == id);
@@ -3928,12 +3964,20 @@ async function viewClientesDocumentacion(id) {
 
     $(".documentos-clientes-content").empty();
 
+    // Filtrar y mostrar archivos para el proveedor seleccionado
+    const filteredFiles = filesAlmacenDocumentacion.filter(
+      (file) => file.id_proveedor === selectedTabDocumentacionId
+    );
+    const filteredFilesInspection = filesAlmacenInspection.filter(
+      (file) => file.id_proveedor === selectedTabDocumentacionId
+    );
+
     let facturaDiv = "";
     let excelDiv = "";
     let facturaComercial = provider.factura_comercial;
     let excelConfirmacion = provider.excel_confirmacion;
 
-    if (currentPrivilege == "Coordinacion"){
+    if (currentPrivilege != "Documentacion"){
     $(".documentos-clientes-content").append(`<div class="flex gap-8">
         <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
           <div class="flex items-center gap-2 mb-6
@@ -4112,18 +4156,100 @@ async function viewClientesDocumentacion(id) {
   }else{
     // Vista para otros usuarios (como en la imagen)
     $(".documentos-clientes-content").append(`
-      <div class="flex gap-8">
-        <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
-          <h2 class="text-lg">Documentación Perú</h2>
-          <p>Volumen Documento: ${provider.volumen_doc}</p>
-          <p>Valor Documento: $${provider.valor_doc}</p>
-          <h3 class="text-md mt-4">Archivos:</h3>
-          <ul>
-            <li></li>
-          </ul>
+      <div class="flex col-4 h-25">
+        <div class="bg-white rounded-lg shadow-md w-100">
+          <div class="p-6" style="border-bottom:solid 2px #DFDFDF;">
+            <h2 class="text-md d-flex gap-4">Documentación Perú 
+              <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" alt="Peru" style="height:20px; margin-top:-5px; border-radius:5px">
+            </h2>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-column gap-4 pb-4">
+              <p>Volumen Documento: &nbsp ${provider.volumen_doc}</p>
+              <p>Valor Documento: &nbsp  $${provider.valor_doc}</p>
+            </div>
+            <div>
+              <p>Factura Comercial</p>
+              <div class="flex align-items-center py-2 gap-5">
+                ${facturaComercial
+                  ? `
+                    <div class="file-iconic">${getIconByType(facturaComercial.split('.').pop().toLowerCase())}</div>
+                    <div>
+                      <span class="file-name">${decodeURIComponent(facturaComercial.split('_').pop())}</span>
+                    </div>
+                  `
+                  : `
+                    <div class="py-2">No hay archivo disponible</div>
+                  `}
+              </div>
+
+            </div>
+            <div>
+              <p>Excel Confirmacion</p>
+              <div class="flex align-items-center py-2 gap-5">
+                ${excelConfirmacion
+                  ? `
+                    <div class="file-iconic">${getIconByType(excelConfirmacion.split('.').pop().toLowerCase())}</div>
+                    <div>
+                      <span class="file-name">${decodeURIComponent(excelConfirmacion.split('_').pop())}</span>
+                    </div>
+                  `
+                  : `
+                    <div class="py-2">No hay archivo disponible</div>
+                  `}
+              </div>
+            </div>
+            <div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex col-4 h-25">
+        <div class="bg-white rounded-lg shadow-md w-100">
+          <div class="p-6" style="border-bottom:solid 2px #DFDFDF;">
+            <h2 class="text-md d-flex gap-4">Documentación China 
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" style="height:20px; margin-top:-5px; border-radius:5px">
+            </h2>
+          </div>
+          <div class="p-6">
+            <div class="col-12 col-sm-12" id="multiple-file-upload">
+                <div class="form-group">
+                  
+                  <div class="file-lista hidden" id="file-lista-documentacion-documentacion">
+                  </div>
+                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                </div>
+            </div
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="flex col-4 h-25">
+        <div class="bg-white rounded-lg shadow-md w-100">
+          <div class="p-6" style="border-bottom:solid 2px #DFDFDF;">
+            <h2 class="text-md d-flex gap-4">Inspección
+            </h2>
+          </div>
+          <div class="p-6">
+             <div class="col-12 col-sm-12" id="multiple-file-upload">
+                <div class="form-group">
+                  
+                  <div class="file-lista hidden" id="file-lista-documentacion-inspection">
+                  </div>
+                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                </div>
+            </div
+          </div>
         </div>
       </div>
     `);
+    filteredFiles.forEach((file)=>{
+      addFileToList(file,null,'file-lista-documentacion-documentacion')
+    })
+    filteredFilesInspection.forEach((file)=>{
+      addFileToList(file,null,'file-lista-documentacion-inspection')
+    })
   }
 
     
@@ -4328,57 +4454,61 @@ async function viewClientesDocumentacion(id) {
     //clean .aditional-file
     $(".aditional-file").remove();
     // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
-    const files = JSON.parse(result.files ?? "[]");
-    const filesFilter = files.filter((file) => file.id_proveedor == selectedTabDocumentacionId);
-    //for each file add a col with a link to download and delete icon  in collapse-documentacion
-    filesFilter.forEach((file) => {
-      $("#form-documentacion").append(`
+    // const files = JSON.parse(result.files_almacen_documentacion ?? "[]");
+    // const filesFilter = files.filter((file) => file.id_proveedor == selectedTabDocumentacionId);
+    
+    // //for each file add a col with a link to download and delete icon  in collapse-documentacion
+    // filesFilter.forEach((file) => {
+    //   if(!file.file_url){
+    //     return; // Exit the current function instead of using 'continue'
+    //   }
+    //   $("#form-documentacion").append(`
            
-            ${file.folder_name}
-            <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
-                <div class="form-group">
-                    <div class="file-upload-box">
-                        <div class="file-info-box">
-                            <div class="file-info">
-                                <div class="file-iconic">
-                                    <a href="javascript:void(0)" class="file-icon-link" id="file-icon-link-${file.id}">${getIconByType((file.file_url).split('.').pop().toLowerCase())}</a>
-                                </div>
-                                <span class="file-name">Excel Confirmación</span>
-                                <button class="remove-file-button" onclick="deleteClienteDocumentacionFile(${file.id})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>`
-      );
-      const fileIconLink = $(`#file-icon-link-${file.id}`)[0];
-      if (fileIconLink) {
-        const fileExtension = (file.file_url).split('.').pop().toLowerCase();
-        if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
-          // Agregar estilo de cursor: pointer
-          fileIconLink.style.cursor = 'pointer';
+    //         ${file.folder_name}
+    //         <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
+    //             <div class="form-group">
+    //                 <div class="file-upload-box">
+    //                     <div class="file-info-box">
+    //                         <div class="file-info">
+    //                             <div class="file-iconic">
+    //                                 <a href="javascript:void(0)" class="file-icon-link" id="file-icon-link-${file.id}">${getIconByType((file.file_url).split('.').pop().toLowerCase())}</a>
+    //                             </div>
+    //                             <span class="file-name">Excel Confirmación</span>
+    //                             <button class="remove-file-button" onclick="deleteClienteDocumentacionFile(${file.id})">
+    //                                 <i class="fas fa-trash"></i>
+    //                             </button>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>`
+    //   );
+    //   const fileIconLink = $(`#file-icon-link-${file.id}`)[0];
+    //   if (fileIconLink) {
+    //     const fileExtension = (file.file_url).split('.').pop().toLowerCase();
+    //     if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+    //       // Agregar estilo de cursor: pointer
+    //       fileIconLink.style.cursor = 'pointer';
 
-          // Agregar evento de clic para mostrar la vista previa
-          fileIconLink.addEventListener('click', (event) => {
-            event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+    //       // Agregar evento de clic para mostrar la vista previa
+    //       fileIconLink.addEventListener('click', (event) => {
+    //         event.preventDefault(); // Evitar comportamiento predeterminado del enlace
 
-            // Mostrar la imagen en el modal
-            const modal = document.getElementById('image-modal');
-            const modalImage = modal.querySelector('#image-preview');
-            modalImage.src = (file.file_url);
-            const bootstrapModal = new bootstrap.Modal(modal);
-            bootstrapModal.show();
-          });
-        } else {
-          // Si no es una imagen, redirigir al archivo
-          fileIconLink.href = (file.file_url);
-          fileIconLink.target = '_blank';
-        }
-      }
+    //         // Mostrar la imagen en el modal
+    //         const modal = document.getElementById('image-modal');
+    //         const modalImage = modal.querySelector('#image-preview');
+    //         modalImage.src = (file.file_url);
+    //         const bootstrapModal = new bootstrap.Modal(modal);
+    //         bootstrapModal.show();
+    //       });
+    //     } else {
+    //       // Si no es una imagen, redirigir al archivo
+    //       fileIconLink.href = (file.file_url);
+    //       fileIconLink.target = '_blank';
+    //     }
+    //   }
 
-    });
+    // });
   });
 
   $(`.tab-cliente-documentacion[data-id="${selectedTabDocumentacionId}"]`).click();  // $("#txt-Vol_Doc").val(parseFloat(result[0].volumen_doc));

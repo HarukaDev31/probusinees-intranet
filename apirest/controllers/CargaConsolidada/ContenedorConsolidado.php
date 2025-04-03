@@ -511,16 +511,17 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->correo;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;
-					// $subdata[] = $row->volumen;
-					// $subdata[] = $row->monto;
-					// $subdata[] = $row->tarifa;
+					if($this->user->No_Grupo != "Documentacion"){
+						$subdata[] = $row->volumen;
+						$subdata[] = $row->monto;
+						$subdata[] = $row->tarifa;
+					}
+					
 
-					    $btnView = '<div  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
-					<i class="fas fa-eye" style="cursor:pointer;"></i>
-					</div>';
-					    $subdata[]           = $btnView;
-					$selectEstadoCliente = "";
+					    
+					
 					if ($this->user->No_Grupo == "Coordinación") {
+						$selectEstadoCliente = "";
 						$selectEstadoCliente = '<select class="form-control
 						' . ($row->estado_cliente == "RESERVADO" ? "bg-warning" : "") .
 							($row->estado_cliente == "NO RESERVADO" ? "bg-secondary" : "") .
@@ -534,17 +535,24 @@ class ContenedorConsolidado extends CI_Controller
 						<option value="C FINAL" ' . ($row->estado_cliente == "C FINAL" ? "selected" : "") . '>C FINAL</option>
 						<option value="FACTURADO" ' . ($row->estado_cliente == "FACTURADO" ? "selected" : "") . '>FACTURADO</option>
 					</select>';
-					}
 					$subdata[] = $selectEstadoCliente;
+					}
 					if ($this->user->No_Grupo == "Coordinación") {
 						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
-				<i class="fas fa-eye" style="cursor:pointer;"></i>
-				</div>' .
-							'<div class="d-flex" onclick="deleteCliente(' . $row->id_cotizacion . ')">
-					<i class="fas fa-trash text-danger" style="cursor:pointer;" ></i>
-					</div></div>';
+						<i class="fas fa-eye" style="cursor:pointer;"></i>
+						</div>' .
+						'<div class="d-flex" onclick="deleteCliente(' . $row->id_cotizacion . ')">
+							<i class="fas fa-trash text-danger" style="cursor:pointer;" ></i>
+							</div></div>';
+						$subdata[] = $divAcciones;
+					}else{
+						$btnView = '<div onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes($row->nombre) . '\')">
+
+					<i class="fas fa-eye" style="cursor:pointer;"></i>
+					</div>';
+					    $subdata[] = $btnView;
 					}
-					$subdata[] = $divAcciones;
+					
 					$data[]    = $subdata;
 					$index++;
 				} else {
@@ -1370,4 +1378,19 @@ class ContenedorConsolidado extends CI_Controller
 		$dateObject = DateTime::createFromFormat('d/m/Y', $date);
 		return $dateObject ? $dateObject->format('Y-m-d') : null; // Devuelve null si la fecha no es válida
 	}
+
+	public function getChinaDocuments()
+{
+    $idCotizacion = $this->input->get('id_cotizacion'); // Obtén el ID de la cotización desde la solicitud AJAX
+    $this->load->model('CargaConsolidada/ContenedorConsolidadoModel'); // Carga el modelo
+
+    $data = $this->ContenedorConsolidadoModel->showClientesDocumentacion($idCotizacion); // Llama al método del modelo
+
+    if ($data) {
+        echo json_encode(['status' => 'success', 'data' => $data]); // Devuelve los datos en formato JSON
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron documentos para la cotización especificada.']);
+    }
+}
+
 }
