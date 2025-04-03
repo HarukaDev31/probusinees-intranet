@@ -2395,6 +2395,11 @@ const openStepFunction = async (step, id) => {
               orderable: false,
             },
           ],
+          pageLength: 100, // Mostrar 100 elementos por página
+          lengthMenu: [
+            [100, 1000, -1],
+            [100, 1000, "Todos"],
+          ],
           order: [[1, "asc"]],
           ajax: {
             url: url,
@@ -2660,6 +2665,11 @@ const openStepFunction = async (step, id) => {
                         orderable: false,
                       },
                     ],
+                    pageLength: 100, // Mostrar 100 elementos por página
+                    lengthMenu: [
+                      [100, 1000, -1],
+                      [100, 1000, "Todos"],
+                    ],
                     ajax: {
                       url: url,
                       type: "POST",
@@ -2739,6 +2749,11 @@ const openStepFunction = async (step, id) => {
               visible: false,
             },
           ],
+          pageLength: 100, // Mostrar 100 elementos por página
+          lengthMenu: [
+            [100, 1000, -1],
+            [100, 1000, "Todos"],
+          ],
           ajax: {
             url: url,
             type: "POST",
@@ -2769,9 +2784,10 @@ const openStepFunction = async (step, id) => {
               orderable: false,
             },
           ],
+          pageLength: 100, // Mostrar 100 elementos por página
           lengthMenu: [
-            [10, 100, 1000, -1],
-            [10, 100, 1000, "Todos"],
+            [100, 1000, -1],
+            [100, 1000, "Todos"],
           ],
         });
       }
@@ -3003,6 +3019,11 @@ const openStepFunction = async (step, id) => {
                         orderable: false,
                       },
                     ],
+                    pageLength: 100, // Mostrar 100 elementos por página
+                    lengthMenu: [
+                      [100, 1000, -1],
+                      [100, 1000, "Todos"],
+                    ],
                     paging: true,
                     lengthChange: true,
                     searching: true,
@@ -3080,6 +3101,11 @@ const openStepFunction = async (step, id) => {
             targets: "sorting_asc",
             orderable: false,
           },
+        ],
+        pageLength: 100, // Mostrar 100 elementos por página
+        lengthMenu: [
+          [100, 1000, -1],
+          [100, 1000, "Todos"],
         ],
         oLanguage: {
           sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
@@ -3310,6 +3336,11 @@ async function viewFacturaGuia() {
           orderable: false,
         },
       ],
+      pageLength: 100, // Mostrar 100 elementos por página
+      lengthMenu: [
+        [100, 1000, -1],
+        [100, 1000, "Todos"],
+      ],
       ajax: {
         url: url,
         type: "POST",
@@ -3407,6 +3438,11 @@ async function viewCotizacionFinal() {
           targets: "",
           orderable: false,
         },
+      ],
+      pageLength: 100, // Mostrar 100 elementos por página
+      lengthMenu: [
+        [100, 1000, -1],
+        [100, 1000, "Todos"],
       ],
       ajax: {
         url: url,
@@ -5173,9 +5209,10 @@ $(document).ready(async function () {
           orderable: false,
         },
       ],
+      pageLength: 100, // Mostrar 100 elementos por página
       lengthMenu: [
-        [10, 100, 1000, -1],
-        [10, 100, 1000, "Todos"],
+        [100, 1000, -1],
+        [100, 1000, "Todos"],
       ],
     });
   } else {
@@ -5277,9 +5314,10 @@ $(document).ready(async function () {
           orderable: false,
         },
       ],
+      pageLength: 100, // Mostrar 100 elementos por página
       lengthMenu: [
-        [10, 100, 1000, -1],
-        [10, 100, 1000, "Todos"],
+        [100, 1000, -1],
+        [100, 1000, "Todos"],
       ],
     });
     configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
