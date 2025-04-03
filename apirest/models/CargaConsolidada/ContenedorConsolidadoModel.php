@@ -2087,7 +2087,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED", "estados" => "EMBARCADO"]);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED"]);
             $this->db->select('SUM(ifnull(cbm_total_china,0)) as volumen_china')
                 ->from($this->table_contenedor_cotizacion_proveedores)
                 ->where('id_cotizacion', $idCotizacion)
