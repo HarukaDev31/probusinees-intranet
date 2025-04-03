@@ -21,7 +21,7 @@
         <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion") {  ?>
 
           <!-- Buscador de la tabla -->
-          <div class="col-12 col-xl-2">
+          <div class="col-12 col-xl-2 filter-contenedor">
             <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
               <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
@@ -30,7 +30,7 @@ Search for
                           <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
             </div>
           </div>
-          <div class="col-12 col-xl-1 dropdown">
+          <div class="col-12 col-xl-1 dropdown filter-contenedor">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>
@@ -50,7 +50,7 @@ Search for
             </div>
           </div>
 
-          <div class="col-12 col-xl-1 dropdown">
+          <div class="col-12 col-xl-1 dropdown filter-contenedor">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -99,7 +99,7 @@ Search for
 
           </div>
 
-          <div class="col-12 col-xl-1">
+          <div class="col-12 col-xl-1 filter-contenedor">
             <button type="button" id="btn-crear" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
           </div>
         <?php } else { ?>
@@ -107,7 +107,7 @@ Search for
           <div class="col-12 col-xl-1"></div>
 
           <!-- Buscador de la tabla -->
-          <div class="col-12 col-xl-1">
+          <div class="col-12 col-xl-1 filter-contenedor">
             <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
               <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
@@ -121,7 +121,7 @@ Search for
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-          <div class="col-12 col-xl-1 dropdown">
+          <div class="col-12 col-xl-1 dropdown filter-contenedor">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>
@@ -262,6 +262,27 @@ Filters
             </tr>
           </thead>
         </table>
+        <table id="table-contenedor-completados" style="display:none;" class="table table-hover">
+          <thead class="thead-default">
+            <tr>
+              <!--th mes,pais,empresa,T.ctn,canal,desaduanaje,ajuste,multa,fob,flete,c.destino,observaciones,ver-->
+              <th>Mes</th>
+              <th>País</th>
+              <th>Empresa</th>
+              <th>T. Ctn</th>
+              <th>Canal</th>
+              <th>Desaduanaje</th>
+              <th>Ajuste</th>
+              <th>Multa</th>
+              <th>FOB</th>
+              <th>Flete</th>
+              <th>C. Destino</th>
+              <th>Observaciones</th>
+              <th>Ver</th>
+              
+            </tr>
+          </thead>
+        </table>
       </div>
     </div>
   </section>
@@ -360,12 +381,12 @@ Filters
   </section>
   <section class="m-5"
     id="documentacion-documentacion-container">
-    <div class="row my-2 p-8">
+    <div class="row my-2 ">
       <button type="button" id="btn-back-documentacion-documentacion" class="py-1 px-2 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
     </div>
-    <div class="row bg-white rounded-xl p-8 ">
-      <div class="col-10">
-        <span class="mb-6 text-gray-800 border-b pb-4">
+    <div class="row bg-white rounded-xl p-8 mb-5">
+      <div class="col-10 mb-6 ">
+        <span class="text-gray-800 border-b text-lg">
           Documentación
           <i class="bi bi-folder me-2"></i>
 
@@ -375,16 +396,16 @@ Filters
         <button type="button" id="btn-crear-documentacion-documentacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i></button>
       </div>
 
-    </div>
-
-    <!--button with plus icon to add new document-->
-
-    <!-- Document Filter -->
 
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="documentacion-documentacion">
-      <!-- Document Cards -->
-      <!-- <div class="doc-card opacity-0 bg-blue-50 p-4 rounded-lg transition-all duration-300" data-type="envio">
+      <!--button with plus icon to add new document-->
+
+      <!-- Document Filter -->
+
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 " id="documentacion-documentacion">
+        <!-- Document Cards -->
+        <!-- <div class="doc-card opacity-0 bg-blue-50 p-4 rounded-lg transition-all duration-300" data-type="envio">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <i class="bi bi-file-text text-blue-500 text-xl"></i>
@@ -473,6 +494,7 @@ Filters
           </button>
         </div>
       </div> -->
+      </div>
     </div>
   </section>
   <section class=""
@@ -480,7 +502,7 @@ Filters
     <div class="row p-6">
       <button type="button" id="btn-back-documentacion-aduana" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
     </div>
-    <div class="max-w-7xl  p-6 bg-gray-50">
+    <div class="mx-6 p-6 bg-white">
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -497,10 +519,10 @@ Filters
       </div>
 
       <!-- Tabs -->
-     
+
 
       <!-- Form -->
-      <div class="bg-white rounded-xl shadow-sm p-8">
+      <div class=" rounded-xl shadow-sm p-8">
         <form id="customsForm" class="space-y-6">
           <!-- General Information Tab -->
           <div class="tab-content active" id="general">
@@ -509,12 +531,12 @@ Filters
                 <label class="block text-gray-700 mb-2">Naviera</label>
                 <div class="relative">
                   <select
-                  id="select-naviera" 
-                  name="naviera" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                   
+                    id="select-naviera"
+                    name="naviera" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent input-aduana">
+
                   </select>
-                  <div class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full" >
-                  <i class="fa fa-plus text-gray-500" id="navieraAdd"></i>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full">
+                    <i class="fa fa-plus text-gray-500" id="navieraAdd"></i>
 
                   </div>
 
@@ -524,18 +546,18 @@ Filters
                 <label class="block text-gray-700 mb-2">Multa</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="multa" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <input name="multa" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border input-aduana border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
               </div>
               <!--Div ocupes 3 rows-->
               <div class="form-group row-span-3">
                 <label class="block text-gray-700 mb-2">OBSERVACIONES</label>
-                <textarea name="observaciones" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
+                <textarea name="observaciones" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 input-aduana focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
               </div>
-            
+
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Toneladas contenedor</label>
-                <select name="tipo_contenedor" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select name="tipo_contenedor" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 input-aduana focus:ring-blue-500 focus:border-transparent">
                   <option value="">Seleccione tipo</option>
                   <option value="LCL">LCL</option>
                   <option value="20 GP">20 GP</option>
@@ -546,78 +568,78 @@ Filters
               </div>
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Fecha levante</label>
-                <input name="fecha_levante" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <input name="fecha_levante" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 input-aduana focus:ring-blue-500 focus:border-transparent">
               </div>
-              
+
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Fecha zarpe</label>
-                <input name="fecha_zarpe" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <input name="fecha_zarpe" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 input-aduana focus:ring-blue-500 focus:border-transparent">
               </div>
-            
+
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Número Dua</label>
-                <input name="numero_dua" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <input name="numero_dua" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 input-aduana focus:ring-blue-500 focus:border-transparent">
               </div>
-             
+
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Fecha arribo</label>
-                <input name="fecha_arribo" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <input name="fecha_arribo" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 input-aduana focus:ring-blue-500 focus:border-transparent">
               </div>
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Valor FOB</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="valor_fob" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <input name="valor_fob" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg input-aduana focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
               </div>
               <div class="form-group row-span-3">
-              <div class="col-12 col-sm-12" id="multiple-file-upload-aduana">
-                <div class="form-group">
-                  <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
-                    <input type="file" id="file-input-aduana" class="file-input" multiple accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm" />
-                    <label for="file-inpute" class="file-label d-flex">
-                      <i class="fas fa-upload"></i>
-                      <div class="file-group-text">
-                        <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Selecciona o arrastra tu archivo aquí
+                <div class="col-12 col-sm-12" id="multiple-file-upload-aduana">
+                  <div class="form-group">
+                    <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
+                      <input type="file" id="file-input-aduana" class="file-input" multiple accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm" />
+                      <label for="file-inpute" class="file-label d-flex">
+                        <i class="fas fa-upload"></i>
+                        <div class="file-group-text">
+                          <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                              Selecciona o arrastra tu archivo aquí
+                            <?php } else { ?>
+                              Select or drag your file here
+                            <?php } ?></span>
+                          <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                              Formatos
+                            <?php } else { ?>
+                              Formats
+                              <?php } ?>: .xlsx</span>
+                        </div>
+                        <button class="upload-button upload-button-aduana" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Subir archivo
                           <?php } else { ?>
-                            Select or drag your file here
-                          <?php } ?></span>
-                        <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Formatos
-                          <?php } else { ?>
-                            Formats
-                            <?php } ?>: .xlsx</span>
-                      </div>
-                      <button class="upload-button upload-button-aduana" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                          Subir archivo
-                        <?php } else { ?>
-                          Upload Files
-                        <?php } ?></button>
-                    </label>
+                            Upload Files
+                          <?php } ?></button>
+                      </label>
+                    </div>
+                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                    <div class="file-lista hidden" id="file-lista-aduana">
+                    </div>
+                    <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                   </div>
-                  <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
-                  <div class="file-lista hidden" id="file-lista-aduana">
-                  </div>
-                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                 </div>
-              </div>
               </div>
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Fecha declaración</label>
-                <input name="fecha_declaracion" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <input name="fecha_declaracion" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg input-aduana focus:ring-2 focus:ring-blue-500 focus:border-transparent">
               </div>
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Valor flete</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="valor_flete" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <input name="valor_flete" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 input-aduana rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
               </div>
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Canal de Control</label>
                 <div class="relative">
-                  <select name="canal_control" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="controlChannel">
+                  <select name="canal_control" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 input-aduana focus:ring-blue-500 focus:border-transparent" id="controlChannel">
                     <option value="">Seleccione canal</option>
                     <option value="Verde">Verde</option>
                     <option value="Naranja">Naranja</option>
@@ -629,7 +651,7 @@ Filters
                 <label class="block text-gray-700 mb-2">Costo destino</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="costo_destino" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <input name="costo_destino" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 input-aduana rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
               </div>
 
@@ -637,47 +659,19 @@ Filters
                 <label class="block text-gray-700 mb-2">Ajuste de valor</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="ajuste_valor" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <input name="ajuste_valor" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200  input-aduana rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
               </div>
 
-           
-          </div>
 
-          <!-- Dates Tab -->
-          <div class="tab-content " id="dates">
-            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
-              
-
-              
-
-              
-
-              
             </div>
-          </div>
 
-          <!-- Values Tab -->
-          <div class="tab-content " id="values">
-            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
-              
-              </div>
-
-              
-
-              
-
-              
-
-              
-            </div>
-          </div>
 
           <!-- Buttons -->
           <div class="flex pt-6 border-t mt-6 row">
             <div class="col-9"></div>
             <div class="col-3 d-flex justify-content-end gap-2">
-              <button type="submit" class="btn btn-primary btn-block btn-reporte">
+              <button type="submit" class="btn btn-primary btn-block btn-reporte btn-guardar-aduana">
                 <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                   Guardar
                 <?php } else { ?>
@@ -809,7 +803,7 @@ Filters
             <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
           </div>
           <div class="col-xl-6 col-0"></div>
-          <div class="col-12 col-xl-2">
+          <div class="col-12 col-xl-2 filter-contenedor ">
             <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
               <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
@@ -819,7 +813,7 @@ Search for
             </div>
           </div>
           <!-- Contenedor Principal de Cargar-->
-          <div class="col-12 col-xl-1 dropdown">
+          <div class="col-12 col-xl-1 dropdown filter-contenedor">
             <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Cargar
@@ -837,7 +831,7 @@ Search for
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-          <div class="col-12 col-xl-1 dropdown">
+          <div class="col-12 col-xl-1 dropdown filter-contenedor">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>

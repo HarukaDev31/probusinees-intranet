@@ -10,7 +10,7 @@ require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class ContenedorConsolidadoModel extends CI_Model
 {
     use FileTrait, WebSocketTrait, WhatsappTrait, NotificationTrait, MailTrait;
-    var $table_cliente = 'entidad';
+    private $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
     private $table_pais = "pais";
@@ -67,7 +67,8 @@ class ContenedorConsolidadoModel extends CI_Model
     private $STATUS_EMBARCADO = "EMBARCADO";
     private $STATUS_NO_EMBARCADO = "NO EMBARCADO";
     private $table_contenedor_cotizacion_proveedores_documentacion = "contenedor_consolidado_proveedores_documentacion";
-    var $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
+    private $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
+    private $table_contenedor_aduana_files="carga_consolidada_aduana_files";
     public function __construct()
     {
         try {
@@ -86,6 +87,26 @@ class ContenedorConsolidadoModel extends CI_Model
             if ($this->input->post('Filtro_Estado') != "0") {
                 $this->db->where('estado', $this->input->post('Filtro_Estado'));
             }
+            $this->db->order_by('carga', 'desc');
+            $query = $this->db->get();
+            return $query->result();
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            return false;
+        }
+    }
+    public function indexCompletados()
+    {
+        try {
+
+            $this->db->select("*,
+            (select count(id) from carga_consolidada_aduana_files where id_contenedor = carga_consolidada_contenedor.id) as file_count,
+            ")
+                ->from($this->table)
+                ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
+         
+                $this->db->where('estado_documentacion', "COMPLETADO");
+            
             $this->db->order_by('carga', 'desc');
             $query = $this->db->get();
             return $query->result();
@@ -2665,6 +2686,14 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
         }
         return false;
     }
+    public function deleteFileAduana($idAduana){
+        $this->db->where("id", $idAduana);
+        $this->db->delete($this->table_contenedor_aduana_files);
+        if ($this->db->affected_rows() > 0) {
+            return "success";
+        }
+        return false;
+    }
     public function updateProveedorData($data, $idProveedor, $idCotizacion)
     {
         try {
@@ -5235,19 +5264,49 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
     public function viewFormularioAduana($idContenedor)
     {
         //get all data from carga_consolidada_contenedor
-        $this->db->select('*')
+        $this->db->select('*,
+        (select json_arrayagg(json_object(
+            "id", id,
+            "file_name", file_name,
+            "file_url", file_path,
+            "file_ext", file_type,
+            "file_size", file_size
+        )) as files from carga_consolidada_aduana_files where id_contenedor ='. $idContenedor.') as files')
             ->from($this->table)
             ->where('id', $idContenedor);
         $query = $this->db->get();
         return $query->result();
     }
-    public function updateFormularioAduana($idContenedor, $data)
+    public function updateFormularioAduana($idContenedor, $data,$files)
     {
         try {
             //remove idContainer from data
             unset($data['idContainer']);
+            $this->setAllowedExtensionsImagesOfficeFiles();
+            $this->maxFileSize = 1000000;
             $this->db->where('id', $idContenedor);
             $this->db->update($this->table, $data);
+            //foreach file 
+            foreach ($files['files']['tmp_name'] as $key => $tmp_name) {
+                $fileUrl = $this->uploadSingleFile(
+                    [
+                        "name" => $files['files']['name'][$key],
+                        "type" => $files['files']['type'][$key],
+                        "tmp_name" => $files['files']['tmp_name'][$key],
+                        "error" => $files['files']['error'][$key],
+                        "size" => $files['files']['size'][$key]
+                    ],
+                    'assets/cargaconsolidada/formularioAduana'
+                );
+                $data = [
+                    'id_contenedor' => $idContenedor,
+                    'file_name' => $files['files']['name'][$key],
+                    'file_path' => $fileUrl,
+                    'file_type' => $files['files']['type'][$key],
+                    'file_size' => $files['files']['size'][$key],
+                ];
+                $this->db->insert($this->table_contenedor_aduana_files, $data);
+            }
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error en updateFormularioAduana: ' . $this->db->error()['message']);
                 return false;
@@ -5362,6 +5421,27 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
         } catch (Exception $e) {
             log_message('error', 'Error en deleteFileInspection: ' . $e->getMessage());
             return false;
+        }
+    }
+    public function getObservaciones($idContenedor){
+        try {
+            $this->db->select('observaciones,
+            (select json_arrayagg(json_object(
+                "id", id,
+                "file_name", file_name,
+                "file_url", file_path,
+                "file_ext", file_type,
+                "file_size", file_size
+            )) as files from carga_consolidada_aduana_files where id_contenedor ='. $idContenedor.') as files
+            ');
+            $this->db->from($this->table);
+            $this->db->where('id', $idContenedor);
+            $query = $this->db->get();
+            //return all data from table
+            return ['status' => true, 'data' => $query->row()];
+                
+        }catch (Exception $e) {
+            log_message('error', ''. $e->getMessage());
         }
     }
 }

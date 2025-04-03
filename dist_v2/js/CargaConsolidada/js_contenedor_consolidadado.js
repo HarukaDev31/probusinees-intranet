@@ -22,6 +22,7 @@ var originalNoteInpectionText = "";
 var shouldSaveDocumentacion = false;
 var originalVolumenDocumento = "";
 var originalValorDocumento = "";
+var sectionsDisabled=false;
 var meses = [
   {
     id: "ENERO",
@@ -439,7 +440,11 @@ function deleteFile(fileId, cardElement, deleteFileList) {
   console.log(deleteFileList, "deleteFileList");
   if (deleteFileList == "file-lista-documentacion") {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteFileDocumentation/" + fileId;
-  } else {
+  } else if (deleteFileList == "file-lista-aduana") {
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteFileAduana/" + fileId;
+  }
+
+  else {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteFileInspection/" + fileId;
   }
   $.ajax({
@@ -458,7 +463,7 @@ function deleteFile(fileId, cardElement, deleteFileList) {
     },
   });
 }
-function addFileToList(file, fileList = null, id = null) {
+function addFileToList(file, fileList = null, id = null,deleteHidden = false) {
   if (fileList == null) {
     fileList = $(".file-lista");
   }
@@ -485,7 +490,7 @@ function addFileToList(file, fileList = null, id = null) {
                 <button class="btn-sm download-btn" data-url="${file.file_url}">
                     <i class="fas fa-download"></i> 
                 </button>
-                ${!isCotizador
+                ${!isCotizador && !deleteHidden
       ? `<button class="btn-sm delete-btn" data-id="${file.id}">
                         <i class="far fa-trash-alt"></i>
                       </button>`
@@ -1405,7 +1410,8 @@ async function view(id) {
   $("#btn-actualizar").show();
   currentCarga = result.id;
 }
-async function viewSteps(id, carga) {
+async function viewSteps(id, carga,disabled=false) {
+  sectionsDisabled=disabled;
   currentCargaNumber = carga;
   url = base_url + "CargaConsolidada/ContenedorConsolidado/steps/" + id;
   idContenedor = id;
@@ -1590,7 +1596,9 @@ async function showDocumentacionDocumentacionContainer(id) {
                                 </svg>
 
                                 </button>
-                                <div  onclick="deleteDocumentacionFileDocumentacion(${file.id_file})">
+                                <div  
+                                style="cursor: pointer;${sectionsDisabled ? "display: none;" : ""}"
+                                onclick="deleteDocumentacionFileDocumentacion(${file.id_file})">
                                   <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M1 3.32031H2.16H11.44" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
                                   <path d="M10.2799 3.32V11.44C10.2799 11.7477 10.1577 12.0427 9.94016 12.2602C9.72261 12.4778 9.42756 12.6 9.11991 12.6H3.31991C3.01226 12.6 2.71721 12.4778 2.49967 12.2602C2.28213 12.0427 2.15991 11.7477 2.15991 11.44V3.32M3.89991 3.32V2.16C3.89991 1.85235 4.02213 1.5573 4.23967 1.33976C4.45721 1.12221 4.75226 1 5.05991 1H7.37991C7.68756 1 7.98261 1.12221 8.20016 1.33976C8.4177 1.5573 8.53991 1.85235 8.53991 2.16V3.32" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1657,7 +1665,8 @@ async function showDocumentacionDocumentacionContainer(id) {
                               <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
                               <i class="fas fa-download"></i>
                               </button>
-                              <div  onclick="deleteDocumentacionFile(${file.id_file})">
+                              <div  onclick="deleteDocumentacionFile(${file.id_file})"
+                              style="${sectionsDisabled ? "display:none" : ""}">
                               <i class="fas fa-trash"></i>
                               </div>
                           </div>
@@ -1838,6 +1847,10 @@ async function showDocumentacionDocumentacionContainer(id) {
         });
       });
     }
+    if(sectionsDisabled){
+      $(".upload-button").prop("disabled", true);
+      $("#btn-crear-documentacion-documentacion").hide();
+    }
   });
   $(".input-group").on("focusin", "input", function () {
     $(this).parent().addClass("ring-2 ring-blue-500");
@@ -1973,6 +1986,12 @@ async function viewFormularioAduana() {
   spinner.show();
   let response = await fetch(url);
   const result = await response.json();
+  $('#file-lista-aduana').empty();
+  $('#file-input-aduana').val('');
+  files = JSON.parse(result[0].files);
+  files.forEach((file) => {
+    addFileToList(file, null, 'file-lista-aduana',true);
+  });
   spinner.hide();
   documentacionAduanaContainer.show();
   $(".tab-btn").click(function () {
@@ -1985,8 +2004,9 @@ async function viewFormularioAduana() {
   //fetch to getNavieras
   url = base_url + "AgenteCompra/PedidosPagados/getNavieras";
   response = await fetch(url);
-  let navieras = await response.json();
-  navieras = navieras.data;
+  const data = await response.json();
+  let navieras = data.data;
+
   //populate navieras select
   const navieraSelect = $("#select-naviera");
   navieraSelect.empty();
@@ -1998,8 +2018,10 @@ async function viewFormularioAduana() {
       `<option value="${naviera.name}">${naviera.name}</option>`
     );
   }
-
-
+  //disavle .input-aduana}
+  $(".input-aduana").prop("disabled", true);
+  $(".btn-guardar-aduana").hide();
+  $(".upload-button-aduana").hide();
   // Control channel color indicator
   function updateChannelIndicator() {
     const channel = $("#controlChannel").val();
@@ -2154,6 +2176,12 @@ async function viewFormularioAduana() {
 
     // Si no hay errores, continuar con el envío del formulario
     const formData = new FormData(this);
+    //add files in file-input-aduana input
+    const fileInput = $("#file-input-aduana")[0];
+    const files = fileInput.files;
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files[]", files[i]);
+    }
     formData.append("idContainer", idContenedor);
     url =
       base_url +
@@ -2170,6 +2198,7 @@ async function viewFormularioAduana() {
         const result = JSON.parse(response);
         if (result.status == "success") {
           Swal.fire("Correcto!", result.message, "success");
+          viewFormularioAduana();
         } else {
           Swal.fire("Error!", result.message, "error");
         }
@@ -4862,7 +4891,7 @@ $(document).ready(async function () {
   documentacionDocumentacionContainer.hide();
   documentacionAduanaContainer = $("#documentacion-aduana-container");
   documentacionAduanaContainer.hide();
-  url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
+ 
   try {
     $(".export-pdf-main-content").off("click");
     $(".export-pdf-main-content").on("click", function () {
@@ -4884,109 +4913,228 @@ $(document).ready(async function () {
     console.log(error);
   }
 
+  //if current windows route includes listarCompletados hide .filter-contenedor 
 
-  table_Entidad = $("#table-contenedor").DataTable({
-    dom:
-      "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-      "<'row'<'col-sm-12'tr>>" +
-      "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-    buttons: [
-      {
-        extend: "excel",
-        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-        titleAttr: "Excel",
-        exportOptions: {
-          columns: ":visible",
-        },
-        attr: {
-          id: "export-excel-main",
-          class: "hidden",
-        },
-      },
-      {
-        extend: "pdf",
-        text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-        titleAttr: "PDF",
-        exportOptions: {
-          columns: ":visible",
-        },
-        attr: {
-          id: "export-pdf-main",
-          class: "hidden",
-        },
-      },
-      {
-        extend: "colvis",
-        text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-        titleAttr: "Columnas",
-        exportOptions: {
-          columns: ":visible",
-        },
-        attr: {
-          class: "hidden",
-        },
-      },
-    ],
-    paging: true,
-    lengthChange: true,
-    searching: true,
-    ordering: false,
-    info: true,
-    autoWidth: false,
-    responsive: false,
-    serverSide: false,
-    pagingType: "full_numbers",
-    oLanguage: {
-      sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-      sLengthMenu: "_MENU_",
-      sSearch: "Buscar por: ",
-      sSearchPlaceholder: "",
-      sZeroRecords: "No se encontraron registros",
-      sInfoEmpty: "No hay registros",
-      sLoadingRecords: "Cargando...",
-      sProcessing: "Procesando...",
-      oPaginate: {
-        sFirst: "<<",
-        sLast: ">>",
-        sPrevious: "<",
-        sNext: ">",
-      },
-    },
-    ajax: {
-      url: url,
-      type: "POST",
-      dataType: "JSON",
-      data: function (data) {
-        data.Filtro_Estado = $("#txt-ID_Estado").val();
-        data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
-        data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
-      },
-      complete: function () {
-        $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-      },
-    },
-    columnDefs: [
-      {
-        targets: "no-hidden",
-        visible: false,
-      },
-      {
-        className: "text-center",
-        targets: "no-sort",
-        orderable: false,
-      },
-      {
-        targets: "",
-        orderable: false,
-      },
-    ],
-    lengthMenu: [
-      [10, 100, 1000, -1],
-      [10, 100, 1000, "Todos"],
-    ],
-  });
+ 
+  if (window.location.href.includes("listarCompletados")) {
+    $(".filter-contenedor").hide();
 
-  configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
+    $("#table-contenedor-completados").show();
+    $("#table-contenedor").hide();
+
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/indexCompletados";
+    table_Entidad = $("#table-contenedor-completados").DataTable({
+      dom:
+        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      buttons: [
+        {
+          extend: "excel",
+          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+          titleAttr: "Excel",
+          exportOptions: {
+            columns: ":visible",
+          },
+          attr: {
+            id: "export-excel-main",
+            class: "hidden",
+          },
+        },
+        {
+          extend: "pdf",
+          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+          titleAttr: "PDF",
+          exportOptions: {
+            columns: ":visible",
+          },
+          attr: {
+            id: "export-pdf-main",
+            class: "hidden",
+          },
+        },
+        {
+          extend: "colvis",
+          text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+          titleAttr: "Columnas",
+          exportOptions: {
+            columns: ":visible",
+          },
+          attr: {
+            class: "hidden",
+          },
+        },
+      ],
+      paging: true,
+      lengthChange: true,
+      searching: false,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      },
+      ajax: {
+        url: url,
+        type: "POST",
+        dataType: "JSON",
+        data: function (data) {
+          data.Filtro_Estado = $("#txt-ID_Estado").val();
+          data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+          data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+          //if url contains listarCompletados 
+  
+        },
+        complete: function () {
+          $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+        },
+      },
+      columnDefs: [
+        {
+          targets: "no-hidden",
+          visible: false,
+        },
+        {
+          className: "text-center",
+          targets: "no-sort",
+          orderable: false,
+        },
+        {
+          targets: "",
+          orderable: false,
+        },
+      ],
+      lengthMenu: [
+        [10, 100, 1000, -1],
+        [10, 100, 1000, "Todos"],
+      ],
+    });
+  } else {
+    url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
+    table_Entidad = $("#table-contenedor").DataTable({
+      dom:
+        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      buttons: [
+        {
+          extend: "excel",
+          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+          titleAttr: "Excel",
+          exportOptions: {
+            columns: ":visible",
+          },
+          attr: {
+            id: "export-excel-main",
+            class: "hidden",
+          },
+        },
+        {
+          extend: "pdf",
+          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+          titleAttr: "PDF",
+          exportOptions: {
+            columns: ":visible",
+          },
+          attr: {
+            id: "export-pdf-main",
+            class: "hidden",
+          },
+        },
+        {
+          extend: "colvis",
+          text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+          titleAttr: "Columnas",
+          exportOptions: {
+            columns: ":visible",
+          },
+          attr: {
+            class: "hidden",
+          },
+        },
+      ],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      },
+      ajax: {
+        url: url,
+        type: "POST",
+        dataType: "JSON",
+        data: function (data) {
+          data.Filtro_Estado = $("#txt-ID_Estado").val();
+          data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+          data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+          //if url contains listarCompletados 
+  
+        },
+        complete: function () {
+          $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+        },
+      },
+      columnDefs: [
+        {
+          targets: "no-hidden",
+          visible: false,
+        },
+        {
+          className: "text-center",
+          targets: "no-sort",
+          orderable: false,
+        },
+        {
+          targets: "",
+          orderable: false,
+        },
+      ],
+      lengthMenu: [
+        [10, 100, 1000, -1],
+        [10, 100, 1000, "Todos"],
+      ],
+    });
+    configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
+
+  }
+  //if current windows route includes listarCompletados hide .filter-contenedor
+
+
 
 
   $("#upload-documents").click(() => $("#upload-input-documents").click());
@@ -6194,7 +6342,49 @@ function getIconByType(typeOrExtension) {
   // Si no se encuentra, devolver el ícono por defecto
   return icons.default;
 }
+async function showObservaciones(id) {
+  spinner.show();
+  url=base_url+"CargaConsolidada/ContenedorConsolidado/getObservaciones/"+id;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  const data = await response.json();
+  const files=JSON.parse(data.data.files);
+  const observaciones=data.data.observaciones;
+  spinner.hide();
+  //SHOW SWALL WITH DATA
+  if (data.status) {
+    const html = `<div class="col-12 col-sm-12" id="multiple-file-upload-aduana">
+                  <div class="form-group">
+                    <!--TEXT AREA-->
+                    <textarea class="form-control" id="observaciones" rows="3" readonly>${observaciones}</textarea>
+                    
+                    <div class="file-lista" id="file-lista-observaciones">
+                    </div>
+                    <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                  </div>
+                </div>`
+    Swal.fire({
+      title: 'Observaciones',
+      html: html,
 
+      showCloseButton: false,
+      showCancelButton: true,
+      showConfirmButton:false,
+
+      focusConfirm: false,
+      confirmButtonText: 'Cerrar',
+      confirmButtonAriaLabel: 'Cerrar'
+    });
+  }
+  files.forEach((file) => {
+    addFileToList(file, null,'file-lista-observaciones',true);
+  });
+
+}
 function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], selectInputId = '.upload-button', automaticUpload = false) {
   try {
     const container = document.getElementById(containerId);

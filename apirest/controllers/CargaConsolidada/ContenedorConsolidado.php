@@ -43,6 +43,25 @@ class ContenedorConsolidado extends CI_Controller
 			log_message('error', 'ContenedorConsolidado : listar() => ' . $e->getMessage());
 		}
 	}
+	public function listarCompletados($ID_Carga_Consolidada = 0)
+	{
+		try {
+			if (! $this->MenuModel->verificarAccesoMenu()) {
+				redirect('Inicio/InicioView');
+			}
+
+			if (isset($this->session->userdata['usuario'])) {
+				$this->load->view('header_v2', ["js_contenedor_consolidadado" => true]);
+				$this->load->view('CargaConsolidada/ContenedorConsolidadoView', [
+					'arrResponseConsolidado' => [],
+					'ID_Carga_Consolidada'   => $ID_Carga_Consolidada,
+				]);
+				$this->load->view('footer_v2', ["js_contenedor_consolidadado" => true]);
+			}
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : listar() => ' . $e->getMessage());
+		}
+	}
 	public function index()
 	{
 		$arrData = $this->ContenedorConsolidadoModel->index();
@@ -120,6 +139,54 @@ class ContenedorConsolidado extends CI_Controller
 
 			$divAcciones .= '</div>';
 
+			$subdata[] = $divAcciones;
+			$data[] = $subdata;
+		}
+
+		$output = array(
+			"data" => $data
+		);
+		echo json_encode($output);
+	}
+	public function indexCompletados()
+	{
+		$arrData = $this->ContenedorConsolidadoModel->indexCompletados();
+		$data    = [];
+		usort($arrData, function ($a, $b) {
+			$numA = (int)$a->carga;
+			$numB = (int)$b->carga;
+			return $numB - $numA;
+		});
+		foreach ($arrData as $row) {
+			$subdata   = [];
+			$subdata[] = $row->mes;
+			$subdata[] = $row->No_Pais;
+			$subdata[] = $row->empresa;
+			$subdata[] = $row->tipo_contenedor;
+			$subdata[] = $row->canal_control;
+			$subdata[] = $row->fecha_levante;
+			$subdata[] = $row->ajuste_valor;
+			$subdata[] = $row->multa;
+			$subdata[] = $row->valor_fob;
+			$subdata[] = $row->valor_flete;
+			$subdata[] = $row->costo_destino;
+			//icon mail
+			$divObservacion = "
+			<div class='d-flex justify-center items-center' style='position: relative; display: flex; justify-content: center; align-items: center;'>
+			<div class='relative'>	
+			<i class='fas fa-envelope text-lg' style='cursor:pointer;' onclick='showObservaciones(" . $row->id . ")'></i>";
+
+			if ($row->file_count > 0) {
+				// Círculo rojo con el número de archivos, posicionado encima del icono
+				$divObservacion .= "<span class='absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs' style='position: absolute; z-index: 10;'>" . $row->file_count . "</span>";
+			}
+			$divObservacion .= "
+			</div>
+			</div>";
+			$subdata[] = $divObservacion;
+			//icon eye
+			$divAcciones = '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+			' . $row->carga . ',true)"></i>';
 			$subdata[] = $divAcciones;
 			$data[] = $subdata;
 		}
@@ -837,10 +904,10 @@ class ContenedorConsolidado extends CI_Controller
 	public function createClienteDocumentacion()
 	{
 		$id_cotizacion = $this->input->post('id_cotizacion');
-		$id_proveedor= $this->input->post('id_proveedor');
+		$id_proveedor = $this->input->post('id_proveedor');
 		$name = $this->input->post('name');
 		$file = $_FILES['file'];
-		$arrResponse = $this->ContenedorConsolidadoModel->createClienteDocumentacion($id_cotizacion, $name, $file,$id_proveedor);
+		$arrResponse = $this->ContenedorConsolidadoModel->createClienteDocumentacion($id_cotizacion, $name, $file, $id_proveedor);
 		echo json_encode($arrResponse);
 	}
 	public function deleteClienteDocumentacionFile($id)
@@ -1328,7 +1395,8 @@ class ContenedorConsolidado extends CI_Controller
 	{
 		$idContenedor = $this->input->post('idContainer');
 		$data = $this->input->post();
-		$arrResponse = $this->ContenedorConsolidadoModel->updateFormularioAduana($idContenedor, $data);
+		$files = $_FILES;
+		$arrResponse = $this->ContenedorConsolidadoModel->updateFormularioAduana($idContenedor, $data, $files);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
@@ -1363,6 +1431,21 @@ class ContenedorConsolidado extends CI_Controller
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteFileInspection($id);
 		echo json_encode([
 			'status' => $arrResponse,
+		]);
+	}
+	public function deleteFileAduana($id)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->deleteFileAduana($id);
+		echo json_encode([
+			'status' => $arrResponse,
+		]);
+	}
+	public function getObservaciones($idContainer)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->getObservaciones($idContainer);
+		echo json_encode([
+			'status' => $arrResponse['status'],
+			'data' => $arrResponse['data'],
 		]);
 	}
 	function convertDateFormat($date)
