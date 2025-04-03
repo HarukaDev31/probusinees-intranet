@@ -290,7 +290,7 @@
                               <p>&nbsp;<?php if ($this->user->No_Grupo == 'ContenedorAlmacen') {
                                           echo $arrHijos->No_Menu_China;
                                         } else {
-                                          if ($this->user->No_Grupo == 'Documentacion' && $arrHijos->No_Menu == "Carga Consolidada ") {
+                                          if ($this->user->No_Grupo == 'Documentacion' && $arrHijos->No_Menu == "Carga Consolidada") {
                                             echo "Pendientes";
                                           }else if ($this->user->No_Grupo == 'Documentacion' && $arrHijos->No_Menu == "Despachos Completados") {
                                             echo "Completados";
