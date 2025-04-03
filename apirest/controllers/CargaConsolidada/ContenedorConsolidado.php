@@ -86,7 +86,7 @@ class ContenedorConsolidado extends CI_Controller
 			if ($this->user->No_Grupo == "ContenedorAlmacen") {
 				$divEstado = '<select
 		onchange="updateEstado(' . $row->id . ')"
-				
+				 id="estado-' . $row->id . '"
 			class="form-control
 					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
 					($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .

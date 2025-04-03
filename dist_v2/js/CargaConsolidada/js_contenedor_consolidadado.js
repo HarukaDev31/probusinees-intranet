@@ -3133,7 +3133,7 @@ const openStepFunction = async (step, id) => {
       contentHeader.show();
       cotizacionContainer.hide();
       clientesDocumentacionContainer.hide();
-
+      table_Entidad.ajax.reload()
       stepsContainer.hide();
     } else {
       returnToSteps();
@@ -3625,7 +3625,12 @@ async function getTableCotizacionEmbarqueHeaders() {
           )
             .then((response) => {
               getTableCotizacionEmbarqueHeaders();
-
+              //show success message
+              if (response.status == 200) {
+                Swal.fire("Correcto", "Se subió la lista de embarque", "success");
+              } else {
+                Swal.fire("Error", "No se pudo subir la lista de embarque", "error");
+              }
               return response.json();
             })
             .catch((error) => {

@@ -1018,7 +1018,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->update($this->table);
             }
 
-            if ($this->db->affected_rows() > 0) {
+            if ($this->db->error()['code'] == 0) {
                 return "success";
             }
             $errors = $this->db->error();
@@ -1237,72 +1237,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 ],
                 'assets/images/agentecompra/'
             );
-            $objPHPExcel = PHPExcel_IOFactory::load($file['tmp_name']);
-            $sheet = $objPHPExcel->getSheet(0);
-            $highestRow = $sheet->getHighestRow();
-            $data = [];
-            $initialRow = 5;
 
-            // Obtén las celdas fusionadas
-            $mergedCells = $sheet->getMergeCells();
-
-            for ($row = $initialRow; $row <= $highestRow; ++$row) {
-                $currentName = $sheet->getCell('D' . $row)->getValue();
-                $isMerged = false;
-                $totalVolumen = 0;
-
-                // Verifica si la celda actual está fusionada
-                foreach ($mergedCells as $mergedRange) {
-                    [$start, $end] = explode(':', $mergedRange);
-                    $startRow = preg_replace('/[^\d]/', '', $start);
-                    $endRow = preg_replace('/[^\d]/', '', $end);
-                    $startCol = preg_replace('/\d/', '', $start);
-
-                    // Si la celda está en un rango fusionado en la columna D
-                    if ($startCol == 'D' && $row >= $startRow && $row <= $endRow) {
-                        $isMerged = true;
-
-                        // Obtén el valor fusionado
-                        $currentName = $sheet->getCell($start)->getValue();
-
-                        // Suma los valores de la columna O en el rango fusionado
-                        for ($mergeRow = $startRow; $mergeRow <= $endRow; ++$mergeRow) {
-                            $cellValue = $sheet->getCell('O' . $mergeRow)->getValue();
-                            $totalVolumen += is_numeric($cellValue) ? $cellValue : 0;
-                        }
-                        break;
-                    }
-                }
-
-                // Si no está fusionada, solo toma el valor de la fila actual
-                if (!$isMerged) {
-                    $cellValue = $sheet->getCell('O' . $row)->getValue();
-                    $totalVolumen = is_numeric($cellValue) ? $cellValue : 0;
-                }
-
-                $data[] = [
-                    'name' => trim($currentName),
-                    'volumen_china' => $totalVolumen
-                ];
-            }
-
-            // Compara con la base de datos y actualiza
-            $this->db->select('id,nombre')
-                ->from($this->table_contenedor_cotizacion)
-                ->where('id_contenedor', $idContenedor);
-            $query = $this->db->get();
-            $cotizaciones = $query->result();
-
-            foreach ($cotizaciones as $cotizacion) {
-                foreach ($data as $item) {
-                    if (trim($cotizacion->nombre) == trim($item['name'])) {
-                        $this->db->where('id', $cotizacion->id);
-                        $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $item['volumen_china']]);
-                    }
-                }
-            }
-
-            // Actualiza el archivo en la tabla
             $this->db->where('id', $idContenedor);
             $this->db->update($this->table, ['lista_embarque_url' => $fileUrl]);
             $this->verifyContainerIsCompleted($idContenedor);
