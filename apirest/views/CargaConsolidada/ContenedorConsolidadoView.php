@@ -1,11 +1,11 @@
 <script>
-    var currentPrivilege="<?php echo $this->user->No_Grupo; ?>";
-    localStorage.setItem("currentPrivilege", currentPrivilege);
-  </script>
+  var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
+  localStorage.setItem("currentPrivilege", currentPrivilege);
+</script>
 <div class="content-wrapper">
   <!--set js variable = php variable-->
   <script>
-    var currentPrivilege="<?php echo $this->user->No_Grupo; ?>";
+    var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
     localStorage.setItem("currentPrivilege", currentPrivilege);
   </script>
   <!-- Content Header (Page header) -->
@@ -20,44 +20,44 @@
         </div>
         <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion") {  ?>
 
-        <!-- Buscador de la tabla -->
-        <div class="col-12 col-xl-2">
-          <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+          <!-- Buscador de la tabla -->
+          <div class="col-12 col-xl-2">
+            <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
                           <?php } else { ?>
 Search for
                           <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+            </div>
           </div>
-        </div>
-        <div class="col-12 col-xl-1 dropdown">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?></button>
-          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> PDF</button>
-            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> Excel</button>
+          <div class="col-12 col-xl-1 dropdown">
+            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                Exportar
+              <?php } else { ?>
+                Export
+              <?php } ?></button>
+            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+              <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Exportar
+                <?php } else { ?>
+                  Export
+                <?php } ?> PDF</button>
+              <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Exportar
+                <?php } else { ?>
+                  Export
+                <?php } ?> Excel</button>
+            </div>
           </div>
-        </div>
 
           <div class="col-12 col-xl-1 dropdown">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                           Filtros
-                          <?php } else { ?>
-                          Filters
-                          <?php } ?>
+                Filtros
+              <?php } else { ?>
+                Filters
+              <?php } ?>
             </button>
             <!-- Menú Desplegable -->
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
@@ -106,120 +106,120 @@ Search for
 
           <div class="col-12 col-xl-1"></div>
 
-        <!-- Buscador de la tabla -->
-        <div class="col-12 col-xl-1">
-          <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-            <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+          <!-- Buscador de la tabla -->
+          <div class="col-12 col-xl-1">
+            <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
                           <?php } else { ?>
 Search for
                           <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+            </div>
           </div>
-        </div>
-        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?>-->
-        <div class="col-12 col-xl-1 dropdown">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?></button>
-          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> PDF</button>
-            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> Excel</button>
-          </div>
-        </div>
-
-        <div class=" col-12 col-xl-1 dropdown">
-
-          <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                           Filtros
-                          <?php } else { ?>
-Filters
-                          <?php } ?>
-          </button>
-          <!-- Menú Desplegable -->
-          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
-            <div class="form-group">
-              <div class="d-flex align-items-center p-2">
-                <div class="d-flex" style="width:60%">Fecha Inicio</div>
-                <div style="width: 200px;">
-                  <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
-                  <span class="help-block text-danger" id="error"></span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center p-2">
-                <div class="d-flex" style="width:60%">Fecha Fin</div>
-                <div style="width: 200px;">
-                  <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
-                  <span class="help-block text-danger" id="error"></span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center p-2" style="width:300px;">
-                <div class="d-flex" style="width:60%">Estado</div>
-                <div style="width: 200px;">
-                  <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
-                    <option value="0" selected>Todos</option>
-                    <option value="PENDIENTE">WAITING</option>
-                    <option value="RECIBIENDO">RECEIVING</option>
-                    <option value="COMPLETADO">FINISH</option>
-                  </select>
-                </div>
-
-              </div>
-          </div>
-          <div class="dropdown-divider"></div>
-          <!-- Botones -->
-          <div class="d-flex justify-content-around">
-                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
-                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
-          </div>
-
           <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                             Exportar
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
           <div class="col-12 col-xl-1 dropdown">
-            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?></button>
+            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                Exportar
+              <?php } else { ?>
+                Export
+              <?php } ?></button>
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
               <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> PDF</button>
+                  Exportar
+                <?php } else { ?>
+                  Export
+                <?php } ?> PDF</button>
               <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> Excel</button>
+                  Exportar
+                <?php } else { ?>
+                  Export
+                <?php } ?> Excel</button>
             </div>
           </div>
-          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+
+          <div class=" col-12 col-xl-1 dropdown">
+
+            <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                Filtros
+              <?php } else { ?>
+                Filters
+              <?php } ?>
+            </button>
+            <!-- Menú Desplegable -->
+            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
+              <div class="form-group">
+                <div class="d-flex align-items-center p-2">
+                  <div class="d-flex" style="width:60%">Fecha Inicio</div>
+                  <div style="width: 200px;">
+                    <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                    <span class="help-block text-danger" id="error"></span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center p-2">
+                  <div class="d-flex" style="width:60%">Fecha Fin</div>
+                  <div style="width: 200px;">
+                    <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
+                    <span class="help-block text-danger" id="error"></span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center p-2" style="width:300px;">
+                  <div class="d-flex" style="width:60%">Estado</div>
+                  <div style="width: 200px;">
+                    <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
+                      <option value="0" selected>Todos</option>
+                      <option value="PENDIENTE">WAITING</option>
+                      <option value="RECIBIENDO">RECEIVING</option>
+                      <option value="COMPLETADO">FINISH</option>
+                    </select>
+                  </div>
+
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <!-- Botones -->
+              <div class="d-flex justify-content-around">
+                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
+                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
+              </div>
+
+              <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Exportar
+                          <?php } else { ?>
+                            Export
+                          <?php } ?>-->
+              <div class="col-12 col-xl-1 dropdown">
+                <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Exportar
+                  <?php } else { ?>
+                    Export
+                  <?php } ?></button>
+                <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+                  <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                      Exportar
+                    <?php } else { ?>
+                      Export
+                    <?php } ?> PDF</button>
+                  <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                      Exportar
+                    <?php } else { ?>
+                      Export
+                    <?php } ?> Excel</button>
+                </div>
+              </div>
+              <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
                           <?php } else { ?>
 Filters
                           <?php } ?>-->
+            </div>
+          <?php } ?>
           </div>
-        <?php } ?>
-      </div>
-    </div><!-- /.container-fluid desactivate for a moment-->
+      </div><!-- /.container-fluid desactivate for a moment-->
   </section>
   <section class="content" id="main-container">
     <div class="container-fluid">
@@ -358,34 +358,29 @@ Filters
       </div>
     </div>
   </section>
-  <section class="bg-white rounded-xl shadow-lg p-8"
+  <section class="m-5"
     id="documentacion-documentacion-container">
-    <div class="row">
+    <div class="row my-2 p-8">
+      <button type="button" id="btn-back-documentacion-documentacion" class="py-1 px-2 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+    </div>
+    <div class="row bg-white rounded-xl p-8 ">
       <div class="col-10">
-        <h2 class="text-xl font-bold mb-6 text-gray-800 border-b pb-4">
+        <span class="mb-6 text-gray-800 border-b pb-4">
+          Documentación
           <i class="bi bi-folder me-2"></i>
-          DOCUMENTACIÓN
-        </h2>
+
+        </span>
       </div>
       <div class="col-1">
         <button type="button" id="btn-crear-documentacion-documentacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i></button>
       </div>
-      <div class="col-1">
-        <button type="button" id="btn-back-documentacion-documentacion" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i></button>
-      </div>
+
     </div>
 
     <!--button with plus icon to add new document-->
 
     <!-- Document Filter -->
-    <div class="mb-8">
-      <div class="flex space-x-4 bg-gray-100 p-2 rounded-lg">
-        <button class="doc-filter active px-4 py-2 rounded-md transition-all duration-300" data-filter="todos">Todos</button>
-        <button class="doc-filter px-4 py-2 rounded-md transition-all duration-300" data-filter="ENVIO">Envío</button>
-        <button class="doc-filter px-4 py-2 rounded-md transition-all duration-300" data-filter="COMERCIAL">Comercial</button>
-        <button class="doc-filter px-4 py-2 rounded-md transition-all duration-300" data-filter="LEGAL">Legal</button>
-      </div>
-    </div>
+
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="documentacion-documentacion">
       <!-- Document Cards -->
@@ -480,60 +475,66 @@ Filters
       </div> -->
     </div>
   </section>
-  <section class="bg-gray-50"
+  <section class=""
     id="documentacion-aduana-container">
-    <div class="max-w-7xl mx-auto p-6">
+    <div class="row p-6">
+      <button type="button" id="btn-back-documentacion-aduana" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+    </div>
+    <div class="max-w-7xl  p-6 bg-gray-50">
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-800">Formulario de Aduana</h1>
-          <p class="text-gray-500 mt-1">Complete la información para el trámite aduanero</p>
+          <h1 class="text-lg d-flex flex-row gap-3 align-items-center">Aduana <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.9232 8.46043V5.68313C11.9232 5.19881 11.6693 4.76745 11.2386 4.53286C11.2155 4.51772 11.1924 4.51772 11.1693 4.50259L8.23087 2.62583C7.78472 2.33826 7.2078 2.33826 6.76164 2.62583L3.81549 4.51016C3.81549 4.51016 3.76934 4.52529 3.75395 4.53286C3.32318 4.77502 3.06934 5.19881 3.06934 5.68313V8.46043C3.06934 8.92205 3.32318 9.36097 3.72318 9.59556L6.80011 11.4118C7.01549 11.5404 7.25395 11.601 7.49241 11.601C7.73087 11.601 7.96934 11.5404 8.18472 11.4118L11.2616 9.59556C11.6616 9.36097 11.9155 8.92205 11.9155 8.46043H11.9232ZM7.39241 3.57935C7.45395 3.54151 7.53857 3.54151 7.60011 3.57935L9.48472 4.78259L7.59241 5.89502C7.53087 5.93286 7.45395 5.93286 7.39241 5.89502L5.50011 4.78259L7.38472 3.57935H7.39241ZM4.32318 8.62691C4.26934 8.59664 4.23087 8.52853 4.23087 8.46799V5.6907C4.23087 5.59232 4.29241 5.54691 4.33087 5.52421C4.35395 5.50908 4.38472 5.50151 4.42318 5.50151C4.45395 5.50151 4.48472 5.50151 4.52318 5.53178L6.8078 6.87881C6.8078 6.87881 6.88472 6.90908 6.92318 6.92421V10.1631L4.32318 8.62691ZM10.7693 8.46799C10.7693 8.5361 10.7309 8.59664 10.677 8.62691L8.07703 10.1631V6.92421C8.07703 6.92421 8.15395 6.89394 8.19241 6.87881L10.477 5.53178C10.5616 5.48637 10.6386 5.50908 10.6693 5.53178C10.7078 5.55448 10.7693 5.59989 10.7693 5.69826V8.47556V8.46799Z" fill="#272A30" />
+              <path d="M12.1154 0H10.5769C10.2615 0 10 0.257297 10 0.567568C10 0.877838 10.2615 1.13514 10.5769 1.13514H12.1154C13.0692 1.13514 13.8462 1.89946 13.8462 2.83784V4.35135C13.8462 4.66162 14.1077 4.91892 14.4231 4.91892C14.7385 4.91892 15 4.66162 15 4.35135V2.83784C15 1.27135 13.7077 0 12.1154 0Z" fill="#272A30" />
+              <path d="M0.576923 4.91892C0.892308 4.91892 1.15385 4.66162 1.15385 4.35135V2.83784C1.15385 1.89946 1.93077 1.13514 2.88462 1.13514H4.42308C4.73846 1.13514 5 0.877838 5 0.567568C5 0.257297 4.73846 0 4.42308 0H2.88462C1.29231 0 0 1.27135 0 2.83784V4.35135C0 4.66162 0.261538 4.91892 0.576923 4.91892Z" fill="#272A30" />
+              <path d="M4.42308 12.8658H2.88462C1.93077 12.8658 1.15385 12.1015 1.15385 11.1631V9.6496C1.15385 9.33933 0.892308 9.08203 0.576923 9.08203C0.261538 9.08203 0 9.33933 0 9.6496V11.1631C0 12.7296 1.29231 14.001 2.88462 14.001H4.42308C4.73846 14.001 5 13.7437 5 13.4334C5 13.1231 4.73846 12.8658 4.42308 12.8658Z" fill="#272A30" />
+              <path d="M14.4231 9.08203C14.1077 9.08203 13.8462 9.33933 13.8462 9.6496V11.1631C13.8462 12.1015 13.0692 12.8658 12.1154 12.8658H10.5769C10.2615 12.8658 10 13.1231 10 13.4334C10 13.7437 10.2615 14.001 10.5769 14.001H12.1154C13.7077 14.001 15 12.7296 15 11.1631V9.6496C15 9.33933 14.7385 9.08203 14.4231 9.08203Z" fill="#272A30" />
+            </svg>
+          </h1>
         </div>
-        <div class="text-gray-600 bg-gray-100 px-4 py-2 rounded-lg">
-          <button type="button" id="btn-back-documentacion-aduana" class="btn btn-outline-primary btn-block btn-reporte" data-type="html"><i class="fa fa-arrow-left"></i> </button>
-        </div>
+
       </div>
 
       <!-- Tabs -->
-      <div class="flex space-x-4 mb-8">
-        <button class="tab-btn active flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100" data-tab="general">
-          <i class="bi bi-box-seam"></i>
-          <span>Información General</span>
-        </button>
-        <button class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100" data-tab="dates">
-          <i class="bi bi-calendar"></i>
-          <span>Fechas y Plazos</span>
-        </button>
-        <button class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100" data-tab="values">
-          <i class="bi bi-currency-dollar"></i>
-          <span>Valores y Costos</span>
-        </button>
-      </div>
+     
 
       <!-- Form -->
       <div class="bg-white rounded-xl shadow-sm p-8">
         <form id="customsForm" class="space-y-6">
           <!-- General Information Tab -->
           <div class="tab-content active" id="general">
-            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+            <div class="grid md:grid-cols-3 gap-x-12 gap-y-6">
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Naviera</label>
-                <select name="naviera" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <option value="">Seleccione una naviera</option>
-                  <option value="MAERSK">MAERSK</option>
-                  <option value="ONE">ONE</option>
-                  <option value="COSCO">COSCO</option>
-                  <option value="EVERGREEN">EVERGREEN</option>
-                  <option value="MSC">MSC</option>
-                  <option value="HAPAG LLOYD">HAPAG LLOYD</option>
-                  <option value="CMA CGM">CMA CGM</option>
-                  <option value="YANG MING">YANG MING</option>
-                  <option value="ZIM">ZIM</option>
-                </select>
-              </div>
+                <div class="relative">
+                  <select
+                  id="select-naviera" 
+                  name="naviera" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                   
+                  </select>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full" >
+                  <i class="fa fa-plus text-gray-500" id="navieraAdd"></i>
 
+                  </div>
+
+                </div>
+              </div>
               <div class="form-group">
-                <label class="block text-gray-700 mb-2">Tipo de Contenedor</label>
+                <label class="block text-gray-700 mb-2">Multa</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="multa" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+              <!--Div ocupes 3 rows-->
+              <div class="form-group row-span-3">
+                <label class="block text-gray-700 mb-2">OBSERVACIONES</label>
+                <textarea name="observaciones" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
+              </div>
+            
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Toneladas contenedor</label>
                 <select name="tipo_contenedor" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                   <option value="">Seleccione tipo</option>
                   <option value="LCL">LCL</option>
@@ -543,7 +544,76 @@ Filters
                   <option value="40 HQ">40 HQ</option>
                 </select>
               </div>
-
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Fecha levante</label>
+                <input name="fecha_levante" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Fecha zarpe</label>
+                <input name="fecha_zarpe" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+            
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Número Dua</label>
+                <input name="numero_dua" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+             
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Fecha arribo</label>
+                <input name="fecha_arribo" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Valor FOB</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="valor_fob" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+              <div class="form-group row-span-3">
+              <div class="col-12 col-sm-12" id="multiple-file-upload-aduana">
+                <div class="form-group">
+                  <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
+                    <input type="file" id="file-input-aduana" class="file-input" multiple accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm" />
+                    <label for="file-inpute" class="file-label d-flex">
+                      <i class="fas fa-upload"></i>
+                      <div class="file-group-text">
+                        <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Selecciona o arrastra tu archivo aquí
+                          <?php } else { ?>
+                            Select or drag your file here
+                          <?php } ?></span>
+                        <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Formatos
+                          <?php } else { ?>
+                            Formats
+                            <?php } ?>: .xlsx</span>
+                      </div>
+                      <button class="upload-button upload-button-aduana" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                          Subir archivo
+                        <?php } else { ?>
+                          Upload Files
+                        <?php } ?></button>
+                    </label>
+                  </div>
+                  <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                  <div class="file-lista hidden" id="file-lista-aduana">
+                  </div>
+                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                </div>
+              </div>
+              </div>
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Fecha declaración</label>
+                <input name="fecha_declaracion" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div class="form-group">
+                <label class="block text-gray-700 mb-2">Valor flete</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <input name="valor_flete" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
               <div class="form-group">
                 <label class="block text-gray-700 mb-2">Canal de Control</label>
                 <div class="relative">
@@ -553,63 +623,10 @@ Filters
                     <option value="Naranja">Naranja</option>
                     <option value="Rojo">Rojo</option>
                   </select>
-                  <div class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full" id="channelIndicator"></div>
                 </div>
               </div>
-
               <div class="form-group">
-                <label class="block text-gray-700 mb-2">Número DUA</label>
-                <input name="numero_dua" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-            </div>
-          </div>
-
-          <!-- Dates Tab -->
-          <div class="tab-content hidden" id="dates">
-            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">F. ZARPE</label>
-                <input name="fecha_zarpe" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">F. ARRIBO</label>
-                <input name="fecha_arribo" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">F. DECLARACIÓN</label>
-                <input name="fecha_declaracion" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">F. LEVANTE</label>
-                <input name="fecha_levante" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-            </div>
-          </div>
-
-          <!-- Values Tab -->
-          <div class="tab-content hidden" id="values">
-            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">VALOR FOB</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="valor_fob" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">VALOR FLETE</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="valor_flete" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">COSTO DESTINO</label>
+                <label class="block text-gray-700 mb-2">Costo destino</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                   <input name="costo_destino" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -617,38 +634,58 @@ Filters
               </div>
 
               <div class="form-group">
-                <label class="block text-gray-700 mb-2">AJUSTE DE VALOR</label>
+                <label class="block text-gray-700 mb-2">Ajuste de valor</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                   <input name="ajuste_valor" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
               </div>
 
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">MULTA</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input name="multa" type="number" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
+           
+          </div>
+
+          <!-- Dates Tab -->
+          <div class="tab-content " id="dates">
+            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+              
+
+              
+
+              
+
+              
+            </div>
+          </div>
+
+          <!-- Values Tab -->
+          <div class="tab-content " id="values">
+            <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+              
               </div>
 
-              <div class="form-group">
-                <label class="block text-gray-700 mb-2">OBSERVACIONES</label>
-                <textarea name="observaciones" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
-              </div>
+              
+
+              
+
+              
+
+              
             </div>
           </div>
 
           <!-- Buttons -->
-          <div class="flex justify-between pt-6 border-t mt-6">
+          <div class="flex pt-6 border-t mt-6 row">
+            <div class="col-9"></div>
+            <div class="col-3 d-flex justify-content-end gap-2">
+              <button type="submit" class="btn btn-primary btn-block btn-reporte">
+                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Guardar
+                <?php } else { ?>
+                  Save
+                <?php } ?>
+              </button>
 
-            <button type="submit" class="px-6 py-2 text-white bg-black rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900">
-              <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Guardar
-            <?php } else { ?>
-              Save
-            <?php } ?>
-            </button>
+            </div>
           </div>
         </form>
       </div>
@@ -663,106 +700,106 @@ Filters
           <div class="col-12 col-md-1">
             <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
           </div>
-        <div class="col-12 col-md-8 d-flex gap-2 justify-content-end">
-          <!-- Buscador -->
-        <div class="dataTables_filter">
-          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+          <div class="col-12 col-md-8 d-flex gap-2 justify-content-end">
+            <!-- Buscador -->
+            <div class="dataTables_filter">
+              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
                           <?php } else { ?>
 Search for
                           <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
-        </div>
+            </div>
 
 
-        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                             Exportar
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-        <div class="col-6 col-sm-2 dropdown">
-          <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?></button>
-          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-            <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> PDF</button>
-            <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> Excel</button>
-          </div>
-        </div>
-        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            <div class="col-6 col-sm-2 dropdown">
+              <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Exportar
+                <?php } else { ?>
+                  Export
+                <?php } ?></button>
+              <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+                <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Exportar
+                  <?php } else { ?>
+                    Export
+                  <?php } ?> PDF</button>
+                <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Exportar
+                  <?php } else { ?>
+                    Export
+                  <?php } ?> Excel</button>
+              </div>
+            </div>
+            <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
                           <?php } else { ?>
 Filters
                           <?php } ?>-->
-        <div class=" col-6 col-sm-2 dropdown">
-          <!-- Botón de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            <div class=" col-6 col-sm-2 dropdown">
+              <!-- Botón de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
                           <?php } else { ?>
 Filters
                           <?php } ?> -->
-          <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                           Filtros
-                          <?php } else { ?>
-Filters
-                          <?php } ?>
-          </button>
-          <!-- Menú Desplegable -->
-          <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
-            <div class="form-group">
-              <div class="d-flex align-items-center p-2">
-                <div class="d-flex" style="width:60%">Fecha Inicio</div>
-                <div style="width: 200px;">
-                  <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
-                  <span class="help-block text-danger" id="error"></span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center p-2">
-                <div class="d-flex" style="width:60%">Fecha Fin</div>
-                <div style="width: 200px;">
-                  <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
-                  <span class="help-block text-danger" id="error"></span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center p-2" style="width:300px;">
-                <div class="d-flex" style="width:60%">Estado</div>
-                <div style="width: 200px;">
-                  <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado" >
-                    <option value="0" selected>Todos</option>
-                    <option value="PENDIENTE">WAITING</option>
-                    <option value="RECIBIENDO">RECEIVING</option>
-                    <option value="COMPLETADO">FINISH</option>
-                  </select>
-                </div>
+              <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Filtros
+                <?php } else { ?>
+                  Filters
+                <?php } ?>
+              </button>
+              <!-- Menú Desplegable -->
+              <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
+                <div class="form-group">
+                  <div class="d-flex align-items-center p-2">
+                    <div class="d-flex" style="width:60%">Fecha Inicio</div>
+                    <div style="width: 200px;">
+                      <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                      <span class="help-block text-danger" id="error"></span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center p-2">
+                    <div class="d-flex" style="width:60%">Fecha Fin</div>
+                    <div style="width: 200px;">
+                      <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
+                      <span class="help-block text-danger" id="error"></span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center p-2" style="width:300px;">
+                    <div class="d-flex" style="width:60%">Estado</div>
+                    <div style="width: 200px;">
+                      <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
+                        <option value="0" selected>Todos</option>
+                        <option value="PENDIENTE">WAITING</option>
+                        <option value="RECIBIENDO">RECEIVING</option>
+                        <option value="COMPLETADO">FINISH</option>
+                      </select>
+                    </div>
 
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <!-- Botones -->
+                <div class="d-flex justify-content-around">
+                  <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
+                  <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
+                </div>
               </div>
-          </div>
-          <div class="dropdown-divider"></div>
-          <!-- Botones -->
-          <div class="d-flex justify-content-around">
-                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
-                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
-            </div>
-          </div>
-          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                             Exportar
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-        </div>
-          <div class="col-12 col-md-3">
-            <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
+            </div>
+            <div class="col-12 col-md-3">
+              <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
+            </div>
           </div>
-      </div>
 
         </div>
       <?php } else { ?>
@@ -784,12 +821,12 @@ Search for
           <!-- Contenedor Principal de Cargar-->
           <div class="col-12 col-xl-1 dropdown">
             <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>
-                            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Cargar
-                          <?php } else { ?>
-                            Upload
-                          <?php } ?>
-          </button>
+              <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                Cargar
+              <?php } else { ?>
+                Upload
+              <?php } ?>
+            </button>
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-cargar-carga">
               <div class="dropdown-item btn-block" id="packing-list-container"></div>
               <div class="dropdown-item btn-block" id="bl-file-container"></div>
@@ -801,17 +838,17 @@ Search for
                             Export
                           <?php } ?>-->
           <div class="col-12 col-xl-1 dropdown">
-            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?></button>
+            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                Exportar
+              <?php } else { ?>
+                Export
+              <?php } ?></button>
             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
               <button class="dropdown-item btn-block" id="export-excel"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> Excel</button>
+                  Exportar
+                <?php } else { ?>
+                  Export
+                <?php } ?> Excel</button>
             </div>
           </div>
           <div class="col-12 col-xl-4">
@@ -864,8 +901,7 @@ Search for
               <th>Cotizacion</th>
               <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
                 <th
-                style="min-width: 8em;"
-                >Estado</th>
+                  style="min-width: 8em;">Estado</th>
               <?php } ?>
               <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
 
@@ -894,11 +930,11 @@ Search for
               <?php } ?>
 
               <th
-                style="min-width: 7em;"><?php if ($this->user->No_Grupo != "ContenedorAlmacen" ){  ?>
-               Productos
-              <?php }else{ ?>
-                Products
-              <?php } ?> </th>
+                style="min-width: 7em;"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Productos
+                <?php } else { ?>
+                  Products
+                <?php } ?> </th>
               <th
                 style="min-width: 4em;">Qty Box</th>
               <th
@@ -918,12 +954,12 @@ Search for
               <th
                 style="min-width: 8em;">Arrive Date </th>
               <th>
-              <?php if ($this->user->No_Grupo != "ContenedorAlmacen" ){  ?>
-                Acciones
-              <?php }else{ ?>
-                Actions
-              <?php } ?>
-            </th>
+                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Acciones
+                <?php } else { ?>
+                  Actions
+                <?php } ?>
+              </th>
 
 
             </tr>
@@ -965,22 +1001,22 @@ Search for
                             Export
                           <?php } ?>-->
       <div class="col-6 col-sm-1 dropdown">
-        <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i>  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?></button>
+        <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            Exportar
+          <?php } else { ?>
+            Export
+          <?php } ?></button>
         <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
           <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> PDF</button>
+              Exportar
+            <?php } else { ?>
+              Export
+            <?php } ?> PDF</button>
           <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?> Excel</button>
+              Exportar
+            <?php } else { ?>
+              Export
+            <?php } ?> Excel</button>
         </div>
       </div>
     </div>
@@ -1037,19 +1073,19 @@ Search for
 
       <div class="col-12 col-md-2">
         <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Guardar
-            <?php } else { ?>
-              Save
-            <?php } ?>  </button>
+            Guardar
+          <?php } else { ?>
+            Save
+          <?php } ?> </button>
       </div>
 
     </div>
     <div class="documentos-clientes-tabs">
-              </div>
-              <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
+    </div>
+    <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
 
 
-            </div>
+    </div>
 
     <!-- <div class="container ">
 
@@ -1184,11 +1220,11 @@ Search for
       <div class="col-6 col-md-2 col-xl-4">
       </div>
       <div class="col-12 col-md-3 col-xl-1 <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
-        <button type="button" id="btn-guardar-doc-not"  class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Guardar
-            <?php } else { ?>
-              Save
-            <?php } ?>   <i class="fas fa-save"></i></button>
+        <button type="button" id="btn-guardar-doc-not" class="bg-orange hover:bg-orange-200 text-black-200 py-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            Guardar
+          <?php } else { ?>
+            Save
+          <?php } ?> <i class="fas fa-save"></i></button>
       </div>
       <div class="col-12 col-md-4">
         <label>&nbsp;</label>
@@ -1217,15 +1253,15 @@ Search for
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>">
             <h2 class="d-flex w-100 justify-content-between align-items-center"><label>
-            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Documentación
-            <?php } else { ?>
-              Documentation
-            <?php } ?>
-            <i class="far fa-folder-open"></i></label>
-              
+                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Documentación
+                <?php } else { ?>
+                  Documentation
+                <?php } ?>
+                <i class="far fa-folder-open"></i></label>
+
             </h2>
-          
+
 
           </div>
         </div>
@@ -1249,7 +1285,7 @@ Search for
               <div class="col-12 col-sm-12" id="multiple-file-upload">
                 <div class="form-group">
                   <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
-                    <input type="file" id="file-input-documentacion" class="file-input" multiple accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm"/>
+                    <input type="file" id="file-input-documentacion" class="file-input" multiple accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm" />
                     <label for="file-inpute" class="file-label d-flex">
                       <i class="fas fa-upload"></i>
                       <div class="file-group-text">
@@ -1262,13 +1298,13 @@ Search for
                             Formatos
                           <?php } else { ?>
                             Formats
-                          <?php } ?>: .xlsx</span>
+                            <?php } ?>: .xlsx</span>
                       </div>
                       <button class="upload-button upload-button-documentacion" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Subir archivo
-                          <?php } else { ?>
-                            Upload Files
-                          <?php } ?></button>
+                          Subir archivo
+                        <?php } else { ?>
+                          Upload Files
+                        <?php } ?></button>
                     </label>
                   </div>
                   <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
@@ -1290,14 +1326,14 @@ Search for
       </div>
       <div class="col-12 col-xl-5 col-md-12">
         <div class="container px-4 py-8 file-section-container col-12 col-md-12">
-          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>"><label>Inspection  <i class="fas fa-images"></i></label>
+          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>"><label>Inspection <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
               class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Guardar
-            <?php } else { ?>
-              Save
-            <?php } ?>   &nbsp; <i class="fa fa-save"></i>
+                Guardar
+              <?php } else { ?>
+                Save
+              <?php } ?> &nbsp; <i class="fa fa-save"></i>
             </div>
           </h2>
           <!--Button para guardar-->
@@ -1313,15 +1349,15 @@ Search for
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
                           <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Selecciona o arrastra tu archivo aquí
-                          <?php } else { ?>
-                            Select or drag your file here
-                          <?php } ?></span>
+                              Selecciona o arrastra tu archivo aquí
+                            <?php } else { ?>
+                              Select or drag your file here
+                            <?php } ?></span>
                           <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Formatos
-                          <?php } else { ?>
-                            Formats
-                          <?php } ?>: .jpeg .png .mp4</span>
+                              Formatos
+                            <?php } else { ?>
+                              Formats
+                              <?php } ?>: .jpeg .png .mp4</span>
                         </div>
                         <button class="upload-button upload-button-inspeccion" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                             Subir archivo
@@ -1358,10 +1394,10 @@ Search for
             <i class="fas fa-save  float-right"></i>
 
             <span><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Guardar
-            <?php } else { ?>
-              Save
-            <?php } ?>  </span>
+                Guardar
+              <?php } else { ?>
+                Save
+              <?php } ?> </span>
           </button>
         </h2>
         <div id="note-container" class="bg-white shadow p-4 rounded-lg">
@@ -1409,7 +1445,7 @@ Search for
   <section class="content card" id="cotizacion-final-container">
     <div class="min-h-screen bg-gray-50 p-8">
       <h1 class="text-3xl font-bold text-gray-800 mb-6"
-      id="cotizacion-final-title"></h1>
+        id="cotizacion-final-title"></h1>
 
       <div class="flex gap-4 mb-8">
 
@@ -1461,7 +1497,7 @@ Search for
   <section class="content card" id="factura-guia-container">
     <div class="min-h-screen bg-gray-50 p-8">
       <h1 class="text-3xl font-bold text-gray-800 mb-6"
-      id="factura-guia-title"></h1>
+        id="factura-guia-title"></h1>
       <div class="flex
       w-full gap-4 mb-8
       justify-end
@@ -1600,13 +1636,13 @@ Search for
                             Formatos
                           <?php } else { ?>
                             Formats
-                          <?php } ?>: .xlsx</span>
+                            <?php } ?>: .xlsx</span>
                       </div>
                       <button class="upload-button" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Subir archivo
-                          <?php } else { ?>
-                            Upload Files
-                          <?php } ?></button>
+                          Subir archivo
+                        <?php } else { ?>
+                          Upload Files
+                        <?php } ?></button>
                     </label>
 
                     <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
@@ -1633,10 +1669,10 @@ Search for
             <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-5 border border-transparent hover:border-orange-600 rounded" data-dismiss="modal">Cancelar</button>
             <button type="button" id="btn-actualizar-cotizacion" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Actualizar</button>
             <button type="button" id="btn-guardar-cotizacion" class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-              Guardar
-            <?php } else { ?>
-              Save
-            <?php } ?>  </button>
+                Guardar
+              <?php } else { ?>
+                Save
+              <?php } ?> </button>
           </div>
         </div>
       </div>
@@ -1726,7 +1762,7 @@ Search for
               Guardar
             <?php } else { ?>
               Save
-            <?php } ?>  </button>
+            <?php } ?> </button>
         </div>
       </div>
     </div>
@@ -1742,7 +1778,7 @@ Search for
     font-size: 14px;
   }
 
-  .country-icons{
+  .country-icons {
     width: 24px;
     height: 16px;
     margin-right: 5px;
@@ -2389,31 +2425,43 @@ Search for
 
   #table-contenedor_wrapper.dt-buttons.btn-group.flex-wrap {
     display: none;
-  }.tab-cliente-documentacion{
+  }
+
+  .tab-cliente-documentacion {
     padding: 1em;
     border-radius: 0.5em;
     margin-bottom: 1em;
     width: 100%;
     background-color: #f9f9f9;
-    color:black;
+    color: black;
     text-align: center;
     cursor: pointer;
 
   }
-  .tab-cliente-documentacion.active{
-    background-color: #FF500B!important;
+
+  .tab-cliente-documentacion.active {
+    background-color: #FF500B !important;
     color: white;
 
-  }.documentos-clientes-tabs{
-    display:grid;
+  }
+
+  .documentos-clientes-tabs {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1em;
-    margin:1em 2em;
+    margin: 1em 2em;
   }
 
   .file-icon-container {
     display: flex;
     justify-content: space-between;
     width: -webkit-fill-available;
+  }
+
+  label {
+    font-family: Epilogue;
+    font-size: 14px;
+    font-weight: 400;
+    color: #272A30;
   }
 </style>

@@ -1548,92 +1548,292 @@ async function showDocumentacionDocumentacionContainer(id) {
     }
 
     if (file.file_url) {
+      // $("#documentacion-documentacion").append(`
+      //           <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria
+      //   }">
+      //   <div class="flex items-center justify-between">
+      //     <div class="flex items-center space-x-3">
+      //       <i class="bi bi-${file.b_icon} text-blue-500 text-xl"></i>
+      //       <div>
+      //         <h3 class="font-medium text-gray-800">${file.folder_name}</h3>
+      //         <p class="text-sm text-gray-500">Ver documento</p>
+      //       </div>
+      //     </div>
+      //     <a class="download-btn text-blue-500 hover:text-blue-700"
+      //     href="${file.file_url}" target="_blank" download>
+
+      //       <i class="${`bi bi-download`}"></i>
+      //     </a>
+      //   </div>
+      // </div>`);
       $("#documentacion-documentacion").append(`
-                <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria
-        }">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <i class="bi bi-${file.b_icon} text-blue-500 text-xl"></i>
-            <div>
-              <h3 class="font-medium text-gray-800">${file.folder_name}</h3>
-              <p class="text-sm text-gray-500">Ver documento</p>
-            </div>
-          </div>
-          <a class="download-btn text-blue-500 hover:text-blue-700"
-          href="${file.file_url}" target="_blank" download>
-                
-            <i class="${`bi bi-download`}"></i>
-          </a>
+        <div class="col-12 col-sm-12" id="single-${file.id}">
+            <div class="form-group">
+                <label>${file.folder_name}
+                  ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>` : ""}
+                </label>
+                <div class="file-upload-box">
+                    ${file.file_url ? `
+                            <div class="file-info">
+                              <div class="file-iconic">
+                                ${getIconByType(file.type)}
+                              </div>
+                                <span class="file-name">${file.folder_name}</span>
+                                
+                                <div 
+                                class="d-flex flex-row gap-5"
+                                >
+                                <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
+                                <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12.7436 8.61328H1.25641C0.56718 8.61328 0 9.18046 0 9.86969V11.3056C0 11.9948 0.56718 12.562 1.25641 12.562H12.7436C13.4328 12.562 14 11.9948 14 11.3056V9.86969C14 9.18046 13.4328 8.61328 12.7436 8.61328ZM12.9231 11.3056C12.9231 11.4061 12.8441 11.4851 12.7436 11.4851H1.25641C1.1559 11.4851 1.07692 11.4061 1.07692 11.3056V9.86969C1.07692 9.76918 1.1559 9.6902 1.25641 9.6902H12.7436C12.8441 9.6902 12.9231 9.76918 12.9231 9.86969V11.3056Z" fill="#585858"/>
+                                <path d="M8.4638 4.46608L7.22893 5.70096L7.22893 0.538904C7.22893 0.244545 6.98483 0.000441819 6.69047 0.000441793C6.39611 0.000441767 6.15201 0.244545 6.15201 0.538903L6.15201 5.70096L4.91714 4.46608C4.80944 4.35839 4.67303 4.30813 4.53662 4.30813C4.40021 4.30813 4.2638 4.35839 4.15611 4.46608C3.9479 4.67429 3.9479 5.0189 4.15611 5.22711L6.30996 7.38096C6.51816 7.58916 6.86278 7.58916 7.07098 7.38096L9.22483 5.22711C9.43303 5.0189 9.43303 4.67429 9.22483 4.46608C9.01662 4.25788 8.67201 4.25788 8.4638 4.46608Z" fill="#585858"/>
+                                </svg>
+
+                                </button>
+                                <div  onclick="deleteDocumentacionFileDocumentacion(${file.id_file})">
+                                  <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M1 3.32031H2.16H11.44" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M10.2799 3.32V11.44C10.2799 11.7477 10.1577 12.0427 9.94016 12.2602C9.72261 12.4778 9.42756 12.6 9.11991 12.6H3.31991C3.01226 12.6 2.71721 12.4778 2.49967 12.2602C2.28213 12.0427 2.15991 11.7477 2.15991 11.44V3.32M3.89991 3.32V2.16C3.89991 1.85235 4.02213 1.5573 4.23967 1.33976C4.45721 1.12221 4.75226 1 5.05991 1H7.37991C7.68756 1 7.98261 1.12221 8.20016 1.33976C8.4177 1.5573 8.53991 1.85235 8.53991 2.16V3.32" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M5.06006 6.2207V9.7007" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M7.37988 6.2207V9.7007" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+                                  </svg>
+
+                                </div>
+                                </div>
+                            </div>
+                    `
+          : `
+                        <input type="file" id="file-input-${file.id}" class="file-input" accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt"/>
+                        <label for="file-inputo" class="file-label d-flex">
+                            <i class="fas fa-upload"></i>
+                            <div class="file-group-text">
+                                <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                                <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt</span>
+                            </div>
+                            <button class="upload-button upload-button-documentacion-documentacion-${file.id}" type="button">Subir archivo</button>
+                        </label>
+                     
+                    `
+        }
+            </div>    
         </div>
-      </div>`);
+    `);
     } else {
+      //   $("#documentacion-documentacion").append(`
+      //             <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria
+      //     }">
+      //     <div class="flex items-center justify-between">
+      //         <div class="flex items-center space-x-3">
+      //             <i class="bi bi-file
+      //             text-blue-500 text-xl"></i>
+      //             <div>
+      //                 <h3 class="font-medium text-gray-800">${file.folder_name
+      //     }</h3>
+      //                 <p class="text-sm text-red-500">Documento no subido</p>
+      //             </div>
+      //         </div>
+      //           <span class="download-btn text-blue-500 hover:text-blue-700"
+      //             id="file-input-doc-${file.id}-label">
+      //             <i class="${file.b_icon ?? `bi bi-upload`}"></i>
+      //              </span>
+      //                       <input type="file" id="file-input-doc-${file.id
+      //     }" class="hidden" />
+      //     </div>
+      // </div>`);
       $("#documentacion-documentacion").append(`
-                <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria
-        }">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <i class="bi bi-file
-                text-blue-500 text-xl"></i>
-                <div>
-                    <h3 class="font-medium text-gray-800">${file.folder_name
-        }</h3>
-                    <p class="text-sm text-red-500">Documento no subido</p>
-                </div>
-            </div>
-              <span class="download-btn text-blue-500 hover:text-blue-700"
-                id="file-input-doc-${file.id}-label">
-                <i class="${file.b_icon ?? `bi bi-upload`}"></i>
-                 </span>
-                          <input type="file" id="file-input-doc-${file.id
-        }" class="hidden" />
-        </div>
-    </div>`);
+      <div class="col-12 col-sm-12" id="single-${file.id}">
+          <div class="form-group">
+              <label>${file.folder_name}
+                ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>` : ""}
+              </label>
+              <div class="file-upload-box">
+                  ${file.file_url ? `
+                          <div class="file-info">
+                            <div class="file-iconic">
+                              ${getIconByType(file.type)}
+                            </div>
+                              <span class="file-name">${file.folder_name}</span>
+                              
+                              <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
+                              <i class="fas fa-download"></i>
+                              </button>
+                              <div  onclick="deleteDocumentacionFile(${file.id_file})">
+                              <i class="fas fa-trash"></i>
+                              </div>
+                          </div>
+                  `
+          : `
+                      <input type="file" id="file-input-${file.id}" class="file-input" accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt"/>
+                      <labelf for="file-inputo" class="file-label d-flex">
+                          <i class="fas fa-upload"></i>
+                          <div class="file-group-text">
+                              <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                          </div>
+                          <button class="upload-button upload-button-documentacion-documentacion-${file.id}" type="button">Subir archivo</button>
+                      </label>
+                   
+                  `
+        }
+          </div>    
+      </div>
+  `);
       // Add event listener to file input
-      $(`#file-input-doc-${file.id}-label`).off("click");
-      $(`#file-input-doc-${file.id}-label`).on("click", function () {
+      $(`.upload-button-documentacion-documentacion-${file.id}`).off("click");
+      $(`.upload-button-documentacion-documentacion-${file.id}`).on("click", function () {
         //show swall for upload
         Swal.fire({
-          title: "Subir documento",
-          input: "file",
-          inputAttributes: {
-            //all files
-            accept: "*",
-            "aria-label": "Sube tu archivo",
-          },
-          showCancelButton: true,
-          confirmButtonText: "Subir",
-          cancelButtonText: "Cancelar",
-          inputValidator: (value) => {
-            if (!value) {
-              return "Debes elegir un archivo!";
+          title: "Subir archivo",
+          //set modal width to 50%
+          width: "500px",
+          //html body modal
+          html: `<div class="bg-gray-100 flex items-center justify-center">
+      <div class=" w-100  bg-white py-8 px-4 rounded-lg shadow-md text-center">
+        
+        <div class="mb-4">
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 cursor-pointer hover:border-blue-500 transition-colors" id="dropZone">
+            <div class="text-gray-500">
+              <svg class="w-10 h-10 mx-auto mb-4" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.7564 15.6641H2.24359C1.01282 15.6641 0 16.6769 0 17.9077V20.4718C0 21.7025 1.01282 22.7153 2.24359 22.7153H22.7564C23.9872 22.7153 25 21.7025 25 20.4718V17.9077C25 16.6769 23.9872 15.6641 22.7564 15.6641ZM23.0769 20.4718C23.0769 20.6512 22.9359 20.7923 22.7564 20.7923H2.24359C2.0641 20.7923 1.92308 20.6512 1.92308 20.4718V17.9077C1.92308 17.7282 2.0641 17.5871 2.24359 17.5871H22.7564C22.9359 17.5871 23.0769 17.7282 23.0769 17.9077V20.4718Z" fill="#585858"/>
+              <path d="M8.78064 5.76718L10.9858 3.56205V12.78C10.9858 13.3056 11.4217 13.7415 11.9473 13.7415C12.473 13.7415 12.9088 13.3056 12.9088 12.78V3.56205L15.114 5.76718C15.3063 5.95949 15.5499 6.04923 15.7935 6.04923C16.0371 6.04923 16.2806 5.95949 16.4729 5.76718C16.8447 5.39538 16.8447 4.78 16.4729 4.4082L12.6268 0.562049C12.255 0.190254 11.6396 0.190254 11.2678 0.562049L7.42167 4.4082C7.04987 4.78 7.04987 5.39538 7.42167 5.76718C7.79346 6.13897 8.40885 6.13897 8.78064 5.76718Z" fill="#585858"/>
+              </svg>
+
+              <p class="text-md">Selecciona tu archivo aquí</p>
+              <p class="text-sm text-gray-400">Formatos: xlsx</p>
+            </div>
+          </div>
+          <input type="file" id="fileInput" class="hidden" accept=".xlsx">
+        </div>
+        <div id="fileList" class="space-y-2"></div>
+        <div class="flex justify-between mt-6">
+          <button id="cancelBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+            Cancelar
+          </button>
+          <button id="saveBtn" class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>`,
+          showCancelButton: false,
+          showConfirmButton: false,
+          //on open modal add function to file input
+          didOpen: () => {
+            const $dropZone = $('#dropZone');
+            const $fileInput = $('#fileInput');
+            const $fileList = $('#fileList');
+            const $cancelBtn = $('#cancelBtn');
+            const $saveBtn = $('#saveBtn');
+
+            // Handle drag and drop events
+            $dropZone.on('dragover', function (e) {
+              e.preventDefault();
+              $(this).addClass('border-blue-500');
+            });
+
+            $dropZone.on('dragleave', function (e) {
+              e.preventDefault();
+              $(this).removeClass('border-blue-500');
+            });
+
+            $dropZone.on('drop', function (e) {
+              e.preventDefault();
+              $(this).removeClass('border-blue-500');
+              const files = e.originalEvent.dataTransfer.files;
+              handleFiles(files);
+            });
+
+            // Handle click to upload
+            $dropZone.on('click', function () {
+              $fileInput.click();
+            });
+
+            $fileInput.on('change', function (e) {
+              handleFiles(this.files);
+            });
+
+            function handleFiles(files) {
+              $fileList.empty();
+              Array.from(files).forEach(file => {
+                if (file.name.endsWith('.xlsx')) {
+                  const fileSize = (file.size / 1024).toFixed(0) + ' KB';
+                  const $fileItem = $(`
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
+                      <div class="flex items-center">
+                        <svg class="w-6 h-6 text-green-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <div>
+                          <p class="text-sm font-medium">${file.name}</p>
+                          <p class="text-xs text-gray-500">${fileSize}</p>
+                        </div>
+                      </div>
+                      <button class="delete-file text-gray-400 hover:text-red-500">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  `);
+                  $fileList.append($fileItem);
+                }
+              });
             }
-          },
+
+            // Handle delete file
+            $(document).on('click', '.delete-file', function () {
+              $(this).closest('div').remove();
+              $fileInput.val('');
+            });
+
+            // Handle cancel button
+            $cancelBtn.on('click', function () {
+              $fileList.empty();
+              $fileInput.val('');
+              // Close the modal
+              Swal.close();
+            });
+
+            // Handle save button
+            $saveBtn.on('click', function () {
+              //validate if file is selected
+              const files = $fileInput[0].files;
+              if (files.length === 0) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: "Debes seleccionar un archivo",
+                });
+                return;
+              }
+              const fileI = files[0];
+              const formData = new FormData();
+              formData.append("file", fileI);
+              formData.append("idFolder", file.id);
+              formData.append("idContenedor", idContenedor);
+              url =
+                base_url +
+                "CargaConsolidada/ContenedorConsolidado/uploadFileDocumentation";
+              $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                  const result = JSON.parse(response);
+                  if (result.status == "success") {
+                    Swal.fire("Correcto!", result.message, "success");
+                    showDocumentacionDocumentacionContainer(idContenedor);
+                  } else {
+                    Swal.fire("Error!", result.message, "error");
+                  }
+                },
+              });
+            });
+          }
         }).then((result) => {
           if (result.isConfirmed) {
-            const fileI = result.value;
-            const formData = new FormData();
-            formData.append("file", fileI);
-            formData.append("idFolder", file.id);
-            formData.append("idContenedor", idContenedor);
-            url =
-              base_url +
-              "CargaConsolidada/ContenedorConsolidado/uploadFileDocumentation";
-            $.ajax({
-              url: url,
-              type: "POST",
-              data: formData,
-              processData: false,
-              contentType: false,
-              success: function (response) {
-                const result = JSON.parse(response);
-                if (result.status == "success") {
-                  Swal.fire("Correcto!", result.message, "success");
-                  showDocumentacionDocumentacionContainer(idContenedor);
-                } else {
-                  Swal.fire("Error!", result.message, "error");
-                }
-              },
-            });
+
           }
         });
       });
@@ -1764,13 +1964,14 @@ async function deleteCotizacion(id) {
     }
   });
 }
+
 async function viewFormularioAduana() {
   url =
     base_url +
     "CargaConsolidada/ContenedorConsolidado/viewFormularioAduana/" +
     idContenedor;
   spinner.show();
-  const response = await fetch(url);
+  let response = await fetch(url);
   const result = await response.json();
   spinner.hide();
   documentacionAduanaContainer.show();
@@ -1781,6 +1982,23 @@ async function viewFormularioAduana() {
     $(".tab-content").removeClass("active").addClass("hidden");
     $(`#${tab}`).removeClass("hidden").addClass("active");
   });
+  //fetch to getNavieras
+  url = base_url + "AgenteCompra/PedidosPagados/getNavieras";
+  response = await fetch(url);
+  let navieras = await response.json();
+  navieras = navieras.data;
+  //populate navieras select
+  const navieraSelect = $("#select-naviera");
+  navieraSelect.empty();
+  navieraSelect.append(
+    `<option value="" selected disabled>Selecciona una naviera</option>`
+  );
+  for (const naviera of navieras) {
+    navieraSelect.append(
+      `<option value="${naviera.name}">${naviera.name}</option>`
+    );
+  }
+
 
   // Control channel color indicator
   function updateChannelIndicator() {
@@ -1789,16 +2007,16 @@ async function viewFormularioAduana() {
 
     switch (channel) {
       case "Verde":
-        indicator.css("background-color", "#22c55e");
+        $("#controlChannel").css("background-color", "#22c55e");
         break;
       case "Naranja":
-        indicator.css("background-color", "#f97316");
+        $("#controlChannel").css("background-color", "#f97316");
         break;
       case "Rojo":
-        indicator.css("background-color", "#ef4444");
+        $("#controlChannel").css("background-color", "#ef4444");
         break;
       default:
-        indicator.css("background-color", "#d1d5db");
+
         break;
     }
   }
@@ -3542,6 +3760,34 @@ async function deleteDocumentacionFile(id) {
     }
   });
 }
+async function deleteDocumentacionFileDocumentacion(id) {
+  event.preventDefault();
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡No podrás revertir esto!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí  , eliminarlo",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      url = base_url + "CargaConsolidada/ContenedorConsolidado/deleteDocumentacionFile/" + id;
+      $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response) {
+          const result = JSON.parse(response);
+          if (result.status == "success") {
+            Swal.fire("Eliminado!", result.message, "success");
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+          showDocumentacionDocumentacionContainer();
+        },
+      });
+    }
+  });
+}
 async function openUploadFileDocumentation(idFolder) {
   const file = $(`#file-input-${idFolder}`)[0].files[0];
   console.log(file);
@@ -4008,21 +4254,21 @@ async function viewClientesDocumentacion(id) {
             </button>
           </div>
         </div></div>`);
-        
-        $("#cotizacion_file_url").off("click").on("click", function () {
-          if (result.cotizacion_file_url) {
-            window.open(result.cotizacion_file_url);
-          } else {
-            Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
-          }
-        });
-        $("#cotizacion_final_url").off("click").on("click", function () {
-          if (result.cotizacion_final_url) {
-            window.open(result.cotizacion_final_url);
-          } else {
-            Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
-          }
-        });
+
+    $("#cotizacion_file_url").off("click").on("click", function () {
+      if (result.cotizacion_file_url) {
+        window.open(result.cotizacion_file_url);
+      } else {
+        Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
+      }
+    });
+    $("#cotizacion_final_url").off("click").on("click", function () {
+      if (result.cotizacion_final_url) {
+        window.open(result.cotizacion_final_url);
+      } else {
+        Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
+      }
+    });
     $(".btn-crear-documentacion-cliente").off("click");
     $(".btn-crear-documentacion-cliente").on("click", function () {
       const providerId = $(this).data("id");
@@ -4059,9 +4305,9 @@ async function viewClientesDocumentacion(id) {
 
           if (result.status === "success") {
             Swal.fire("¡Documento subido!", result.message, "success");
-          console.log(name,"name");
+            console.log(name, "name");
             // Agregar dinámicamente el nuevo documento al DOM
-          const newDocument = `
+            const newDocument = `
             ${name}
             <div class="col-12 col-sm-12 file-info-container">
               <div class="form-group">
@@ -4081,24 +4327,24 @@ async function viewClientesDocumentacion(id) {
             </div>
           `;
 
-          // Validar que el HTML sea válido antes de agregarlo al DOM
-          try {
-            $("#documentos-clientes-documentacion").append(newDocument);
+            // Validar que el HTML sea válido antes de agregarlo al DOM
+            try {
+              $("#documentos-clientes-documentacion").append(newDocument);
 
-            // Agregar funcionalidad al botón de borrar
-          
-          } catch (error) {
-            console.error("Error al procesar el HTML del nuevo documento:", error);
-            Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
-          }
-        } else {
-          Swal.fire("Error", result.message, "error");
-          // Si ocurre un error en el servidor, eliminar el archivo subido
-          if (fileInput.dataset.fileId) {
-            deleteClienteDocumentacionFile(fileInput.dataset.fileId);
-          }
+              // Agregar funcionalidad al botón de borrar
 
-        }
+            } catch (error) {
+              console.error("Error al procesar el HTML del nuevo documento:", error);
+              Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
+            }
+          } else {
+            Swal.fire("Error", result.message, "error");
+            // Si ocurre un error en el servidor, eliminar el archivo subido
+            if (fileInput.dataset.fileId) {
+              deleteClienteDocumentacionFile(fileInput.dataset.fileId);
+            }
+
+          }
         },
       });
     });
@@ -4756,6 +5002,7 @@ $(document).ready(async function () {
       console.log(error);
     }
   });
+
   $("#upload-input-documents").change(function () {
     handleFileUpload(this.files, "documents");
   });
@@ -6270,7 +6517,56 @@ function enableHorizontalAutoScrollForAllTables() {
     });
   });
 }
-
+$("#navieraAdd").click(function () {
+  //show swall with text input and save button
+  Swal.fire({
+    title: "Agregar Naviera",
+    input: "text",
+    inputLabel: "Nombre de la naviera",
+    inputPlaceholder: "Ingrese el nombre de la naviera",
+    showCancelButton: true,
+    confirmButtonText: "Guardar",
+    cancelButtonText: "Cancelar",
+    preConfirm: (value) => {
+      if (!value) {
+        Swal.showValidationMessage("Por favor ingrese un nombre");
+      } else {
+        // Guardar la naviera en la base de datos
+        $.ajax({
+          url: base_url + "AgenteCompra/PedidosPagados/addNaviera",
+          type: "POST",
+          data: {
+            name: value,
+          },
+          success: async function (response) {
+            const result = JSON.parse(response);
+            if (result.status == "success") {
+              Swal.fire("¡Guardado!", result.message, "success");
+              // Recargar la lista de navieras
+              url = base_url + "AgenteCompra/PedidosPagados/getNavieras";
+              response = await fetch(url);
+              let navieras = await response.json();
+              navieras = navieras.data;
+              //populate navieras select
+              const navieraSelect = $("#select-naviera");
+              navieraSelect.empty();
+              navieraSelect.append(
+                `<option value="" selected disabled>Selecciona una naviera</option>`
+              );
+              for (const naviera of navieras) {
+                navieraSelect.append(
+                  `<option value="${naviera.name}">${naviera.name}</option>`
+                );
+              }
+            } else {
+              Swal.fire("Error", result.message, "error");
+            }
+          },
+        });
+      }
+    },
+  });
+});
 // Llamar a la función para aplicar el desplazamiento horizontal a todas las tablas
 enableHorizontalAutoScrollForAllTables();
 
@@ -6278,4 +6574,5 @@ setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'doc
 
 
 setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4']);
+setupMultiFileUpload("multiple-file-upload-aduana", "file-input-aduana", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
