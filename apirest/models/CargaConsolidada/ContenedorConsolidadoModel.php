@@ -1566,6 +1566,7 @@ class ContenedorConsolidadoModel extends CI_Model
         //find in query result folder_name factura comercial and get file_url
         $facturaComercial = $query->row();
         if (!$facturaComercial) {
+            log_message('error', 'No se encontró la factura comercial');
             return ['status' => "error", 'message' => "No se encontró la factura comercial"];
         }
 
@@ -1574,6 +1575,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $path_parts = pathinfo($facturaComercial);
         $extension = $path_parts['extension'];
         if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
+            log_message("error", "");
             return ['status' => "error", 'message' => "La Factura Comercial no es un archivo de excel"];
         }
         $this->db->select("main.*,files.id AS id_file,files.file_url")
@@ -1585,6 +1587,7 @@ class ContenedorConsolidadoModel extends CI_Model
         //find in query result folder_name packing list and get file_url
         $packingList = $query->row();
         if (!$packingList) {
+            log_message('error', 'No se encontró el packing list');
             return ['status' => "error", 'message' => "No se encontró el packing list"];
         }
         $packingList = $packingList->file_url;
