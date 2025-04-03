@@ -1646,6 +1646,7 @@ class ContenedorConsolidadoModel extends CI_Model
             
             // Verificar si el archivo existe antes de intentar cargarlo
             if (file_exists($facturaComercial)) {
+                log_message('error', 'El archivo existe en la ruta: ' . $facturaComercial);
                 $objPHPExcel = PHPExcel_IOFactory::load($facturaComercial);
                 return $objPHPExcel;
             } else {
