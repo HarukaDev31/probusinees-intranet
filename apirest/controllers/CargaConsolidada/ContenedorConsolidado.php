@@ -511,14 +511,14 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->correo;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;
-					$subdata[] = $row->volumen;
-					$subdata[] = $row->monto;
-					$subdata[] = $row->tarifa;
+					// $subdata[] = $row->volumen;
+					// $subdata[] = $row->monto;
+					// $subdata[] = $row->tarifa;
 
-					//     $btnView = '<div  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
-					// <i class="fas fa-eye" style="cursor:pointer;"></i>
-					// </div>';
-					//     $subdata[]           = $btnView;
+					    $btnView = '<div  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
+					<i class="fas fa-eye" style="cursor:pointer;"></i>
+					</div>';
+					    $subdata[]           = $btnView;
 					$selectEstadoCliente = "";
 					if ($this->user->No_Grupo == "Coordinación") {
 						$selectEstadoCliente = '<select class="form-control

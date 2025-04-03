@@ -3927,6 +3927,13 @@ async function viewClientesDocumentacion(id) {
     originalVolumenDocumento = provider.volumen_doc;
 
     $(".documentos-clientes-content").empty();
+
+    let facturaDiv = "";
+    let excelDiv = "";
+    let facturaComercial = provider.factura_comercial;
+    let excelConfirmacion = provider.excel_confirmacion;
+
+    if (currentPrivilege == "Coordinacion"){
     $(".documentos-clientes-content").append(`<div class="flex gap-8">
         <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
           <div class="flex items-center gap-2 mb-6
@@ -4102,10 +4109,24 @@ async function viewClientesDocumentacion(id) {
         },
       });
     });
-    let facturaDiv = "";
-    let excelDiv = "";
-    let facturaComercial = provider.factura_comercial;
-    let excelConfirmacion = provider.excel_confirmacion;
+  }else{
+    // Vista para otros usuarios (como en la imagen)
+    $(".documentos-clientes-content").append(`
+      <div class="flex gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
+          <h2 class="text-lg">Documentación Perú</h2>
+          <p>Volumen Documento: ${provider.volumen_doc}</p>
+          <p>Valor Documento: $${provider.valor_doc}</p>
+          <h3 class="text-md mt-4">Archivos:</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
+      </div>
+    `);
+  }
+
+    
     if (!facturaComercial) {
       facturaDiv = `
         Factura Comercial

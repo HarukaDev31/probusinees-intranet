@@ -316,12 +316,21 @@
                 <?php } ?>
               </li>
               <?php endforeach; ?>
+              <?php if($this->user->No_Grupo=='Coordinacion'){ ?>
+              <li class="nav-item">
+                <a class="nav-link" href="<?php echo base_url('Ventas/ReglasVenta/ClienteView'); ?>" title="Crear Cliente">
+                  <i class="nav-icon fas fa-user-plus"></i>
+                  <p>&nbsp;Crear Cliente</p>
+                </a>
+              </li>
+              <?php } ?>
             </ul>
           </nav>
           <?php if($this->user->No_Grupo != 'ContenedorAlmacen'){ ?>
           <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
               <li class="nav-header">Preferencias</li>
+              <?php if($this->user->No_Grupo != 'Documentacion'){ ?>
               <li class="nav-item">
                 <a class="nav-link" href="#" title="Notificaciones" data-target="#modal-notification" id="verNotificaciones"
                 data-toggle="modal" aria-expanded="false" >
@@ -330,6 +339,7 @@
                   <span class="badge badge-danger navbar-badge " id="counter-notifacions"><?php echo $iCantidadNotificaciones; ?></span>
                 </a>
               </li>
+              <?php } ?>
               <li class="nav-item">
                 <a class="nav-link" title="Modo Oscuro" href="#" >
                   <i class="nav-icon far fa-moon"></i>

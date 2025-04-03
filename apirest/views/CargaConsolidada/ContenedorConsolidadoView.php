@@ -952,11 +952,8 @@ Search for
       </div>
       <div class="col-6 col-sm-2">
         <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-Buscar por
-                          <?php } else { ?>
-Search for
-                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?> Buscar por
+                          <?php } else { ?> Search for <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
         </div>
       </div>
       <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -999,12 +996,17 @@ Search for
             <th>DNI/RUC</th>
             <th>Correo</th>
             <th>Whatsapp</th>
+          <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
+            <th>Asesor</th>
+          <?php } ?>
             <th>T. Cliente</th>
+          <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
             <th>Volumen</th>
             <th>Monto</th>
             <th>Tarifa</th>
 
             <th>Estados</th>
+          <?php } ?>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -1036,11 +1038,13 @@ Search for
       <div class="col-xl-9 col-md-8"></div>
 
       <div class="col-12 col-md-2">
+        <?php if ($this->user->No_Grupo != "Documentacion"){ ?>
         <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
             <?php } else { ?>
               Save
             <?php } ?>  </button>
+        <?php } ?>
       </div>
 
     </div>
