@@ -87,6 +87,10 @@ class ContenedorConsolidadoModel extends CI_Model
             if ($this->input->post('Filtro_Estado') != "0") {
                 $this->db->where('estado', $this->input->post('Filtro_Estado'));
             }
+         //if no user = doc where estado_documentacion != "COMPLETADO"
+            if ($this->user->No_Grupo == "Documentacion") {
+                $this->db->where("estado_documentacion != 'COMPLETADO'");,
+            }
             $this->db->order_by('carga', 'desc');
             $query = $this->db->get();
             return $query->result();
