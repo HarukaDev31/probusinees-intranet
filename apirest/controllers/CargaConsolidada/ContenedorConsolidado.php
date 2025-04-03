@@ -1062,6 +1062,7 @@ class ContenedorConsolidado extends CI_Controller
 			$objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
 			$objWriter->save('php://output');
 		} catch (Exception $e) {
+			log_message('error', 'Error al descargar la factura comercial: ' . $e->getMessage());
 			echo json_encode([
 				"status" => false,
 				"message" => $e->getMessage()
