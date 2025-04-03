@@ -89,7 +89,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
          //if no user = doc where estado_documentacion != "COMPLETADO"
             if ($this->user->No_Grupo == "Documentacion") {
-                $this->db->where("estado_documentacion != 'COMPLETADO'");
+                
             }
             $this->db->order_by('carga', 'desc');
             $query = $this->db->get();
@@ -2112,11 +2112,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estado]);
-        } else if ($estado == "COBRANDO") {
-            $this->db->where('id_cotizacion', $idCotizacion);
-            $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
-        }
+        } 
         // Manejo de otros estados
         else {
             $this->db->where('id_cotizacion', $idCotizacion);
@@ -2562,7 +2558,7 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
         if ($this->db->affected_rows() > 0) {
             if ($estados_proveedor == "LOADED") {
                 $this->db->where('id', $idProveedor);
-                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
+                // $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
                 //verify if in tracking exists RESERVADO ELSE TRUE SET estado_cliente in tablee cotizacion TO RESERVADO
                 $this->db->select('estado')
                     ->from($this->table_conteneodr_proveedor_estados_tracking)
