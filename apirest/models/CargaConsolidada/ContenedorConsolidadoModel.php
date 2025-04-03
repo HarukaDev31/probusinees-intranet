@@ -1596,6 +1596,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $extension = $path_parts['extension'];
         if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
             return ['status' => "error", 'message' => "El Packing List no es un archivo de excel"];
+            log_message('error', 'El Packing List no es un archivo de excel');
         }
         $this->db->select("main.*,files.id AS id_file,files.file_url")
             ->from($this->table_contenedor_documentacion_folders . " as main")
@@ -1606,6 +1607,8 @@ class ContenedorConsolidadoModel extends CI_Model
         //find in query result folder_name lista de partidas and get file_url
         $listaPartidas = $query->row();
         if (!$listaPartidas) {
+            log_message('error', 'No se encontró la lista de partidas');
+
             return ['status' => "error", 'message' => "No se encontró la lista de partidas"];
         }
         $listaPartidas = $listaPartidas->file_url;
@@ -1613,6 +1616,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $path_parts = pathinfo($listaPartidas);
         $extension = $path_parts['extension'];
         if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
+            log_message('error', 'La Lista de Partidas no es un archivo de excel');
             return ['status' => "error", 'message' => "La Lista de Partidas no es un archivo de excel"];
         }
         //get object PHPExcel from factura
