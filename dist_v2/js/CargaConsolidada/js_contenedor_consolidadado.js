@@ -3706,9 +3706,13 @@ async function getTableCotizacionEmbarqueHeaders() {
         confirmButtonText: "Subir",
         showLoaderOnConfirm: true,
         preConfirm: (file) => {
+          if (!file) {
+            Swal.showValidationMessage("Debes seleccionar un archivo");
+            return;
+          }
           const formData = new FormData();
           formData.append("file", file);
-          formData.append("id", idContenedor);
+          formData.append("idContenedor", idContenedor);
           return fetch(
             base_url + "CargaConsolidada/ContenedorConsolidado/uploadBL",
             {
@@ -3717,10 +3721,15 @@ async function getTableCotizacionEmbarqueHeaders() {
             }
           )
             .then((response) => {
-              getTableCotizacionEmbarqueHeaders();
-
+              console.log("Respuesta del servidor:", response); // Depuración
+              if (!response.ok) {
+                throw new Error("Error al subir el archivo");
+              }
               return response.json();
-              //call header again
+            })
+            .then((result) => {
+              console.log("Resultado del servidor:", result); // Depuración
+              return result;
             })
             .catch((error) => {
               Swal.showValidationMessage(`Request failed: ${error}`);
@@ -3728,6 +3737,24 @@ async function getTableCotizacionEmbarqueHeaders() {
         },
         allowOutsideClick: () => !Swal.isLoading(),
       });
+      if (file) {
+        if (file.status === "success") {
+          Swal.fire({
+            icon: "success",
+            title: "¡Archivo subido!",
+            text: "El archivo BL se ha subido correctamente.",
+            timer: 3000,
+            showConfirmButton: false,
+          });
+          getTableCotizacionEmbarqueHeaders(); // Actualizar la lista de archivos
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: file.message || "Hubo un problema al subir el archivo.",
+          });
+        }
+      }
     });
   }
 }
@@ -3752,8 +3779,10 @@ async function deleteBL() {
         type: "GET",
         success: function (response) {
           const result = JSON.parse(response);
+          console.log(response);
           if (result.status == "success") {
             Swal.fire("Eliminado!", result.message, "success");
+            getTableCotizacionEmbarqueHeaders();
           } else {
             Swal.fire("Error!", result.message, "error");
           }

@@ -1207,11 +1207,32 @@ class ContenedorConsolidado extends CI_Controller
 	}
 	public function uploadBL()
 	{
-		$file         = $_FILES['file'];
-		$idContenedor = $this->input->post('id');
-		$arrResponse  = $this->ContenedorConsolidadoModel->uploadBL($idContenedor, $file);
+		if (empty($_FILES['file']['name'])) {
+			log_message('error', 'uploadBL: No se recibió ningún archivo.');
+			echo json_encode([
+				"status" => "error",
+				"message" => "No se recibió ningún archivo.",
+			]);
+			return;
+		}
+	
+		$file = $_FILES['file'];
+		$idContenedor = $this->input->post('idContenedor');
+		if (empty($idContenedor)) {
+			log_message('error', 'uploadBL: No se recibió el ID del contenedor.');
+			echo json_encode([
+				"status" => "error",
+				"message" => "No se recibió el ID del contenedor.",
+			]);
+			return;
+		}
+	
+		// Llama al modelo para manejar la subida
+		$arrResponse = $this->ContenedorConsolidadoModel->uploadBL($idContenedor, $file);
+		log_message('error', 'uploadBL: Respuesta del modelo: ' . json_encode($arrResponse));
 		echo json_encode([
-			"status" => $arrResponse,
+			"status" => $arrResponse['status'],
+			"error" => $arrResponse['message']
 		]);
 	}
 	public function updateVolSelected()
@@ -1232,7 +1253,8 @@ class ContenedorConsolidado extends CI_Controller
 	{
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteBL($idContenedor);
 		echo json_encode([
-			"status" => $arrResponse,
+			"status" => $arrResponse['status'],
+			"message" => $arrResponse['message']
 		]);
 	}
 	public function deleteListaEmbarque($idContenedor)

@@ -3263,61 +3263,85 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             return $e->getMessage();
         }
     }
-    public function uploadBL($idContenedor, $file)
-    {
-        $this->maxFileSize = 1000000;
-        $this->setAllowedExtensionsImagesOfficeFiles();
-        $fileUrl = $this->uploadSingleFile(
-            [
-                "name" => $file['name'],
-                "type" => $file['type'],
-                "tmp_name" => $file['tmp_name'],
-                "error" => $file['error'],
-                "size" => $file['size']
-            ],
-            'assets/images/agentecompra/'
-        );
-        if ($fileUrl) {
-            $this->db->where('id', $idContenedor);
-            $this->db->update($this->table, ['bl_file_url' => $fileUrl]);
-            $this->verifyContainerIsCompleted($idContenedor);
+    public function uploadBL($idContenedor, $file){
 
-            if ($this->db->affected_rows() > 0) {
-                return ['status' => "success", 'error' => false];
-            }
-        }
-        return ['status' => "error", 'error' => true];
+    $this->maxFileSize = 1000000;
+    $this->setAllowedExtensionsImagesOfficeFiles();
+
+
+    // Validar ruta de almacenamiento
+    $uploadPath = './assets/images/agentecompra/';
+    if (!is_dir($uploadPath)) {
+        mkdir($uploadPath, 0777, true);
     }
+
+    // Subir archivo
+    $fileUrl = $this->uploadSingleFile(
+        [
+            "name" => $file['name'],
+            "type" => $file['type'],
+            "tmp_name" => $file['tmp_name'],
+            "error" => $file['error'],
+            "size" => $file['size']
+        ],
+        $uploadPath
+    );
+
+    if (!$fileUrl) {
+        return ['status' => "error", 'error' => "Error al subir el archivo."];
+    }
+
+    // Actualizar base de datos
+    $this->db->where('id', $idContenedor);
+    $this->db->update($this->table, ['bl_file_url' => $fileUrl]);
+
+    if ($this->db->error()['code'] == 0) {
+        $this->verifyContainerIsCompleted($idContenedor);
+        return ['status' => "success", 'error' => false];
+    }
+
+    return ['status' => "error", 'error' => "No se pudo actualizar la base de datos."];
+}
     public function updateVolSelected($idCotizacion, $volSelected)
     {
         $this->db->where('id', $idCotizacion);
         $this->db->update($this->table_contenedor_cotizacion, ['vol_selected' => $volSelected]);
-        if ($this->db->affected_rows() > 0) {
+        if ($this->db->error()['code'] == 0) {
             return "success";
         }
         return false;
     }
     public function deleteBL($idContenedor)
     {
+        // Verificar si el ID del contenedor es válido
+        if (empty($idContenedor)) {
+            return ['status' => 'error', 'message' => 'No se recibió el ID del contenedor.'];
+        }
+
+        // Obtener la URL del archivo BL para eliminarlo físicamente
+        $this->db->select('bl_file_url')
+            ->from($this->table)
+            ->where('id', $idContenedor);
+        $query = $this->db->get();
+        $result = $query->row();
+
+        if ($result && !empty($result->bl_file_url)) {
+            // Eliminar el archivo físicamente
+            $filePath = FCPATH . ltrim($result->bl_file_url, '/');
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+
+        // Actualizar la base de datos para eliminar la referencia al archivo
         $this->db->where('id', $idContenedor);
-        $this->db->update($this->table, ['bl_file_url' => '']);
-        $this->verifyContainerIsCompleted($idContenedor);
+        $this->db->update($this->table, ['bl_file_url' => null]);
 
         if ($this->db->affected_rows() > 0) {
-            return "success";
+            return ['status' => 'success', 'message' => 'Archivo eliminado correctamente.'];
         }
-        return false;
-    }
-    public function deleteListaEmbarque($idContenedor)
-    {
-        $this->db->where('id', $idContenedor);
-        $this->db->update($this->table, ['lista_embarque_url' => '']);
-        $this->verifyContainerIsCompleted($idContenedor);
 
-        if ($this->db->affected_rows() > 0) {
-            return "success";
-        }
-        return false;
+        return ['status' => 'error', 'message' => 'No se pudo eliminar el archivo.'];
     }
     public function getValidContainers()
     {
