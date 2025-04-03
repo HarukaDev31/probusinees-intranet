@@ -1634,12 +1634,27 @@ class ContenedorConsolidadoModel extends CI_Model
         }
         //get object PHPExcel from factura
         //sanitize file url
-        $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $facturaComercial); // Extraer ruta relativa
-        $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
-        $facturaComercial = FCPATH . ltrim($decodedPath, '/');
-        $objPHPExcel = PHPExcel_IOFactory::load($facturaComercial);
-
-        return $objPHPExcel;
+        // Extraer ruta relativa de manera más robusta
+        if (preg_match('/\/assets\/.*/', $facturaComercial, $matches)) {
+            $filePath = $matches[0]; // Toma la primera coincidencia completa
+            
+            // Decodificar la ruta codificada
+            $decodedPath = rawurldecode($filePath);
+            
+            // Construir la ruta completa, asegurando el manejo correcto de las barras
+            $facturaComercial = FCPATH . ltrim(str_replace('/', DIRECTORY_SEPARATOR, $decodedPath), DIRECTORY_SEPARATOR);
+            
+            // Verificar si el archivo existe antes de intentar cargarlo
+            if (file_exists($facturaComercial)) {
+                $objPHPExcel = PHPExcel_IOFactory::load($facturaComercial);
+                return $objPHPExcel;
+            } else {
+                throw new Exception("El archivo no existe en la ruta: " . $facturaComercial);
+            }
+        } else {
+            throw new Exception("No se pudo extraer la ruta del archivo desde: " . $facturaComercial);
+        }
+     
         $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $packingList); // Extraer ruta relativa
         $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
         $packingList = FCPATH . ltrim($decodedPath, '/');
