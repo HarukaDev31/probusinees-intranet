@@ -1686,7 +1686,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheet0->getStyle('A25:Z25')->getFont()->setBold(true);
             $sheet0->getStyle('A25:Z25')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $sheetPackingList = $objPHPExcelPacking->getSheet(0);
-            $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(2);
+            $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
             //SET R TO V style
             $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
             for ($i = 0; $i < $sheetCount; $i++) {
