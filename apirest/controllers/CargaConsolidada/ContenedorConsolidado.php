@@ -1054,13 +1054,16 @@ class ContenedorConsolidado extends CI_Controller
 	public function downloadFacturaComercial($idContenedor)
 	{
 		try {
-			ob_end_clean();
+			ob_clean();
+			ob_start();
+
 			$objExcel = $this->ContenedorConsolidadoModel->downloadFacturaComercial($idContenedor);
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment;filename="Factura_Comercial.xlsx"');
 			header('Cache-Control: max-age=0');
 			$objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
 			$objWriter->save('php://output');
+			ob_end_flush();
 		} catch (Exception $e) {
 			log_message('error', 'Error al descargar la factura comercial: ' . $e->getMessage());
 			echo json_encode([
