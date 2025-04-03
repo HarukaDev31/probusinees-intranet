@@ -1563,6 +1563,10 @@ class ContenedorConsolidadoModel extends CI_Model
             ->where('files.id_contenedor', $idContenedor)
             ->where('main.folder_name', 'Factura Comercial');
         $query = $this->db->get();
+        if($this->db->error()['code'] != 0){
+            log_message('error', 'Error en la consulta: ' . $this->db->error()['message']);
+            return ['status' => "error", 'message' => $this->db->error()['message']];
+        }
         //find in query result folder_name factura comercial and get file_url
         $facturaComercial = $query->row();
         if (!$facturaComercial) {
@@ -1586,6 +1590,10 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         //find in query result folder_name packing list and get file_url
         $packingList = $query->row();
+        if($this->db->error()['code'] != 0){
+            log_message('error', 'Error en la consulta: ' . $this->db->error()['message']);
+            return ['status' => "error", 'message' => $this->db->error()['message']];
+        }
         if (!$packingList) {
             log_message('error', 'No se encontró el packing list');
             return ['status' => "error", 'message' => "No se encontró el packing list"];
@@ -1603,6 +1611,10 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
             ->where('files.id_contenedor', $idContenedor)
             ->where('main.folder_name', 'Lista de Partidas');
+            if($this->db->error()['code'] != 0){
+                log_message('error', 'Error en la consulta: ' . $this->db->error()['message']);
+                return ['status' => "error", 'message' => $this->db->error()['message']];
+            }
         $query = $this->db->get();
         //find in query result folder_name lista de partidas and get file_url
         $listaPartidas = $query->row();
@@ -1672,30 +1684,30 @@ class ContenedorConsolidadoModel extends CI_Model
 
         try {
             $sheetCount = $objPHPExcel->getSheetCount();
-            $sheet0 = $objPHPExcel->getSheet(0);
-            $sheet0->insertNewColumnBefore('C', 2);
-            $sheet0->setCellValue('D25', 'CLIENTE');
-            $sheet0->setCellValue('C25', 'TIPO DE CLIENTE');
-            $sheet0->removeColumn('E');
-            $sheet0->setCellValue('R25', 'ADVALOREM');
-            $sheet0->setCellValue('S25', 'ANTIDUMPING');
-            $sheet0->setCellValue('T25', 'VOL. SISTEMA');
-            // $sheet0->setCellValue('U25', 'VOL. CHINA');
-            // $sheet0->setCellValue('V25', 'VOL. DOC.');
-            $styleArray = array(
-                'borders' => array(
-                    'allborders' => array(
-                        'style' => PHPExcel_Style_Border::BORDER_THIN,
-                    )
-                )
-            );
-            //set title font bold and center horizontal
-            $sheet0->getStyle('A25:Z25')->getFont()->setBold(true);
-            $sheet0->getStyle('A25:Z25')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $sheetPackingList = $objPHPExcelPacking->getSheet(0);
-            $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
-            //SET R TO V style
-            $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
+            // $sheet0 = $objPHPExcel->getSheet(0);
+            // $sheet0->insertNewColumnBefore('C', 2);
+            // $sheet0->setCellValue('D25', 'CLIENTE');
+            // $sheet0->setCellValue('C25', 'TIPO DE CLIENTE');
+            // $sheet0->removeColumn('E');
+            // $sheet0->setCellValue('R25', 'ADVALOREM');
+            // $sheet0->setCellValue('S25', 'ANTIDUMPING');
+            // $sheet0->setCellValue('T25', 'VOL. SISTEMA');
+            // // $sheet0->setCellValue('U25', 'VOL. CHINA');
+            // // $sheet0->setCellValue('V25', 'VOL. DOC.');
+            // $styleArray = array(
+            //     'borders' => array(
+            //         'allborders' => array(
+            //             'style' => PHPExcel_Style_Border::BORDER_THIN,
+            //         )
+            //     )
+            // );
+            // //set title font bold and center horizontal
+            // $sheet0->getStyle('A25:Z25')->getFont()->setBold(true);
+            // $sheet0->getStyle('A25:Z25')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            // $sheetPackingList = $objPHPExcelPacking->getSheet(0);
+            // $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
+            // //SET R TO V style
+            // $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
             // for ($i = 0; $i < $sheetCount; $i++) {
             //     log_message('error', 'Sheet ' . $i);
             //     $sheet = $objPHPExcel->getSheet($i);
