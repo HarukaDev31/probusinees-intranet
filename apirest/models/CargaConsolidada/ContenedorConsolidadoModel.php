@@ -1690,6 +1690,7 @@ class ContenedorConsolidadoModel extends CI_Model
             //SET R TO V style
             $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
             for ($i = 0; $i < $sheetCount; $i++) {
+                log_message('error', 'Sheet ' . $i);
                 $sheet = $objPHPExcel->getSheet($i);
                 //get from start column to bcolumn= where trim value=TOTAL FOB PRICE remove this row and go to next sheet and add columns to this range for first sheet and this for each sheet
                 if ($i == 0) {
