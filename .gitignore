@@ -4,9 +4,9 @@ apirest/logs/*
 backups/*
 !backups/.gitkeep
 assets/images/*
-assets/img/*
+
 apirest/config/database.php
 assets/agente_compra/
 assets/uploads/
-assets/*
+assets/cargaconsolidada
 assets/downloads/*

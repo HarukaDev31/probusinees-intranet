@@ -3894,6 +3894,10 @@ ACPC.ID_Pedido_Cabecera = " . $ID . " LIMIT 1";
         $this->db->from($this->tableOrdenBookingNaviera);
         return $this->db->get()->result();
     }
+    public function addNaviera($name){
+        $this->db->insert($this->tableOrdenBookingNaviera,['name'=>$name]);
+        return ['status' => 'success', 'message' => 'Naviera guardada'];
+    }
     public function getContainer(){
         $this->db->select('id,name');
         $this->db->from($this->tableOrdenBookingContainer);

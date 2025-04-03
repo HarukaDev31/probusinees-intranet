@@ -2511,6 +2511,11 @@ class PedidosPagados extends CI_Controller
         $response = $this->PedidosPagadosModel->getNavieras();
         echo json_encode(array('status' => 'success', 'data' => $response));
     }
+    public function addNaviera(){
+        $name= $this->input->post('name')??null;
+        $response = $this->PedidosPagadosModel->addNaviera($name);
+        echo json_encode(array('status' => 'success', 'data' => $response));
+    }
     public function getContainer(){
         $response = $this->PedidosPagadosModel->getContainer();
         echo json_encode(array('status' => 'success', 'data' => $response));
