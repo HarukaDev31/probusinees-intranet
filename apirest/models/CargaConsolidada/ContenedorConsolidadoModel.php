@@ -1603,8 +1603,9 @@ class ContenedorConsolidadoModel extends CI_Model
         $path_parts = pathinfo($packingList);
         $extension = $path_parts['extension'];
         if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
-            return ['status' => "error", 'message' => "El Packing List no es un archivo de excel"];
             log_message('error', 'El Packing List no es un archivo de excel');
+
+            return ['status' => "error", 'message' => "El Packing List no es un archivo de excel"];
         }
         $this->db->select("main.*,files.id AS id_file,files.file_url")
             ->from($this->table_contenedor_documentacion_folders . " as main")
@@ -1638,7 +1639,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $facturaComercial = FCPATH . ltrim($decodedPath, '/');
         $objPHPExcel = PHPExcel_IOFactory::load($facturaComercial);
 
-
+        return $objPHPExcel;
         $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $packingList); // Extraer ruta relativa
         $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
         $packingList = FCPATH . ltrim($decodedPath, '/');
