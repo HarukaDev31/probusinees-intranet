@@ -2072,6 +2072,8 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
+            //INSERT INTO TRACKING TABLE
+           
         }
         // Manejo del estado "LOADED"
         else if ($estado == "LOADED") {
@@ -2139,7 +2141,15 @@ class ContenedorConsolidadoModel extends CI_Model
             'id_proveedor' => $idProveedor,
             'estado' => $estado
         ]);
+        $this->db->select('estado')
+        ->from($this->table_conteneodr_proveedor_estados_tracking)
+        ->where('id_cotizacion', $idCotizacion)
+        ->where('estado', 'RESERVADO');
+        $query = $this->db->get();
+        $estadoCliente = $query->row() ? "RESERVADO" : "NO RESERVADO";
 
+        $this->db->where('id', $idCotizacion);
+        $this->db->update($this->table_contenedor_cotizacion, ['estado_cliente' => $estadoCliente]);
         // Manejo de errores en la inserción
         $dbError = $this->db->error();
         if ($dbError && $dbError['code'] != 0) {
