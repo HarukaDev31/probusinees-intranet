@@ -5265,13 +5265,13 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
     {
         //get all data from carga_consolidada_contenedor
         $this->db->select('*,
-        (select json_arrayagg(json_object(
+        ifnull((select json_arrayagg(json_object(
             "id", id,
             "file_name", file_name,
             "file_url", file_path,
             "file_ext", file_type,
             "file_size", file_size
-        )) as files from carga_consolidada_aduana_files where id_contenedor ='. $idContenedor.') as files')
+        )) as files from carga_consolidada_aduana_files where id_contenedor ='. $idContenedor.'),"[]") as files')
             ->from($this->table)
             ->where('id', $idContenedor);
         $query = $this->db->get();
