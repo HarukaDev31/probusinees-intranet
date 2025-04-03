@@ -1696,312 +1696,312 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
             //SET R TO V style
             $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
-            for ($i = 0; $i < $sheetCount; $i++) {
-                log_message('error', 'Sheet ' . $i);
-                $sheet = $objPHPExcel->getSheet($i);
-                //get from start column to bcolumn= where trim value=TOTAL FOB PRICE remove this row and go to next sheet and add columns to this range for first sheet and this for each sheet
-                if ($i == 0) {
-                    $highestRow = $sheet->getHighestRow();
-                    $nameActual = "";
-                    $mergedEndCell = 0;
-                    $mergedStartCell = $startIndex;
-                    for ($row = $startIndex; $row <= $highestRow; ++$row) {
-                        $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
-                        //get g merged column value where b merged column value in listapartidas =itemN using =vlookup
-                        $mergedCells = $sheetListaPartidas->getMergeCells();
-                        foreach ($mergedCells as $range) {
-                            // Extraer las celdas inicial y final del rango
-                            [$startCell, $endCell] = explode(':', $range);
-                            // Verificar si el rango está en la columna B
-                            if (preg_match('/^B\d+$/', $startCell)) {
-                                // Obtener el valor de la celda fusionada
-                                $value = $sheetListaPartidas->getCell($startCell)->getValue();
-                                if (trim($value) == $itemN) {
-                                    preg_match('/\d+/', $startCell, $startMatches);
-                                    preg_match('/\d+/', $endCell, $endMatches);
-                                    $startRow = (int)$startMatches[0];
-                                    $endRow = (int)$endMatches[0];
-                                    for ($r = $startRow; $r <= $endRow; $r++) {
-                                        $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                        if (trim($adValorem) == "FTA") {
-                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
-                                        }
-                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
-                                        $sheet->setCellValue('R' . $row, $adValorem);
-                                        $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
-                                        break;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                        //set client col value= packinglist c column  startPackingListIndex
-                        $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
-                        if ($client !== $nameActual) {
-                            if ($nameActual !== "") {
-                                // Si cambia el cliente, fusionar las celdas desde el inicio hasta la última fila del bloque actual
-                                $sheet->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
-                                $sheet->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                                // $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                                // $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
-                                $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
-                            }
+            // for ($i = 0; $i < $sheetCount; $i++) {
+            //     log_message('error', 'Sheet ' . $i);
+            //     $sheet = $objPHPExcel->getSheet($i);
+            //     //get from start column to bcolumn= where trim value=TOTAL FOB PRICE remove this row and go to next sheet and add columns to this range for first sheet and this for each sheet
+            //     if ($i == 0) {
+            //         $highestRow = $sheet->getHighestRow();
+            //         $nameActual = "";
+            //         $mergedEndCell = 0;
+            //         $mergedStartCell = $startIndex;
+            //         for ($row = $startIndex; $row <= $highestRow; ++$row) {
+            //             $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
+            //             //get g merged column value where b merged column value in listapartidas =itemN using =vlookup
+            //             $mergedCells = $sheetListaPartidas->getMergeCells();
+            //             foreach ($mergedCells as $range) {
+            //                 // Extraer las celdas inicial y final del rango
+            //                 [$startCell, $endCell] = explode(':', $range);
+            //                 // Verificar si el rango está en la columna B
+            //                 if (preg_match('/^B\d+$/', $startCell)) {
+            //                     // Obtener el valor de la celda fusionada
+            //                     $value = $sheetListaPartidas->getCell($startCell)->getValue();
+            //                     if (trim($value) == $itemN) {
+            //                         preg_match('/\d+/', $startCell, $startMatches);
+            //                         preg_match('/\d+/', $endCell, $endMatches);
+            //                         $startRow = (int)$startMatches[0];
+            //                         $endRow = (int)$endMatches[0];
+            //                         for ($r = $startRow; $r <= $endRow; $r++) {
+            //                             $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
+            //                             if (trim($adValorem) == "FTA") {
+            //                                 $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+            //                             }
+            //                             $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
+            //                             $sheet->setCellValue('R' . $row, $adValorem);
+            //                             $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
+            //                             break;
+            //                         }
+            //                         break;
+            //                     }
+            //                 }
+            //             }
+            //             //set client col value= packinglist c column  startPackingListIndex
+            //             $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
+            //             if ($client !== $nameActual) {
+            //                 if ($nameActual !== "") {
+            //                     // Si cambia el cliente, fusionar las celdas desde el inicio hasta la última fila del bloque actual
+            //                     $sheet->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
+            //                     $sheet->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
+            //                     // $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
+            //                     // $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
+            //                     $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
+            //                     // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
+            //                     // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+            //                 }
 
-                            // Actualizar el valor actual y establecer nuevas celdas iniciales
-                            $nameActual = $client;
-                            $mergedStartCell = $row;
-                        }
-                        $mergedEndCell = $row;
-                        $sheet->setCellValue('D' . $row, $client);
-                        //find if exists row in datasystem array where trim(nombre)=trim(client) if exists set volumen_cotizacion, volumen_china, volumen_doc, valor_doc, valor_cot else set -
-                        $volumen_cotizacion = "-";
-                        $volumen_selected = '';
-                        $volumen_china = "-";
-                        $volumen_doc = "-";
-                        $valor_doc = "-";
-                        $valor_cot = "-";
-                        $tipoCliente = "No existe en contenedor";
-                        //find in array
-                        foreach ($dataSystem as $item) {
-                            if (trim($item->nombre) == trim($client)) {
-                                $volumen_cotizacion = $item->volumen;
-                                $volumen_china = $item->volumen_china;
-                                $volumen_selected = $item->vol_selected ?? '';
-                                $volumen_doc = $item->volumen_doc;
-                                $valor_doc = $item->valor_doc;
-                                $tipoCliente = $item->name;
-                                break;
-                            }
-                        }
-                        //volumen_doc,volumen_china,volumen
-                        if ($volumen_selected == 'volumen_doc') {
-                            $volumen_cotizacion = $volumen_doc;
-                        }
-                        if ($volumen_selected == 'volumen_china') {
-                            $volumen_cotizacion = $volumen_china;
-                        }
-                        if ($volumen_selected == 'volumen') {
-                            $volumen_cotizacion = $volumen_cotizacion;
-                        }
-                        //set vol_cot to t column
-                        $sheet->setCellValue('T' . $row, $volumen_cotizacion);
-                        // $sheet->setCellValue('U' . $row, $volumen_china);
-                        // $sheet->setCellValue('V' . $row, $volumen_doc);
-                        $sheet->setCellValue('C' . $row, $tipoCliente);
-                        if (trim($itemN) == "TOTAL FOB PRICE") {
-                            //unmerge cell
+            //                 // Actualizar el valor actual y establecer nuevas celdas iniciales
+            //                 $nameActual = $client;
+            //                 $mergedStartCell = $row;
+            //             }
+            //             $mergedEndCell = $row;
+            //             $sheet->setCellValue('D' . $row, $client);
+            //             //find if exists row in datasystem array where trim(nombre)=trim(client) if exists set volumen_cotizacion, volumen_china, volumen_doc, valor_doc, valor_cot else set -
+            //             $volumen_cotizacion = "-";
+            //             $volumen_selected = '';
+            //             $volumen_china = "-";
+            //             $volumen_doc = "-";
+            //             $valor_doc = "-";
+            //             $valor_cot = "-";
+            //             $tipoCliente = "No existe en contenedor";
+            //             //find in array
+            //             foreach ($dataSystem as $item) {
+            //                 if (trim($item->nombre) == trim($client)) {
+            //                     $volumen_cotizacion = $item->volumen;
+            //                     $volumen_china = $item->volumen_china;
+            //                     $volumen_selected = $item->vol_selected ?? '';
+            //                     $volumen_doc = $item->volumen_doc;
+            //                     $valor_doc = $item->valor_doc;
+            //                     $tipoCliente = $item->name;
+            //                     break;
+            //                 }
+            //             }
+            //             //volumen_doc,volumen_china,volumen
+            //             if ($volumen_selected == 'volumen_doc') {
+            //                 $volumen_cotizacion = $volumen_doc;
+            //             }
+            //             if ($volumen_selected == 'volumen_china') {
+            //                 $volumen_cotizacion = $volumen_china;
+            //             }
+            //             if ($volumen_selected == 'volumen') {
+            //                 $volumen_cotizacion = $volumen_cotizacion;
+            //             }
+            //             //set vol_cot to t column
+            //             $sheet->setCellValue('T' . $row, $volumen_cotizacion);
+            //             // $sheet->setCellValue('U' . $row, $volumen_china);
+            //             // $sheet->setCellValue('V' . $row, $volumen_doc);
+            //             $sheet->setCellValue('C' . $row, $tipoCliente);
+            //             if (trim($itemN) == "TOTAL FOB PRICE") {
+            //                 //unmerge cell
 
-                            $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
-                            // //MERGE FROM D TO K
-                            $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
-                            $highestRow = $row - 1;
-                            $highestFirstSheetRow += $highestRow + 1;
+            //                 $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
+            //                 // //MERGE FROM D TO K
+            //                 $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
+            //                 $highestRow = $row - 1;
+            //                 $highestFirstSheetRow += $highestRow + 1;
 
-                            break;
-                        }
-                        $startPackingListIndex++;
-
-
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
-                        //set horizontal alignment to center
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                        //set vertical alignment to center
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-
-                        $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
-                    }
-                } else {
-
-                    $startIndex = $startColumn;
-                    $highestSheetRow = $sheet->getHighestRow();
-                    for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
-                        $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
-                        if ($client !== $nameActual) {
-                            if ($nameActual !== "") {
-                                $sheet0->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
-                                $sheet0->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                                // $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                                // $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
-                                $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
-                            }
-
-                            // Actualizar el valor actual y establecer nuevas celdas iniciales
-                            $nameActual = $client;
-                            $mergedStartCell = $highestFirstSheetRow;
-                        }
-                        $mergedEndCell = $highestFirstSheetRow;
-
-                        $sheet0 = $objPHPExcel->getSheet(0);
-                        $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
-
-                        if (trim($itemN) == "TOTAL FOB PRICE") {
-                            $highestSheetRow = $row - 1;
-                            break;
-                        }
-                        $sheet0->insertNewRowBefore($highestFirstSheetRow, 1);
-
-                        $volumen_cotizacion = "-";
-                        $volumen_china = "-";
-                        $volumen_doc = "-";
-                        $valor_doc = "-";
-                        $valor_cot = "-";
-                        $volumen_selected = '';
-
-                        $tipoCliente = "No existe en contenedor";
-                        //find in array
-                        foreach ($dataSystem as $item) {
-                            if (trim($item->nombre) == trim($client)) {
-                                $volumen_cotizacion = $item->volumen;
-                                $volumen_china = $item->volumen_china;
-                                $volumen_selected = $item->vol_selected ?? '';
-                                $volumen_doc = $item->volumen_doc;
-                                $valor_doc = $item->valor_doc;
-                                $tipoCliente = $item->name;
-                                break;
-                            }
-                        }
-
-                        //set vol_cot to t column
-                        if ($volumen_selected == 'volumen_doc') {
-                            $volumen_cotizacion = $volumen_doc;
-                        }
-                        if ($volumen_selected == 'volumen_china') {
-                            $volumen_cotizacion = $volumen_china;
-                        }
-                        if ($volumen_selected == 'volumen') {
-                            $volumen_cotizacion = $volumen_cotizacion;
-                        }
-                        $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
-                        // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
-                        // $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
-                        $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
-                        $mergedCells = $sheetListaPartidas->getMergeCells();
-                        foreach ($mergedCells as $range) {
-                            // Extraer las celdas inicial y final del rango
-                            [$startCell, $endCell] = explode(':', $range);
-
-                            // Verificar si el rango está en la columna B
-                            if (preg_match('/^B\d+$/', $startCell)) {
-                                // Obtener el valor de la celda fusionada
-                                $value = $sheetListaPartidas->getCell($startCell)->getValue();
-
-                                // Comparar el valor con el itemNumber
-                                if (trim($value) == $itemN) {
-                                    // Obtener el rango de filas del rango fusionado
-                                    preg_match('/\d+/', $startCell, $startMatches);
-                                    preg_match('/\d+/', $endCell, $endMatches);
-                                    $startRow = (int)$startMatches[0];
-                                    $endRow = (int)$endMatches[0];
-
-                                    // Obtener el valor de la columna G para el rango fusionado
-                                    for ($r = $startRow; $r <= $endRow; $r++) {
-                                        $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                        if (trim($adValorem) == "FTA") {
-                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
-                                        }
-                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
-                                        $sheet0->setCellValue('R' . $highestFirstSheetRow, $adValorem);
-                                        $sheet0->setCellValue('S' . $highestFirstSheetRow, $antiDumping == 0 ? "-" : $antiDumping);
-                                        break;
-                                    }
-
-                                    // Salir del bucle si ya encontramos el rango que buscamos
-                                    break;
-                                }
-                            }
-                        }
-                        $sheet0->setCellValue('D' . $highestFirstSheetRow, $client);
-
-                        //get this sheet values and insert in first sheet
-
-                        // $brand = $sheet->getCell($brandColumn.$row)->getValue();
-                        $description = $sheet->getCell($descriptionColumn . $row)->getValue();
-                        $quantityCount = $sheet->getCell($quantityCountColumn . $row)->getValue();
-                        $quantityMeasure = $sheet->getCell($quantityMeasureColumn . $row)->getValue();
-                        $unitPrice = $sheet->getCell($unitPriceColumn . $row)->getValue();
-                        $unitMeasure = $sheet->getCell($unitMeasureColumn . $row)->getValue();
-                        $fobPrice = $sheet->getCell($fobPriceColumn . $row)->getValue();
-                        $sheet0->setCellValue($itemNColumn . $highestFirstSheetRow, $itemN);
-
-                        // // $sheet0->setCellValue($brandColumn.$highestFirstSheetRow,$brand);
-                        $sheet0->setCellValue($descriptionNColumn . $highestFirstSheetRow, $description);
-                        $sheet0->setCellValue($quantityCountNColumn . $highestFirstSheetRow, $quantityCount);
-                        $sheet0->setCellValue($quantityMeasureNColumn . $highestFirstSheetRow, $quantityMeasure);
-                        $sheet0->setCellValue($unitPriceNColumn . $highestFirstSheetRow, $unitPrice);
-                        $sheet0->setCellValue($unitMeasureNColumn . $highestFirstSheetRow, $unitMeasure);
-                        $sheet0->setCellValue($fobPriceNColumn . $highestFirstSheetRow, "=" . $quantityCountNColumn . $highestFirstSheetRow . "*" . $unitPriceNColumn . $highestFirstSheetRow);
-                        // // $sheet0->mergeCells('D'.$highestFirstSheetRow.':K'.$highestFirstSheetRow);
-                        $styleArray = array(
-                            'borders' => array(
-                                'allborders' => array(
-                                    'style' => PHPExcel_Style_Border::BORDER_THIN,
-                                )
-                            )
-                        );
-                        $objPHPExcel->getActiveSheet()->mergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
+            //                 break;
+            //             }
+            //             $startPackingListIndex++;
 
 
-                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
-                        //set horizontal alignment to center
-                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                        //set vertical alignment to center
-                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-                        $sheet0->getStyle('O' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                        $sheet0->getStyle('Q' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                        //set r column porcentage format
-                        $sheet0->getStyle('R' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+            //             $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
+            //             //set horizontal alignment to center
+            //             $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            //             //set vertical alignment to center
+            //             $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
-                        $highestFirstSheetRow++;
+            //             $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+            //         }
+            //     } else {
 
-                        $startPackingListIndex++;
-                    }
-                }
-            }
-            //unmerge e to l
-            $objPHPExcel->getActiveSheet()->unmergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
-            $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
-            //set fill none in sheet 0 row=highestFirstSheetRow
-            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
-            //set all borders
-            $styleArray = array(
-                'borders' => array(
-                    'allborders' => array(
-                        'style' => PHPExcel_Style_Border::BORDER_THIN,
-                    )
-                )
-            );
-            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
+            //         $startIndex = $startColumn;
+            //         $highestSheetRow = $sheet->getHighestRow();
+            //         for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
+            //             $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
+            //             if ($client !== $nameActual) {
+            //                 if ($nameActual !== "") {
+            //                     $sheet0->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
+            //                     $sheet0->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
+            //                     // $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
+            //                     // $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
+            //                     $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
+            //                     // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
+            //                     // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+            //                 }
 
-            //MERGE B TO 0
-            //set p highestFirstSheetRow value to sum from p.startColumn to p.highestFirstSheetRow-1
-            $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
-            $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
+            //                 // Actualizar el valor actual y establecer nuevas celdas iniciales
+            //                 $nameActual = $client;
+            //                 $mergedStartCell = $highestFirstSheetRow;
+            //             }
+            //             $mergedEndCell = $highestFirstSheetRow;
 
-            //set  d column auto size
-            $sheet0->getStyle('D')->getAlignment()->setWrapText(true);
-            $sheet0->getColumnDimension('C')->setWidth(30);
+            //             $sheet0 = $objPHPExcel->getSheet(0);
+            //             $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
 
-            $sheet0->getColumnDimension('D')->setWidth(60);
-            //SET WIDTH TO COLUMNS
-            $sheet0->getColumnDimension('R')->setWidth(20);
-            $sheet0->getColumnDimension('S')->setWidth(25);
-            $sheet0->getColumnDimension('T')->setWidth(15);
-            // $sheet0->getColumnDimension('U')->setWidth(15);
-            // $sheet0->getColumnDimension('V')->setWidth(15);
-            //from b starcolumn to b highestFirstSheetRow-1 set fill pinkColor
-            $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
-            //D TO GRAY, R AND S TO SKYBLUE, T TO PINK,U TO GREEN
-            $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
-            $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
-            $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+            //             if (trim($itemN) == "TOTAL FOB PRICE") {
+            //                 $highestSheetRow = $row - 1;
+            //                 break;
+            //             }
+            //             $sheet0->insertNewRowBefore($highestFirstSheetRow, 1);
+
+            //             $volumen_cotizacion = "-";
+            //             $volumen_china = "-";
+            //             $volumen_doc = "-";
+            //             $valor_doc = "-";
+            //             $valor_cot = "-";
+            //             $volumen_selected = '';
+
+            //             $tipoCliente = "No existe en contenedor";
+            //             //find in array
+            //             foreach ($dataSystem as $item) {
+            //                 if (trim($item->nombre) == trim($client)) {
+            //                     $volumen_cotizacion = $item->volumen;
+            //                     $volumen_china = $item->volumen_china;
+            //                     $volumen_selected = $item->vol_selected ?? '';
+            //                     $volumen_doc = $item->volumen_doc;
+            //                     $valor_doc = $item->valor_doc;
+            //                     $tipoCliente = $item->name;
+            //                     break;
+            //                 }
+            //             }
+
+            //             //set vol_cot to t column
+            //             if ($volumen_selected == 'volumen_doc') {
+            //                 $volumen_cotizacion = $volumen_doc;
+            //             }
+            //             if ($volumen_selected == 'volumen_china') {
+            //                 $volumen_cotizacion = $volumen_china;
+            //             }
+            //             if ($volumen_selected == 'volumen') {
+            //                 $volumen_cotizacion = $volumen_cotizacion;
+            //             }
+            //             $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
+            //             // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
+            //             // $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
+            //             $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
+            //             $mergedCells = $sheetListaPartidas->getMergeCells();
+            //             foreach ($mergedCells as $range) {
+            //                 // Extraer las celdas inicial y final del rango
+            //                 [$startCell, $endCell] = explode(':', $range);
+
+            //                 // Verificar si el rango está en la columna B
+            //                 if (preg_match('/^B\d+$/', $startCell)) {
+            //                     // Obtener el valor de la celda fusionada
+            //                     $value = $sheetListaPartidas->getCell($startCell)->getValue();
+
+            //                     // Comparar el valor con el itemNumber
+            //                     if (trim($value) == $itemN) {
+            //                         // Obtener el rango de filas del rango fusionado
+            //                         preg_match('/\d+/', $startCell, $startMatches);
+            //                         preg_match('/\d+/', $endCell, $endMatches);
+            //                         $startRow = (int)$startMatches[0];
+            //                         $endRow = (int)$endMatches[0];
+
+            //                         // Obtener el valor de la columna G para el rango fusionado
+            //                         for ($r = $startRow; $r <= $endRow; $r++) {
+            //                             $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
+            //                             if (trim($adValorem) == "FTA") {
+            //                                 $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+            //                             }
+            //                             $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
+            //                             $sheet0->setCellValue('R' . $highestFirstSheetRow, $adValorem);
+            //                             $sheet0->setCellValue('S' . $highestFirstSheetRow, $antiDumping == 0 ? "-" : $antiDumping);
+            //                             break;
+            //                         }
+
+            //                         // Salir del bucle si ya encontramos el rango que buscamos
+            //                         break;
+            //                     }
+            //                 }
+            //             }
+            //             $sheet0->setCellValue('D' . $highestFirstSheetRow, $client);
+
+            //             //get this sheet values and insert in first sheet
+
+            //             // $brand = $sheet->getCell($brandColumn.$row)->getValue();
+            //             $description = $sheet->getCell($descriptionColumn . $row)->getValue();
+            //             $quantityCount = $sheet->getCell($quantityCountColumn . $row)->getValue();
+            //             $quantityMeasure = $sheet->getCell($quantityMeasureColumn . $row)->getValue();
+            //             $unitPrice = $sheet->getCell($unitPriceColumn . $row)->getValue();
+            //             $unitMeasure = $sheet->getCell($unitMeasureColumn . $row)->getValue();
+            //             $fobPrice = $sheet->getCell($fobPriceColumn . $row)->getValue();
+            //             $sheet0->setCellValue($itemNColumn . $highestFirstSheetRow, $itemN);
+
+            //             // // $sheet0->setCellValue($brandColumn.$highestFirstSheetRow,$brand);
+            //             $sheet0->setCellValue($descriptionNColumn . $highestFirstSheetRow, $description);
+            //             $sheet0->setCellValue($quantityCountNColumn . $highestFirstSheetRow, $quantityCount);
+            //             $sheet0->setCellValue($quantityMeasureNColumn . $highestFirstSheetRow, $quantityMeasure);
+            //             $sheet0->setCellValue($unitPriceNColumn . $highestFirstSheetRow, $unitPrice);
+            //             $sheet0->setCellValue($unitMeasureNColumn . $highestFirstSheetRow, $unitMeasure);
+            //             $sheet0->setCellValue($fobPriceNColumn . $highestFirstSheetRow, "=" . $quantityCountNColumn . $highestFirstSheetRow . "*" . $unitPriceNColumn . $highestFirstSheetRow);
+            //             // // $sheet0->mergeCells('D'.$highestFirstSheetRow.':K'.$highestFirstSheetRow);
+            //             $styleArray = array(
+            //                 'borders' => array(
+            //                     'allborders' => array(
+            //                         'style' => PHPExcel_Style_Border::BORDER_THIN,
+            //                     )
+            //                 )
+            //             );
+            //             $objPHPExcel->getActiveSheet()->mergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
+
+
+            //             $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
+            //             //set horizontal alignment to center
+            //             $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            //             //set vertical alignment to center
+            //             $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            //             $sheet0->getStyle('O' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            //             $sheet0->getStyle('Q' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            //             //set r column porcentage format
+            //             $sheet0->getStyle('R' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+
+            //             $highestFirstSheetRow++;
+
+            //             $startPackingListIndex++;
+            //         }
+            //     }
+            // }
+            // //unmerge e to l
+            // $objPHPExcel->getActiveSheet()->unmergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
+            // $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
+            // //set fill none in sheet 0 row=highestFirstSheetRow
+            // $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
+            // //set all borders
+            // $styleArray = array(
+            //     'borders' => array(
+            //         'allborders' => array(
+            //             'style' => PHPExcel_Style_Border::BORDER_THIN,
+            //         )
+            //     )
+            // );
+            // $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
+
+            // //MERGE B TO 0
+            // //set p highestFirstSheetRow value to sum from p.startColumn to p.highestFirstSheetRow-1
+            // $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
+            // $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
+
+            // //set  d column auto size
+            // $sheet0->getStyle('D')->getAlignment()->setWrapText(true);
+            // $sheet0->getColumnDimension('C')->setWidth(30);
+
+            // $sheet0->getColumnDimension('D')->setWidth(60);
+            // //SET WIDTH TO COLUMNS
+            // $sheet0->getColumnDimension('R')->setWidth(20);
+            // $sheet0->getColumnDimension('S')->setWidth(25);
+            // $sheet0->getColumnDimension('T')->setWidth(15);
+            // // $sheet0->getColumnDimension('U')->setWidth(15);
+            // // $sheet0->getColumnDimension('V')->setWidth(15);
+            // //from b starcolumn to b highestFirstSheetRow-1 set fill pinkColor
+            // $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+            // //D TO GRAY, R AND S TO SKYBLUE, T TO PINK,U TO GREEN
+            // $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
+            // $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
+            // $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            // $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
 
             return $objPHPExcel;
         } catch (Exception $e) {
