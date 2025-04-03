@@ -2019,9 +2019,11 @@ async function viewFormularioAduana() {
     );
   }
   //disavle .input-aduana}
-  $(".input-aduana").prop("disabled", true);
+  if(sectionsDisabled){
+    $(".input-aduana").prop("disabled", true);
   $(".btn-guardar-aduana").hide();
   $(".upload-button-aduana").hide();
+  }
   // Control channel color indicator
   function updateChannelIndicator() {
     const channel = $("#controlChannel").val();
