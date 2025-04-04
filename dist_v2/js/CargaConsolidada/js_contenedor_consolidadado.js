@@ -4284,6 +4284,9 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
   documentosContainer.empty();
 
   filteredFiles.forEach((file) => {
+    if (file.file_url == null) {
+      return;
+    }
     documentosContainer.append(`
       <div class="file-item">
         <div class="file-info">
