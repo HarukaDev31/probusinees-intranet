@@ -89,7 +89,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
          //if no user = doc where estado_documentacion != "COMPLETADO"
             if ($this->user->No_Grupo == "Documentacion") {
-                $this->db->where("estado_documentacion != 'COMPLETADO'");
+                
             }
             $this->db->order_by('carga', 'desc');
             $query = $this->db->get();
@@ -1018,7 +1018,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->update($this->table);
             }
 
-            if ($this->db->affected_rows() > 0) {
+            if ($this->db->error()['code'] == 0) {
                 return "success";
             }
             $errors = $this->db->error();
@@ -1077,7 +1077,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 'volumen_doc', prov.volumen_doc,
                 'valor_doc', prov.valor_doc,
                 'factura_comercial', prov.factura_comercial,
-                'excel_confirmacion', prov.excel_confirmacion
+                'excel_confirmacion', prov.excel_confirmacion,
+                'packing_list', prov.packing_list
             )
         )
         FROM " . $this->table_contenedor_cotizacion_proveedores . " prov
@@ -1196,6 +1197,25 @@ class ContenedorConsolidadoModel extends CI_Model
                 );
                 $data['excel_confirmacion'] = $fileUrl;
             }
+            if (isset($files['packing_list'])) {
+                $this->db->select('packing_list')
+                    ->from($this->table_contenedor_cotizacion_proveedores)
+                    ->where('id', $data['idProveedor']);
+                $query = $this->db->get();
+                $fileUrl = $query->row()->file_url;
+                unlink($fileUrl);
+                $fileUrl = $this->uploadSingleFile(
+                    [
+                        "name" => $files['packing_list']['name'],
+                        "type" => $files['packing_list']['type'],
+                        "tmp_name" => $files['packing_list']['tmp_name'],
+                        "error" => $files['packing_list']['error'],
+                        "size" => $files['packing_list']['size']
+                    ],
+                    'assets/images/agentecompra/'
+                );
+                $data['packing_list'] = $fileUrl;
+            }
             //remove id from data array
             $idCotizacion = $data['id'];
             unset($data['id']);
@@ -1237,74 +1257,10 @@ class ContenedorConsolidadoModel extends CI_Model
                 ],
                 'assets/images/agentecompra/'
             );
-            $objPHPExcel = PHPExcel_IOFactory::load($file['tmp_name']);
-            $sheet = $objPHPExcel->getSheet(0);
-            $highestRow = $sheet->getHighestRow();
-            $data = [];
-            $initialRow = 5;
 
-            // Obtén las celdas fusionadas
-            $mergedCells = $sheet->getMergeCells();
-
-            for ($row = $initialRow; $row <= $highestRow; ++$row) {
-                $currentName = $sheet->getCell('D' . $row)->getValue();
-                $isMerged = false;
-                $totalVolumen = 0;
-
-                // Verifica si la celda actual está fusionada
-                foreach ($mergedCells as $mergedRange) {
-                    [$start, $end] = explode(':', $mergedRange);
-                    $startRow = preg_replace('/[^\d]/', '', $start);
-                    $endRow = preg_replace('/[^\d]/', '', $end);
-                    $startCol = preg_replace('/\d/', '', $start);
-
-                    // Si la celda está en un rango fusionado en la columna D
-                    if ($startCol == 'D' && $row >= $startRow && $row <= $endRow) {
-                        $isMerged = true;
-
-                        // Obtén el valor fusionado
-                        $currentName = $sheet->getCell($start)->getValue();
-
-                        // Suma los valores de la columna O en el rango fusionado
-                        for ($mergeRow = $startRow; $mergeRow <= $endRow; ++$mergeRow) {
-                            $cellValue = $sheet->getCell('O' . $mergeRow)->getValue();
-                            $totalVolumen += is_numeric($cellValue) ? $cellValue : 0;
-                        }
-                        break;
-                    }
-                }
-
-                // Si no está fusionada, solo toma el valor de la fila actual
-                if (!$isMerged) {
-                    $cellValue = $sheet->getCell('O' . $row)->getValue();
-                    $totalVolumen = is_numeric($cellValue) ? $cellValue : 0;
-                }
-
-                $data[] = [
-                    'name' => trim($currentName),
-                    'volumen_china' => $totalVolumen
-                ];
-            }
-
-            // Compara con la base de datos y actualiza
-            $this->db->select('id,nombre')
-                ->from($this->table_contenedor_cotizacion)
-                ->where('id_contenedor', $idContenedor);
-            $query = $this->db->get();
-            $cotizaciones = $query->result();
-
-            foreach ($cotizaciones as $cotizacion) {
-                foreach ($data as $item) {
-                    if (trim($cotizacion->nombre) == trim($item['name'])) {
-                        $this->db->where('id', $cotizacion->id);
-                        $this->db->update($this->table_contenedor_cotizacion, ['volumen_china' => $item['volumen_china']]);
-                    }
-                }
-            }
-
-            // Actualiza el archivo en la tabla
             $this->db->where('id', $idContenedor);
             $this->db->update($this->table, ['lista_embarque_url' => $fileUrl]);
+            $this->verifyContainerIsCompleted($idContenedor);
 
             if ($this->db->affected_rows() > 0) {
                 return [
@@ -1312,7 +1268,6 @@ class ContenedorConsolidadoModel extends CI_Model
                     'message' => "Lista de embarque actualizada"
                 ];
             }
-            $this->verifyContainerIsCompleted($idContenedor);
             if ($this->db->error()['code'] != 0) {
                 return [
                     'status' => "error",
@@ -1751,7 +1706,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $sheet0->getStyle('A25:Z25')->getFont()->setBold(true);
             $sheet0->getStyle('A25:Z25')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $sheetPackingList = $objPHPExcelPacking->getSheet(0);
-            $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(2);
+            $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
             //SET R TO V style
             $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
             for ($i = 0; $i < $sheetCount; $i++) {
@@ -2062,6 +2017,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
             return $objPHPExcel;
         } catch (Exception $e) {
+            log_message('error', __METHOD__ .''. $e->getMessage());
             return ['status' => "error", 'message' => $e->getMessage()];
         }
     }
@@ -2137,6 +2093,8 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
+            //INSERT INTO TRACKING TABLE
+           
         }
         // Manejo del estado "LOADED"
         else if ($estado == "LOADED") {
@@ -2152,7 +2110,7 @@ class ContenedorConsolidadoModel extends CI_Model
 
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED", "estados" => "EMBARCADO"]);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => "LOADED"]);
             $this->db->select('SUM(ifnull(cbm_total_china,0)) as volumen_china')
                 ->from($this->table_contenedor_cotizacion_proveedores)
                 ->where('id_cotizacion', $idCotizacion)
@@ -2177,11 +2135,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estado]);
-        } else if ($estado == "COBRANDO") {
-            $this->db->where('id_cotizacion', $idCotizacion);
-            $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
-        }
+        } 
         // Manejo de otros estados
         else {
             $this->db->where('id_cotizacion', $idCotizacion);
@@ -2208,7 +2162,15 @@ class ContenedorConsolidadoModel extends CI_Model
             'id_proveedor' => $idProveedor,
             'estado' => $estado
         ]);
+        $this->db->select('estado')
+        ->from($this->table_conteneodr_proveedor_estados_tracking)
+        ->where('id_cotizacion', $idCotizacion)
+        ->where('estado', 'RESERVADO');
+        $query = $this->db->get();
+        $estadoCliente = $query->row() ? "RESERVADO" : "NO RESERVADO";
 
+        $this->db->where('id', $idCotizacion);
+        $this->db->update($this->table_contenedor_cotizacion, ['estado_cliente' => $estadoCliente]);
         // Manejo de errores en la inserción
         $dbError = $this->db->error();
         if ($dbError && $dbError['code'] != 0) {
@@ -2627,7 +2589,7 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
         if ($this->db->affected_rows() > 0) {
             if ($estados_proveedor == "LOADED") {
                 $this->db->where('id', $idProveedor);
-                $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
+                // $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => 'EMBARCADO']);
                 //verify if in tracking exists RESERVADO ELSE TRUE SET estado_cliente in tablee cotizacion TO RESERVADO
                 $this->db->select('estado')
                     ->from($this->table_conteneodr_proveedor_estados_tracking)

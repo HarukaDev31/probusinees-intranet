@@ -86,7 +86,7 @@ class ContenedorConsolidado extends CI_Controller
 			if ($this->user->No_Grupo == "ContenedorAlmacen") {
 				$divEstado = '<select
 		onchange="updateEstado(' . $row->id . ')"
-				
+				 id="estado-' . $row->id . '"
 			class="form-control
 					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
 					($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .
@@ -480,9 +480,7 @@ class ContenedorConsolidado extends CI_Controller
 							<option value="INSPECCIONADO" ' . ($proveedor->estados == "INSPECCIONADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? " disabled" : "") . '		>INSPECCIONADO</option>
 							<option value="COBRANDO" ' . ($proveedor->estados == "COBRANDO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "Coordinación" ? " disabled" : "") . '		>COBRANDO</option>
 							<option value="RESERVADO" ' . ($proveedor->estados == "RESERVADO" ? "selected" : "") . '>RESERVADO</option>
-							<option value="EMBARCADO" ' . ($proveedor->estados == "EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '
-							>EMBARCADO</option>
-							<option value="NO EMBARCADO" ' . ($proveedor->estados == "NO EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '>NO EMBARCADO</option>
+							
 						</select>';
 
 						$qtyBoxDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->qty_box ?? 0) . '"></input></div>';
@@ -1054,14 +1052,18 @@ class ContenedorConsolidado extends CI_Controller
 	public function downloadFacturaComercial($idContenedor)
 	{
 		try {
-			ob_end_clean();
+			ob_clean();
+			ob_start();
+
 			$objExcel = $this->ContenedorConsolidadoModel->downloadFacturaComercial($idContenedor);
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment;filename="Factura_Comercial.xlsx"');
 			header('Cache-Control: max-age=0');
 			$objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
 			$objWriter->save('php://output');
+			ob_end_flush();
 		} catch (Exception $e) {
+			log_message('error', 'Error al descargar la factura comercial: ' . $e->getMessage());
 			echo json_encode([
 				"status" => false,
 				"message" => $e->getMessage()

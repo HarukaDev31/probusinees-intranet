@@ -3159,7 +3159,7 @@ const openStepFunction = async (step, id) => {
       contentHeader.show();
       cotizacionContainer.hide();
       clientesDocumentacionContainer.hide();
-
+      table_Entidad.ajax.reload()
       stepsContainer.hide();
     } else {
       returnToSteps();
@@ -3661,7 +3661,12 @@ async function getTableCotizacionEmbarqueHeaders() {
           )
             .then((response) => {
               getTableCotizacionEmbarqueHeaders();
-
+              //show success message
+              if (response.status == 200) {
+                Swal.fire("Correcto", "Se subió la lista de embarque", "success");
+              } else {
+                Swal.fire("Error", "No se pudo subir la lista de embarque", "error");
+              }
               return response.json();
             })
             .catch((error) => {
@@ -4264,13 +4269,16 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
 
   const filesAlmacenDocumentacion = JSON.parse(result.files_almacen_documentacion || "[]");
   const filesAlmacenInspection= JSON.parse(result.files_almacen_inspection || "[]");
+  const filesF= JSON.parse(result.files || "[]");
   const filteredFiles = filesAlmacenDocumentacion.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
   const filteredFilesInspection = filesAlmacenInspection.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
-
+  const filtFiles=filesF.filter(
+    (file) => file.id_proveedor === selectedTabDocumentacionId
+  );
   // Mostrar los archivos en la interfaz
   const documentosContainer = $("#documentos-china");
   documentosContainer.empty();
@@ -4313,12 +4321,15 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
     const filteredFilesInspection = filesAlmacenInspection.filter(
       (file) => file.id_proveedor === selectedTabDocumentacionId
     );
+    const filteredFilesF = filesF.filter(
+      (file) => file.id_proveedor === selectedTabDocumentacionId
+    );
 
     let facturaDiv = "";
     let excelDiv = "";
     let facturaComercial = provider.factura_comercial;
     let excelConfirmacion = provider.excel_confirmacion;
-
+    let packingList= provider.packing_list;
     if (currentPrivilege != "Documentacion"){
     $(".documentos-clientes-content").append(`<div class="flex gap-8">
         <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
@@ -4449,7 +4460,7 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
           );
 
           const result = await response.json();
-
+          console.log(result, "result");
           if (result.status === "success") {
             Swal.fire("¡Documento subido!", result.message, "success");
             console.log(name, "name");
@@ -4494,6 +4505,58 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
           }
         },
       });
+    });
+    $(".aditional-file").remove();
+    filteredFilesF.forEach((file) => {
+      if(!file.file_url){
+        return; // Exit the current function instead of using 'continue'
+      }
+      $("#form-documentacion").append(`<div class="aditional-file">
+           
+            ${file.folder_name}
+            <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
+                <div class="form-group">
+                    <div class="file-upload-box">
+                        <div class="file-info-box">
+                            <div class="file-info">
+                                <div class="file-iconic">
+                                    <a href="javascript:void(0)" class="file-icon-link" id="file-icon-link-${file.id}">${getIconByType((file.file_url).split('.').pop().toLowerCase())}</a>
+                                </div>
+                                <span class="file-name">${file.folder_name}</span>
+                                <button class="remove-file-button" onclick="deleteClienteDocumentacionFile(${file.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>`);
+      const fileIconLink = $(`#file-icon-link-${file.id}`)[0];
+      if (fileIconLink) {
+        const fileExtension = (file.file_url).split('.').pop().toLowerCase();
+        if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+          // Agregar estilo de cursor: pointer
+          fileIconLink.style.cursor = 'pointer';
+
+          // Agregar evento de clic para mostrar la vista previa
+          fileIconLink.addEventListener('click', (event) => {
+            event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+
+            // Mostrar la imagen en el modal
+            const modal = document.getElementById('image-modal');
+            const modalImage = modal.querySelector('#image-preview');
+            modalImage.src = (file.file_url);
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+          });
+        } else {
+          // Si no es una imagen, redirigir al archivo
+          fileIconLink.href = (file.file_url);
+          fileIconLink.target = '_blank';
+        }
+      }
+
     });
   }else{
     // Vista para otros usuarios (como en la imagen)
@@ -4541,6 +4604,7 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
                   `}
               </div>
             </div>
+            
             <div>
 
             </div>
@@ -4652,11 +4716,10 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
 
     // Agregar funcionalidad de vista previa si es una imagen
     const facturaContainer = document.getElementById('single-file-upload-factura');
-    console.log(facturaContainer, "facturaContainer");
     if (facturaContainer) {
       const fileIconLink = facturaContainer.querySelector('.file-icon-link');
       if (fileIconLink) {
-        const fileExtension = excelConfirmacion.split('.').pop().toLowerCase();
+        const fileExtension = facturaComercial.split('.').pop().toLowerCase();
         if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
           // Agregar estilo de cursor: pointer
           fileIconLink.style.cursor = 'pointer';
@@ -4679,7 +4742,89 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
         }
       }
     }
+    if (!packingList) {
+      packingDiv = `
+        Packing List
+        <div class="col-12 col-sm-12" id="single-file-upload-packing">
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <input type="file" id="file-input-packing" class="file-input" name="packing_list"
+                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" />
+                    <label for="file-input-packing" class="file-label d-flex">
+                        <i class="fas fa-upload"></i>
+                        <div class="file-group-text">
+                            <span class="file-text">Selecciona o arrastra tu archivo aquí</span>
+                            <span class="file-format">Formatos: .xlsx, .png, .jpg, .jpeg</span>
+                        </div>
+                        <button class="upload-button" type="button">Subir archivo</button>
+                    </label>
+    
+                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                    <div class="file-info-box hidden">
+                        <div class="file-info">
+                            <div class="file-iconic"></div>
+                            <span class="file-name"></span>
+                            <span class="file-size"></span>
+                            <button class="remove-file-button
+                            
+                            ">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    } else {
+      // Si existe el enlace de la packing, mostrar el contenedor con la información del archivo
+      packingDiv = `
+        Packing List
+        <div class="col-12 col-sm-12" id="single-file-upload-packing">
+            <div class="form-group">
+                <div class="file-upload-box">
+                    <div class="file-info-box">
+                        <div class="file-info">
+                            <div class="file-iconic"><a href="javascript:void(0)" class="file-icon-link">${getIconByType(packingList.split('.').pop().toLowerCase())}</a></div>
+                            <span class="file-name">Packing List</span>
+                            <button class="remove-file-button" onclick="deleteFacturaComercial(${provider.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+    $("#documentos-clientes-documentacion").append(packingDiv);
 
+    // Agregar funcionalidad de vista previa si es una imagen
+    const packingContainer = document.getElementById('single-file-upload-packing');
+    if (packingContainer) {
+      const fileIconLink = packingContainer.querySelector('.file-icon-link');
+      if (fileIconLink) {
+        const fileExtension = packingList.split('.').pop().toLowerCase();
+        if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+          // Agregar estilo de cursor: pointer
+          fileIconLink.style.cursor = 'pointer';
+
+          // Agregar evento de clic para mostrar la vista previa
+          fileIconLink.addEventListener('click', (event) => {
+            event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+
+            // Mostrar la imagen en el modal
+            const modal = document.getElementById('image-modal');
+            const modalImage = modal.querySelector('#image-preview');
+            modalImage.src = packingList;
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+          });
+        } else {
+          // Si no es una imagen, redirigir al archivo
+          fileIconLink.href = packingList;
+          fileIconLink.target = '_blank';
+        }
+      }
+    }
 
 
     // Repetir el mismo proceso para el Excel de confirmación
@@ -4786,6 +4931,9 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
         ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg"]
       );
     }
+    if(!packingList) {
+      setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg']);
+    }
     $("#file-input-factura").on("change", function () {
       shouldSaveDocumentacion = true;
     });
@@ -4794,7 +4942,7 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
     });
 
     //clean .aditional-file
-    $(".aditional-file").remove();
+
     // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
     // const files = JSON.parse(result.files_almacen_documentacion ?? "[]");
     // const filesFilter = files.filter((file) => file.id_proveedor == selectedTabDocumentacionId);
