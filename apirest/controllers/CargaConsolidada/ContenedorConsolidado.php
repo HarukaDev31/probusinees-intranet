@@ -480,9 +480,7 @@ class ContenedorConsolidado extends CI_Controller
 							<option value="INSPECCIONADO" ' . ($proveedor->estados == "INSPECCIONADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? " disabled" : "") . '		>INSPECCIONADO</option>
 							<option value="COBRANDO" ' . ($proveedor->estados == "COBRANDO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "Coordinación" ? " disabled" : "") . '		>COBRANDO</option>
 							<option value="RESERVADO" ' . ($proveedor->estados == "RESERVADO" ? "selected" : "") . '>RESERVADO</option>
-							<option value="EMBARCADO" ' . ($proveedor->estados == "EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '
-							>EMBARCADO</option>
-							<option value="NO EMBARCADO" ' . ($proveedor->estados == "NO EMBARCADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? "disabled" : "") . '>NO EMBARCADO</option>
+							
 						</select>';
 
 						$qtyBoxDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->qty_box ?? 0) . '"></input></div>';

@@ -1077,7 +1077,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 'volumen_doc', prov.volumen_doc,
                 'valor_doc', prov.valor_doc,
                 'factura_comercial', prov.factura_comercial,
-                'excel_confirmacion', prov.excel_confirmacion
+                'excel_confirmacion', prov.excel_confirmacion,
+                'packing_list', prov.packing_list
             )
         )
         FROM " . $this->table_contenedor_cotizacion_proveedores . " prov
@@ -1195,6 +1196,25 @@ class ContenedorConsolidadoModel extends CI_Model
                     'assets/images/agentecompra/'
                 );
                 $data['excel_confirmacion'] = $fileUrl;
+            }
+            if (isset($files['packing_list'])) {
+                $this->db->select('packing_list')
+                    ->from($this->table_contenedor_cotizacion_proveedores)
+                    ->where('id', $data['idProveedor']);
+                $query = $this->db->get();
+                $fileUrl = $query->row()->file_url;
+                unlink($fileUrl);
+                $fileUrl = $this->uploadSingleFile(
+                    [
+                        "name" => $files['packing_list']['name'],
+                        "type" => $files['packing_list']['type'],
+                        "tmp_name" => $files['packing_list']['tmp_name'],
+                        "error" => $files['packing_list']['error'],
+                        "size" => $files['packing_list']['size']
+                    ],
+                    'assets/images/agentecompra/'
+                );
+                $data['packing_list'] = $fileUrl;
             }
             //remove id from data array
             $idCotizacion = $data['id'];
