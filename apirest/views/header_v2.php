@@ -312,9 +312,7 @@ $SectionNames=[
                           <li class="<?php echo $No_Class_Li; ?>">
                             <a class="nav-link 1 <?php echo ($this->router->class == $arrHijos->No_Class_Controller && $this->router->method == $arrSubHijos->No_Menu_Url ? 'nav-item active' : 'nav-item'); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
                               <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
-                              <p>&nbsp;<?php if ($this->user->No_Grupo == 'ContenedorAlmacen') {
-                                          echo $arrHijos->No_Menu_China;
-                                        } else {
+                              <p>&nbsp;<?php 
                                           if(array_key_exists($arrHijos->No_Menu, $SectionNames[$this->user->No_Grupo])){
                                             echo $SectionNames[$this->user->No_Grupo][$arrHijos->No_Menu];
                                           }
@@ -322,7 +320,7 @@ $SectionNames=[
                                           else {
                                             echo $arrHijos->No_Menu;
                                           }
-                                        } ?></p>
+                                         ?></p>
                               <?php if ($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
                                 <i class="right fas fa-angle-left"></i>
                               <?php endif; ?>
