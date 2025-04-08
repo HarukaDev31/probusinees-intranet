@@ -889,6 +889,8 @@ class ContenedorConsolidadoModel extends CI_Model
             );
             $dataToInsert = $this->getCotizacionData($file);
             $dataToInsert['cotizacion_file_url'] = $fileUrl;
+            //disable foreign key check
+            $this->db->query('SET FOREIGN_KEY_CHECKS = 0');
             $this->db->where('id', $id);
             $this->db->update($this->table_contenedor_cotizacion, $dataToInsert);
             //truncate all data in table contenedor_consolidado_cotizacion_proveedores where id_cotizacion=$id
@@ -960,6 +962,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 log_message('error', 'Error en uploadCotizacionFile: ' . $this->db->error()['message']);
                 return false;
             }
+            $this->db->query('SET FOREIGN_KEY_CHECKS = 1');
             return false;
         } catch (Exception $e) {
             log_message('error', 'Error en uploadCotizacionFile: ' . $e->getMessage());
