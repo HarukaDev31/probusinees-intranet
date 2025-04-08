@@ -13,8 +13,7 @@
 <section class="content-header px-4" style="
     height: 93vh;">
   <!-- Hero Section -->
-  <div class="hero-section position-relative mb-n5" style="background-image: url('<?php echo base_url().'assets/img/backgrounds/inicioview.png'?>');">
-    <div class="overlay"></div>
+  <div class="hero-section position-relative" style="background-image: url('<?php echo base_url().'assets/img/backgrounds/inicioview.png'?>');">
     <div class="container position-relative d-flex align-items-center mx-4" style="height: 100%;">
       <div class="text-white display-4 py-5" style="font-weight: 400;z-index: 3">¡Hola, bienvenido!</div>
     </div>
@@ -24,13 +23,13 @@
   <div class="container">
     <div class="row g-4">
       <!-- Dollar Stats -->
-      <div class="col-md-6 col-lg-3">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container">
               <i class="bi bi-currency-dollar stat-icon"></i>
             </div>
-            <div class="">
+            <div class="text-container">
               <div class="display-2 fw-bold" id="Dolars import">0M</div>
               <p class="text-muted"><small>De dólares en importaciones</small></p>
             </div>
@@ -39,13 +38,13 @@
       </div>
 
       <!-- Users Stats -->
-      <div class="col-md-6 col-lg-3">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container">
               <i class="bi bi-people stat-icon"></i>
             </div>
-            <div class="">
+            <div class="text-container">
               <div class="display-2 fw-bold" id="Clients satisfied">0K</div>
               <p class="text-muted"><small>Clientes satisfechos</small></p>
             </div>
@@ -54,13 +53,13 @@
       </div>
 
       <!-- Package Stats -->
-      <div class="col-md-6 col-lg-3">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container">
               <i class="bi bi-box-seam stat-icon"></i>
             </div>
-            <div class="">
+            <div class="text-container">
               <div class="display-2 fw-bold" id="CBM sells">0</div>
               <p class="text-muted"><small>CBM vendidos</small></p>
             </div>
@@ -69,13 +68,13 @@
       </div>
 
       <!-- Container Stats -->
-      <div class="col-md-6 col-lg-3">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container">
               <i class="fas fa-ship stat-icon"></i>
             </div>
-            <div class="">
+            <div class="text-container">
               <div class="display-2 fw-bold" id="Containers imported">0K</div>
               <p class="text-muted"><small>Contenedores importados</small></p>
             </div>
@@ -1860,6 +1859,21 @@
 
     .stat-card {
       margin-top: 1.5rem;
+    }
+  }
+  @media (max-width: 576px) {
+    .stat-card {
+      padding: 1rem;
+    }
+
+    .display-6 {
+      font-size: 1.2rem;
+    }
+    .card-body{
+      flex-direction: column;
+    }
+    .text-container{
+      text-align: center;
     }
   }
 </style>
