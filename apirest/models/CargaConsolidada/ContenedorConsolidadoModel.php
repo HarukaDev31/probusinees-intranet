@@ -1747,19 +1747,24 @@ class ContenedorConsolidadoModel extends CI_Model
                         // Extraer las celdas inicial y final del rango
                         [$startCell, $endCell] = explode(':', $range);
                         // Verificar si el rango está en la columna B
-                        if (preg_match('/^B\d+$/', $startCell)) {
+                        if (preg_match('/^A\d+$/', $startCell)) {
                             // Obtener el valor de la celda fusionada
                             $value = $sheetListaPartidas->getCell($startCell)->getValue();
+                            log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
+
                             if (trim($value) == $itemN) {
                                 preg_match('/\d+/', $startCell, $startMatches);
                                 preg_match('/\d+/', $endCell, $endMatches);
                                 $startRow = (int)$startMatches[0];
                                 $endRow = (int)$endMatches[0];
+                                log_message('error', 'Start Row: ' . $startRow . ' End Row: ' . $endRow);
                                 for ($r = $startRow; $r <= $endRow; $r++) {
                                     $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
                                     if (trim($adValorem) == "FTA") {
                                         $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
                                     }
+                                    log_message('error', 'Advalorem: ' . $adValorem);
+
                                     $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
                                     $sheet->setCellValue('R' . $row, $adValorem);
                                     $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
@@ -1849,7 +1854,6 @@ class ContenedorConsolidadoModel extends CI_Model
             } else {
                 $startIndex = $startColumn;
                 $highestSheetRow = $sheet->getHighestRow();
-                log_message('error', 'Highest row: ' . $mergedStartCell.' ' . $highestSheetRow);
                 for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
                     $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
                     
@@ -1885,9 +1889,7 @@ class ContenedorConsolidadoModel extends CI_Model
                         $highestSheetRow = $row - 1;
                         break;
                     }
-                    if($client == null){
-                        break;
-                    }
+                    
                     $sheet0->insertNewRowBefore($highestFirstSheetRow, 1);
 
                     $volumen_cotizacion = "-";
@@ -1929,23 +1931,23 @@ class ContenedorConsolidadoModel extends CI_Model
                     foreach ($mergedCells as $range) {
                         // Extraer las celdas inicial y final del rango
                         [$startCell, $endCell] = explode(':', $range);
-
                         // Verificar si el rango está en la columna B
-                        if (preg_match('/^B\d+$/', $startCell)) {
-                            // Obtener el valor de la celda fusionada
+                        if (preg_match('/^A\d+$/', $startCell)) {
                             $value = $sheetListaPartidas->getCell($startCell)->getValue();
 
+                            log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
                             // Comparar el valor con el itemNumber
+
                             if (trim($value) == $itemN) {
                                 // Obtener el rango de filas del rango fusionado
+                                log_message('error', 'Rango: ' . $startCell . ' - ' . $endCell);
                                 preg_match('/\d+/', $startCell, $startMatches);
                                 preg_match('/\d+/', $endCell, $endMatches);
                                 $startRow = (int)$startMatches[0];
                                 $endRow = (int)$endMatches[0];
-
                                 // Obtener el valor de la columna G para el rango fusionado
                                 for ($r = $startRow; $r <= $endRow; $r++) {
-                                    $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
+                                    $adValorem = $sheetListaPartidas->getCell('G' . $r  )->getValue();
                                     if (trim($adValorem) == "FTA") {
                                         $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
                                     }
