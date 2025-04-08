@@ -1800,7 +1800,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     $tipoCliente = "No existe en contenedor";
                     //find in array
                     foreach ($dataSystem as $item) {
-                        if (trim($item->nombre) == trim($client)) {
+                        if (strtolower(trim($item->nombre)) == strtolower(trim($client)) ) {
                             $volumen_cotizacion = $item->volumen;
                             $volumen_china = $item->volumen_china;
                             $volumen_selected = $item->vol_selected ?? '';
