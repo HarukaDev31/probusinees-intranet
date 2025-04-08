@@ -7,7 +7,7 @@ trait FileTrait
      * @param $file
      * @param $allowedExtensions
      */
-    private $maxFileSize = 3072;
+    private $maxFileSize = 50072;
     private $allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP');
     private $allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp');
     public function __construct($maxFileSize = null, $allowedExtensions = null, $allowedContentTypes = null)
@@ -27,6 +27,7 @@ trait FileTrait
     {
         $extension = pathinfo($name, PATHINFO_EXTENSION);
         $contentType = $type;
+        log_message('error', 'Extension: ' . $extension . ' Content Type: ' . $contentType);
         if (!in_array($extension, $allowedExtensions) || !in_array($contentType, $allowedContentTypes)) {
             return false;
         }
@@ -34,7 +35,7 @@ trait FileTrait
     }
     public function validateSize($size, $maxSize)
     {
-        if ($size > $maxSize) {
+        if ($size > $this->maxFileSize) {
             return false;
         }
         return true;
@@ -43,7 +44,7 @@ trait FileTrait
     {
         $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf','xlsm');
         $this->allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/pdf','application/vnd.ms-excel.sheet.macroEnabled.12');
+        'application/pdf','application/vnd.ms-excel.sheet.macroEnabled.12','multipart/form-data',);
     }
     public function setAllowedExtensionsImagesOfficeFilesVideos(){
         $this->allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','doc','docx','xls','xlsx','pdf','mp4','MP4','avi','AVI','mov','MOV','flv','FLV','wmv','WMV','3gp','3GP','mkv','MKV','webm','WEBM','avif','AVIF','heif','HEIF','heic','HEIC');
@@ -64,7 +65,11 @@ trait FileTrait
         if (function_exists('normalizer_normalize')) {
             $fileName = normalizer_normalize($fileName, Normalizer::FORM_C);
         }
-    
+       
+        log_message("error","upload_max_filesize: " . ini_get('upload_max_filesize'));
+        log_message("error","post_max_size: " . ini_get('post_max_size'));
+        
+       
         // Validaciones existentes
         $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($fileName, $fileType, $this->allowedExtensions, $this->allowedContentTypes);
         if (!$validateExtensionAndContentTypes) {
@@ -111,6 +116,7 @@ trait FileTrait
             throw new Exception("Failed to copy uploaded file to $destination");
         }
     } catch (Exception $e) {
+        log_message('error', 'Failed to copy uploaded file: ' . $e->getMessage());
         return $e->getMessage();
     }
 }
@@ -152,14 +158,13 @@ trait FileTrait
                     $paths[$filesIndex][$keyFile] = null;
                     continue;
                 }
-
                 $rowFile = $data_files['file']['tmp_name'][$filesIndex][$keyFile];
                 $type = $data_files['file']['type'][$filesIndex][$keyFile];
                 $name = $data_files['file']['name'][$filesIndex][$keyFile];
                 $size = $data_files['file']['size'][$filesIndex][$keyFile] / 1024; // size in KB
                 $allowedExtensions = array('png', 'jpg', 'jpeg', 'webp', 'PNG', 'JPG', 'JPEG', 'WEBP','mp4','MP4','avi','AVI','mov','MOV','flv','FLV','wmv','WMV','3gp','3GP','mkv','MKV','webm','WEBM');
                 $allowedContentTypes = array('image/png', 'image/jpeg', 'image/pjpeg', 'image/jpg', 'image/webp','video/mp4','video/avi','video/mov','video/flv','video/wmv','video/3gp','video/mkv','video/webm');
-                $maxSize = 20240; // 1024 KB = 3 MB
+                $maxSize = 100240; // 1024 KB = 3 MB
 
                 $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($name, $type, $allowedExtensions, $allowedContentTypes);
                 $validateSize = $this->validateSize($size, $maxSize);
