@@ -5285,118 +5285,223 @@ $(document).ready(async function () {
   //if current windows route includes listarCompletados hide .filter-contenedor 
 
  
-  if (window.location.href.includes("listarCompletados") &&
-  currentPrivilege == "Documentacion"
-) {
+  if (window.location.href.includes("listarCompletados") ) {
     $(".filter-contenedor").hide();
 
     $("#table-contenedor-completados").show();
-    $("#table-contenedor").hide();
-
+    $("#table-contenedor").html("");
+   
     url = base_url + "CargaConsolidada/ContenedorConsolidado/indexCompletados";
-    table_Entidad = $("#table-contenedor-completados").DataTable({
-      dom:
-        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      buttons: [
-        {
-          extend: "excel",
-          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-          titleAttr: "Excel",
-          exportOptions: {
-            columns: ":visible",
+    if(currentPrivilege == "Documentacion"){
+      table_Entidad = $("#table-contenedor-completados").DataTable({
+        dom:
+          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+        buttons: [
+          {
+            extend: "excel",
+            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+            titleAttr: "Excel",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-excel-main",
+              class: "hidden",
+            },
           },
-          attr: {
-            id: "export-excel-main",
-            class: "hidden",
+          {
+            extend: "pdf",
+            text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+            titleAttr: "PDF",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-pdf-main",
+              class: "hidden",
+            },
+          },
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+            titleAttr: "Columnas",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              class: "hidden",
+            },
+          },
+        ],
+        paging: true,
+        lengthChange: true,
+        searching: false,
+        ordering: false,
+        info: true,
+        autoWidth: false,
+        responsive: false,
+        serverSide: false,
+        pagingType: "full_numbers",
+        oLanguage: {
+          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+          sLengthMenu: "_MENU_",
+          sSearch: "Buscar por: ",
+          sSearchPlaceholder: "",
+          sZeroRecords: "No se encontraron registros",
+          sInfoEmpty: "No hay registros",
+          sLoadingRecords: "Cargando...",
+          sProcessing: "Procesando...",
+          oPaginate: {
+            sFirst: "<<",
+            sLast: ">>",
+            sPrevious: "<",
+            sNext: ">",
           },
         },
-        {
-          extend: "pdf",
-          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-          titleAttr: "PDF",
-          exportOptions: {
-            columns: ":visible",
+        ajax: {
+          url: url,
+          type: "POST",
+          dataType: "JSON",
+          data: function (data) {
+            data.Filtro_Estado = $("#txt-ID_Estado").val();
+            data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+            data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+            //if url contains listarCompletados 
+    
           },
-          attr: {
-            id: "export-pdf-main",
-            class: "hidden",
-          },
-        },
-        {
-          extend: "colvis",
-          text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-          titleAttr: "Columnas",
-          exportOptions: {
-            columns: ":visible",
-          },
-          attr: {
-            class: "hidden",
+          complete: function () {
+            $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
           },
         },
-      ],
-      paging: true,
-      lengthChange: true,
-      searching: false,
-      ordering: false,
-      info: true,
-      autoWidth: false,
-      responsive: false,
-      serverSide: false,
-      pagingType: "full_numbers",
-      oLanguage: {
-        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-        sLengthMenu: "_MENU_",
-        sSearch: "Buscar por: ",
-        sSearchPlaceholder: "",
-        sZeroRecords: "No se encontraron registros",
-        sInfoEmpty: "No hay registros",
-        sLoadingRecords: "Cargando...",
-        sProcessing: "Procesando...",
-        oPaginate: {
-          sFirst: "<<",
-          sLast: ">>",
-          sPrevious: "<",
-          sNext: ">",
+        columnDefs: [
+          {
+            targets: "no-hidden",
+            visible: false,
+          },
+          {
+            className: "text-center",
+            targets: "no-sort",
+            orderable: false,
+          },
+          {
+            targets: "",
+            orderable: false,
+          },
+        ],
+        pageLength: 100, // Mostrar 100 elementos por página
+        lengthMenu: [
+          [100, 1000, -1],
+          [100, 1000, "Todos"],
+        ],
+      });
+    }else{
+      
+      table_Entidad = $("#table-contenedor").DataTable({
+        dom:
+          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+        buttons: [
+          {
+            extend: "excel",
+            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+            titleAttr: "Excel",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-excel-main",
+              class: "hidden",
+            },
+          },
+          {
+            extend: "pdf",
+            text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+            titleAttr: "PDF",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-pdf-main",
+              class: "hidden",
+            },
+          },
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+            titleAttr: "Columnas",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              class: "hidden",
+            },
+          },
+        ],
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: false,
+        info: false,
+        autoWidth: false,
+        responsive: false,
+        serverSide: false,
+        pagingType: "full_numbers",
+        oLanguage: {
+          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+          sLengthMenu: "_MENU_",
+          sSearch: "Buscar por: ",
+          sSearchPlaceholder: "",
+          sZeroRecords: "No se encontraron registros",
+          sInfoEmpty: "No hay registros",
+          sLoadingRecords: "Cargando...",
+          sProcessing: "Procesando...",
+          oPaginate: {
+            sFirst: "<<",
+            sLast: ">>",
+            sPrevious: "<",
+            sNext: ">",
+          },
         },
-      },
-      ajax: {
-        url: url,
-        type: "POST",
-        dataType: "JSON",
-        data: function (data) {
-          data.Filtro_Estado = $("#txt-ID_Estado").val();
-          data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
-          data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
-          //if url contains listarCompletados 
-  
+        ajax: {
+          url: url,
+          type: "POST",
+          dataType: "JSON",
+          data: function (data) {
+            data.Filtro_Estado = $("#txt-ID_Estado").val();
+            data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+            data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+            //if url contains listarCompletados 
+    
+          },
+          complete: function () {
+            $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+          },
         },
-        complete: function () {
-          $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-        },
-      },
-      columnDefs: [
-        {
-          targets: "no-hidden",
-          visible: false,
-        },
-        {
-          className: "text-center",
-          targets: "no-sort",
-          orderable: false,
-        },
-        {
-          targets: "",
-          orderable: false,
-        },
-      ],
-      pageLength: 100, // Mostrar 100 elementos por página
-      lengthMenu: [
-        [100, 1000, -1],
-        [100, 1000, "Todos"],
-      ],
-    });
+        columnDefs: [
+          {
+            targets: "no-hidden",
+            visible: false,
+          },
+          {
+            className: "text-center",
+            targets: "no-sort",
+            orderable: false,
+          },
+          {
+            targets: "",
+            orderable: false,
+          },
+        ],
+        pageLength: 100, // Mostrar 100 elementos por página
+        lengthMenu: [
+          [100, 1000, -1],
+          [100, 1000, "Todos"],
+        ],
+      });
+    }
   } else {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     table_Entidad = $("#table-contenedor").DataTable({

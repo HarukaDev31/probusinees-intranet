@@ -138,7 +138,7 @@ Search for
             </div>
           </div>
 
-          <div class=" col-12 col-xl-1 dropdown">
+          <div class=" col-12 col-xl-1 dropdown filter-contenedor">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -913,7 +913,7 @@ Search for
               <?php } ?>
               <th style="min-width: 8em;" class="no-sort">Status</th>
               <th class="orderable">N.</th>
-              <th style="min-width: 14em;">Buyer</th>
+              <th style="min-width: 10em;">Buyer</th>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen" && $this->user->No_Grupo != "Documentacion") {  ?>
                 <th style="min-width: 8em;">Whatsapp</th>
                 <th
@@ -921,7 +921,7 @@ Search for
               <?php } ?>
 
               <th
-                style="min-width: 7em;"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                style="min-width: 10em;"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                   Productos
                 <?php } else { ?>
                   Products
