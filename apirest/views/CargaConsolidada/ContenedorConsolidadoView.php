@@ -4,10 +4,7 @@
 </script>
 <div class="content-wrapper">
   <!--set js variable = php variable-->
-  <script>
-    var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
-    localStorage.setItem("currentPrivilege", currentPrivilege);
-  </script>
+
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">

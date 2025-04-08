@@ -5285,7 +5285,9 @@ $(document).ready(async function () {
   //if current windows route includes listarCompletados hide .filter-contenedor 
 
  
-  if (window.location.href.includes("listarCompletados")) {
+  if (window.location.href.includes("listarCompletados") &&
+  currentPrivilege == "Documentacion"
+) {
     $(".filter-contenedor").hide();
 
     $("#table-contenedor-completados").show();
