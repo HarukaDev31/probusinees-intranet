@@ -68,7 +68,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $STATUS_NO_EMBARCADO = "NO EMBARCADO";
     private $table_contenedor_cotizacion_proveedores_documentacion = "contenedor_consolidado_proveedores_documentacion";
     private $order = array('carga_consolidada_pedido_cabecera.Fe_Registro' => 'desc');
-    private $table_contenedor_aduana_files="carga_consolidada_aduana_files";
+    private $table_contenedor_aduana_files = "carga_consolidada_aduana_files";
     public function __construct()
     {
         try {
@@ -87,9 +87,13 @@ class ContenedorConsolidadoModel extends CI_Model
             if ($this->input->post('Filtro_Estado') != "0") {
                 $this->db->where('estado', $this->input->post('Filtro_Estado'));
             }
-         //if no user = doc where estado_documentacion != "COMPLETADO"
+            //if no user = doc where estado_documentacion != "COMPLETADO"
             if ($this->user->No_Grupo == "Documentacion") {
-                
+                $this->db->where('estado_documentacion !=', "COMPLETADO");
+            }
+            //if no grupo in ["Cotizador", "Coordinación"] where estado_documentacion = "COMPLETADO"
+            if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen])) {
+                $this->db->where('estado_china !=', "COMPLETADO");
             }
             $this->db->order_by('carga', 'desc');
             $query = $this->db->get();
@@ -108,9 +112,13 @@ class ContenedorConsolidadoModel extends CI_Model
             ")
                 ->from($this->table)
                 ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
-         
-                $this->db->where('estado_documentacion', "COMPLETADO");
-            
+
+            if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen])) {
+                $this->db->where('estado_china =', "COMPLETADO");
+            }if ($this->user->No_Grupo == "Documentacion") {
+                $this->db->where('estado_documentacion =', "COMPLETADO");
+            }
+
             $this->db->order_by('carga', 'desc');
             $query = $this->db->get();
             return $query->result();
@@ -1576,482 +1584,481 @@ class ContenedorConsolidadoModel extends CI_Model
         }
     }
     public function downloadFacturaComercial($idContenedor)
-{
-    //find in folder join files folser with name factura comercial,packing list  and lista partidas
-    $this->db->select("main.*,files.id AS id_file,files.file_url")
-        ->from($this->table_contenedor_documentacion_folders . " as main")
-        ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
-        ->where('files.id_contenedor', $idContenedor)
-        ->where('main.folder_name', 'Factura Comercial');
-    $query = $this->db->get();
-    //find in query result folder_name factura comercial and get file_url
-    $facturaComercial = $query->row();
-    if (!$facturaComercial) {
-        return ['status' => "error", 'message' => "No se encontró la factura comercial"];
-    }
-
-    $facturaComercial = $facturaComercial->file_url;
-    //validate if factura_comercial is xls, xlsx,xlsm
-    $path_parts = pathinfo($facturaComercial);
-    $extension = $path_parts['extension'];
-    if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
-        return ['status' => "error", 'message' => "La Factura Comercial no es un archivo de excel"];
-    }
-    $this->db->select("main.*,files.id AS id_file,files.file_url")
-        ->from($this->table_contenedor_documentacion_folders . " as main")
-        ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
-        ->where('files.id_contenedor', $idContenedor)
-        ->where('main.folder_name', 'Packing List');
-    $query = $this->db->get();
-    //find in query result folder_name packing list and get file_url
-    $packingList = $query->row();
-    if (!$packingList) {
-        return ['status' => "error", 'message' => "No se encontró el packing list"];
-    }
-    $packingList = $packingList->file_url;
-    //validate if packing list is xls, xlsx,xlsm
-    $path_parts = pathinfo($packingList);
-    $extension = $path_parts['extension'];
-    if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
-        return ['status' => "error", 'message' => "El Packing List no es un archivo de excel"];
-    }
-    $this->db->select("main.*,files.id AS id_file,files.file_url")
-        ->from($this->table_contenedor_documentacion_folders . " as main")
-        ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
-        ->where('files.id_contenedor', $idContenedor)
-        ->where('main.folder_name', 'Lista de Partidas');
-    $query = $this->db->get();
-    //find in query result folder_name lista de partidas and get file_url
-    $listaPartidas = $query->row();
-    if (!$listaPartidas) {
-        return ['status' => "error", 'message' => "No se encontró la lista de partidas"];
-    }
-    $listaPartidas = $listaPartidas->file_url;
-    //validate if lista de partidas is xls, xlsx,xlsm
-    $path_parts = pathinfo($listaPartidas);
-    $extension = $path_parts['extension'];
-    if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
-        return ['status' => "error", 'message' => "La Lista de Partidas no es un archivo de excel"];
-    }
-    //get object PHPExcel from factura
-    //sanitize file url
-    $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $facturaComercial); // Extraer ruta relativa
-    $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
-    $facturaComercial = FCPATH . ltrim($decodedPath, '/');
-    $objPHPExcel = PHPExcel_IOFactory::load($facturaComercial);
-
-
-    $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $packingList); // Extraer ruta relativa
-    $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
-    $packingList = FCPATH . ltrim($decodedPath, '/');
-    $objPHPExcelPacking = PHPExcel_IOFactory::load($packingList);
-    $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $listaPartidas); // Extraer ruta relativa
-    $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
-    $listaPartidas = FCPATH . ltrim($decodedPath, '/');
-    $objPHPExcelListaPartidas = PHPExcel_IOFactory::load($listaPartidas);
-
-    $itemNColumn = "B";
-    $tipoClienteColumn = "C";
-    $clienteColumn = "D";
-    $descriptionColumn = "D";
-    $descriptionNColumn = "E";
-    $quantityCountColumn = "L";
-    $quantityCountNColumn = "M";
-    $quantityMeasureColumn = "M";
-    $quantityMeasureNColumn = "N";
-    $unitPriceColumn = "N";
-    $unitPriceNColumn = "O";
-    $unitMeasureColumn = "O";
-    $unitMeasureNColumn = "P";
-    $fobPriceColumn = "P";
-    $fobPriceNColumn = "Q";
-    $startColumn = 26;
-    $startPackingListColumn = 27;
-    $startListaPartidasColumn = 6;
-    $startIndex = $startColumn;
-    $startPackingListIndex = $startPackingListColumn;
-    $highestFirstSheetRow = 0;
-    $skyBlueColor = "85c1e9";
-    $pinkColor = "f5b7b1";
-    $greenColor = "7dcea0";
-    $grayColor = "dcdde1";
-    $yellow2Color = "fad7a0";
-    $dataSystem = $this->db->select('nombre,volumen,volumen_doc,valor_doc,valor_cot,volumen_china,name,vol_selected')
-        ->from($this->table_contenedor_cotizacion)
-        ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
-        ->where('id_contenedor', $idContenedor)
-        ->where('estado_cliente!=', null)
-        ->get()->result();
-    // echo json_encode($dataSystem);
-
-    try {
-        // Create a mapping of item IDs to clients from the packing list
-        $itemToClientMap = [];
-        $sheetPackingList = $objPHPExcelPacking->getSheet(0);
-        $highestPackingRow = $sheetPackingList->getHighestRow();
-        for ($packRow = $startPackingListColumn; $packRow <= $highestPackingRow; $packRow++) {
-            $itemId = $sheetPackingList->getCell('B' . $packRow)->getValue();
-            $client = $sheetPackingList->getCell('C' . $packRow)->getValue();
-            if (!empty($itemId) && !empty($client)) {
-                $itemToClientMap[trim($itemId)] = trim($client);
-            }
+    {
+        //find in folder join files folser with name factura comercial,packing list  and lista partidas
+        $this->db->select("main.*,files.id AS id_file,files.file_url")
+            ->from($this->table_contenedor_documentacion_folders . " as main")
+            ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
+            ->where('files.id_contenedor', $idContenedor)
+            ->where('main.folder_name', 'Factura Comercial');
+        $query = $this->db->get();
+        //find in query result folder_name factura comercial and get file_url
+        $facturaComercial = $query->row();
+        if (!$facturaComercial) {
+            return ['status' => "error", 'message' => "No se encontró la factura comercial"];
         }
 
-        $sheetCount = $objPHPExcel->getSheetCount();
-        $sheet0 = $objPHPExcel->getSheet(0);
-        $sheet0->insertNewColumnBefore('C', 2);
-        $sheet0->setCellValue('D25', 'CLIENTE');
-        $sheet0->setCellValue('C25', 'TIPO DE CLIENTE');
-        $sheet0->removeColumn('E');
-        $sheet0->setCellValue('R25', 'ADVALOREM');
-        $sheet0->setCellValue('S25', 'ANTIDUMPING');
-        $sheet0->setCellValue('T25', 'VOL. SISTEMA');
-        // $sheet0->setCellValue('U25', 'VOL. CHINA');
-        // $sheet0->setCellValue('V25', 'VOL. DOC.');
-        $styleArray = array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN,
-                )
-            )
-        );
-        //set title font bold and center horizontal
-        $sheet0->getStyle('A25:Z25')->getFont()->setBold(true);
-        $sheet0->getStyle('A25:Z25')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
-        //SET R TO V style
-        $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
-        for ($i = 0; $i < $sheetCount; $i++) {
-            $sheet = $objPHPExcel->getSheet($i);
-            $nameActual = "";
+        $facturaComercial = $facturaComercial->file_url;
+        //validate if factura_comercial is xls, xlsx,xlsm
+        $path_parts = pathinfo($facturaComercial);
+        $extension = $path_parts['extension'];
+        if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
+            return ['status' => "error", 'message' => "La Factura Comercial no es un archivo de excel"];
+        }
+        $this->db->select("main.*,files.id AS id_file,files.file_url")
+            ->from($this->table_contenedor_documentacion_folders . " as main")
+            ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
+            ->where('files.id_contenedor', $idContenedor)
+            ->where('main.folder_name', 'Packing List');
+        $query = $this->db->get();
+        //find in query result folder_name packing list and get file_url
+        $packingList = $query->row();
+        if (!$packingList) {
+            return ['status' => "error", 'message' => "No se encontró el packing list"];
+        }
+        $packingList = $packingList->file_url;
+        //validate if packing list is xls, xlsx,xlsm
+        $path_parts = pathinfo($packingList);
+        $extension = $path_parts['extension'];
+        if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
+            return ['status' => "error", 'message' => "El Packing List no es un archivo de excel"];
+        }
+        $this->db->select("main.*,files.id AS id_file,files.file_url")
+            ->from($this->table_contenedor_documentacion_folders . " as main")
+            ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id', 'left')
+            ->where('files.id_contenedor', $idContenedor)
+            ->where('main.folder_name', 'Lista de Partidas');
+        $query = $this->db->get();
+        //find in query result folder_name lista de partidas and get file_url
+        $listaPartidas = $query->row();
+        if (!$listaPartidas) {
+            return ['status' => "error", 'message' => "No se encontró la lista de partidas"];
+        }
+        $listaPartidas = $listaPartidas->file_url;
+        //validate if lista de partidas is xls, xlsx,xlsm
+        $path_parts = pathinfo($listaPartidas);
+        $extension = $path_parts['extension'];
+        if ($extension != "xls" && $extension != "xlsx" && $extension != "xlsm") {
+            return ['status' => "error", 'message' => "La Lista de Partidas no es un archivo de excel"];
+        }
+        //get object PHPExcel from factura
+        //sanitize file url
+        $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $facturaComercial); // Extraer ruta relativa
+        $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
+        $facturaComercial = FCPATH . ltrim($decodedPath, '/');
+        $objPHPExcel = PHPExcel_IOFactory::load($facturaComercial);
 
-            if ($i == 0) {
-                $highestRow = $sheet->getHighestRow();
-                $mergedEndCell = 0;
-                $mergedStartCell = $startIndex;
-                for ($row = $startIndex; $row <= $highestRow; ++$row) {
-                    $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
-                    
-                    // Look up the client using the item ID instead of sequential row
-                    $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
-                    
-                    // If no client found, try to use the sequential approach as fallback
-                    if ($client === null) {
-                        $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
-                        $startPackingListIndex++; // Still increment for compatibility
-                    }
-                    
-                    //get g merged column value where b merged column value in listapartidas =itemN using =vlookup
-                    $mergedCells = $sheetListaPartidas->getMergeCells();
-                    foreach ($mergedCells as $range) {
-                        // Extraer las celdas inicial y final del rango
-                        [$startCell, $endCell] = explode(':', $range);
-                        // Verificar si el rango está en la columna B
-                        if (preg_match('/^A\d+$/', $startCell)) {
-                            // Obtener el valor de la celda fusionada
-                            $value = $sheetListaPartidas->getCell($startCell)->getValue();
-                            log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
 
-                            if (trim($value) == $itemN) {
-                                preg_match('/\d+/', $startCell, $startMatches);
-                                preg_match('/\d+/', $endCell, $endMatches);
-                                $startRow = (int)$startMatches[0];
-                                $endRow = (int)$endMatches[0];
-                                log_message('error', 'Start Row: ' . $startRow . ' End Row: ' . $endRow);
-                                for ($r = $startRow; $r <= $endRow; $r++) {
-                                    $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                    if (trim($adValorem) == "FTA") {
-                                        $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
-                                    }
-                                    log_message('error', 'Advalorem: ' . $adValorem);
+        $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $packingList); // Extraer ruta relativa
+        $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
+        $packingList = FCPATH . ltrim($decodedPath, '/');
+        $objPHPExcelPacking = PHPExcel_IOFactory::load($packingList);
+        $filePath = preg_replace('/.*(\/assets\/.*)/', '$1', $listaPartidas); // Extraer ruta relativa
+        $decodedPath = rawurldecode($filePath); // Decodificar la ruta codificada
+        $listaPartidas = FCPATH . ltrim($decodedPath, '/');
+        $objPHPExcelListaPartidas = PHPExcel_IOFactory::load($listaPartidas);
 
-                                    $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
-                                    $sheet->setCellValue('R' . $row, $adValorem);
-                                    $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
-                                    break;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if ($client !== $nameActual) {
-                        if ($nameActual !== "" && $client !== "" && $client !== null) {
-                            // Si cambia el cliente, fusionar las celdas desde el inicio hasta la última fila del bloque actual
-                            $sheet->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
-                            $sheet->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                            // $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                            // $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
-                            $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                            // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                            // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
-                        }
+        $itemNColumn = "B";
+        $tipoClienteColumn = "C";
+        $clienteColumn = "D";
+        $descriptionColumn = "D";
+        $descriptionNColumn = "E";
+        $quantityCountColumn = "L";
+        $quantityCountNColumn = "M";
+        $quantityMeasureColumn = "M";
+        $quantityMeasureNColumn = "N";
+        $unitPriceColumn = "N";
+        $unitPriceNColumn = "O";
+        $unitMeasureColumn = "O";
+        $unitMeasureNColumn = "P";
+        $fobPriceColumn = "P";
+        $fobPriceNColumn = "Q";
+        $startColumn = 26;
+        $startPackingListColumn = 27;
+        $startListaPartidasColumn = 6;
+        $startIndex = $startColumn;
+        $startPackingListIndex = $startPackingListColumn;
+        $highestFirstSheetRow = 0;
+        $skyBlueColor = "85c1e9";
+        $pinkColor = "f5b7b1";
+        $greenColor = "7dcea0";
+        $grayColor = "dcdde1";
+        $yellow2Color = "fad7a0";
+        $dataSystem = $this->db->select('nombre,volumen,volumen_doc,valor_doc,valor_cot,volumen_china,name,vol_selected')
+            ->from($this->table_contenedor_cotizacion)
+            ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
+            ->where('id_contenedor', $idContenedor)
+            ->where('estado_cliente!=', null)
+            ->get()->result();
+        // echo json_encode($dataSystem);
 
-                        // Actualizar el valor actual y establecer nuevas celdas iniciales
-                        $nameActual = $client;
-                        $mergedStartCell = $row;
-                    }
-                    
-                    $mergedEndCell = $row;
-                    $sheet->setCellValue('D' . $row, $client);
-                    
-                    //find if exists row in datasystem array where trim(nombre)=trim(client) if exists set volumen_cotizacion, volumen_china, volumen_doc, valor_doc, valor_cot else set -
-                    $volumen_cotizacion = "-";
-                    $volumen_selected = '';
-                    $volumen_china = "-";
-                    $volumen_doc = "-";
-                    $valor_doc = "-";
-                    $valor_cot = "-";
-                    $tipoCliente = "No existe en contenedor";
-                    //find in array
-                    foreach ($dataSystem as $item) {
-                        if (strtolower(trim($item->nombre)) == strtolower(trim($client)) ) {
-                            $volumen_cotizacion = $item->volumen;
-                            $volumen_china = $item->volumen_china;
-                            $volumen_selected = $item->vol_selected ?? '';
-                            $volumen_doc = $item->volumen_doc;
-                            $valor_doc = $item->valor_doc;
-                            $tipoCliente = $item->name;
-                            break;
-                        }
-                        
-                    }
-                    //volumen_doc,volumen_china,volumen
-                    if ($volumen_selected == 'volumen_doc') {
-                        $volumen_cotizacion = $volumen_doc;
-                    }
-                    if ($volumen_selected == 'volumen_china') {
-                        $volumen_cotizacion = $volumen_china;
-                    }
-                    if ($volumen_selected == 'volumen') {
-                        $volumen_cotizacion = $volumen_cotizacion;
-                    }
-                    //set vol_cot to t column
-                    $sheet->setCellValue('T' . $row, $volumen_cotizacion);
-                    // $sheet->setCellValue('U' . $row, $volumen_china);
-                    // $sheet->setCellValue('V' . $row, $volumen_doc);
-                    $sheet->setCellValue('C' . $row, $tipoCliente);
-                    if (trim($itemN) == "TOTAL FOB PRICE") {
-                        //unmerge cell
-
-                        $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
-                        // //MERGE FROM D TO K
-                        $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
-                        $highestRow = $row - 1;
-                        $highestFirstSheetRow += $highestRow + 1;
-
-                        break;
-                    }
-
-                    $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
-                    //set horizontal alignment to center
-                    $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                    //set vertical alignment to center
-                    $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-
-                    $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+        try {
+            // Create a mapping of item IDs to clients from the packing list
+            $itemToClientMap = [];
+            $sheetPackingList = $objPHPExcelPacking->getSheet(0);
+            $highestPackingRow = $sheetPackingList->getHighestRow();
+            for ($packRow = $startPackingListColumn; $packRow <= $highestPackingRow; $packRow++) {
+                $itemId = $sheetPackingList->getCell('B' . $packRow)->getValue();
+                $client = $sheetPackingList->getCell('C' . $packRow)->getValue();
+                if (!empty($itemId) && !empty($client)) {
+                    $itemToClientMap[trim($itemId)] = trim($client);
                 }
-            } else {
-                $startIndex = $startColumn;
-                $highestSheetRow = $sheet->getHighestRow();
-                for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
-                    $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
-                    
-                    // Look up the client using the item ID instead of sequential row
-                    $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
-                    
-                    // If no client found, try to use the sequential approach as fallback
-                    if ($client === null) {
-                        $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
-                        $startPackingListIndex++; // Still increment for compatibility
-                    }
-                    
-                    if ($client !== $nameActual && $client !== null) {
-                        if ($nameActual !== "") {
-                            $sheet0->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
-                            $sheet0->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                            // $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                            // $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
-                            $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                            // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                            // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+            }
+
+            $sheetCount = $objPHPExcel->getSheetCount();
+            $sheet0 = $objPHPExcel->getSheet(0);
+            $sheet0->insertNewColumnBefore('C', 2);
+            $sheet0->setCellValue('D25', 'CLIENTE');
+            $sheet0->setCellValue('C25', 'TIPO DE CLIENTE');
+            $sheet0->removeColumn('E');
+            $sheet0->setCellValue('R25', 'ADVALOREM');
+            $sheet0->setCellValue('S25', 'ANTIDUMPING');
+            $sheet0->setCellValue('T25', 'VOL. SISTEMA');
+            // $sheet0->setCellValue('U25', 'VOL. CHINA');
+            // $sheet0->setCellValue('V25', 'VOL. DOC.');
+            $styleArray = array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    )
+                )
+            );
+            //set title font bold and center horizontal
+            $sheet0->getStyle('A25:Z25')->getFont()->setBold(true);
+            $sheet0->getStyle('A25:Z25')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
+            //SET R TO V style
+            $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
+            for ($i = 0; $i < $sheetCount; $i++) {
+                $sheet = $objPHPExcel->getSheet($i);
+                $nameActual = "";
+
+                if ($i == 0) {
+                    $highestRow = $sheet->getHighestRow();
+                    $mergedEndCell = 0;
+                    $mergedStartCell = $startIndex;
+                    for ($row = $startIndex; $row <= $highestRow; ++$row) {
+                        $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
+
+                        // Look up the client using the item ID instead of sequential row
+                        $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
+
+                        // If no client found, try to use the sequential approach as fallback
+                        if ($client === null) {
+                            $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
+                            $startPackingListIndex++; // Still increment for compatibility
                         }
 
-                        // Actualizar el valor actual y establecer nuevas celdas iniciales
-                        $nameActual = $client;
-                        $mergedStartCell = $highestFirstSheetRow;
-                    }
-                    $mergedEndCell = $highestFirstSheetRow;
+                        //get g merged column value where b merged column value in listapartidas =itemN using =vlookup
+                        $mergedCells = $sheetListaPartidas->getMergeCells();
+                        foreach ($mergedCells as $range) {
+                            // Extraer las celdas inicial y final del rango
+                            [$startCell, $endCell] = explode(':', $range);
+                            // Verificar si el rango está en la columna B
+                            if (preg_match('/^A\d+$/', $startCell)) {
+                                // Obtener el valor de la celda fusionada
+                                $value = $sheetListaPartidas->getCell($startCell)->getValue();
+                                log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
 
-                    $sheet0 = $objPHPExcel->getSheet(0);
+                                if (trim($value) == $itemN) {
+                                    preg_match('/\d+/', $startCell, $startMatches);
+                                    preg_match('/\d+/', $endCell, $endMatches);
+                                    $startRow = (int)$startMatches[0];
+                                    $endRow = (int)$endMatches[0];
+                                    log_message('error', 'Start Row: ' . $startRow . ' End Row: ' . $endRow);
+                                    for ($r = $startRow; $r <= $endRow; $r++) {
+                                        $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
+                                        if (trim($adValorem) == "FTA") {
+                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                        }
+                                        log_message('error', 'Advalorem: ' . $adValorem);
 
-                    if (trim($itemN) == "TOTAL FOB PRICE") {
-                        $highestSheetRow = $row - 1;
-                        break;
-                    }
-                    
-                    $sheet0->insertNewRowBefore($highestFirstSheetRow, 1);
-
-                    $volumen_cotizacion = "-";
-                    $volumen_china = "-";
-                    $volumen_doc = "-";
-                    $valor_doc = "-";
-                    $valor_cot = "-";
-                    $volumen_selected = '';
-
-                    $tipoCliente = "No existe en contenedor";
-                    //find in array
-                    foreach ($dataSystem as $item) {
-                        if (strtolower(trim($item->nombre)) == strtolower(trim($client))) {
-                            $volumen_cotizacion = $item->volumen;
-                            $volumen_china = $item->volumen_china;
-                            $volumen_selected = $item->vol_selected ?? '';
-                            $volumen_doc = $item->volumen_doc;
-                            $valor_doc = $item->valor_doc;
-                            $tipoCliente = $item->name;
-                            break;
-                        }
-                    }
-
-                    //set vol_cot to t column
-                    if ($volumen_selected == 'volumen_doc') {
-                        $volumen_cotizacion = $volumen_doc;
-                    }
-                    if ($volumen_selected == 'volumen_china') {
-                        $volumen_cotizacion = $volumen_china;
-                    }
-                    if ($volumen_selected == 'volumen') {
-                        $volumen_cotizacion = $volumen_cotizacion;
-                    }
-                    $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
-                    // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
-                    // $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
-                    $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
-                    $mergedCells = $sheetListaPartidas->getMergeCells();
-                    foreach ($mergedCells as $range) {
-                        // Extraer las celdas inicial y final del rango
-                        [$startCell, $endCell] = explode(':', $range);
-                        // Verificar si el rango está en la columna B
-                        if (preg_match('/^A\d+$/', $startCell)) {
-                            $value = $sheetListaPartidas->getCell($startCell)->getValue();
-
-                            log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
-                            // Comparar el valor con el itemNumber
-
-                            if (trim($value) == $itemN) {
-                                // Obtener el rango de filas del rango fusionado
-                                log_message('error', 'Rango: ' . $startCell . ' - ' . $endCell);
-                                preg_match('/\d+/', $startCell, $startMatches);
-                                preg_match('/\d+/', $endCell, $endMatches);
-                                $startRow = (int)$startMatches[0];
-                                $endRow = (int)$endMatches[0];
-                                // Obtener el valor de la columna G para el rango fusionado
-                                for ($r = $startRow; $r <= $endRow; $r++) {
-                                    $adValorem = $sheetListaPartidas->getCell('G' . $r  )->getValue();
-                                    if (trim($adValorem) == "FTA") {
-                                        $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
+                                        $sheet->setCellValue('R' . $row, $adValorem);
+                                        $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
+                                        break;
                                     }
-                                    $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
-                                    $sheet0->setCellValue('R' . $highestFirstSheetRow, $adValorem);
-                                    $sheet0->setCellValue('S' . $highestFirstSheetRow, $antiDumping == 0 ? "-" : $antiDumping);
                                     break;
                                 }
+                            }
+                        }
 
-                                // Salir del bucle si ya encontramos el rango que buscamos
+                        if ($client !== $nameActual) {
+                            if ($nameActual !== "" && $client !== "" && $client !== null) {
+                                // Si cambia el cliente, fusionar las celdas desde el inicio hasta la última fila del bloque actual
+                                $sheet->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
+                                $sheet->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
+                                // $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
+                                // $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
+                                $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
+                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
+                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+                            }
+
+                            // Actualizar el valor actual y establecer nuevas celdas iniciales
+                            $nameActual = $client;
+                            $mergedStartCell = $row;
+                        }
+
+                        $mergedEndCell = $row;
+                        $sheet->setCellValue('D' . $row, $client);
+
+                        //find if exists row in datasystem array where trim(nombre)=trim(client) if exists set volumen_cotizacion, volumen_china, volumen_doc, valor_doc, valor_cot else set -
+                        $volumen_cotizacion = "-";
+                        $volumen_selected = '';
+                        $volumen_china = "-";
+                        $volumen_doc = "-";
+                        $valor_doc = "-";
+                        $valor_cot = "-";
+                        $tipoCliente = "No existe en contenedor";
+                        //find in array
+                        foreach ($dataSystem as $item) {
+                            if (strtolower(trim($item->nombre)) == strtolower(trim($client))) {
+                                $volumen_cotizacion = $item->volumen;
+                                $volumen_china = $item->volumen_china;
+                                $volumen_selected = $item->vol_selected ?? '';
+                                $volumen_doc = $item->volumen_doc;
+                                $valor_doc = $item->valor_doc;
+                                $tipoCliente = $item->name;
                                 break;
                             }
                         }
+                        //volumen_doc,volumen_china,volumen
+                        if ($volumen_selected == 'volumen_doc') {
+                            $volumen_cotizacion = $volumen_doc;
+                        }
+                        if ($volumen_selected == 'volumen_china') {
+                            $volumen_cotizacion = $volumen_china;
+                        }
+                        if ($volumen_selected == 'volumen') {
+                            $volumen_cotizacion = $volumen_cotizacion;
+                        }
+                        //set vol_cot to t column
+                        $sheet->setCellValue('T' . $row, $volumen_cotizacion);
+                        // $sheet->setCellValue('U' . $row, $volumen_china);
+                        // $sheet->setCellValue('V' . $row, $volumen_doc);
+                        $sheet->setCellValue('C' . $row, $tipoCliente);
+                        if (trim($itemN) == "TOTAL FOB PRICE") {
+                            //unmerge cell
+
+                            $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
+                            // //MERGE FROM D TO K
+                            $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
+                            $highestRow = $row - 1;
+                            $highestFirstSheetRow += $highestRow + 1;
+
+                            break;
+                        }
+
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
+                        //set horizontal alignment to center
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                        //set vertical alignment to center
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                        $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                     }
-                    
-                    $sheet0->setCellValue('D' . $highestFirstSheetRow, $client);
+                } else {
+                    $startIndex = $startColumn;
+                    $highestSheetRow = $sheet->getHighestRow();
+                    for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
+                        $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
 
-                    //get this sheet values and insert in first sheet
+                        // Look up the client using the item ID instead of sequential row
+                        $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
 
-                    // $brand = $sheet->getCell($brandColumn.$row)->getValue();
-                    $description = $sheet->getCell($descriptionColumn . $row)->getValue();
-                    $quantityCount = $sheet->getCell($quantityCountColumn . $row)->getValue();
-                    $quantityMeasure = $sheet->getCell($quantityMeasureColumn . $row)->getValue();
-                    $unitPrice = $sheet->getCell($unitPriceColumn . $row)->getValue();
-                    $unitMeasure = $sheet->getCell($unitMeasureColumn . $row)->getValue();
-                    $fobPrice = $sheet->getCell($fobPriceColumn . $row)->getValue();
-                    $sheet0->setCellValue($itemNColumn . $highestFirstSheetRow, $itemN);
+                        // If no client found, try to use the sequential approach as fallback
+                        if ($client === null) {
+                            $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
+                            $startPackingListIndex++; // Still increment for compatibility
+                        }
 
-                    // // $sheet0->setCellValue($brandColumn.$highestFirstSheetRow,$brand);
-                    $sheet0->setCellValue($descriptionNColumn . $highestFirstSheetRow, $description);
-                    $sheet0->setCellValue($quantityCountNColumn . $highestFirstSheetRow, $quantityCount);
-                    $sheet0->setCellValue($quantityMeasureNColumn . $highestFirstSheetRow, $quantityMeasure);
-                    $sheet0->setCellValue($unitPriceNColumn . $highestFirstSheetRow, $unitPrice);
-                    $sheet0->setCellValue($unitMeasureNColumn . $highestFirstSheetRow, $unitMeasure);
-                    $sheet0->setCellValue($fobPriceNColumn . $highestFirstSheetRow, "=" . $quantityCountNColumn . $highestFirstSheetRow . "*" . $unitPriceNColumn . $highestFirstSheetRow);
-                    // // $sheet0->mergeCells('D'.$highestFirstSheetRow.':K'.$highestFirstSheetRow);
-                    $styleArray = array(
-                        'borders' => array(
-                            'allborders' => array(
-                                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                        if ($client !== $nameActual && $client !== null) {
+                            if ($nameActual !== "") {
+                                $sheet0->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
+                                $sheet0->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
+                                // $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
+                                // $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
+                                $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
+                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
+                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+                            }
+
+                            // Actualizar el valor actual y establecer nuevas celdas iniciales
+                            $nameActual = $client;
+                            $mergedStartCell = $highestFirstSheetRow;
+                        }
+                        $mergedEndCell = $highestFirstSheetRow;
+
+                        $sheet0 = $objPHPExcel->getSheet(0);
+
+                        if (trim($itemN) == "TOTAL FOB PRICE") {
+                            $highestSheetRow = $row - 1;
+                            break;
+                        }
+
+                        $sheet0->insertNewRowBefore($highestFirstSheetRow, 1);
+
+                        $volumen_cotizacion = "-";
+                        $volumen_china = "-";
+                        $volumen_doc = "-";
+                        $valor_doc = "-";
+                        $valor_cot = "-";
+                        $volumen_selected = '';
+
+                        $tipoCliente = "No existe en contenedor";
+                        //find in array
+                        foreach ($dataSystem as $item) {
+                            if (strtolower(trim($item->nombre)) == strtolower(trim($client))) {
+                                $volumen_cotizacion = $item->volumen;
+                                $volumen_china = $item->volumen_china;
+                                $volumen_selected = $item->vol_selected ?? '';
+                                $volumen_doc = $item->volumen_doc;
+                                $valor_doc = $item->valor_doc;
+                                $tipoCliente = $item->name;
+                                break;
+                            }
+                        }
+
+                        //set vol_cot to t column
+                        if ($volumen_selected == 'volumen_doc') {
+                            $volumen_cotizacion = $volumen_doc;
+                        }
+                        if ($volumen_selected == 'volumen_china') {
+                            $volumen_cotizacion = $volumen_china;
+                        }
+                        if ($volumen_selected == 'volumen') {
+                            $volumen_cotizacion = $volumen_cotizacion;
+                        }
+                        $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
+                        // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
+                        // $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
+                        $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
+                        $mergedCells = $sheetListaPartidas->getMergeCells();
+                        foreach ($mergedCells as $range) {
+                            // Extraer las celdas inicial y final del rango
+                            [$startCell, $endCell] = explode(':', $range);
+                            // Verificar si el rango está en la columna B
+                            if (preg_match('/^A\d+$/', $startCell)) {
+                                $value = $sheetListaPartidas->getCell($startCell)->getValue();
+
+                                log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
+                                // Comparar el valor con el itemNumber
+
+                                if (trim($value) == $itemN) {
+                                    // Obtener el rango de filas del rango fusionado
+                                    log_message('error', 'Rango: ' . $startCell . ' - ' . $endCell);
+                                    preg_match('/\d+/', $startCell, $startMatches);
+                                    preg_match('/\d+/', $endCell, $endMatches);
+                                    $startRow = (int)$startMatches[0];
+                                    $endRow = (int)$endMatches[0];
+                                    // Obtener el valor de la columna G para el rango fusionado
+                                    for ($r = $startRow; $r <= $endRow; $r++) {
+                                        $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
+                                        if (trim($adValorem) == "FTA") {
+                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                        }
+                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
+                                        $sheet0->setCellValue('R' . $highestFirstSheetRow, $adValorem);
+                                        $sheet0->setCellValue('S' . $highestFirstSheetRow, $antiDumping == 0 ? "-" : $antiDumping);
+                                        break;
+                                    }
+
+                                    // Salir del bucle si ya encontramos el rango que buscamos
+                                    break;
+                                }
+                            }
+                        }
+
+                        $sheet0->setCellValue('D' . $highestFirstSheetRow, $client);
+
+                        //get this sheet values and insert in first sheet
+
+                        // $brand = $sheet->getCell($brandColumn.$row)->getValue();
+                        $description = $sheet->getCell($descriptionColumn . $row)->getValue();
+                        $quantityCount = $sheet->getCell($quantityCountColumn . $row)->getValue();
+                        $quantityMeasure = $sheet->getCell($quantityMeasureColumn . $row)->getValue();
+                        $unitPrice = $sheet->getCell($unitPriceColumn . $row)->getValue();
+                        $unitMeasure = $sheet->getCell($unitMeasureColumn . $row)->getValue();
+                        $fobPrice = $sheet->getCell($fobPriceColumn . $row)->getValue();
+                        $sheet0->setCellValue($itemNColumn . $highestFirstSheetRow, $itemN);
+
+                        // // $sheet0->setCellValue($brandColumn.$highestFirstSheetRow,$brand);
+                        $sheet0->setCellValue($descriptionNColumn . $highestFirstSheetRow, $description);
+                        $sheet0->setCellValue($quantityCountNColumn . $highestFirstSheetRow, $quantityCount);
+                        $sheet0->setCellValue($quantityMeasureNColumn . $highestFirstSheetRow, $quantityMeasure);
+                        $sheet0->setCellValue($unitPriceNColumn . $highestFirstSheetRow, $unitPrice);
+                        $sheet0->setCellValue($unitMeasureNColumn . $highestFirstSheetRow, $unitMeasure);
+                        $sheet0->setCellValue($fobPriceNColumn . $highestFirstSheetRow, "=" . $quantityCountNColumn . $highestFirstSheetRow . "*" . $unitPriceNColumn . $highestFirstSheetRow);
+                        // // $sheet0->mergeCells('D'.$highestFirstSheetRow.':K'.$highestFirstSheetRow);
+                        $styleArray = array(
+                            'borders' => array(
+                                'allborders' => array(
+                                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                                )
                             )
-                        )
-                    );
-                    $objPHPExcel->getActiveSheet()->mergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
+                        );
+                        $objPHPExcel->getActiveSheet()->mergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
 
 
-                    $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
-                    //set horizontal alignment to center
-                    $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                    //set vertical alignment to center
-                    $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-                    $sheet0->getStyle('O' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                    $sheet0->getStyle('Q' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                    //set r column porcentage format
-                    $sheet0->getStyle('R' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
+                        //set horizontal alignment to center
+                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                        //set vertical alignment to center
+                        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                        $sheet0->getStyle('O' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                        $sheet0->getStyle('Q' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                        //set r column porcentage format
+                        $sheet0->getStyle('R' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
 
-                    $highestFirstSheetRow++;
+                        $highestFirstSheetRow++;
+                    }
                 }
             }
-        }
-        //unmerge e to l
-        $objPHPExcel->getActiveSheet()->unmergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
-        $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
-        //set fill none in sheet 0 row=highestFirstSheetRow
-        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
-        //set all borders
-        $styleArray = array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+            //unmerge e to l
+            $objPHPExcel->getActiveSheet()->unmergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
+            $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
+            //set fill none in sheet 0 row=highestFirstSheetRow
+            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
+            //set all borders
+            $styleArray = array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    )
                 )
-            )
-        );
-        $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
+            );
+            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
 
-        //MERGE B TO 0
-        //set p highestFirstSheetRow value to sum from p.startColumn to p.highestFirstSheetRow-1
-        $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
-        $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
+            //MERGE B TO 0
+            //set p highestFirstSheetRow value to sum from p.startColumn to p.highestFirstSheetRow-1
+            $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
+            $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
 
-        //set  d column auto size
-        $sheet0->getStyle('D')->getAlignment()->setWrapText(true);
-        $sheet0->getColumnDimension('C')->setWidth(30);
+            //set  d column auto size
+            $sheet0->getStyle('D')->getAlignment()->setWrapText(true);
+            $sheet0->getColumnDimension('C')->setWidth(30);
 
-        $sheet0->getColumnDimension('D')->setWidth(60);
-        //SET WIDTH TO COLUMNS
-        $sheet0->getColumnDimension('R')->setWidth(20);
-        $sheet0->getColumnDimension('S')->setWidth(25);
-        $sheet0->getColumnDimension('T')->setWidth(15);
-        // $sheet0->getColumnDimension('U')->setWidth(15);
-        // $sheet0->getColumnDimension('V')->setWidth(15);
-        //from b starcolumn to b highestFirstSheetRow-1 set fill pinkColor
-        $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-        $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
-        //D TO GRAY, R AND S TO SKYBLUE, T TO PINK,U TO GREEN
-        $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-        $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
-        $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-        $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
-        $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-        $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+            $sheet0->getColumnDimension('D')->setWidth(60);
+            //SET WIDTH TO COLUMNS
+            $sheet0->getColumnDimension('R')->setWidth(20);
+            $sheet0->getColumnDimension('S')->setWidth(25);
+            $sheet0->getColumnDimension('T')->setWidth(15);
+            // $sheet0->getColumnDimension('U')->setWidth(15);
+            // $sheet0->getColumnDimension('V')->setWidth(15);
+            //from b starcolumn to b highestFirstSheetRow-1 set fill pinkColor
+            $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+            //D TO GRAY, R AND S TO SKYBLUE, T TO PINK,U TO GREEN
+            $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
+            $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
+            $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
             return $objPHPExcel;
         } catch (Exception $e) {
-            log_message('error', __METHOD__ .''. $e->getMessage());
+            log_message('error', __METHOD__ . '' . $e->getMessage());
             return ['status' => "error", 'message' => $e->getMessage()];
         }
     }
@@ -2128,7 +2135,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados' => $estado]);
             //INSERT INTO TRACKING TABLE
-           
+
         }
         // Manejo del estado "LOADED"
         else if ($estado == "LOADED") {
@@ -2169,7 +2176,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_cotizacion', $idCotizacion);
             $this->db->where('id', $idProveedor);
             $this->db->update($this->table_contenedor_cotizacion_proveedores, ['estados_proveedor' => $estado]);
-        } 
+        }
         // Manejo de otros estados
         else {
             $this->db->where('id_cotizacion', $idCotizacion);
@@ -2197,9 +2204,9 @@ class ContenedorConsolidadoModel extends CI_Model
             'estado' => $estado
         ]);
         $this->db->select('estado')
-        ->from($this->table_conteneodr_proveedor_estados_tracking)
-        ->where('id_cotizacion', $idCotizacion)
-        ->where('estado', 'RESERVADO');
+            ->from($this->table_conteneodr_proveedor_estados_tracking)
+            ->where('id_cotizacion', $idCotizacion)
+            ->where('estado', 'RESERVADO');
         $query = $this->db->get();
         $estadoCliente = $query->row() ? "RESERVADO" : "NO RESERVADO";
 
@@ -2216,212 +2223,213 @@ class ContenedorConsolidadoModel extends CI_Model
 
         return $data ?: "success";
     }
-public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
-{
-    try {
-        // Obtener información básica de la cotización
-        $cotizacionInfo = $this->db->select('nombre, id_contenedor, telefono')
-            ->from($this->table_contenedor_cotizacion)
-            ->where('id', $idCotizacion)
-            ->get()
-            ->row();
+    public function handlerUpdateCotizacionProveedor($estado, $idProveedor, $idCotizacion)
+    {
+        try {
+            // Obtener información básica de la cotización
+            $cotizacionInfo = $this->db->select('nombre, id_contenedor, telefono')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion)
+                ->get()
+                ->row();
 
-        if (!$cotizacionInfo) {
-            throw new Exception("No se encontró la cotización especificada");
+            if (!$cotizacionInfo) {
+                throw new Exception("No se encontró la cotización especificada");
+            }
+
+            $cliente = $cotizacionInfo->nombre;
+            $idContenedor = $cotizacionInfo->id_contenedor;
+            $telefono = preg_replace('/\s+/', '', $cotizacionInfo->telefono);
+            $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
+
+            // Obtener proveedores asociados a la cotización
+            $proveedores = $this->db->select('code_supplier, products, send_rotulado_status, id')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id_cotizacion', $idCotizacion)
+                ->get()
+                ->result_array();
+
+            if (empty($proveedores)) {
+                throw new Exception("No se encontraron proveedores para esta cotización");
+            }
+
+            // Obtener información del contenedor
+            $contenedorInfo = $this->db->select('carga')
+                ->from($this->table)
+                ->where('id', $idContenedor)
+                ->get()
+                ->row();
+
+            if (!$contenedorInfo) {
+                throw new Exception("No se encontró información del contenedor");
+            }
+
+            $carga = $contenedorInfo->carga;
+
+            if ($estado == "ROTULADO") {
+                return $this->procesarEstadoRotulado($cliente, $carga, $proveedores, $idCotizacion);
+            } elseif ($estado == "COBRANDO") {
+                return $this->procesarEstadoCobrando($idProveedor, $idCotizacion, $carga);
+            }
+
+            return "success";
+        } catch (Exception $e) {
+            log_message("error", "Error en handlerUpdateCotizacionProveedor: " . $e->getMessage());
+            return ['status' => "error", 'message' => $e->getMessage()];
         }
-
-        $cliente = $cotizacionInfo->nombre;
-        $idContenedor = $cotizacionInfo->id_contenedor;
-        $telefono = preg_replace('/\s+/', '', $cotizacionInfo->telefono);
-        $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
-
-        // Obtener proveedores asociados a la cotización
-        $proveedores = $this->db->select('code_supplier, products, send_rotulado_status, id')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id_cotizacion', $idCotizacion)
-            ->get()
-            ->result_array();
-
-        if (empty($proveedores)) {
-            throw new Exception("No se encontraron proveedores para esta cotización");
-        }
-
-        // Obtener información del contenedor
-        $contenedorInfo = $this->db->select('carga')
-            ->from($this->table)
-            ->where('id', $idContenedor)
-            ->get()
-            ->row();
-
-        if (!$contenedorInfo) {
-            throw new Exception("No se encontró información del contenedor");
-        }
-
-        $carga = $contenedorInfo->carga;
-
-        if ($estado == "ROTULADO") {
-            return $this->procesarEstadoRotulado($cliente, $carga, $proveedores, $idCotizacion);
-        } elseif ($estado == "COBRANDO") {
-            return $this->procesarEstadoCobrando($idProveedor, $idCotizacion, $carga);
-        }
-
-        return "success";
-    } catch (Exception $e) {
-        log_message("error", "Error en handlerUpdateCotizacionProveedor: " . $e->getMessage());
-        return ['status' => "error", 'message' => $e->getMessage()];
     }
-}
 
-protected function procesarEstadoRotulado($cliente, $carga, $proveedores, $idCotizacion)
-{
-    try {
-        // Procesar plantilla de bienvenida
-        $htmlWelcomePath = 'assets/downloads/Welcome_Consolidado_Template.html';
-        if (!file_exists($htmlWelcomePath)) {
-            throw new Exception("No se encontró la plantilla de bienvenida");
-        }
+    protected function procesarEstadoRotulado($cliente, $carga, $proveedores, $idCotizacion)
+    {
+        try {
+            // Procesar plantilla de bienvenida
+            $htmlWelcomePath = 'assets/downloads/Welcome_Consolidado_Template.html';
+            if (!file_exists($htmlWelcomePath)) {
+                throw new Exception("No se encontró la plantilla de bienvenida");
+            }
 
-        $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
-        $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
-        $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
+            $htmlWelcomeContent = file_get_contents($htmlWelcomePath);
+            $htmlWelcomeContent = mb_convert_encoding($htmlWelcomeContent, 'UTF-8', mb_detect_encoding($htmlWelcomeContent));
+            $htmlWelcomeContent = str_replace('{{consolidadoNumber}}', $carga, $htmlWelcomeContent);
 
-        // Filtrar proveedores
-        $providersHasSended = array_filter($proveedores, function ($proveedor) {
-            return $proveedor['send_rotulado_status'] == 'SENDED';
-        });
-        $providersHasNoSended = array_filter($proveedores, function ($proveedor) {
-            return $proveedor['send_rotulado_status'] == 'PENDING';
-        });
+            // Filtrar proveedores
+            $providersHasSended = array_filter($proveedores, function ($proveedor) {
+                return $proveedor['send_rotulado_status'] == 'SENDED';
+            });
+            $providersHasNoSended = array_filter($proveedores, function ($proveedor) {
+                return $proveedor['send_rotulado_status'] == 'PENDING';
+            });
 
-        if (empty($providersHasNoSended)) {
-            throw new Exception("No hay proveedores pendientes de envío");
-        }
-        if (count($providersHasSended) == 0) {
-            $this->sendWelcome($carga);
-        }else if(count($providersHasSended) > 0
-        && count($providersHasNoSended) > 0
-        )  {
-            $this->sendMessage("Hola 🙋🏻‍♀, te escribe el área de coordinación de Probusiness. 
+            if (empty($providersHasNoSended)) {
+                throw new Exception("No hay proveedores pendientes de envío");
+            }
+            if (count($providersHasSended) == 0) {
+                $this->sendWelcome($carga);
+            } else if (
+                count($providersHasSended) > 0
+                && count($providersHasNoSended) > 0
+            ) {
+                $this->sendMessage("Hola 🙋🏻‍♀, te escribe el área de coordinación de Probusiness. 
 
 📢 Añadiste un nuevo proveedor en el *Consolidado #${carga}*
 
 *Rotulado: 👇🏼*  
 Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para 
 identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.");
-        }
-
-        
-
-        // Configurar ZIP
-        $zipFileName = 'assets/downloads/Rotulado.zip';
-        $zipDirectory = dirname($zipFileName);
-
-        // Asegurar que el directorio existe
-        if (!file_exists($zipDirectory)) {
-            if (!mkdir($zipDirectory, 0755, true)) {
-                throw new Exception("No se pudo crear el directorio para el archivo ZIP");
-            }
-        }
-
-        // Eliminar archivo ZIP existente si existe
-        if (file_exists($zipFileName) && !unlink($zipFileName)) {
-            throw new Exception("No se pudo eliminar el archivo ZIP existente");
-        }
-
-        $zip = new ZipArchive();
-        if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-            throw new Exception("No se pudo crear el archivo ZIP");
-        }
-
-        // Configuración de DomPDF
-        $options = new Dompdf\Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isFontSubsettingEnabled', true);
-        $options->set('isRemoteEnabled', true);
-        $sleepSendMedia=3;
-        // Procesar cada proveedor
-        foreach ($providersHasNoSended as $proveedor) {
-            $supplierCode = $proveedor['code_supplier'];
-            $products = $proveedor['products'];
-            $sleepSendMedia+=1;
-
-            // Procesar plantilla de rotulado
-            $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
-            if (!file_exists($htmlFilePath)) {
-                throw new Exception("No se encontró la plantilla de rotulado");
             }
 
-            $htmlContent = file_get_contents($htmlFilePath);
-            $htmlContent = mb_convert_encoding($htmlContent, 'UTF-8', mb_detect_encoding($htmlContent));
-            $htmlContent = str_replace('{{cliente}}', $cliente, $htmlContent);
-            $htmlContent = str_replace('{{supplier_code}}', $supplierCode, $htmlContent);
-            $htmlContent = str_replace('{{carga}}', $carga, $htmlContent);
-            $htmlContent = str_replace('{{base_url}}', base_url(), $htmlContent);
 
-            // Generar PDF
-            $dompdf = new Dompdf\Dompdf($options);
-            $dompdf->loadHtml($htmlContent);
-            $dompdf->setPaper('A4', 'portrait');
-            $dompdf->render();
-            $pdfContent = $dompdf->output();
 
-            // Guardar temporalmente
-            $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
-            if (file_exists($tempFilePath) && !unlink($tempFilePath)) {
-                throw new Exception("No se pudo eliminar el archivo temporal existente");
-            }
+            // Configurar ZIP
+            $zipFileName = 'assets/downloads/Rotulado.zip';
+            $zipDirectory = dirname($zipFileName);
 
-            if (file_put_contents($tempFilePath, $pdfContent) === false) {
-                throw new Exception("No se pudo guardar el PDF temporal");
-            }
-
-            try {
-                if (!$zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf")) {
-                    log_message('error', "No se pudo añadir $tempFilePath al ZIP");
-                    continue;
+            // Asegurar que el directorio existe
+            if (!file_exists($zipDirectory)) {
+                if (!mkdir($zipDirectory, 0755, true)) {
+                    throw new Exception("No se pudo crear el directorio para el archivo ZIP");
                 }
-                // if (!$zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf")) {
-                //     throw new Exception("No se pudo añadir el archivo al ZIP");
-                // }
-                // Enviar documento al proveedor
-                $this->sendDataItem(
-                    "Producto: {$products}\nCódigo de proveedor: {$supplierCode}",
-                    $tempFilePath
-                );
-
-                // Actualizar estado del proveedor
-                $this->db->update(
-                    $this->table_contenedor_cotizacion_proveedores,
-                    ["send_rotulado_status" => "SENDED"],
-                    ["id" => $proveedor['id']]
-                );
-
-                // Agregar al ZIP
-            } catch (Exception $e) {
-                log_message('error', 'Error procesando proveedor ' . $supplierCode . ': ' . $e->getMessage());
-                continue; // Continuar con el siguiente proveedor si hay error
-            } finally {
-                // Limpiar memoria
-
-                gc_collect_cycles();
             }
-        }
 
-        // Cerrar ZIP
-        if (!$zip->close()) {
-            throw new Exception("Error al cerrar el archivo ZIP");
-        }
+            // Eliminar archivo ZIP existente si existe
+            if (file_exists($zipFileName) && !unlink($zipFileName)) {
+                throw new Exception("No se pudo eliminar el archivo ZIP existente");
+            }
 
-        // // Verificar que el ZIP tiene contenido
-        // if ($zip->numFiles == 0) {
-        //     throw new Exception("El archivo ZIP no contiene documentos");
-        // }
+            $zip = new ZipArchive();
+            if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+                throw new Exception("No se pudo crear el archivo ZIP");
+            }
 
-        // Enviar información adicional
-        $direccionUrl = base_url('assets/downloads/Direccion.jpg');
-        $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China',null,$sleepSendMedia);
-        $sleepSendMedia+=1;
-        $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
+            // Configuración de DomPDF
+            $options = new Dompdf\Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isFontSubsettingEnabled', true);
+            $options->set('isRemoteEnabled', true);
+            $sleepSendMedia = 3;
+            // Procesar cada proveedor
+            foreach ($providersHasNoSended as $proveedor) {
+                $supplierCode = $proveedor['code_supplier'];
+                $products = $proveedor['products'];
+                $sleepSendMedia += 1;
+
+                // Procesar plantilla de rotulado
+                $htmlFilePath = 'assets/downloads/Rotulado_Template.html';
+                if (!file_exists($htmlFilePath)) {
+                    throw new Exception("No se encontró la plantilla de rotulado");
+                }
+
+                $htmlContent = file_get_contents($htmlFilePath);
+                $htmlContent = mb_convert_encoding($htmlContent, 'UTF-8', mb_detect_encoding($htmlContent));
+                $htmlContent = str_replace('{{cliente}}', $cliente, $htmlContent);
+                $htmlContent = str_replace('{{supplier_code}}', $supplierCode, $htmlContent);
+                $htmlContent = str_replace('{{carga}}', $carga, $htmlContent);
+                $htmlContent = str_replace('{{base_url}}', base_url(), $htmlContent);
+
+                // Generar PDF
+                $dompdf = new Dompdf\Dompdf($options);
+                $dompdf->loadHtml($htmlContent);
+                $dompdf->setPaper('A4', 'portrait');
+                $dompdf->render();
+                $pdfContent = $dompdf->output();
+
+                // Guardar temporalmente
+                $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$supplierCode}.pdf";
+                if (file_exists($tempFilePath) && !unlink($tempFilePath)) {
+                    throw new Exception("No se pudo eliminar el archivo temporal existente");
+                }
+
+                if (file_put_contents($tempFilePath, $pdfContent) === false) {
+                    throw new Exception("No se pudo guardar el PDF temporal");
+                }
+
+                try {
+                    if (!$zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf")) {
+                        log_message('error', "No se pudo añadir $tempFilePath al ZIP");
+                        continue;
+                    }
+                    // if (!$zip->addFile($tempFilePath, "Rotulado_{$supplierCode}.pdf")) {
+                    //     throw new Exception("No se pudo añadir el archivo al ZIP");
+                    // }
+                    // Enviar documento al proveedor
+                    $this->sendDataItem(
+                        "Producto: {$products}\nCódigo de proveedor: {$supplierCode}",
+                        $tempFilePath
+                    );
+
+                    // Actualizar estado del proveedor
+                    $this->db->update(
+                        $this->table_contenedor_cotizacion_proveedores,
+                        ["send_rotulado_status" => "SENDED"],
+                        ["id" => $proveedor['id']]
+                    );
+
+                    // Agregar al ZIP
+                } catch (Exception $e) {
+                    log_message('error', 'Error procesando proveedor ' . $supplierCode . ': ' . $e->getMessage());
+                    continue; // Continuar con el siguiente proveedor si hay error
+                } finally {
+                    // Limpiar memoria
+
+                    gc_collect_cycles();
+                }
+            }
+
+            // Cerrar ZIP
+            if (!$zip->close()) {
+                throw new Exception("Error al cerrar el archivo ZIP");
+            }
+
+            // // Verificar que el ZIP tiene contenido
+            // if ($zip->numFiles == 0) {
+            //     throw new Exception("El archivo ZIP no contiene documentos");
+            // }
+
+            // Enviar información adicional
+            $direccionUrl = base_url('assets/downloads/Direccion.jpg');
+            $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China', null, $sleepSendMedia);
+            $sleepSendMedia += 1;
+            $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
 ➡ *Datos del proveedor: (Usted lo llena)*
 
@@ -2429,130 +2437,138 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
 ☑ Nombre del vendedor:
 ☑ Celular del vendedor:
 
-Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡",null,$sleepSendMedia);
+Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡", null, $sleepSendMedia);
 
-        // Enviar ZIP al cliente
-        if (!file_exists($zipFileName)) {
-            throw new Exception("El archivo ZIP no se generó correctamente");
-        }
-
-        $fileSize = filesize($zipFileName);
-        if ($fileSize === false || $fileSize == 0) {
-            throw new Exception("El archivo ZIP está vacío");
-        }
-
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="Rotulado.zip"');
-        header('Content-Length: ' . $fileSize);
-
-        if (readfile($zipFileName) === false) {
-            throw new Exception("No se pudo enviar el archivo ZIP");
-        }
-
-        // Limpieza final
-        foreach ($proveedores as $proveedor) {
-            $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$proveedor['code_supplier']}.pdf";
-            if (file_exists($tempFilePath)) {
-                unlink($tempFilePath);
+            // Enviar ZIP al cliente
+            if (!file_exists($zipFileName)) {
+                throw new Exception("El archivo ZIP no se generó correctamente");
             }
-        }
 
-        exit;
-    } catch (Exception $e) {
-        log_message('error', 'Error en procesarEstadoRotulado: ' . $e->getMessage());
-        throw $e;
+            $fileSize = filesize($zipFileName);
+            if ($fileSize === false || $fileSize == 0) {
+                throw new Exception("El archivo ZIP está vacío");
+            }
+
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="Rotulado.zip"');
+            header('Content-Length: ' . $fileSize);
+
+            if (readfile($zipFileName) === false) {
+                throw new Exception("No se pudo enviar el archivo ZIP");
+            }
+
+            // Limpieza final
+            foreach ($proveedores as $proveedor) {
+                $tempFilePath = sys_get_temp_dir() . "/temp_document_proveedor{$proveedor['code_supplier']}.pdf";
+                if (file_exists($tempFilePath)) {
+                    unlink($tempFilePath);
+                }
+            }
+
+            exit;
+        } catch (Exception $e) {
+            log_message('error', 'Error en procesarEstadoRotulado: ' . $e->getMessage());
+            throw $e;
+        }
     }
-}
 
-protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
-{
-    try {
-        // Obtener información del proveedor
-        $proveedorInfo = $this->db->select('estados_proveedor, code_supplier, qty_box_china, qty_box, id_cotizacion')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id', $idProveedor)
-            ->get()
-            ->row();
+    protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
+    {
+        try {
+            // Obtener información del proveedor
+            $proveedorInfo = $this->db->select('estados_proveedor, code_supplier, qty_box_china, qty_box, id_cotizacion')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id', $idProveedor)
+                ->get()
+                ->row();
 
-        if (!$proveedorInfo) {
-            throw new Exception("No se encontró información del proveedor");
+            if (!$proveedorInfo) {
+                throw new Exception("No se encontró información del proveedor");
+            }
+
+            $supplierCode = $proveedorInfo->code_supplier;
+            $idCotizacion = $proveedorInfo->id_cotizacion;
+
+            // Obtener información de la cotización
+            $cotizacionInfo = $this->db->select('volumen, monto, id_contenedor')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion)
+                ->get()
+                ->row();
+
+            if (!$cotizacionInfo) {
+                throw new Exception("No se encontró información de la cotización");
+            }
+
+            $volumen = $cotizacionInfo->volumen;
+            $valorCot = $cotizacionInfo->monto;
+            $idContenedor = $cotizacionInfo->id_contenedor;
+
+            // Obtener fecha de cierre
+            $fechaCierre = $this->db->select('f_cierre')
+                ->from($this->table)
+                ->where('id', $idContenedor)
+                ->get()
+                ->row();
+
+            if (!$fechaCierre) {
+                throw new Exception("No se encontró la fecha de cierre");
+            }
+
+            $fCierre = date('d F', strtotime($fechaCierre->f_cierre));
+            $meses = [
+                'January' => 'Enero',
+                'February' => 'Febrero',
+                'March' => 'Marzo',
+                'April' => 'Abril',
+                'May' => 'Mayo',
+                'June' => 'Junio',
+                'July' => 'Julio',
+                'August' => 'Agosto',
+                'September' => 'Septiembre',
+                'October' => 'Octubre',
+                'November' => 'Noviembre',
+                'December' => 'Diciembre'
+            ];
+            $fCierre = strtr($fCierre, $meses);
+
+            // Obtener información del cliente
+            $clienteInfo = $this->db->select('nombre, telefono')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $idCotizacion)
+                ->get()
+                ->row();
+
+            if (!$clienteInfo) {
+                throw new Exception("No se encontró información del cliente");
+            }
+
+            $telefono = preg_replace('/\s+/', '', $clienteInfo->telefono);
+            $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
+
+            // Construir y enviar mensaje
+            $message = "Reserva de espacio:\n" .
+                "*Consolidado #" . $carga . "-2025*\n\n" .
+                "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
+                "☑ CBM Preliminar: " . $volumen . " cbm\n" .
+                "☑ Costo CBM: $" . $valorCot . "\n" .
+                "☑ Fecha Limite de pago: " . $fCierre . "\n\n" .
+                "⚠ Nota: Realizar el pago antes del llenado del contenedor.\n\n" .
+                "📦 En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final.\n\n" .
+                "Apenas haga el pago, envíe por este medio para hacer la reserva.";
+
+            $this->sendMessage($message);
+
+            // Enviar imagen de pagos
+            $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
+            $this->sendMedia($pagosUrl, 'image/jpg');
+
+            return "success";
+        } catch (Exception $e) {
+            log_message('error', 'Error en procesarEstadoCobrando: ' . $e->getMessage());
+            throw $e;
         }
-
-        $supplierCode = $proveedorInfo->code_supplier;
-        $idCotizacion = $proveedorInfo->id_cotizacion;
-
-        // Obtener información de la cotización
-        $cotizacionInfo = $this->db->select('volumen, monto, id_contenedor')
-            ->from($this->table_contenedor_cotizacion)
-            ->where('id', $idCotizacion)
-            ->get()
-            ->row();
-
-        if (!$cotizacionInfo) {
-            throw new Exception("No se encontró información de la cotización");
-        }
-
-        $volumen = $cotizacionInfo->volumen;
-        $valorCot = $cotizacionInfo->monto;
-        $idContenedor = $cotizacionInfo->id_contenedor;
-
-        // Obtener fecha de cierre
-        $fechaCierre = $this->db->select('f_cierre')
-            ->from($this->table)
-            ->where('id', $idContenedor)
-            ->get()
-            ->row();
-
-        if (!$fechaCierre) {
-            throw new Exception("No se encontró la fecha de cierre");
-        }
-
-        $fCierre = date('d F', strtotime($fechaCierre->f_cierre));
-        $meses = [
-            'January' => 'Enero', 'February' => 'Febrero', 'March' => 'Marzo',
-            'April' => 'Abril', 'May' => 'Mayo', 'June' => 'Junio',
-            'July' => 'Julio', 'August' => 'Agosto', 'September' => 'Septiembre',
-            'October' => 'Octubre', 'November' => 'Noviembre', 'December' => 'Diciembre'
-        ];
-        $fCierre = strtr($fCierre, $meses);
-
-        // Obtener información del cliente
-        $clienteInfo = $this->db->select('nombre, telefono')
-            ->from($this->table_contenedor_cotizacion)
-            ->where('id', $idCotizacion)
-            ->get()
-            ->row();
-
-        if (!$clienteInfo) {
-            throw new Exception("No se encontró información del cliente");
-        }
-
-        $telefono = preg_replace('/\s+/', '', $clienteInfo->telefono);
-        $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
-
-        // Construir y enviar mensaje
-        $message = "Reserva de espacio:\n" .
-            "*Consolidado #" . $carga . "-2025*\n\n" .
-            "Ahora tienes que hacer el pago del CBM preliminar para poder subir su carga en nuestro contenedor.\n\n" .
-            "☑ CBM Preliminar: " . $volumen . " cbm\n" .
-            "☑ Costo CBM: $" . $valorCot . "\n" .
-            "☑ Fecha Limite de pago: " . $fCierre . "\n\n" .
-            "⚠ Nota: Realizar el pago antes del llenado del contenedor.\n\n" .
-            "📦 En caso hubiera variaciones en el cubicaje se cobrará la diferencia en la cotización final.\n\n" .
-            "Apenas haga el pago, envíe por este medio para hacer la reserva.";
-
-        $this->sendMessage($message);
-
-        // Enviar imagen de pagos
-        $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
-        $this->sendMedia($pagosUrl, 'image/jpg');
-
-        return "success";
-    } catch (Exception $e) {
-        log_message('error', 'Error en procesarEstadoCobrando: ' . $e->getMessage());
-        throw $e;
     }
-}
     public function updateTelefonoProveedor($idProveedor, $telefono)
     {
         $this->db->where('id', $idProveedor);
@@ -2702,7 +2718,8 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
         }
         return false;
     }
-    public function deleteFileAduana($idAduana){
+    public function deleteFileAduana($idAduana)
+    {
         $this->db->where("id", $idAduana);
         $this->db->delete($this->table_contenedor_aduana_files);
         if ($this->db->affected_rows() > 0) {
@@ -2815,16 +2832,16 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                 $dateTime = DateTime::createFromFormat('d/m/Y', $data['arrive_date_china']);
                 if ($dateTime) {
                     $data['arrive_date_china'] = $dateTime->format('Y-m-d');
-                } 
+                }
                 $estadoProveedorOrder = $this->providerOrderStatus[$estadoProveedor] ?? 0;
-                log_message('error',"llego");
+                log_message('error', "llego");
                 $estadoProvedorToUpdate = $this->providerOrderStatus[$this->STATUS_RECIVED] ?? 0;
                 if ($estadoProveedorOrder < $estadoProvedorToUpdate) {
                     $this->db->where('id', $idProveedor);
                     $this->db->update($this->table_contenedor_cotizacion_proveedores, [
                         'estados_proveedor' =>
                         $this->STATUS_RECIVED,
-                        
+
                         'qty_box_china' => $data['qty_box_china'],
                         'cbm_total_china' => $data['cbm_total_china'],
                         'arrive_date_china' => $data['arrive_date_china']
@@ -2837,7 +2854,7 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                         'estado' => $this->STATUS_RECIVED
                     ]);
                     //update estado column in table $this->table to estado RECIBIENDO where id = $idContenedor
-                  
+
 
 
 
@@ -2879,9 +2896,10 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                 $contenedorEstado = $this->db->select('estado_china')->from($this->table)->where('id', $idContenedor)->get()->row()->estado_china;
                 if ($contenedorEstado == "PENDIENTE") {
                     $this->db->where('id', $idContenedor);
-                    $this->db->update($this->table, ['estado_china' => "RECIBIENDO",
-                    "estado" => "RECIBIENDO"]);
-                
+                    $this->db->update($this->table, [
+                        'estado_china' => "RECIBIENDO",
+                        "estado" => "RECIBIENDO"
+                    ]);
                 }
             }
             $this->db->where('id', $idProveedor);
@@ -3181,10 +3199,10 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             // Inspección: ' . $message);
             //for each images and video send media
             foreach ($imagesUrls as $image) {
-                $this->sendMedia($image->file_path, $image->file_type,null,null,1);
+                $this->sendMedia($image->file_path, $image->file_type, null, null, 1);
             }
             foreach ($videosUrls as $video) {
-                $this->sendMedia($video->file_path, $video->file_type,null,null,1);
+                $this->sendMedia($video->file_path, $video->file_type, null, null, 1);
             }
             return true;
         }
@@ -3259,45 +3277,46 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             return $e->getMessage();
         }
     }
-    public function uploadBL($idContenedor, $file){
+    public function uploadBL($idContenedor, $file)
+    {
 
-    $this->maxFileSize = 1000000;
-    $this->setAllowedExtensionsImagesOfficeFiles();
+        $this->maxFileSize = 1000000;
+        $this->setAllowedExtensionsImagesOfficeFiles();
 
 
-    // Validar ruta de almacenamiento
-    $uploadPath = './assets/images/agentecompra/';
-    if (!is_dir($uploadPath)) {
-        mkdir($uploadPath, 0777, true);
+        // Validar ruta de almacenamiento
+        $uploadPath = './assets/images/agentecompra/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
+
+        // Subir archivo
+        $fileUrl = $this->uploadSingleFile(
+            [
+                "name" => $file['name'],
+                "type" => $file['type'],
+                "tmp_name" => $file['tmp_name'],
+                "error" => $file['error'],
+                "size" => $file['size']
+            ],
+            $uploadPath
+        );
+
+        if (!$fileUrl) {
+            return ['status' => "error", 'error' => "Error al subir el archivo."];
+        }
+
+        // Actualizar base de datos
+        $this->db->where('id', $idContenedor);
+        $this->db->update($this->table, ['bl_file_url' => $fileUrl]);
+
+        if ($this->db->error()['code'] == 0) {
+            $this->verifyContainerIsCompleted($idContenedor);
+            return ['status' => "success", 'error' => false];
+        }
+
+        return ['status' => "error", 'error' => "No se pudo actualizar la base de datos."];
     }
-
-    // Subir archivo
-    $fileUrl = $this->uploadSingleFile(
-        [
-            "name" => $file['name'],
-            "type" => $file['type'],
-            "tmp_name" => $file['tmp_name'],
-            "error" => $file['error'],
-            "size" => $file['size']
-        ],
-        $uploadPath
-    );
-
-    if (!$fileUrl) {
-        return ['status' => "error", 'error' => "Error al subir el archivo."];
-    }
-
-    // Actualizar base de datos
-    $this->db->where('id', $idContenedor);
-    $this->db->update($this->table, ['bl_file_url' => $fileUrl]);
-
-    if ($this->db->error()['code'] == 0) {
-        $this->verifyContainerIsCompleted($idContenedor);
-        return ['status' => "success", 'error' => false];
-    }
-
-    return ['status' => "error", 'error' => "No se pudo actualizar la base de datos."];
-}
     public function updateVolSelected($idCotizacion, $volSelected)
     {
         $this->db->where('id', $idCotizacion);
@@ -3497,8 +3516,9 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                     $mergeStart = $currentRow;
                     $mergeEnd = $currentRow;
                     //if sheet b column trim =TOTAL FOB PRICE then break
-                    if (trim($sheet->getCell('B' . $currentRow)->getValue()) == "TOTAL FOB PRICE"
-                    ||$currentRow >= $highestRow
+                    if (
+                        trim($sheet->getCell('B' . $currentRow)->getValue()) == "TOTAL FOB PRICE"
+                        || $currentRow >= $highestRow
                     ) {
                         $continue = false;
                         break;
@@ -5313,13 +5333,13 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             "file_url", file_path,
             "file_ext", file_type,
             "file_size", file_size
-        )) as files from carga_consolidada_aduana_files where id_contenedor ='. $idContenedor.'),"[]") as files')
+        )) as files from carga_consolidada_aduana_files where id_contenedor =' . $idContenedor . '),"[]") as files')
             ->from($this->table)
             ->where('id', $idContenedor);
         $query = $this->db->get();
         return $query->result();
     }
-    public function updateFormularioAduana($idContenedor, $data,$files)
+    public function updateFormularioAduana($idContenedor, $data, $files)
     {
         try {
             //remove idContainer from data
@@ -5465,7 +5485,8 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
             return false;
         }
     }
-    public function getObservaciones($idContenedor){
+    public function getObservaciones($idContenedor)
+    {
         try {
             $this->db->select('observaciones,
             (select json_arrayagg(json_object(
@@ -5474,16 +5495,15 @@ protected function procesarEstadoCobrando($idProveedor, $idCotizacion, $carga)
                 "file_url", file_path,
                 "file_ext", file_type,
                 "file_size", file_size
-            )) as files from carga_consolidada_aduana_files where id_contenedor ='. $idContenedor.') as files
+            )) as files from carga_consolidada_aduana_files where id_contenedor =' . $idContenedor . ') as files
             ');
             $this->db->from($this->table);
             $this->db->where('id', $idContenedor);
             $query = $this->db->get();
             //return all data from table
             return ['status' => true, 'data' => $query->row()];
-                
-        }catch (Exception $e) {
-            log_message('error', ''. $e->getMessage());
+        } catch (Exception $e) {
+            log_message('error', '' . $e->getMessage());
         }
     }
 }
