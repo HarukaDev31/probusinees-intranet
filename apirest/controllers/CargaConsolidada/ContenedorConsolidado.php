@@ -150,6 +150,8 @@ class ContenedorConsolidado extends CI_Controller
 	}
 	public function indexCompletados()
 	{
+		
+			
 		$arrData = $this->ContenedorConsolidadoModel->indexCompletados();
 		$data    = [];
 		usort($arrData, function ($a, $b) {
@@ -157,8 +159,10 @@ class ContenedorConsolidado extends CI_Controller
 			$numB = (int)$b->carga;
 			return $numB - $numA;
 		});
+		
 		foreach ($arrData as $row) {
 			$subdata   = [];
+			if($this->user->No_Grupo == "Documentacion"){
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
 			$subdata[] = $row->empresa;
@@ -188,6 +192,76 @@ class ContenedorConsolidado extends CI_Controller
 			$divAcciones = '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
 			' . $row->carga . ',true)"></i>';
 			$subdata[] = $divAcciones;
+		}else{
+			$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : $row->tipo_carga . " #" . $row->carga;
+			$subdata[] = $row->mes;
+			$subdata[] = $row->No_Pais;
+			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
+			if ($this->user->No_Grupo == "Coordinación") {
+				$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
+				$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
+			}
+
+			$subdata[] = $row->empresa;
+			if ($this->user->No_Grupo == "ContenedorAlmacen") {
+				$divEstado = '<select
+		onchange="updateEstado(' . $row->id . ')"
+				 id="estado-' . $row->id . '"
+			class="form-control
+					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
+					($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .
+					($row->estado_china == "COMPLETADO" ? "bg-success" : "") . '">
+					<option value="PENDIENTE" ' . ($row->estado_china == "PENDIENTE" ? "selected" : "") . '>WAITING</option>
+					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>RECEIVING</option>
+					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>FINISH</option>
+				</select>';
+			} else if ($this->user->No_Grupo == "Documentacion") {
+				$divEstado = '<select 
+				class="form-control
+				' . ($row->estado_documentacion == "PENDIENTE" ||  !$row->estado_documentacion ? "bg-warning" : "") .
+					($row->estado_documentacion == "DOCUMENTACION" ? "bg-primary" : "") .
+					($row->estado_documentacion == "COMPLETADO" ? "bg-success" : "") . '
+				
+				" id="estado-documentacion-' . $row->id . '" name="estado" onchange="updateEstadoDocumentacion(' . $row->id . ')">
+					<option 
+					value="PENDIENTE" ' . ($row->estado_documentacion == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
+					<option value="DOCUMENTACION" ' . ($row->estado_documentacion == "DOCUMENTACION" ? "selected" : "") . '>Documentacion</option>
+	
+					<option value="COMPLETADO" ' . ($row->estado_documentacion == "COMPLETADO" ? "selected" : "") . '>Completado</option>
+				</select>';
+			} else {
+				$divEstado = '<select 
+				class="form-control
+				' . ($row->estado == "PENDIENTE" ||  !$row->estado ? "bg-warning" : "") .
+					($row->estado == "RECIBIENDO" ? "bg-primary" : "") .
+					($row->estado == "COMPLETADO" ? "bg-success" : "") . '
+				
+				" id="estado-' . $row->id . '" name="estado" onchange="updateEstado(' . $row->id . ')">
+					<option 
+					value="PENDIENTE" ' . ($row->estado == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
+					<option value="RECIBIENDO" ' . ($row->estado == "RECIBIENDO" ? "selected" : "") . '>Recibiendo</option>
+
+				
+					<option value="COMPLETADO" ' . ($row->estado == "COMPLETADO" ? "selected" : "") . '>Completado</option>
+				</select>';
+			}
+			$subdata[] = $divEstado;
+
+			$divAcciones = '<div>';
+
+			$divAcciones .= '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+			' . $row->carga . ')"></i>';
+			//if user is coordinacion show
+			if ($this->user->No_Grupo == "Coordinación") {
+				$divAcciones .= '<i class="fas fa-edit text-warning" style="cursor:pointer; padding:10px;" onclick="view(' . $row->id . ')"></i>';
+				$divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="deleteCarga(' . $row->id . ')"></i>';
+			}
+
+			$divAcciones .= '</div>';
+
+			$subdata[] = $divAcciones;
+		}
+			
 			$data[] = $subdata;
 		}
 
@@ -195,6 +269,8 @@ class ContenedorConsolidado extends CI_Controller
 			"data" => $data
 		);
 		echo json_encode($output);
+		
+		
 	}
 	public function getPaises()
 	{

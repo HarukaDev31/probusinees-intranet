@@ -5289,10 +5289,12 @@ $(document).ready(async function () {
     $(".filter-contenedor").hide();
 
     $("#table-contenedor-completados").show();
-    $("#table-contenedor").html("");
    
     url = base_url + "CargaConsolidada/ContenedorConsolidado/indexCompletados";
+
     if(currentPrivilege == "Documentacion"){
+
+      $("#table-contenedor").html("");
       table_Entidad = $("#table-contenedor-completados").DataTable({
         dom:
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -5397,7 +5399,7 @@ $(document).ready(async function () {
         ],
       });
     }else{
-      
+      $("#table-contenedor-completados").html("");
       table_Entidad = $("#table-contenedor").DataTable({
         dom:
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
