@@ -84,7 +84,7 @@ class ContenedorConsolidado extends CI_Controller
 
 			$subdata[] = $row->empresa;
 			if ($this->user->No_Grupo == "ContenedorAlmacen") {
-				$divEstado = '<select
+				$divEstado = '<select disabled
 		onchange="updateEstado(' . $row->id . ')"
 				 id="estado-' . $row->id . '"
 			class="form-control

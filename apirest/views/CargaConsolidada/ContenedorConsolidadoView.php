@@ -2190,6 +2190,8 @@ Search for
     font-size: 28px !important;
     line-height: 30px;
     color: #272A30;
+    height: auto;
+    min-height: 150px;
   }
 
   button.swal2-confirm.swal2-styled.swal2-default-outline {

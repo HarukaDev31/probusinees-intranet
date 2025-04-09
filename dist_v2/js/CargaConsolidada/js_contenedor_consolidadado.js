@@ -1489,13 +1489,14 @@ async function deleteCarga(id) {
     icon: "warning",
     iconColor: "#FF0000",
     showCancelButton: true,
-    confirmButtonText: "Cancelar",
-    confirmButtonColor: "#00000000",
-    cancelButtonText: "Sí, eliminar",
-    cancelButtonColor: "#FF0000",
-    heihgtAuto: "false",
+
+    confirmButtonText: "Sí, eliminar",
+    confirmButtonColor: "#FF0000",
+    cancelButtonColor: "#000000",
+    cancelButtonText: "Cancelar",
   }).then((result) => {
-    if (result.isCancel) {
+    console.log(result)
+    if (result.isConfirmed) {
       url = base_url + "CargaConsolidada/ContenedorConsolidado/delete";
       $.ajax({
         url: url,
@@ -1505,7 +1506,7 @@ async function deleteCarga(id) {
         },
         success: function (response) {
           const result = JSON.parse(response);
-          if (result.status == 1) {
+          if (result.status == "success") {
             table_Entidad.ajax.reload();
             Swal.fire("Eliminado!", result.message, "success");
           } else {
