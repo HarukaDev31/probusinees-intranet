@@ -228,6 +228,7 @@ Filters
               <?php if (
                 $this->user->No_Grupo == "Coordinación"
                 || $this->user->No_Grupo == "Documentacion"
+                ||$this->user->No_Grupo == "Cotizador"
               ) {
               ?>
                 <th>Carga</th>
@@ -249,6 +250,8 @@ Filters
                 <th>Month</th>
                 <th>Country</th>
                 <th>Cut off</th>
+                <th>Arrival Date</th>
+                <th>Delivery Date</th>
                 <th>Company</th>
                 <th style="min-width: 8em;">Status</th>
 

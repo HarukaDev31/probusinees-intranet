@@ -77,11 +77,10 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
-			if ($this->user->No_Grupo == "Coordinación") {
+			
 				$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 				$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
-			}
-
+			
 			$subdata[] = $row->empresa;
 			if ($this->user->No_Grupo == "ContenedorAlmacen") {
 				$divEstado = '<select disabled
