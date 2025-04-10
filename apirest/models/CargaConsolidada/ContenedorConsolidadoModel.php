@@ -736,15 +736,19 @@ class ContenedorConsolidadoModel extends CI_Model
             ];
         }
     }
-    public function generateCodeSupplier($string, $rowCount, $index, $idContenedor)
-    {
-        //from string get first letter each word in uppercase and concatenate with rowCount and index
-        $words = explode(" ", $string);
+    public function generateCodeSupplier($string, $idContenedor, $rowCount, $index) {
+        $words = explode(" ", trim($string));
         $code = "";
+        
+        // Primeras 2 letras de las primeras 2 palabras (protegido)
         foreach ($words as $word) {
-            $code .= strtoupper(substr($word, 0, 1));
+            if (strlen($code) >= 4) break; // Ya tenemos 4 caracteres (2 palabras)
+            if (strlen($word) >= 2) { // Solo si la palabra tiene 2+ caracteres
+                $code .= strtoupper(substr($word, 0, 2));
+            }
         }
-        //complete $idcontenedor with 0 to 2 digits
+    
+        // Completar con ceros y retornar
         $idContenedor = str_pad($idContenedor, 2, "0", STR_PAD_LEFT);
         return $code . $rowCount . "-" . $index;
     }
@@ -764,7 +768,6 @@ class ContenedorConsolidadoModel extends CI_Model
                 'assets/images/agentecompra/'
             );
             $dataToInsert = $this->getCotizacionData($cotizacion);
-            log_message('error', 'Data to insert: ' . json_encode($dataToInsert));
             $dataToInsert['cotizacion_file_url'] = $fileUrl;
             $dataToInsert['id_contenedor'] = $data['id_contenedor'];
             $dataToInsert['id_usuario'] = $this->user->ID_Usuario;

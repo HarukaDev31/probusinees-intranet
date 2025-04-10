@@ -937,7 +937,7 @@ Search for
               <th
                 style="min-width: 6em;">Supplier</th>
               <th
-                style="min-width: 6em;">C. Supplier</th>
+                style="min-width: 8em;">C. Supplier</th>
               <th
                 style="min-width: 8em;">P. Number</th>
               <th
