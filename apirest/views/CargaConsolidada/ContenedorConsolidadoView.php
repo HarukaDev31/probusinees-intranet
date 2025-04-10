@@ -250,8 +250,7 @@ Filters
                 <th>Month</th>
                 <th>Country</th>
                 <th>Cut off</th>
-                <th>Arrival Date</th>
-                <th>Delivery Date</th>
+         
                 <th>Company</th>
                 <th style="min-width: 8em;">Status</th>
 

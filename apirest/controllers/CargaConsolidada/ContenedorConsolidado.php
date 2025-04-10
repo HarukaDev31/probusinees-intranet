@@ -77,10 +77,10 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
-			
+			if($this->user->No_Grupo == "Coordinación"){
 				$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 				$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
-			
+			}
 			$subdata[] = $row->empresa;
 			if ($this->user->No_Grupo == "ContenedorAlmacen") {
 				$divEstado = '<select disabled
@@ -475,16 +475,16 @@ class ContenedorConsolidado extends CI_Controller
 								<option
 								class="bg-info"
 								value="NC"' . ($proveedor->estados_proveedor == "NC" ? "selected" : "") . '>NC</option>
-								<option value="C"
+								<option value="C" disabled
 								class="bg-warning"
 								' . ($proveedor->estados_proveedor == "C" ? "selected" : "") . '>C</option>
-								<option value="R"
+								<option value="R" disabled
 								class="bg-success"
 								' . ($proveedor->estados_proveedor == "R" ? "selected" : "") . '>R</option>
 								<option value="NS"
 								class="bg-danger"
 								' . ($proveedor->estados_proveedor == "NS" ? "selected" : "") . '>NS</option>
-								<option value="INSPECTION" ' . ($proveedor->estados_proveedor == "INSPECTION" ? "selected" : "") . '>INSPECTION</option>
+								<option value="INSPECTION"  disabled ' . ($proveedor->estados_proveedor == "INSPECTION" ? "selected" : "") . '>INSPECTION</option>
 								<option value="LOADED" ' . ($proveedor->estados_proveedor == "LOADED" ? "selected" : "") . '>LOADED</option>
 								<option value="NO LOADED" ' . ($proveedor->estados_proveedor == "NO LOADED" ? "selected" : "") . '>NO LOADED</option>
 

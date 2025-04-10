@@ -10,3 +10,4 @@ assets/agente_compra/
 assets/uploads/
 assets/cargaconsolidada
 assets/downloads/*
+apirest/config/*
