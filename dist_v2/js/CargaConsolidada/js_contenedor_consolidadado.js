@@ -1356,6 +1356,8 @@ async function updateEstadoCotizacionProveedor(
         link.href = window.URL.createObjectURL(blob);
         link.download = `Cotizacion-${idCotizacion}.zip`;
         link.click();
+        //reload table 
+        reloadTableCotizacionEmbarque();
       },
       error: function () {
         //set current select previous status
