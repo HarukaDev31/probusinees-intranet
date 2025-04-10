@@ -750,7 +750,7 @@ class ContenedorConsolidadoModel extends CI_Model
     
         // Completar con ceros y retornar
         $idContenedor = str_pad($idContenedor, 2, "0", STR_PAD_LEFT);
-        return $code . $rowCount . "-" . $index;
+        return $code . $idContenedor . "-" . $rowCount;
     }
     public function storeCotizacion($data, $cotizacion)
     {
