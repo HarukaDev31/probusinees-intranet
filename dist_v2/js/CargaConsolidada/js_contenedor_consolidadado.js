@@ -5501,6 +5501,8 @@ $(document).ready(async function () {
       ],
     });
     configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
+    applyDynamicStylesForTableRows();
+    
 
   }
   //if current windows route includes listarCompletados hide .filter-contenedor
@@ -7128,6 +7130,107 @@ $("#navieraAdd").click(function () {
     },
   });
 });
+
+function applyDynamicStylesForTableRows() {
+  const isMobile = window.matchMedia("(max-width: 768px)");
+
+  const applyStyles = () => {
+    if (isMobile.matches) {
+      console.log("Aplicando estilos para móvil...");
+      document.querySelectorAll("tbody tr").forEach((row) => {
+        // Ajustar el grid-template-areas dinámicamente según el perfil
+        if (currentPrivilege === "ContenedorAlmacen") {
+          row.style.gridTemplateRows = "repeat(5, 1fr)";
+        } else if (currentPrivilege === "Coordinación") {
+          row.style.gridTemplateRows = "repeat(7, 1fr)";
+        }
+
+        // Aplicar estilos a los <td> según su posición
+        row.querySelectorAll("td:nth-child(1)").forEach((td) => {
+          td.style.gridArea = "3/1";
+          td.style.fontWeight = "600";
+        });
+        row.querySelectorAll("td:nth-child(2)").forEach((td) => {
+          td.style.gridArea = "1/1";
+        });
+        row.querySelectorAll("td:nth-child(3)").forEach((td) => {
+          td.style.gridArea = "2/1";
+        });
+        row.querySelectorAll("td:nth-child(4)").forEach((td) => {
+          td.style.gridArea = "4/1";
+        });
+        row.querySelectorAll("td:nth-child(5)").forEach((td) => {
+          td.style.gridArea = "5/1";
+        });
+        row.querySelectorAll("td:nth-child(6)").forEach((td) => {
+          td.style.gridArea = "3/2";
+        });
+        row.querySelectorAll("td:nth-child(7)").forEach((td) => {
+          td.style.gridArea = "3";
+        });
+
+        // Si el perfil es Coordinación, aplica estilos adicionales
+        if (currentPrivilege === "Coordinación") {
+          row.querySelectorAll("td:nth-child(1)").forEach((td) => {
+            td.style.gridArea = "3/1";
+            td.style.fontWeight = "600";
+          });
+          row.querySelectorAll("td:nth-child(2)").forEach((td) => {
+            td.style.gridArea = "1/1";
+          });
+          row.querySelectorAll("td:nth-child(3)").forEach((td) => {
+            td.style.gridArea = "2/1";
+          });
+          row.querySelectorAll("td:nth-child(4)").forEach((td) => {
+            td.style.gridArea = "4/1";
+          });
+          row.querySelectorAll("td:nth-child(5)").forEach((td) => {
+            td.style.gridArea = "5/1";
+            td.style.fontWeight = "600";
+          });
+          row.querySelectorAll("td:nth-child(6)").forEach((td) => {
+            td.style.gridArea = "6/1";
+            td.style.fontWeight = "600";
+          });
+          row.querySelectorAll("td:nth-child(7)").forEach((td) => {
+            td.style.gridArea = "7/1";
+          });
+          row.querySelectorAll("td:nth-child(8)").forEach((td) => {
+            td.style.gridArea = "3/2";
+          });
+          row.querySelectorAll("td:nth-child(9)").forEach((td) => {
+            td.style.gridArea = "3";
+          });
+        }
+      });
+    } else {
+      console.log("Aplicando estilos para escritorio...");
+      document.querySelectorAll("tbody tr").forEach((row) => {
+        row.style.gridTemplateRows = "none"; // Restablecer estilos para escritorio
+        row.querySelectorAll("td").forEach((td) => {
+          td.style.gridArea = ""; // Restablecer grid-area para cada <td>
+        });
+      });
+    }
+  };
+
+  // Ejecutar la función inmediatamente
+  applyStyles();
+
+  // Escuchar cambios en el tamaño de la pantalla
+  isMobile.addEventListener("change", applyStyles);
+
+  // Observar cambios en el DOM para detectar nuevas filas dinámicamente
+  const observer = new MutationObserver(() => {
+    applyStyles();
+  });
+
+  const tableBody = document.querySelector("tbody");
+  if (tableBody) {
+    observer.observe(tableBody, { childList: true, subtree: true });
+  }
+}
+
 // Llamar a la función para aplicar el desplazamiento horizontal a todas las tablas
 enableHorizontalAutoScrollForAllTables();
 

@@ -26,7 +26,7 @@
       <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
-            <div class="icon-container">
+            <div class="icon-container px-2">
               <i class="bi bi-currency-dollar stat-icon"></i>
             </div>
             <div class="text-container">
@@ -41,7 +41,7 @@
       <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
-            <div class="icon-container">
+            <div class="icon-container px-2">
               <i class="bi bi-people stat-icon"></i>
             </div>
             <div class="text-container">
@@ -56,7 +56,7 @@
       <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
-            <div class="icon-container">
+            <div class="icon-container px-2">
               <i class="bi bi-box-seam stat-icon"></i>
             </div>
             <div class="text-container">
@@ -71,7 +71,7 @@
       <div class="col-md-6 col-lg-3 col-sm-6 col-6">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
-            <div class="icon-container">
+            <div class="icon-container px-2">
               <i class="fas fa-ship stat-icon"></i>
             </div>
             <div class="text-container">
@@ -1844,7 +1844,6 @@
   }
 
   .icon-container {
-    width: 80px;
     height: 80px;
     display: flex;
     align-items: center;
