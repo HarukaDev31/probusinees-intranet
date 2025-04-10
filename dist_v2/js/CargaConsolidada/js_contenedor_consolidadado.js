@@ -7209,6 +7209,7 @@ function applyDynamicStylesForTableRows() {
         row.style.gridTemplateRows = "none"; // Restablecer estilos para escritorio
         row.querySelectorAll("td").forEach((td) => {
           td.style.gridArea = ""; // Restablecer grid-area para cada <td>
+          td.style.fontWeight = ""; // Restablecer font-weight para cada <td>
         });
       });
     }
