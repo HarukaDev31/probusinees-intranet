@@ -2412,7 +2412,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "embarque";
-              data.estado = $("#txt-ID_Estado").val();
+              data.Filtro_Estado = $("#txt-ID_Estado").val();
               validateListEmbarque(idContenedor);
               $(".input-date").datepicker({
                 autoclose: true,
@@ -2681,7 +2681,7 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "embarque";
-                        data.estado = $("#txt-ID_Estado").val();
+                        data.Filtro_Estado = $("#txt-ID_Estado").val();
                         validateListEmbarque(idContenedor);
                         $(".input-date").datepicker({
                           autoclose: true,
@@ -3083,7 +3083,7 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "variacion";
-                        data.estado = $("#txt-ID_Estado").val();
+                        data.Filtro_Estado = $("#txt-ID_Estado").val();
                         validateListEmbarque(idContenedor);
                       },
                     },
@@ -3156,7 +3156,7 @@ const openStepFunction = async (step, id) => {
             data.stepIndex = stepIndex;
             data.idContenedor = idContenedor;
             data.tipoTabla = "general";
-            data.estado = "0";
+            data.Filtro_Estado = "0";
           },
         },
 
