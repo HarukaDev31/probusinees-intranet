@@ -3247,9 +3247,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         //get sum of cbm_total_china and cbm_total from each cotizacion proveedor
         try {
             $this->db->select('
-            COALESCE(SUM(IF(cccp.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
-            COALESCE(SUM(IF(cccp.estado_cotizador = "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total_confirmado,
-            COALESCE(SUM(IF(cccp.estado_cotizador != "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total_pendiente')
+            COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cc.cbm_total_china, 0)), 0) as cbm_total_china,
+            COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cc.cbm_total, 0)), 0) as cbm_total_confirmado,
+            COALESCE(SUM(IF(cc.estado_cotizador != "CONFIRMADO", cc.cbm_total, 0)), 0) as cbm_total_pendiente')
         ->from($this->table_contenedor_cotizacion_proveedores . ' cccp') // Usando alias
         ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id') // Usando alias
         ->where('cccp.id_contenedor', $idContenedor);
