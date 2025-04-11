@@ -22,7 +22,7 @@ var originalNoteInpectionText = "";
 var shouldSaveDocumentacion = false;
 var originalVolumenDocumento = "";
 var originalValorDocumento = "";
-var sectionsDisabled=false;
+var sectionsDisabled = false;
 var meses = [
   {
     id: "ENERO",
@@ -463,7 +463,7 @@ function deleteFile(fileId, cardElement, deleteFileList) {
     },
   });
 }
-function addFileToList(file, fileList = null, id = null,deleteHidden = false) {
+function addFileToList(file, fileList = null, id = null, deleteHidden = false) {
   if (fileList == null) {
     fileList = $(".file-lista");
   }
@@ -1412,8 +1412,8 @@ async function view(id) {
   $("#btn-actualizar").show();
   currentCarga = result.id;
 }
-async function viewSteps(id, carga,disabled=false) {
-  sectionsDisabled=disabled;
+async function viewSteps(id, carga, disabled = false) {
+  sectionsDisabled = disabled;
   currentCargaNumber = carga;
   url = base_url + "CargaConsolidada/ContenedorConsolidado/steps/" + id;
   idContenedor = id;
@@ -1850,7 +1850,7 @@ async function showDocumentacionDocumentacionContainer(id) {
         });
       });
     }
-    if(sectionsDisabled){
+    if (sectionsDisabled) {
       $(".upload-button").prop("disabled", true);
       $("#btn-crear-documentacion-documentacion").hide();
     }
@@ -1993,7 +1993,7 @@ async function viewFormularioAduana() {
   $('#file-input-aduana').val('');
   files = JSON.parse(result[0].files);
   files.forEach((file) => {
-    addFileToList(file, null, 'file-lista-aduana',true);
+    addFileToList(file, null, 'file-lista-aduana', true);
   });
   spinner.hide();
   documentacionAduanaContainer.show();
@@ -2022,10 +2022,10 @@ async function viewFormularioAduana() {
     );
   }
   //disavle .input-aduana}
-  if(sectionsDisabled){
+  if (sectionsDisabled) {
     $(".input-aduana").prop("disabled", true);
-  $(".btn-guardar-aduana").hide();
-  $(".upload-button-aduana").hide();
+    $(".btn-guardar-aduana").hide();
+    $(".upload-button-aduana").hide();
   }
   // Control channel color indicator
   function updateChannelIndicator() {
@@ -2701,6 +2701,12 @@ const openStepFunction = async (step, id) => {
                         dateFormat: "dd/mm/yyyy",
                       });
                     },
+                    complete: function () {
+                      $("#aplicar-btn").off("click");
+                      $("#aplicar-btn").click(function () {
+                        table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                      });
+                    },
                   });
                   configurarBuscador(
                     "table-cotizacion-embarque",
@@ -2768,8 +2774,24 @@ const openStepFunction = async (step, id) => {
             },
             complete: async function () {
               $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+              $("#aplicar-btn").off("click");
+              $("#aplicar-btn").click(function () {
+                table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+              });
               spinner.hide();
+              // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
+              if (
+                currentPrivilege == "Cotizador" 
+              ) {
+                $("#txt-ID_Estado").empty();
+                $("#txt-ID_Estado").append(
+                  '<option value="0">Todos</option>' +
+                  '<option value="PENDIENTE">Pendiente</option>' +
+                  '<option value="CONFIRMADO">Confirmado</option>'
+                );
+              }
               await getTableCotizacionEmbarqueHeaders();
+              
             },
           },
           columnDefs: [
@@ -3241,7 +3263,6 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
   $("." + searchInputClass).on("input", function () {
     var searchTerm = $(this).val(); // Obtener el valor del buscador
     table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
-    console.log(searchTerm);
   });
 
   // Actualizar el mensaje de información después de cada búsqueda
@@ -4242,8 +4263,8 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
     });
   }
 }
-async function viewClientesDocumentacion(id,nombrecliente=null) {
-  if(nombrecliente){
+async function viewClientesDocumentacion(id, nombrecliente = null) {
+  if (nombrecliente) {
     $(".name_cliente").text(nombrecliente);
   }
   $(".aditional-file").remove();
@@ -4272,15 +4293,15 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
   selectedTabDocumentacionId = !selectedTabDocumentacionId ? providers[0].id : selectedTabDocumentacionId;
 
   const filesAlmacenDocumentacion = JSON.parse(result.files_almacen_documentacion || "[]");
-  const filesAlmacenInspection= JSON.parse(result.files_almacen_inspection || "[]");
-  const filesF= JSON.parse(result.files || "[]");
+  const filesAlmacenInspection = JSON.parse(result.files_almacen_inspection || "[]");
+  const filesF = JSON.parse(result.files || "[]");
   const filteredFiles = filesAlmacenDocumentacion.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
   const filteredFilesInspection = filesAlmacenInspection.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
-  const filtFiles=filesF.filter(
+  const filtFiles = filesF.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
   // Mostrar los archivos en la interfaz
@@ -4336,9 +4357,9 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
     let excelDiv = "";
     let facturaComercial = provider.factura_comercial;
     let excelConfirmacion = provider.excel_confirmacion;
-    let packingList= provider.packing_list;
-    if (currentPrivilege != "Documentacion"){
-    $(".documentos-clientes-content").append(`<div class="flex gap-8">
+    let packingList = provider.packing_list;
+    if (currentPrivilege != "Documentacion") {
+      $(".documentos-clientes-content").append(`<div class="flex gap-8">
         <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
           <div class="flex items-center gap-2 mb-6
           justify-between">
@@ -4420,59 +4441,59 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
           </div>
         </div></div>`);
 
-    $("#cotizacion_file_url").off("click").on("click", function () {
-      if (result.cotizacion_file_url) {
-        window.open(result.cotizacion_file_url);
-      } else {
-        Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
-      }
-    });
-    $("#cotizacion_final_url").off("click").on("click", function () {
-      if (result.cotizacion_final_url) {
-        window.open(result.cotizacion_final_url);
-      } else {
-        Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
-      }
-    });
-    $(".btn-crear-documentacion-cliente").off("click");
-    $(".btn-crear-documentacion-cliente").on("click", function () {
-      const providerId = $(this).data("id");
-      Swal.fire({
-        title: "Crear nuevo documento",
-        html: `
+      $("#cotizacion_file_url").off("click").on("click", function () {
+        if (result.cotizacion_file_url) {
+          window.open(result.cotizacion_file_url);
+        } else {
+          Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
+        }
+      });
+      $("#cotizacion_final_url").off("click").on("click", function () {
+        if (result.cotizacion_final_url) {
+          window.open(result.cotizacion_final_url);
+        } else {
+          Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
+        }
+      });
+      $(".btn-crear-documentacion-cliente").off("click");
+      $(".btn-crear-documentacion-cliente").on("click", function () {
+        const providerId = $(this).data("id");
+        Swal.fire({
+          title: "Crear nuevo documento",
+          html: `
                 <input type="text" id="swal-input1" class="swal2-input" placeholder="Nombre del documento">
                 <input type="file" id="swal-input2" class="swal2-file" accept=".pdf, .doc, .docx, .xls, .xlsx, .png, .jpg, .jpeg" placeholder="Selecciona un archivo">
             `,
-        showCancelButton: true,
-        confirmButtonText: "Subir",
-        preConfirm: async () => {
-          const name = document.getElementById("swal-input1").value;
-          const file = document.getElementById("swal-input2").files[0];
-          if (!name || !file) {
-            Swal.showValidationMessage("Por favor, completa todos los campos");
-            return;
-          }
-          const formData = new FormData();
-          formData.append("name", name);
-          formData.append("file", file);
-          formData.append("id_cotizacion", idCotizacion);
-          formData.append("id_proveedor", providerId);
-          const response = await fetch(
-            base_url +
-            "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
-            {
-              method: "POST",
-              body: formData,
+          showCancelButton: true,
+          confirmButtonText: "Subir",
+          preConfirm: async () => {
+            const name = document.getElementById("swal-input1").value;
+            const file = document.getElementById("swal-input2").files[0];
+            if (!name || !file) {
+              Swal.showValidationMessage("Por favor, completa todos los campos");
+              return;
             }
-          );
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("file", file);
+            formData.append("id_cotizacion", idCotizacion);
+            formData.append("id_proveedor", providerId);
+            const response = await fetch(
+              base_url +
+              "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
 
-          const result = await response.json();
-          console.log(result, "result");
-          if (result.status === "success") {
-            Swal.fire("¡Documento subido!", result.message, "success");
-            console.log(name, "name");
-            // Agregar dinámicamente el nuevo documento al DOM
-            const newDocument = `
+            const result = await response.json();
+            console.log(result, "result");
+            if (result.status === "success") {
+              Swal.fire("¡Documento subido!", result.message, "success");
+              console.log(name, "name");
+              // Agregar dinámicamente el nuevo documento al DOM
+              const newDocument = `
             ${name}
             <div class="col-12 col-sm-12 file-info-container">
               <div class="form-group">
@@ -4492,33 +4513,33 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
             </div>
           `;
 
-            // Validar que el HTML sea válido antes de agregarlo al DOM
-            try {
-              $("#documentos-clientes-documentacion").append(newDocument);
+              // Validar que el HTML sea válido antes de agregarlo al DOM
+              try {
+                $("#documentos-clientes-documentacion").append(newDocument);
 
-              // Agregar funcionalidad al botón de borrar
+                // Agregar funcionalidad al botón de borrar
 
-            } catch (error) {
-              console.error("Error al procesar el HTML del nuevo documento:", error);
-              Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
+              } catch (error) {
+                console.error("Error al procesar el HTML del nuevo documento:", error);
+                Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
+              }
+            } else {
+              Swal.fire("Error", result.message, "error");
+              // Si ocurre un error en el servidor, eliminar el archivo subido
+              if (fileInput.dataset.fileId) {
+                deleteClienteDocumentacionFile(fileInput.dataset.fileId);
+              }
+
             }
-          } else {
-            Swal.fire("Error", result.message, "error");
-            // Si ocurre un error en el servidor, eliminar el archivo subido
-            if (fileInput.dataset.fileId) {
-              deleteClienteDocumentacionFile(fileInput.dataset.fileId);
-            }
-
-          }
-        },
+          },
+        });
       });
-    });
-    $(".aditional-file").remove();
-    filteredFilesF.forEach((file) => {
-      if(!file.file_url){
-        return; // Exit the current function instead of using 'continue'
-      }
-      $("#form-documentacion").append(`<div class="aditional-file">
+      $(".aditional-file").remove();
+      filteredFilesF.forEach((file) => {
+        if (!file.file_url) {
+          return; // Exit the current function instead of using 'continue'
+        }
+        $("#form-documentacion").append(`<div class="aditional-file">
            
             ${file.folder_name}
             <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
@@ -4539,35 +4560,35 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
                 </div>
             </div>
             </div>`);
-      const fileIconLink = $(`#file-icon-link-${file.id}`)[0];
-      if (fileIconLink) {
-        const fileExtension = (file.file_url).split('.').pop().toLowerCase();
-        if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
-          // Agregar estilo de cursor: pointer
-          fileIconLink.style.cursor = 'pointer';
+        const fileIconLink = $(`#file-icon-link-${file.id}`)[0];
+        if (fileIconLink) {
+          const fileExtension = (file.file_url).split('.').pop().toLowerCase();
+          if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+            // Agregar estilo de cursor: pointer
+            fileIconLink.style.cursor = 'pointer';
 
-          // Agregar evento de clic para mostrar la vista previa
-          fileIconLink.addEventListener('click', (event) => {
-            event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+            // Agregar evento de clic para mostrar la vista previa
+            fileIconLink.addEventListener('click', (event) => {
+              event.preventDefault(); // Evitar comportamiento predeterminado del enlace
 
-            // Mostrar la imagen en el modal
-            const modal = document.getElementById('image-modal');
-            const modalImage = modal.querySelector('#image-preview');
-            modalImage.src = (file.file_url);
-            const bootstrapModal = new bootstrap.Modal(modal);
-            bootstrapModal.show();
-          });
-        } else {
-          // Si no es una imagen, redirigir al archivo
-          fileIconLink.href = (file.file_url);
-          fileIconLink.target = '_blank';
+              // Mostrar la imagen en el modal
+              const modal = document.getElementById('image-modal');
+              const modalImage = modal.querySelector('#image-preview');
+              modalImage.src = (file.file_url);
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+            });
+          } else {
+            // Si no es una imagen, redirigir al archivo
+            fileIconLink.href = (file.file_url);
+            fileIconLink.target = '_blank';
+          }
         }
-      }
 
-    });
-  }else{
-    // Vista para otros usuarios (como en la imagen)
-    $(".documentos-clientes-content").append(`
+      });
+    } else {
+      // Vista para otros usuarios (como en la imagen)
+      $(".documentos-clientes-content").append(`
       <div class="flex col-4 h-25">
         <div class="bg-white rounded-lg shadow-md w-100">
           <div class="p-6" style="border-bottom:solid 2px #DFDFDF;">
@@ -4584,13 +4605,13 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
               <p>Factura Comercial</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${facturaComercial
-                  ? `
+          ? `
                     <div class="file-iconic">${getIconByType(facturaComercial.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(facturaComercial.split('_').pop())}</span>
                     </div>
                   `
-                  : `
+          : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
@@ -4600,13 +4621,13 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
               <p>Excel Confirmacion</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${excelConfirmacion
-                  ? `
+          ? `
                     <div class="file-iconic">${getIconByType(excelConfirmacion.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(excelConfirmacion.split('_').pop())}</span>
                     </div>
                   `
-                  : `
+          : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
@@ -4657,15 +4678,15 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
         </div>
       </div>
     `);
-    filteredFiles.forEach((file)=>{
-      addFileToList(file,null,'file-lista-documentacion-documentacion',true)
-    })
-    filteredFilesInspection.forEach((file)=>{
-      addFileToList(file,null,'file-lista-documentacion-inspection',true)
-    })
-  }
+      filteredFiles.forEach((file) => {
+        addFileToList(file, null, 'file-lista-documentacion-documentacion', true)
+      })
+      filteredFilesInspection.forEach((file) => {
+        addFileToList(file, null, 'file-lista-documentacion-inspection', true)
+      })
+    }
 
-    
+
     if (!facturaComercial) {
       facturaDiv = `
         Factura Comercial
@@ -4938,7 +4959,7 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
         ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg"]
       );
     }
-    if(!packingList) {
+    if (!packingList) {
       setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg']);
     }
     $("#file-input-factura").on("change", function () {
@@ -4953,14 +4974,14 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
     // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
     // const files = JSON.parse(result.files_almacen_documentacion ?? "[]");
     // const filesFilter = files.filter((file) => file.id_proveedor == selectedTabDocumentacionId);
-    
+
     // //for each file add a col with a link to download and delete icon  in collapse-documentacion
     // filesFilter.forEach((file) => {
     //   if(!file.file_url){
     //     return; // Exit the current function instead of using 'continue'
     //   }
     //   $("#form-documentacion").append(`
-           
+
     //         ${file.folder_name}
     //         <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
     //             <div class="form-group">
@@ -5264,7 +5285,7 @@ $(document).ready(async function () {
   documentacionDocumentacionContainer.hide();
   documentacionAduanaContainer = $("#documentacion-aduana-container");
   documentacionAduanaContainer.hide();
- 
+
   try {
     $(".export-pdf-main-content").off("click");
     $(".export-pdf-main-content").on("click", function () {
@@ -5288,15 +5309,15 @@ $(document).ready(async function () {
 
   //if current windows route includes listarCompletados hide .filter-contenedor 
 
- 
-  if (window.location.href.includes("listarCompletados") ) {
+
+  if (window.location.href.includes("listarCompletados")) {
     $(".filter-contenedor").hide();
 
     $("#table-contenedor-completados").show();
-   
+
     url = base_url + "CargaConsolidada/ContenedorConsolidado/indexCompletados";
 
-    if(currentPrivilege == "Documentacion"){
+    if (currentPrivilege == "Documentacion") {
 
       $("#table-contenedor").html("");
       table_Entidad = $("#table-contenedor-completados").DataTable({
@@ -5375,7 +5396,7 @@ $(document).ready(async function () {
             data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
             data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
             //if url contains listarCompletados 
-    
+
           },
           complete: function () {
             $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
@@ -5402,7 +5423,7 @@ $(document).ready(async function () {
           [100, 1000, "Todos"],
         ],
       });
-    }else{
+    } else {
       $("#table-contenedor-completados").html("");
       table_Entidad = $("#table-contenedor").DataTable({
         dom:
@@ -5480,7 +5501,7 @@ $(document).ready(async function () {
             data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
             data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
             //if url contains listarCompletados 
-    
+
           },
           complete: function () {
             $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
@@ -5590,14 +5611,14 @@ $(document).ready(async function () {
           data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
           data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
           //if url contains listarCompletados 
-  
+
         },
         complete: function () {
           $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
           $("#aplicar-btn").off("click");
-            $("#aplicar-btn").click(function () {
-              table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-            });
+          $("#aplicar-btn").click(function () {
+            table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+          });
         },
       },
       columnDefs: [
@@ -6836,7 +6857,7 @@ function getIconByType(typeOrExtension) {
 }
 async function showObservaciones(id) {
   spinner.show();
-  url=base_url+"CargaConsolidada/ContenedorConsolidado/getObservaciones/"+id;
+  url = base_url + "CargaConsolidada/ContenedorConsolidado/getObservaciones/" + id;
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -6844,8 +6865,8 @@ async function showObservaciones(id) {
     }
   });
   const data = await response.json();
-  const files=JSON.parse(data.data.files);
-  const observaciones=data.data.observaciones;
+  const files = JSON.parse(data.data.files);
+  const observaciones = data.data.observaciones;
   spinner.hide();
   //SHOW SWALL WITH DATA
   if (data.status) {
@@ -6865,7 +6886,7 @@ async function showObservaciones(id) {
 
       showCloseButton: false,
       showCancelButton: true,
-      showConfirmButton:false,
+      showConfirmButton: false,
 
       focusConfirm: false,
       confirmButtonText: 'Cerrar',
@@ -6873,7 +6894,7 @@ async function showObservaciones(id) {
     });
   }
   files.forEach((file) => {
-    addFileToList(file, null,'file-lista-observaciones',true);
+    addFileToList(file, null, 'file-lista-observaciones', true);
   });
 
 }

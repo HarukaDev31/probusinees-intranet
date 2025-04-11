@@ -15,7 +15,7 @@
             &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
           </h1>
         </div>
-        <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion") {  ?>
+        <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Cotizador") {  ?>
 
           <!-- Buscador de la tabla -->
           <div class="col-12 col-xl-2 filter-contenedor">
@@ -80,6 +80,7 @@ Search for
                       <option value="0" selected>Todos</option>
                       <option value="PENDIENTE">PENDIENTE</option>
                       <option value="RECIBIENDO">RECIBIENDO</option>
+                      <option value="COMPLETADO">COMPLETADO</option>
                     </select>
                   </div>
 
@@ -170,6 +171,7 @@ Search for
                       <option value="0" selected>Todos</option>
                       <option value="PENDIENTE">WAITING</option>
                       <option value="RECIBIENDO">RECEIVING</option>
+                      <option value="COMPLETADO">FINISH</option>
                     </select>
                   </div>
 
@@ -226,7 +228,7 @@ Filters
               <?php if (
                 $this->user->No_Grupo == "Coordinación"
                 || $this->user->No_Grupo == "Documentacion"
-                ||$this->user->No_Grupo == "Cotizador"
+                || $this->user->No_Grupo == "Cotizador"
               ) {
               ?>
                 <th>Carga</th>
@@ -248,7 +250,7 @@ Filters
                 <th>Month</th>
                 <th>Country</th>
                 <th>Cut off</th>
-         
+
                 <th>Company</th>
                 <th style="min-width: 8em;">Status</th>
 
@@ -276,7 +278,7 @@ Filters
               <th>C. Destino</th>
               <th>Observaciones</th>
               <th>Ver</th>
-              
+
             </tr>
           </thead>
         </table>
@@ -664,20 +666,20 @@ Filters
             </div>
 
 
-          <!-- Buttons -->
-          <div class="flex pt-6 border-t mt-6 row">
-            <div class="col-9"></div>
-            <div class="col-3 d-flex justify-content-end gap-2">
-              <button type="submit" class="btn btn-primary btn-block btn-reporte btn-guardar-aduana">
-                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                  Guardar
-                <?php } else { ?>
-                  Save
-                <?php } ?>
-              </button>
+            <!-- Buttons -->
+            <div class="flex pt-6 border-t mt-6 row">
+              <div class="col-9"></div>
+              <div class="col-3 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary btn-block btn-reporte btn-guardar-aduana">
+                  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Guardar
+                  <?php } else { ?>
+                    Save
+                  <?php } ?>
+                </button>
 
+              </div>
             </div>
-          </div>
         </form>
       </div>
     </div>
@@ -866,14 +868,14 @@ Search for
             <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></span></strong>
           </div>
         </div>
-        <?php if ($this->user->No_Grupo == 'Cotizador') {?>
-        <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
-        <span>CBM Pendiente:</span>
-          <div class="">
-            <strong><span type="number" id="txt-CBM_Total_Pendiente" class="cbm_score" disabled></span></strong>
+        <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
+          <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
+            <span>CBM Pendiente:</span>
+            <div class="">
+              <strong><span type="number" id="txt-CBM_Total_Pendiente" class="cbm_score" disabled></span></strong>
+            </div>
           </div>
-        </div>
         <?php } ?>
         <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
@@ -882,7 +884,7 @@ Search for
             <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></span></strong>
           </div>
         </div>
-        
+
       </div>
       <!-- Body de la tabla -->
       <div class="table-responsive">
@@ -1033,18 +1035,20 @@ Search for
             <th>DNI/RUC</th>
             <th>Correo</th>
             <th>Whatsapp</th>
-          <!-- <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
+            <!-- <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
             <th>Asesor</th>
           <?php } ?> -->
             <th>T. Cliente</th>
-          <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
-            <th>Volumen</th>
-            <th>Monto</th>
-            <th>Tarifa</th>
+            <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
+              <th>Volumen</th>
+              <th>Monto</th>
+              <th>Tarifa</th>
 
-            <th>Estados</th>
-          <?php } ?>
-            <th>Acciones</th>
+              <th>Estados</th>
+            <?php } ?>
+            <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
+              <th>Acciones</th>
+            <?php } ?>
           </tr>
         </thead>
       </table>
@@ -1075,23 +1079,23 @@ Search for
       <div class="col-xl-9 col-md-8"></div>
 
       <div class="col-12 col-md-2">
-        <?php if ($this->user->No_Grupo != "Documentacion"){ ?>
-        <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+        <?php if ($this->user->No_Grupo != "Documentacion") { ?>
+          <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
             <?php } else { ?>
               Save
-            <?php } ?>  </button>
+            <?php } ?> </button>
         <?php } ?>
       </div>
 
       <div class="name_cliente col-12 p-6" style="border-bottom: #DFDFDF solid 2px;">
-              Nombre Cliente
+        Nombre Cliente
       </div>
 
     </div>
     <div class="documentos-clientes-tabs pt-6">
-              </div>
-              <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
+    </div>
+    <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
 
 
     </div>
@@ -2436,7 +2440,9 @@ Search for
 
   #table-contenedor_wrapper.dt-buttons.btn-group.flex-wrap {
     display: none;
-  }.tab-cliente-documentacion{
+  }
+
+  .tab-cliente-documentacion {
     padding: 0.5em;
     border-radius: 0.5em;
     margin-bottom: 1em;
@@ -2448,13 +2454,16 @@ Search for
     cursor: pointer;
 
   }
-  .tab-cliente-documentacion.active{
+
+  .tab-cliente-documentacion.active {
     background-color: #FFFFFF;
     color: black;
     border-width: 0px;
 
-  }.documentos-clientes-tabs{
-    display:grid;
+  }
+
+  .documentos-clientes-tabs {
+    display: grid;
     grid-template-columns: repeat(8, 1fr);
     gap: 1em;
     margin: 1em 2em;

@@ -268,7 +268,22 @@ class ContenedorConsolidadoModel extends CI_Model
             ->order_by('id_cotizacion', 'asc');
         if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
+            
+            if ($this->input->post('Filtro_Estado') != "0") {
+                $fieldToFilter=[
+                    'Coordinación'=>'estado',
+                    'ContenedorAlmacen'=>'estado_china',
+                    'Documentacion'=>'estado',  
+                ];
+                $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
+            }          
+        }else{
+            if ($this->input->post('Filtro_Estado') != "0") {
+             
+                $this->db->where('estado_cotizador', $this->input->post('Filtro_Estado'));
+            }       
         }
+
         $query = $this->db->get();
         return $query->result();
     }
@@ -305,9 +320,23 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
             ->order_by('main.id', 'asc');
-        if ($this->user->No_Grupo != "Cotizador") {
-            $this->db->where('main.estado_cotizador', 'CONFIRMADO');
-        }
+            if ($this->user->No_Grupo != "Cotizador") {
+                $this->db->where('estado_cotizador', 'CONFIRMADO');
+                
+                if ($this->input->post('Filtro_Estado') != "0") {
+                    $fieldToFilter=[
+                        'Coordinación'=>'estado',
+                        'ContenedorAlmacen'=>'estado_china',
+                        'Documentacion'=>'estado',  
+                    ];
+                    $this->db->where("main".$fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
+                }          
+            }else{
+                if ($this->input->post('Filtro_Estado') != "0") {
+                 
+                    $this->db->where('main.estado_cotizador', $this->input->post('Filtro_Estado'));
+                }       
+            }
         $query = $this->db->get();
         return $query->result();
     }
@@ -4880,7 +4909,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
             ->where('id_contenedor', $idContenedor)
             ->where('estado_cliente!=', null);
+        //if $this-
         $query = $this->db->get();
+
         return $query->result();
     }
     public function updateEstadoCotizacionFinal($idCotizacionFinal, $estado)
