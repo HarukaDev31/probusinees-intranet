@@ -3247,15 +3247,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         //get sum of cbm_total_china and cbm_total from each cotizacion proveedor
         try {
             $this->db->select('
-    SUM(IF(contenedor_consolidado_cotizacion.estado_cotizador = "CONFIRMADO", IFNULL(contenedor_consolidado_cotizacion_proveedores.cbm_total_china, 0), 0)) as cbm_total_china,
-    SUM(IF(contenedor_consolidado_cotizacion.estado_cotizador = "CONFIRMADO", IFNULL(contenedor_consolidado_cotizacion_proveedores.cbm_total, 0), 0)) as cbm_total_confirmado,
-    SUM(IF(contenedor_consolidado_cotizacion.estado_cotizador != "CONFIRMADO", IFNULL(contenedor_consolidado_cotizacion_proveedores.cbm_total, 0), 0)) as cbm_total_pendiente')
-            // $this->db->select('SUM(ifnull(contenedor_consolidado_cotizacion_proveedores.cbm_total_china,0)) as cbm_total_china,
-            //     SUM(ifnull(contenedor_consolidado_cotizacion_proveedores.cbm_total,0)) as cbm_total,
-            //     SUM(IF(contenedor_consolidado_cotizacion.estado_cotizador != "CONFIRMADO", IFNULL(cbm_total, 0), 0)) acbm_totals cbm_total_pendiente')
-                ->from($this->table_contenedor_cotizacion_proveedores)
-                ->join($this->table_contenedor_cotizacion, 'contenedor_consolidado_cotizacion_proveedores.id_cotizacion=contenedor_consolidado_cotizacion.id')
-                ->where('contenedor_consolidado_cotizacion_proveedores.id_contenedor', $idContenedor);
+            COALESCE(SUM(IF(cccp.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
+            COALESCE(SUM(IF(cccp.estado_cotizador = "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total_confirmado,
+            COALESCE(SUM(IF(cccp.estado_cotizador != "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total_pendiente')
+        ->from($this->table_contenedor_cotizacion_proveedores . ' cccp') // Usando alias
+        ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id') // Usando alias
+        ->where('cccp.id_contenedor', $idContenedor);
             $query = $this->db->get();
             $result = $query->row();
             if ($this->db->error()['code'] != 0) {
