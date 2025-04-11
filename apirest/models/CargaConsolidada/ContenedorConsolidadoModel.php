@@ -275,12 +275,12 @@ class ContenedorConsolidadoModel extends CI_Model
                     'ContenedorAlmacen'=>'estado_china',
                     'Documentacion'=>'estado',  
                 ];
-                $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
+                $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('estado'));
             }          
         }else{
-            if ($this->input->post('Filtro_Estado') != "0") {
+            if ($this->input->post('estado') != "0" ) {
              
-                $this->db->where('estado_cotizador', $this->input->post('Filtro_Estado'));
+                $this->db->where('estado_cotizador', $this->input->post('estado'));
             }       
         }
 
@@ -323,18 +323,18 @@ class ContenedorConsolidadoModel extends CI_Model
             if ($this->user->No_Grupo != "Cotizador") {
                 $this->db->where('estado_cotizador', 'CONFIRMADO');
                 
-                if ($this->input->post('Filtro_Estado') != "0") {
+                if ($this->input->post('estado') != "0") {
                     $fieldToFilter=[
                         'Coordinación'=>'estado',
                         'ContenedorAlmacen'=>'estado_china',
                         'Documentacion'=>'estado',  
                     ];
-                    $this->db->where("main".$fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
+                    $this->db->where("main".$fieldToFilter[$this->user->No_Grupo], $this->input->post('estado'));
                 }          
             }else{
-                if ($this->input->post('Filtro_Estado') != "0") {
+                if ($this->input->post('estado') != "0") {
                  
-                    $this->db->where('main.estado_cotizador', $this->input->post('Filtro_Estado'));
+                    $this->db->where('main.estado_cotizador', $this->input->post('estado'));
                 }       
             }
         $query = $this->db->get();
