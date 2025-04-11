@@ -2771,6 +2771,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "prospectos";
+              data.Filtro_Estado = $("#txt-ID_Estado").val();
             },
             complete: async function () {
               $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
@@ -2780,16 +2781,7 @@ const openStepFunction = async (step, id) => {
               });
               spinner.hide();
               // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
-              if (
-                currentPrivilege == "Cotizador" 
-              ) {
-                $("#txt-ID_Estado").empty();
-                $("#txt-ID_Estado").append(
-                  '<option value="0">Todos</option>' +
-                  '<option value="PENDIENTE">Pendiente</option>' +
-                  '<option value="CONFIRMADO">Confirmado</option>'
-                );
-              }
+              
               await getTableCotizacionEmbarqueHeaders();
               
             },
@@ -2823,6 +2815,16 @@ const openStepFunction = async (step, id) => {
       );
 
       await getTipoCliente();
+      if (
+        currentPrivilege == "Cotizador" 
+      ) {
+        $("#txt-ID_Estado").empty();
+        $("#txt-ID_Estado").append(
+          '<option value="0">Todos</option>' +
+          '<option value="PENDIENTE">Pendiente</option>' +
+          '<option value="CONFIRMADO">Confirmado</option>'
+        );
+      }
     }
   } else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
     showDocumentacionDocumentacionContainer(id);
