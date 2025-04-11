@@ -5484,6 +5484,10 @@ $(document).ready(async function () {
           },
           complete: function () {
             $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+            $("#aplicar-btn").off("click");
+            $("#aplicar-btn").click(function () {
+              table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+            });
           },
         },
         columnDefs: [
@@ -5590,6 +5594,10 @@ $(document).ready(async function () {
         },
         complete: function () {
           $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+          $("#aplicar-btn").off("click");
+            $("#aplicar-btn").click(function () {
+              table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+            });
         },
       },
       columnDefs: [

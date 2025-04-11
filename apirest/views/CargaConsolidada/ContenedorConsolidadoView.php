@@ -80,7 +80,6 @@ Search for
                       <option value="0" selected>Todos</option>
                       <option value="PENDIENTE">PENDIENTE</option>
                       <option value="RECIBIENDO">RECIBIENDO</option>
-                      <option value="COMPLETADO">COMPLETADO</option>
                     </select>
                   </div>
 
@@ -171,7 +170,6 @@ Search for
                       <option value="0" selected>Todos</option>
                       <option value="PENDIENTE">WAITING</option>
                       <option value="RECIBIENDO">RECEIVING</option>
-                      <option value="COMPLETADO">FINISH</option>
                     </select>
                   </div>
 
