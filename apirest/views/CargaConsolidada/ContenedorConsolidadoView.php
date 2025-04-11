@@ -875,6 +875,15 @@ Search for
             <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></span></strong>
           </div>
         </div>
+        <?php if ($this->user->No_Grupo != 'Cotizador') {?>
+        <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
+          <span>CBM Pendiente:</span>
+          <div class="">
+            <strong><span type="number" id="txt-CBM_Total_Pendiente" class="cbm_score" disabled></span></strong>
+          </div>
+        </div>
+        <?php } ?>
       </div>
       <!-- Body de la tabla -->
       <div class="table-responsive">
