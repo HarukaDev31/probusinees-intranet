@@ -2704,7 +2704,7 @@ const openStepFunction = async (step, id) => {
                     complete: function () {
                       $("#aplicar-btn").off("click");
                       $("#aplicar-btn").click(function () {
-                        table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                        tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
                       });
                     },
                   });
@@ -2777,7 +2777,7 @@ const openStepFunction = async (step, id) => {
               $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
               $("#aplicar-btn").off("click");
               $("#aplicar-btn").click(function () {
-                table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
               });
               spinner.hide();
               // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
