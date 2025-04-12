@@ -2412,7 +2412,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "embarque";
-              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val()??0;
               validateListEmbarque(idContenedor);
               $(".input-date").datepicker({
                 autoclose: true,
@@ -2441,6 +2441,7 @@ const openStepFunction = async (step, id) => {
               format: "dd/mm/yyyy",
               dateFormat: "dd/mm/yyyy",
             });
+
           },
           drawCallback: function (settings) {
             $(".input-date").datepicker({
