@@ -766,11 +766,11 @@ Filters
                   <div class="d-flex align-items-center p-2" style="width:300px;">
                     <div class="d-flex" style="width:60%">Estado</div>
                     <div style="width: 200px;">
-                      <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
+                      <select id="txt-ID_Estado_Cotizacion" name="ID_Estado" class="form-control input-estado">
                         <option value="0" selected>Todos</option>
-                        <option value="PENDIENTE">WAITING</option>
-                        <option value="RECIBIENDO">RECEIVING</option>
-                        <option value="COMPLETADO">FINISH</option>
+                        <option value="PENDIENTE">PENDIENTE</option>
+                        <option value="RECIBIENDO">RECIBIENDO</option>
+                        <option value="COMPLETADO">COMPLETADO</option>
                       </select>
                     </div>
 
@@ -780,7 +780,7 @@ Filters
                 <!-- Botones -->
                 <div class="d-flex justify-content-around">
                   <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
-                  <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
+                  <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn-cotizacion">Aplicar</button>
                 </div>
               </div>
               <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>

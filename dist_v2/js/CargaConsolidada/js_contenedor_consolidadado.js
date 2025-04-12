@@ -2412,7 +2412,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "embarque";
-              data.Filtro_Estado = $("#txt-ID_Estado").val();
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
               validateListEmbarque(idContenedor);
               $(".input-date").datepicker({
                 autoclose: true,
@@ -2681,7 +2681,7 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "embarque";
-                        data.Filtro_Estado = $("#txt-ID_Estado").val();
+                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
                         validateListEmbarque(idContenedor);
                         $(".input-date").datepicker({
                           autoclose: true,
@@ -2702,9 +2702,9 @@ const openStepFunction = async (step, id) => {
                       });
                     },
                     complete: function () {
-                      $("#aplicar-btn").off("click");
-                      $("#aplicar-btn").click(function () {
-                        tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                      $("#aplicar-btn-cotizacion").off("click");
+                      $("#aplicar-btn-cotizacion").click(function () {
+                        tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
                       });
                     },
                   });
@@ -2771,19 +2771,25 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "prospectos";
-              data.Filtro_Estado = $("#txt-ID_Estado").val();
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
             },
             complete: async function () {
+              console.log("Init propectos")
               $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-              $("#aplicar-btn").off("click");
-              $("#aplicar-btn").click(function () {
-                tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+              $("#aplicar-btn-cotizacion").off("click");
+              $("#aplicar-btn-cotizacion").click(function () {
+                if (currentTableCotizacion == "embarque") {
+                  tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                }
+                else {
+                  tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                }
               });
               spinner.hide();
               // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
-              
+
               await getTableCotizacionEmbarqueHeaders();
-              
+
             },
           },
           columnDefs: [
@@ -2816,10 +2822,10 @@ const openStepFunction = async (step, id) => {
 
       await getTipoCliente();
       if (
-        currentPrivilege == "Cotizador" 
+        currentPrivilege == "Cotizador"
       ) {
-        $("#txt-ID_Estado").empty();
-        $("#txt-ID_Estado").append(
+        $("#txt-ID_Estado_Cotizacion").empty();
+        $("#txt-ID_Estado_Cotizacion").append(
           '<option value="0">Todos</option>' +
           '<option value="PENDIENTE">Pendiente</option>' +
           '<option value="CONFIRMADO">Confirmado</option>'
@@ -3181,6 +3187,7 @@ const openStepFunction = async (step, id) => {
   }
   $(".btn-back-cotizacion").off("click");
   $(".btn-back-cotizacion").on("click", function () {
+    $("#Txt-ID_Estado_Cotizacion").val("0");
     if (currentPrivilege == "ContenedorAlmacen") {
       mainContainer.show();
       contentHeader.show();
