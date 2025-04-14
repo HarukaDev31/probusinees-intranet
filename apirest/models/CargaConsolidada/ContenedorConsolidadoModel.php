@@ -3037,9 +3037,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             'id_cotizacion' => $idCotizacion,
             'last_modified' => time(),
         ];
+        log_message('error',"fileUrl: " . $fileUrl);
+        log_message('error',"fileToInsert: " . json_encode($fileToInsert));
+
         if ($fileUrl) {
-
-
+         
             $this->db->insert($this->table_contenedor_almacen_inspection, $fileToInsert);
             if ($this->db->error()['code'] != 0) {
                 return ['status' => "error", 'error' => $this->db->error()];
@@ -5437,14 +5439,20 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     ],
                     'assets/images/'
                 );
+                log_message('error', 'FileUrl: ' . $fileUrl);
+                log_message('error', 'FileName: ' . $files['files']['name'][$key]);
+                $fileName = mb_convert_encoding($files['files']['name'][$key], 'UTF-8', 'auto');
                 $data = [
                     'id_cotizacion' => $idCotizacion,
                     'id_proveedor' => $idProveedor,
-                    'file_name' => $files['files']['name'][$key],
+                    'file_name' => $fileName,
                     'file_path' => $fileUrl,
                     'file_type' => $files['files']['type'][$key],
                     'file_size' => $files['files']['size'][$key],
+                    'last_modified' => date('Y-m-d H:i:s'),
                 ];
+                log_message('error', 'Data: ' . json_encode($data));
+
                 $this->db->insert($this->table_contenedor_almacen_inspection, $data);
                 if ($this->db->error()['code'] != 0) {
                     log_message('error', 'Error en saveInspection: ' . $this->db->error()['message']);

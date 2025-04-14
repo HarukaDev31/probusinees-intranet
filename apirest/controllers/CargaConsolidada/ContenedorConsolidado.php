@@ -364,7 +364,6 @@ class ContenedorConsolidado extends CI_Controller
 			} else {
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
 			}
-			log_message('error', 'ContenedorConsolidado : step() => ' . json_encode($arrResponse));
 			$data  = [];
 			$index = 1;
 			foreach ($arrResponse as $row) {
