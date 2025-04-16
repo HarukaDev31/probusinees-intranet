@@ -2412,7 +2412,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "embarque";
-              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val()??0;
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
               validateListEmbarque(idContenedor);
               $(".input-date").datepicker({
                 autoclose: true,
@@ -6995,6 +6995,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
     // Manejar el botón de tacho de basura para quitar el archivo
     if (removeFileButton) {
+      console.log('Elemento de botón de eliminación encontrado:', removeFileButton); // Depuración
       removeFileButton.addEventListener('click', (e) => {
         e.preventDefault();
         fileInput.value = ""; // Limpia el input
@@ -7047,7 +7048,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
 // Funcion para subir archivos multiples
 
-function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], automaticUpload = false) {
+function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], automaticUpload = false,removeFileButtonId = '.remove-file-button') {
   const container = document.getElementById(containerId);
   const fileInput = $(`#${inputId}`)[0];
   const fileLabel = container.querySelector('.file-label');
@@ -7089,7 +7090,10 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
           <div class="file-icon-container"> 
             <div class="file-icon" style="cursor: pointer;">${fileIcon}</div>
             <p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
-            <div class="remove-file-button" data-index="${index}">
+            <div class="remove-file-button"
+            id="remove-file-button-${index}"
+          
+            data-index="${index}">
               <i class="fas fa-trash"></i>
             </div>
           </div>
@@ -7147,7 +7151,7 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
       // Convertir FileList a un array para poder eliminar el archivo
       const files = Array.from(fileInput.files);
       files.splice(index, 1); // Eliminar el archivo del array
-
+      fileList.innerHTML = ''; // Limpiar la lista de archivos
       // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
       const dataTransfer = new DataTransfer();
       files.forEach((file) => dataTransfer.items.add(file));
@@ -7185,10 +7189,15 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   if (removeFileButton) {
     removeFileButton.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log(e.target, "removeFileButton");
-      //remove most close file input and remove this from input file
-      $(e.target).closest('.file-item').remove();
-
+      //get item id from data attribute
+      const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
+      // Limpiar el input de archivos
+      fileInput.value = ""; // Limpia el input/
+      //remover de la lista el item con ese id
+      const fileItem = fileList.querySelector(`.file-list-item[data-index="${index}"]`);
+      if (fileItem) {
+        fileItem.remove(); // Eliminar el elemento de la lista
+      }
     });
   }
 }
@@ -7286,6 +7295,6 @@ enableHorizontalAutoScrollForAllTables();
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 
 
-setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4']);
+setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'],false,'#remove-file-button-inspeccion');
 setupMultiFileUpload("multiple-file-upload-aduana", "file-input-aduana", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
