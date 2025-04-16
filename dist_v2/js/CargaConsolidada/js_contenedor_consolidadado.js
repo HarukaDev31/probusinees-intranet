@@ -6995,7 +6995,6 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
     // Manejar el botón de tacho de basura para quitar el archivo
     if (removeFileButton) {
-      console.log('Elemento de botón de eliminación encontrado:', removeFileButton); // Depuración
       removeFileButton.addEventListener('click', (e) => {
         e.preventDefault();
         fileInput.value = ""; // Limpia el input
@@ -7092,7 +7091,7 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
             <p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
             <div class="remove-file-button"
             id="remove-file-button-${index}"
-          
+            data-id="${index}"
             data-index="${index}">
               <i class="fas fa-trash"></i>
             </div>
@@ -7151,7 +7150,7 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
       // Convertir FileList a un array para poder eliminar el archivo
       const files = Array.from(fileInput.files);
       files.splice(index, 1); // Eliminar el archivo del array
-      fileList.innerHTML = ''; // Limpiar la lista de archivos
+      $(".file-list-item").remove(); // Eliminar el elemento de la lista
       // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
       const dataTransfer = new DataTransfer();
       files.forEach((file) => dataTransfer.items.add(file));
@@ -7178,12 +7177,38 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   fileLabel.addEventListener('drop', (e) => {
     e.preventDefault();
     fileLabel.style.borderColor = '#cccccc';
+    
     if (e.dataTransfer.files.length > 0) {
-      // Asignar los archivos arrastrados al input
-      fileInput.files = e.dataTransfer.files;
-
-      // Mostrar la lista de archivos
-      fileInput.dispatchEvent(new Event('change'));
+      // Convertir FileList existente y nuevos archivos a arrays
+      const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
+      const newFiles = Array.from(e.dataTransfer.files);
+      
+      // Filtrar y validar los nuevos archivos
+      const validFiles = newFiles.filter(file => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedFileTypes.includes(fileType) || allowedFileTypes.includes(fileExtension);
+      });
+      
+      if (validFiles.length !== newFiles.length) {
+        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
+      }
+      
+      if (validFiles.length > 0) {
+        // Combinar archivos existentes con los nuevos válidos
+        const combinedFiles = [...existingFiles, ...validFiles];
+        
+        // Crear nuevo FileList usando DataTransfer
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        
+        // Limpiar la lista antes de volver a renderizar
+        $(".file-list-item").remove(); // Eliminar el elemento de la lista
+        
+        // Disparar el evento change para mostrar los archivos
+        fileInput.dispatchEvent(new Event('change'));
+      }
     }
   });
   if (removeFileButton) {
@@ -7191,13 +7216,10 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
       e.preventDefault();
       //get item id from data attribute
       const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
-      // Limpiar el input de archivos
-      fileInput.value = ""; // Limpia el input/
-      //remover de la lista el item con ese id
-      const fileItem = fileList.querySelector(`.file-list-item[data-index="${index}"]`);
-      if (fileItem) {
-        fileItem.remove(); // Eliminar el elemento de la lista
-      }
+
+      //remove most close file input and remove this from input file
+      $(e.target).closest('.file-item').remove();
+
     });
   }
 }
