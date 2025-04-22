@@ -6730,7 +6730,7 @@ window.addEventListener("load", () => {
       }
       if (action == "new-cotizacion") {
         //confirm swall
-        text = "El coordinador registro un nuevo prospecto";
+        text = "Prospecto Confirmado";
         //check if mainContainer is visible
         if (cotizacionContainer.is(":visible")) {
           text += "¿Desea actualizar?";
@@ -6757,6 +6757,32 @@ window.addEventListener("load", () => {
         }
       }
       if (action == "cambio-estado-proveedor") {
+        if ($("#table-cotizacion-embarque").is(":visible")) {
+          text = "Actualización de estado de proveedor";
+          text += "¿Desea actualizar?";
+          Swal.fire({
+            title: "Cambio de estado",
+            text: message,
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Si",
+            cancelButtonText: "Cerrar",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              tableCotizacionEmbarque.ajax.reload();
+            }
+          });
+        } else {
+          //show alert swall
+          Swal.fire({
+            title: "Cambio de estado",
+            text: message,
+            icon: "info",
+            confirmButtonText: "Cerrar",
+          });
+        }
+      }
+      if (action=="new-confirmado"){
         if ($("#table-cotizacion-embarque").is(":visible")) {
           text = "Actualización de estado de proveedor";
           text += "¿Desea actualizar?";

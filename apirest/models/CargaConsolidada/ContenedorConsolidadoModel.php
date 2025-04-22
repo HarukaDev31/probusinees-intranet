@@ -13,7 +13,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
-    private $defaultHoursContactado = 0.01;
+    private $defaultHoursContactado = 1;
     private $defaultHoursInteresado = 48;
     private $table_pais = "pais";
     private $table_contenedor_steps = "contenedor_consolidado_order_steps";
@@ -32,6 +32,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $roleContenedorAlmacen = "ContenedorAlmacen";
     private $roleDocumentacion = "Documentacion";
     private $aNewContainer = "new-container";
+    private $aNewConfirmado = "new-confirmado";
     private $aNewCotizacion = "new-cotizacion";
     private $cambioEstadoProveedor = "cambio-estado-proveedor";
     private $table_contenedor_cotizacion_final = "contenedor_consolidado_cotizacion_final";
@@ -3512,19 +3513,36 @@ Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus
                 $telefono = $telefono ? $telefono . '@c.us' : '';
                 $data_json = [
                     'message' => $message,
-                    'phone' => $telefono,
+                    'phoneNumberId' => $telefono,
                 ];
                 $data = [
                     'id_contenedor' => $idContenedor,
                     'id_cotizacion' => $ID,
                     'created_at' => date('Y-m-d H:i:s'),
-                    'data_json' => json_encode($result),
-                    'execution_at' => date('Y-m-d H:i:s', strtotime('+' . $this->defaultHoursContactado . ' hours')),
+                    'data_json' => json_encode($data_json),
+                    'execution_at' => date('Y-m-d H:i:s', strtotime('+' . $this->defaultHoursContactado . ' minutes')),
                     'time_between' => $this->defaultHoursContactado,
                     'status' => 'PENDING',
                 ];
-                //insert and get id from table table_contenedor_cotizacion_crons
                 $this->db->insert($this->table_contenedor_cotizacion_crons, $data);
+            }
+            if($estado=="CONFIRMADO"){
+                $this->db->select('id_contenedor,nombre,telefono')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $ID);
+                $query = $this->db->get();
+                $result = $query->row();
+                $idContenedor = $result->id_contenedor;
+                $nombre = $result->nombre;
+                $message= "El cliente ".$nombre." del contenedor #".$idContenedor." ha pasado a confirmado, por favor contactar.";
+
+                $socketResponse = $this->sendEvent([
+                "project" => "0",
+                "role" => $this->roleCoordinacion,
+                "user" => "0",
+                "action" => $this->aNewConfirmado,
+                "message" => $message,
+            ]);
             }
             return "success";
         } catch (Exception $e) {

@@ -329,7 +329,7 @@ socket.onclose = function(event) {
 
 socket.onmessage = function(event) {
   text="";
-  const {action}=JSON.parse(event.data);
+  const {action,message}=JSON.parse(event.data);
   console.log(event.data)
   if(action=="new-container"){
     text="El coordinador registro un nuevo contenedor"
@@ -337,6 +337,18 @@ socket.onmessage = function(event) {
       Swal.fire({
         title: "Nuevo contenedor",
         text: text,
+        icon: "info",
+        confirmButtonText: "Cerrar",
+      });
+    } else {
+      console.error("SweetAlert no está disponible");
+    }
+  }
+  if(action=="new-confirmado"){
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        title: "Prospecto Confirmado",
+        text: message,
         icon: "info",
         confirmButtonText: "Cerrar",
       });
