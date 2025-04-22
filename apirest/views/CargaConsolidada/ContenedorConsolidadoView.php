@@ -173,7 +173,6 @@ Search for
                     <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
                       <option value="0" selected>Todos</option>
                       <option value="PENDIENTE">WAITING</option>
-                      <option value="RECIBIENDO">RECEIVING</option>
                       <option value="COMPLETADO">FINISH</option>
                     </select>
                   </div>
@@ -187,29 +186,6 @@ Search for
                 <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
               </div>
 
-              <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?>-->
-              <div class="col-12 col-xl-1 dropdown">
-                <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                    Exportar
-                  <?php } else { ?>
-                    Export
-                  <?php } ?></button>
-                <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-                  <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                      Exportar
-                    <?php } else { ?>
-                      Export
-                    <?php } ?> PDF</button>
-                  <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                      Exportar
-                    <?php } else { ?>
-                      Export
-                    <?php } ?> Excel</button>
-                </div>
               </div>
               <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
@@ -976,10 +952,10 @@ Search for
       </div>
       <div class="col-12 col-md-2 col-xl-1">
       </div>
-      <div class="col-12 col-md-2 col-xl-3">
+      <div class="col-12 col-md-0 col-xl-3">
         <label>&nbsp;</label>
       </div>
-      <div class="col-6 col-sm-11">
+      <div class="col-6 col-sm-11 col-md-11 col-xl-2">
         <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
           <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?> Buscar por
                           <?php } else { ?> Search for <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
@@ -2522,6 +2498,34 @@ Search for
 
 }
 
+.scroll-arrow {
+  position: absolute;
+  top: 20%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: none;
+  z-index: 10;
+  border-radius: 50%;
+  font-size: 16px;
+  display: none; /* Ocultar inicialmente */
+  justify-content: center;
+  align-items: center;
+}
+
+.scroll-arrow.left {
+  left: 10px;
+}
+
+.scroll-arrow.right {
+  right: 10px;
+}
+
+.scroll-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
 
 
 

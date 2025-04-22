@@ -2342,9 +2342,11 @@ const openStepFunction = async (step, id) => {
       $("#table-cotizacion-prospectos").attr("style", "display:none");
       if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
         reloadTableCotizacionEmbarque();
+        enableHorizontalAutoScrollForAllTables();
       } else {
         url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
         tableCotizacionEmbarque.show();
+        enableHorizontalAutoScrollForAllTables();
         tableCotizacionEmbarque = $("#table-cotizacion-embarque").DataTable({
           dom:
             "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
@@ -2467,12 +2469,14 @@ const openStepFunction = async (step, id) => {
     } else {
       if (currentTableCotizacion != "prospectos") {
         reloadTableCotizacionEmbarque();
+        enableHorizontalAutoScrollForAllTables();
       }
       if (
         $.fn.DataTable.isDataTable("#table-cotizacion-prospectos") &&
         currentTableCotizacion != "embarque"
       ) {
         reloadTableCotizacion();
+        enableHorizontalAutoScrollForAllTables();
       } else if (currentTableCotizacion == "prospectos") {
         url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
         tableCotizacion = $("#table-cotizacion-prospectos").DataTable({
@@ -2520,10 +2524,12 @@ const openStepFunction = async (step, id) => {
                   $("#table-cotizacion-prospectos").attr("style", "");
                   $("#table-cotizacion-prospectos_wrapper").show();
                   reloadTableCotizacion();
+                  enableHorizontalAutoScrollForAllTables();
                 } else {
                   $("#table-cotizacion-prospectos").attr("style", "");
                   $("#table-cotizacion-prospectos_wrapper").show();
                   reloadTableCotizacion();
+                  enableHorizontalAutoScrollForAllTables();
                 }
 
                 currentTableCotizacion = "prospectos";
@@ -2546,6 +2552,7 @@ const openStepFunction = async (step, id) => {
                   $("#table-cotizacion-embarque").attr("style", "");
                   $("#table-cotizacion-embarque_wrapper").show();
                   reloadTableCotizacionEmbarque();
+                  enableHorizontalAutoScrollForAllTables();
                 } else {
                   url =
                     base_url + "CargaConsolidada/ContenedorConsolidado/step";
@@ -2581,9 +2588,11 @@ const openStepFunction = async (step, id) => {
 
                             $("#table-cotizacion-prospectos").attr("style", "");
                             reloadTableCotizacion();
+                            enableHorizontalAutoScrollForAllTables();
                           } else {
                             $("#table-cotizacion-prospectos").attr("style", "");
                             reloadTableCotizacion();
+                            enableHorizontalAutoScrollForAllTables();
                           }
                           currentTableCotizacion = "prospectos";
                         },
@@ -3508,6 +3517,7 @@ async function updateEstadoCotizador(id) {
         Swal.fire("Error!", result.message, "error");
       }
       reloadTableCotizacion();
+      enableHorizontalAutoScrollForAllTables();
     },
   });
 }
@@ -7043,11 +7053,93 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   }
 }
 
+function updateTableScrollArrows(tableWrapper, leftArrow, rightArrow) {
+  // Busca la tabla visible
+  const innerTable = Array.from(tableWrapper.querySelectorAll('table'))
+    .find(tbl => tbl.offsetParent !== null);
+
+  // Si no hay tabla visible o su ancho es <= 900, oculta ambas flechas
+  if (!innerTable || innerTable.offsetWidth <= 900) {
+    leftArrow.style.display = 'none';
+    rightArrow.style.display = 'none';
+    return;
+  }
+
+  // Si la tabla visible cabe en el contenedor, oculta ambas flechas
+  if (innerTable.offsetWidth <= tableWrapper.clientWidth) {
+    leftArrow.style.display = 'none';
+    rightArrow.style.display = 'none';
+    return;
+  }
+
+  const scrollLeft = tableWrapper.scrollLeft;
+  const maxScrollLeft = innerTable.offsetWidth - tableWrapper.clientWidth;
+
+  leftArrow.style.display = scrollLeft > 0 ? 'flex' : 'none';
+  rightArrow.style.display = scrollLeft < maxScrollLeft ? 'flex' : 'none';
+}
+
 function enableHorizontalAutoScrollForAllTables() {
+
+  if (!isDesktopView()) {
+    // Elimina flechas si existen en mobile/tablet
+    document.querySelectorAll('.scroll-arrow.left, .scroll-arrow.right').forEach(el => el.remove());
+    return;
+  }
   // Seleccionar todos los contenedores con la clase .table-responsive
   const tableWrappers = document.querySelectorAll('.table-responsive');
 
   tableWrappers.forEach((tableWrapper) => {
+    // Elimina flechas existentes para evitar duplicados
+    const oldLeft = tableWrapper.parentElement.querySelector('.scroll-arrow.left');
+    const oldRight = tableWrapper.parentElement.querySelector('.scroll-arrow.right');
+    if (oldLeft) oldLeft.remove();
+    if (oldRight) oldRight.remove();
+    // Busca la tabla interna
+    const innerTable = Array.from(tableWrapper.querySelectorAll('table'))
+      .find(tbl => tbl.offsetParent !== null); // Solo la visible
+
+    // Condición: solo crear flechas si la tabla es más ancha que el contenedor y mayor a 900px
+    if (
+      !innerTable ||
+      innerTable.offsetWidth <= 900 ||
+      tableWrapper.scrollWidth <= tableWrapper.clientWidth
+    ) {
+      return;
+    }
+
+    // Crear contenedor para las flechas
+    const leftArrow = document.createElement('div');
+    const rightArrow = document.createElement('div');
+
+    // Agregar clases y contenido a las flechas
+    leftArrow.classList.add('scroll-arrow', 'left');
+    rightArrow.classList.add('scroll-arrow', 'right');
+    leftArrow.innerHTML = '&#9664;'; // Flecha izquierda
+    rightArrow.innerHTML = '&#9654;'; // Flecha derecha
+
+    // Insertar las flechas en el contenedor de la tabla
+    tableWrapper.parentElement.style.position = 'relative'; // Asegurar que el contenedor tenga posición relativa
+    tableWrapper.parentElement.appendChild(leftArrow);
+    tableWrapper.parentElement.appendChild(rightArrow);
+
+    // Agregar eventos de clic a las flechas
+    leftArrow.addEventListener('click', () => {
+      tableWrapper.scrollBy({ left: -100, behavior: 'smooth' });
+    });
+
+    rightArrow.addEventListener('click', () => {
+      tableWrapper.scrollBy({ left: 100, behavior: 'smooth' });
+    });
+
+    // Actualizar visibilidad de las flechas al hacer scroll
+    tableWrapper.addEventListener('scroll', () => {
+      updateTableScrollArrows(tableWrapper, leftArrow, rightArrow);
+    });
+
+    // Mostrar flechas inicialmente
+    updateTableScrollArrows(tableWrapper, leftArrow, rightArrow);
+
     let scrollInterval;
 
     // Detectar la posición del mouse y desplazar automáticamente
@@ -7080,6 +7172,19 @@ function enableHorizontalAutoScrollForAllTables() {
     });
   });
 }
+// Detectar si la vista es de ordenador
+function isDesktopView() {
+  return window.innerWidth >= 1024; // Cambia el valor si necesitas otro umbral
+}
+// Ejecutar en resize y al cargar
+window.addEventListener('resize', function () {
+  enableHorizontalAutoScrollForAllTables();
+});
+enableHorizontalAutoScrollForAllTables();
+if (isDesktopView()) {
+  enableHorizontalAutoScrollForAllTables();
+}
+
 $("#navieraAdd").click(function () {
   //show swall with text input and save button
   Swal.fire({
@@ -7215,6 +7320,25 @@ function applyDynamicStylesForTableRows() {
     }
   };
 
+
+  function aplicarFiltros() {
+    // Obtener los valores de los filtros
+    const fechaInicio = $("#txt-Fe_Inicio_Carga").val();
+    const fechaFin = $("#txt-Fe_Fin_Carga").val();
+    const estado = $("#txt-ID_Estado").val();
+  
+    // Validar los campos (opcional)
+    if (!fechaInicio || !fechaFin) {
+      Swal.fire("Error", "Por favor, selecciona las fechas de inicio y fin.", "error");
+      return;
+    }
+  
+    // Recargar la tabla con los filtros aplicados
+    table_Entidad.ajax.reload(null, false); // Recargar la tabla sin reiniciar la paginación
+  }
+  
+  // Asociar la función al botón "Aplicar"
+  $("#aplicar-btn").on("click", aplicarFiltros);
   // Ejecutar la función inmediatamente
   applyStyles();
 
@@ -7232,8 +7356,6 @@ function applyDynamicStylesForTableRows() {
   }
 }
 
-// Llamar a la función para aplicar el desplazamiento horizontal a todas las tablas
-enableHorizontalAutoScrollForAllTables();
 
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 
