@@ -412,6 +412,8 @@ class ContenedorConsolidado extends CI_Controller
 						" id="estado-cotizador-' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizador(' . $row->id_cotizacion . ')">
 							<option
 							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
+							<option value="CONTACTADO" ' . ($row->estado_cotizador == "CONTACTADO" ? "selected" : "") . '>CONTACTADO</option>
+							<option value="INTERESADO" ' . ($row->estado_cotizador == "INTERESADO" ? "selected" : "") . '>INTERESADO</option>
 
 							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>CONFIRMADO</option>
 						</select>';

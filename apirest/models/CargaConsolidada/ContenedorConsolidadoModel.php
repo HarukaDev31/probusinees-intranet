@@ -13,9 +13,12 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
+    private $defaultHoursContactado = 0.01;
+    private $defaultHoursInteresado = 48;
     private $table_pais = "pais";
     private $table_contenedor_steps = "contenedor_consolidado_order_steps";
     private $table_contenedor_cotizacion = "contenedor_consolidado_cotizacion";
+    private $table_contenedor_cotizacion_crons = "contenedor_consolidado_cotizacion_crons";
     private $table_contenedor_cotizacion_proveedores = "contenedor_consolidado_cotizacion_proveedores";
     private $table_contenedor_documentacion_files = "contenedor_consolidado_documentacion_files";
     private $table_contenedor_documentacion_folders = "contenedor_consolidado_documentacion_folders";
@@ -115,7 +118,8 @@ class ContenedorConsolidadoModel extends CI_Model
 
             if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen])) {
                 $this->db->where('estado_china =', "COMPLETADO");
-            }if ($this->user->No_Grupo == "Documentacion") {
+            }
+            if ($this->user->No_Grupo == "Documentacion") {
                 $this->db->where('estado_documentacion =', "COMPLETADO");
             }
 
@@ -268,20 +272,20 @@ class ContenedorConsolidadoModel extends CI_Model
             ->order_by('id_cotizacion', 'asc');
         if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
-            
+
             if ($this->input->post('Filtro_Estado') != "0") {
-                $fieldToFilter=[
-                    'Coordinación'=>'estado',
-                    'ContenedorAlmacen'=>'estado_china',
-                    'Documentacion'=>'estado',  
+                $fieldToFilter = [
+                    'Coordinación' => 'estado',
+                    'ContenedorAlmacen' => 'estado_china',
+                    'Documentacion' => 'estado',
                 ];
                 $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
-            }          
-        }else{
+            }
+        } else {
             if ($this->input->post('Filtro_Estado') != "0") {
-             
+
                 $this->db->where('estado_cotizador', $this->input->post('Filtro_Estado'));
-            }       
+            }
         }
 
         $query = $this->db->get();
@@ -320,23 +324,23 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
             ->order_by('main.id', 'asc');
-            if ($this->user->No_Grupo != "Cotizador") {
-                $this->db->where('estado_cotizador', 'CONFIRMADO');
-                
-                if ($this->input->post('Filtro_Estado') != "0") {
-                    $fieldToFilter=[
-                        'Coordinación'=>'estado',
-                        'ContenedorAlmacen'=>'estado_china',
-                        'Documentacion'=>'estado',  
-                    ];
-                    $this->db->where("main".$fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
-                }          
-            }else{
-                if ($this->input->post('Filtro_Estado') != "0") {
-                 
-                    $this->db->where('main.estado_cotizador', $this->input->post('Filtro_Estado'));
-                }       
+        if ($this->user->No_Grupo != "Cotizador") {
+            $this->db->where('estado_cotizador', 'CONFIRMADO');
+
+            if ($this->input->post('Filtro_Estado') != "0") {
+                $fieldToFilter = [
+                    'Coordinación' => 'estado',
+                    'ContenedorAlmacen' => 'estado_china',
+                    'Documentacion' => 'estado',
+                ];
+                $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
+        } else {
+            if ($this->input->post('Filtro_Estado') != "0") {
+
+                $this->db->where('main.estado_cotizador', $this->input->post('Filtro_Estado'));
+            }
+        }
         $query = $this->db->get();
         return $query->result();
     }
@@ -765,10 +769,11 @@ class ContenedorConsolidadoModel extends CI_Model
             ];
         }
     }
-    public function generateCodeSupplier($string, $idContenedor, $rowCount, $index) {
+    public function generateCodeSupplier($string, $idContenedor, $rowCount, $index)
+    {
         $words = explode(" ", trim($string));
         $code = "";
-        
+
         // Primeras 2 letras de las primeras 2 palabras (protegido)
         foreach ($words as $word) {
             if (strlen($code) >= 4) break; // Ya tenemos 4 caracteres (2 palabras)
@@ -776,7 +781,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $code .= strtoupper(substr($word, 0, 2));
             }
         }
-    
+
         // Completar con ceros y retornar
         $idContenedor = str_pad($idContenedor, 2, "0", STR_PAD_LEFT);
         return $code . $idContenedor . "-" . $rowCount;
@@ -3037,11 +3042,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             'id_cotizacion' => $idCotizacion,
             'last_modified' => time(),
         ];
-        log_message('error',"fileUrl: " . $fileUrl);
-        log_message('error',"fileToInsert: " . json_encode($fileToInsert));
+        log_message('error', "fileUrl: " . $fileUrl);
+        log_message('error', "fileToInsert: " . json_encode($fileToInsert));
 
         if ($fileUrl) {
-         
+
             $this->db->insert($this->table_contenedor_almacen_inspection, $fileToInsert);
             if ($this->db->error()['code'] != 0) {
                 return ['status' => "error", 'error' => $this->db->error()];
@@ -3232,9 +3237,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
             $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
 
-            //             $this->sendMessage('Hola buen día 🙋🏻‍♀
-            // Inspección: ' . $message);
-            //for each images and video send media
             foreach ($imagesUrls as $image) {
                 $this->sendMedia($image->file_path, $image->file_type, null, null, 1);
             }
@@ -3281,9 +3283,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
             COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total,
             COALESCE(SUM(IF(cc.estado_cotizador = "PENDIENTE", cc.volumen, 0)), 0) as cbm_total_pendiente')
-        ->from($this->table_contenedor_cotizacion_proveedores . ' cccp') // Usando alias
-        ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id') // Usando alias
-        ->where('cccp.id_contenedor', $idContenedor);
+                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp') // Usando alias
+                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id') // Usando alias
+                ->where('cccp.id_contenedor', $idContenedor);
             $query = $this->db->get();
             $result = $query->row();
             if ($this->db->error()['code'] != 0) {
@@ -3476,12 +3478,53 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $query = $this->db->get();
             $result = $query->result();
             if (count($result) > 0) {
+
                 return ['status' => "error", 'error' => "No se puede cambiar el estado a " . $estado . " hasta que todos los proveedores tengan productos"];
             }
             $this->db->where('id', $ID);
             $this->db->update($this->table_contenedor_cotizacion, ['estado_cotizador' => $estado]);
             if ($this->db->error()['code'] != 0) {
                 return ['status' => "error", 'error' => $this->db->error()];
+            }
+            if ($estado == "CONTACTADO") {
+                //get id_contenedor from table contenedor_consolidado_cotizacion
+                $this->db->select('id_contenedor,nombre,telefono')
+                    ->from($this->table_contenedor_cotizacion)
+                    ->where('id', $ID);
+                $query = $this->db->get();
+                $result = $query->row();
+                $idContenedor = $result->id_contenedor;
+                $nombre = $result->nombre;
+                $telefono = $result->telefono;
+                //get f_cierre from table contenedor
+                $this->db->select('f_cierre,carga')
+                    ->from($this->table)
+                    ->where('id', $idContenedor);
+                $query = $this->db->get();
+                $result = $query->row();
+                $fCierre = $result->f_cierre;
+                $carga = $result->carga;
+                $message = "Hola " . $nombre . " pudiste revisar la cotización enviada? 
+Te comento que cerramos nuestro consolidado # " . $carga . "este " . $fCierre . ".
+Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus dudas.
+";
+                $telefono = preg_replace('/\s+/', '', $telefono);
+                $telefono = $telefono ? $telefono . '@c.us' : '';
+                $data_json = [
+                    'message' => $message,
+                    'phone' => $telefono,
+                ];
+                $data = [
+                    'id_contenedor' => $idContenedor,
+                    'id_cotizacion' => $ID,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'data_json' => json_encode($result),
+                    'execution_at' => date('Y-m-d H:i:s', strtotime('+' . $this->defaultHoursContactado . ' hours')),
+                    'time_between' => $this->defaultHoursContactado,
+                    'status' => 'PENDING',
+                ];
+                //insert and get id from table table_contenedor_cotizacion_crons
+                $this->db->insert($this->table_contenedor_cotizacion_crons, $data);
             }
             return "success";
         } catch (Exception $e) {
