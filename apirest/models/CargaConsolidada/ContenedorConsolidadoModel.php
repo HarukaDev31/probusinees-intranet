@@ -3534,7 +3534,7 @@ Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus
                 $result = $query->row();
                 $idContenedor = $result->id_contenedor;
                 $nombre = $result->nombre;
-                $message= "El cliente ".$nombre." del contenedor #".$idContenedor." ha pasado a confirmado, por favor contactar.";
+                $message= "El cliente ".$nombre." ha pasado a confirmado, por favor contactar.";
                 $usuariosCoordinacion = $this->getUsersByGrupo($this->roleCoordinacion);
                 $ids = array_column($usuariosCoordinacion, 'ID_Usuario');
                 $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
