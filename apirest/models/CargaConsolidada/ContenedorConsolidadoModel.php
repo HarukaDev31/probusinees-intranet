@@ -14,7 +14,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
     private $defaultHoursContactado = 1;
-    private $defaultHoursInteresado = 48;
+    private $defaultHoursInteresado = 1;
     private $table_pais = "pais";
     private $table_contenedor_steps = "contenedor_consolidado_order_steps";
     private $table_contenedor_cotizacion = "contenedor_consolidado_cotizacion";
@@ -825,6 +825,31 @@ class ContenedorConsolidadoModel extends CI_Model
                     ];
                 }
                 if ($this->db->affected_rows() > 0) {
+                    $nombre = $dataToInsert['nombre'];
+                    //get f_cierre from table carga_consolidada_contenedor where id = $data['id_contenedor']
+                    $this->db->select('f_cierre')
+                        ->from($this->table)
+                        ->where('id', $data['id_contenedor']);
+                    $query = $this->db->get();
+                    $f_cierre = $query->row()->f_cierre;
+
+                    $message = 'Hola '.$nombre.' pudiste revisar la cotización enviada? 
+                    Te comento que cerramos nuestro consolidado este' . $f_cierre . 'Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus dudas.';
+                    $data_json = [
+                        'message' => $message,
+                        'phoneNumberId' => $dataToInsert['telefono'],
+                    ];
+                    $data = [
+                        'id_contenedor' => $data['id_contenedor'],
+                        'id_cotizacion' => $idCotizacion,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'data_json' => json_encode($data_json),
+                        'execution_at' => date('Y-m-d H:i:s', strtotime('+' . $this->defaultHoursContactado . ' minutes')),
+                        'time_between' => $this->defaultHoursContactado,
+                        'status' => 'PENDING',
+                    ];
+                    $this->db->insert($this->table_contenedor_cotizacion_crons, $data);
+
                     //{"project": "0", "role": "Cotizador", "user": "0", "message": "Prueba de comunicación en tiempo real","action":"new-cotizacion"}
                     // $this->sendEvent([
                     //     "project" => "0",
@@ -3487,7 +3512,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             if ($this->db->error()['code'] != 0) {
                 return ['status' => "error", 'error' => $this->db->error()];
             }
-            if ($estado == "CONTACTADO") {
+            if ($estado == "INTERESADO") {
                 //get id_contenedor from table contenedor_consolidado_cotizacion
                 $this->db->select('id_contenedor,nombre,telefono')
                     ->from($this->table_contenedor_cotizacion)
@@ -3505,10 +3530,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $result = $query->row();
                 $fCierre = $result->f_cierre;
                 $carga = $result->carga;
-                $message = "Hola " . $nombre . " pudiste revisar la cotización enviada? 
-Te comento que cerramos nuestro consolidado # " . $carga . "este " . $fCierre . ".
-Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus dudas.
-";
+                /*Hola @nombre del cliente@, sabemos que está interesad@ en el consolidado #@, y no queremos que te quedes sin espacio, deseas confirmar tu participación?
+                */
+                $message = "Hola " . $nombre . ", sabemos que está interesad@ en el consolidado #" . $carga . ", y no queremos que te quedes sin espacio, deseas confirmar tu participación? \n\n" ;
+                    
                 $telefono = preg_replace('/\s+/', '', $telefono);
                 $telefono = $telefono ? $telefono . '@c.us' : '';
                 $data_json = [
@@ -3520,8 +3545,8 @@ Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus
                     'id_cotizacion' => $ID,
                     'created_at' => date('Y-m-d H:i:s'),
                     'data_json' => json_encode($data_json),
-                    'execution_at' => date('Y-m-d H:i:s', strtotime('+' . $this->defaultHoursContactado . ' minutes')),
-                    'time_between' => $this->defaultHoursContactado,
+                    'execution_at' => date('Y-m-d H:i:s', strtotime('+' . $this->defaultHoursInteresado . ' minutes')),
+                    'time_between' => $this->defaultHoursInteresado,
                     'status' => 'PENDING',
                 ];
                 $this->db->insert($this->table_contenedor_cotizacion_crons, $data);
