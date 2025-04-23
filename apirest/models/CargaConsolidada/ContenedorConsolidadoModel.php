@@ -834,7 +834,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     $f_cierre = $query->row()->f_cierre;
 
                     $message = 'Hola '.$nombre.' pudiste revisar la cotización enviada? 
-                    Te comento que cerramos nuestro consolidado este' . $f_cierre . 'Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus dudas.';
+Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus dudas.';
                     $telefono = preg_replace('/\s+/', '', $dataToInsert['telefono']);
                     $telefono ? $telefono . '@c.us' : '';
                     $data_json = [
@@ -2872,26 +2872,18 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         'id_proveedor' => $idProveedor,
                         'estado' => $this->STATUS_CONTACTED
                     ]);
-                    $usuariosAlmacen = $this->getUsersByGrupo($this->roleCoordinacion);
-                    $ids = array_column($usuariosAlmacen, 'ID_Usuario');
+                    $message='Hola, hemos contactado a tu proveedor con código '.
+                    $supplierCode.' nos comunica que la carga será enviada el '.
+                    $data['arrive_date_china'].'.';
+                    $this->db->select('telefono')
+                        ->from($this->table_contenedor_cotizacion)
+                        ->where('id', $idCotizacion);
+                    $query = $this->db->get();
+                    $telefono = $query->row()->telefono;
 
-                    $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado CONTACTADO";
-                    // $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
-                    // $socketResponse = $this->sendEvent([
-                    //     "project" => "intranet",
-                    //     "role" => $this->roleCoordinacion,
-                    //     "user" => 0,
-                    //     "action" => $this->cambioEstadoProveedor,
-                    //     "message" => $message
-                    // ]);
-                    // $socketResponse = $this->sendEvent([
-                    //     "project" => "intranet",
-                    //     "role" => $this->roleCotizador,
-                    //     "user" => 0,
-                    //     "action" => $this->cambioEstadoProveedor,
-                    //     "message" => $message
-                    // ]);
-                    //if contenedor estado_china is PENDIENTE UPDATE TO RECIBIENDO
+                    $telefono = preg_replace('/\s+/', '', $telefono);
+                    $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
+                    $this->sendMessage($message);
 
                 }
                 $this->verifyContainerIsCompleted($idContenedor);
