@@ -835,9 +835,11 @@ class ContenedorConsolidadoModel extends CI_Model
 
                     $message = 'Hola '.$nombre.' pudiste revisar la cotización enviada? 
                     Te comento que cerramos nuestro consolidado este' . $f_cierre . 'Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus dudas.';
+                    $telefono = preg_replace('/\s+/', '', $dataToInsert['telefono']);
+                    $telefono ? $telefono . '@c.us' : '';
                     $data_json = [
                         'message' => $message,
-                        'phoneNumberId' => $dataToInsert['telefono'],
+                        'phoneNumberId' => $telefono,
                     ];
                     $data = [
                         'id_contenedor' => $data['id_contenedor'],
