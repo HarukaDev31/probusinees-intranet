@@ -1519,6 +1519,7 @@ async function deleteCarga(id) {
     }
   });
 }
+
 async function getTipoCliente() {
   url = base_url + "CargaConsolidada/ContenedorConsolidado/getTipoCliente";
   const response = await fetch(url);
@@ -1949,6 +1950,31 @@ async function deleteCotizacionFile(id) {
       });
     }
   });
+}
+async function updateRotulado(idCotizacion, idProveedor) {
+  url =
+    base_url +
+    "CargaConsolidada/ContenedorConsolidado/updateRotulado";
+  spinner.show();
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: {
+      idCotizacion: idCotizacion,
+      idProveedor: idProveedor,
+    },
+    success: function (response) {
+      const result = JSON.parse(response);
+      if (result.status == "success") {
+        Swal.fire(successConfig.title, result.message, "success");
+        //reload embarque table
+        reloadTableCotizacionEmbarque();
+      } else {
+        Swal.fire(errorConfig.title, result.message, "error");
+      }
+    },
+  });
+  spinner.hide();
 }
 async function deleteCotizacion(id) {
   Swal.fire({

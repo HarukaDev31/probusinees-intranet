@@ -13,8 +13,8 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
-    private $defaultHoursContactado = 1*60*24;
-    private $defaultHoursInteresado = 1*60*24;
+    private $defaultHoursContactado = 1 * 60 * 24;
+    private $defaultHoursInteresado = 1 * 60 * 24;
     private $table_pais = "pais";
     private $table_contenedor_steps = "contenedor_consolidado_order_steps";
     private $table_contenedor_cotizacion = "contenedor_consolidado_cotizacion";
@@ -318,7 +318,8 @@ class ContenedorConsolidadoModel extends CI_Model
                     'id_proveedor', proveedores.id,
                     'products',proveedores.products,
                     'estado_china',proveedores.estado_china,
-                    'arrive_date_china',proveedores.arrive_date_china
+                    'arrive_date_china',proveedores.arrive_date_china,
+                    'send_rotulado_status',proveedores.send_rotulado_status
                 )
             )
             FROM " . $this->table_contenedor_cotizacion_proveedores . " proveedores
@@ -837,7 +838,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     $query = $this->db->get();
                     $f_cierre = $query->row()->f_cierre;
 
-                    $message = 'Hola '.$nombre.' pudiste revisar la cotización enviada? 
+                    $message = 'Hola ' . $nombre . ' pudiste revisar la cotización enviada? 
 Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si cuentas con alguna duda me avisas y puedo llamarte para aclarar tus dudas.';
                     $telefono = preg_replace('/\s+/', '', $dataToInsert['telefono']);
                     $telefono ? $telefono . '@c.us' : '';
@@ -2876,9 +2877,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         'id_proveedor' => $idProveedor,
                         'estado' => $this->STATUS_CONTACTED
                     ]);
-                    $message='Hola, hemos contactado a tu proveedor con código '.
-                    $supplierCode.' nos comunica que la carga será enviada el '.
-                    $data['arrive_date_china'].'.';
+                    $message = 'Hola, hemos contactado a tu proveedor con código ' .
+                        $supplierCode . ' nos comunica que la carga será enviada el ' .
+                        $data['arrive_date_china'] . '.';
                     $this->db->select('telefono')
                         ->from($this->table_contenedor_cotizacion)
                         ->where('id', $idCotizacion);
@@ -2888,7 +2889,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     $telefono = preg_replace('/\s+/', '', $telefono);
                     $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
                     $this->sendMessage($message);
-
                 }
                 $this->verifyContainerIsCompleted($idContenedor);
             }
@@ -3530,8 +3530,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $carga = $result->carga;
                 /*Hola @nombre del cliente@, sabemos que está interesad@ en el consolidado #@, y no queremos que te quedes sin espacio, deseas confirmar tu participación?
                 */
-                $message = "Hola " . $nombre . ", sabemos que está interesad@ en el consolidado #" . $carga . ", y no queremos que te quedes sin espacio, deseas confirmar tu participación? \n\n" ;
-                    
+                $message = "Hola " . $nombre . ", sabemos que está interesad@ en el consolidado #" . $carga . ", y no queremos que te quedes sin espacio, deseas confirmar tu participación? \n\n";
+
                 $telefono = preg_replace('/\s+/', '', $telefono);
                 $telefono = $telefono ? $telefono . '@c.us' : '';
                 $data_json = [
@@ -3549,26 +3549,26 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 ];
                 $this->db->insert($this->table_contenedor_cotizacion_crons, $data);
             }
-            if($estado=="CONFIRMADO"){
+            if ($estado == "CONFIRMADO") {
                 $this->db->select('id_contenedor,nombre,telefono')
-                ->from($this->table_contenedor_cotizacion)
-                ->where('id', $ID);
+                    ->from($this->table_contenedor_cotizacion)
+                    ->where('id', $ID);
                 $query = $this->db->get();
                 $result = $query->row();
                 $idContenedor = $result->id_contenedor;
                 $nombre = $result->nombre;
-                $message= "El cliente ".$nombre." ha pasado a confirmado, por favor contactar.";
+                $message = "El cliente " . $nombre . " ha pasado a confirmado, por favor contactar.";
                 $usuariosCoordinacion = $this->getUsersByGrupo($this->roleCoordinacion);
                 $ids = array_column($usuariosCoordinacion, 'ID_Usuario');
                 $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);
 
                 $socketResponse = $this->sendEvent([
-                "project" => "0",
-                "role" => $this->roleCoordinacion,
-                "user" => "0",
-                "action" => $this->aNewConfirmado,
-                "message" => $message,
-            ]);
+                    "project" => "0",
+                    "role" => $this->roleCoordinacion,
+                    "user" => "0",
+                    "action" => $this->aNewConfirmado,
+                    "message" => $message,
+                ]);
             }
             return "success";
         } catch (Exception $e) {
@@ -5639,6 +5639,25 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             return ['status' => true, 'data' => $query->row()];
         } catch (Exception $e) {
             log_message('error', '' . $e->getMessage());
+        }
+    }
+    public function updateRotulado($idCotizacion, $idProveedor)
+    {
+        try {
+
+            //update send_rotulado_status to PENDING
+            $this->db->set('send_rotulado_status', 'PENDING');
+            $this->db->where('id', $idProveedor);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores);
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en updateRotulado: ' . $this->db->error()['message']);
+                return false;
+            } else {
+                return "success";
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en updateRotulado: ' . $e->getMessage());
+            return false;
         }
     }
 }
