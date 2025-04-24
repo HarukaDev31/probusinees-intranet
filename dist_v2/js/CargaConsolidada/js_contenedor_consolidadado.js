@@ -7084,6 +7084,54 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   // Abrir el diálogo de selección de archivos al hacer clic en el botón
   uploadButton.addEventListener('click', (e) => {
     e.preventDefault();
+    
+    // Modificamos esta parte para preservar los archivos existentes
+    // Guardamos el listener original
+    const originalChangeListener = fileInput.onchange;
+    
+    // Reemplazamos temporalmente con un nuevo listener
+    fileInput.onchange = function(event) {
+      // Convertir FileList existente y nuevos archivos a arrays
+      const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
+      const newFiles = Array.from(event.target.files);
+      
+      // Filtrar y validar los nuevos archivos
+      const validFiles = newFiles.filter(file => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedFileTypes.length === 0 || 
+               allowedFileTypes.includes(fileType) || 
+               allowedFileTypes.includes(fileExtension);
+      });
+      
+      if (validFiles.length !== newFiles.length) {
+        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
+      }
+      
+      if (validFiles.length > 0) {
+        // Combinar archivos existentes con los nuevos válidos
+        const combinedFiles = [...existingFiles, ...validFiles];
+        
+        // Crear nuevo FileList usando DataTransfer
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        
+        // Limpiar la lista antes de volver a renderizar
+        $(".file-list-item").remove();
+        
+        // Restaurar el listener original después de aplicar nuestros cambios
+        fileInput.onchange = originalChangeListener;
+        
+        // Disparar el evento change original para mostrar los archivos
+        if (originalChangeListener) {
+          const newEvent = new Event('change');
+          originalChangeListener(newEvent);
+        }
+      }
+    };
+    
+    // Ahora abrimos el selector de archivos
     fileInput.click();
   });
 
