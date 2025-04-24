@@ -341,7 +341,11 @@ class ContenedorConsolidadoModel extends CI_Model
                 ];
                 $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
-        } else {
+        }else if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
+            $this->db->where($this->table_contenedor_cotizacion . '.id_usuario', $this->user->ID_Usuario);
+        }
+        
+        else {
             if ($this->input->post('Filtro_Estado') != "0") {
 
                 $this->db->where('main.estado_cotizador', $this->input->post('Filtro_Estado'));
@@ -2372,7 +2376,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             $providersHasNoSended = array_filter($proveedores, function ($proveedor) {
                 return $proveedor['send_rotulado_status'] == 'PENDING';
             });
-
             if (empty($providersHasNoSended)) {
                 throw new Exception("No hay proveedores pendientes de envío");
             }
@@ -2422,6 +2425,7 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
             $sleepSendMedia = 3;
             // Procesar cada proveedor
             foreach ($providersHasNoSended as $proveedor) {
+                log_message('error', 'Proveedor enviado: ' . json_encode($proveedor));
                 $supplierCode = $proveedor['code_supplier'];
                 $products = $proveedor['products'];
                 $sleepSendMedia += 1;
@@ -2492,13 +2496,6 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
             if (!$zip->close()) {
                 throw new Exception("Error al cerrar el archivo ZIP");
             }
-
-            // // Verificar que el ZIP tiene contenido
-            // if ($zip->numFiles == 0) {
-            //     throw new Exception("El archivo ZIP no contiene documentos");
-            // }
-
-            // Enviar información adicional
             $direccionUrl = base_url('assets/downloads/Direccion.jpg');
             $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China', null, $sleepSendMedia);
             $sleepSendMedia += 1;
