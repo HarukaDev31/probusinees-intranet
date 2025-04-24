@@ -271,6 +271,10 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
             ->where('id_contenedor', $idContenedor)
             ->order_by('id_cotizacion', 'asc');
+        // Si el usuario es "Cotizador", filtrar por el id del usuario actual
+        if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
+            $this->db->where($this->table_contenedor_cotizacion . '.id_usuario', $this->user->ID_Usuario);
+        }
         if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
 

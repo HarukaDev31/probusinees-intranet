@@ -2481,4 +2481,95 @@ Search for
     font-weight: 400;
     color: #272A30;
   }
+/* Ocultar el texto del botón en pantallas pequeñas */
+@media (max-width: 768px) {
+  #table-contenedor thead {
+    display: none; /* Ocultar encabezados de la tabla */
+  }
+
+
+  #table-contenedor tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  #table-contenedor tbody td {
+    align-items: center;
+    gap: 8px; /* Espaciado entre   el select y el botón */
+  }
+
+  tr.odd>td, tr.even>td {
+    border: 0px solid transparent;
+    padding: .25rem;
+  }
+
+  #btn-exportar-carga, #btn-filtrar-carga, #btn-cargar-carga{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0; /* Oculta el texto del botón */
+  }
+
+  #btn-exportar-carga i {
+    margin-right: 0; /* Asegúrate de que el ícono esté centrado */
+  }
+  #btn-exportar-carga>.fa-upload, #btn-exportar-carga>.fa-download, #btn-filtrar-carga>.fa-filter, #btn-cargar-carga>.fa-upload {
+    font-size: 20px;
+    margin-right: -12px;
+  }
+  #btn-grd-doc-not{
+    order: 99;
+  }
+
+  .note-container-container{
+    min-height: 10%;
+    padding-bottom: 15%;
+  }
+  
+  #btn-grd-doc-not{
+    position: absolute;
+    bottom: 1%;
+  }
+
+  #txt-Id_Carga_Consolidada{
+    height: 20vh;
+  }
+
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: 400px;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: none;
+  z-index: 10;
+  border-radius: 50%;
+  font-size: 16px;
+  display: none; /* Ocultar inicialmente */
+  justify-content: center;
+  align-items: center;
+}
+
+.scroll-arrow.left {
+  left: 10px;
+}
+
+.scroll-arrow.right {
+  right: 10px;
+}
+
+.scroll-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+
+
 </style>
