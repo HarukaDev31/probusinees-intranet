@@ -7084,54 +7084,6 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   // Abrir el diálogo de selección de archivos al hacer clic en el botón
   uploadButton.addEventListener('click', (e) => {
     e.preventDefault();
-    
-    // Modificamos esta parte para preservar los archivos existentes
-    // Guardamos el listener original
-    const originalChangeListener = fileInput.onchange;
-    
-    // Reemplazamos temporalmente con un nuevo listener
-    fileInput.onchange = function(event) {
-      // Convertir FileList existente y nuevos archivos a arrays
-      const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
-      const newFiles = Array.from(event.target.files);
-      
-      // Filtrar y validar los nuevos archivos
-      const validFiles = newFiles.filter(file => {
-        const fileType = file.type;
-        const fileExtension = file.name.split('.').pop().toLowerCase();
-        return allowedFileTypes.length === 0 || 
-               allowedFileTypes.includes(fileType) || 
-               allowedFileTypes.includes(fileExtension);
-      });
-      
-      if (validFiles.length !== newFiles.length) {
-        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
-      }
-      
-      if (validFiles.length > 0) {
-        // Combinar archivos existentes con los nuevos válidos
-        const combinedFiles = [...existingFiles, ...validFiles];
-        
-        // Crear nuevo FileList usando DataTransfer
-        const dataTransfer = new DataTransfer();
-        combinedFiles.forEach(file => dataTransfer.items.add(file));
-        fileInput.files = dataTransfer.files;
-        
-        // Limpiar la lista antes de volver a renderizar
-        $(".file-list-item").remove();
-        
-        // Restaurar el listener original después de aplicar nuestros cambios
-        fileInput.onchange = originalChangeListener;
-        
-        // Disparar el evento change original para mostrar los archivos
-        if (originalChangeListener) {
-          const newEvent = new Event('change');
-          originalChangeListener(newEvent);
-        }
-      }
-    };
-    
-    // Ahora abrimos el selector de archivos
     fileInput.click();
   });
 
@@ -7297,6 +7249,220 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
     });
   }
 }
+function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], automaticUpload = false, removeFileButtonId = '.remove-file-button') {
+  const container = document.getElementById(containerId);
+  const fileInput = $(`#${inputId}`)[0];
+  const fileLabel = container.querySelector('.file-label');
+  const fileList = container.querySelector('.file-lista');
+  const uploadButton = container.querySelector('.upload-button');
+  
+  // Abrir el diálogo de selección de archivos al hacer clic en el botón
+  uploadButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Guardamos una referencia a los archivos existentes
+    const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
+    
+    // Reseteamos el input para que se pueda seleccionar el mismo archivo múltiples veces
+    // y almacenamos el listener original
+    const originalChangeHandler = fileInput.onchange;
+    fileInput.value = "";
+    
+    // Creamos un nuevo manejador para el evento change
+    fileInput.onchange = function(event) {
+      // Obtener los nuevos archivos seleccionados
+      const newFiles = Array.from(event.target.files);
+      
+      // Filtrar y validar los nuevos archivos
+      const validFiles = newFiles.filter(file => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedFileTypes.length === 0 || 
+               allowedFileTypes.includes(fileType) || 
+               allowedFileTypes.includes(fileExtension);
+      });
+      
+      if (validFiles.length !== newFiles.length) {
+        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
+      }
+      
+      if (validFiles.length > 0) {
+        // Combinar archivos existentes con los nuevos válidos
+        const combinedFiles = [...existingFiles, ...validFiles];
+        
+        // Crear nuevo FileList usando DataTransfer
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        
+        // Limpiar la lista visual de archivos
+        fileList.innerHTML = '';
+        
+        // Restaurar el manejador original
+        fileInput.onchange = originalChangeHandler;
+        
+        // Ahora actualizamos la vista manualmente
+        updateFileListView(fileInput.files, fileList, allowedFileTypes);
+      }
+    };
+    
+    // Ahora abrimos el selector de archivos
+    fileInput.click();
+  });
+  
+  // Función para actualizar la vista de la lista de archivos
+  function updateFileListView(files, listElement, allowedTypes) {
+    if (files.length > 0) {
+      listElement.classList.remove('hidden');
+      
+      // Recorrer los archivos seleccionados
+      Array.from(files).forEach((file, index) => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        
+        // Determinar el ícono correspondiente usando getIconByType
+        const fileIcon = getIconByType(fileType || fileExtension);
+        
+        // Crear un elemento de lista para cada archivo
+        const fileItem = document.createElement('div');
+        fileItem.classList.add('file-list-item');
+        
+        // Mostrar el nombre y el tamaño del archivo
+        fileItem.innerHTML = `
+          <div class="file-icon-container"> 
+            <div class="file-icon" style="cursor: pointer;">${fileIcon}</div>
+            <p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
+            <div class="remove-file-button"
+            id="remove-file-button-${index}"
+            data-id="${index}"
+            data-index="${index}">
+              <i class="fas fa-trash"></i>
+            </div>
+          </div>
+        `;
+        
+        // Agregar el elemento a la lista
+        listElement.appendChild(fileItem);
+        
+        // Agregar funcionalidad de vista previa para imágenes y videos
+        if (fileType.startsWith('image/') || fileType.startsWith('video/')) {
+          const fileIconElement = fileItem.querySelector('.file-icon');
+          fileIconElement.style.cursor = 'pointer';
+          fileIconElement.addEventListener('click', () => {
+            if (fileType.startsWith('image/')) {
+              // Mostrar la imagen en el modal
+              const modal = document.getElementById('image-modal');
+              const modalImage = modal.querySelector('#image-preview');
+              modalImage.src = URL.createObjectURL(file);
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+            } else if (fileType.startsWith('video/')) {
+              // Mostrar el video en el modal
+              const modal = document.getElementById('video-modal');
+              const modalVideo = modal.querySelector('#video-preview');
+              modalVideo.src = URL.createObjectURL(file);
+              modalVideo.load(); // Cargar el video
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+
+              // Detener el video cuando se haga clic fuera del modal
+              modal.addEventListener('click', (e) => {
+                if (e.target === modal) { // Verifica si el clic fue en el fondo del modal
+                  modalVideo.pause(); // Pausar el video
+                  modalVideo.currentTime = 0; // Reiniciar el video al inicio
+                  bootstrapModal.hide(); // Cerrar el modal
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  }
+  
+  // Mostrar la lista de archivos seleccionados (evento change original)
+  fileInput.addEventListener('change', (e) => {
+    if (fileInput.files.length > 0) {
+      // Usamos nuestra función auxiliar para actualizar la vista
+      updateFileListView(fileInput.files, fileList, allowedFileTypes);
+    }
+  });
+  
+  // Manejar la eliminación de archivos individuales
+  fileList.addEventListener('click', (e) => {
+    if (
+      e.target.classList.contains('remove-file-button') ||
+      e.target.closest('.remove-file-button')
+    ) {
+      const index = parseInt(
+        e.target.dataset.index ||
+        e.target.closest('.remove-file-button').dataset.index
+      );
+
+      // Convertir FileList a un array para poder eliminar el archivo
+      const files = Array.from(fileInput.files);
+      files.splice(index, 1); // Eliminar el archivo del array
+      
+      // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
+      const dataTransfer = new DataTransfer();
+      files.forEach((file) => dataTransfer.items.add(file));
+      fileInput.files = dataTransfer.files;
+
+      // Limpiar la lista visual y actualizarla
+      fileList.innerHTML = '';
+      updateFileListView(fileInput.files, fileList, allowedFileTypes);
+    }
+  });
+
+  // Manejar el arrastre de archivos
+  fileLabel.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#007bff';
+  });
+
+  fileLabel.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#cccccc';
+  });
+
+  fileLabel.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#cccccc';
+    
+    if (e.dataTransfer.files.length > 0) {
+      // Convertir FileList existente y nuevos archivos a arrays
+      const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
+      const newFiles = Array.from(e.dataTransfer.files);
+      
+      // Filtrar y validar los nuevos archivos
+      const validFiles = newFiles.filter(file => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedFileTypes.length === 0 || 
+               allowedFileTypes.includes(fileType) || 
+               allowedFileTypes.includes(fileExtension);
+      });
+      
+      if (validFiles.length !== newFiles.length) {
+        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
+      }
+      
+      if (validFiles.length > 0) {
+        // Combinar archivos existentes con los nuevos válidos
+        const combinedFiles = [...existingFiles, ...validFiles];
+        
+        // Crear nuevo FileList usando DataTransfer
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        
+        // Limpiar la lista y actualizarla
+        fileList.innerHTML = '';
+        updateFileListView(fileInput.files, fileList, allowedFileTypes);
+      }
+    }
+  });
+}
 
 function enableHorizontalAutoScrollForAllTables() {
   // Seleccionar todos los contenedores con la clase .table-responsive
@@ -7391,6 +7557,6 @@ enableHorizontalAutoScrollForAllTables();
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 
 
-setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'],false,'#remove-file-button-inspeccion');
+setupMultiFileUploadv2("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'],false,'#remove-file-button-inspeccion');
 setupMultiFileUpload("multiple-file-upload-aduana", "file-input-aduana", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
