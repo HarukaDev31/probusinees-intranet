@@ -342,7 +342,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
         }else if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
-            $this->db->where($this->table_contenedor_cotizacion . '.id_usuario', $this->user->ID_Usuario);
+            $this->db->where('main.id_usuario', $this->user->ID_Usuario);
         }
         
         else {
