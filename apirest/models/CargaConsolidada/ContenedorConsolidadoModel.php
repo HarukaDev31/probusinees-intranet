@@ -13,7 +13,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_cliente = 'entidad';
     private $table_usuario = 'usuario';
     private $table = "carga_consolidada_contenedor";
-    private $defaultHoursContactado = 1 * 60 * 24;
+    private $defaultHoursContactado = 1 ;
     private $defaultHoursInteresado = 1 * 60 * 48;
     private $table_pais = "pais";
     private $table_contenedor_steps = "contenedor_consolidado_order_steps";
