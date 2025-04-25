@@ -5688,7 +5688,44 @@ $(document).ready(async function () {
 
   $("#upload-documents").click(() => $("#upload-input-documents").click());
   $("#upload-inspection").click(() => $("#upload-input-inspection").click());
-
+  $("#btn-send-inspection").click(() => {
+    //ajax to forceSendRotulado/currENTProviderId
+    const url = base_url + "CargaConsolidada/ContenedorConsolidado/forceSendRotulado/" + currentProveedor;
+    $.ajax({
+      url: url,
+      type: "POST",
+      dataType: "JSON",
+      success: function (response) {
+        if (response.status) {
+          Swal.fire({
+            title: "Éxito",
+            text: response.message,
+            icon: "success",
+            confirmButtonText: "Aceptar",
+          }).then(() => {
+            // Reload the page or perform any other action
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: response.message,
+            icon: "error",
+            confirmButtonText: "Aceptar",
+          });
+        }
+      },
+      error: function (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          title: "Error",
+          text: "Ocurrió un error al enviar la solicitud.",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        });
+      },
+    });
+  });
+      
   // Listeners para subir archivos
   $('#btn-guardar-doc-not').click(async () => {
     try {

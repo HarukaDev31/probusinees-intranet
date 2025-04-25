@@ -465,7 +465,7 @@ class ContenedorConsolidado extends CI_Controller
 							$cbmTotalPeru += $proveedor->cbm_total;
 						}
 
-						if ($this->user->No_Grupo == "ContenedorAlmacen") {
+						if ($this->user->No_Grupo == "ContenedorAlmacen" || $this->user->No_Grupo == "GERENCIA") {
 							$proveedoresSelect .= '<select class="form-control
 							' . ($proveedor->estados_proveedor == "NC" ? "bg-info" : "") .
 								($proveedor->estados_proveedor == "C" ? "bg-warning" : "") .
@@ -1594,6 +1594,12 @@ class ContenedorConsolidado extends CI_Controller
 		$idProveeedor = $this->input->post('idProveedor');
 		Log_message('error', 'updateRotulado: idCotizacion: ' . $idCotizacion . ', idProveedor: ' . $idProveeedor);
 		$arrResponse = $this->ContenedorConsolidadoModel->updateRotulado($idCotizacion, $idProveeedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function forceSendRotulado($idProveedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->validateToSendInspectionMessage($idProveedor);
 		echo json_encode([
 			"status" => $arrResponse
 		]);

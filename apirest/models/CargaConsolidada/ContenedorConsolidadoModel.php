@@ -3161,6 +3161,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     }
     function validateToSendInspectionMessage($idProveedor)
     {
+        log_message('error', "validateToSendInspectionMessage: " . $idProveedor);
         //find if exists more two files type image and one type video
         $this->db->select('id, file_path,file_type')
             ->from($this->table_contenedor_almacen_inspection)
