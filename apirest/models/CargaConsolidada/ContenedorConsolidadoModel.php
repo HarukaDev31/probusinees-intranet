@@ -2874,9 +2874,29 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         'id_proveedor' => $idProveedor,
                         'estado' => $this->STATUS_CONTACTED
                     ]);
+                    //conver yyyy-mm-dd to dd de Mes
+                    $date = DateTime::createFromFormat('Y-m-d', $data['arrive_date_china']);
+                    $month = $date->format('F');
+                    $day = $date->format('d');
+                    $months = [
+                        'January' => 'Enero',
+                        'February' => 'Febrero',
+                        'March' => 'Marzo',
+                        'April' => 'Abril',
+                        'May' => 'Mayo',
+                        'June' => 'Junio',
+                        'July' => 'Julio',
+                        'August' => 'Agosto',
+                        'September' => 'Septiembre',
+                        'October' => 'Octubre',
+                        'November' => 'Noviembre',
+                        'December' => 'Diciembre'
+                    ];
+                    $month = strtr($month, $months);
+                    $date = $day . ' de ' . $month;
                     $message = 'Hola, hemos contactado a tu proveedor con código ' .
                         $supplierCode . ' nos comunica que la carga será enviada el ' .
-                        $data['arrive_date_china'] . '.';
+                        $date . '.';
                     $this->db->select('telefono')
                         ->from($this->table_contenedor_cotizacion)
                         ->where('id', $idCotizacion);
