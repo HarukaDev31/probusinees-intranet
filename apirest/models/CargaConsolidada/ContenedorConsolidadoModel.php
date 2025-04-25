@@ -3255,7 +3255,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $this->phoneNumberId = $telefono;
             //message = cliente code supplieer qtyboxchina??qtybox
             $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
-                '📦 Tu carga del llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
+                '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
 
             $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
 
