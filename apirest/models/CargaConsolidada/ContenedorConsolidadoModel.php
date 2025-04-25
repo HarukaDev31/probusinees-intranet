@@ -1299,12 +1299,11 @@ class ContenedorConsolidadoModel extends CI_Model
     public function verifyContainerIsCompleted($idcontenedor)
     {
         //IF lista_embarque_url  && bl_file_url is no null set estado COMPLETADO ELSE RECIBIENDO
-        $this->db->select('lista_embarque_url,bl_file_url')
+        $this->db->select('lista_embarque_url')
             ->from($this->table)
             ->where('id', $idcontenedor);
         $query = $this->db->get();
         $listaEmbarque = $query->row()->lista_embarque_url;
-        $blFile = $query->row()->bl_file_url;
         //FIND IF EXISTS PROVEEDOR WITH ESTADOS = DATOS PROVEEDOR
         $this->db->select('estado')
             ->from($this->table_contenedor_cotizacion)
@@ -1318,7 +1317,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 break;
             }
         }
-        if ($listaEmbarque != null && $blFile != null) {
+        if ($listaEmbarque != null) {
             $this->db->set('estado_china', 'COMPLETADO');
         } else if ($estado == "DATOS PROVEEDOR") {
         } else {

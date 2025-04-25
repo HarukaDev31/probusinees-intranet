@@ -82,7 +82,8 @@ Search for
                     <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
                       <option value="0" selected>Todos</option>
                       <option value="PENDIENTE">PENDIENTE</option>
-                      <option value="RECIBIENDO">RECIBIENDO</option>
+                      <option value="CONTACTADO">CONTACTADO</option>
+                      <option value="INTERESADO">INTERESADO</option>
                       <option value="COMPLETADO">COMPLETADO</option>
                     </select>
                   </div>
