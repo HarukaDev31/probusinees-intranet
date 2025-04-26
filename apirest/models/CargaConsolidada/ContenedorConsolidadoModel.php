@@ -274,6 +274,8 @@ class ContenedorConsolidadoModel extends CI_Model
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
             $this->db->where($this->table_contenedor_cotizacion . '.id_usuario', $this->user->ID_Usuario);
+            //order by fecha_confirmacion asc
+
         }
         if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
@@ -292,7 +294,9 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->where('estado_cotizador', $this->input->post('Filtro_Estado'));
             }
         }
-
+        if ($this->user->No_Grupo == "Cotizador") {
+            $this->db->order_by('fecha_confirmacion', 'asc');
+        }
         $query = $this->db->get();
         return $query->result();
     }
@@ -341,15 +345,18 @@ class ContenedorConsolidadoModel extends CI_Model
                 ];
                 $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
-        }else if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
+        } else if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
             $this->db->where('main.id_usuario', $this->user->ID_Usuario);
-        }
-        
-        else {
+            $this->db->order_by('fecha_confirmacion', 'asc');
+
+        } else {
             if ($this->input->post('Filtro_Estado') != "0") {
 
                 $this->db->where('main.estado_cotizador', $this->input->post('Filtro_Estado'));
             }
+        }
+        if ($this->user->No_Grupo == "Cotizador") {
+            $this->db->order_by('main.fecha_confirmacion', 'asc');
         }
         $query = $this->db->get();
         return $query->result();
@@ -3519,12 +3526,15 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 ->where('products is null or products=""');
             $query = $this->db->get();
             $result = $query->result();
-            if (count($result) > 0) {
+            if (count($result) > 0 && $estado == "CONFIRMADO") {
 
                 return ['status' => "error", 'error' => "No se puede cambiar el estado a " . $estado . " hasta que todos los proveedores tengan productos"];
             }
             $this->db->where('id', $ID);
-            $this->db->update($this->table_contenedor_cotizacion, ['estado_cotizador' => $estado]);
+            $this->db->update($this->table_contenedor_cotizacion, [
+                'estado_cotizador' => $estado,
+                'fecha_confirmacion' => date('Y-m-d H:i:s')
+            ]);
             if ($this->db->error()['code'] != 0) {
                 return ['status' => "error", 'error' => $this->db->error()];
             }
