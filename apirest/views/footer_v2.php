@@ -270,7 +270,13 @@
 <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/consolidado.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
-  
+<?php if (isset($js_catalogo) && $js_catalogo==true) : ?>
+  <script src="<?php echo base_url() . 'dist_v2/js/utils/file_uploader.js?ver=' . $iControlVersionDashboard; ?>"></script>
+
+<script src="<?php echo base_url() . 'dist_v2/js/catalogo.js?ver=' . $iControlVersionDashboard; ?>"></script>
+
+<?php endif; ?>
+
 <?php if (isset($js_ccotizaciones) && $js_ccotizaciones==true) : ?>
   <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
@@ -329,7 +335,7 @@ socket.onclose = function(event) {
 
 socket.onmessage = function(event) {
   text="";
-  const {action}=JSON.parse(event.data);
+  const {action,message}=JSON.parse(event.data);
   console.log(event.data)
   if(action=="new-container"){
     text="El coordinador registro un nuevo contenedor"
@@ -337,6 +343,18 @@ socket.onmessage = function(event) {
       Swal.fire({
         title: "Nuevo contenedor",
         text: text,
+        icon: "info",
+        confirmButtonText: "Cerrar",
+      });
+    } else {
+      console.error("SweetAlert no está disponible");
+    }
+  }
+  if(action=="new-confirmado"){
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        title: "Prospecto Confirmado",
+        text: message,
         icon: "info",
         confirmButtonText: "Cerrar",
       });

@@ -3,10 +3,11 @@ apirest/logs/*
 
 backups/*
 !backups/.gitkeep
-assets/images/*
 
-apirest/config/database.php
+apirest/config/**
+
 assets/agente_compra/
 assets/uploads/
 assets/cargaconsolidada
 assets/downloads/*
+assets/images/*

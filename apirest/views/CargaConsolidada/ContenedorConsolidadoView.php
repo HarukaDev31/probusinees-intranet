@@ -4,10 +4,7 @@
 </script>
 <div class="content-wrapper">
   <!--set js variable = php variable-->
-  <script>
-    var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
-    localStorage.setItem("currentPrivilege", currentPrivilege);
-  </script>
+
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">
@@ -18,7 +15,7 @@
             &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
           </h1>
         </div>
-        <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion") {  ?>
+        <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Cotizador") {  ?>
 
           <!-- Buscador de la tabla -->
           <div class="col-7 col-xl-2 filter-contenedor">
@@ -142,7 +139,7 @@ Search for
             </div>
           </div>
 
-          <div class=" col-1 col-xl-1 dropdown px-0">
+          <div class=" col-12 col-xl-1 dropdown filter-contenedor">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -208,6 +205,7 @@ Filters
               <?php if (
                 $this->user->No_Grupo == "Coordinación"
                 || $this->user->No_Grupo == "Documentacion"
+                || $this->user->No_Grupo == "Cotizador"
               ) {
               ?>
                 <th>Carga</th>
@@ -229,6 +227,7 @@ Filters
                 <th>Month</th>
                 <th>Country</th>
                 <th>Cut off</th>
+
                 <th>Company</th>
                 <th style="min-width: 8em;">Status</th>
 
@@ -256,7 +255,7 @@ Filters
               <th>C. Destino</th>
               <th>Observaciones</th>
               <th>Ver</th>
-              
+
             </tr>
           </thead>
         </table>
@@ -644,20 +643,20 @@ Filters
             </div>
 
 
-          <!-- Buttons -->
-          <div class="flex pt-6 border-t mt-6 row">
-            <div class="col-9"></div>
-            <div class="col-3 d-flex justify-content-end gap-2">
-              <button type="submit" class="btn btn-primary btn-block btn-reporte btn-guardar-aduana">
-                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                  Guardar
-                <?php } else { ?>
-                  Save
-                <?php } ?>
-              </button>
+            <!-- Buttons -->
+            <div class="flex pt-6 border-t mt-6 row">
+              <div class="col-9"></div>
+              <div class="col-3 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary btn-block btn-reporte btn-guardar-aduana">
+                  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Guardar
+                  <?php } else { ?>
+                    Save
+                  <?php } ?>
+                </button>
 
+              </div>
             </div>
-          </div>
         </form>
       </div>
     </div>
@@ -744,11 +743,11 @@ Filters
                   <div class="d-flex align-items-center p-2" style="width:300px;">
                     <div class="d-flex" style="width:60%">Estado</div>
                     <div style="width: 200px;">
-                      <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
+                      <select id="txt-ID_Estado_Cotizacion" name="ID_Estado" class="form-control input-estado">
                         <option value="0" selected>Todos</option>
-                        <option value="PENDIENTE">WAITING</option>
-                        <option value="RECIBIENDO">RECEIVING</option>
-                        <option value="COMPLETADO">FINISH</option>
+                        <option value="PENDIENTE">PENDIENTE</option>
+                        <option value="RECIBIENDO">RECIBIENDO</option>
+                        <option value="COMPLETADO">COMPLETADO</option>
                       </select>
                     </div>
 
@@ -758,7 +757,7 @@ Filters
                 <!-- Botones -->
                 <div class="d-flex justify-content-around">
                   <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
-                  <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
+                  <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn-cotizacion">Aplicar</button>
                 </div>
               </div>
               <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -840,18 +839,28 @@ Search for
 
         <div class="col-12 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
-          <span>CBM Total Peru:</span>
+          <span>CBM Total:</span>
           <div class="">
             <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score" disabled></span></strong>
           </div>
         </div>
-        <div class="col-12 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
+          <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
+            <span>CBM Pendiente:</span>
+            <div class="">
+              <strong><span type="number" id="txt-CBM_Total_Pendiente" class="cbm_score" disabled></span></strong>
+            </div>
+          </div>
+        <?php } ?>
+        <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
-          <span>CBM Total China:</span>
+          <span>CBM Total:</span>
           <div class="">
             <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></span></strong>
           </div>
         </div>
+
       </div>
       <!-- Body de la tabla -->
       <div class="table-responsive">
@@ -892,7 +901,7 @@ Search for
               <?php } ?>
               <th style="min-width: 8em;" class="no-sort">Status</th>
               <th class="orderable">N.</th>
-              <th style="min-width: 14em;">Buyer</th>
+              <th style="min-width: 10em;">Buyer</th>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen" && $this->user->No_Grupo != "Documentacion") {  ?>
                 <th style="min-width: 8em;">Whatsapp</th>
                 <th
@@ -900,7 +909,7 @@ Search for
               <?php } ?>
 
               <th
-                style="min-width: 7em;"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                style="min-width: 10em;"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                   Productos
                 <?php } else { ?>
                   Products
@@ -914,7 +923,7 @@ Search for
               <th
                 style="min-width: 6em;">Supplier</th>
               <th
-                style="min-width: 6em;">C. Supplier</th>
+                style="min-width: 8em;">C. Supplier</th>
               <th
                 style="min-width: 8em;">P. Number</th>
               <th
@@ -1002,18 +1011,20 @@ Search for
             <th>DNI/RUC</th>
             <th>Correo</th>
             <th>Whatsapp</th>
-          <!-- <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
+            <!-- <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
             <th>Asesor</th>
           <?php } ?> -->
             <th>T. Cliente</th>
-          <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
-            <th>Volumen</th>
-            <th>Monto</th>
-            <th>Tarifa</th>
+            <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
+              <th>Volumen</th>
+              <th>Monto</th>
+              <th>Tarifa</th>
 
-            <th>Estados</th>
-          <?php } ?>
-            <th>Acciones</th>
+              <th>Estados</th>
+            <?php } ?>
+            <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
+              <th>Acciones</th>
+            <?php } ?>
           </tr>
         </thead>
       </table>
@@ -1044,23 +1055,23 @@ Search for
       <div class="col-xl-9 col-md-8"></div>
 
       <div class="col-12 col-md-2">
-        <?php if ($this->user->No_Grupo != "Documentacion"){ ?>
-        <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+        <?php if ($this->user->No_Grupo != "Documentacion") { ?>
+          <button type="button" id="btn-guardar-documentacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
               Guardar
             <?php } else { ?>
               Save
-            <?php } ?>  </button>
+            <?php } ?> </button>
         <?php } ?>
       </div>
 
       <div class="name_cliente col-12 p-6" style="border-bottom: #DFDFDF solid 2px;">
-              Nombre Cliente
+        Nombre Cliente
       </div>
 
     </div>
     <div class="documentos-clientes-tabs pt-6">
-              </div>
-              <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
+    </div>
+    <div class="container documentos-clientes-content mx-auto px-4 py-8 max-w-75 flex justify-content-center">
 
 
     </div>
@@ -1315,6 +1326,14 @@ Search for
                 Save
               <?php } ?> &nbsp; <i class="fa fa-save"></i>
             </div>
+            
+            <?php if ($this->user->No_Grupo == "GERENCIA") {  ?>
+              
+              <div id="btn-send-inspection">
+              <i class="fas fa-save"></i>
+              </div>
+
+            <?php } ?>
           </h2>
           <!--Button para guardar-->
 
@@ -2171,6 +2190,8 @@ Search for
     font-size: 28px !important;
     line-height: 30px;
     color: #272A30;
+    height: auto;
+    min-height: 150px;
   }
 
   button.swal2-confirm.swal2-styled.swal2-default-outline {
@@ -2405,7 +2426,9 @@ Search for
 
   #table-contenedor_wrapper.dt-buttons.btn-group.flex-wrap {
     display: none;
-  }.tab-cliente-documentacion{
+  }
+
+  .tab-cliente-documentacion {
     padding: 0.5em;
     border-radius: 0.5em;
     margin-bottom: 1em;
@@ -2417,13 +2440,16 @@ Search for
     cursor: pointer;
 
   }
-  .tab-cliente-documentacion.active{
+
+  .tab-cliente-documentacion.active {
     background-color: #FFFFFF;
     color: black;
     border-width: 0px;
 
-  }.documentos-clientes-tabs{
-    display:grid;
+  }
+
+  .documentos-clientes-tabs {
+    display: grid;
     grid-template-columns: repeat(8, 1fr);
     gap: 1em;
     margin: 1em 2em;
@@ -2450,7 +2476,11 @@ Search for
 
   #table-contenedor tbody tr {
     display: grid;
+<<<<<<< HEAD
     grid-template-columns: 2fr 1fr; /* Dos columnas iguales */
+=======
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+>>>>>>> feature/agente-compra-new
     margin-bottom: 16px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -2481,6 +2511,13 @@ Search for
     font-size: 20px;
     margin-right: -12px;
   }
+<<<<<<< HEAD
+=======
+  #btn-grd-doc-not{
+    order: 99;
+  }
+
+>>>>>>> feature/agente-compra-new
   .note-container-container{
     min-height: 10%;
     padding-bottom: 15%;
@@ -2491,6 +2528,7 @@ Search for
     bottom: 0%;
     left: 0%;
     order: 99;
+    bottom: 1%;
   }
 
   #txt-Id_Carga_Consolidada{
@@ -2501,6 +2539,7 @@ Search for
 
 .scroll-arrow {
   position: absolute;
+  top: 400px;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
   color: white;

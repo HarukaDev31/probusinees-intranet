@@ -22,7 +22,7 @@ var originalNoteInpectionText = "";
 var shouldSaveDocumentacion = false;
 var originalVolumenDocumento = "";
 var originalValorDocumento = "";
-var sectionsDisabled=false;
+var sectionsDisabled = false;
 var meses = [
   {
     id: "ENERO",
@@ -463,7 +463,7 @@ function deleteFile(fileId, cardElement, deleteFileList) {
     },
   });
 }
-function addFileToList(file, fileList = null, id = null,deleteHidden = false) {
+function addFileToList(file, fileList = null, id = null, deleteHidden = false) {
   if (fileList == null) {
     fileList = $(".file-lista");
   }
@@ -1356,6 +1356,8 @@ async function updateEstadoCotizacionProveedor(
         link.href = window.URL.createObjectURL(blob);
         link.download = `Cotizacion-${idCotizacion}.zip`;
         link.click();
+        //reload table 
+        reloadTableCotizacionEmbarque();
       },
       error: function () {
         //set current select previous status
@@ -1410,8 +1412,8 @@ async function view(id) {
   $("#btn-actualizar").show();
   currentCarga = result.id;
 }
-async function viewSteps(id, carga,disabled=false) {
-  sectionsDisabled=disabled;
+async function viewSteps(id, carga, disabled = false) {
+  sectionsDisabled = disabled;
   currentCargaNumber = carga;
   url = base_url + "CargaConsolidada/ContenedorConsolidado/steps/" + id;
   idContenedor = id;
@@ -1489,13 +1491,14 @@ async function deleteCarga(id) {
     icon: "warning",
     iconColor: "#FF0000",
     showCancelButton: true,
-    confirmButtonText: "Cancelar",
-    confirmButtonColor: "#00000000",
-    cancelButtonText: "Sí, eliminar",
-    cancelButtonColor: "#FF0000",
-    heihgtAuto: "false",
+
+    confirmButtonText: "Sí, eliminar",
+    confirmButtonColor: "#FF0000",
+    cancelButtonColor: "#000000",
+    cancelButtonText: "Cancelar",
   }).then((result) => {
-    if (result.isCancel) {
+    console.log(result)
+    if (result.isConfirmed) {
       url = base_url + "CargaConsolidada/ContenedorConsolidado/delete";
       $.ajax({
         url: url,
@@ -1505,7 +1508,7 @@ async function deleteCarga(id) {
         },
         success: function (response) {
           const result = JSON.parse(response);
-          if (result.status == 1) {
+          if (result.status == "success") {
             table_Entidad.ajax.reload();
             Swal.fire("Eliminado!", result.message, "success");
           } else {
@@ -1516,6 +1519,7 @@ async function deleteCarga(id) {
     }
   });
 }
+
 async function getTipoCliente() {
   url = base_url + "CargaConsolidada/ContenedorConsolidado/getTipoCliente";
   const response = await fetch(url);
@@ -1847,7 +1851,7 @@ async function showDocumentacionDocumentacionContainer(id) {
         });
       });
     }
-    if(sectionsDisabled){
+    if (sectionsDisabled) {
       $(".upload-button").prop("disabled", true);
       $("#btn-crear-documentacion-documentacion").hide();
     }
@@ -1947,6 +1951,31 @@ async function deleteCotizacionFile(id) {
     }
   });
 }
+async function updateRotulado(idCotizacion, idProveedor) {
+  url =
+    base_url +
+    "CargaConsolidada/ContenedorConsolidado/updateRotulado";
+  spinner.show();
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: {
+      idCotizacion: idCotizacion,
+      idProveedor: idProveedor,
+    },
+    success: function (response) {
+      const result = JSON.parse(response);
+      if (result.status == "success") {
+        Swal.fire(successConfig.title, result.message, "success");
+        //reload embarque table
+        reloadTableCotizacionEmbarque();
+      } else {
+        Swal.fire(errorConfig.title, result.message, "error");
+      }
+    },
+  });
+  spinner.hide();
+}
 async function deleteCotizacion(id) {
   Swal.fire({
     title: "¿Estás seguro?",
@@ -1990,7 +2019,7 @@ async function viewFormularioAduana() {
   $('#file-input-aduana').val('');
   files = JSON.parse(result[0].files);
   files.forEach((file) => {
-    addFileToList(file, null, 'file-lista-aduana',true);
+    addFileToList(file, null, 'file-lista-aduana', true);
   });
   spinner.hide();
   documentacionAduanaContainer.show();
@@ -2019,10 +2048,10 @@ async function viewFormularioAduana() {
     );
   }
   //disavle .input-aduana}
-  if(sectionsDisabled){
+  if (sectionsDisabled) {
     $(".input-aduana").prop("disabled", true);
-  $(".btn-guardar-aduana").hide();
-  $(".upload-button-aduana").hide();
+    $(".btn-guardar-aduana").hide();
+    $(".upload-button-aduana").hide();
   }
   // Control channel color indicator
   function updateChannelIndicator() {
@@ -2411,7 +2440,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "embarque";
-              data.estado = $("#txt-ID_Estado").val();
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
               validateListEmbarque(idContenedor);
               $(".input-date").datepicker({
                 autoclose: true,
@@ -2440,6 +2469,7 @@ const openStepFunction = async (step, id) => {
               format: "dd/mm/yyyy",
               dateFormat: "dd/mm/yyyy",
             });
+
           },
           drawCallback: function (settings) {
             $(".input-date").datepicker({
@@ -2687,7 +2717,7 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "embarque";
-                        data.estado = $("#txt-ID_Estado").val();
+                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
                         validateListEmbarque(idContenedor);
                         $(".input-date").datepicker({
                           autoclose: true,
@@ -2705,6 +2735,12 @@ const openStepFunction = async (step, id) => {
                         todayHighlight: true,
                         format: "dd/mm/yyyy",
                         dateFormat: "dd/mm/yyyy",
+                      });
+                    },
+                    complete: function () {
+                      $("#aplicar-btn-cotizacion").off("click");
+                      $("#aplicar-btn-cotizacion").click(function () {
+                        tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
                       });
                     },
                   });
@@ -2771,11 +2807,25 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "prospectos";
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
             },
             complete: async function () {
+              console.log("Init propectos")
               $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+              $("#aplicar-btn-cotizacion").off("click");
+              $("#aplicar-btn-cotizacion").click(function () {
+                if (currentTableCotizacion == "embarque") {
+                  tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                }
+                else {
+                  tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                }
+              });
               spinner.hide();
+              // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
+
               await getTableCotizacionEmbarqueHeaders();
+
             },
           },
           columnDefs: [
@@ -2807,6 +2857,16 @@ const openStepFunction = async (step, id) => {
       );
 
       await getTipoCliente();
+      if (
+        currentPrivilege == "Cotizador"
+      ) {
+        $("#txt-ID_Estado_Cotizacion").empty();
+        $("#txt-ID_Estado_Cotizacion").append(
+          '<option value="0">Todos</option>' +
+          '<option value="PENDIENTE">Pendiente</option>' +
+          '<option value="CONFIRMADO">Confirmado</option>'
+        );
+      }
     }
   } else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
     showDocumentacionDocumentacionContainer(id);
@@ -3067,7 +3127,7 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "variacion";
-                        data.estado = $("#txt-ID_Estado").val();
+                        data.Filtro_Estado = $("#txt-ID_Estado").val();
                         validateListEmbarque(idContenedor);
                       },
                     },
@@ -3140,7 +3200,7 @@ const openStepFunction = async (step, id) => {
             data.stepIndex = stepIndex;
             data.idContenedor = idContenedor;
             data.tipoTabla = "general";
-            data.estado = "0";
+            data.Filtro_Estado = "0";
           },
         },
 
@@ -3163,6 +3223,7 @@ const openStepFunction = async (step, id) => {
   }
   $(".btn-back-cotizacion").off("click");
   $(".btn-back-cotizacion").on("click", function () {
+    $("#Txt-ID_Estado_Cotizacion").val("0");
     if (currentPrivilege == "ContenedorAlmacen") {
       mainContainer.show();
       contentHeader.show();
@@ -3247,7 +3308,6 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
   $("." + searchInputClass).on("input", function () {
     var searchTerm = $(this).val(); // Obtener el valor del buscador
     table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
-    console.log(searchTerm);
   });
 
   // Actualizar el mensaje de información después de cada búsqueda
@@ -3624,6 +3684,7 @@ async function getTableCotizacionEmbarqueHeaders() {
   $("#cotizacion_name").val('#' + currentCargaNumber);
   $("#txt-CBM_Total_Peru").html(result.cbm_total);
   $("#txt-CBM_Total_China").html(result.cbm_total_china);
+  $("#txt-CBM_Total_Pendiente").html(result.cbm_total_pendiente);
   //if result.lista_embarque_url is not null add button to download else file input with button to upload remember remove and add event listener
   if (result.lista_embarque_url) {
     $("#packing-list-container").empty();
@@ -4252,8 +4313,8 @@ async function loadProviderData(index, parsed_proveedores_documentacion) {
     });
   }
 }
-async function viewClientesDocumentacion(id,nombrecliente=null) {
-  if(nombrecliente){
+async function viewClientesDocumentacion(id, nombrecliente = null) {
+  if (nombrecliente) {
     $(".name_cliente").text(nombrecliente);
   }
   $(".aditional-file").remove();
@@ -4282,15 +4343,15 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
   selectedTabDocumentacionId = !selectedTabDocumentacionId ? providers[0].id : selectedTabDocumentacionId;
 
   const filesAlmacenDocumentacion = JSON.parse(result.files_almacen_documentacion || "[]");
-  const filesAlmacenInspection= JSON.parse(result.files_almacen_inspection || "[]");
-  const filesF= JSON.parse(result.files || "[]");
+  const filesAlmacenInspection = JSON.parse(result.files_almacen_inspection || "[]");
+  const filesF = JSON.parse(result.files || "[]");
   const filteredFiles = filesAlmacenDocumentacion.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
   const filteredFilesInspection = filesAlmacenInspection.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
-  const filtFiles=filesF.filter(
+  const filtFiles = filesF.filter(
     (file) => file.id_proveedor === selectedTabDocumentacionId
   );
   // Mostrar los archivos en la interfaz
@@ -4346,9 +4407,9 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
     let excelDiv = "";
     let facturaComercial = provider.factura_comercial;
     let excelConfirmacion = provider.excel_confirmacion;
-    let packingList= provider.packing_list;
-    if (currentPrivilege != "Documentacion"){
-    $(".documentos-clientes-content").append(`<div class="flex gap-8">
+    let packingList = provider.packing_list;
+    if (currentPrivilege != "Documentacion") {
+      $(".documentos-clientes-content").append(`<div class="flex gap-8">
         <div class="bg-white p-6 rounded-lg shadow-md" style="width:60%">
           <div class="flex items-center gap-2 mb-6
           justify-between">
@@ -4430,59 +4491,59 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
           </div>
         </div></div>`);
 
-    $("#cotizacion_file_url").off("click").on("click", function () {
-      if (result.cotizacion_file_url) {
-        window.open(result.cotizacion_file_url);
-      } else {
-        Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
-      }
-    });
-    $("#cotizacion_final_url").off("click").on("click", function () {
-      if (result.cotizacion_final_url) {
-        window.open(result.cotizacion_final_url);
-      } else {
-        Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
-      }
-    });
-    $(".btn-crear-documentacion-cliente").off("click");
-    $(".btn-crear-documentacion-cliente").on("click", function () {
-      const providerId = $(this).data("id");
-      Swal.fire({
-        title: "Crear nuevo documento",
-        html: `
+      $("#cotizacion_file_url").off("click").on("click", function () {
+        if (result.cotizacion_file_url) {
+          window.open(result.cotizacion_file_url);
+        } else {
+          Swal.fire("Error", "No hay un enlace disponible para la cotización.", "error");
+        }
+      });
+      $("#cotizacion_final_url").off("click").on("click", function () {
+        if (result.cotizacion_final_url) {
+          window.open(result.cotizacion_final_url);
+        } else {
+          Swal.fire("Error", "No hay un enlace disponible para la cotización final.", "error");
+        }
+      });
+      $(".btn-crear-documentacion-cliente").off("click");
+      $(".btn-crear-documentacion-cliente").on("click", function () {
+        const providerId = $(this).data("id");
+        Swal.fire({
+          title: "Crear nuevo documento",
+          html: `
                 <input type="text" id="swal-input1" class="swal2-input" placeholder="Nombre del documento">
                 <input type="file" id="swal-input2" class="swal2-file" accept=".pdf, .doc, .docx, .xls, .xlsx, .png, .jpg, .jpeg" placeholder="Selecciona un archivo">
             `,
-        showCancelButton: true,
-        confirmButtonText: "Subir",
-        preConfirm: async () => {
-          const name = document.getElementById("swal-input1").value;
-          const file = document.getElementById("swal-input2").files[0];
-          if (!name || !file) {
-            Swal.showValidationMessage("Por favor, completa todos los campos");
-            return;
-          }
-          const formData = new FormData();
-          formData.append("name", name);
-          formData.append("file", file);
-          formData.append("id_cotizacion", idCotizacion);
-          formData.append("id_proveedor", providerId);
-          const response = await fetch(
-            base_url +
-            "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
-            {
-              method: "POST",
-              body: formData,
+          showCancelButton: true,
+          confirmButtonText: "Subir",
+          preConfirm: async () => {
+            const name = document.getElementById("swal-input1").value;
+            const file = document.getElementById("swal-input2").files[0];
+            if (!name || !file) {
+              Swal.showValidationMessage("Por favor, completa todos los campos");
+              return;
             }
-          );
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("file", file);
+            formData.append("id_cotizacion", idCotizacion);
+            formData.append("id_proveedor", providerId);
+            const response = await fetch(
+              base_url +
+              "CargaConsolidada/ContenedorConsolidado/createClienteDocumentacion",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
 
-          const result = await response.json();
-          console.log(result, "result");
-          if (result.status === "success") {
-            Swal.fire("¡Documento subido!", result.message, "success");
-            console.log(name, "name");
-            // Agregar dinámicamente el nuevo documento al DOM
-            const newDocument = `
+            const result = await response.json();
+            console.log(result, "result");
+            if (result.status === "success") {
+              Swal.fire("¡Documento subido!", result.message, "success");
+              console.log(name, "name");
+              // Agregar dinámicamente el nuevo documento al DOM
+              const newDocument = `
             ${name}
             <div class="col-12 col-sm-12 file-info-container">
               <div class="form-group">
@@ -4502,33 +4563,33 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
             </div>
           `;
 
-            // Validar que el HTML sea válido antes de agregarlo al DOM
-            try {
-              $("#documentos-clientes-documentacion").append(newDocument);
+              // Validar que el HTML sea válido antes de agregarlo al DOM
+              try {
+                $("#documentos-clientes-documentacion").append(newDocument);
 
-              // Agregar funcionalidad al botón de borrar
+                // Agregar funcionalidad al botón de borrar
 
-            } catch (error) {
-              console.error("Error al procesar el HTML del nuevo documento:", error);
-              Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
+              } catch (error) {
+                console.error("Error al procesar el HTML del nuevo documento:", error);
+                Swal.fire("Error", "Hubo un problema al agregar el documento al DOM.", "error");
+              }
+            } else {
+              Swal.fire("Error", result.message, "error");
+              // Si ocurre un error en el servidor, eliminar el archivo subido
+              if (fileInput.dataset.fileId) {
+                deleteClienteDocumentacionFile(fileInput.dataset.fileId);
+              }
+
             }
-          } else {
-            Swal.fire("Error", result.message, "error");
-            // Si ocurre un error en el servidor, eliminar el archivo subido
-            if (fileInput.dataset.fileId) {
-              deleteClienteDocumentacionFile(fileInput.dataset.fileId);
-            }
-
-          }
-        },
+          },
+        });
       });
-    });
-    $(".aditional-file").remove();
-    filteredFilesF.forEach((file) => {
-      if(!file.file_url){
-        return; // Exit the current function instead of using 'continue'
-      }
-      $("#form-documentacion").append(`<div class="aditional-file">
+      $(".aditional-file").remove();
+      filteredFilesF.forEach((file) => {
+        if (!file.file_url) {
+          return; // Exit the current function instead of using 'continue'
+        }
+        $("#form-documentacion").append(`<div class="aditional-file">
            
             ${file.folder_name}
             <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
@@ -4549,35 +4610,35 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
                 </div>
             </div>
             </div>`);
-      const fileIconLink = $(`#file-icon-link-${file.id}`)[0];
-      if (fileIconLink) {
-        const fileExtension = (file.file_url).split('.').pop().toLowerCase();
-        if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
-          // Agregar estilo de cursor: pointer
-          fileIconLink.style.cursor = 'pointer';
+        const fileIconLink = $(`#file-icon-link-${file.id}`)[0];
+        if (fileIconLink) {
+          const fileExtension = (file.file_url).split('.').pop().toLowerCase();
+          if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+            // Agregar estilo de cursor: pointer
+            fileIconLink.style.cursor = 'pointer';
 
-          // Agregar evento de clic para mostrar la vista previa
-          fileIconLink.addEventListener('click', (event) => {
-            event.preventDefault(); // Evitar comportamiento predeterminado del enlace
+            // Agregar evento de clic para mostrar la vista previa
+            fileIconLink.addEventListener('click', (event) => {
+              event.preventDefault(); // Evitar comportamiento predeterminado del enlace
 
-            // Mostrar la imagen en el modal
-            const modal = document.getElementById('image-modal');
-            const modalImage = modal.querySelector('#image-preview');
-            modalImage.src = (file.file_url);
-            const bootstrapModal = new bootstrap.Modal(modal);
-            bootstrapModal.show();
-          });
-        } else {
-          // Si no es una imagen, redirigir al archivo
-          fileIconLink.href = (file.file_url);
-          fileIconLink.target = '_blank';
+              // Mostrar la imagen en el modal
+              const modal = document.getElementById('image-modal');
+              const modalImage = modal.querySelector('#image-preview');
+              modalImage.src = (file.file_url);
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+            });
+          } else {
+            // Si no es una imagen, redirigir al archivo
+            fileIconLink.href = (file.file_url);
+            fileIconLink.target = '_blank';
+          }
         }
-      }
 
-    });
-  }else{
-    // Vista para otros usuarios (como en la imagen)
-    $(".documentos-clientes-content").append(`
+      });
+    } else {
+      // Vista para otros usuarios (como en la imagen)
+      $(".documentos-clientes-content").append(`
       <div class="flex col-4 h-25">
         <div class="bg-white rounded-lg shadow-md w-100">
           <div class="p-6" style="border-bottom:solid 2px #DFDFDF;">
@@ -4594,13 +4655,13 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
               <p>Factura Comercial</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${facturaComercial
-                  ? `
+          ? `
                     <div class="file-iconic">${getIconByType(facturaComercial.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(facturaComercial.split('_').pop())}</span>
                     </div>
                   `
-                  : `
+          : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
@@ -4610,13 +4671,13 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
               <p>Excel Confirmacion</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${excelConfirmacion
-                  ? `
+          ? `
                     <div class="file-iconic">${getIconByType(excelConfirmacion.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(excelConfirmacion.split('_').pop())}</span>
                     </div>
                   `
-                  : `
+          : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
@@ -4667,15 +4728,15 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
         </div>
       </div>
     `);
-    filteredFiles.forEach((file)=>{
-      addFileToList(file,null,'file-lista-documentacion-documentacion',true)
-    })
-    filteredFilesInspection.forEach((file)=>{
-      addFileToList(file,null,'file-lista-documentacion-inspection',true)
-    })
-  }
+      filteredFiles.forEach((file) => {
+        addFileToList(file, null, 'file-lista-documentacion-documentacion', true)
+      })
+      filteredFilesInspection.forEach((file) => {
+        addFileToList(file, null, 'file-lista-documentacion-inspection', true)
+      })
+    }
 
-    
+
     if (!facturaComercial) {
       facturaDiv = `
         Factura Comercial
@@ -4948,7 +5009,7 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
         ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg"]
       );
     }
-    if(!packingList) {
+    if (!packingList) {
       setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg']);
     }
     $("#file-input-factura").on("change", function () {
@@ -4963,14 +5024,14 @@ async function viewClientesDocumentacion(id,nombrecliente=null) {
     // const filesDoc = JSON.parse(result[0].files_almacen_documentacion ?? "[]");
     // const files = JSON.parse(result.files_almacen_documentacion ?? "[]");
     // const filesFilter = files.filter((file) => file.id_proveedor == selectedTabDocumentacionId);
-    
+
     // //for each file add a col with a link to download and delete icon  in collapse-documentacion
     // filesFilter.forEach((file) => {
     //   if(!file.file_url){
     //     return; // Exit the current function instead of using 'continue'
     //   }
     //   $("#form-documentacion").append(`
-           
+
     //         ${file.folder_name}
     //         <div class="col-12 col-sm-12" id="single-file-upload-confirmacion">
     //             <div class="form-group">
@@ -5274,7 +5335,7 @@ $(document).ready(async function () {
   documentacionDocumentacionContainer.hide();
   documentacionAduanaContainer = $("#documentacion-aduana-container");
   documentacionAduanaContainer.hide();
- 
+
   try {
     $(".export-pdf-main-content").off("click");
     $(".export-pdf-main-content").on("click", function () {
@@ -5298,117 +5359,230 @@ $(document).ready(async function () {
 
   //if current windows route includes listarCompletados hide .filter-contenedor 
 
- 
+
   if (window.location.href.includes("listarCompletados")) {
     $(".filter-contenedor").hide();
 
     $("#table-contenedor-completados").show();
-    $("#table-contenedor").hide();
 
     url = base_url + "CargaConsolidada/ContenedorConsolidado/indexCompletados";
-    table_Entidad = $("#table-contenedor-completados").DataTable({
-      dom:
-        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      buttons: [
-        {
-          extend: "excel",
-          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-          titleAttr: "Excel",
-          exportOptions: {
-            columns: ":visible",
+
+    if (currentPrivilege == "Documentacion") {
+
+      $("#table-contenedor").html("");
+      table_Entidad = $("#table-contenedor-completados").DataTable({
+        dom:
+          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+        buttons: [
+          {
+            extend: "excel",
+            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+            titleAttr: "Excel",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-excel-main",
+              class: "hidden",
+            },
           },
-          attr: {
-            id: "export-excel-main",
-            class: "hidden",
+          {
+            extend: "pdf",
+            text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+            titleAttr: "PDF",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-pdf-main",
+              class: "hidden",
+            },
+          },
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+            titleAttr: "Columnas",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              class: "hidden",
+            },
+          },
+        ],
+        paging: true,
+        lengthChange: true,
+        searching: false,
+        ordering: false,
+        info: true,
+        autoWidth: false,
+        responsive: false,
+        serverSide: false,
+        pagingType: "full_numbers",
+        oLanguage: {
+          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+          sLengthMenu: "_MENU_",
+          sSearch: "Buscar por: ",
+          sSearchPlaceholder: "",
+          sZeroRecords: "No se encontraron registros",
+          sInfoEmpty: "No hay registros",
+          sLoadingRecords: "Cargando...",
+          sProcessing: "Procesando...",
+          oPaginate: {
+            sFirst: "<<",
+            sLast: ">>",
+            sPrevious: "<",
+            sNext: ">",
           },
         },
-        {
-          extend: "pdf",
-          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-          titleAttr: "PDF",
-          exportOptions: {
-            columns: ":visible",
+        ajax: {
+          url: url,
+          type: "POST",
+          dataType: "JSON",
+          data: function (data) {
+            data.Filtro_Estado = $("#txt-ID_Estado").val();
+            data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+            data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+            //if url contains listarCompletados 
+
           },
-          attr: {
-            id: "export-pdf-main",
-            class: "hidden",
-          },
-        },
-        {
-          extend: "colvis",
-          text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-          titleAttr: "Columnas",
-          exportOptions: {
-            columns: ":visible",
-          },
-          attr: {
-            class: "hidden",
+          complete: function () {
+            $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
           },
         },
-      ],
-      paging: true,
-      lengthChange: true,
-      searching: false,
-      ordering: false,
-      info: true,
-      autoWidth: false,
-      responsive: false,
-      serverSide: false,
-      pagingType: "full_numbers",
-      oLanguage: {
-        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-        sLengthMenu: "_MENU_",
-        sSearch: "Buscar por: ",
-        sSearchPlaceholder: "",
-        sZeroRecords: "No se encontraron registros",
-        sInfoEmpty: "No hay registros",
-        sLoadingRecords: "Cargando...",
-        sProcessing: "Procesando...",
-        oPaginate: {
-          sFirst: "<<",
-          sLast: ">>",
-          sPrevious: "<",
-          sNext: ">",
+        columnDefs: [
+          {
+            targets: "no-hidden",
+            visible: false,
+          },
+          {
+            className: "text-center",
+            targets: "no-sort",
+            orderable: false,
+          },
+          {
+            targets: "",
+            orderable: false,
+          },
+        ],
+        pageLength: 100, // Mostrar 100 elementos por página
+        lengthMenu: [
+          [100, 1000, -1],
+          [100, 1000, "Todos"],
+        ],
+      });
+    } else {
+      $("#table-contenedor-completados").html("");
+      table_Entidad = $("#table-contenedor").DataTable({
+        dom:
+          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+        buttons: [
+          {
+            extend: "excel",
+            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+            titleAttr: "Excel",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-excel-main",
+              class: "hidden",
+            },
+          },
+          {
+            extend: "pdf",
+            text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+            titleAttr: "PDF",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              id: "export-pdf-main",
+              class: "hidden",
+            },
+          },
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+            titleAttr: "Columnas",
+            exportOptions: {
+              columns: ":visible",
+            },
+            attr: {
+              class: "hidden",
+            },
+          },
+        ],
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: false,
+        info: false,
+        autoWidth: false,
+        responsive: false,
+        serverSide: false,
+        pagingType: "full_numbers",
+        oLanguage: {
+          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+          sLengthMenu: "_MENU_",
+          sSearch: "Buscar por: ",
+          sSearchPlaceholder: "",
+          sZeroRecords: "No se encontraron registros",
+          sInfoEmpty: "No hay registros",
+          sLoadingRecords: "Cargando...",
+          sProcessing: "Procesando...",
+          oPaginate: {
+            sFirst: "<<",
+            sLast: ">>",
+            sPrevious: "<",
+            sNext: ">",
+          },
         },
-      },
-      ajax: {
-        url: url,
-        type: "POST",
-        dataType: "JSON",
-        data: function (data) {
-          data.Filtro_Estado = $("#txt-ID_Estado").val();
-          data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
-          data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
-          //if url contains listarCompletados 
-  
+        ajax: {
+          url: url,
+          type: "POST",
+          dataType: "JSON",
+          data: function (data) {
+            data.Filtro_Estado = $("#txt-ID_Estado").val();
+            data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+            data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+            //if url contains listarCompletados 
+
+          },
+          complete: function () {
+            $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+            $("#aplicar-btn").off("click");
+            $("#aplicar-btn").click(function () {
+              table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+            });
+          },
         },
-        complete: function () {
-          $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-        },
-      },
-      columnDefs: [
-        {
-          targets: "no-hidden",
-          visible: false,
-        },
-        {
-          className: "text-center",
-          targets: "no-sort",
-          orderable: false,
-        },
-        {
-          targets: "",
-          orderable: false,
-        },
-      ],
-      pageLength: 100, // Mostrar 100 elementos por página
-      lengthMenu: [
-        [100, 1000, -1],
-        [100, 1000, "Todos"],
-      ],
-    });
+        columnDefs: [
+          {
+            targets: "no-hidden",
+            visible: false,
+          },
+          {
+            className: "text-center",
+            targets: "no-sort",
+            orderable: false,
+          },
+          {
+            targets: "",
+            orderable: false,
+          },
+        ],
+        pageLength: 100, // Mostrar 100 elementos por página
+        lengthMenu: [
+          [100, 1000, -1],
+          [100, 1000, "Todos"],
+        ],
+      });
+    }
   } else {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     table_Entidad = $("#table-contenedor").DataTable({
@@ -5487,10 +5661,14 @@ $(document).ready(async function () {
           data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
           data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
           //if url contains listarCompletados 
-  
+
         },
         complete: function () {
           $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+          $("#aplicar-btn").off("click");
+          $("#aplicar-btn").click(function () {
+            table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+          });
         },
       },
       columnDefs: [
@@ -5526,7 +5704,44 @@ $(document).ready(async function () {
 
   $("#upload-documents").click(() => $("#upload-input-documents").click());
   $("#upload-inspection").click(() => $("#upload-input-inspection").click());
-
+  $("#btn-send-inspection").click(() => {
+    //ajax to forceSendRotulado/currENTProviderId
+    const url = base_url + "CargaConsolidada/ContenedorConsolidado/forceSendRotulado/" + currentProveedor;
+    $.ajax({
+      url: url,
+      type: "POST",
+      dataType: "JSON",
+      success: function (response) {
+        if (response.status) {
+          Swal.fire({
+            title: "Éxito",
+            text: response.message,
+            icon: "success",
+            confirmButtonText: "Aceptar",
+          }).then(() => {
+            // Reload the page or perform any other action
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: response.message,
+            icon: "error",
+            confirmButtonText: "Aceptar",
+          });
+        }
+      },
+      error: function (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          title: "Error",
+          text: "Ocurrió un error al enviar la solicitud.",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        });
+      },
+    });
+  });
+      
   // Listeners para subir archivos
   $('#btn-guardar-doc-not').click(async () => {
     try {
@@ -6594,7 +6809,7 @@ window.addEventListener("load", () => {
       }
       if (action == "new-cotizacion") {
         //confirm swall
-        text = "El coordinador registro un nuevo prospecto";
+        text = "Prospecto Confirmado";
         //check if mainContainer is visible
         if (cotizacionContainer.is(":visible")) {
           text += "¿Desea actualizar?";
@@ -6621,6 +6836,32 @@ window.addEventListener("load", () => {
         }
       }
       if (action == "cambio-estado-proveedor") {
+        if ($("#table-cotizacion-embarque").is(":visible")) {
+          text = "Actualización de estado de proveedor";
+          text += "¿Desea actualizar?";
+          Swal.fire({
+            title: "Cambio de estado",
+            text: message,
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Si",
+            cancelButtonText: "Cerrar",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              tableCotizacionEmbarque.ajax.reload();
+            }
+          });
+        } else {
+          //show alert swall
+          Swal.fire({
+            title: "Cambio de estado",
+            text: message,
+            icon: "info",
+            confirmButtonText: "Cerrar",
+          });
+        }
+      }
+      if (action=="new-confirmado"){
         if ($("#table-cotizacion-embarque").is(":visible")) {
           text = "Actualización de estado de proveedor";
           text += "¿Desea actualizar?";
@@ -6731,7 +6972,7 @@ function getIconByType(typeOrExtension) {
 }
 async function showObservaciones(id) {
   spinner.show();
-  url=base_url+"CargaConsolidada/ContenedorConsolidado/getObservaciones/"+id;
+  url = base_url + "CargaConsolidada/ContenedorConsolidado/getObservaciones/" + id;
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -6739,8 +6980,8 @@ async function showObservaciones(id) {
     }
   });
   const data = await response.json();
-  const files=JSON.parse(data.data.files);
-  const observaciones=data.data.observaciones;
+  const files = JSON.parse(data.data.files);
+  const observaciones = data.data.observaciones;
   spinner.hide();
   //SHOW SWALL WITH DATA
   if (data.status) {
@@ -6760,7 +7001,7 @@ async function showObservaciones(id) {
 
       showCloseButton: false,
       showCancelButton: true,
-      showConfirmButton:false,
+      showConfirmButton: false,
 
       focusConfirm: false,
       confirmButtonText: 'Cerrar',
@@ -6768,7 +7009,7 @@ async function showObservaciones(id) {
     });
   }
   files.forEach((file) => {
-    addFileToList(file, null,'file-lista-observaciones',true);
+    addFileToList(file, null, 'file-lista-observaciones', true);
   });
 
 }
@@ -6911,7 +7152,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
 // Funcion para subir archivos multiples
 
-function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], automaticUpload = false) {
+function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], automaticUpload = false,removeFileButtonId = '.remove-file-button') {
   const container = document.getElementById(containerId);
   const fileInput = $(`#${inputId}`)[0];
   const fileLabel = container.querySelector('.file-label');
@@ -6953,7 +7194,10 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
           <div class="file-icon-container"> 
             <div class="file-icon" style="cursor: pointer;">${fileIcon}</div>
             <p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
-            <div class="remove-file-button" data-index="${index}">
+            <div class="remove-file-button"
+            id="remove-file-button-${index}"
+            data-id="${index}"
+            data-index="${index}">
               <i class="fas fa-trash"></i>
             </div>
           </div>
@@ -7011,7 +7255,7 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
       // Convertir FileList a un array para poder eliminar el archivo
       const files = Array.from(fileInput.files);
       files.splice(index, 1); // Eliminar el archivo del array
-
+      $(".file-list-item").remove(); // Eliminar el elemento de la lista
       // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
       const dataTransfer = new DataTransfer();
       files.forEach((file) => dataTransfer.items.add(file));
@@ -7038,23 +7282,265 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   fileLabel.addEventListener('drop', (e) => {
     e.preventDefault();
     fileLabel.style.borderColor = '#cccccc';
+    
     if (e.dataTransfer.files.length > 0) {
-      // Asignar los archivos arrastrados al input
-      fileInput.files = e.dataTransfer.files;
-
-      // Mostrar la lista de archivos
-      fileInput.dispatchEvent(new Event('change'));
+      // Convertir FileList existente y nuevos archivos a arrays
+      const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
+      const newFiles = Array.from(e.dataTransfer.files);
+      
+      // Filtrar y validar los nuevos archivos
+      const validFiles = newFiles.filter(file => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedFileTypes.includes(fileType) || allowedFileTypes.includes(fileExtension);
+      });
+      
+      if (validFiles.length !== newFiles.length) {
+        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
+      }
+      
+      if (validFiles.length > 0) {
+        // Combinar archivos existentes con los nuevos válidos
+        const combinedFiles = [...existingFiles, ...validFiles];
+        
+        // Crear nuevo FileList usando DataTransfer
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        
+        // Limpiar la lista antes de volver a renderizar
+        $(".file-list-item").remove(); // Eliminar el elemento de la lista
+        
+        // Disparar el evento change para mostrar los archivos
+        fileInput.dispatchEvent(new Event('change'));
+      }
     }
   });
   if (removeFileButton) {
     removeFileButton.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log(e.target, "removeFileButton");
+      //get item id from data attribute
+      const index = e.target.dataset.index || e.target.closest('.remove-file-button').dataset.index;
+
       //remove most close file input and remove this from input file
       $(e.target).closest('.file-item').remove();
 
     });
   }
+}
+function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], automaticUpload = false, removeFileButtonId = '.remove-file-button') {
+  const container = document.getElementById(containerId);
+  const fileInput = $(`#${inputId}`)[0];
+  const fileLabel = container.querySelector('.file-label');
+  const fileList = container.querySelector('.file-lista');
+  const uploadButton = container.querySelector('.upload-button');
+  
+  // Abrir el diálogo de selección de archivos al hacer clic en el botón
+  uploadButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Guardamos una referencia a los archivos existentes
+    const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
+    
+    // Reseteamos el input para que se pueda seleccionar el mismo archivo múltiples veces
+    // y almacenamos el listener original
+    const originalChangeHandler = fileInput.onchange;
+    fileInput.value = "";
+    
+    // Creamos un nuevo manejador para el evento change
+    fileInput.onchange = function(event) {
+      // Obtener los nuevos archivos seleccionados
+      const newFiles = Array.from(event.target.files);
+      
+      // Filtrar y validar los nuevos archivos
+      const validFiles = newFiles.filter(file => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedFileTypes.length === 0 || 
+               allowedFileTypes.includes(fileType) || 
+               allowedFileTypes.includes(fileExtension);
+      });
+      
+      if (validFiles.length !== newFiles.length) {
+        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
+      }
+      
+      if (validFiles.length > 0) {
+        // Combinar archivos existentes con los nuevos válidos
+        const combinedFiles = [...existingFiles, ...validFiles];
+        
+        // Crear nuevo FileList usando DataTransfer
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        
+        // Limpiar la lista visual de archivos
+        fileList.innerHTML = '';
+        
+        // Restaurar el manejador original
+        fileInput.onchange = originalChangeHandler;
+        
+        // Ahora actualizamos la vista manualmente
+        updateFileListView(fileInput.files, fileList, allowedFileTypes);
+      }
+    };
+    
+    // Ahora abrimos el selector de archivos
+    fileInput.click();
+  });
+  
+  // Función para actualizar la vista de la lista de archivos
+  function updateFileListView(files, listElement, allowedTypes) {
+    if (files.length > 0) {
+      listElement.classList.remove('hidden');
+      
+      // Recorrer los archivos seleccionados
+      Array.from(files).forEach((file, index) => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        
+        // Determinar el ícono correspondiente usando getIconByType
+        const fileIcon = getIconByType(fileType || fileExtension);
+        
+        // Crear un elemento de lista para cada archivo
+        const fileItem = document.createElement('div');
+        fileItem.classList.add('file-list-item');
+        
+        // Mostrar el nombre y el tamaño del archivo
+        fileItem.innerHTML = `
+          <div class="file-icon-container"> 
+            <div class="file-icon" style="cursor: pointer;">${fileIcon}</div>
+            <p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
+            <div class="remove-file-button"
+            id="remove-file-button-${index}"
+            data-id="${index}"
+            data-index="${index}">
+              <i class="fas fa-trash"></i>
+            </div>
+          </div>
+        `;
+        
+        // Agregar el elemento a la lista
+        listElement.appendChild(fileItem);
+        
+        // Agregar funcionalidad de vista previa para imágenes y videos
+        if (fileType.startsWith('image/') || fileType.startsWith('video/')) {
+          const fileIconElement = fileItem.querySelector('.file-icon');
+          fileIconElement.style.cursor = 'pointer';
+          fileIconElement.addEventListener('click', () => {
+            if (fileType.startsWith('image/')) {
+              // Mostrar la imagen en el modal
+              const modal = document.getElementById('image-modal');
+              const modalImage = modal.querySelector('#image-preview');
+              modalImage.src = URL.createObjectURL(file);
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+            } else if (fileType.startsWith('video/')) {
+              // Mostrar el video en el modal
+              const modal = document.getElementById('video-modal');
+              const modalVideo = modal.querySelector('#video-preview');
+              modalVideo.src = URL.createObjectURL(file);
+              modalVideo.load(); // Cargar el video
+              const bootstrapModal = new bootstrap.Modal(modal);
+              bootstrapModal.show();
+
+              // Detener el video cuando se haga clic fuera del modal
+              modal.addEventListener('click', (e) => {
+                if (e.target === modal) { // Verifica si el clic fue en el fondo del modal
+                  modalVideo.pause(); // Pausar el video
+                  modalVideo.currentTime = 0; // Reiniciar el video al inicio
+                  bootstrapModal.hide(); // Cerrar el modal
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  }
+  
+  // Mostrar la lista de archivos seleccionados (evento change original)
+  fileInput.addEventListener('change', (e) => {
+    if (fileInput.files.length > 0) {
+      // Usamos nuestra función auxiliar para actualizar la vista
+      updateFileListView(fileInput.files, fileList, allowedFileTypes);
+    }
+  });
+  
+  // Manejar la eliminación de archivos individuales
+  fileList.addEventListener('click', (e) => {
+    if (
+      e.target.classList.contains('remove-file-button') ||
+      e.target.closest('.remove-file-button')
+    ) {
+      const index = parseInt(
+        e.target.dataset.index ||
+        e.target.closest('.remove-file-button').dataset.index
+      );
+
+      // Convertir FileList a un array para poder eliminar el archivo
+      const files = Array.from(fileInput.files);
+      files.splice(index, 1); // Eliminar el archivo del array
+      
+      // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
+      const dataTransfer = new DataTransfer();
+      files.forEach((file) => dataTransfer.items.add(file));
+      fileInput.files = dataTransfer.files;
+
+      // Limpiar la lista visual y actualizarla
+      fileList.innerHTML = '';
+      updateFileListView(fileInput.files, fileList, allowedFileTypes);
+    }
+  });
+
+  // Manejar el arrastre de archivos
+  fileLabel.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#007bff';
+  });
+
+  fileLabel.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#cccccc';
+  });
+
+  fileLabel.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileLabel.style.borderColor = '#cccccc';
+    
+    if (e.dataTransfer.files.length > 0) {
+      // Convertir FileList existente y nuevos archivos a arrays
+      const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
+      const newFiles = Array.from(e.dataTransfer.files);
+      
+      // Filtrar y validar los nuevos archivos
+      const validFiles = newFiles.filter(file => {
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedFileTypes.length === 0 || 
+               allowedFileTypes.includes(fileType) || 
+               allowedFileTypes.includes(fileExtension);
+      });
+      
+      if (validFiles.length !== newFiles.length) {
+        alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
+      }
+      
+      if (validFiles.length > 0) {
+        // Combinar archivos existentes con los nuevos válidos
+        const combinedFiles = [...existingFiles, ...validFiles];
+        
+        // Crear nuevo FileList usando DataTransfer
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        
+        // Limpiar la lista y actualizarla
+        fileList.innerHTML = '';
+        updateFileListView(fileInput.files, fileList, allowedFileTypes);
+      }
+    }
+  });
 }
 
 function updateTableScrollArrows(tableWrapper, leftArrow, rightArrow) {
@@ -7372,6 +7858,6 @@ function applyDynamicStylesForTableRows() {
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 
 
-setupMultiFileUpload("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4']);
+setupMultiFileUploadv2("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'],false,'#remove-file-button-inspeccion');
 setupMultiFileUpload("multiple-file-upload-aduana", "file-input-aduana", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);

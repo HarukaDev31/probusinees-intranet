@@ -8,6 +8,7 @@ class ContenedorConsolidado extends CI_Controller
 	private $file_path = '../assets/images/logos/';
 	private $logo_cliente_path = '../assets/images/logos/';
 	private $logo_cliente_logos_empresa_almacen_path = '../assets/images/logos_empresa_almacen/';
+	private $roleGerencia = "GERENCIA";
 	function __construct()
 	{
 		try {
@@ -77,14 +78,16 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
-			if ($this->user->No_Grupo == "Coordinación") {
+			if (
+				$this->user->No_Grupo == "Coordinación"
+				|| $this->user->No_Grupo == "Cotizador"
+			) {
 				$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 				$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 			}
-
 			$subdata[] = $row->empresa;
 			if ($this->user->No_Grupo == "ContenedorAlmacen") {
-				$divEstado = '<select
+				$divEstado = '<select disabled
 		onchange="updateEstado(' . $row->id . ')"
 				 id="estado-' . $row->id . '"
 			class="form-control
@@ -150,6 +153,8 @@ class ContenedorConsolidado extends CI_Controller
 	}
 	public function indexCompletados()
 	{
+
+
 		$arrData = $this->ContenedorConsolidadoModel->indexCompletados();
 		$data    = [];
 		usort($arrData, function ($a, $b) {
@@ -157,37 +162,109 @@ class ContenedorConsolidado extends CI_Controller
 			$numB = (int)$b->carga;
 			return $numB - $numA;
 		});
+
 		foreach ($arrData as $row) {
 			$subdata   = [];
-			$subdata[] = $row->mes;
-			$subdata[] = $row->No_Pais;
-			$subdata[] = $row->empresa;
-			$subdata[] = $row->tipo_contenedor;
-			$subdata[] = $row->canal_control;
-			$subdata[] = $row->fecha_levante;
-			$subdata[] = $row->ajuste_valor;
-			$subdata[] = $row->multa;
-			$subdata[] = $row->valor_fob;
-			$subdata[] = $row->valor_flete;
-			$subdata[] = $row->costo_destino;
-			//icon mail
-			$divObservacion = "
+			if ($this->user->No_Grupo == "Documentacion") {
+				$subdata[] = $row->mes;
+				$subdata[] = $row->No_Pais;
+				$subdata[] = $row->empresa;
+				$subdata[] = $row->tipo_contenedor;
+				$subdata[] = $row->canal_control;
+				$subdata[] = $row->fecha_levante;
+				$subdata[] = $row->ajuste_valor;
+				$subdata[] = $row->multa;
+				$subdata[] = $row->valor_fob;
+				$subdata[] = $row->valor_flete;
+				$subdata[] = $row->costo_destino;
+				//icon mail
+				$divObservacion = "
 			<div class='d-flex justify-center items-center' style='position: relative; display: flex; justify-content: center; align-items: center;'>
 			<div class='relative'>	
 			<i class='fas fa-envelope text-lg' style='cursor:pointer;' onclick='showObservaciones(" . $row->id . ")'></i>";
 
-			if ($row->file_count > 0) {
-				// Círculo rojo con el número de archivos, posicionado encima del icono
-				$divObservacion .= "<span class='absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs' style='position: absolute; z-index: 10;'>" . $row->file_count . "</span>";
-			}
-			$divObservacion .= "
+				if ($row->file_count > 0) {
+					// Círculo rojo con el número de archivos, posicionado encima del icono
+					$divObservacion .= "<span class='absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs' style='position: absolute; z-index: 10;'>" . $row->file_count . "</span>";
+				}
+				$divObservacion .= "
 			</div>
 			</div>";
-			$subdata[] = $divObservacion;
-			//icon eye
-			$divAcciones = '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+				$subdata[] = $divObservacion;
+				//icon eye
+				$divAcciones = '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
 			' . $row->carga . ',true)"></i>';
-			$subdata[] = $divAcciones;
+				$subdata[] = $divAcciones;
+			} else {
+				$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : $row->tipo_carga . " #" . $row->carga;
+				$subdata[] = $row->mes;
+				$subdata[] = $row->No_Pais;
+				$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
+				if ($this->user->No_Grupo == "Coordinación") {
+					$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
+					$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
+				}
+
+				$subdata[] = $row->empresa;
+				if ($this->user->No_Grupo == "ContenedorAlmacen") {
+					$divEstado = '<select
+		onchange="updateEstado(' . $row->id . ')"
+				 id="estado-' . $row->id . '"
+			class="form-control
+					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
+						($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .
+						($row->estado_china == "COMPLETADO" ? "bg-success" : "") . '">
+					<option value="PENDIENTE" ' . ($row->estado_china == "PENDIENTE" ? "selected" : "") . '>WAITING</option>
+					<option value="RECIBIENDO" ' . ($row->estado_china == "RECIBIENDO" ? "selected" : "") . '>RECEIVING</option>
+					<option value="COMPLETADO" ' . ($row->estado_china == "COMPLETADO" ? "selected" : "") . '>FINISH</option>
+				</select>';
+				} else if ($this->user->No_Grupo == "Documentacion") {
+					$divEstado = '<select 
+				class="form-control
+				' . ($row->estado_documentacion == "PENDIENTE" ||  !$row->estado_documentacion ? "bg-warning" : "") .
+						($row->estado_documentacion == "DOCUMENTACION" ? "bg-primary" : "") .
+						($row->estado_documentacion == "COMPLETADO" ? "bg-success" : "") . '
+				
+				" id="estado-documentacion-' . $row->id . '" name="estado" onchange="updateEstadoDocumentacion(' . $row->id . ')">
+					<option 
+					value="PENDIENTE" ' . ($row->estado_documentacion == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
+					<option value="DOCUMENTACION" ' . ($row->estado_documentacion == "DOCUMENTACION" ? "selected" : "") . '>Documentacion</option>
+	
+					<option value="COMPLETADO" ' . ($row->estado_documentacion == "COMPLETADO" ? "selected" : "") . '>Completado</option>
+				</select>';
+				} else {
+					$divEstado = '<select 
+				class="form-control
+				' . ($row->estado == "PENDIENTE" ||  !$row->estado ? "bg-warning" : "") .
+						($row->estado == "RECIBIENDO" ? "bg-primary" : "") .
+						($row->estado == "COMPLETADO" ? "bg-success" : "") . '
+				
+				" id="estado-' . $row->id . '" name="estado" onchange="updateEstado(' . $row->id . ')">
+					<option 
+					value="PENDIENTE" ' . ($row->estado == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
+					<option value="RECIBIENDO" ' . ($row->estado == "RECIBIENDO" ? "selected" : "") . '>Recibiendo</option>
+
+				
+					<option value="COMPLETADO" ' . ($row->estado == "COMPLETADO" ? "selected" : "") . '>Completado</option>
+				</select>';
+				}
+				$subdata[] = $divEstado;
+
+				$divAcciones = '<div>';
+
+				$divAcciones .= '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+			' . $row->carga . ')"></i>';
+				//if user is coordinacion show
+				if ($this->user->No_Grupo == "Coordinación") {
+					$divAcciones .= '<i class="fas fa-edit text-warning" style="cursor:pointer; padding:10px;" onclick="view(' . $row->id . ')"></i>';
+					$divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="deleteCarga(' . $row->id . ')"></i>';
+				}
+
+				$divAcciones .= '</div>';
+
+				$subdata[] = $divAcciones;
+			}
+
 			$data[] = $subdata;
 		}
 
@@ -287,7 +364,6 @@ class ContenedorConsolidado extends CI_Controller
 			} else {
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
 			}
-			log_message('error', 'ContenedorConsolidado : step() => ' . json_encode($arrResponse));
 			$data  = [];
 			$index = 1;
 			foreach ($arrResponse as $row) {
@@ -336,6 +412,8 @@ class ContenedorConsolidado extends CI_Controller
 						" id="estado-cotizador-' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizador(' . $row->id_cotizacion . ')">
 							<option
 							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
+							<option value="CONTACTADO" ' . ($row->estado_cotizador == "CONTACTADO" ? "selected" : "") . '>CONTACTADO</option>
+							<option value="INTERESADO" ' . ($row->estado_cotizador == "INTERESADO" ? "selected" : "") . '>INTERESADO</option>
 
 							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>CONFIRMADO</option>
 						</select>';
@@ -387,7 +465,7 @@ class ContenedorConsolidado extends CI_Controller
 							$cbmTotalPeru += $proveedor->cbm_total;
 						}
 
-						if ($this->user->No_Grupo == "ContenedorAlmacen") {
+						if ($this->user->No_Grupo == "ContenedorAlmacen" || $this->user->No_Grupo == "GERENCIA") {
 							$proveedoresSelect .= '<select class="form-control
 							' . ($proveedor->estados_proveedor == "NC" ? "bg-info" : "") .
 								($proveedor->estados_proveedor == "C" ? "bg-warning" : "") .
@@ -400,16 +478,16 @@ class ContenedorConsolidado extends CI_Controller
 								<option
 								class="bg-info"
 								value="NC"' . ($proveedor->estados_proveedor == "NC" ? "selected" : "") . '>NC</option>
-								<option value="C"
+								<option value="C" disabled
 								class="bg-warning"
 								' . ($proveedor->estados_proveedor == "C" ? "selected" : "") . '>C</option>
-								<option value="R"
+								<option value="R" disabled
 								class="bg-success"
 								' . ($proveedor->estados_proveedor == "R" ? "selected" : "") . '>R</option>
 								<option value="NS"
 								class="bg-danger"
 								' . ($proveedor->estados_proveedor == "NS" ? "selected" : "") . '>NS</option>
-								<option value="INSPECTION" ' . ($proveedor->estados_proveedor == "INSPECTION" ? "selected" : "") . '>INSPECTION</option>
+								<option value="INSPECTION"  disabled ' . ($proveedor->estados_proveedor == "INSPECTION" ? "selected" : "") . '>INSPECTION</option>
 								<option value="LOADED" ' . ($proveedor->estados_proveedor == "LOADED" ? "selected" : "") . '>LOADED</option>
 								<option value="NO LOADED" ' . ($proveedor->estados_proveedor == "NO LOADED" ? "selected" : "") . '>NO LOADED</option>
 
@@ -530,6 +608,17 @@ class ContenedorConsolidado extends CI_Controller
 									<i class="far fa-trash-alt text-danger" style="cursor:pointer;padding:10px;"></i>
 								</div>';
 						}
+						//if no grupo is $roleGerencia add button with text change rotulado to penidng 
+						if ($this->user->No_Grupo == $this->roleGerencia) {
+							$divAcciones .= '<div class="mb-1"
+							data-toggle="tooltip" data-placement="right" title="Cambiar Rotulado a Pendiente"
+							onclick="updateRotulado(' . $row->id . ',' . $proveedor->id_proveedor . ')">
+								<i class="fas fa-sync-alt
+								' . ($proveedor->send_rotulado_status == "SENDED" ? "text-success" : "") . '
+								" style="cursor:pointer;padding:10px;"></i>
+							
+								</div>';
+						}
 
 						$divAcciones .= '</div>';
 					}
@@ -576,15 +665,15 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->correo;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;
-					if($this->user->No_Grupo != "Documentacion"){
+					if ($this->user->No_Grupo != "Documentacion") {
 						$subdata[] = $row->volumen;
 						$subdata[] = $row->monto;
 						$subdata[] = $row->tarifa;
 					}
-					
 
-					    
-					
+
+
+
 					if ($this->user->No_Grupo == "Coordinación") {
 						$selectEstadoCliente = "";
 						$selectEstadoCliente = '<select class="form-control
@@ -600,24 +689,24 @@ class ContenedorConsolidado extends CI_Controller
 						<option value="C FINAL" ' . ($row->estado_cliente == "C FINAL" ? "selected" : "") . '>C FINAL</option>
 						<option value="FACTURADO" ' . ($row->estado_cliente == "FACTURADO" ? "selected" : "") . '>FACTURADO</option>
 					</select>';
-					$subdata[] = $selectEstadoCliente;
+						$subdata[] = $selectEstadoCliente;
 					}
 					if ($this->user->No_Grupo == "Coordinación") {
 						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 						</div>' .
-						'<div class="d-flex" onclick="deleteCliente(' . $row->id_cotizacion . ')">
+							'<div class="d-flex" onclick="deleteCliente(' . $row->id_cotizacion . ')">
 							<i class="fas fa-trash text-danger" style="cursor:pointer;" ></i>
 							</div></div>';
 						$subdata[] = $divAcciones;
-					}else{
+					} else {
 						$btnView = '<div onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes($row->nombre) . '\')">
 
 					<i class="fas fa-eye" style="cursor:pointer;"></i>
 					</div>';
-					    $subdata[] = $btnView;
+						$subdata[] = $btnView;
 					}
-					
+
 					$data[]    = $subdata;
 					$index++;
 				} else {
@@ -1217,7 +1306,7 @@ class ContenedorConsolidado extends CI_Controller
 			]);
 			return;
 		}
-	
+
 		$file = $_FILES['file'];
 		$idContenedor = $this->input->post('idContenedor');
 		if (empty($idContenedor)) {
@@ -1228,7 +1317,7 @@ class ContenedorConsolidado extends CI_Controller
 			]);
 			return;
 		}
-	
+
 		// Llama al modelo para manejar la subida
 		$arrResponse = $this->ContenedorConsolidadoModel->uploadBL($idContenedor, $file);
 		log_message('error', 'uploadBL: Respuesta del modelo: ' . json_encode($arrResponse));
@@ -1487,17 +1576,32 @@ class ContenedorConsolidado extends CI_Controller
 	}
 
 	public function getChinaDocuments()
-{
-    $idCotizacion = $this->input->get('id_cotizacion'); // Obtén el ID de la cotización desde la solicitud AJAX
-    $this->load->model('CargaConsolidada/ContenedorConsolidadoModel'); // Carga el modelo
+	{
+		$idCotizacion = $this->input->get('id_cotizacion'); // Obtén el ID de la cotización desde la solicitud AJAX
+		$this->load->model('CargaConsolidada/ContenedorConsolidadoModel'); // Carga el modelo
 
-    $data = $this->ContenedorConsolidadoModel->showClientesDocumentacion($idCotizacion); // Llama al método del modelo
+		$data = $this->ContenedorConsolidadoModel->showClientesDocumentacion($idCotizacion); // Llama al método del modelo
 
-    if ($data) {
-        echo json_encode(['status' => 'success', 'data' => $data]); // Devuelve los datos en formato JSON
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'No se encontraron documentos para la cotización especificada.']);
-    }
-}
-
+		if ($data) {
+			echo json_encode(['status' => 'success', 'data' => $data]); // Devuelve los datos en formato JSON
+		} else {
+			echo json_encode(['status' => 'error', 'message' => 'No se encontraron documentos para la cotización especificada.']);
+		}
+	}
+	public function updateRotulado()
+	{
+		$idCotizacion = $this->input->post('idCotizacion');
+		$idProveeedor = $this->input->post('idProveedor');
+		Log_message('error', 'updateRotulado: idCotizacion: ' . $idCotizacion . ', idProveedor: ' . $idProveeedor);
+		$arrResponse = $this->ContenedorConsolidadoModel->updateRotulado($idCotizacion, $idProveeedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function forceSendRotulado($idProveedor){
+		$arrResponse = $this->ContenedorConsolidadoModel->validateToSendInspectionMessage($idProveedor);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 }

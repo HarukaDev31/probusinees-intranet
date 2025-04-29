@@ -1,3 +1,24 @@
+
+<?php
+$SectionNames=[
+  "ContenedorAlmacen"=>[
+    "Carga Consolidada"=>"Waiting",
+    "Completados"=>"Finished",
+  ],
+  "Documentacion"=>[
+    "Carga Consolidada"=>"Pendientes",
+    "Completados"=>"Completados",
+  ],
+  "Coordinación"=>[
+    "Carga Consolidada"=>"Abiertos",
+    "Completados"=>"Embarcados",
+  ],
+  "Cotizador"=>[
+    "Carga Consolidada"=>"Abiertos",
+    "Completados"=>"Embarcados",
+  ],
+]
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -279,31 +300,31 @@
                     <?php if ($arrMenuPadre->Nu_Cantidad_Menu_Padre > 0): ?>
                       <ul class="nav nav-treeview">
                         <?php
+                   
                         foreach ($arrMenuPadre->Hijos as $arrHijos):
-
+                          $menuEndUrl= explode('/', $arrHijos->No_Menu_Url);
+                          $menuEndUrl= end($menuEndUrl);
                           $No_Class_Li = "nav-item";
                           if ($this->router->directory != $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
                             $No_Class_Li = "nav-item";
-                          else if ($this->router->directory == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
+                          else if ($this->router->directory == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0
+                          
+                          )
                             $No_Class_Li = "nav-item active  menu-open";
-                          else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0)
+                          else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0 && $menuEndUrl==$this->router->method)
                             $No_Class_Li = "nav-item active  menu-open"; ?>
                           <li class="<?php echo $No_Class_Li; ?>">
-                            <a class="nav-link 1 <?php echo ($this->router->class == $arrHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
+                            <a class="nav-link 1 <?php echo ($this->router->class == $arrHijos->No_Class_Controller && $this->router->method == $arrSubHijos->No_Menu_Url ? 'nav-item active' : 'nav-item'); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
                               <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
-                              <p>&nbsp;<?php if ($this->user->No_Grupo == 'ContenedorAlmacen') {
-                                          echo $arrHijos->No_Menu_China;
-                                        } else {
-                                          if ($this->user->No_Grupo == 'Documentacion' && $arrHijos->No_Menu == "Carga Consolidada") {
-                                            echo "Pendientes";
-                                          }else if ($this->user->No_Grupo == 'Documentacion' && $arrHijos->No_Menu == "Despachos Completados") {
-                                            echo "Completados";
-                                          } 
-                                          
+                              <p>&nbsp;<?php 
+                                          if(array_key_exists($arrHijos->No_Menu, $SectionNames[$this->user->No_Grupo])){
+                                            echo $SectionNames[$this->user->No_Grupo][$arrHijos->No_Menu];
+                                          }
+
                                           else {
                                             echo $arrHijos->No_Menu;
                                           }
-                                        } ?></p>
+                                         ?></p>
                               <?php if ($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
                                 <i class="right fas fa-angle-left"></i>
                               <?php endif; ?>
@@ -312,8 +333,12 @@
                               <ul class="nav nav-treeview">
                                 <?php foreach ($arrHijos->SubHijos as $arrSubHijos): ?>
                                   <li class="<?php
-                                              echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>">
-                                    <a class="nav-link 2 <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller ? 'nav-item active' : 'nav-item'); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
+                                              echo ($this->router->class == $arrSubHijos->No_Class_Controller 
+                                              
+                                              ? 'nav-item active' : 'nav-item'); ?>">
+                                    <a class="nav-link 2 <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller 
+                                    && $this->router->method == $arrSubHijos->No_Menu_Url
+                                    ? 'nav-item active' : 'nav-item'); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
                                       <i class="<?php echo $arrSubHijos->Txt_Css_Icons; ?>"></i>
                                       <p>&nbsp;<?php echo $arrSubHijos->No_Menu; ?></p>
                                     </a>
