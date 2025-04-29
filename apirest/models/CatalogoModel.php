@@ -125,7 +125,7 @@ class CatalogoModel extends CI_Model
                 }
             } else {
                 
-                $catalogProductUrl = $this->catalogoUrl . '/' . $data['nombre'] . '_' . $randomUuid . '/';
+                $catalogProductUrl = $this->catalogoUrl . '/';
                 if (isset($files['contactCard']) && $files['contactCard']['size'] > 0) {
                     $contactCardUrl = $this->uploadSingleFile($files['contactCard'], $catalogProductUrl);
                 }
