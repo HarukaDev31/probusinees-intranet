@@ -1,0 +1,541 @@
+
+var productoFormSection = null
+var productListSection = null
+var currentProductId = null
+var mainImage = null
+var additionalImage1 = null
+var additionalImage2 = null
+var additionalVideo1 = null
+var contactCardContainer = null
+$(document).ready(async function () {
+    productoFormSection = $('#productoFormSection')
+    productListSection = $('#productListSection')
+    showSkeletons();
+
+    // Simulate loading data (replace with actual API call)
+    await loadProducts();
+
+    // Setup event handlers
+    setupEventHandlers();
+
+    function showSkeletons() {
+        const $grid = $('#productGrid');
+        const $template = $('#skeletonTemplate');
+
+        // Clear grid and add skeletons
+        $grid.empty();
+        for (let i = 0; i < 8; i++) {
+            const $skeleton = $($template.html());
+            $grid.append($skeleton);
+        }
+    }
+
+    async function loadProducts() {
+        url = base_url + 'CatalogoController/getCatalogo';
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                const products = data.data;
+                renderProducts(products);
+            } else {
+                console.error('Error loading products:', data.message);
+            }
+        } else {
+            console.error('Network error:', response.statusText);
+        }
+        // const products = [
+        //     {
+        //         id: 1,
+        //         name: 'Compresor de Aire RMB-150',
+        //         image: 'https://images.pexels.com/photos/3785927/pexels-photo-3785927.jpeg',
+        //         price: '50',
+        //         moq: '100'
+        //     },
+        //     {
+        //         id: 2,
+        //         name: 'Compresor Industrial X2000',
+        //         image: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg',
+        //         price: '75',
+        //         moq: '50'
+        //     },
+        //     {
+        //         id: 3,
+        //         name: 'Compresor Portátil Pro',
+        //         image: 'https://images.pexels.com/photos/834892/pexels-photo-834892.jpeg',
+        //         price: '45',
+        //         moq: '200'
+        //     },
+        //     {
+        //         id: 4,
+        //         name: 'Compresor de Alta Presión',
+        //         image: 'https://images.pexels.com/photos/2381463/pexels-photo-2381463.jpeg',
+        //         price: '120',
+        //         moq: '75'
+        //     },
+        //     {
+        //         id: 5,
+        //         name: 'Mini Compresor Plus',
+        //         image: 'https://images.pexels.com/photos/190574/pexels-photo-190574.jpeg',
+        //         price: '35',
+        //         moq: '150'
+        //     },
+        //     {
+        //         id: 6,
+        //         name: 'Compresor Industrial Max',
+        //         image: 'https://images.pexels.com/photos/210881/pexels-photo-210881.jpeg',
+        //         price: '95',
+        //         moq: '80'
+        //     }
+        // ];
+
+        // renderProducts(products);
+    }
+
+    function renderProducts(products) {
+        const $grid = $('#productGrid');
+        const $template = $('#productTemplate');
+        // Clear grid
+        $grid.empty();
+
+        // Add products with staggered animation
+        products.forEach((product, index) => {
+            const $product = $($template.html());
+
+            // Set product data
+            $product.find('img').attr({
+                src: product.main_image_url,
+                alt: product.name
+            });
+            $product.find('h3').text(product.name);
+            $product.find('.text-gray-600').text(`RMB: ¥${product.precio}`);
+            $product.find('.text-gray-500').text(`MOQ: ${product.moq}`);
+
+            // Add to grid with staggered fade in animation
+            $product.css('opacity', 0);
+            //add product id to the card
+            $product.attr('data-product-id', product.id);
+            $grid.append($product);
+            setTimeout(() => {
+                $product.animate({ opacity: 1 }, 300);
+            }, index * 100);
+        });
+    }
+    function renderProductDetails(product) {
+        productoFormSection.show();
+        productListSection.hide();
+        currentProductId = product.id;
+        const $form = $('#productForm');
+        $form.find('#nombre').val(product.nombre);
+        $form.find('#precio').val(product.precio);
+        $form.find('#moq').val(product.moq);
+        $form.find('#delivery').val(product.delivery);
+        $form.find('#diasEntrega').val(product.dias_entrega);
+        $form.find('#qtyXbox').val(product.qty_box);
+        $form.find('#cbmXbox').val(product.cbm_box);
+        $form.find('#wechatPhone').val(product.whechat_phone);
+        $form.find('#colores').val(product.colores);
+        $form.find('#notas').val(product.notas);
+        $form.find('#mainImageContainer').attr('data-file', product.main_image_url);
+        $form.find('#additionalImage1Container').attr('data-file', product.additional_image_1_url);
+        $form.find('#additionalImage2Container').attr('data-file', product.additional_image_2_url);
+        $form.find('#additionalVideo1Container').attr('data-file', product.additional_video_1_url);
+        $form.find('#contactCardContainer').attr('data-file', product.contact_card_url);
+        mainImage = new FileUploader({
+            containerId: 'mainImageContainer',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+
+
+        additionalImage1 = new FileUploader({
+            containerId: 'additionalImage1Container',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+        additionalImage2 = new FileUploader({
+            containerId: 'additionalImage2Container',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+        
+        additionalVideo1 = new FileUploader({
+            containerId: 'additionalVideo1Container',
+            acceptedTypes: "video/mp4,video/webm,video/ogg",// Tipos de archivos aceptados
+            maxSize: 20 * 1024 * 1024
+        });
+       
+        contactCardContainer = new FileUploader({
+            containerId: 'contactCardContainer',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+        if (product.main_image_url) {
+            mainImage.loadFromURL(product.main_image_url);
+        }
+        if (product.aditional_image1_url) {
+            additionalImage1.loadFromURL(product.aditional_image1_url);
+        }
+        if (product.aditional_image2_url) {
+            additionalImage2.loadFromURL(product.aditional_image2_url);
+        }
+        if (product.aditional_video1_url) {
+            additionalVideo1.loadFromURL(product.aditional_video1_url);
+        }
+        if (product.contact_card_url) {
+            contactCardContainer.loadFromURL(product.contact_card_url);
+        }
+      
+
+
+    }
+
+    function setupEventHandlers() {
+        // Search input handler
+        $('#searchInput').on('input', debounce(function () {
+            const query = $(this).val()?.toLowerCase() || '';
+            filterProducts(query);
+        }, 300));
+
+        // Sort select handler
+        $('#sortSelect').on('change', function () {
+            const value = $(this).val();
+            sortProducts(value);
+        });
+
+        // Filter button handler
+        $('#filterBtn').on('click', function () {
+            // Implement filter modal/dropdown
+            console.log('Show filters');
+        });
+
+        // Edit button handler
+        $(document).on('click', '.edit-btn', async function () {
+            const $card = $(this).closest('.card');
+            const productId = $card.data('product-id');
+            // Redirect to edit page
+            await loadProductDetails(productId);
+        });
+
+        // Delete button handler
+        $(document).on('click', '.delete-btn', async function () {
+            const $card = $(this).closest('.card');
+            const productId = $card.data('product-id');
+            console.log('Delete product with ID:', productId);
+            await deleteProduct(productId);
+        });
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function filterProducts(query) {
+        const $grid = $('#productGrid');
+        const $cards = $grid.find('.card');
+
+        // Filter cards based on query
+        $cards.each(function () {
+            const $card = $(this);
+            const name = $card.find('h3').text().toLowerCase();
+            if (name.includes(query)) {
+                $card.show();
+            } else {
+                $card.hide();
+            }
+        });
+        // Show or hide "No results" message
+        const $noResults = $('#noResults');
+        if ($grid.find('.card:visible').length === 0) {
+            $noResults.show();
+        } else {
+            $noResults.hide();
+        }
+        // Reset scroll position
+        $grid.scrollTop(0);
+    }
+
+    function sortProducts(criteria) {
+        const $grid = $('#productGrid');
+        const $cards = $grid.find('.card');
+
+        // Sort cards based on criteria
+        const sortedCards = $cards.sort((a, b) => {
+            const aValue = $(a).find('.text-gray-600').text().replace('RMB: ¥', '');
+            const bValue = $(b).find('.text-gray-600').text().replace('RMB: ¥', '');
+            if (criteria === 'priceAsc') {
+                return parseFloat(aValue) - parseFloat(bValue);
+            } else if (criteria === 'priceDesc') {
+                return parseFloat(bValue) - parseFloat(aValue);
+            }
+            return 0;
+        });
+
+        // Clear grid and append sorted cards
+        $grid.empty().append(sortedCards);
+
+    }
+    async function loadProductDetails(productId) {
+        url = base_url + 'CatalogoController/getProductDetails/' + productId;
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                const product = data.data;
+                renderProductDetails(product);
+            } else {
+                console.error('Error loading product details:', data.message);
+            }
+        } else {
+            console.error('Network error:', response.statusText);
+        }
+    }
+    async function deleteProduct(productId) {
+        url = base_url + 'CatalogoController/deleteProduct';
+        const formData = new FormData();
+        formData.append('productId', productId);
+        const response = await fetch(url, {
+            method: 'post',
+            body: formData,
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                // Reload products after deletion
+                await loadProducts();
+            } else {
+                console.error('Error deleting product:', data.message);
+            }
+        } else {
+            console.error('Network error:', response.statusText);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $("#btnSave").on("click", function (e) {
+        e.preventDefault();
+        validateForm();
+
+    });
+    $("#btnBack").on("click", function (e) {
+        e.preventDefault();
+        productoFormSection.hide();
+        productListSection.show();
+    });
+    $("#btnAddProduct").on("click", function (e) {
+        e.preventDefault();
+        productoFormSection.show();
+        productListSection.hide();
+        currentProductId = null;
+        const $form = $('#productForm');
+        $form[0].reset();
+        $form.find('.form-error').addClass('hidden');
+        $form.find('input, textarea').removeClass('border-red-500');
+        $form.find('#mainImageContainer').attr('data-file', '');
+        $form.find('#additionalImage1Container').attr('data-file', '');
+        $form.find('#additionalImage2Container').attr('data-file', '');
+        $form.find('#additionalVideo1Container').attr('data-file', '');
+        $form.find('#contactCardContainer').attr('data-file', '');
+        mainImage = new FileUploader({
+            containerId: 'mainImageContainer',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+        additionalImage1 = new FileUploader({
+            containerId: 'additionalImage1Container',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+        additionalImage2 = new FileUploader({
+            containerId: 'additionalImage2Container',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+        additionalVideo1 = new FileUploader({
+            containerId: 'additionalVideo1Container',
+            acceptedTypes: "video/mp4,video/webm,video/ogg",// Tipos de archivos aceptados
+            maxSize: 20 * 1024 * 1024
+        });
+        contactCardContainer = new FileUploader({
+            containerId: 'contactCardContainer',
+            acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
+            maxSize: 5 * 1024 * 1024
+        });
+       ;
+    })
+
+    // Validar campos al perder el foco
+    const formInputs = document.querySelectorAll('#productForm input, #productForm textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('blur', function () {
+            validateField(this);
+        });
+    });
+
+    // Formatear campos de precio al perder el foco
+    const priceFields = document.querySelectorAll('#precio, #delivery');
+    priceFields.forEach(field => {
+        field.addEventListener('blur', function () {
+            if (this.value && !isNaN(parseFloat(this.value))) {
+                this.value = parseFloat(this.value).toFixed(2);
+            }
+        });
+    });
+
+    function validateForm() {
+        let isValid = true;
+        const requiredFields = document.querySelectorAll('#productForm [required]');
+
+        // Validar cada campo requerido
+        requiredFields.forEach(field => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+
+        // Si el formulario es válido, proceder con el envío o procesamiento
+        if (isValid) {
+            const formData = new FormData($('#productForm')[0]);
+            //append wechatPhone.trim() if wechatPhone.trim() !== '
+            const wechatPhone = $('#wechatPhone').val();
+            formData.append('wechatPhone', wechatPhone.trim());
+            formData.append('contactCard', contactCardContainer.getFile());
+            formData.append('mainImage', mainImage.getFile());
+            formData.append('additionalImage1', additionalImage1.getFile());
+            formData.append('additionalImage2', additionalImage2.getFile());
+            formData.append('additionalVideo1', additionalVideo1.getFile());
+            if (currentProductId) {
+                formData.append('productId', currentProductId);
+            }
+            // Enviar el formulario usando fetch
+            url = base_url + 'CatalogoController/saveProduct';
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                })
+                .then(data => {
+                    if (data.status) {
+                        // Mostrar mensaje de éxito
+                        // Volver a cargar la lista de productos
+                        loadProducts();
+                        // Volver a la sección de lista de productos
+                        productoFormSection.hide();
+                        productListSection.show();
+                    } else {
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+        } else {
+            console.log('Formulario inválido, corrige los errores');
+        }
+
+        return isValid;
+    }
+
+    // Función para validar un campo específico
+    function validateField(field) {
+        // Obtener el mensaje de error relacionado con este campo
+        const errorElement = field.parentElement.querySelector('.form-error') || field.parentElement.parentElement.querySelector('.form-error');
+
+        // Validación básica de campo requerido vacío
+        if (field.hasAttribute('required')
+            && field.value.trim() == ""
+        ) {
+            showError(field, errorElement, 'Este campo es obligatorio.');
+            return false;
+        }
+        // Validaciones específicas por tipo o ID del campo
+        switch (field.id) {
+            case 'precio':
+                if (!/^\d+(\.\d{1,2})?$/.test(field.value.trim()) && field.value.trim() !== '') {
+                    showError(field, errorElement, 'Ingrese solo valores numéricos con hasta 2 decimales.');
+                    return false;
+                }
+                break;
+
+            case 'delivery':
+                // Validar formato de precio
+                if (!/^\d+(\.\d{1,2})?$/.test(field.value.trim()) && field.value.trim() !== '') {
+                    showError(field, errorElement, 'Ingrese solo valores numéricos con hasta 2 decimales.');
+                    return false;
+                }
+                break;
+
+            case 'moq':
+            case 'qtyXbox':
+            case 'diasEntrega':
+                // Validar que sea un número entero positivo
+                if (parseInt(field.value) <= 0 || isNaN(parseInt(field.value))) {
+                    showError(field, errorElement, 'Ingrese un valor numérico entero positivo.');
+                    return false;
+                }
+                break;
+
+            case 'cbmXbox':
+                // Validar que sea un número positivo (puede tener decimales)
+                if (parseFloat(field.value) < 0 || isNaN(parseFloat(field.value))) {
+                    showError(field, errorElement, 'Ingrese un valor numérico positivo.');
+                    return false;
+                }
+                break;
+        }
+
+        // Si llegamos aquí, el campo es válido
+        hideError(field, errorElement);
+        return true;
+    }
+
+    // Función para mostrar un mensaje de error
+    function showError(field, errorElement, message) {
+        // Añadir clase de error al campo
+        field.classList.add('border-red-500');
+
+        // Mostrar mensaje de error si existe el elemento
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+    }
+
+    // Función para ocultar un mensaje de error
+    function hideError(field, errorElement) {
+        // Quitar clase de error del campo
+        field.classList.remove('border-red-500');
+
+        // Ocultar mensaje de error si existe el elemento
+        if (errorElement) {
+            errorElement.classList.add('hidden');
+        }
+    }
+});
