@@ -3596,18 +3596,22 @@ async function viewDocumentacion() {
 async function reloadTableClientesGeneral() {
   tableClientesGeneral.ajax.reload();
   await getClientesHeader();
+  enableHorizontalAutoScrollForAllTables();
 }
 async function reloadTableClientesVariacion() {
   tableClientesVariacion.ajax.reload();
   await getClientesHeader();
+  enableHorizontalAutoScrollForAllTables();
 }
 
 async function reloadTableCotizacionEmbarque() {
   tableCotizacionEmbarque.ajax.reload();
   await getTableCotizacionEmbarqueHeaders();
+  enableHorizontalAutoScrollForAllTables();
 }
 async function reloadTableCotizacionFinal() {
   tableCotizacionFinal.ajax.reload();
+  enableHorizontalAutoScrollForAllTables();
 }
 async function getTableCotizacionEmbarqueHeaders() {
   url =
@@ -7057,6 +7061,7 @@ function updateTableScrollArrows(tableWrapper, leftArrow, rightArrow) {
   // Busca la tabla visible
   const innerTable = Array.from(tableWrapper.querySelectorAll('table'))
     .find(tbl => tbl.offsetParent !== null);
+    console.log(innerTable, "innerTable");
 
   // Si no hay tabla visible o su ancho es <= 900, oculta ambas flechas
   if (!innerTable || innerTable.offsetWidth <= 900) {
@@ -7074,9 +7079,10 @@ function updateTableScrollArrows(tableWrapper, leftArrow, rightArrow) {
 
   const scrollLeft = tableWrapper.scrollLeft;
   const maxScrollLeft = innerTable.offsetWidth - tableWrapper.clientWidth;
+  const tolerance = 2; // píxeles de tolerancia
 
-  leftArrow.style.display = scrollLeft > 0 ? 'flex' : 'none';
-  rightArrow.style.display = scrollLeft < maxScrollLeft ? 'flex' : 'none';
+  leftArrow.style.display = scrollLeft > tolerance ? 'flex' : 'none';
+  rightArrow.style.display = scrollLeft < (maxScrollLeft - tolerance) ? 'flex' : 'none';
 }
 
 function enableHorizontalAutoScrollForAllTables() {
@@ -7095,11 +7101,12 @@ function enableHorizontalAutoScrollForAllTables() {
     const oldRight = tableWrapper.parentElement.querySelector('.scroll-arrow.right');
     if (oldLeft) oldLeft.remove();
     if (oldRight) oldRight.remove();
-    // Busca la tabla interna
-    const innerTable = Array.from(tableWrapper.querySelectorAll('table'))
-      .find(tbl => tbl.offsetParent !== null); // Solo la visible
 
-    // Condición: solo crear flechas si la tabla es más ancha que el contenedor y mayor a 900px
+    // Busca la tabla visible
+    const innerTable = Array.from(tableWrapper.querySelectorAll('table'))
+      .find(tbl => tbl.offsetParent !== null);
+
+    // Solo crear flechas si la tabla es más ancha que el contenedor y mayor a 900px
     if (
       !innerTable ||
       innerTable.offsetWidth <= 900 ||
@@ -7122,6 +7129,11 @@ function enableHorizontalAutoScrollForAllTables() {
     tableWrapper.parentElement.style.position = 'relative'; // Asegurar que el contenedor tenga posición relativa
     tableWrapper.parentElement.appendChild(leftArrow);
     tableWrapper.parentElement.appendChild(rightArrow);
+
+    const wrapperHeight = tableWrapper.offsetHeight;
+    const topValue = (wrapperHeight - (wrapperHeight * 0.9)) + 300;
+    leftArrow.style.top = `${topValue}px`;
+    rightArrow.style.top = `${topValue}px`;
 
     // Agregar eventos de clic a las flechas
     leftArrow.addEventListener('click', () => {

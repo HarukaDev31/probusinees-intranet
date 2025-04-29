@@ -30,7 +30,7 @@ Search for
                           <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
             </div>
           </div>
-          <div class="col-1 col-xl-1 dropdown filter-contenedor">
+          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>
@@ -50,7 +50,7 @@ Search for
             </div>
           </div>
 
-          <div class="col-1 col-xl-1 dropdown filter-contenedor">
+          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -122,7 +122,7 @@ Search for
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-          <div class="col-1 col-xl-1 dropdown filter-contenedor">
+          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>
@@ -142,7 +142,7 @@ Search for
             </div>
           </div>
 
-          <div class=" col-1 col-xl-1 dropdown">
+          <div class=" col-1 col-xl-1 dropdown px-0">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -789,7 +789,7 @@ Search for
             </div>
           </div>
           <!-- Contenedor Principal de Cargar-->
-          <div class="col-1 col-xl-1 dropdown filter-contenedor">
+          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
             <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Cargar
@@ -807,7 +807,7 @@ Search for
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-          <div class="col-1 col-xl-1 dropdown filter-contenedor">
+          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>
@@ -1190,7 +1190,7 @@ Search for
   </section>
   <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
-    <div class="row mb-2 gap-3 gap-xl-0">
+    <div class="row mb-2 gap-3 gap-xl-0 px-3 py-2 py-xl-0 px-xl-0">
       <div class="col-sm-3 col-md-3 col-xl-1 py-sm-3 py-xl-0">
         <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 mx-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" id="btn-back-cotizacion-almacen"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
@@ -1227,7 +1227,7 @@ Search for
     </div>
 
     <div class="row mb-2 justify-center">
-      <div class="px-4 py-8 py-sm-4 file-section-container col-10 col-xl-4  col-lg-12 col-md-12 ">
+      <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-4  col-lg-12 col-md-12 ">
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>">
             <h2 class="d-flex w-100 justify-content-between align-items-center"><label>
@@ -1302,7 +1302,7 @@ Search for
           </div>
         </div>
       </div>
-      <div class="col-10 col-xl-5 col-md-12 px-4 py-8 py-sm-4">
+      <div class="col-12 col-xl-5 col-md-12 px-4 py-8 py-sm-4">
         <div class="container px-4 py-8 py-sm-4 file-section-container col-12 col-md-12">
           <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>"><label>Inspection <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
@@ -2448,7 +2448,7 @@ Search for
 
   #table-contenedor tbody tr {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    grid-template-columns: 2fr 1fr; /* Dos columnas iguales */
     margin-bottom: 16px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -2501,7 +2501,6 @@ Search for
 
 .scroll-arrow {
   position: absolute;
-  top: 20%;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
