@@ -45,7 +45,7 @@ class CatalogoModel extends CI_Model
                 'contact_card_url' => $contactCardUrl,
                
             );
-            $catalogProductUrl = $this->catalogoUrl . '/' . $data['nombre'] . '_' . $randomUuid . '/';
+            $catalogProductUrl = $this->catalogoUrl . '/';
             if ($data['productId']!= null  ) {
           
                 //try to unlink files
