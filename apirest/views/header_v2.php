@@ -105,13 +105,17 @@
     <div class="spinner-border text-primary" role="status">
     </div>
   </div>
-  <div class="main-header navbar navbar-expand navbar-white navbar-light d-block d-xl-none">
+  <div class="main-header navbar navbar-expand navbar-white navbar-light d-flex d-xl-none">
     <!-- Left navbar links -->
     <ul class="navbar-nav ">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars"></i></a>
       </li>
     </ul>
+    <a href="<?php echo base_url() . 'InicioController'; ?>" class="brand-link" style="min-height:2vh;">
+      <span class="brand-text font-weight-light"><strong><b>probusiness</b></strong></span>
+      <img src="<?php echo base_url() . 'dist_v2/img/logos/probusiness.png?ver=2.0.0'; ?>" alt="ProBusiness" class="brand-image img-circle elevation-3" style="opacity: .8">
+    </a>
   </div>
   <input type="hidden" id="hidden-sDirectory" name="sDirectory" class="form-control" value="<?php echo $this->router->directory; ?>">
   <input type="hidden" id="hidden-sClass" name="sClass" class="form-control" value="<?php echo $this->router->class; ?>">
@@ -475,4 +479,18 @@
       body:not(.layout-fixed) .main-sidebar {
         height: -webkit-fill-available;
       }
+
+      @media (max-width: 991.98px) {
+      .main-sidebar .brand-link {
+        display: none !important;
+      }
+      .main-header .brand-link {
+        display: flex !important;
+      }
+    }
+    @media (min-width: 992px) {
+      .main-header .brand-link {
+        display: none !important;
+      }
+    }
     </style>

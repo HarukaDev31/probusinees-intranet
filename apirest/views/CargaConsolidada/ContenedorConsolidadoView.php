@@ -1197,8 +1197,10 @@ Search for
       <div class="col-xl-5 col-md-5"></div>
       <div class="col-6 col-md-2 col-xl-4 d-sm-none d-xl-block">
       </div>
-      <div id="btn-grd-doc-not" class="col-12 col-md-3 col-xl-1 px-sm-5 px-xl-1 <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
-        <button type="button" id="btn-guardar-doc-not" class="py-sm-3 px-sm-0 bg-orange hover:bg-orange-200 text-black-200 py-xl-2 py-md-2 py-lg-2 px-20 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+      <div id="btn-grd-doc-not" class="col-12 col-md-3 col-xl-1 px-xl-1 px-lg-1 px-md-1 px-sm-5 px-5 <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
+        <button type="button" id="btn-guardar-doc-not" 
+        class="py-sm-3 py-3 py-xl-2 py-md-2 py-lg-2 bg-orange hover:bg-orange-200 text-black-200 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" 
+        data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
             Guardar
           <?php } else { ?>
             Save
@@ -1226,8 +1228,8 @@ Search for
       </div>
     </div>
 
-    <div class="row mb-2 justify-center">
-      <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-4  col-lg-12 col-md-12 ">
+    <div class="row mb-2 justify-around">
+      <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-4 col-lg-12 col-md-12 ">
         <div>
           <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>">
             <h2 class="d-flex w-100 justify-content-between align-items-center"><label>
@@ -1302,8 +1304,8 @@ Search for
           </div>
         </div>
       </div>
-      <div class="col-12 col-xl-5 col-md-12 px-4 py-8 py-sm-4">
-        <div class="container px-4 py-8 py-sm-4 file-section-container col-12 col-md-12">
+      <!-- <div class="col-12 col-xl-5 col-md-12 px-4 py-8 py-sm-4"> -->
+        <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-5 col-lg-12 col-md-12">
           <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>"><label>Inspection <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
@@ -1360,7 +1362,7 @@ Search for
             </div>
           </div>
         </div>
-      </div>
+      <!-- </div> -->
       <div class="col-10 col-xl-3 col-md-12 px-4 py-8 pt-sm-4 note-container-container">
         <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">
           <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -2479,10 +2481,6 @@ Search for
     font-size: 20px;
     margin-right: -12px;
   }
-  #btn-grd-doc-not{
-    order: 99;
-  }
-
   .note-container-container{
     min-height: 10%;
     padding-bottom: 15%;
@@ -2490,7 +2488,9 @@ Search for
   
   #btn-grd-doc-not{
     position: absolute;
-    bottom: 1%;
+    bottom: 0%;
+    left: 0%;
+    order: 99;
   }
 
   #txt-Id_Carga_Consolidada{
