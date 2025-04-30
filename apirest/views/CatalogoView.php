@@ -1,3 +1,7 @@
+<script>
+  var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
+  localStorage.setItem("currentPrivilege", currentPrivilege);
+</script>
 <div class="content-wrapper">
     <!--Main Content-->
     <section class="content" id="productListSection">
@@ -138,7 +142,18 @@
                                     </div>
                                     <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
                                 </div>
-
+                                <div class="form-group">
+                                    <label for="profit" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Profit <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
+                                        <input type="text" id="profit" 
+                                            class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
+                                            placeholder="0.00" disabled
+                                            value="3.00">
+                                    </div>
+                                </div>
                                 <!-- MOQ -->
                                 <div class="form-group">
                                     <label for="moq" class="block text-sm font-medium text-gray-700 mb-1">
@@ -234,9 +249,11 @@
                                     <label for="wechatPhone" class="block text-sm font-medium text-gray-700 mb-1">
                                         WeChat / Phone
                                     </label>
-                                    <input type="text" id="wechatPhone" name="wechatPhone"
+                                    <input type="text" id="wechatPhone" name="wechatPhone" required
                                         class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                                </div>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
+
+                                    </div>
 
                                 <!-- Contact Card -->
                                 <div class="form-group">
