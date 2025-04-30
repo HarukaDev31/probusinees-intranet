@@ -8,8 +8,8 @@
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">
-      <div class="row mb-2 gap-2 px-lg-0 px-3">
-        <div class="col-sm-12 col-xl-6">
+      <div class="row mb-2 gap-2 px-xl-3 px-0 justify-content-center">
+        <div class="col-sm-12 col-xl-6 p-3 p-xl-0">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <span id="section-title"><?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></span>
             &nbsp;<span id="span-id_pedido" class="badge badge-secondary"></span>
@@ -18,7 +18,7 @@
         <?php if ($this->user->No_Grupo == "Coordinación"  || $this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Cotizador") {  ?>
 
           <!-- Buscador de la tabla -->
-          <div class="col-7 col-xl-2 filter-contenedor">
+          <div class="col-9 col-xl-2 filter-contenedor">
             <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
               <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
@@ -119,7 +119,7 @@ Search for
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
+          <div class="col-1 col-xl-1 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>
@@ -139,7 +139,7 @@ Search for
             </div>
           </div>
 
-          <div class=" col-1 col-xl-1 dropdown filter-contenedor px-0">
+          <div class="col-1 col-xl-1 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -837,7 +837,7 @@ Search for
           </div>
         <?php } ?>
 
-        <div class="col-4 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
           <span>CBM Total:</span>
           <div class="">
@@ -845,7 +845,7 @@ Search for
           </div>
         </div>
         <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
-          <div class="col-4 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+          <div class="col-5 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
             <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
             <span>CBM Pendiente:</span>
             <div class="">
@@ -853,7 +853,7 @@ Search for
             </div>
           </div>
         <?php } ?>
-        <div class="col-4 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-5 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
           <span>CBM Total:</span>
           <div class="">
@@ -953,7 +953,7 @@ Search for
 
   <section class="content px-3" id="clientes-container">
     <!-- header de la tabla -->
-    <div class="row mb-2">
+    <div class="row mb-2 d-flex justify-content-between">
       <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
         <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
@@ -1201,7 +1201,7 @@ Search for
   </section>
   <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
-    <div class="row mb-2 gap-3 gap-xl-0 px-3 py-2 py-xl-0 px-xl-0">
+    <div class="row mb-2 gap-2 px-xl-3 px-0">
       <div class="col-sm-3 col-md-3 col-xl-1 py-sm-3 py-xl-0">
         <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 mx-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" id="btn-back-cotizacion-almacen"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>

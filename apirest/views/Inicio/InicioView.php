@@ -10,7 +10,7 @@
   <!-- /.navbar -->
 
 <!-- Content Header (Page header) -->
-<section class="content-header px-4" style="
+<section class="content-header xl-px-4 px-2" style="
     height: 93vh;">
   <!-- Hero Section -->
   <div class="hero-section position-relative" style="background-image: url('<?php echo base_url().'assets/img/backgrounds/inicioview.png'?>');">
@@ -20,7 +20,7 @@
   </div>
 
   <!-- Stats Section -->
-  <div class="container">
+  <div class="container px">
     <div class="row g-4">
       <!-- Dollar Stats -->
       <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
