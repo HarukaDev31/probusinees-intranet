@@ -1,4 +1,4 @@
-
+var spinner = null;
 var productoFormSection = null
 var productListSection = null
 var currentProductId = null
@@ -7,9 +7,13 @@ var additionalImage1 = null
 var additionalImage2 = null
 var additionalVideo1 = null
 var contactCardContainer = null
+var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
+
 $(document).ready(async function () {
     productoFormSection = $('#productoFormSection')
     productListSection = $('#productListSection')
+    spinner = $(".backdrop")
+    
     showSkeletons();
 
     // Simulate loading data (replace with actual API call)
@@ -158,13 +162,13 @@ $(document).ready(async function () {
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
             maxSize: 5 * 1024 * 1024
         });
-        
+
         additionalVideo1 = new FileUploader({
             containerId: 'additionalVideo1Container',
             acceptedTypes: "video/mp4,video/webm,video/ogg",// Tipos de archivos aceptados
             maxSize: 20 * 1024 * 1024
         });
-       
+
         contactCardContainer = new FileUploader({
             containerId: 'contactCardContainer',
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
@@ -185,7 +189,7 @@ $(document).ready(async function () {
         if (product.contact_card_url) {
             contactCardContainer.loadFromURL(product.contact_card_url);
         }
-      
+
 
 
     }
@@ -382,7 +386,7 @@ $(document).ready(async function () {
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
             maxSize: 5 * 1024 * 1024
         });
-       ;
+        ;
     })
 
     // Validar campos al perder el foco
@@ -406,9 +410,12 @@ $(document).ready(async function () {
     function validateForm() {
         let isValid = true;
         const requiredFields = document.querySelectorAll('#productForm [required]');
-
+        const requiredFieldsProvider = document.querySelectorAll('#providerForm [required]');
+        //union of both arrays
+        const allRequiredFields = [...requiredFields, ...requiredFieldsProvider];
         // Validar cada campo requerido
-        requiredFields.forEach(field => {
+        allRequiredFields.forEach(field => {
+            console.log(field)
             if (!validateField(field)) {
                 isValid = false;
             }
@@ -429,6 +436,7 @@ $(document).ready(async function () {
                 formData.append('productId', currentProductId);
             }
             // Enviar el formulario usando fetch
+            spinner.show();
             url = base_url + 'CatalogoController/saveProduct';
             fetch(url, {
                 method: 'POST',
@@ -436,10 +444,12 @@ $(document).ready(async function () {
             })
                 .then(response => {
                     if (response.ok) {
+                        spinner.hide();
                         return response.json();
                     } else {
                         throw new Error('Error en la respuesta del servidor');
                     }
+                    spinner.hide();
                 })
                 .then(data => {
                     if (data.status) {
@@ -451,6 +461,7 @@ $(document).ready(async function () {
                         productListSection.show();
                     } else {
                     }
+                    spinner.hide();
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -477,6 +488,14 @@ $(document).ready(async function () {
         }
         // Validaciones específicas por tipo o ID del campo
         switch (field.id) {
+            case 'wechatPhone':
+                // Validar formato de número de teléfono (ejemplo: solo dígitos y longitud de 10-15)
+                if (!/^\d{9}$/.test(field.value.trim()) && field.value.trim() !== '') {
+                    showError(field, errorElement, 'Ingrese un número de teléfono válido (9 dígitos).');
+                    return false;
+                }
+                break;
+
             case 'precio':
                 if (!/^\d+(\.\d{1,2})?$/.test(field.value.trim()) && field.value.trim() !== '') {
                     showError(field, errorElement, 'Ingrese solo valores numéricos con hasta 2 decimales.');
@@ -518,6 +537,7 @@ $(document).ready(async function () {
 
     // Función para mostrar un mensaje de error
     function showError(field, errorElement, message) {
+        console.log(field, errorElement, message)
         // Añadir clase de error al campo
         field.classList.add('border-red-500');
 
