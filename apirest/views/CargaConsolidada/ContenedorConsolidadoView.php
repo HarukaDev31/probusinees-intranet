@@ -837,7 +837,7 @@ Search for
           </div>
         <?php } ?>
 
-        <div class="col-12 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-4 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
           <span>CBM Total:</span>
           <div class="">
@@ -845,7 +845,7 @@ Search for
           </div>
         </div>
         <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
-          <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+          <div class="col-4 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
             <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
             <span>CBM Pendiente:</span>
             <div class="">
@@ -853,7 +853,7 @@ Search for
             </div>
           </div>
         <?php } ?>
-        <div class="col-12 col-sm-12  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-4 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
           <span>CBM Total:</span>
           <div class="">
@@ -1242,8 +1242,8 @@ Search for
     <div class="row mb-2 justify-around">
       <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-4 col-lg-12 col-md-12 ">
         <div>
-          <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>">
-            <h2 class="d-flex w-100 justify-content-between align-items-center"><label>
+          <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?> title-inspection">
+            <h2 class="d-flex w-100 justify-content-between align-items-center title-inspection"><label class="text-lg">
                 <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                   Documentación
                 <?php } else { ?>
@@ -1317,7 +1317,8 @@ Search for
       </div>
       <!-- <div class="col-12 col-xl-5 col-md-12 px-4 py-8 py-sm-4"> -->
         <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-5 col-lg-12 col-md-12">
-          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?>"><label>Inspection <i class="fas fa-images"></i></label>
+          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?> title-inspection">
+            <label class="text-lg">Inspection <i class="fas fa-images"></i></label>
             <div id="btn-guardar-inspection"
               onclick="saveInspection()"
               class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -1383,12 +1384,12 @@ Search for
         </div>
       <!-- </div> -->
       <div class="col-12 col-xl-3 col-md-12 px-4 py-8 pt-sm-4 note-container-container">
-        <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">
-          <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+        <h2 class="text-lg font-semibold bg-white shadow documentation-title d-flex justify-content-between rounded-top p-5 title-inspection">
+          <label class="text-lg"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
             Notas
           <?php } else { ?>
             Notes
-          <?php } ?>
+          <?php } ?></label>
           <button onclick="addNote()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
             <i class="fas fa-save  float-right"></i>
 
@@ -1399,9 +1400,9 @@ Search for
               <?php } ?> </span>
           </button>
         </h2>
-        <div id="note-container" class="bg-white shadow p-4 rounded-lg">
+        <div id="note-container" class="bg-white shadow p-4 rounded-lg" style="height: 250px;">
           <textarea id="txt-Id_Carga_Consolidada"
-            class="form-control"></textarea>
+            class="form-control" style="height: 200px;"></textarea>
         </div>
       </div>
     </div>
@@ -2529,6 +2530,32 @@ Search for
 
   #txt-Id_Carga_Consolidada{
     height: 20vh;
+  }
+
+  .file-upload-box{
+    height: 300px;
+  }
+  .file-label>i{
+    font-size:2.5rem;
+  }
+
+  .file-label{
+    flex-direction: column;
+    justify-content: center;
+    gap:30px;
+    height: 100%;
+  }
+  .file-group-text{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .file-format{
+    margin-bottom: 0;
+  }
+  .title-inspection{
+    justify-content: center !important;
   }
 
 }
