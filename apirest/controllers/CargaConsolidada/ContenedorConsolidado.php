@@ -132,7 +132,7 @@ class ContenedorConsolidado extends CI_Controller
 
 			$divAcciones = '<div>';
 
-			$divAcciones .= '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+			$divAcciones .= '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
 			' . $row->carga . ')"></i>';
 			//if user is coordinacion show
 			if ($this->user->No_Grupo == "Coordinación") {
@@ -143,6 +143,8 @@ class ContenedorConsolidado extends CI_Controller
 			$divAcciones .= '</div>';
 
 			$subdata[] = $divAcciones;
+			$subdata[] = $row->id;  
+			$subdata[] = $row->carga;
 			$data[] = $subdata;
 		}
 
@@ -192,7 +194,7 @@ class ContenedorConsolidado extends CI_Controller
 			</div>";
 				$subdata[] = $divObservacion;
 				//icon eye
-				$divAcciones = '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+				$divAcciones = '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
 			' . $row->carga . ',true)"></i>';
 				$subdata[] = $divAcciones;
 			} else {
@@ -252,7 +254,7 @@ class ContenedorConsolidado extends CI_Controller
 
 				$divAcciones = '<div>';
 
-				$divAcciones .= '<i class="fas fa-eye text-primary" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
+				$divAcciones .= '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
 			' . $row->carga . ')"></i>';
 				//if user is coordinacion show
 				if ($this->user->No_Grupo == "Coordinación") {
@@ -263,6 +265,8 @@ class ContenedorConsolidado extends CI_Controller
 				$divAcciones .= '</div>';
 
 				$subdata[] = $divAcciones;
+				$subdata[] = $row->id;
+				$subdata[] = $row->carga;
 			}
 
 			$data[] = $subdata;

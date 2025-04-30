@@ -139,7 +139,7 @@ Search for
             </div>
           </div>
 
-          <div class=" col-12 col-xl-1 dropdown filter-contenedor">
+          <div class=" col-1 col-xl-1 dropdown filter-contenedor px-0">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -1382,7 +1382,7 @@ Search for
           </div>
         </div>
       <!-- </div> -->
-      <div class="col-10 col-xl-3 col-md-12 px-4 py-8 pt-sm-4 note-container-container">
+      <div class="col-12 col-xl-3 col-md-12 px-4 py-8 pt-sm-4 note-container-container">
         <h2 class="text-lg font-semibold  documentation-title  bg-white d-flex justify-content-between">
           <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
             Notas
@@ -2472,15 +2472,19 @@ Search for
   #table-contenedor thead {
     display: none; /* Ocultar encabezados de la tabla */
   }
-
+  #table-contenedor tbody tr:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    background: #f7f7f7;
+  }
+  .view-eye{
+    display: none;
+  }
 
   #table-contenedor tbody tr {
+    cursor: pointer;
+    transition: box-shadow 0.2s;
     display: grid;
-<<<<<<< HEAD
     grid-template-columns: 2fr 1fr; /* Dos columnas iguales */
-=======
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
->>>>>>> feature/agente-compra-new
     margin-bottom: 16px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -2511,13 +2515,6 @@ Search for
     font-size: 20px;
     margin-right: -12px;
   }
-<<<<<<< HEAD
-=======
-  #btn-grd-doc-not{
-    order: 99;
-  }
-
->>>>>>> feature/agente-compra-new
   .note-container-container{
     min-height: 10%;
     padding-bottom: 15%;
@@ -2528,7 +2525,6 @@ Search for
     bottom: 0%;
     left: 0%;
     order: 99;
-    bottom: 1%;
   }
 
   #txt-Id_Carga_Consolidada{

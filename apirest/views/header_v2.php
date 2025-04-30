@@ -464,6 +464,8 @@ $SectionNames=[
       }
 
       .brand-link {
+        color: #151515;
+        text-decoration: none;
         display: flex;
         font-size: 1.25rem !important;
         min-height: 10vh;
@@ -476,6 +478,10 @@ $SectionNames=[
         justify-content: center;
         align-items: center;
         border-bottom: 0px !important;
+      }
+      .brand-link:hover {
+        text-decoration: none;
+        color: #151515;
       }
 
       .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
@@ -517,5 +523,8 @@ $SectionNames=[
       .main-header .brand-link {
         display: none !important;
       }
+    }
+    @media (min-width: 768px){
+      
     }
     </style>

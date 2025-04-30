@@ -5473,6 +5473,7 @@ $(document).ready(async function () {
           [100, 1000, "Todos"],
         ],
       });
+      applyDynamicStylesForTableRows();
     } else {
       $("#table-contenedor-completados").html("");
       table_Entidad = $("#table-contenedor").DataTable({
@@ -5582,7 +5583,20 @@ $(document).ready(async function () {
           [100, 1000, "Todos"],
         ],
       });
+      applyDynamicStylesForTableRows();
+      const isMobile = window.matchMedia("(max-width: 768px)");
+    function handleRowClickByDevice() {
+      if (isMobile.matches) {
+        setupRowClickDetalleContenedor('#table-contenedor');
+        setupRowClickDetalleContenedor('#table-contenedor-completados');
+      } else {
+        $('#table-contenedor tbody').off('click', 'tr');
+      }
     }
+    isMobile.addEventListener("change", handleRowClickByDevice);
+    handleRowClickByDevice();
+    }
+    applyDynamicStylesForTableRows();
   } else {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     table_Entidad = $("#table-contenedor").DataTable({
@@ -5694,6 +5708,17 @@ $(document).ready(async function () {
     });
     configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
     applyDynamicStylesForTableRows();
+    const isMobile = window.matchMedia("(max-width: 768px)");
+    function handleRowClickByDevice() {
+      if (isMobile.matches) {
+        setupRowClickDetalleContenedor('#table-contenedor');
+        setupRowClickDetalleContenedor('#table-contenedor-completados');
+      } else {
+        $('#table-contenedor tbody').off('click', 'tr');
+      }
+    }
+    isMobile.addEventListener("change", handleRowClickByDevice);
+    handleRowClickByDevice();
     
 
   }
@@ -7854,6 +7879,19 @@ function applyDynamicStylesForTableRows() {
   }
 }
 
+
+function setupRowClickDetalleContenedor(tableSelector) {
+  const $table = $(tableSelector);
+  $table.find('tbody').off('click', 'tr'); // Evita duplicados
+  $table.find('tbody').on('click', 'tr', function () {
+    const rowData = $table.DataTable().row(this).data(); // <-- Cambiado aquí
+    if (rowData) {
+      const id = rowData[rowData.length - 2];
+      const carga = rowData[rowData.length - 1];
+      viewSteps(id, carga);
+    }
+  });
+}
 
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 

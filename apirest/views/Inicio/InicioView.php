@@ -15,7 +15,7 @@
   <!-- Hero Section -->
   <div class="hero-section position-relative" style="background-image: url('<?php echo base_url().'assets/img/backgrounds/inicioview.png'?>');">
     <div class="container position-relative d-flex align-items-center mx-4" style="height: 100%;">
-      <div class="text-white display-4 py-5" style="font-weight: 400;z-index: 3">¡Hola, bienvenido!</div>
+      <div class="text-white lg:text-5xl sm:text-4xl text-4xl xl-py-5 main-text" style="font-weight: 400;z-index: 3">¡Hola,<br> bienvenido!</div>
     </div>
   </div>
 
@@ -23,7 +23,7 @@
   <div class="container">
     <div class="row g-4">
       <!-- Dollar Stats -->
-      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container px-2">
@@ -31,14 +31,14 @@
             </div>
             <div class="text-container">
               <div class="display-2 fw-bold" id="Dolars import">0M</div>
-              <p class="text-muted"><small>De dólares en importaciones</small></p>
+              <p class="text-muted"><small>Dólares en importaciones</small></p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Users Stats -->
-      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container px-2">
@@ -53,7 +53,7 @@
       </div>
 
       <!-- Package Stats -->
-      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container px-2">
@@ -68,7 +68,7 @@
       </div>
 
       <!-- Container Stats -->
-      <div class="col-md-6 col-lg-3 col-sm-6 col-6">
+      <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div class="icon-container px-2">
@@ -1821,6 +1821,7 @@
 
   /* Stats Card Styles */
   .stat-card {
+    height: 80%;
     background: white;
     border-radius: 1rem;
     border: none;
@@ -1861,9 +1862,6 @@
     }
   }
   @media (max-width: 576px) {
-    .stat-card {
-      padding: 1rem;
-    }
 
     .display-6 {
       font-size: 1.2rem;
@@ -1873,6 +1871,9 @@
     }
     .text-container{
       text-align: center;
+    }
+    .main-text{
+      margin-top: -10%;
     }
   }
 </style>
