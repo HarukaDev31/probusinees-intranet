@@ -1,6 +1,6 @@
 <script>
-  var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
-  localStorage.setItem("currentPrivilege", currentPrivilege);
+    var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
+    localStorage.setItem("currentPrivilege", currentPrivilege);
 </script>
 <div class="content-wrapper">
     <!--Main Content-->
@@ -8,11 +8,12 @@
         <div class="container-fluid">
             <div class="flex items-center justify-between mb-8">
                 <h1 class="text-2xl font-bold text-gray-800">Productos</h1>
-
+                <?php if ($this->user->No_Grupo == "CatalogoChina") { ?>
                 <button id="btnAddProduct" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors flex items-center justify-center shadow-sm">
                     <span class="i-lucide-plus mr-2"></span>
                     <span>Agregar Producto</span>
                 </button>
+                <?php } ?>
             </div>
 
             <!-- Search and Filter Bar -->
@@ -60,16 +61,22 @@
     <!-- Add Product Form -->
     <section class="content hidden" id="productoFormSection">
         <div class="container-fluid">
-            <div class="flex items-center justify-between mb-6">
-                <button 
-                id="btnBack"
-                type="button" id="btn-back-documentacion-documentacion" class="py-1 px-2 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
-
-
+            <div class="flex items-center justify-between mb-6" >
+                <button
+                    id="btnBack"
+                    type="button" id="btn-back-documentacion-documentacion" class="py-1 px-2 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+                <div class="gap-2 d-flex flex-row" id="actionButtons">
+                    <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
+                    <button id="btnCotizar" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-md transition-colors flex items-center justify-center shadow-sm">
+                    <span>Pasar a cotizados</span>
+                    <span class="i-lucide-check-circle ml-2"></span>
+                    </button>
+                <?php } ?>
                 <button id="btnSave" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-md transition-colors flex items-center justify-center shadow-sm">
                     <span>Guardar</span>
                     <span class="i-lucide-save ml-2"></span>
                 </button>
+                </div>
             </div>
 
         </div>
@@ -107,7 +114,8 @@
 
             <!-- Right Column - Product Details Form -->
             <div class="lg:col-span-3">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6" <?php if ($this->user->No_Grupo != "CatalogoChina") echo 'style="pointer-events:none"'; ?>>
                     <div class="p-4 border-b border-gray-100 flex items-center">
                         <h2 class="text-lg font-medium text-gray-800">Detalles del Producto</h2>
                         <div class="ml-2 tooltip" data-tooltip="Información obligatoria para guardar el producto">
@@ -142,18 +150,20 @@
                                     </div>
                                     <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
                                 </div>
+                                <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
                                 <div class="form-group">
                                     <label for="profit" class="block text-sm font-medium text-gray-700 mb-1">
                                         Profit <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative">
                                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-                                        <input type="text" id="profit" 
+                                        <input type="text" id="profit"
                                             class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
                                             placeholder="0.00" disabled
                                             value="3.00">
                                     </div>
                                 </div>
+                                <?php } ?>
                                 <!-- MOQ -->
                                 <div class="form-group">
                                     <label for="moq" class="block text-sm font-medium text-gray-700 mb-1">
@@ -251,9 +261,9 @@
                                     </label>
                                     <input type="text" id="wechatPhone" name="wechatPhone" required
                                         class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
+                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
 
-                                    </div>
+                                </div>
 
                                 <!-- Contact Card -->
                                 <div class="form-group">
@@ -274,192 +284,178 @@
                 </div>
             </div>
             <!-- both columns -->
-            <div class="lg:col-span-5">
+            <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
+                <div class="lg:col-span-5">
 
-            <div class=" bg-white rounded-lg shadow-lg p-6">
-                <h1 class="text-2xl font-bold mb-6">COSTOS DE IMPORTACIÓN:</h1>
-                
-                <!-- Input Fields Section -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">Precio USD:</label>
-                        <input 
-                        disabled
-                        type="number" id="precioUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01">
-                    </div>
-        
-                    
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">Total USD:</label>
-                        <input type="number" id="totalUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" readonly>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">Total CBM:</label>
-                        <input type="number" id="totalCBM" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01">
-                    </div>
-                </div>
+                    <div class=" bg-white rounded-lg shadow-lg p-6">
+                        <h1 class="text-2xl font-bold mb-6">COSTOS DE IMPORTACIÓN:</h1>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
-                        <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
-                    </div>
-                    
-                    <div class="input-group">
-                        <!-- <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
-                        <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            <option value="0">0%</option>
-                            <option value="6">6%</option>
-                            <option value="11">11%</option>
-                        </select> -->
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">IGV:</label>
-                        <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">*Antidumping:</label>
-                        <input type="number" id="antidumping" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
-                    </div>
-                </div>
+                        <!-- Input Fields Section -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Precio USD:</label>
+                                <input
+                                    disabled
+                                    type="number" id="precioUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01" disabled>
+                            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">Percepción:</label>
-                        <input type="number" id="percepcion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="3.5" readonly>
-                    </div>
-                </div>
 
-                <!-- Calculation Tables -->
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                    <!-- Base Imponible Table -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULO DE BASE IMPONIBLE</h2>
-                        <table class="w-full">
-                            <tr>
-                                <td class="py-2">Valor de carga</td>
-                                <td class="py-2 text-right" id="valorCarga">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Flete</td>
-                                <td class="py-2 text-right" id="flete">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Seguro</td>
-                                <td class="py-2 text-right" id="seguro">$ 0.00</td>
-                            </tr>
-                            <tr class="font-bold">
-                                <td class="py-2">VALOR CIF</td>
-                                <td class="py-2 text-right" id="valorCIF">$ 0.00</td>
-                            </tr>
-                        </table>
-                    </div>
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Total USD:</label>
+                                <input type="number" id="totalUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
+                            </div>
 
-                    <!-- Resumen Table -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h2 class="text-lg font-semibold mb-4 bg-orange-500 text-white p-2">RESUMEN DE COTIZACIÓN</h2>
-                        <table class="w-full">
-                            <tr>
-                                <td class="py-2">Valor de carga (pago China)</td>
-                                <td class="py-2 text-right" id="valorCargaResumen">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Servicio trading (pago China)</td>
-                                <td class="py-2 text-right" id="servicioTrading">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Servicio importación</td>
-                                <td class="py-2 text-right" id="servicioImportacion">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Impuestos</td>
-                                <td class="py-2 text-right" id="impuestos">$ 0.00</td>
-                            </tr>
-                            <tr class="font-bold">
-                                <td class="py-2">MONTO TOTAL</td>
-                                <td class="py-2 text-right" id="montoTotal">$ 0.00</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULOS DE TRIBUTOS</h2>
-                        <table class="w-full">
-                            <!-- ADD FOR AD VALOREM IGV IPM ANTIDUMPING SUBTOTAL IN BOLD, PERCEPCION AND TOTAL INPUTS-->
-                            <tr>
-                                <td class="py-2">Ad Valorem</td>
-                                <td class="py-2 text-right" id="adValorem">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">IGV</td>
-                                <td class="py-2 text-right" id="igvTotal">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">IPM</td>
-                                <td class="py-2 text-right" id="ipmTotal">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Antidumping</td>
-                                <td class="py-2 text-right" id="antidumpingTotal">$ 0.00</td>
-                            </tr>
-                            <tr class="font-bold">
-                                <td class="py-2">Subtotal</td>
-                                <td class="py-2 text-right" id="subtotal">$ 0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Percepción</td>
-                                <td class="py-2 text-right" id="percepcionTotal">$ 0.00</td>
-                            </tr>
-                            <tr class="font-bold">
-                                <td class="py-2">TOTAL</td>
-                                <td class="py-2 text-right" id="total">$ 0.00</td>
-                            </tr>
-                            <!-- costo en destiono -->
-                            <tr class="font-bold">
-                                <td class="py-2">Costo en destino</td>
-                                <td class="py-2 text-right" id="costoDestino">$ 0.00</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Cost Results -->
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-orange-500 text-white p-4 rounded-lg">
-                        <div class="flex justify-between items-center">
-                            <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                            <span id="costoUnitarioUSD">$ 0.00</span>
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Total CBM:</label>
+                                <input type="number" id="totalCBM" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01" disabled>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-orange-500 text-white p-4 rounded-lg">
-                        <div class="flex justify-between items-center">
-                            <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                            <span id="costoUnitarioPEN">S/ 0.00</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Help Text -->
-                <div class="mt-8 text-sm text-gray-600">
-                    <h3 class="font-bold text-red-600 mb-2">COSTOS DE IMPORTACIÓN:</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        <li>Cuando quieran sacar los costos tienen que llenar obligatoriamente lo siguiente:</li>
-                        <li>Arancel: Tenga la opción de seleccionar o escribir *0% - 6% - 11%</li>
-                        <li>*Puede escribir en porcentaje</li>
-                        <li>Antidumping: Le permita colocar valor y el signo en dólares</li>
-                        <li>Precio USD: Es la suma de precio en yuanes + profit y divido entre 7</li>
-                        <li>Total USD: Es la multiplicación del MOQ x el PRECIO USD.</li>
-                        <li>Total CBM: Es la división de MOQ / QTY box, luego el resultado lo multiplica por el CBM x box</li>
-                        <li>Servicio de impo: por defecto sale $350</li>
-                        <li>IGV: sale por defecto 18%</li>
-                        <li>Percepción: Sale por defecto 3.5%</li>
-                        <li>Costo unitario de importación en soles: Siempre será divido entre 3.8</li>
-                    </ul>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
+                                <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00">
+                            </div>
+
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
+                                <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                    <option value="0.00">0%</option>
+                                    <option value="6.00">6%</option>
+                                    <option value="11.00">11%</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">IGV:</label>
+                                <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18">
+                            </div>
+
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">*Antidumping:</label>
+                                <input type="number" id="antidumping" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Percepción:</label>
+                                <input type="number" id="percepcion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="3.5">
+                            </div>
+                        </div>
+
+                        <!-- Calculation Tables -->
+                        <div class="grid grid-cols-1 md:grid-cols-2">
+                            <!-- Base Imponible Table -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULO DE BASE IMPONIBLE</h2>
+                                <table class="w-full">
+                                    <tr>
+                                        <td class="py-2">Valor de carga</td>
+                                        <td class="py-2 text-right" id="valorCarga">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Flete</td>
+                                        <td class="py-2 text-right" id="flete">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Seguro</td>
+                                        <td class="py-2 text-right" id="seguro">$ 0.00</td>
+                                    </tr>
+                                    <tr class="font-bold">
+                                        <td class="py-2">VALOR CIF</td>
+                                        <td class="py-2 text-right" id="valorCIF">$ 0.00</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Resumen Table -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h2 class="text-lg font-semibold mb-4 bg-orange-500 text-white p-2">RESUMEN DE COTIZACIÓN</h2>
+                                <table class="w-full">
+                                    <tr>
+                                        <td class="py-2">Valor de carga (pago China)</td>
+                                        <td class="py-2 text-right" id="valorCargaResumen">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Servicio trading (pago China)</td>
+                                        <td class="py-2 text-right" id="servicioTrading">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Servicio importación</td>
+                                        <td class="py-2 text-right" id="servicioImportacion">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Impuestos</td>
+                                        <td class="py-2 text-right" id="impuestos">$ 0.00</td>
+                                    </tr>
+                                    <tr class="font-bold">
+                                        <td class="py-2">MONTO TOTAL</td>
+                                        <td class="py-2 text-right" id="montoTotal">$ 0.00</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULOS DE TRIBUTOS</h2>
+                                <table class="w-full">
+                                    <!-- ADD FOR AD VALOREM IGV IPM ANTIDUMPING SUBTOTAL IN BOLD, PERCEPCION AND TOTAL INPUTS-->
+                                    <tr>
+                                        <td class="py-2">Ad Valorem</td>
+                                        <td class="py-2 text-right" id="adValorem">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">IGV</td>
+                                        <td class="py-2 text-right" id="igvTotal">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">IPM</td>
+                                        <td class="py-2 text-right" id="ipmTotal">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Antidumping</td>
+                                        <td class="py-2 text-right" id="antidumpingTotal">$ 0.00</td>
+                                    </tr>
+                                    <tr class="font-bold">
+                                        <td class="py-2">Subtotal</td>
+                                        <td class="py-2 text-right" id="subtotal">$ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Percepción</td>
+                                        <td class="py-2 text-right" id="percepcionTotal">$ 0.00</td>
+                                    </tr>
+                                    <tr class="font-bold">
+                                        <td class="py-2">TOTAL</td>
+                                        <td class="py-2 text-right" id="total">$ 0.00</td>
+                                    </tr>
+                                    <!-- costo en destiono -->
+                                    <tr class="font-bold">
+                                        <td class="py-2">Costo en destino</td>
+                                        <td class="py-2 text-right" id="costoDestino">$ 0.00</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Cost Results -->
+                        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-orange-500 text-white p-4 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span>COSTO UNITARIO DE IMPORTACIÓN</span>
+                                    $  <input disabled id="costoUnitarioUSD" style="background: transparent;">
+                                </div>
+                            </div>
+                            <div class="bg-orange-500 text-white p-4 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span>COSTO UNITARIO DE IMPORTACIÓN</span>
+                                    S/ <input disabled id="costoUnitarioPEN" style="background: transparent;" >
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
                 </div>
-            </div>
-            </div>
+            <?php } ?>
         </div>
 
     </section>
@@ -480,18 +476,25 @@
     </template>
     <template id="productTemplate">
         <div class="bg-white card rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
+            <!--add badge status in top right corner -->
+            <div class="absolute top-2 right-2  text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
+
             <div class="relative aspect-square">
                 <img src="" alt="" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity"></div>
             </div>
 
             <div class="p-4">
-                <h3 class="font-medium text-gray-800 mb-2"></h3>
-                <div class="flex items-center justify-between text-sm">
-                    <span class="text-gray-600 font-bold text-lg"></span>
-                    <span class="text-gray-500 font-bold text-lg"></span>
+                <h3 class="mb-2 text-center font-bold"></h3>
+                <div class="flex-col flex items-center justify-between text-sm">
+                    <span class="text-gray-600  text-lg"></span>
+                    <span class="text-gray-500  text-lg"></span>
+                    <span class="text-black-600  text-lg precioPeru"></span>
+                    <span class="text-black-500  text-lg precioUSD"></span>
                 </div>
-
+                <button class="btn btn-primary btnTienda  mx-auto mt-4 bg-blue-50  text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1">
+                    <span>PASAR A TIENDA</span>
+                </button>
                 <div class="mt-4 pt-4 border-t border-gray-100">
                     <div class="flex items-center justify-center gap-2">
                         <button class="edit-btn flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1">
@@ -620,10 +623,10 @@
         height: auto;
 
     }
+
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
-
 </style>
