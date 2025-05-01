@@ -8,12 +8,15 @@ var additionalImage2 = null
 var additionalVideo1 = null
 var contactCardContainer = null
 var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
+const EXCHANGE_RATE = 3.8;
+
+// Function to format number as currency
 
 $(document).ready(async function () {
     productoFormSection = $('#productoFormSection')
     productListSection = $('#productListSection')
     spinner = $(".backdrop")
-    
+
     showSkeletons();
 
     // Simulate loading data (replace with actual API call)
@@ -295,6 +298,7 @@ $(document).ready(async function () {
             if (data.status) {
                 const product = data.data;
                 renderProductDetails(product);
+                calculateValues();
             } else {
                 console.error('Error loading product details:', data.message);
             }
@@ -558,4 +562,230 @@ $(document).ready(async function () {
             errorElement.classList.add('hidden');
         }
     }
+    function formatCurrency(number, currency = '$') {
+        return currency + ' ' + parseFloat(number).toFixed(2);
+    }
+
+    function calculateValues() {
+        // 1. Obtenemos todos los valores de entrada
+        const inputValues = getInputValues();
+
+        // 2. Calculamos valores derivados básicos
+        const derivedValues = calculateDerivedValues(inputValues);
+
+        // 3. Calculamos valores base imponible
+        const baseImponibleValues = calculateBaseImponible(derivedValues);
+
+        // 4. Calculamos impuestos
+        const impuestosValues = calculateImpuestos(baseImponibleValues, inputValues);
+
+        // 5. Calculamos percepción
+        const percepcionValue = calculatePercepcion(baseImponibleValues, impuestosValues, inputValues);
+
+        // 6. Calculamos totales
+        const totalValues = calculateTotals(
+            derivedValues,
+            baseImponibleValues,
+            impuestosValues,
+            percepcionValue,
+            inputValues
+        );
+
+        // 7. Calculamos costos unitarios
+        const unitCosts = calculateUnitCosts(totalValues, inputValues.moq);
+
+        // 8. Actualizamos la UI con todos los valores calculados
+        updateUI(
+            derivedValues,
+            baseImponibleValues,
+            impuestosValues,
+            percepcionValue,
+            totalValues,
+            unitCosts
+        );
+    }
+
+    /**
+     * Obtiene todos los valores de entrada del formulario
+     */
+    function getInputValues() {
+        return {
+            precioYuanes: parseFloat($('#precio').val()) || 0,
+            moq: parseInt($('#moq').val()) || 0,
+            arancelRate: parseFloat($('#arancel').val()) / 100,
+            igvRate: parseFloat($('#igv').val()) / 100,
+            antidumpingValue: parseFloat($('#antidumping').val()) || 0,
+            percepcionRate: parseFloat($('#percepcion').val()) / 100,
+            servicioImpoValue: parseFloat($('#servicioImpo').val()),
+            qtyXbox: parseInt($('#qtyXbox').val()) || 0,
+            cbmXbox: parseFloat($('#cbmXbox').val()) || 0
+        };
+    }
+
+    /**
+     * Calcula valores derivados de los inputs
+     */
+    function calculateDerivedValues(inputs) {
+        // Calcula precio en USD según fórmula (precio en yuanes + 7) / 7
+        const precioUSD = (inputs.precioYuanes + 7) / 7;
+
+        // Calcula total USD como MOQ * precio USD
+        const totalUSDValue = inputs.moq * precioUSD;
+
+        // Calcula CBM total según fórmula MOQ / cantidad por caja * CBM por caja
+        const totalCBMValue = inputs.moq / inputs.qtyXbox * inputs.cbmXbox;
+
+        return {
+            precioUSD,
+            totalUSDValue,
+            totalCBMValue
+        };
+    }
+
+    /**
+     * Calcula valores de la base imponible
+     */
+    function calculateBaseImponible(derived) {
+        const valorCargaValue = derived.totalUSDValue;
+        const fleteValue = 350 * 0.6; // Servicio de impo * 0.6
+        const seguroValue = derived.totalUSDValue >= 5000 ? 100 : 50;
+        const valorCIFValue = valorCargaValue + fleteValue + seguroValue;
+
+        return {
+            valorCargaValue,
+            fleteValue,
+            seguroValue,
+            valorCIFValue
+        };
+    }
+
+    /**
+     * Calcula los diferentes impuestos
+     */
+    function calculateImpuestos(baseImponible, inputs) {
+        const arancelValue = baseImponible.valorCIFValue * inputs.arancelRate;
+        const baseIGV = baseImponible.valorCIFValue + arancelValue;
+        const igvValue = baseIGV * inputs.igvRate;
+        const igvTotal = 0.16 * baseImponible.valorCIFValue;
+        const ipmTotal = (inputs.igvRate - 0.16) * baseImponible.valorCIFValue;
+        const antidumpingTotal = inputs.antidumpingValue * inputs.moq;
+
+        const subtotal = arancelValue + igvTotal + ipmTotal + antidumpingTotal;
+
+        return {
+            arancelValue,
+            baseIGV,
+            igvValue,
+            igvTotal,
+            ipmTotal,
+            antidumpingTotal,
+            subtotal
+        };
+    }
+
+    /**
+     * Calcula la percepción
+     */
+    function calculatePercepcion(baseImponible, impuestos, inputs) {
+        return (baseImponible.valorCIFValue + impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
+    }
+
+    /**
+     * Calcula los totales
+     */
+    function calculateTotals(derived, baseImponible, impuestos, percepcionValue, inputs) {
+        const costoDestino = baseImponible.valorCIFValue * 0.4;
+
+        const impuestosTotal = impuestos.arancelValue +
+            impuestos.igvValue +
+            (inputs.igvRate - 0.16) * baseImponible.valorCIFValue +
+            (inputs.antidumpingValue * inputs.moq) +
+            percepcionValue;
+
+        const servicioTrading = 250;
+
+        const montoTotalValue = servicioTrading +
+            inputs.servicioImpoValue +
+            impuestosTotal +
+            baseImponible.valorCargaValue;
+
+        return {
+            impuestosTotal,
+            costoDestino,
+            servicioTrading,
+            montoTotalValue
+        };
+    }
+
+    /**
+     * Calcula los costos unitarios
+     */
+    function calculateUnitCosts(totals, moq) {
+        let costoUnitarioUSDValue = 0;
+        if (moq > 0) {
+            costoUnitarioUSDValue = totals.montoTotalValue / moq;
+        }
+        const costoUnitarioPENValue = costoUnitarioUSDValue * EXCHANGE_RATE;
+
+        return {
+            costoUnitarioUSDValue,
+            costoUnitarioPENValue
+        };
+    }
+
+    /**
+     * Actualiza la interfaz de usuario con todos los valores calculados
+     */
+    function updateUI(derived, baseImponible, impuestos, percepcionValue, totals, unitCosts) {
+        // Actualizar valores derivados
+        $("#precioUSD").val(derived.precioUSD.toFixed(2));
+        $('#totalUSD').val(derived.totalUSDValue.toFixed(2));
+        $('#totalCBM').val(derived.totalCBMValue.toFixed(2));
+
+        // Actualizar base imponible
+        $('#valorCarga').text(formatCurrency(baseImponible.valorCargaValue));
+        $('#flete').text(formatCurrency(baseImponible.fleteValue));
+        $('#seguro').text(formatCurrency(baseImponible.seguroValue));
+        $('#valorCIF').text(formatCurrency(baseImponible.valorCIFValue));
+
+        // Actualizar impuestos
+        $("#adValorem").text(formatCurrency(impuestos.arancelValue));
+        $("#igvTotal").text(formatCurrency(impuestos.igvTotal));
+        $("#ipmTotal").text(formatCurrency(impuestos.ipmTotal));
+        $("#antidumpingTotal").text(formatCurrency(impuestos.antidumpingTotal));
+        $("#subtotal").text(formatCurrency(impuestos.subtotal));
+
+        // Actualizar percepción
+        $("#percepcionTotal").text(formatCurrency(percepcionValue));
+
+        // Actualizar totales de impuestos
+        $('#total').text(formatCurrency(totals.impuestosTotal));
+        $("#costoDestino").text(formatCurrency(totals.costoDestino));
+
+        // Actualizar resumen
+        $('#valorCargaResumen').text(formatCurrency(baseImponible.valorCargaValue));
+        $('#servicioTrading').text(formatCurrency(totals.servicioTrading));
+        $('#servicioImportacion').text(formatCurrency(250));
+        $('#impuestos').text(formatCurrency(totals.impuestosTotal));
+        $('#montoTotal').text(formatCurrency(totals.montoTotalValue));
+
+        // Actualizar costos unitarios
+        $('#costoUnitarioUSD').text(formatCurrency(unitCosts.costoUnitarioUSDValue));
+        $('#costoUnitarioPEN').text(formatCurrency(unitCosts.costoUnitarioPENValue, 'S/'));
+    }
+
+    // Event listeners for input changes
+    $('#precioUSD, #moq, #totalCBM, #arancel, #antidumping').on('input', calculateValues);
+
+    // Also allow manually entering percentage in arancel dropdown
+    $('#arancel').on('change', function () {
+        calculateValues();
+    });
+
+    // Allow custom arancel percentage input
+    $('#arancel').on('keyup', function () {
+        let value = $(this).val().replace('%', '');
+        $(this).val(value);
+        calculateValues();
+    });
 });

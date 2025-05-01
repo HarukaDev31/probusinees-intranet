@@ -236,7 +236,7 @@
                 </div>
 
                 <!-- Provider Data -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ">
                     <div class="p-4 border-b border-gray-100">
                         <h2 class="text-lg font-medium text-gray-800">Datos del Proveedor</h2>
                     </div>
@@ -272,6 +272,193 @@
                         </form>
                     </div>
                 </div>
+            </div>
+            <!-- both columns -->
+            <div class="lg:col-span-5">
+
+            <div class=" bg-white rounded-lg shadow-lg p-6">
+                <h1 class="text-2xl font-bold mb-6">COSTOS DE IMPORTACIÓN:</h1>
+                
+                <!-- Input Fields Section -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700">Precio USD:</label>
+                        <input 
+                        disabled
+                        type="number" id="precioUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01">
+                    </div>
+        
+                    
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700">Total USD:</label>
+                        <input type="number" id="totalUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" readonly>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700">Total CBM:</label>
+                        <input type="number" id="totalCBM" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
+                        <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
+                    </div>
+                    
+                    <div class="input-group">
+                        <!-- <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
+                        <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="0">0%</option>
+                            <option value="6">6%</option>
+                            <option value="11">11%</option>
+                        </select> -->
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700">IGV:</label>
+                        <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700">*Antidumping:</label>
+                        <input type="number" id="antidumping" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700">Percepción:</label>
+                        <input type="number" id="percepcion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="3.5" readonly>
+                    </div>
+                </div>
+
+                <!-- Calculation Tables -->
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    <!-- Base Imponible Table -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULO DE BASE IMPONIBLE</h2>
+                        <table class="w-full">
+                            <tr>
+                                <td class="py-2">Valor de carga</td>
+                                <td class="py-2 text-right" id="valorCarga">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">Flete</td>
+                                <td class="py-2 text-right" id="flete">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">Seguro</td>
+                                <td class="py-2 text-right" id="seguro">$ 0.00</td>
+                            </tr>
+                            <tr class="font-bold">
+                                <td class="py-2">VALOR CIF</td>
+                                <td class="py-2 text-right" id="valorCIF">$ 0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Resumen Table -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h2 class="text-lg font-semibold mb-4 bg-orange-500 text-white p-2">RESUMEN DE COTIZACIÓN</h2>
+                        <table class="w-full">
+                            <tr>
+                                <td class="py-2">Valor de carga (pago China)</td>
+                                <td class="py-2 text-right" id="valorCargaResumen">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">Servicio trading (pago China)</td>
+                                <td class="py-2 text-right" id="servicioTrading">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">Servicio importación</td>
+                                <td class="py-2 text-right" id="servicioImportacion">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">Impuestos</td>
+                                <td class="py-2 text-right" id="impuestos">$ 0.00</td>
+                            </tr>
+                            <tr class="font-bold">
+                                <td class="py-2">MONTO TOTAL</td>
+                                <td class="py-2 text-right" id="montoTotal">$ 0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULOS DE TRIBUTOS</h2>
+                        <table class="w-full">
+                            <!-- ADD FOR AD VALOREM IGV IPM ANTIDUMPING SUBTOTAL IN BOLD, PERCEPCION AND TOTAL INPUTS-->
+                            <tr>
+                                <td class="py-2">Ad Valorem</td>
+                                <td class="py-2 text-right" id="adValorem">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">IGV</td>
+                                <td class="py-2 text-right" id="igvTotal">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">IPM</td>
+                                <td class="py-2 text-right" id="ipmTotal">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">Antidumping</td>
+                                <td class="py-2 text-right" id="antidumpingTotal">$ 0.00</td>
+                            </tr>
+                            <tr class="font-bold">
+                                <td class="py-2">Subtotal</td>
+                                <td class="py-2 text-right" id="subtotal">$ 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2">Percepción</td>
+                                <td class="py-2 text-right" id="percepcionTotal">$ 0.00</td>
+                            </tr>
+                            <tr class="font-bold">
+                                <td class="py-2">TOTAL</td>
+                                <td class="py-2 text-right" id="total">$ 0.00</td>
+                            </tr>
+                            <!-- costo en destiono -->
+                            <tr class="font-bold">
+                                <td class="py-2">Costo en destino</td>
+                                <td class="py-2 text-right" id="costoDestino">$ 0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cost Results -->
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-orange-500 text-white p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span>COSTO UNITARIO DE IMPORTACIÓN</span>
+                            <span id="costoUnitarioUSD">$ 0.00</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-500 text-white p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span>COSTO UNITARIO DE IMPORTACIÓN</span>
+                            <span id="costoUnitarioPEN">S/ 0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Text -->
+                <div class="mt-8 text-sm text-gray-600">
+                    <h3 class="font-bold text-red-600 mb-2">COSTOS DE IMPORTACIÓN:</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Cuando quieran sacar los costos tienen que llenar obligatoriamente lo siguiente:</li>
+                        <li>Arancel: Tenga la opción de seleccionar o escribir *0% - 6% - 11%</li>
+                        <li>*Puede escribir en porcentaje</li>
+                        <li>Antidumping: Le permita colocar valor y el signo en dólares</li>
+                        <li>Precio USD: Es la suma de precio en yuanes + profit y divido entre 7</li>
+                        <li>Total USD: Es la multiplicación del MOQ x el PRECIO USD.</li>
+                        <li>Total CBM: Es la división de MOQ / QTY box, luego el resultado lo multiplica por el CBM x box</li>
+                        <li>Servicio de impo: por defecto sale $350</li>
+                        <li>IGV: sale por defecto 18%</li>
+                        <li>Percepción: Sale por defecto 3.5%</li>
+                        <li>Costo unitario de importación en soles: Siempre será divido entre 3.8</li>
+                    </ul>
+                </div>
+            </div>
             </div>
         </div>
 
@@ -433,4 +620,10 @@
         height: auto;
 
     }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
 </style>
