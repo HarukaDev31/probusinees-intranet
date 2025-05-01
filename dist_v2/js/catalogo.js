@@ -397,7 +397,9 @@ $(document).ready(async function () {
                         body: formData,
                     });
                     if (response.ok) {
-
+                        productoFormSection.hide();
+                        productListSection.show();
+                        await loadProducts();
                     } else {
                         Swal.fire(
                             'Error!',
