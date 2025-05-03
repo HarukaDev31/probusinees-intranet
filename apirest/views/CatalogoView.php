@@ -542,8 +542,7 @@
         </div>
     </template>
     <template id="productTemplate">
-        <div class="bg-white card rounded-lg h-40 flex flex-row w-full  my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative">
-            <!--status badge-->
+    <div class="card edit-btn rounded-lg h-40 cursor-pointer flex flex-row w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative">            <!--status badge-->
             <div class="absolute bottom-2 right-2 text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
 
             <!--dropdown menu trigger-->
@@ -579,10 +578,10 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-row gap-2 w-full">
+            <div class="flex flex-row gap-2 w-full ">
                 <div class="relative aspect-square w-2/5 p-2 px-1">
                     <img src="" alt="" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity"></div>
+                    <div class="absolute inset-0 "></div>
                 </div>
 
                 <div class="px-2 py-4 w-3/5">

@@ -71,14 +71,19 @@ $(document).ready(async function () {
         document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
             // Limpiar handlers anteriores si existieran
             trigger.removeEventListener('click', toggleDropdown);
-            // Añadir nuevo event listener
+            trigger.removeEventListener('focusout', handleFocusOut);
+
+            // Añadir nuevos event listeners
             trigger.addEventListener('click', toggleDropdown);
+            trigger.addEventListener('focusout', handleFocusOut);
         });
 
         // Cerrar todos los dropdowns cuando se hace clic en cualquier parte
         document.addEventListener('click', function (event) {
             const isDropdownTrigger = event.target.closest('.dropdown-trigger');
-            if (!isDropdownTrigger) {
+            const isDropdownMenu = event.target.closest('.dropdown-menu');
+
+            if (!isDropdownTrigger && !isDropdownMenu) {
                 document.querySelectorAll('.dropdown-menu').forEach(menu => {
                     menu.classList.add('hidden');
                 });
@@ -100,6 +105,23 @@ $(document).ready(async function () {
 
         // Alternar el actual
         dropdownMenu.classList.toggle('hidden');
+    }
+
+    // Función para manejar cuando el trigger pierde el foco
+    function handleFocusOut(event) {
+        const dropdownTrigger = event.target;
+        const dropdownMenu = dropdownTrigger.nextElementSibling;
+
+        // Pequeño retraso para permitir que el `click` se procese primero
+        setTimeout(() => {
+            // Verificar si el nuevo elemento con foco está dentro del dropdown
+            const focusedElement = document.activeElement;
+            const isFocusInsideDropdown = dropdownMenu.contains(focusedElement);
+
+            if (!isFocusInsideDropdown) {
+                dropdownMenu.classList.add('hidden');
+            }
+        }, 100);
     }
 
 
