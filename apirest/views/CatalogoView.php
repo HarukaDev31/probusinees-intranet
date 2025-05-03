@@ -3,57 +3,82 @@
     localStorage.setItem("currentPrivilege", currentPrivilege);
 </script>
 <div class="content-wrapper">
-    <!--Main Content-->
     <section class="content" id="productListSection">
         <div class="container-fluid">
-            <div class="flex items-center justify-between mb-8">
-                <h1 class="text-2xl font-bold text-gray-800">Productos</h1>
-                <?php if ($this->user->No_Grupo == "CatalogoChina") { ?>
-                <button id="btnAddProduct" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors flex items-center justify-center shadow-sm">
-                    <span class="i-lucide-plus mr-2"></span>
-                    <span>Agregar Producto</span>
-                </button>
-                <?php } ?>
+            <div class="flex items-center
+            flex-col flex-md-row flex-lg-row flex-xl-row
+            justify-between mb-8 mt-3  border-b-2 border-gray-200 pb-2">
+                <h1 class="text-2xl font-bold text-gray-800">Listado de Productos</h1>
+
+                <div class="flex flex-col gap-2 flex-md-row flex-lg-row flex-xl-row">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                            <span class="i-lucide-search w-5 h-5"></span>
+                        </span>
+                        <input type="text" id="searchInput"
+                            placeholder="Buscar por"
+                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    </div>
+                    <?php if ($this->user->No_Grupo == "CatalogoChina") { ?>
+                        <button id="btnAddProduct" class="gap-2 bg-orange-600 hover:bg-orange-700 text-white py-2 px-10 rounded-md transition-colors flex items-center justify-center shadow-sm">
+                            <span>Agregar Producto</span>
+                            <span class="i-lucide-plus text-lg"></span>
+                        </button>
+                    <?php } ?>
+                </div>
             </div>
 
             <!-- Search and Filter Bar -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class=" mb-6">
                 <div class="flex flex-col md:flex-row gap-4">
                     <!-- Search -->
                     <div class="flex-1">
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <span class="i-lucide-search w-5 h-5"></span>
-                            </span>
-                            <input type="text" id="searchInput"
-                                placeholder="Buscar productos..."
-                                class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                        </div>
+
                     </div>
 
                     <!-- Filters -->
-                    <div class="flex gap-4">
-                        <select id="sortSelect" class="border border-gray-300 rounded-md px-4 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <option value="">Ordenar por</option>
-                            <option value="name">Nombre</option>
-                            <option value="price">Precio</option>
-                            <option value="date">Fecha</option>
-                        </select>
+                    <div class="flex align-items-center justify-end gap-2">
+                        <div class="flex gap-2 items-center justify-center mr-4">
+                            <span value=""
+                                class="text-sm font-medium text-gray-400 mb-1">Ordenar por:</span>
+                            <select id="sortSelect" class="border border-gray-300 rounded-md px-4 py-2 bg-white focus:ring-2  text-gray-300  focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="name" class="text-gray-300">Agregados recientemente</option>
+                                <option value="price">Precio</option>
+                                <option value="date">Fecha</option>
+                            </select>
+                        </div>
+                        <!-- ver vista cuadricula ,lista -->
+                        <div class="flex gap-1 items-center justify-center">
+                            Ver
+                            <button id="gridViewBtn" class="rounded-full w-8 h-8 flex items-center justify-center shadow-sm focus:outline-none">
+                                <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="4.09091" height="4.09091" rx="0.818182" fill="#7E7E7E" />
+                                    <rect y="4.9082" width="4.09091" height="4.09091" rx="0.818182" fill="#7E7E7E" />
+                                    <rect x="4.90918" width="4.09091" height="4.09091" rx="0.818182" fill="#7E7E7E" />
+                                    <rect x="4.90918" y="4.9082" width="4.09091" height="4.09091" rx="0.818182" fill="#7E7E7E" />
+                                </svg>
 
-                        <button id="filterBtn" class="border border-gray-300 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-gray-50 transition-colors">
-                            <span class="i-lucide-filter w-5 h-5"></span>
-                            <span>Filtros</span>
-                        </button>
+                            </button>
+                            <button id="listViewBtn" class="rounded-full w-8 h-8 flex items-center justify-center shadow-sm focus:outline-none">
+                                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" width="9" height="2" rx="1" fill="#7E7E7E" />
+                                    <rect width="2" height="2" rx="1" fill="#7E7E7E" />
+                                    <rect y="3" width="2" height="2" rx="1" fill="#7E7E7E" />
+                                    <rect y="6" width="2" height="2" rx="1" fill="#7E7E7E" />
+                                    <rect x="3" y="3" width="9" height="2" rx="1" fill="#7E7E7E" />
+                                    <rect x="3" y="6" width="9" height="2" rx="1" fill="#7E7E7E" />
+                                </svg>
+
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
 
             <!-- Product Grid -->
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Skeleton Template -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 h-full">
 
-
-                <!-- Product Card Template -->
 
             </div>
         </div>
@@ -61,61 +86,76 @@
     <!-- Add Product Form -->
     <section class="content hidden" id="productoFormSection">
         <div class="container-fluid">
-            <div class="flex items-center justify-between mb-6" >
+
+            <div class="flex items-center justify-between mt-3">
                 <button
                     id="btnBack"
-                    type="button" id="btn-back-documentacion-documentacion" class="py-1 px-2 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+                    type="button" id="btn-back-documentacion-documentacion" class="py-2  px-4 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left mr-2"></i> Regresar</button>
                 <div class="gap-2 d-flex flex-row" id="actionButtons">
                     <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
-                    <button id="btnCotizar" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-md transition-colors flex items-center justify-center shadow-sm">
-                    <span>Pasar a cotizados</span>
-                    <span class="i-lucide-check-circle ml-2"></span>
+                        <button id="btnCotizar" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-sm transition-colors flex items-center justify-center shadow-sm">
+                            <span>Pasar a cotizados</span>
+                            <span class="i-lucide-check-circle ml-2"></span>
+                        </button>
+                    <?php } ?>
+                    <button id="btnDelete" class="border-2 border-red-500 gap-2 text-red py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 3.5H2.55556H15" stroke="#FF3636" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M13.4446 3.5V14C13.4446 14.3978 13.2807 14.7794 12.9889 15.0607C12.6972 15.342 12.3016 15.5 11.889 15.5H4.11122C3.69866 15.5 3.303 15.342 3.01128 15.0607C2.71955 14.7794 2.55566 14.3978 2.55566 14V3.5M4.889 3.5V2C4.889 1.60218 5.05289 1.22064 5.34461 0.93934C5.63633 0.658035 6.03199 0.5 6.44455 0.5H9.55566C9.96822 0.5 10.3639 0.658035 10.6556 0.93934C10.9473 1.22064 11.1112 1.60218 11.1112 2V3.5" stroke="#FF3636" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M6.44434 7.25V11.75" stroke="#FF3636" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M9.55566 7.25V11.75" stroke="#FF3636" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>Eliminar Producto</span>
+
+
                     </button>
-                <?php } ?>
-                <button id="btnSave" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-md transition-colors flex items-center justify-center shadow-sm">
-                    <span>Guardar</span>
-                    <span class="i-lucide-save ml-2"></span>
-                </button>
+                    <button id="btnSave" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm">
+                        <span>Guardar</span>
+                        <span class="i-lucide-save ml-2"></span>
+                    </button>
                 </div>
             </div>
 
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-8 gap-6 mt-6">
             <!-- Left Column - Images -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 border-b border-gray-100">
-                        <h2 class="text-lg font-medium text-gray-800">Imágenes</h2>
-                    </div>
+            <div class="lg:col-span-3">
+                <div class="">
 
-                    <div class="p-4">
+
+                    <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                         <!-- Main Image Upload -->
-                        <div id="mainImageContainer" class="relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg mb-4 transition-all hover:bg-gray-100 hover:border-blue-300">
+                        <div id="mainImageContainer" class="relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg mb-4 transition-all hover:bg-gray-100 hover:border-blue-300 w-75 mx-auto">
 
                         </div>
 
-                        <!-- Additional Images -->
-                        <div class="grid grid-cols-3 gap-3">
-                            <div id="additionalImage1Container" class="additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
 
-                            </div>
-
-                            <div id="additionalImage2Container" class="additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
-
-                            </div>
-
-                            <div id="additionalVideo1Container" class="video-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
-
-                            </div>
-                        </div>
                     </div>
+                    <div class=" mt-2 shadow-sm border border-gray-200 overflow-hidden">
+                        <!-- Main Image Upload -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div id="additionalImage1Container" class=" bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
+
+                            </div>
+
+                            <div id="additionalImage2Container" class=" bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
+
+                            </div>
+
+                            <div id="additionalVideo1Container" class=" bg-white p-2 rounded-lg video-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
+
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
 
             <!-- Right Column - Product Details Form -->
             <div class="lg:col-span-3">
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6" <?php if ($this->user->No_Grupo != "CatalogoChina") echo 'style="pointer-events:none"'; ?>>
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden " <?php if ($this->user->No_Grupo != "CatalogoChina") echo 'style="pointer-events:none"'; ?>>
                     <div class="p-4 border-b border-gray-100 flex items-center">
                         <h2 class="text-lg font-medium text-gray-800">Detalles del Producto</h2>
                         <div class="ml-2 tooltip" data-tooltip="Información obligatoria para guardar el producto">
@@ -123,127 +163,157 @@
                         </div>
                     </div>
 
-                    <div class="p-4">
+                    <div class="px-4 py-3">
                         <form id="productForm">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <!-- Nombre -->
-                                <div class="form-group col-span-2">
-                                    <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row col-span-2">
+                                    <label for="nombre" class="flex flex-row gap-1 w-1/6 text-sm font-medium text-gray-400 mb-1">
                                         Nombre <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" id="nombre" name="nombre"
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                        required>
-                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
+                                    <div class="flex flex-col gap-1 w-5/6">
+                                        <input type="text" id="nombre" name="nombre"
+                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                            required>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
+                                    </div>
+
                                 </div>
 
                                 <!-- Precio -->
-                                <div class="form-group">
-                                    <label for="precio" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row">
+                                    <label for="precio" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
                                         Precio <span class="text-red-500">*</span>
                                     </label>
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-                                        <input type="text" id="precio" name="precio"
-                                            class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
-                                            placeholder="0.00" required>
+                                    <div class="flex flex-col gap-1 w-2/3">
+                                        <div class="relative">
+                                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
+                                            <input type="text" id="precio" name="precio"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
+                                                placeholder="0.00" required>
+                                        </div>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
                                     </div>
-                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
+
                                 </div>
                                 <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
-                                <div class="form-group">
-                                    <label for="profit" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Profit <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-                                        <input type="text" id="profit"
-                                            class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
-                                            placeholder="0.00" disabled
-                                            value="3.00">
+                                    <div class="form-group flex flex-row">
+                                        <label for="profit" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
+                                            Profit <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="flex flex-col gap-1 w-2/3">
+                                            <div class="relative">
+                                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
+                                                <input type="text" id="profit"
+                                                    class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
+                                                    placeholder="0.00" disabled
+                                                    value="3.00">
+                                            </div>
+                                        </div>
+
                                     </div>
-                                </div>
                                 <?php } ?>
                                 <!-- MOQ -->
-                                <div class="form-group">
-                                    <label for="moq" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row">
+                                    <label for="moq" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
                                         MOQ <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="number" id="moq" name="moq" min="1"
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                        required>
-                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="moq" name="moq" min="1"
+                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                            required>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    </div>
+
                                 </div>
 
                                 <!-- Qty x box -->
-                                <div class="form-group">
-                                    <label for="qtyXbox" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row">
+                                    <label for="qtyXbox" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
                                         Qty x box <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="number" id="qtyXbox" name="qtyXbox" min="1"
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                        required>
-                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="qtyXbox" name="qtyXbox" min="1"
+                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                            required>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    </div>
+
                                 </div>
 
                                 <!-- Cbm x box -->
-                                <div class="form-group">
-                                    <label for="cbmXbox" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row">
+                                    <label for="cbmXbox" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
                                         Cbm x box <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="number" id="cbmXbox" name="cbmXbox" min="0" step="0.001"
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                        required>
-                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="cbmXbox" name="cbmXbox" min="0" step="0.001"
+                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                            required>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    </div>
+
                                 </div>
 
                                 <!-- Días Entrega -->
-                                <div class="form-group">
-                                    <label for="diasEntrega" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row">
+                                    <label for="diasEntrega" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
                                         Días Entrega <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="number" id="diasEntrega" name="diasEntrega" min="1"
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                        required>
-                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="diasEntrega" name="diasEntrega" min="1"
+                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                            required>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                    </div>
+
                                 </div>
 
                                 <!-- Delivery -->
-                                <div class="form-group">
-                                    <label for="delivery" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row">
+                                    <label for="delivery" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
                                         Delivery <span class="text-red-500">*</span>
                                     </label>
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-                                        <input type="text" id="delivery" name="delivery"
-                                            class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
-                                            placeholder="0.00" required>
+                                    <div class="flex flex-col gap-1 w-2/3">
+                                        <div class="relative">
+                                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
+                                            <input type="text" id="delivery" name="delivery"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
+                                                placeholder="0.00" required>
+                                        </div>
+                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
                                     </div>
-                                    <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
+
                                 </div>
 
                                 <!-- Colores -->
-                                <div class="form-group col-span-2">
-                                    <label for="colores" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row col-span-2">
+                                    <label for="colores" class="flex flex-row  text-sm font-medium text-gray-400 mb-1 w-1/6">
                                         Colores
                                     </label>
-                                    <input type="text" id="colores" name="colores"
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                                    <div class="flex flex-col gap-1 w-5/6">
+                                        <input type="text" id="colores" name="colores"
+                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300  shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                                    </div>
                                 </div>
 
                                 <!-- Notas -->
-                                <div class="form-group col-span-2">
-                                    <label for="notas" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group flex flex-row col-span-2">
+                                    <label for="notas" class="flex flex-row gap-1 text-sm font-medium text-gray-400 mb-1 w-1/6">
                                         Notas
                                     </label>
-                                    <textarea id="notas" name="notas" rows="4"
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                        placeholder="Información adicional..."></textarea>
+                                    <div class="flex flex-col gap-1 w-5/6">
+                                        <textarea id="notas" name="notas" rows="4"
+                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
+
+                <!-- Provider Data -->
+
+            </div>
+            <div class="lg:col-span-2">
+
+
 
                 <!-- Provider Data -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ">
@@ -255,28 +325,25 @@
                         <form id="providerForm">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- WeChat / Phone -->
-                                <div class="form-group">
-                                    <label for="wechatPhone" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group col-span-2 flex flex-row gap-1">
+                                    <label for="wechatPhone" class="block text-sm font-medium text-gray-400 mb-1 w-1/2">
                                         WeChat / Phone
                                     </label>
                                     <input type="text" id="wechatPhone" name="wechatPhone" required
-                                        class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                                        class=" w-1/2 form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
                                     <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
 
                                 </div>
 
                                 <!-- Contact Card -->
-                                <div class="form-group">
-                                    <label for="contactCard" class="block text-sm font-medium text-gray-700 mb-1">
+                                <div class="form-group col-span-2">
+                                    <label for="contactCard" class="block text-sm font-medium text-gray-400 mb-1">
                                         Tarjeta de contacto
                                     </label>
                                     <div id="contactCardContainer" class="relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
 
                                     </div>
-                                    <p class="text-xs text-blue-600 mt-1 cursor-pointer hover:underline">
-                                        <span class="i-lucide-info mr-1"></span>
-                                        Puede darle clic y ver
-                                    </p>
+
                                 </div>
                             </div>
                         </form>
@@ -441,13 +508,13 @@
                             <div class="bg-orange-500 text-white p-4 rounded-lg">
                                 <div class="flex justify-between items-center">
                                     <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                                    $  <input disabled id="costoUnitarioUSD" style="background: transparent;">
+                                    $ <input disabled id="costoUnitarioUSD" style="background: transparent;">
                                 </div>
                             </div>
                             <div class="bg-orange-500 text-white p-4 rounded-lg">
                                 <div class="flex justify-between items-center">
                                     <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                                    S/ <input disabled id="costoUnitarioPEN" style="background: transparent;" >
+                                    S/ <input disabled id="costoUnitarioPEN" style="background: transparent;">
                                 </div>
                             </div>
                         </div>
@@ -475,41 +542,80 @@
         </div>
     </template>
     <template id="productTemplate">
-        <div class="bg-white card rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
-            <!--add badge status in top right corner -->
-            <div class="absolute top-2 right-2  text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
+        <div class="bg-white card rounded-lg h-40 flex flex-row w-full  my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative">
+            <!--status badge-->
+            <div class="absolute bottom-2 right-2 text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
 
-            <div class="relative aspect-square">
-                <img src="" alt="" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity"></div>
-            </div>
+            <!--dropdown menu trigger-->
+            <div class="absolute top-0 right-2 z-30">
+                <button class="dropdown-trigger bg-white hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center shadow-sm focus:outline-none">
+                    <svg width="20" height="5" viewBox="0 0 11 3" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="9.76901" cy="1.15385" r="1.15385" transform="rotate(90 9.76901 1.15385)" fill="#D9D9D9" />
+                        <circle cx="5.46139" cy="1.15385" r="1.15385" transform="rotate(90 5.46139 1.15385)" fill="#D9D9D9" />
+                        <circle cx="1.15377" cy="1.15385" r="1.15385" transform="rotate(90 1.15377 1.15385)" fill="#D9D9D9" />
+                    </svg>
 
-            <div class="p-4">
-                <h3 class="mb-2 text-center font-bold"></h3>
-                <div class="flex-col flex items-center justify-between text-sm">
-                    <span class="text-gray-600  text-lg"></span>
-                    <span class="text-gray-500  text-lg"></span>
-                    <span class="text-black-600  text-lg precioPeru"></span>
-                    <span class="text-black-500  text-lg precioUSD"></span>
-                </div>
-                <button class="btn btn-primary btnTienda  mx-auto mt-4 bg-blue-50  text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1">
-                    <span>PASAR A TIENDA</span>
                 </button>
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <div class="flex items-center justify-center gap-2">
-                        <button class="edit-btn flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1">
-                            <span class="i-lucide-edit w-4 h-4"></span>
-                            <span>Editar</span>
+
+                <!--dropdown menu content-->
+                <div class="dropdown-menu2 absolute right-0 mt-1 w-80 bg-white rounded-md shadow-lg overflow-hidden z-40 hidden">
+                    <div class="py-1">
+                        <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Editar
                         </button>
-                        <button class="delete-btn flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1">
-                            <span class="i-lucide-trash-2 w-4 h-4"></span>
-                            <span>Eliminar</span>
+                        <button class="delete-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 text-red-600 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            Eliminar producto
                         </button>
                     </div>
                 </div>
             </div>
+            <div class="flex flex-row gap-2 w-full">
+                <div class="relative aspect-square w-2/5 p-2 px-1">
+                    <img src="" alt="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity"></div>
+                </div>
+
+                <div class="px-2 py-4 w-3/5">
+                    <h3 class="mb-2 font-bold text-2xl"></h3>
+                    <div class="flex-col flex items-start justify-between text-sm">
+                        <span class="text-gray-600 text-md"></span>
+                        <span class="text-gray-500 text-md"></span>
+                        <span class="text-black-600 text-md precioPeru"></span>
+                        <span class="text-black-500 text-md precioUSD"></span>
+                    </div>
+                    <button class="btn btn-primary btnTienda mx-auto mt-4 bg-blue-50 text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1 w-full">
+                        <span>PASAR A TIENDA</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </template>
+    <div id="noResults" class="hidden col-span-2 lg:col-span-4 h-full">
+        <div class=" rounded-lg  overflow-hidden flex flex-col items-center gap-10 justify-center h-full">
+            <svg width="140" height="217" viewBox="0 0 74 107" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="40" width="66" height="66" rx="9" stroke="#D9D9D9" stroke-width="2" />
+                <mask id="path-2-inside-1_3747_3546" fill="white">
+                    <path d="M71 97C71 102.523 66.5228 107 61 107H13C7.47715 107 3 102.523 3 97V75H27V87.1377H48V75H71V97Z" />
+                </mask>
+                <path d="M61 107V109V107ZM13 107V109V107ZM3 75V73H1V75H3ZM27 75H29V73H27V75ZM27 87.1377H25V89.1377H27V87.1377ZM48 87.1377V89.1377H50V87.1377H48ZM48 75V73H46V75H48ZM71 75H73V73H71V75ZM71 97H69C69 101.418 65.4183 105 61 105V107V109C67.6274 109 73 103.627 73 97H71ZM61 107V105H13V107V109H61V107ZM13 107V105C8.58172 105 5 101.418 5 97H3H1C1 103.627 6.37258 109 13 109V107ZM3 97H5V75H3H1V97H3ZM3 75V77H27V75V73H3V75ZM27 75H25V87.1377H27H29V75H27ZM27 87.1377V89.1377H48V87.1377V85.1377H27V87.1377ZM48 87.1377H50V75H48H46V87.1377H48ZM48 75V77H71V75V73H48V75ZM71 75H69V97H71H73V75H71Z" fill="#D9D9D9" mask="url(#path-2-inside-1_3747_3546)" />
+                <path d="M37.0195 2V21.8129" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M2 16.5117L16.0176 30.5294" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M58.0212 30.5294L72.0389 16.5117" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+            <p class="text-gray-500">Aún no hay productos ingresados</p>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -621,12 +727,15 @@
 
     #productGrid {
         height: auto;
-
+        min-height: 70vh;
     }
 
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
+    }
+    body{
+        font-family: 'Epilogue', sans-serif;
     }
 </style>
