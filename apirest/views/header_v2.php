@@ -126,7 +126,7 @@ $SectionNames=[
     <div class="spinner-border text-primary" role="status">
     </div>
   </div>
-  <div class="main-header navbar navbar-expand navbar-white navbar-light d-flex d-xl-none">
+  <div class="main-header navbar navbar-expand navbar-white navbar-light d-flex d-xl-none px-xl-0 px-2 flex-xl-row flex-row-reverse justify-content-between">
     <!-- Left navbar links -->
     <ul class="navbar-nav ">
       <li class="nav-item">
@@ -258,7 +258,7 @@ $SectionNames=[
       </a>
 
       <!-- Sidebar -->
-      <div class="sidebar d-flex flex-column justify-content-between">
+      <div class="sidebar d-flex flex-column justify-content-between h-100">
         <div class="menu-top">
           <!-- Sidebar Menu -->
           <nav class="mt-2">

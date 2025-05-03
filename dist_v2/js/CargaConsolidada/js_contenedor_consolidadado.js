@@ -7792,6 +7792,11 @@ function applyDynamicStylesForTableRows() {
         });
         row.querySelectorAll("td:nth-child(6)").forEach((td) => {
           td.style.gridArea = "3/2";
+          td.style.display = "flex";
+          td.style.flexDirection = "column";
+          td.style.alignItems = "flex-end";
+          td.style.justifyContent = "center";
+          td.style.marginRight = "5%";
         });
         row.querySelectorAll("td:nth-child(7)").forEach((td) => {
           td.style.gridArea = "3";
@@ -7838,6 +7843,9 @@ function applyDynamicStylesForTableRows() {
         row.querySelectorAll("td").forEach((td) => {
           td.style.gridArea = ""; // Restablecer grid-area para cada <td>
           td.style.fontWeight = ""; // Restablecer font-weight para cada <td>
+          td.style.display = ""; // Restablecer display para cada <td>
+          td.style.flexDirection = ""; // Restablecer flex-direction para cada <td>
+          td.style.alignItems = ""; // Restablecer align-items para cada <td>
         });
       });
     }

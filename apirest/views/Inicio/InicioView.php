@@ -25,13 +25,13 @@
       <!-- Dollar Stats -->
       <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
-          <div class="card-body d-flex justify-content-between align-items-center">
+          <div class="card-body d-flex justify-content-between align-items-center px-0">
             <div class="icon-container px-2">
               <i class="bi bi-currency-dollar stat-icon"></i>
             </div>
             <div class="text-container">
               <div class="display-2 fw-bold" id="Dolars import">0M</div>
-              <p class="text-muted"><small>Dólares en importaciones</small></p>
+              <p class="text-muted text-center"><small>Dólares en importaciones</small></p>
             </div>
           </div>
         </div>
@@ -40,13 +40,13 @@
       <!-- Users Stats -->
       <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
-          <div class="card-body d-flex justify-content-between align-items-center">
+          <div class="card-body d-flex justify-content-between align-items-center px-0">
             <div class="icon-container px-2">
               <i class="bi bi-people stat-icon"></i>
             </div>
             <div class="text-container">
               <div class="display-2 fw-bold" id="Clients satisfied">0K</div>
-              <p class="text-muted"><small>Clientes satisfechos</small></p>
+              <p class="text-muted text-center"><small>Clientes satisfechos</small></p>
             </div>
           </div>
         </div>
@@ -55,13 +55,13 @@
       <!-- Package Stats -->
       <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
-          <div class="card-body d-flex justify-content-between align-items-center">
+          <div class="card-body d-flex justify-content-between align-items-center px-0">
             <div class="icon-container px-2">
               <i class="bi bi-box-seam stat-icon"></i>
             </div>
             <div class="text-container">
               <div class="display-2 fw-bold" id="CBM sells">0</div>
-              <p class="text-muted"><small>CBM vendidos</small></p>
+              <p class="text-muted text-center"><small>CBM vendidos</small></p>
             </div>
           </div>
         </div>
@@ -70,13 +70,13 @@
       <!-- Container Stats -->
       <div class="col-md-6 col-lg-3 col-sm-6 col-6 h-100 px-1">
         <div class="card stat-card">
-          <div class="card-body d-flex justify-content-between align-items-center">
+          <div class="card-body d-flex justify-content-between align-items-center px-0">
             <div class="icon-container px-2">
               <i class="fas fa-ship stat-icon"></i>
             </div>
             <div class="text-container">
               <div class="display-2 fw-bold" id="Containers imported">0K</div>
-              <p class="text-muted"><small>Contenedores importados</small></p>
+              <p class="text-muted text-center"><small>Contenedores importados</small></p>
             </div>
           </div>
         </div>

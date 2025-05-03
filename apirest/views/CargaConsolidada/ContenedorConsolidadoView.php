@@ -8,7 +8,7 @@
   <!-- Content Header (Page header) -->
   <section class="content-header" id="content-header">
     <div class="container-fluid">
-      <div class="row mb-2 gap-2 px-xl-3 px-0 justify-content-center">
+      <div class="row mb-2 gap-2 px-xl-3 px-0">
         <div class="col-sm-12 col-xl-6 p-3 p-xl-0">
           <h1>
             <i class="<?php echo $this->MenuModel->verificarAccesoMenuCRUD()->Txt_Css_Icons; ?>" aria-hidden="true"></i> <span id="section-title"><?php echo $this->MenuModel->verificarAccesoMenuCRUD()->No_Menu; ?></span>
@@ -102,16 +102,17 @@ Search for
           </div>
         <?php } else { ?>
 
-          <div class="col-12 col-xl-1"></div>
+          <div class="col-12 col-xl-2"></div>
 
           <!-- Buscador de la tabla -->
-          <div class="col-9 col-xl-1 filter-contenedor">
+        <div class="col-12 col-xl-3 flex justify-content-center gap-2 align-items-center filter-contenedor">
+          <div class="col-9 col-xl-8 filter-contenedor px-0">
             <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
               <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
                           <?php } else { ?>
 Search for
-                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+                          <?php } ?> " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
             </div>
           </div>
           <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -119,7 +120,7 @@ Search for
                           <?php } else { ?>
                             Export
                           <?php } ?>-->
-          <div class="col-1 col-xl-1 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
+          <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
             <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Exportar
               <?php } else { ?>
@@ -139,7 +140,7 @@ Search for
             </div>
           </div>
 
-          <div class="col-1 col-xl-1 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
+          <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
 
             <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -188,10 +189,11 @@ Search for
               <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
                           <?php } else { ?>
-Filters
+                           Filters
                           <?php } ?>-->
             </div>
           <?php } ?>
+      </div>
           </div>
       </div><!-- /.container-fluid desactivate for a moment-->
   </section>
@@ -677,7 +679,7 @@ Filters
 Buscar por
                           <?php } else { ?>
 Search for
-                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+                          <?php } ?> " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
             </div>
 
 
@@ -767,67 +769,66 @@ Filters
                           <?php } ?>-->
             </div>
             <div class="col-12 col-md-3">
-              <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
+              <button type="button" id="btn-crear-cotizacion" class="bg-orange text-black-200 py-2 px-3 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear Prospecto</button>
             </div>
           </div>
 
         </div>
       <?php } else { ?>
-        <div class="row mb-2 gap-3 gap-xl-0 px-3 py-2 py-xl-0 px-xl-0">
-          <div class="col-sm-3 col-md-3 col-xl-1 py-sm-3 py-xl-0">
-            <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
+        <div class="row mb-2 gap-3 gap-xl-0 pt-3 pt-xl-0 pt-lg-0 pt-md-0">
+          <div class="col-sm-4 col-md-4 col-xl-1 col-4 py-3 py-lg-0 col-lg-2 py-xl-0 py-md-0">
+            <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-3 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" data-type="html"><i class="fa fa-arrow-left"></i> Regresar</button>
           </div>
-          <div class="col-xl-6 col-0"></div>
-          <div class="col-9 col-xl-2 filter-contenedor ">
-            <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-Buscar por
-                          <?php } else { ?>
-Search for
-                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+          <div class="col-xl-7 col-0"></div>
+          <div class="col-12 col-xl-3 flex justify-content-center gap-2 align-items-center filter-contenedor px-0">
+            <div class="col-9 col-xl-8 filter-contenedor px-0">
+              <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+                <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+  Buscar por
+                            <?php } else { ?>
+  Search for
+                            <?php } ?> " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+              </div>
             </div>
-          </div>
-          <!-- Contenedor Principal de Cargar-->
-          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
-            <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>
-              <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                Cargar
-              <?php } else { ?>
-                Upload
-              <?php } ?>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-cargar-carga">
-              <div class="dropdown-item btn-block" id="packing-list-container"></div>
-              <div class="dropdown-item btn-block" id="bl-file-container"></div>
+            <!-- Contenedor Principal de Cargar-->
+            <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
+              <button type="button" id="btn-cargar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i>
+                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Cargar
+                <?php } else { ?>
+                  Upload
+                <?php } ?>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-cargar-carga">
+                <div class="dropdown-item btn-block" id="packing-list-container"></div>
+                <div class="dropdown-item btn-block" id="bl-file-container"></div>
+              </div>
             </div>
-          </div>
-          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?>-->
-          <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
-            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                Exportar
-              <?php } else { ?>
-                Export
-              <?php } ?></button>
-            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-              <button class="dropdown-item btn-block" id="export-excel"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                              Exportar
+                            <?php } else { ?>
+                              Export
+                            <?php } ?>-->
+            <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
+              <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                   Exportar
                 <?php } else { ?>
                   Export
-                <?php } ?> Excel</button>
+                <?php } ?></button>
+              <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+                <button class="dropdown-item btn-block" id="export-excel"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Exportar
+                  <?php } else { ?>
+                    Export
+                  <?php } ?> Excel</button>
+              </div>
             </div>
-          </div>
-          <div class="col-12 col-xl-4">
-            <label>&nbsp;</label>
           </div>
         </div>
       <?php } ?>
 
 
-      <div class="row mb-2 gap-xs-3 gap-md-0" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
+      <div class="list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 py-3" style="border-bottom: #DFDFDF solid 2px">
         <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
           <div class="d-flex align-items-center col-sm-3" style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
             <span>Consolidado </span>
@@ -901,7 +902,7 @@ Search for
               <?php } ?>
               <th style="min-width: 8em;" class="no-sort">Status</th>
               <th class="orderable">N.</th>
-              <th style="min-width: 10em;">Buyer</th>
+              <th class="buyer" style="min-width: 10em;">Buyer</th>
               <?php if ($this->user->No_Grupo != "ContenedorAlmacen" && $this->user->No_Grupo != "Documentacion") {  ?>
                 <th style="min-width: 8em;">Whatsapp</th>
                 <th
@@ -924,7 +925,7 @@ Search for
                 style="min-width: 6em;">Supplier</th>
               <th
                 style="min-width: 8em;">C. Supplier</th>
-              <th
+              <th class="number"
                 style="min-width: 8em;">P. Number</th>
               <th
                 style="min-width: 4em;">Qty Box.</th>
@@ -968,7 +969,7 @@ Search for
       <div class="col-6 col-sm-11 col-md-11 col-xl-2">
         <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
           <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?> Buscar por
-                          <?php } else { ?> Search for <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
+                          <?php } else { ?> Search for <?php } ?> " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
         </div>
       </div>
       <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -1201,12 +1202,12 @@ Search for
   </section>
   <section class="content" id="cotizacion-almacen">
     <!--row with button back and search-->
-    <div class="row mb-2 gap-2 px-xl-3 px-0">
-      <div class="col-sm-3 col-md-3 col-xl-1 py-sm-3 py-xl-0">
+    <div class="row mb-2 gap-2 px-xl-3 px-0 pt-2 pt-sm-2 pt-md-2 pt-lg-0 pt-xl-0">
+      <div class="col-sm-3 col-md-3 col-4 col-xl-1 py-3 py-sm-3 py-xl-0 py-lg-0 py-md-0">
         <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 mx-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" id="btn-back-cotizacion-almacen"><i class="fa fa-arrow-left"></i> Regresar</button>
       </div>
-      <div class="col-xl-5 col-md-5"></div>
-      <div class="col-6 col-md-2 col-xl-4 d-sm-none d-xl-block">
+      <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5 col-0"></div>
+      <div class="col-0 col-lg-4 col-md-2 col-xl-4 d-sm-none d-xl-block">
       </div>
       <div id="btn-grd-doc-not" class="col-12 col-md-3 col-xl-1 px-xl-1 px-lg-1 px-md-1 px-sm-5 px-5 <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
         <button type="button" id="btn-guardar-doc-not" 
@@ -1217,21 +1218,18 @@ Search for
             Save
           <?php } ?> <i class="fas fa-save"></i></button>
       </div>
-      <div class="col-12 col-md-4">
-        <label>&nbsp;</label>
-      </div>
     </div>
 
 
 
-    <div class="row mb-2 ml-2" style="border-bottom: #DFDFDF solid 2px;">
-      <div class="d-flex col-4 col-md-3 col-xl-2 flex-column flex-md-row" style="border-right: #DFDFDF solid 2px;">
+    <div class="row m-0 m-sm-2 m-md-2 m-lg-2 m-xl-2" style="border-bottom: #DFDFDF solid 2px;">
+      <div class="d-flex col-4 col-md-3 col-xl-2 flex-column flex-md-row consolid-name" style="border-right: #DFDFDF solid 2px;">
         <span>Consolidado</span>
         <div class="">
           <label id="cotizacion_name" disabled=""></label>
         </div>
       </div>
-      <div class="col-5 col-xl-4 col-md-6  d-flex align-items-center" style="border-right: #DFDFDF solid 2px;">
+      <div class="col-8 col-xl-4 col-lg-6 col-md-6 d-flex align-items-center" style="border-right: #DFDFDF solid 2px;">
         <span id="client-title"></span>
       </div>
       <div class="col-3 col-xl-1  d-flex align-items-center">
@@ -1242,7 +1240,7 @@ Search for
     <div class="row mb-2 justify-around">
       <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-4 col-lg-12 col-md-12 ">
         <div>
-          <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?> title-inspection">
+          <div class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-xl-5 p-lg-5 p-md-5 pt-sm-3 pt-3'; ?> title-inspection">
             <h2 class="d-flex w-100 justify-content-between align-items-center title-inspection"><label class="text-lg">
                 <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                   Documentación
@@ -2142,7 +2140,6 @@ Search for
     border-top: 4px solid #f4f6f9;
     border-bottom: 4px solid #f4f6f9;
     vertical-align: middle !important;
-    padding-bottom: 20px;
     height: 3vh;
   }
 
@@ -2300,14 +2297,14 @@ Search for
   }
 
   .upload-button {
-    width: 55%;
-    padding: 0.75rem;
+    width: 60%;
+    padding: 0.75rem .5rem;
     background-color: #F0F4F9;
     color: #272A30;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: .75rem;
     transition: background-color 0.3s ease;
   }
 
@@ -2468,8 +2465,69 @@ Search for
     font-weight: 400;
     color: #272A30;
   }
+  label>i{
+    font-size: 20px;
+  }
 /* Ocultar el texto del botón en pantallas pequeñas */
 @media (max-width: 768px) {
+
+  #table-contenedor.table.table-hover.dataTable.no-footer tbody{
+    background-color: transparent;
+  }
+  .fa-bars{
+    font-size: 20px;
+  }
+  h1, .content-header h1{
+    font-size: 1.2rem;
+  }
+  body{
+    font-size: 12px;
+  }
+  button>.fa{
+    font-size: 15px !important;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+  }
+  #table-cotizacion-embarque tbody{
+    padding: 10px 20px;
+  }
+  .consolid-name{
+    display: none !important;
+  }
+  .documentation-title{
+    border-bottom: 1px #DFDFDF solid;
+  }
+  .documentation-title>h2>label,.title-inspection>label{
+    font-size:1rem !important;
+  }
+  .file-upload-box {
+    padding: 0;
+    height: 200px;
+  }
+  .form-horizontal{
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  .file-preview>p{
+    width: 70%;
+    overflow-x: hidden;
+    font-weight: 400;
+    font-size: 12px;
+  }
+  .file-preview{
+    width: 80%;
+  }
+  .file-format{
+    font-size: 10px !important;
+    margin-top: -5%;
+    padding-bottom: 5%;
+  }
+  .file-item{
+    padding: 8px;
+    background: transparent;
+  }
   #table-contenedor thead {
     display: none; /* Ocultar encabezados de la tabla */
   }
@@ -2480,26 +2538,55 @@ Search for
   .view-eye{
     display: none;
   }
-
+  .buyer{
+    min-width: 20em !important;
+  }
+  .number{
+    min-width: 10em !important;
+  }
   #table-contenedor tbody tr {
+    font-size: 11px;
     cursor: pointer;
     transition: box-shadow 0.2s;
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Dos columnas iguales */
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
     margin-bottom: 16px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 16px;
+    padding: 10px 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: white;
   }
   #table-contenedor tbody td {
-    align-items: center;
-    gap: 8px; /* Espaciado entre   el select y el botón */
+    align-content: center;
+    gap: 0px; /* Espaciado entre   el select y el botón */
   }
-
-  tr.odd>td, tr.even>td {
+  .form-horizontal>.row>div>.form-group{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .form-group>.file-upload-box{
+    width: 80%;
+  }
+  #table-contenedor tr.odd>td,#table-contenedor tr.even>td {
     border: 0px solid transparent;
-    padding: .25rem;
+    padding: 0rem;
+  }
+  td>.form-control{
+    height: auto;
+    width: auto;
+    border-radius: .40rem;
+    border: 0px solid #ddd;
+    font-size: 13px;
+    padding: 9px 20px;
+    margin: 1px;
+  }
+  .form-control:disabled{
+    background-color: transparent;
+    border: 0px solid #ddd;
+    opacity: 1;
+    font-size: 12px;
   }
 
   #btn-exportar-carga, #btn-filtrar-carga, #btn-cargar-carga{
@@ -2518,7 +2605,8 @@ Search for
   }
   .note-container-container{
     min-height: 10%;
-    padding-bottom: 15%;
+    padding-bottom: 25%;
+    margin-top: 7%;
   }
   
   #btn-grd-doc-not{
@@ -2532,9 +2620,6 @@ Search for
     height: 20vh;
   }
 
-  .file-upload-box{
-    height: 300px;
-  }
   .file-label>i{
     font-size:2.5rem;
   }
@@ -2542,14 +2627,18 @@ Search for
   .file-label{
     flex-direction: column;
     justify-content: center;
-    gap:30px;
+    gap:0px;
     height: 100%;
+    font-size: 11px;
   }
   .file-group-text{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+  .file-group-text>span{
+    font-size: 12px;
   }
   .file-format{
     margin-bottom: 0;
