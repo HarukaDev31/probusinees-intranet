@@ -8,8 +8,10 @@ var additionalImage2 = null
 var additionalVideo1 = null
 var contactCardContainer = null
 var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
+var isInCompleted = false;
 const EXCHANGE_RATE = 3.8;
-
+const ROLE_PERU = "CatalogoPeru";
+const ROLE_CHINA = "CatalogoChina";
 // Function to format number as currency
 
 $(document).ready(async function () {
@@ -38,7 +40,16 @@ $(document).ready(async function () {
     }
 
     async function loadProducts() {
+        if (window.location.href.includes("listarCompletados")) {
+            isInCompleted = true;
+        } else {
+            isInCompleted = false;
+        }
+
         url = base_url + 'CatalogoController/getCatalogo';
+        if (isInCompleted) {
+            url = base_url + 'CatalogoController/getCatalogoCompletados';
+        }
         const response = await fetch(url);
         if (response.ok) {
             const data = await response.json();
@@ -51,57 +62,73 @@ $(document).ready(async function () {
         } else {
             console.error('Network error:', response.statusText);
         }
-        // const products = [
-        //     {
-        //         id: 1,
-        //         name: 'Compresor de Aire RMB-150',
-        //         image: 'https://images.pexels.com/photos/3785927/pexels-photo-3785927.jpeg',
-        //         price: '50',
-        //         moq: '100'
-        //     },
-        //     {
-        //         id: 2,
-        //         name: 'Compresor Industrial X2000',
-        //         image: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg',
-        //         price: '75',
-        //         moq: '50'
-        //     },
-        //     {
-        //         id: 3,
-        //         name: 'Compresor Portátil Pro',
-        //         image: 'https://images.pexels.com/photos/834892/pexels-photo-834892.jpeg',
-        //         price: '45',
-        //         moq: '200'
-        //     },
-        //     {
-        //         id: 4,
-        //         name: 'Compresor de Alta Presión',
-        //         image: 'https://images.pexels.com/photos/2381463/pexels-photo-2381463.jpeg',
-        //         price: '120',
-        //         moq: '75'
-        //     },
-        //     {
-        //         id: 5,
-        //         name: 'Mini Compresor Plus',
-        //         image: 'https://images.pexels.com/photos/190574/pexels-photo-190574.jpeg',
-        //         price: '35',
-        //         moq: '150'
-        //     },
-        //     {
-        //         id: 6,
-        //         name: 'Compresor Industrial Max',
-        //         image: 'https://images.pexels.com/photos/210881/pexels-photo-210881.jpeg',
-        //         price: '95',
-        //         moq: '80'
-        //     }
-        // ];
 
-        // renderProducts(products);
+
+
     }
+    function initializeProductDropdowns() {
+        // Buscar todos los productos con el dropdown
+        document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
+            // Limpiar handlers anteriores si existieran
+            trigger.removeEventListener('click', toggleDropdown);
+            trigger.removeEventListener('focusout', handleFocusOut);
+
+            // Añadir nuevos event listeners
+            trigger.addEventListener('click', toggleDropdown);
+            trigger.addEventListener('focusout', handleFocusOut);
+        });
+
+        // Cerrar todos los dropdowns cuando se hace clic en cualquier parte
+        document.addEventListener('click', function (event) {
+            const isDropdownTrigger = event.target.closest('.dropdown-trigger');
+            const isDropdownMenu = event.target.closest('.dropdown-menu');
+
+            if (!isDropdownTrigger && !isDropdownMenu) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+    }
+
+    // Función para alternar la visibilidad del dropdown
+    function toggleDropdown(event) {
+        event.stopPropagation();
+        const dropdownMenu = this.nextElementSibling;
+
+        // Cerrar todos los otros dropdowns
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            if (menu !== dropdownMenu) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Alternar el actual
+        dropdownMenu.classList.toggle('hidden');
+    }
+
+    // Función para manejar cuando el trigger pierde el foco
+    function handleFocusOut(event) {
+        const dropdownTrigger = event.target;
+        const dropdownMenu = dropdownTrigger.nextElementSibling;
+
+        // Pequeño retraso para permitir que el `click` se procese primero
+        setTimeout(() => {
+            // Verificar si el nuevo elemento con foco está dentro del dropdown
+            const focusedElement = document.activeElement;
+            const isFocusInsideDropdown = dropdownMenu.contains(focusedElement);
+
+            if (!isFocusInsideDropdown) {
+                dropdownMenu.classList.add('hidden');
+            }
+        }, 100);
+    }
+
 
     function renderProducts(products) {
         const $grid = $('#productGrid');
         const $template = $('#productTemplate');
+        const $noResults = $('#noResults');
         // Clear grid
         $grid.empty();
 
@@ -109,29 +136,101 @@ $(document).ready(async function () {
         products.forEach((product, index) => {
             const $product = $($template.html());
 
+            //add badge in tienda 
+            $product.find('.badge').text(product.status);
+            switch (product.status) {
+                case "COTIZADO":
+                    $product.find('.badge').addClass('bg-blue-500');
+                    break;
+                case "PENDIENTE":
+                    $product.find('.badge').addClass('bg-yellow-500');
+                    break;
+                case "EN TIENDA":
+                    $product.find('.badge').addClass('bg-green-500');
+                    break;
+                default:
+                    $product.find('.badge').addClass('bg-gray-500');
+                    break;
+            }
             // Set product data
             $product.find('img').attr({
                 src: product.main_image_url,
                 alt: product.name
             });
-            $product.find('h3').text(product.name);
+            $product.find('h3').text(product.nombre);
             $product.find('.text-gray-600').text(`RMB: ¥${product.precio}`);
             $product.find('.text-gray-500').text(`MOQ: ${product.moq}`);
-
+            $product.find('.precioPeru').text(`Precio Peru: S/. ${product.precio_peru}`);
+            $product.find('.precioUSD').text(`Precio USD: $ ${product.precio_usd}`);
+            if (product.status == "PENDIENTE") {
+                $product.find('.precioUSD').hide();
+                $product.find('.precioPeru').hide();
+            } else {
+                $product.find('.precioUSD').show();
+                $product.find('.precioPeru').show();
+            }
+            if (product.status != "COTIZADO") {
+                $product.find('.btnTienda').hide();
+            } else {
+                $product.find('.btnTienda').show();
+            }
+            $product.find('.btnTienda').off('click');
+            $product.find(".btnTienda").on("click", function (e) {
+                e.preventDefault();
+                const $card = $(this).closest('.card');
+                const productId = $card.data('product-id');
+                url = base_url + 'CatalogoController/pasarTienda';
+                const formData = new FormData();
+                formData.append('productId', productId);
+                fetch(url, {
+                    method: 'post',
+                    body: formData,
+                }).then(async response => {
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Éxito',
+                                text: 'Producto pasado a tienda correctamente.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            await loadProducts();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message,
+                            });
+                        }
+                    } else {
+                        console.error('Network error:', response.statusText);
+                    }
+                });
+            });
             // Add to grid with staggered fade in animation
             $product.css('opacity', 0);
             //add product id to the card
             $product.attr('data-product-id', product.id);
             $grid.append($product);
+            initializeProductDropdowns();
+
             setTimeout(() => {
                 $product.animate({ opacity: 1 }, 300);
             }, index * 100);
+
         });
+        if (products.length === 0) {
+            $grid.append($noResults);
+            $noResults.show();
+        }
     }
     function renderProductDetails(product) {
         productoFormSection.show();
         productListSection.hide();
         currentProductId = product.id;
+
         const $form = $('#productForm');
         $form.find('#nombre').val(product.nombre);
         $form.find('#precio').val(product.precio);
@@ -140,7 +239,7 @@ $(document).ready(async function () {
         $form.find('#diasEntrega').val(product.dias_entrega);
         $form.find('#qtyXbox').val(product.qty_box);
         $form.find('#cbmXbox').val(product.cbm_box);
-        $form.find('#wechatPhone').val(product.whechat_phone);
+        $('#wechatPhone').val(product.whechat_phone);
         $form.find('#colores').val(product.colores);
         $form.find('#notas').val(product.notas);
         $form.find('#mainImageContainer').attr('data-file', product.main_image_url);
@@ -175,7 +274,8 @@ $(document).ready(async function () {
         contactCardContainer = new FileUploader({
             containerId: 'contactCardContainer',
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
-            maxSize: 5 * 1024 * 1024
+            maxSize: 5 * 1024 * 1024,
+            showPreview: false
         });
         if (product.main_image_url) {
             mainImage.loadFromURL(product.main_image_url);
@@ -192,15 +292,29 @@ $(document).ready(async function () {
         if (product.contact_card_url) {
             contactCardContainer.loadFromURL(product.contact_card_url);
         }
-
-
+        if (currentPrivilege == ROLE_PERU) {
+            $('#servicioImpo').val(product.servicio_impo ?? 350);
+            $('#arancel').val(product.arancel ?? 6.00);
+            $('#igv').val(product.igv ?? 0.18);
+            $('#antidumping').val(product.antidumping ?? 0.00);
+            $('#percepcion').val(product.percepcion ?? 3.50);
+        }
+        if (product.status != "PENDIENTE") {
+            $("#actionButtons").addClass("hidden");
+            $("#actionButtons").removeClass("d-flex");
+        }
+        else {
+            $("#actionButtons").removeClass("hidden");
+            $("#actionButtons").addClass("d-flex");
+        }
 
     }
 
     function setupEventHandlers() {
         // Search input handler
         $('#searchInput').on('input', debounce(function () {
-            const query = $(this).val()?.toLowerCase() || '';
+
+            const query = $("#searchInput").val()?.toLowerCase() || '';
             filterProducts(query);
         }, 300));
 
@@ -248,7 +362,7 @@ $(document).ready(async function () {
     function filterProducts(query) {
         const $grid = $('#productGrid');
         const $cards = $grid.find('.card');
-
+        console.log($cards)
         // Filter cards based on query
         $cards.each(function () {
             const $card = $(this);
@@ -297,7 +411,9 @@ $(document).ready(async function () {
             const data = await response.json();
             if (data.status) {
                 const product = data.data;
+
                 renderProductDetails(product);
+
                 calculateValues();
             } else {
                 console.error('Error loading product details:', data.message);
@@ -326,7 +442,41 @@ $(document).ready(async function () {
             console.error('Network error:', response.statusText);
         }
     }
-
+    async function sendCotizacion() {
+        //show swall confirmation
+        Swal.fire({
+            title: '¿Está seguro de enviar la cotización?',
+            text: "Una vez enviada, no podrá deshacer esta acción.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Enviar',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                //send cotizacion
+                validateForm();
+                const formData = new FormData();
+                formData.append('productId', currentProductId);
+                const response = await fetch(base_url + 'CatalogoController/sendCotizacion', {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (response.ok) {
+                    productoFormSection.hide();
+                    productListSection.show();
+                    await loadProducts();
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'Error al enviar la cotización.',
+                        'error'
+                    )
+                }
+            }
+        })
+    }
 
 
 
@@ -344,12 +494,48 @@ $(document).ready(async function () {
     $("#btnSave").on("click", function (e) {
         e.preventDefault();
         validateForm();
-
+    });
+    $("#btnCotizar").on("click", function (e) {
+        e.preventDefault();
+        sendCotizacion();
     });
     $("#btnBack").on("click", function (e) {
         e.preventDefault();
         productoFormSection.hide();
         productListSection.show();
+    });
+    $("#listViewBtn").on("click", function (e) {
+        e.preventDefault();
+        //change productsGrid to flex column
+        const $grid = $('#productGrid');
+        $grid.removeClass('grid grid-cols-4 gap-4');
+        $grid.addClass('flex flex-col gap-4');
+
+    })
+    $("#gridViewBtn").on("click", function (e) {
+        e.preventDefault();
+        //change productsGrid to grid
+        const $grid = $('#productGrid');
+        $grid.removeClass('flex flex-col gap-4');
+        $grid.addClass('grid grid-cols-4 gap-4');
+    })
+    $("#btnDelete").on("click", function (e) {
+        e.preventDefault();
+        //show swall confirmation
+        Swal.fire({
+            title: '¿Está seguro de eliminar el producto?',
+            text: "Una vez eliminado, no podrá deshacer esta acción.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteProduct(currentProductId);
+            }
+        })
     });
     $("#btnAddProduct").on("click", function (e) {
         e.preventDefault();
@@ -387,6 +573,7 @@ $(document).ready(async function () {
         });
         contactCardContainer = new FileUploader({
             containerId: 'contactCardContainer',
+            showPreview: false,
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
             maxSize: 5 * 1024 * 1024
         });
@@ -411,7 +598,7 @@ $(document).ready(async function () {
         });
     });
 
-    function validateForm() {
+    async function validateForm() {
         let isValid = true;
         const requiredFields = document.querySelectorAll('#productForm [required]');
         const requiredFieldsProvider = document.querySelectorAll('#providerForm [required]');
@@ -436,30 +623,50 @@ $(document).ready(async function () {
             formData.append('additionalImage1', additionalImage1.getFile());
             formData.append('additionalImage2', additionalImage2.getFile());
             formData.append('additionalVideo1', additionalVideo1.getFile());
+            formData.append('servicioImpo', $('#servicioImpo').val());
+            formData.append('arancel', $('#arancel').val());
+            formData.append('igv', $('#igv').val());
+            formData.append('antidumping', $('#antidumping').val());
+            formData.append('percepcion', $('#percepcion').val());
+            //append precio_peru and precio_usd
+            formData.append('precio_peru', $('#costoUnitarioPEN').val());
+            formData.append('precio_usd', $('#costoUnitarioUSD').val());
             if (currentProductId) {
                 formData.append('productId', currentProductId);
             }
             // Enviar el formulario usando fetch
             spinner.show();
             url = base_url + 'CatalogoController/saveProduct';
-            fetch(url, {
+            await fetch(url, {
                 method: 'POST',
                 body: formData,
             })
-                .then(response => {
+                .then(async response => {
+                    console.log(response)
                     if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: 'Producto guardado correctamente.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+
                         spinner.hide();
                         return response.json();
+
                     } else {
                         throw new Error('Error en la respuesta del servidor');
                     }
                     spinner.hide();
                 })
-                .then(data => {
+                .then(async data => {
+                    console.log(data)
                     if (data.status) {
                         // Mostrar mensaje de éxito
                         // Volver a cargar la lista de productos
-                        loadProducts();
+                        await loadProducts();
                         // Volver a la sección de lista de productos
                         productoFormSection.hide();
                         productListSection.show();
@@ -544,6 +751,8 @@ $(document).ready(async function () {
         console.log(field, errorElement, message)
         // Añadir clase de error al campo
         field.classList.add('border-red-500');
+        field.classList.remove('border-gray-300');
+        field.classList.add('border-2');
 
         // Mostrar mensaje de error si existe el elemento
         if (errorElement) {
@@ -647,7 +856,8 @@ $(document).ready(async function () {
      */
     function calculateBaseImponible(derived) {
         const valorCargaValue = derived.totalUSDValue;
-        const fleteValue = 350 * 0.6; // Servicio de impo * 0.6
+        const servicioImpoValue = $('#servicioImpo').val() || 0;
+        const fleteValue = servicioImpoValue * 0.6; // Servicio de impo * 0.6
         const seguroValue = derived.totalUSDValue >= 5000 ? 100 : 50;
         const valorCIFValue = valorCargaValue + fleteValue + seguroValue;
 
@@ -770,8 +980,8 @@ $(document).ready(async function () {
         $('#montoTotal').text(formatCurrency(totals.montoTotalValue));
 
         // Actualizar costos unitarios
-        $('#costoUnitarioUSD').text(formatCurrency(unitCosts.costoUnitarioUSDValue));
-        $('#costoUnitarioPEN').text(formatCurrency(unitCosts.costoUnitarioPENValue, 'S/'));
+        $('#costoUnitarioUSD').val(unitCosts.costoUnitarioUSDValue.toFixed(2));
+        $('#costoUnitarioPEN').val(unitCosts.costoUnitarioPENValue.toFixed(2));
     }
 
     // Event listeners for input changes
@@ -788,4 +998,17 @@ $(document).ready(async function () {
         $(this).val(value);
         calculateValues();
     });
+    $("#servicioImpo").on("keyup", function () {
+        calculateValues();
+    });
+    $("#igv").on("keyup", function () {
+        calculateValues();
+    });
+    $("#antidumping").on("keyup", function () {
+        calculateValues();
+    });
+    $("#percepcion").on("keyup", function () {
+        calculateValues();
+    });
+
 });

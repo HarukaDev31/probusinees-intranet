@@ -6,8 +6,9 @@ class FileUploader {
       containerId: '', // ID del contenedor principal (también será el prefijo)
       acceptedTypes: '*/*', // Tipos de archivos aceptados (todos por defecto)
       maxSize: 5 * 1024 * 1024, // Tamaño máximo en bytes (5MB por defecto)
-      placeholderText: 'Haga clic para agregar archivo',
-      placeholderIcon: 'i-lucide-file', // Clase de icono para placeholder
+      placeholderText: 'Arrastra o sube tu archivo aquí',
+      placeholderIcon: 'i-lucide-file',
+      showPreview: true, // Clase de icono para placeholder
       ...config
     };
 
@@ -58,22 +59,34 @@ class FileUploader {
     if (!this.container.classList.contains('relative')) {
       this.container.classList.add('relative', 'bg-gray-50', 'border-2', 'border-dashed',
         'border-gray-300', 'rounded-lg', 'mb-4', 'transition-all',
-        'hover:bg-gray-100', 'hover:border-blue-300');
+        'hover:bg-gray-100', 'hover:border-blue-300', 'p-6');
     }
-
     // Generar HTML interno
     this.container.innerHTML = `
-      <div class="flex flex-col items-center justify-center p-6 h-48">
+      <div class="flex flex-col items-center justify-center h-48 w-full">
         <div id="${previewId}" class="hidden w-full h-full flex flex-col items-center justify-center"></div>
-        <div id="${placeholderId}" class="text-center">
-          <span class="${this.config.placeholderIcon} text-gray-400 w-12 h-12 mb-2"></span>
+        <div id="${placeholderId}" class="text-center gap-5 w-100 flex flex-col items-center justify-center w-full">
+        <svg width="40" height="36  " viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.7564 15.3809H2.24359C1.01282 15.3809 0 16.3937 0 17.6244V20.1886C0 21.4193 1.01282 22.4321 2.24359 22.4321H22.7564C23.9872 22.4321 25 21.4193 25 20.1886V17.6244C25 16.3937 23.9872 15.3809 22.7564 15.3809ZM23.0769 20.1886C23.0769 20.368 22.9359 20.5091 22.7564 20.5091H2.24359C2.0641 20.5091 1.92308 20.368 1.92308 20.1886V17.6244C1.92308 17.445 2.0641 17.3039 2.24359 17.3039H22.7564C22.9359 17.3039 23.0769 17.445 23.0769 17.6244V20.1886Z" fill="#585858"/>
+        <path d="M8.78089 5.48397L10.986 3.27885V12.4968C10.986 13.0224 11.4219 13.4583 11.9476 13.4583C12.4732 13.4583 12.9091 13.0224 12.9091 12.4968V3.27885L15.1142 5.48397C15.3065 5.67628 15.5501 5.76603 15.7937 5.76603C16.0373 5.76603 16.2809 5.67628 16.4732 5.48397C16.845 5.11218 16.845 4.49679 16.4732 4.125L12.627 0.278846C12.2552 -0.0929487 11.6399 -0.0929487 11.2681 0.278846L7.42191 4.125C7.05012 4.49679 7.05012 5.11218 7.42191 5.48397C7.79371 5.85577 8.40909 5.85577 8.78089 5.48397Z" fill="#585858"/>
+        </svg>
+        <div>
           <p class="text-sm text-gray-500">${this.config.placeholderText}</p>
+          <p class="text-xs text-gray-400">Formatos: PNG, JPGE</p>
+         
+        </div>
+        <div
+          class="bg-gray-200  w-75 hover:bg-gray-300 text-black text-sm py-2 px-8 rounded-md transition-colors flex items-center justify-center ">Subir archivo</div> 
         </div>
         <input id="${inputId}" type="file" accept="${this.config.acceptedTypes}" class="hidden" />
       </div>
-      <button id="${removeId}" class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hidden hover:bg-red-600 transition-colors">
-        <span class="i-lucide-x w-4 h-4"></span>
-      </button>
+      ${this.config.showPreview?`<button id="${removeId}" class="absolute top-2 right-2 hidden ">
+        <svg width="16" height="15" viewBox="0 0 16 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.8335 14H14.6671" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11.2504 1.47176C11.5524 1.1697 11.9621 1 12.3893 1C12.6008 1 12.8103 1.04166 13.0057 1.12261C13.2011 1.20355 13.3787 1.32219 13.5282 1.47176C13.6778 1.62133 13.7964 1.79889 13.8774 1.99431C13.9583 2.18972 14 2.39917 14 2.61069C14 2.82221 13.9583 3.03166 13.8774 3.22708C13.7964 3.42249 13.6778 3.60006 13.5282 3.74962L4.03715 13.2407L1 14L1.75929 10.9629L11.2504 1.47176Z" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+      </button>`: `<button id="${removeId}" class="absolute top-2 right-2 hidden "></button>`}
     `;
 
     // Guardar referencias a los elementos DOM
@@ -83,27 +96,27 @@ class FileUploader {
     this.removeButton = document.getElementById(removeId);
   }
 
-  
+
   initEvents() {
     // Eventos del contenedor principal
     const handleContainerClick = () => this.input.click();
     this.addEventListenerWithTracking(this.container, 'click', handleContainerClick);
-    
+
     const handleDragOver = (e) => {
       e.preventDefault();
       this.container.classList.add('border-blue-500', 'bg-blue-50');
     };
     this.addEventListenerWithTracking(this.container, 'dragover', handleDragOver);
-    
+
     const handleDragLeave = () => {
       this.container.classList.remove('border-blue-500', 'bg-blue-50');
     };
     this.addEventListenerWithTracking(this.container, 'dragleave', handleDragLeave);
-    
+
     const handleDrop = (e) => {
       e.preventDefault();
       this.container.classList.remove('border-blue-500', 'bg-blue-50');
-      
+
       if (e.dataTransfer.files.length) {
         this.handleFile(e.dataTransfer.files[0]);
       }
@@ -120,6 +133,7 @@ class FileUploader {
 
     // Evento del botón de eliminar
     const handleRemoveClick = (e) => {
+      e.preventDefault();
       e.stopPropagation();
       this.clearFile();
     };
@@ -217,15 +231,92 @@ class FileUploader {
   showImagePreview() {
     const reader = new FileReader();
     reader.onload = (e) => {
-      this.preview.innerHTML = `
-        <div class="relative w-full h-full flex items-center justify-center">
-          <img src="${e.target.result}" alt="${this.file.name}" class="max-w-full max-h-full object-contain" />
-          <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
-            ${this.file.name}
+      const imageDataUrl = e.target.result;
+
+      if (this.config.showPreview) {
+        // Si showPreview es true, mostrar la imagen directamente
+        this.preview.innerHTML = `
+          <div class="relative w-full h-full flex items-center justify-center">
+            <img src="${imageDataUrl}" alt="${this.file.name}" class="max-w-full max-h-full object-contain" />
+            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
+              ${this.file.name} 
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      } else {
+        // Si showPreview es false, mostrar solo los metadatos y el icono
+        this.preview.innerHTML = `
+          <div class="relative w-full h-full flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-1/6 h-1/6 cursor-pointer" id="${this.prefix}-show-preview-modal">
+              <path d="M17 1H3C1.89543 1 1 1.89543 1 3V17C1 18.1046 1.89543 19 3 19H17C18.1046 19 19 18.1046 19 17V3C19 1.89543 18.1046 1 17 1Z" stroke="#585858" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.5 8C7.32843 8 8 7.32843 8 6.5C8 5.67157 7.32843 5 6.5 5C5.67157 5 5 5.67157 5 6.5C5 7.32843 5.67157 8 6.5 8Z" stroke="#585858" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 13L14 8L3 19" stroke="#585858" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="w-4/6">
+              <p class="text-sm text-gray-500">${this.file.name.length > 30 ? this.file.name.substring(0, 30) + '...' : this.file.name}</p>
+              <p class="text-xs text-gray-400">Tamaño: ${(this.file.size / 1024).toFixed(2)} KB</p>
+            </div>
+            <div class="w-1/6 h-1/6">
+              <svg width="28" height="24" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="${this.prefix}-remove-button">
+                <path d="M1.39941 3.51953H2.55941H11.8394" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10.6796 3.51922V11.6392C10.6796 11.9469 10.5574 12.2419 10.3398 12.4595C10.1223 12.677 9.82722 12.7992 9.51957 12.7992H3.71957C3.41192 12.7992 3.11687 12.677 2.89933 12.4595C2.68178 12.2419 2.55957 11.9469 2.55957 11.6392V3.51922M4.29957 3.51922V2.35922C4.29957 2.05157 4.42178 1.75652 4.63933 1.53897C4.85687 1.32143 5.15192 1.19922 5.45957 1.19922H7.77957C8.08722 1.19922 8.38227 1.32143 8.59981 1.53897C8.81736 1.75652 8.93957 2.05157 8.93957 2.35922V3.51922" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5.45947 6.41992V9.89992" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7.7793 6.41992V9.89992" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        `;
+
+        // Añadir evento de clic al icono para mostrar el modal
+        setTimeout(() => {
+          const showPreviewButton = document.getElementById(`${this.prefix}-show-preview-modal`);
+          const removeButton = document.querySelector(`.${this.prefix}-remove-button`);
+          if (showPreviewButton) {
+            showPreviewButton.addEventListener('click', (evt) => {
+              evt.preventDefault();
+              evt.stopPropagation();
+
+              // Crear y mostrar el modal
+              const modal = document.createElement('div');
+              modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+              modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-lg p-4 relative max-w-2xl max-h-screen">
+                  <img src="${imageDataUrl}" alt="${this.file.name}" class="max-w-full max-h-[80vh] object-contain" />
+                  <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="close-modal">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 1L15 15" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M1 15L15 1" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              `;
+              document.body.appendChild(modal);
+
+              // Evento para cerrar el modal
+              document.getElementById('close-modal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+              });
+
+              // También cerrar al hacer clic fuera del contenido del modal
+              modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                  document.body.removeChild(modal);
+                }
+              });
+            });
+          }
+          if (removeButton) {
+            removeButton.addEventListener('click', (evt) => {
+              evt.preventDefault();
+              evt.stopPropagation();
+              this.clearFile();
+            });
+          }
+
+        }, 0);
+      }
     };
+
     reader.readAsDataURL(this.file);
   }
 
@@ -309,6 +400,7 @@ class FileUploader {
       `;
       this.preview.classList.remove('hidden');
       this.placeholder.classList.add('hidden');
+      this.removeButton.classList.remove('hidden');
 
       // Obtener la imagen de la URL
       const response = await fetch(url);
@@ -359,10 +451,10 @@ class FileUploader {
     this.eventListeners.forEach(({ element, type, handler }) => {
       element.removeEventListener(type, handler);
     });
-    
+
     // Limpiar la referencia en el almacenamiento estático
     delete FileUploader.instances[this.config.containerId];
-    
+
     console.log(`FileUploader con ID: ${this.config.containerId} destruido correctamente`);
   }
 
