@@ -307,12 +307,12 @@
                     </div>
                     
                     <div class="input-group">
-                        <!-- <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
+                        <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
                         <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                             <option value="0">0%</option>
                             <option value="6">6%</option>
                             <option value="11">11%</option>
-                        </select> -->
+                        </select>
                     </div>
                     
                     <div class="input-group">
