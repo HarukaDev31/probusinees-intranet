@@ -105,85 +105,81 @@ Search for
           <div class="col-12 col-xl-2"></div>
 
           <!-- Buscador de la tabla -->
-        <div class="col-12 col-xl-3 flex justify-content-center gap-2 align-items-center filter-contenedor">
-          <div class="col-9 col-xl-8 filter-contenedor px-0">
-            <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-Buscar por
+          <div class="col-12 col-xl-3 flex justify-content-center gap-2 align-items-center filter-contenedor">
+            <div class="col-9 col-xl-8 filter-contenedor px-0">
+              <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
+                <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                Buscar por
                           <?php } else { ?>
-Search for
+                Search for
                           <?php } ?> " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+              </div>
             </div>
-          </div>
-          <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Exportar
-                          <?php } else { ?>
-                            Export
-                          <?php } ?>-->
-          <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
-            <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                Exportar
-              <?php } else { ?>
-                Export
-              <?php } ?></button>
-            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-              <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+
+            <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
+              <button type="button" id="btn-exportar-carga" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                   Exportar
                 <?php } else { ?>
                   Export
-                <?php } ?> PDF</button>
-              <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                  Exportar
-                <?php } else { ?>
-                  Export
-                <?php } ?> Excel</button>
+                <?php } ?></button>
+              <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
+                <button class="dropdown-item btn-block export-pdf-main-content"><i class="fa fa-file-pdf color_icon_pdf"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Exportar
+                  <?php } else { ?>
+                    Export
+                  <?php } ?> PDF</button>
+                <button class="dropdown-item btn-block export-excel-main-content"><i class="fa fa-file-excel color_icon_excel"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    Exportar
+                  <?php } else { ?>
+                    Export
+                  <?php } ?> Excel</button>
+              </div>
             </div>
-          </div>
 
-          <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
+            <div class="col-1 col-xl-4 col-lg-1 col-md-1 dropdown filter-contenedor px-0">
 
-            <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                Filtros
-              <?php } else { ?>
-                Filters
-              <?php } ?>
-            </button>
-            <!-- Menú Desplegable -->
-            <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
-              <div class="form-group">
-                <div class="d-flex align-items-center p-2">
-                  <div class="d-flex" style="width:60%">Fecha Inicio</div>
-                  <div style="width: 200px;">
-                    <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
-                    <span class="help-block text-danger" id="error"></span>
+              <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                  Filtros
+                <?php } else { ?>
+                  Filters
+                <?php } ?>
+              </button>
+              <!-- Menú Desplegable -->
+              <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
+                <div class="form-group">
+                  <div class="d-flex align-items-center p-2">
+                    <div class="d-flex" style="width:60%">Fecha Inicio</div>
+                    <div style="width: 200px;">
+                      <input type="text" id="txt-Fe_Inicio_Carga" class="form-control text-center input-date input-report required" value="<?php echo dateNow('month_date_ini_report'); ?>">
+                      <span class="help-block text-danger" id="error"></span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center p-2">
+                    <div class="d-flex" style="width:60%">Fecha Fin</div>
+                    <div style="width: 200px;">
+                      <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
+                      <span class="help-block text-danger" id="error"></span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center p-2" style="width:300px;">
+                    <div class="d-flex" style="width:60%">Estado</div>
+                    <div style="width: 200px;">
+                      <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
+                        <option value="0" selected>Todos</option>
+                        <option value="PENDIENTE">WAITING</option>
+                        <option value="COMPLETADO">FINISH</option>
+                      </select>
+                    </div>
+
                   </div>
                 </div>
-                <div class="d-flex align-items-center p-2">
-                  <div class="d-flex" style="width:60%">Fecha Fin</div>
-                  <div style="width: 200px;">
-                    <input type="text" id="txt-Fe_Fin_Carga" class="form-control input-date input-report required">
-                    <span class="help-block text-danger" id="error"></span>
-                  </div>
+                <div class="dropdown-divider"></div>
+                <!-- Botones -->
+                <div class="d-flex justify-content-around">
+                  <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
+                  <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
                 </div>
-                <div class="d-flex align-items-center p-2" style="width:300px;">
-                  <div class="d-flex" style="width:60%">Estado</div>
-                  <div style="width: 200px;">
-                    <select id="txt-ID_Estado" name="ID_Estado" class="form-control input-estado">
-                      <option value="0" selected>Todos</option>
-                      <option value="PENDIENTE">WAITING</option>
-                      <option value="COMPLETADO">FINISH</option>
-                    </select>
-                  </div>
-
-                </div>
-              </div>
-              <div class="dropdown-divider"></div>
-              <!-- Botones -->
-              <div class="d-flex justify-content-around">
-                <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
-                <button class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block" id="aplicar-btn">Aplicar</button>
-              </div>
 
               </div>
               <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
@@ -192,10 +188,11 @@ Search for
                            Filters
                           <?php } ?>-->
             </div>
-          <?php } ?>
-      </div>
           </div>
-      </div><!-- /.container-fluid desactivate for a moment-->
+
+        <?php } ?>
+      </div>
+    </div><!-- /.container-fluid desactivate for a moment-->
   </section>
   <section class="content" id="main-container">
     <div class="container-fluid">
@@ -1210,9 +1207,9 @@ Filters
       <div class="col-0 col-lg-4 col-md-2 col-xl-4 d-sm-none d-xl-block">
       </div>
       <div id="btn-grd-doc-not" class="col-12 col-md-3 col-xl-1 px-xl-1 px-lg-1 px-md-1 px-sm-5 px-5 <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
-        <button type="button" id="btn-guardar-doc-not" 
-        class="py-sm-3 py-3 py-xl-2 py-md-2 py-lg-2 bg-orange hover:bg-orange-200 text-black-200 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" 
-        data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+        <button type="button" id="btn-guardar-doc-not"
+          class="py-sm-3 py-3 py-xl-2 py-md-2 py-lg-2 bg-orange hover:bg-orange-200 text-black-200 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
+          data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
             Guardar
           <?php } else { ?>
             Save
@@ -1314,80 +1311,80 @@ Filters
         </div>
       </div>
       <!-- <div class="col-12 col-xl-5 col-md-12 px-4 py-8 py-sm-4"> -->
-        <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-5 col-lg-12 col-md-12">
-          <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?> title-inspection">
-            <label class="text-lg">Inspection <i class="fas fa-images"></i></label>
-            <div id="btn-guardar-inspection"
-              onclick="saveInspection()"
-              class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                Guardar
-              <?php } else { ?>
-                Save
-              <?php } ?> &nbsp; <i class="fa fa-save"></i>
-            </div>
-            
-            <?php if ($this->user->No_Grupo == "GERENCIA") {  ?>
-              
-              <div id="btn-send-inspection">
+      <div class="px-4 py-8 py-sm-4 file-section-container col-12 col-xl-5 col-lg-12 col-md-12">
+        <h2 class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-5'; ?> title-inspection">
+          <label class="text-lg">Inspection <i class="fas fa-images"></i></label>
+          <div id="btn-guardar-inspection"
+            onclick="saveInspection()"
+            class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              Guardar
+            <?php } else { ?>
+              Save
+            <?php } ?> &nbsp; <i class="fa fa-save"></i>
+          </div>
+
+          <?php if ($this->user->No_Grupo == "GERENCIA") {  ?>
+
+            <div id="btn-send-inspection">
               <i class="fas fa-save"></i>
-              </div>
+            </div>
 
-            <?php } ?>
-          </h2>
-          <!--Button para guardar-->
+          <?php } ?>
+        </h2>
+        <!--Button para guardar-->
 
-          <div id="file-grid-inspection" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
-            <form class="form-horizontal" method="post">
-              <div class="row">
-                <div class="col-12 col-sm-12" id="multiple-file-upload-image">
-                  <div class="form-group">
-                    <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
-                      <input type="file" id="file-input-inspeccion" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
-                      <label for="file-inpute" class="file-label d-flex">
-                        <i class="fas fa-upload"></i>
-                        <div class="file-group-text">
-                          <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                              Selecciona o arrastra tu archivo aquí
-                            <?php } else { ?>
-                              Select or drag your file here
-                            <?php } ?></span>
-                          <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                              Formatos
-                            <?php } else { ?>
-                              Formats
-                              <?php } ?>: .jpeg .png .mp4</span>
-                        </div>
-                        <button class="upload-button upload-button-inspeccion" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-                            Subir archivo
+        <div id="file-grid-inspection" class="grid gap-4 text-lg font-semibold bg-white shadow p-3 rounded-bot">
+          <form class="form-horizontal" method="post">
+            <div class="row">
+              <div class="col-12 col-sm-12" id="multiple-file-upload-image">
+                <div class="form-group">
+                  <div class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
+                    <input type="file" id="file-input-inspeccion" class="file-input" multiple accept=".jpeg, .jpg, .png, .mp4" />
+                    <label for="file-inpute" class="file-label d-flex">
+                      <i class="fas fa-upload"></i>
+                      <div class="file-group-text">
+                        <span class="file-text"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Selecciona o arrastra tu archivo aquí
                           <?php } else { ?>
-                            Upload Files
-                          <?php } ?></button>
-                      </label>
-                    </div>
-                    <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
-                    <div class="file-lista hidden" id="file-lista-inspection">
-                    </div>
-                    <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
+                            Select or drag your file here
+                          <?php } ?></span>
+                        <span class="file-format"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            Formatos
+                          <?php } else { ?>
+                            Formats
+                            <?php } ?>: .jpeg .png .mp4</span>
+                      </div>
+                      <button class="upload-button upload-button-inspeccion" type="button"> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                          Subir archivo
+                        <?php } else { ?>
+                          Upload Files
+                        <?php } ?></button>
+                    </label>
                   </div>
+                  <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                  <div class="file-lista hidden" id="file-lista-inspection">
+                  </div>
+                  <span class="invalid-feedback" id="error-volumen">La cotización es requerida</span>
                 </div>
               </div>
-            </form>
-          </div>
-          <div id="pending-files-inspection hidden" class="mb-4 hidden">
-            <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
-            <div id="pending-file-list-inspection" class="space-y-2">
-              <!-- Los archivos pendientes aparecerán aquí -->
             </div>
+          </form>
+        </div>
+        <div id="pending-files-inspection hidden" class="mb-4 hidden">
+          <h2 class="text-lg font-semibold mb-2">Archivos Pendientes</h2>
+          <div id="pending-file-list-inspection" class="space-y-2">
+            <!-- Los archivos pendientes aparecerán aquí -->
           </div>
         </div>
+      </div>
       <!-- </div> -->
       <div class="col-12 col-xl-3 col-md-12 px-4 py-8 pt-sm-4 note-container-container">
         <h2 class="text-lg font-semibold bg-white shadow documentation-title d-flex justify-content-between rounded-top p-5 title-inspection">
           <label class="text-lg"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-            Notas
-          <?php } else { ?>
-            Notes
-          <?php } ?></label>
+              Notas
+            <?php } else { ?>
+              Notes
+            <?php } ?></label>
           <button onclick="addNote()" class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
             <i class="fas fa-save  float-right"></i>
 
@@ -2465,219 +2462,264 @@ Filters
     font-weight: 400;
     color: #272A30;
   }
-  label>i{
+
+  label>i {
     font-size: 20px;
   }
-/* Ocultar el texto del botón en pantallas pequeñas */
-@media (max-width: 768px) {
 
-  #table-contenedor.table.table-hover.dataTable.no-footer tbody{
-    background-color: transparent;
-  }
-  .fa-bars{
-    font-size: 20px;
-  }
-  h1, .content-header h1{
-    font-size: 1.2rem;
-  }
-  body{
-    font-size: 12px;
-  }
-  button>.fa{
-    font-size: 15px !important;
-    width: 20px;
-    height: 20px;
-    margin-top: 1px;
-  }
-  #table-cotizacion-embarque tbody{
-    padding: 10px 20px;
-  }
-  .consolid-name{
-    display: none !important;
-  }
-  .documentation-title{
-    border-bottom: 1px #DFDFDF solid;
-  }
-  .documentation-title>h2>label,.title-inspection>label{
-    font-size:1rem !important;
-  }
-  .file-upload-box {
-    padding: 0;
-    height: 200px;
-  }
-  .form-horizontal{
-    max-width: 100%;
-    overflow-x: hidden;
-    box-sizing: border-box;
-  }
-  .file-preview>p{
-    width: 70%;
-    overflow-x: hidden;
-    font-weight: 400;
-    font-size: 12px;
-  }
-  .file-preview{
-    width: 80%;
-  }
-  .file-format{
-    font-size: 10px !important;
-    margin-top: -5%;
-    padding-bottom: 5%;
-  }
-  .file-item{
-    padding: 8px;
-    background: transparent;
-  }
-  #table-contenedor thead {
-    display: none; /* Ocultar encabezados de la tabla */
-  }
-  #table-contenedor tbody tr:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-    background: #f7f7f7;
-  }
-  .view-eye{
-    display: none;
-  }
-  .buyer{
-    min-width: 20em !important;
-  }
-  .number{
-    min-width: 10em !important;
-  }
-  #table-contenedor tbody tr {
-    font-size: 11px;
-    cursor: pointer;
-    transition: box-shadow 0.2s;
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    margin-bottom: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: white;
-  }
-  #table-contenedor tbody td {
-    align-content: center;
-    gap: 0px; /* Espaciado entre   el select y el botón */
-  }
-  .form-horizontal>.row>div>.form-group{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .form-group>.file-upload-box{
-    width: 80%;
-  }
-  #table-contenedor tr.odd>td,#table-contenedor tr.even>td {
-    border: 0px solid transparent;
-    padding: 0rem;
-  }
-  td>.form-control{
-    height: auto;
-    width: auto;
-    border-radius: .40rem;
-    border: 0px solid #ddd;
-    font-size: 13px;
-    padding: 9px 20px;
-    margin: 1px;
-  }
-  .form-control:disabled{
-    background-color: transparent;
-    border: 0px solid #ddd;
-    opacity: 1;
-    font-size: 12px;
+  /* Ocultar el texto del botón en pantallas pequeñas */
+  @media (max-width: 768px) {
+
+    #table-contenedor.table.table-hover.dataTable.no-footer tbody {
+      background-color: transparent;
+    }
+
+    .fa-bars {
+      font-size: 20px;
+    }
+
+    h1,
+    .content-header h1 {
+      font-size: 1.2rem;
+    }
+
+    body {
+      font-size: 12px;
+    }
+
+    button>.fa {
+      font-size: 15px !important;
+      width: 20px;
+      height: 20px;
+      margin-top: 1px;
+    }
+
+    #table-cotizacion-embarque tbody {
+      padding: 10px 20px;
+    }
+
+    .consolid-name {
+      display: none !important;
+    }
+
+    .documentation-title {
+      border-bottom: 1px #DFDFDF solid;
+    }
+
+    .documentation-title>h2>label,
+    .title-inspection>label {
+      font-size: 1rem !important;
+    }
+
+    .file-upload-box {
+      padding: 0;
+      height: 200px;
+    }
+
+    .form-horizontal {
+      max-width: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
+    }
+
+    .file-preview>p {
+      width: 70%;
+      overflow-x: hidden;
+      font-weight: 400;
+      font-size: 12px;
+    }
+
+    .file-preview {
+      width: 80%;
+    }
+
+    .file-format {
+      font-size: 10px !important;
+      margin-top: -5%;
+      padding-bottom: 5%;
+    }
+
+    .file-item {
+      padding: 8px;
+      background: transparent;
+    }
+
+    #table-contenedor thead {
+      display: none;
+      /* Ocultar encabezados de la tabla */
+    }
+
+    #table-contenedor tbody tr:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      background: #f7f7f7;
+    }
+
+    .view-eye {
+      display: none;
+    }
+
+    .buyer {
+      min-width: 20em !important;
+    }
+
+    .number {
+      min-width: 10em !important;
+    }
+
+    #table-contenedor tbody tr {
+      font-size: 11px;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      /* Dos columnas iguales */
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+
+    #table-contenedor tbody td {
+      align-content: center;
+      gap: 0px;
+      /* Espaciado entre   el select y el botón */
+    }
+
+    .form-horizontal>.row>div>.form-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .form-group>.file-upload-box {
+      width: 80%;
+    }
+
+    #table-contenedor tr.odd>td,
+    #table-contenedor tr.even>td {
+      border: 0px solid transparent;
+      padding: 0rem;
+    }
+
+    td>.form-control {
+      height: auto;
+      width: auto;
+      border-radius: .40rem;
+      border: 0px solid #ddd;
+      font-size: 13px;
+      padding: 9px 20px;
+      margin: 1px;
+    }
+
+    .form-control:disabled {
+      background-color: transparent;
+      border: 0px solid #ddd;
+      opacity: 1;
+      font-size: 12px;
+    }
+
+    #btn-exportar-carga,
+    #btn-filtrar-carga,
+    #btn-cargar-carga {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0;
+      /* Oculta el texto del botón */
+    }
+
+    #btn-exportar-carga i {
+      margin-right: 0;
+      /* Asegúrate de que el ícono esté centrado */
+    }
+
+    #btn-exportar-carga>.fa-upload,
+    #btn-exportar-carga>.fa-download,
+    #btn-filtrar-carga>.fa-filter,
+    #btn-cargar-carga>.fa-upload {
+      font-size: 20px;
+      margin-right: -12px;
+    }
+
+    .note-container-container {
+      min-height: 10%;
+      padding-bottom: 25%;
+      margin-top: 7%;
+    }
+
+    #btn-grd-doc-not {
+      position: absolute;
+      bottom: 0%;
+      left: 0%;
+      order: 99;
+    }
+
+    #txt-Id_Carga_Consolidada {
+      height: 20vh;
+    }
+
+    .file-label>i {
+      font-size: 2.5rem;
+    }
+
+    .file-label {
+      flex-direction: column;
+      justify-content: center;
+      gap: 0px;
+      height: 100%;
+      font-size: 11px;
+    }
+
+    .file-group-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .file-group-text>span {
+      font-size: 12px;
+    }
+
+    .file-format {
+      margin-bottom: 0;
+    }
+
+    .title-inspection {
+      justify-content: center !important;
+    }
+
   }
 
-  #btn-exportar-carga, #btn-filtrar-carga, #btn-cargar-carga{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0; /* Oculta el texto del botón */
-  }
-
-  #btn-exportar-carga i {
-    margin-right: 0; /* Asegúrate de que el ícono esté centrado */
-  }
-  #btn-exportar-carga>.fa-upload, #btn-exportar-carga>.fa-download, #btn-filtrar-carga>.fa-filter, #btn-cargar-carga>.fa-upload {
-    font-size: 20px;
-    margin-right: -12px;
-  }
-  .note-container-container{
-    min-height: 10%;
-    padding-bottom: 25%;
-    margin-top: 7%;
-  }
-  
-  #btn-grd-doc-not{
+  .scroll-arrow {
     position: absolute;
-    bottom: 0%;
-    left: 0%;
-    order: 99;
-  }
-
-  #txt-Id_Carga_Consolidada{
-    height: 20vh;
-  }
-
-  .file-label>i{
-    font-size:2.5rem;
-  }
-
-  .file-label{
-    flex-direction: column;
+    top: 400px;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: none;
+    z-index: 10;
+    border-radius: 50%;
+    font-size: 16px;
+    display: none;
+    /* Ocultar inicialmente */
     justify-content: center;
-    gap:0px;
-    height: 100%;
-    font-size: 11px;
-  }
-  .file-group-text{
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-  }
-  .file-group-text>span{
-    font-size: 12px;
-  }
-  .file-format{
-    margin-bottom: 0;
-  }
-  .title-inspection{
-    justify-content: center !important;
   }
 
-}
+  .scroll-arrow.left {
+    left: 10px;
+  }
 
-.scroll-arrow {
-  position: absolute;
-  top: 400px;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: none;
-  z-index: 10;
-  border-radius: 50%;
-  font-size: 16px;
-  display: none; /* Ocultar inicialmente */
-  justify-content: center;
-  align-items: center;
-}
+  .scroll-arrow.right {
+    right: 10px;
+  }
 
-.scroll-arrow.left {
-  left: 10px;
-}
-
-.scroll-arrow.right {
-  right: 10px;
-}
-
-.scroll-arrow:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-
-
+  .scroll-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
 </style>
