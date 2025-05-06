@@ -10,7 +10,7 @@
             justify-between mb-8 mt-3  border-b-2 border-gray-200 pb-2">
                 <h1 class="text-2xl font-bold text-gray-800">Listado de Productos</h1>
 
-                <div class="flex flex-col gap-2 flex-md-row flex-lg-row flex-xl-row">
+                <div class="flex flex-col gap-2 flex-md-row flex-xs-row flex-xl-row">
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                             <span class="i-lucide-search w-5 h-5"></span>
@@ -37,10 +37,11 @@
                     </div>
 
                     <!-- Filters -->
-                    <div class="flex align-items-center justify-end gap-2">
+                    <div class="flex flex-col flex-sm-row align-items-center justify-end gap-2">
+                        <span value=""
+                            class="text-sm font-medium text-gray-400 mb-1">Ordenar por:</span>
                         <div class="flex gap-2 items-center justify-center mr-4">
-                            <span value=""
-                                class="text-sm font-medium text-gray-400 mb-1">Ordenar por:</span>
+
                             <select id="sortSelect" class="border border-gray-300 rounded-md px-4 py-2 bg-white focus:ring-2  text-gray-300  focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 <option value="name" class="text-gray-300">Agregados recientemente</option>
                                 <option value="price">Precio</option>
@@ -77,7 +78,7 @@
             </div>
 
             <!-- Product Grid -->
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 h-full">
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4    p-3 h-full">
 
 
             </div>
@@ -87,11 +88,11 @@
     <section class="content hidden" id="productoFormSection">
         <div class="container-fluid">
 
-            <div class="flex items-center justify-between mt-3">
+            <div class="flex items-center justify-between mt-3 flex-col md:flex-row mt-4">
                 <button
                     id="btnBack"
-                    type="button" id="btn-back-documentacion-documentacion" class="py-2  px-4 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left mr-2"></i> Regresar</button>
-                <div class="gap-2 d-flex flex-row" id="actionButtons">
+                    type="button" id="btn-back-documentacion-documentacion" class="py-2 px-4 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left mr-2"></i> Regresar</button>
+                <div class="gap-2 d-flex flex-row  mt-2 md:mt-0" id="actionButtons">
                     <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
                         <button id="btnCotizar" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-sm transition-colors flex items-center justify-center shadow-sm">
                             <span>Pasar a cotizados</span>
@@ -133,7 +134,7 @@
                     </div>
                     <div class=" mt-2 shadow-sm border border-gray-200 overflow-hidden">
                         <!-- Main Image Upload -->
-                        <div class="grid grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div id="additionalImage1Container" class=" bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
 
                             </div>
@@ -167,140 +168,158 @@
                         <form id="productForm">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <!-- Nombre -->
-                                <div class="form-group flex flex-row col-span-2">
-                                    <label for="nombre" class="flex flex-row gap-1 w-1/6 text-sm font-medium text-gray-400 mb-1">
-                                        Nombre <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-5/6">
-                                        <input type="text" id="nombre" name="nombre"
-                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                            required>
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
+                                <div class="form-group col-span-1 md:col-span-2">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="nombre" class="mb-1 sm:mb-0 sm:w-1/6 text-sm font-medium text-gray-400 flex items-center">
+                                            Nombre <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="w-full sm:w-5/6">
+                                            <input type="text" id="nombre" name="nombre"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                required>
+                                            <p class="form-error text-red-500 text-xs mt-1 hidden">Este campo es obligatorio.</p>
+                                        </div>
                                     </div>
-
                                 </div>
 
                                 <!-- Precio -->
-                                <div class="form-group flex flex-row">
-                                    <label for="precio" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
-                                        Precio <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-2/3">
-                                        <div class="relative">
-                                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-                                            <input type="text" id="precio" name="precio"
-                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
-                                                placeholder="0.00" required>
-                                        </div>
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
-                                    </div>
-
-                                </div>
-                                <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
-                                    <div class="form-group flex flex-row">
-                                        <label for="profit" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
-                                            Profit <span class="text-red-500">*</span>
+                                <div class="form-group col-span-1">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="precio" class="mb-1 sm:mb-0 sm:w-1/3 text-sm font-medium text-gray-400 flex items-center">
+                                            Precio <span class="text-red-500">*</span>
                                         </label>
-                                        <div class="flex flex-col gap-1 w-2/3">
+                                        <div class="w-full sm:w-2/3">
                                             <div class="relative">
                                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-                                                <input type="text" id="profit"
-                                                    class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
-                                                    placeholder="0.00" disabled
-                                                    value="3.00">
+                                                <input type="text" id="precio" name="precio"
+                                                    class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8"
+                                                    placeholder="0.00" required>
+                                            </div>
+                                            <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Profit (conditionally shown) -->
+                                <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
+                                    <div class="form-group col-span-1">
+                                        <div class="flex flex-col sm:flex-row">
+                                            <label for="profit" class="mb-1 sm:mb-0 sm:w-1/3 text-sm font-medium text-gray-400 flex items-center">
+                                                Profit <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="w-full sm:w-2/3">
+                                                <div class="relative">
+                                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
+                                                    <input type="text" id="profit"
+                                                        class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8"
+                                                        placeholder="0.00" disabled value="3.00">
+                                                </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 <?php } ?>
-                                <!-- MOQ -->
-                                <div class="form-group flex flex-row">
-                                    <label for="moq" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
-                                        MOQ <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="moq" name="moq" min="1"
-                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                            required>
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
-                                    </div>
 
+                                <!-- MOQ -->
+                                <div class="form-group col-span-1">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="moq" class="mb-1 sm:mb-0 sm:w-1/3 text-sm font-medium text-gray-400 flex items-center">
+                                            MOQ <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="w-full sm:w-2/3">
+                                            <input type="number" id="moq" name="moq" min="1"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                required>
+                                            <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Qty x box -->
-                                <div class="form-group flex flex-row">
-                                    <label for="qtyXbox" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
-                                        Qty x box <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="qtyXbox" name="qtyXbox" min="1"
-                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                            required>
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                <div class="form-group col-span-1">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="qtyXbox" class="mb-1 sm:mb-0 sm:w-1/3 text-sm font-medium text-gray-400 flex items-center">
+                                            Qty x box <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="w-full sm:w-2/3">
+                                            <input type="number" id="qtyXbox" name="qtyXbox" min="1"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                required>
+                                            <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                        </div>
                                     </div>
-
                                 </div>
 
                                 <!-- Cbm x box -->
-                                <div class="form-group flex flex-row">
-                                    <label for="cbmXbox" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
-                                        Cbm x box <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="cbmXbox" name="cbmXbox" min="0" step="0.001"
-                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                            required>
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                <div class="form-group col-span-1">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="cbmXbox" class="mb-1 sm:mb-0 sm:w-1/3 text-sm font-medium text-gray-400 flex items-center">
+                                            Cbm x box <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="w-full sm:w-2/3">
+                                            <input type="number" id="cbmXbox" name="cbmXbox" min="0" step="0.001"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                required>
+                                            <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                        </div>
                                     </div>
-
                                 </div>
 
                                 <!-- Días Entrega -->
-                                <div class="form-group flex flex-row">
-                                    <label for="diasEntrega" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
-                                        Días Entrega <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-2/3"><input type="number" id="diasEntrega" name="diasEntrega" min="1"
-                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                            required>
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                <div class="form-group col-span-1">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="diasEntrega" class="mb-1 sm:mb-0 sm:w-1/3 text-sm font-medium text-gray-400 flex items-center">
+                                            Días Entrega <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="w-full sm:w-2/3">
+                                            <input type="number" id="diasEntrega" name="diasEntrega" min="1"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                required>
+                                            <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese un valor numérico válido.</p>
+                                        </div>
                                     </div>
-
                                 </div>
 
                                 <!-- Delivery -->
-                                <div class="form-group flex flex-row">
-                                    <label for="delivery" class="flex flex-row gap-1 w-1/3 text-sm font-medium text-gray-400 mb-1">
-                                        Delivery <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-2/3">
-                                        <div class="relative">
-                                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-                                            <input type="text" id="delivery" name="delivery"
-                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8 transition-colors"
-                                                placeholder="0.00" required>
+                                <div class="form-group col-span-1">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="delivery" class="mb-1 sm:mb-0 sm:w-1/3 text-sm font-medium text-gray-400 flex items-center">
+                                            Delivery <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="w-full sm:w-2/3">
+                                            <div class="relative">
+                                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
+                                                <input type="text" id="delivery" name="delivery"
+                                                    class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-8"
+                                                    placeholder="0.00" required>
+                                            </div>
+                                            <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
                                         </div>
-                                        <p class="form-error text-red-500 text-xs mt-1 hidden">Ingrese solo valores numéricos.</p>
                                     </div>
-
                                 </div>
 
                                 <!-- Colores -->
-                                <div class="form-group flex flex-row col-span-2">
-                                    <label for="colores" class="flex flex-row  text-sm font-medium text-gray-400 mb-1 w-1/6">
-                                        Colores
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-5/6">
-                                        <input type="text" id="colores" name="colores"
-                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300  shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                                <div class="form-group col-span-1 md:col-span-2">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="colores" class="mb-1 sm:mb-0 sm:w-1/6 text-sm font-medium text-gray-400 flex items-center">
+                                            Colores
+                                        </label>
+                                        <div class="w-full sm:w-5/6">
+                                            <input type="text" id="colores" name="colores"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Notas -->
-                                <div class="form-group flex flex-row col-span-2">
-                                    <label for="notas" class="flex flex-row gap-1 text-sm font-medium text-gray-400 mb-1 w-1/6">
-                                        Notas
-                                    </label>
-                                    <div class="flex flex-col gap-1 w-5/6">
-                                        <textarea id="notas" name="notas" rows="4"
-                                            class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></textarea>
+                                <div class="form-group col-span-1 md:col-span-2">
+                                    <div class="flex flex-col sm:flex-row">
+                                        <label for="notas" class="mb-1 sm:mb-0 sm:w-1/6 text-sm font-medium text-gray-400 flex items-center">
+                                            Notas
+                                        </label>
+                                        <div class="w-full sm:w-5/6">
+                                            <textarea id="notas" name="notas" rows="4"
+                                                class="form-input block w-full border-2 text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -357,62 +376,24 @@
                     <div class=" bg-white rounded-lg shadow-lg p-6">
                         <h1 class="text-2xl font-bold mb-6">COSTOS DE IMPORTACIÓN:</h1>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
-                        <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
-                        <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            <option value="0">0%</option>
-                            <option value="6">6%</option>
-                            <option value="11">11%</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">IGV:</label>
-                        <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="block text-sm font-medium text-gray-700">*Antidumping:</label>
-                        <input type="number" id="antidumping" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
-                    </div>
-                </div>
-
-
-                            <div class="input-group">
-                                <label class="block text-sm font-medium text-gray-700">Total USD:</label>
-                                <input type="number" id="totalUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
-                            </div>
-
-                            <div class="input-group">
-                                <label class="block text-sm font-medium text-gray-700">Total CBM:</label>
-                                <input type="number" id="totalCBM" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01" disabled>
-                            </div>
-                        </div>
-
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                             <div class="input-group">
                                 <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
-                                <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00">
+                                <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
                             </div>
 
                             <div class="input-group">
                                 <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
                                 <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                    <option value="0.00">0%</option>
-                                    <option value="6.00">6%</option>
-                                    <option value="11.00">11%</option>
+                                    <option value="0">0%</option>
+                                    <option value="6">6%</option>
+                                    <option value="11">11%</option>
                                 </select>
                             </div>
 
                             <div class="input-group">
                                 <label class="block text-sm font-medium text-gray-700">IGV:</label>
-                                <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18">
+                                <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
                             </div>
 
                             <div class="input-group">
@@ -421,217 +402,255 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                            <div class="input-group">
-                                <label class="block text-sm font-medium text-gray-700">Percepción:</label>
-                                <input type="number" id="percepcion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="3.5">
-                            </div>
+
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Total USD:</label>
+                            <input type="number" id="totalUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
                         </div>
 
-                        <!-- Calculation Tables -->
-                        <div class="grid grid-cols-1 md:grid-cols-2">
-                            <!-- Base Imponible Table -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULO DE BASE IMPONIBLE</h2>
-                                <table class="w-full">
-                                    <tr>
-                                        <td class="py-2">Valor de carga</td>
-                                        <td class="py-2 text-right" id="valorCarga">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Flete</td>
-                                        <td class="py-2 text-right" id="flete">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Seguro</td>
-                                        <td class="py-2 text-right" id="seguro">$ 0.00</td>
-                                    </tr>
-                                    <tr class="font-bold">
-                                        <td class="py-2">VALOR CIF</td>
-                                        <td class="py-2 text-right" id="valorCIF">$ 0.00</td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                            <!-- Resumen Table -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h2 class="text-lg font-semibold mb-4 bg-orange-500 text-white p-2">RESUMEN DE COTIZACIÓN</h2>
-                                <table class="w-full">
-                                    <tr>
-                                        <td class="py-2">Valor de carga (pago China)</td>
-                                        <td class="py-2 text-right" id="valorCargaResumen">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Servicio trading (pago China)</td>
-                                        <td class="py-2 text-right" id="servicioTrading">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Servicio importación</td>
-                                        <td class="py-2 text-right" id="servicioImportacion">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Impuestos</td>
-                                        <td class="py-2 text-right" id="impuestos">$ 0.00</td>
-                                    </tr>
-                                    <tr class="font-bold">
-                                        <td class="py-2">MONTO TOTAL</td>
-                                        <td class="py-2 text-right" id="montoTotal">$ 0.00</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULOS DE TRIBUTOS</h2>
-                                <table class="w-full">
-                                    <!-- ADD FOR AD VALOREM IGV IPM ANTIDUMPING SUBTOTAL IN BOLD, PERCEPCION AND TOTAL INPUTS-->
-                                    <tr>
-                                        <td class="py-2">Ad Valorem</td>
-                                        <td class="py-2 text-right" id="adValorem">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">IGV</td>
-                                        <td class="py-2 text-right" id="igvTotal">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">IPM</td>
-                                        <td class="py-2 text-right" id="ipmTotal">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Antidumping</td>
-                                        <td class="py-2 text-right" id="antidumpingTotal">$ 0.00</td>
-                                    </tr>
-                                    <tr class="font-bold">
-                                        <td class="py-2">Subtotal</td>
-                                        <td class="py-2 text-right" id="subtotal">$ 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Percepción</td>
-                                        <td class="py-2 text-right" id="percepcionTotal">$ 0.00</td>
-                                    </tr>
-                                    <tr class="font-bold">
-                                        <td class="py-2">TOTAL</td>
-                                        <td class="py-2 text-right" id="total">$ 0.00</td>
-                                    </tr>
-                                    <!-- costo en destiono -->
-                                    <tr class="font-bold">
-                                        <td class="py-2">Costo en destino</td>
-                                        <td class="py-2 text-right" id="costoDestino">$ 0.00</td>
-                                    </tr>
-                                </table>
-                            </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Total CBM:</label>
+                            <input type="number" id="totalCBM" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01" disabled>
                         </div>
-
-                        <!-- Cost Results -->
-                        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-orange-500 text-white p-4 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                                    $ <input disabled id="costoUnitarioUSD" style="background: transparent;">
-                                </div>
-                            </div>
-                            <div class="bg-orange-500 text-white p-4 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                                    S/ <input disabled id="costoUnitarioPEN" style="background: transparent;">
-                                </div>
-                            </div>
-                        </div>
-
-
                     </div>
-                </div>
-            <?php } ?>
-        </div>
 
-    </section>
-    <template id="skeletonTemplate">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-            <div class="aspect-square bg-gray-200"></div>
-            <div class="p-4">
-                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div class="flex items-center justify-between mb-4">
-                    <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-                    <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
+                            <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00">
+                        </div>
+
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
+                            <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                <option value="0.00">0%</option>
+                                <option value="6.00">6%</option>
+                                <option value="11.00">11%</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">IGV:</label>
+                            <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18">
+                        </div>
+
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">*Antidumping:</label>
+                            <input type="number" id="antidumping" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Percepción:</label>
+                            <input type="number" id="percepcion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="3.5">
+                        </div>
+                    </div>
+
+                    <!-- Calculation Tables -->
+                    <div class="grid grid-cols-1 md:grid-cols-2">
+                        <!-- Base Imponible Table -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULO DE BASE IMPONIBLE</h2>
+                            <table class="w-full">
+                                <tr>
+                                    <td class="py-2">Valor de carga</td>
+                                    <td class="py-2 text-right" id="valorCarga">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Flete</td>
+                                    <td class="py-2 text-right" id="flete">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Seguro</td>
+                                    <td class="py-2 text-right" id="seguro">$ 0.00</td>
+                                </tr>
+                                <tr class="font-bold">
+                                    <td class="py-2">VALOR CIF</td>
+                                    <td class="py-2 text-right" id="valorCIF">$ 0.00</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Resumen Table -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h2 class="text-lg font-semibold mb-4 bg-orange-500 text-white p-2">RESUMEN DE COTIZACIÓN</h2>
+                            <table class="w-full">
+                                <tr>
+                                    <td class="py-2">Valor de carga (pago China)</td>
+                                    <td class="py-2 text-right" id="valorCargaResumen">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Servicio trading (pago China)</td>
+                                    <td class="py-2 text-right" id="servicioTrading">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Servicio importación</td>
+                                    <td class="py-2 text-right" id="servicioImportacion">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Impuestos</td>
+                                    <td class="py-2 text-right" id="impuestos">$ 0.00</td>
+                                </tr>
+                                <tr class="font-bold">
+                                    <td class="py-2">MONTO TOTAL</td>
+                                    <td class="py-2 text-right" id="montoTotal">$ 0.00</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULOS DE TRIBUTOS</h2>
+                            <table class="w-full">
+                                <!-- ADD FOR AD VALOREM IGV IPM ANTIDUMPING SUBTOTAL IN BOLD, PERCEPCION AND TOTAL INPUTS-->
+                                <tr>
+                                    <td class="py-2">Ad Valorem</td>
+                                    <td class="py-2 text-right" id="adValorem">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">IGV</td>
+                                    <td class="py-2 text-right" id="igvTotal">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">IPM</td>
+                                    <td class="py-2 text-right" id="ipmTotal">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Antidumping</td>
+                                    <td class="py-2 text-right" id="antidumpingTotal">$ 0.00</td>
+                                </tr>
+                                <tr class="font-bold">
+                                    <td class="py-2">Subtotal</td>
+                                    <td class="py-2 text-right" id="subtotal">$ 0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Percepción</td>
+                                    <td class="py-2 text-right" id="percepcionTotal">$ 0.00</td>
+                                </tr>
+                                <tr class="font-bold">
+                                    <td class="py-2">TOTAL</td>
+                                    <td class="py-2 text-right" id="total">$ 0.00</td>
+                                </tr>
+                                <!-- costo en destiono -->
+                                <tr class="font-bold">
+                                    <td class="py-2">Costo en destino</td>
+                                    <td class="py-2 text-right" id="costoDestino">$ 0.00</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Cost Results -->
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-orange-500 text-white p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span>COSTO UNITARIO DE IMPORTACIÓN</span>
+                                $ <input disabled id="costoUnitarioUSD" style="background: transparent;">
+                            </div>
+                        </div>
+                        <div class="bg-orange-500 text-white p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span>COSTO UNITARIO DE IMPORTACIÓN</span>
+                                S/ <input disabled id="costoUnitarioPEN" style="background: transparent;">
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
-                <div class="border-t border-gray-100 pt-4 mt-4">
-                    <div class="h-8 bg-gray-200 rounded"></div>
-                </div>
+        </div>
+    <?php } ?>
+</div>
+
+</section>
+<template id="skeletonTemplate">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
+        <div class="aspect-square bg-gray-200"></div>
+        <div class="p-4">
+            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div class="flex items-center justify-between mb-4">
+                <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            </div>
+            <div class="border-t border-gray-100 pt-4 mt-4">
+                <div class="h-8 bg-gray-200 rounded"></div>
             </div>
         </div>
-    </template>
-    <template id="productTemplate">
-    <div class="card edit-btn rounded-lg h-40 cursor-pointer flex flex-row w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative">            <!--status badge-->
-            <div class="absolute bottom-2 right-2 text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
+    </div>
+</template>
+<template id="productTemplate">
+    <div class="card edit-btn rounded-lg h-40 cursor-pointer flex flex-row w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative"> <!--status badge-->
+        <div class="absolute bottom-2 right-2 text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
 
-            <!--dropdown menu trigger-->
-            <div class="absolute top-0 right-2 z-30">
-                <button class="dropdown-trigger bg-white hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center shadow-sm focus:outline-none">
-                    <svg width="20" height="5" viewBox="0 0 11 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="9.76901" cy="1.15385" r="1.15385" transform="rotate(90 9.76901 1.15385)" fill="#D9D9D9" />
-                        <circle cx="5.46139" cy="1.15385" r="1.15385" transform="rotate(90 5.46139 1.15385)" fill="#D9D9D9" />
-                        <circle cx="1.15377" cy="1.15385" r="1.15385" transform="rotate(90 1.15377 1.15385)" fill="#D9D9D9" />
-                    </svg>
+        <!--dropdown menu trigger-->
+        <div class="absolute top-0 right-2 z-30">
+            <button class="dropdown-trigger bg-white hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center shadow-sm focus:outline-none">
+                <svg width="20" height="5" viewBox="0 0 11 3" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="9.76901" cy="1.15385" r="1.15385" transform="rotate(90 9.76901 1.15385)" fill="#D9D9D9" />
+                    <circle cx="5.46139" cy="1.15385" r="1.15385" transform="rotate(90 5.46139 1.15385)" fill="#D9D9D9" />
+                    <circle cx="1.15377" cy="1.15385" r="1.15385" transform="rotate(90 1.15377 1.15385)" fill="#D9D9D9" />
+                </svg>
 
-                </button>
+            </button>
 
-                <!--dropdown menu content-->
-                <div class="dropdown-menu2 absolute right-0 mt-1 w-80 bg-white rounded-md shadow-lg overflow-hidden z-40 hidden">
-                    <div class="py-1">
-                        <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                            Editar
-                        </button>
-                        <button class="delete-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 text-red-600 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                <line x1="10" y1="11" x2="10" y2="17"></line>
-                                <line x1="14" y1="11" x2="14" y2="17"></line>
-                            </svg>
-                            Eliminar producto
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-row gap-2 w-full ">
-                <div class="relative aspect-square w-2/5 p-2 px-1">
-                    <img src="" alt="" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 "></div>
-                </div>
-
-                <div class="px-2 py-4 w-3/5">
-                    <h3 class="mb-2 font-bold text-2xl"></h3>
-                    <div class="flex-col flex items-start justify-between text-sm">
-                        <span class="text-gray-600 text-md"></span>
-                        <span class="text-gray-500 text-md"></span>
-                        <span class="text-black-600 text-md precioPeru"></span>
-                        <span class="text-black-500 text-md precioUSD"></span>
-                    </div>
-                    <button class="btn btn-primary btnTienda mx-auto mt-4 bg-blue-50 text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1 w-full">
-                        <span>PASAR A TIENDA</span>
+            <!--dropdown menu content-->
+            <div class="dropdown-menu2 absolute right-0 mt-1 w-80 bg-white rounded-md shadow-lg overflow-hidden z-40 hidden">
+                <div class="py-1">
+                    <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Editar
+                    </button>
+                    <button class="delete-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 text-red-600 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        Eliminar producto
                     </button>
                 </div>
             </div>
         </div>
-    </template>
-    <div id="noResults" class="hidden col-span-2 lg:col-span-4 h-full">
-        <div class=" rounded-lg  overflow-hidden flex flex-col items-center gap-10 justify-center h-full">
-            <svg width="140" height="217" viewBox="0 0 74 107" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="40" width="66" height="66" rx="9" stroke="#D9D9D9" stroke-width="2" />
-                <mask id="path-2-inside-1_3747_3546" fill="white">
-                    <path d="M71 97C71 102.523 66.5228 107 61 107H13C7.47715 107 3 102.523 3 97V75H27V87.1377H48V75H71V97Z" />
-                </mask>
-                <path d="M61 107V109V107ZM13 107V109V107ZM3 75V73H1V75H3ZM27 75H29V73H27V75ZM27 87.1377H25V89.1377H27V87.1377ZM48 87.1377V89.1377H50V87.1377H48ZM48 75V73H46V75H48ZM71 75H73V73H71V75ZM71 97H69C69 101.418 65.4183 105 61 105V107V109C67.6274 109 73 103.627 73 97H71ZM61 107V105H13V107V109H61V107ZM13 107V105C8.58172 105 5 101.418 5 97H3H1C1 103.627 6.37258 109 13 109V107ZM3 97H5V75H3H1V97H3ZM3 75V77H27V75V73H3V75ZM27 75H25V87.1377H27H29V75H27ZM27 87.1377V89.1377H48V87.1377V85.1377H27V87.1377ZM48 87.1377H50V75H48H46V87.1377H48ZM48 75V77H71V75V73H48V75ZM71 75H69V97H71H73V75H71Z" fill="#D9D9D9" mask="url(#path-2-inside-1_3747_3546)" />
-                <path d="M37.0195 2V21.8129" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M2 16.5117L16.0176 30.5294" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M58.0212 30.5294L72.0389 16.5117" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+        <div class="flex flex-row gap-2 w-full ">
+            <div class="relative aspect-square w-2/5 p-2 px-1">
+                <img src="" alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 "></div>
+            </div>
 
-            <p class="text-gray-500">Aún no hay productos ingresados</p>
+            <div class="px-2 py-4 w-3/5">
+                <h3 class="mb-2 font-bold text-2xl"></h3>
+                <div class="flex-col flex items-start justify-between text-sm">
+                    <span class="text-gray-600 text-md"></span>
+                    <span class="text-gray-500 text-md"></span>
+                    <span class="text-black-600 text-md precioPeru"></span>
+                    <span class="text-black-500 text-md precioUSD"></span>
+                </div>
+                <button class="btn btn-primary btnTienda mx-auto mt-4 bg-blue-50 text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1 w-full">
+                    <span>PASAR A TIENDA</span>
+                </button>
+            </div>
         </div>
     </div>
+</template>
+<div id="noResults" class="hidden col-span-2 lg:col-span-4 h-full">
+    <div class=" rounded-lg  overflow-hidden flex flex-col items-center gap-10 justify-center h-full">
+        <svg width="140" height="217" viewBox="0 0 74 107" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="40" width="66" height="66" rx="9" stroke="#D9D9D9" stroke-width="2" />
+            <mask id="path-2-inside-1_3747_3546" fill="white">
+                <path d="M71 97C71 102.523 66.5228 107 61 107H13C7.47715 107 3 102.523 3 97V75H27V87.1377H48V75H71V97Z" />
+            </mask>
+            <path d="M61 107V109V107ZM13 107V109V107ZM3 75V73H1V75H3ZM27 75H29V73H27V75ZM27 87.1377H25V89.1377H27V87.1377ZM48 87.1377V89.1377H50V87.1377H48ZM48 75V73H46V75H48ZM71 75H73V73H71V75ZM71 97H69C69 101.418 65.4183 105 61 105V107V109C67.6274 109 73 103.627 73 97H71ZM61 107V105H13V107V109H61V107ZM13 107V105C8.58172 105 5 101.418 5 97H3H1C1 103.627 6.37258 109 13 109V107ZM3 97H5V75H3H1V97H3ZM3 75V77H27V75V73H3V75ZM27 75H25V87.1377H27H29V75H27ZM27 87.1377V89.1377H48V87.1377V85.1377H27V87.1377ZM48 87.1377H50V75H48H46V87.1377H48ZM48 75V77H71V75V73H48V75ZM71 75H69V97H71H73V75H71Z" fill="#D9D9D9" mask="url(#path-2-inside-1_3747_3546)" />
+            <path d="M37.0195 2V21.8129" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M2 16.5117L16.0176 30.5294" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M58.0212 30.5294L72.0389 16.5117" stroke="#DFDFDE" stroke-width="3.30215" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+
+        <p class="text-gray-500">Aún no hay productos ingresados</p>
+    </div>
+</div>
 </div>
 
 <style>
@@ -751,7 +770,8 @@
         -webkit-appearance: none;
         margin: 0;
     }
-    body{
+
+    body {
         font-family: 'Epilogue', sans-serif;
     }
 </style>

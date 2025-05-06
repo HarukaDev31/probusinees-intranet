@@ -508,7 +508,7 @@ $(document).ready(async function () {
         e.preventDefault();
         //change productsGrid to flex column
         const $grid = $('#productGrid');
-        $grid.removeClass('grid grid-cols-4 gap-4');
+        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4');
         $grid.addClass('flex flex-col gap-4');
 
     })
@@ -516,8 +516,8 @@ $(document).ready(async function () {
         e.preventDefault();
         //change productsGrid to grid
         const $grid = $('#productGrid');
-        $grid.removeClass('flex flex-col gap-4');
-        $grid.addClass('grid grid-cols-4 gap-4');
+        $grid.removeClass('flex flex-col gap-4 ');
+        $grid.addClass('grid  gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4');
     })
     $("#btnDelete").on("click", function (e) {
         e.preventDefault();

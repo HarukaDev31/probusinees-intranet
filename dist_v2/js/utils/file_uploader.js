@@ -253,7 +253,7 @@ class FileUploader {
               <path d="M19 13L14 8L3 19" stroke="#585858" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <div class="w-4/6">
-              <p class="text-sm text-gray-500">${this.file.name.length > 30 ? this.file.name.substring(0, 30) + '...' : this.file.name}</p>
+              <p class="text-sm text-gray-500">${this.file.name.length > 25 ? this.file.name.substring(0, 25) + '...' : this.file.name}</p>
               <p class="text-xs text-gray-400">Tamaño: ${(this.file.size / 1024).toFixed(2)} KB</p>
             </div>
             <div class="w-1/6 h-1/6">
