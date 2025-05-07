@@ -267,7 +267,7 @@ $(document).ready(async function () {
 
         additionalVideo1 = new FileUploader({
             containerId: 'additionalVideo1Container',
-            acceptedTypes: "video/mp4,video/webm,video/ogg",// Tipos de archivos aceptados
+            acceptedTypes: "video/mp4,video/webm,video/ogg,video/quicktime,.mov,.mp4",
             maxSize: 20 * 1024 * 1024
         });
 
