@@ -568,7 +568,7 @@ $(document).ready(async function () {
         });
         additionalVideo1 = new FileUploader({
             containerId: 'additionalVideo1Container',
-            acceptedTypes: "video/mp4,video/webm,video/ogg",// Tipos de archivos aceptados
+            acceptedTypes: "video/mp4,video/webm,video/ogg,video/quicktime,.mov,.mp4",
             maxSize: 20 * 1024 * 1024
         });
         contactCardContainer = new FileUploader({
@@ -701,7 +701,7 @@ $(document).ready(async function () {
         switch (field.id) {
             case 'wechatPhone':
                 // Validar formato de número de teléfono (ejemplo: solo dígitos y longitud de 10-15)
-                if (!/^\d{9}$/.test(field.value.trim()) && field.value.trim() !== '') {
+                if (field.value.trim() !== '') {
                     showError(field, errorElement, 'Ingrese un número de teléfono válido (9 dígitos).');
                     return false;
                 }
