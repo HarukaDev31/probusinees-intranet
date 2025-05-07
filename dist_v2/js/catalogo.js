@@ -331,7 +331,9 @@ $(document).ready(async function () {
         });
 
         // Edit button handler
-        $(document).on('click', '.edit-btn', async function () {
+        $(document).on('click', '.edit-btn', async function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
             // Redirect to edit page
@@ -339,9 +341,10 @@ $(document).ready(async function () {
         });
 
         // Delete button handler
-        $(document).on('click', '.delete-btn', async function () {
+        $(document).on('click', '.delete-btn', async function (e) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('delete')
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
             await deleteProduct(productId);
