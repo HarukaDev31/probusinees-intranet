@@ -701,8 +701,8 @@ $(document).ready(async function () {
         switch (field.id) {
             case 'wechatPhone':
                 // Validar formato de número de teléfono (ejemplo: solo dígitos y longitud de 10-15)
-                if (field.value.trim() !== '') {
-                    showError(field, errorElement, 'Ingrese un número de teléfono válido (9 dígitos).');
+                if (field.value.trim() === '') {
+                    showError(field, errorElement, 'Ingrese un número de teléfono válido');
                     return false;
                 }
                 break;
