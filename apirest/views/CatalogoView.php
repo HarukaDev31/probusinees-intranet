@@ -7,7 +7,7 @@
         <div class="container-fluid">
             <div class="flex items-center
             flex-col flex-md-row flex-lg-row flex-xl-row
-            justify-between mb-8 mt-3  border-b-2 border-gray-200 pb-2">
+            justify-between mb-8 pt-3  border-b-2 border-gray-200 pb-2">
                 <h1 class="text-2xl font-bold text-gray-800">Listado de Productos</h1>
 
                 <div class="flex flex-col gap-2 flex-md-row flex-xs-row flex-xl-row">
@@ -88,7 +88,7 @@
     <section class="content hidden" id="productoFormSection">
         <div class="container-fluid">
 
-            <div class="flex items-center justify-between mt-3 flex-col md:flex-row mt-4">
+            <div class="flex items-center justify-between flex-col md:flex-row pt-4">
                 <button
                     id="btnBack"
                     type="button" id="btn-back-documentacion-documentacion" class="py-2 px-4 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left mr-2"></i> Regresar</button>
@@ -122,32 +122,21 @@
             <!-- Left Column - Images -->
             <div class="lg:col-span-3">
                 <div class="">
-
-
                     <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                         <!-- Main Image Upload -->
                         <div id="mainImageContainer" class="relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg mb-4 transition-all hover:bg-gray-100 hover:border-blue-300 w-75 mx-auto">
-
                         </div>
-
-
                     </div>
                     <div class=" mt-2 shadow-sm border border-gray-200 overflow-hidden">
                         <!-- Main Image Upload -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div id="additionalImage1Container" class=" bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
-
-                            </div>
-
-                            <div id="additionalImage2Container" class=" bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
-
-                            </div>
-
-                            <div id="additionalVideo1Container" class=" bg-white p-2 rounded-lg video-container relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg transition-all hover:bg-gray-100 hover:border-blue-300">
-
-                            </div>
+                        <div class="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory">
+                        <div id="additionalImage1Container"
+                            class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
+                        <div id="additionalImage2Container"
+                            class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
+                        <div id="additionalVideo1Container"
+                            class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg video-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
                         </div>
-
                     </div>
 
                 </div>
