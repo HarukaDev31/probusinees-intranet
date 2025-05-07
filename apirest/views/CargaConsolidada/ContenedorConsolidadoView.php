@@ -3,6 +3,8 @@
   localStorage.setItem("currentPrivilege", currentPrivilege);
 </script>
 <div class="content-wrapper">
+<div class="sessions-container d-flex flex-row gap-2">
+</div>
   <!--set js variable = php variable-->
 
   <!-- Content Header (Page header) -->

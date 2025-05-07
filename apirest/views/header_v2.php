@@ -127,7 +127,8 @@ $SectionNames=[
     </div>
   </div>
   <div class="main-header navbar navbar-expand navbar-white navbar-light d-flex d-xl-none px-xl-0 px-2 flex-xl-row flex-row-reverse justify-content-between">
-    <!-- Left navbar links -->
+
+
     <ul class="navbar-nav ">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars"></i></a>
@@ -528,3 +529,4 @@ $SectionNames=[
       
     }
     </style>
+  
