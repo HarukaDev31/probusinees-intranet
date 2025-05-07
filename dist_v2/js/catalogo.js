@@ -344,10 +344,23 @@ $(document).ready(async function () {
         $(document).on('click', '.delete-btn', async function (e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('delete')
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
-            await deleteProduct(productId);
+            Swal.fire({
+                title: '¿Está seguro de eliminar el producto?',
+                text: "Una vez eliminado, no podrá deshacer esta acción.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    // Delete product
+                    await deleteProduct(productId);
+                }
+            });
         });
     }
 
