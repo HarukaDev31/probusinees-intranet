@@ -52,6 +52,9 @@ class FileUploader {
     const inputId = `${this.prefix}-input`;
     const removeId = `${this.prefix}-remove`;
 
+     // Obtener formatos aceptados en texto legible
+  const acceptedTypesText = this.getAcceptedTypesText();
+
     // Guardar referencias para usar más tarde
     this.ids = { previewId, placeholderId, inputId, removeId };
 
@@ -72,7 +75,7 @@ class FileUploader {
         </svg>
         <div>
           <p class="text-sm text-gray-500">${this.config.placeholderText}</p>
-          <p class="text-xs text-gray-400">Formatos: PNG, JPGE</p>
+          <p class="text-xs text-gray-400">Formatos: ${acceptedTypesText}</p>
          
         </div>
         <div
@@ -486,5 +489,72 @@ class FileUploader {
       this.clearFile();
     }
   }
-
+  getAcceptedTypesText() {
+    if (this.config.acceptedTypes === '*/*') return 'Cualquier archivo';
+    const types = this.config.acceptedTypes.split(',').map(type => type.trim().toLowerCase());
+  
+    let hasImage = false, hasVideo = false, hasAudio = false;
+    let hasPdf = false, hasExcel = false, hasWord = false, hasPowerPoint = false, others = [];
+  
+    types.forEach(type => {
+      if (
+        type === 'image/png' ||
+        type === 'image/jpeg' ||
+        type === 'image/jpg' ||
+        type === 'image/gif' ||
+        type === 'image/webp' ||
+        type === 'image/*' ||
+        type === '.png' ||
+        type === '.jpg' ||
+        type === '.jpeg' ||
+        type === '.gif' ||
+        type === '.webp'
+      ) hasImage = true;
+      else if (
+        type === 'video/*' ||
+        type === 'video/mp4' ||
+        type === 'video/webm' ||
+        type === 'video/ogg' ||
+        type === 'video/quicktime' ||
+        type === 'video/mov' ||
+        type === '.mp4' ||
+        type === '.webm' ||
+        type === '.ogg' ||
+        type === '.mov'
+      ) hasVideo = true;
+      else if (type === 'audio/*' || type === '.mp3' || type === '.wav' || type === '.ogg') hasAudio = true;
+      else if (type === 'application/pdf' || type === '.pdf') hasPdf = true;
+      else if (
+        type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        type === 'application/vnd.ms-excel' ||
+        type === '.xls' ||
+        type === '.xlsx'
+      ) hasExcel = true;
+      else if (
+        type === 'application/msword' ||
+        type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        type === '.doc' ||
+        type === '.docx'
+      ) hasWord = true;
+      else if (
+        type === 'application/vnd.ms-powerpoint' ||
+        type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+        type === '.ppt' ||
+        type === '.pptx'
+      ) hasPowerPoint = true;
+      else others.push(type.replace(/^\s*\.\s*/, '').toUpperCase());
+    });
+  
+    const result = [];
+    if (hasImage) result.push('Imágenes');
+    if (hasVideo) result.push('Videos');
+    if (hasAudio) result.push('Audios');
+    if (hasPdf) result.push('PDF');
+    if (hasExcel) result.push('Excel');
+    if (hasWord) result.push('Word');
+    if (hasPowerPoint) result.push('PowerPoint');
+    if (others.length) result.push(...others);
+  
+    return result.join(', ');
+  }
 }
