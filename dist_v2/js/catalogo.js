@@ -340,9 +340,10 @@ $(document).ready(async function () {
 
         // Delete button handler
         $(document).on('click', '.delete-btn', async function () {
+            e.preventDefault();
+            e.stopPropagation();
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
-            console.log('Delete product with ID:', productId);
             await deleteProduct(productId);
         });
     }
