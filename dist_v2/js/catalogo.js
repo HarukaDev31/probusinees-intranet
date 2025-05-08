@@ -67,92 +67,66 @@ $(document).ready(async function () {
 
     }
 
+    // Función para alternar la visibilidad del dropdown
     function initializeProductDropdowns() {
         // Buscar todos los productos con el dropdown
         document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
             // Limpiar handlers anteriores si existieran
             trigger.removeEventListener('click', toggleDropdown);
-            trigger.removeEventListener('touchstart', toggleDropdownIOS);
-
-            // Detectar si es iOS para usar el manejador adecuado
-            if (isIOS()) {
-                trigger.addEventListener('touchstart', toggleDropdownIOS, { passive: false });
-            } else {
-                trigger.addEventListener('click', toggleDropdown);
-                trigger.addEventListener('focusout', handleFocusOut);
-            }
+            trigger.removeEventListener('touchstart', handleTouchStart); // Nuevo para Safari móvil
+            
+            // Añadir nuevos event listeners
+            trigger.addEventListener('click', toggleDropdown);
+            trigger.addEventListener('touchstart', handleTouchStart); // Para Safari en iOS
         });
-
-        // Cerrar todos los dropdowns cuando se hace clic en cualquier parte
-        document.removeEventListener('click', closeDropdownsOnOutsideClick);
-        document.removeEventListener('touchstart', closeDropdownsOnOutsideClick);
-
-        document.addEventListener('click', closeDropdownsOnOutsideClick);
-
-        // Manejador específico para iOS
-        if (isIOS()) {
-            document.addEventListener('touchstart', closeDropdownsOnOutsideClick, { passive: false });
-        }
-    }
-
-    // Función para detectar si estamos en iOS
-    function isIOS() {
-        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    }
-
-    // Función específica para togglear dropdown en iOS
-    function toggleDropdownIOS(event) {
-        event.stopPropagation();
-
-        const dropdownMenu = this.nextElementSibling;
-        const isCurrentlyHidden = dropdownMenu.classList.contains('hidden');
-
-        // Cerrar todos los dropdowns
-        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-            menu.classList.add('hidden');
+    
+        // Cerrar todos los dropdowns cuando se hace clic/touch en cualquier parte
+        document.addEventListener('click', function(event) {
+            closeAllDropdowns(event);
         });
-
-        // Si estaba oculto, mostrarlo
-        if (isCurrentlyHidden) {
-            dropdownMenu.classList.remove('hidden');
-            event.preventDefault(); // Prevenir el comportamiento por defecto solo al abrir
-        }
+        
+        // Manejar toques en iOS
+        document.addEventListener('touchstart', function(event) {
+            closeAllDropdowns(event);
+        });
     }
-
-    // Función para alternar la visibilidad del dropdown (no iOS)
+    
+    // Nuevo: Manejar el primer toque en iOS
+    function handleTouchStart(event) {
+        // Prevenir el comportamiento por defecto para evitar problemas de doble toque
+        event.preventDefault();
+        toggleDropdown.call(this, event);
+    }
+    
+    // Función para alternar la visibilidad del dropdown
     function toggleDropdown(event) {
         event.stopPropagation();
         const dropdownMenu = this.nextElementSibling;
-
+    
         // Cerrar todos los otros dropdowns
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             if (menu !== dropdownMenu) {
                 menu.classList.add('hidden');
             }
         });
-
+    
         // Alternar el actual
         dropdownMenu.classList.toggle('hidden');
     }
-
-    // Función para cerrar dropdowns cuando se hace clic fuera
-    function closeDropdownsOnOutsideClick(event) {
+    
+    // Función para cerrar todos los dropdowns excepto el actual
+    function closeAllDropdowns(event) {
         const isDropdownTrigger = event.target.closest('.dropdown-trigger');
         const isDropdownMenu = event.target.closest('.dropdown-menu');
-
+    
         if (!isDropdownTrigger && !isDropdownMenu) {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.add('hidden');
             });
         }
     }
-
-    // Función para manejar cuando el trigger pierde el foco (solo para no iOS)
+    // Función para manejar cuando el trigger pierde el foco
     function handleFocusOut(event) {
-        // Solo aplicar en dispositivos que no son iOS
-        if (isIOS()) return;
-
         const dropdownTrigger = event.target;
         const dropdownMenu = dropdownTrigger.nextElementSibling;
 
