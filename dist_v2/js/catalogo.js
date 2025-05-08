@@ -66,67 +66,106 @@ $(document).ready(async function () {
 
 
     }
+
     function initializeProductDropdowns() {
-        // Find all products with the dropdown
+        // Buscar todos los productos con el dropdown
         document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
-            // Clear previous handlers if they existed
+            // Limpiar handlers anteriores si existieran
             trigger.removeEventListener('click', toggleDropdown);
-            trigger.removeEventListener('touchstart', toggleDropdown);
-            
-            // Add new event listeners - both click and touch events
-            trigger.addEventListener('click', toggleDropdown);
-            trigger.addEventListener('touchstart', toggleDropdown, {passive: true});
+            trigger.removeEventListener('touchstart', toggleDropdownIOS);
+
+            // Detectar si es iOS para usar el manejador adecuado
+            if (isIOS()) {
+                trigger.addEventListener('touchstart', toggleDropdownIOS, { passive: false });
+            } else {
+                trigger.addEventListener('click', toggleDropdown);
+                trigger.addEventListener('focusout', handleFocusOut);
+            }
         });
-        
-        // Close all dropdowns when clicking or touching anywhere else
+
+        // Cerrar todos los dropdowns cuando se hace clic en cualquier parte
+        document.removeEventListener('click', closeDropdownsOnOutsideClick);
+        document.removeEventListener('touchstart', closeDropdownsOnOutsideClick);
+
         document.addEventListener('click', closeDropdownsOnOutsideClick);
-        document.addEventListener('touchstart', closeDropdownsOnOutsideClick, {passive: true});
-        
-        // Add specific iOS touch handler
+
+        // Manejador específico para iOS
         if (isIOS()) {
-            document.addEventListener('touchmove', function() {
-                // If user starts scrolling, close all dropdowns
-                document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                    menu.classList.add('hidden');
-                });
-            }, {passive: true});
+            document.addEventListener('touchstart', closeDropdownsOnOutsideClick, { passive: false });
         }
     }
-    
-    // Function to toggle dropdown visibility
+
+    // Función para detectar si estamos en iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    // Función específica para togglear dropdown en iOS
+    function toggleDropdownIOS(event) {
+        event.stopPropagation();
+
+        const dropdownMenu = this.nextElementSibling;
+        const isCurrentlyHidden = dropdownMenu.classList.contains('hidden');
+
+        // Cerrar todos los dropdowns
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+
+        // Si estaba oculto, mostrarlo
+        if (isCurrentlyHidden) {
+            dropdownMenu.classList.remove('hidden');
+            event.preventDefault(); // Prevenir el comportamiento por defecto solo al abrir
+        }
+    }
+
+    // Función para alternar la visibilidad del dropdown (no iOS)
     function toggleDropdown(event) {
         event.stopPropagation();
-        event.preventDefault();
-        
         const dropdownMenu = this.nextElementSibling;
-        
-        // Close all other dropdowns
+
+        // Cerrar todos los otros dropdowns
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             if (menu !== dropdownMenu) {
                 menu.classList.add('hidden');
             }
         });
-        
-        // Toggle current dropdown
+
+        // Alternar el actual
         dropdownMenu.classList.toggle('hidden');
     }
-    
-    // Function to close dropdowns when clicking/touching outside
+
+    // Función para cerrar dropdowns cuando se hace clic fuera
     function closeDropdownsOnOutsideClick(event) {
         const isDropdownTrigger = event.target.closest('.dropdown-trigger');
         const isDropdownMenu = event.target.closest('.dropdown-menu');
-        
+
         if (!isDropdownTrigger && !isDropdownMenu) {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.add('hidden');
             });
         }
     }
-    
-    // Helper function to detect iOS
-    function isIOS() {
-        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    // Función para manejar cuando el trigger pierde el foco (solo para no iOS)
+    function handleFocusOut(event) {
+        // Solo aplicar en dispositivos que no son iOS
+        if (isIOS()) return;
+
+        const dropdownTrigger = event.target;
+        const dropdownMenu = dropdownTrigger.nextElementSibling;
+
+        // Pequeño retraso para permitir que el `click` se procese primero
+        setTimeout(() => {
+            // Verificar si el nuevo elemento con foco está dentro del dropdown
+            const focusedElement = document.activeElement;
+            const isFocusInsideDropdown = dropdownMenu.contains(focusedElement);
+
+            if (!isFocusInsideDropdown) {
+                dropdownMenu.classList.add('hidden');
+            }
+        }, 100);
     }
 
 
