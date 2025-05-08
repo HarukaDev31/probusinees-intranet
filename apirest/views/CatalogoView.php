@@ -763,4 +763,12 @@
     body {
         font-family: 'Epilogue', sans-serif;
     }
+    .dropdown-trigger {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent; /* Elimina el resaltado azul en iOS */
+    }
+
+    .dropdown-menu {
+        -webkit-overflow-scrolling: touch; /* Mejor scrolling en iOS */
+    }
 </style>
