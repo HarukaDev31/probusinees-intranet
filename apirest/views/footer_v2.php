@@ -387,46 +387,7 @@ function fetchNotifications() {
     }
   });
 }
- function validateWhatsappServiceAreActives(){
-  try{
-   $.ajax({
-    url: 'https://whatsapp2.probusiness.pe/api/sessions',
-    type: 'GET',
-    dataType: 'json',
-    success: function(response) {
-     
-        $(".sessions-container").html('');
-        response.sessions.forEach(function(session) {
-          if (session.status == 'authenticated') {
-            switch (session.phoneNumber) {
-              case '51986223673':
-                $(".sessions-container").append('<div class="alert alert-success" role="alert">Cordinación Activo</div>');
-                break;
-              case '51992583703':
-                $(".sessions-container").append('<div class="alert alert-success" role="alert">Ventas Activo</div>');
-                break;
-              default:
-                $(".sessions-container").append(`<div class="alert alert-danger" role="alert">${session.phoneNumber}</div>`);
-                break;
-            }
-          } else {
-            $(".sessions-container").append('<div class="alert alert-danger" role="alert">La sesión de whatsapp no está activa</div>');
-          }
-        });
-      
-    },
-    error: function(error) {
-      console.error(error);
-    }
-    });
-    }catch(e){
-      console.error(e)
-  }
-}
- validateWhatsappServiceAreActives()
-setInterval(() => {
-  validateWhatsappServiceAreActives()
-}, 300000); // 5 minutes
+
 </script>
 
 <div id="modal-loader" class="modal fade" tabindex="-1">

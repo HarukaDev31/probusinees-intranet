@@ -7568,6 +7568,81 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
   });
 }
 
+function validateWhatsappServiceAreActives(){
+  try{
+   $.ajax({
+    url: 'https://whatsapp2.probusiness.pe/api/sessions',
+    type: 'GET',
+    dataType: 'json',
+    success: function(response) {
+        $(".sessions-container").html('');
+         // Inicializamos los estados como inactivos
+        let coordinacionActiva = false;
+        let ventasActivas = false;
+
+        // Verificamos las sesiones si existen
+        if (response.sessions && response.sessions.length > 0) {
+          response.sessions.forEach(function(session) {
+            if (session.status == 'authenticated') {
+              switch (session.phoneNumber) {
+                case '51986223673':
+                  coordinacionActiva = true;
+                  break;
+                case '51992583703':
+                  ventasActivas = true;
+                  break;
+              }
+            }
+          });
+        }else {
+          $(".sessions-container").html(`
+            <div class="text-danger">
+              <i class="bi bi-exclamation-circle-fill me-2"></i>
+              No hay sesiones activas
+            </div>
+          `);
+          return;
+        }
+        // Función para crear el elemento con indicador
+        const createStatusElement = (text, isActive) => {
+          const badgeClass = isActive ? 'bg-success' : 'bg-danger';
+          return `
+            <div class="d-flex align-items-center mb-2">
+              <span class="me-2">${text}</span>
+              <span class="rounded-circle ${badgeClass} p-2"></span>
+            </div>`;
+        };
+
+        // Añadimos los elementos al contenedor
+        $(".sessions-container").append(createStatusElement('Coordinación', coordinacionActiva));
+        $(".sessions-container").append(createStatusElement('Ventas', ventasActivas));
+
+    },
+      error: function(error) {
+        $(".sessions-container").html(`
+          <div class="text-danger">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            Error al verificar las sesiones
+          </div>
+        `);
+        console.error(error);
+      }
+    });
+    }catch(e){
+      $(".sessions-container").html(`
+        <div class="text-danger">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>
+          Error inesperado
+        </div>
+      `);
+      console.error(e);
+  }
+}
+ validateWhatsappServiceAreActives()
+setInterval(() => {
+  validateWhatsappServiceAreActives()
+}, 300000); // 5 minutes
+
 function updateTableScrollArrows(tableWrapper, leftArrow, rightArrow) {
   // Busca la tabla visible
   const innerTable = Array.from(tableWrapper.querySelectorAll('table'))
