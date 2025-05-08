@@ -67,61 +67,66 @@ $(document).ready(async function () {
 
     }
     function initializeProductDropdowns() {
-        // Buscar todos los productos con el dropdown
+        // Find all products with the dropdown
         document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
-            // Limpiar handlers anteriores si existieran
+            // Clear previous handlers if they existed
             trigger.removeEventListener('click', toggleDropdown);
-            trigger.removeEventListener('focusout', handleFocusOut);
-
-            // Añadir nuevos event listeners
+            trigger.removeEventListener('touchstart', toggleDropdown);
+            
+            // Add new event listeners - both click and touch events
             trigger.addEventListener('click', toggleDropdown);
-            trigger.addEventListener('focusout', handleFocusOut);
+            trigger.addEventListener('touchstart', toggleDropdown, {passive: true});
         });
-
-        // Cerrar todos los dropdowns cuando se hace clic en cualquier parte
-        document.addEventListener('click', function (event) {
-            const isDropdownTrigger = event.target.closest('.dropdown-trigger');
-            const isDropdownMenu = event.target.closest('.dropdown-menu');
-
-            if (!isDropdownTrigger && !isDropdownMenu) {
+        
+        // Close all dropdowns when clicking or touching anywhere else
+        document.addEventListener('click', closeDropdownsOnOutsideClick);
+        document.addEventListener('touchstart', closeDropdownsOnOutsideClick, {passive: true});
+        
+        // Add specific iOS touch handler
+        if (isIOS()) {
+            document.addEventListener('touchmove', function() {
+                // If user starts scrolling, close all dropdowns
                 document.querySelectorAll('.dropdown-menu').forEach(menu => {
                     menu.classList.add('hidden');
                 });
-            }
-        });
+            }, {passive: true});
+        }
     }
-
-    // Función para alternar la visibilidad del dropdown
+    
+    // Function to toggle dropdown visibility
     function toggleDropdown(event) {
         event.stopPropagation();
+        event.preventDefault();
+        
         const dropdownMenu = this.nextElementSibling;
-
-        // Cerrar todos los otros dropdowns
+        
+        // Close all other dropdowns
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             if (menu !== dropdownMenu) {
                 menu.classList.add('hidden');
             }
         });
-
-        // Alternar el actual
+        
+        // Toggle current dropdown
         dropdownMenu.classList.toggle('hidden');
     }
-
-    // Función para manejar cuando el trigger pierde el foco
-    function handleFocusOut(event) {
-        const dropdownTrigger = event.target;
-        const dropdownMenu = dropdownTrigger.nextElementSibling;
-
-        // Pequeño retraso para permitir que el `click` se procese primero
-        setTimeout(() => {
-            // Verificar si el nuevo elemento con foco está dentro del dropdown
-            const focusedElement = document.activeElement;
-            const isFocusInsideDropdown = dropdownMenu.contains(focusedElement);
-
-            if (!isFocusInsideDropdown) {
-                dropdownMenu.classList.add('hidden');
-            }
-        }, 100);
+    
+    // Function to close dropdowns when clicking/touching outside
+    function closeDropdownsOnOutsideClick(event) {
+        const isDropdownTrigger = event.target.closest('.dropdown-trigger');
+        const isDropdownMenu = event.target.closest('.dropdown-menu');
+        
+        if (!isDropdownTrigger && !isDropdownMenu) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        }
+    }
+    
+    // Helper function to detect iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
 
 
