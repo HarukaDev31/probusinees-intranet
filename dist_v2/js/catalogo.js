@@ -89,7 +89,7 @@ $(document).ready(async function () {
         document.addEventListener('touchstart', function(event) {
             closeAllDropdowns(event);
         });
-        // Manejar el evento de pérdida de foco en los dropdowns
+
         document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
             trigger.addEventListener('focusout', handleFocusOut);
             trigger.addEventListener('blur', handleFocusOut);

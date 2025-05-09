@@ -335,8 +335,8 @@ class ContenedorConsolidadoModel extends CI_Model
             ->where('main.id_contenedor', $idContenedor)
             ->order_by('main.id', 'asc');
         // Aplicar filtros solo si no son "0" (valor por defecto)
-        $filtroState = $this->input->post('Filtro_State');
-        $filtroStatus = $this->input->post('Filtro_Status');
+        $filtroState = $this->input->post('Filtro_State')??"0";
+        $filtroStatus = $this->input->post('Filtro_Status')??"0";
         if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
 
@@ -348,7 +348,6 @@ class ContenedorConsolidadoModel extends CI_Model
                 ];
                 $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
-            // Filtro State (1:1) - Tabla consolidado_proveedores
             if ($filtroState != "0") {
                 $state = $this->db->escape_str($filtroState);
                 $this->db->join(
@@ -397,7 +396,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         $data = $query->result();
         // Aplicar filtro al JSON de proveedores si hay filtro activo
-        if ($this->input->post('Filtro_Status') != "0") {
+        if ($filtroStatus != "0") {
             $statusFiltro = $this->input->post('Filtro_Status');
             foreach ($data as $item) {
                 $proveedores = json_decode($item->proveedores, true);
@@ -408,7 +407,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 }
             }
         }
-        if ($this->input->post('Filtro_State') != "0") {
+        if ($filtroState != "0") {
             $stateFiltro = $this->input->post('Filtro_State');
             foreach ($data as $item) {
                 $proveedores = json_decode($item->proveedores, true);
@@ -422,7 +421,7 @@ class ContenedorConsolidadoModel extends CI_Model
         // Obtener valores de los filtros (con validación básica)
         $filtroStatus = $this->input->post('Filtro_Status') ?? "0";
         $filtroState = $this->input->post('Filtro_State') ?? "0";
-
+        log_message('error', 'Filtro Status: ' . $filtroStatus);
         // Aplicar filtros combinados en una sola pasada
         foreach ($data as $item) {
             if (empty($item->proveedores)) {
@@ -437,6 +436,7 @@ class ContenedorConsolidadoModel extends CI_Model
             // Filtrado combinado en una sola operación
             $proveedoresFiltrados = array_filter($proveedores, function($prov) use ($filtroStatus, $filtroState) {
                 $cumpleStatus = ($filtroStatus === "0" || $prov['estados_proveedor'] === $filtroStatus);
+                log_message('error', 'cumpleStatus: ' . $cumpleStatus);
                 $cumpleState = ($filtroState === "0" || $prov['estados'] === $filtroState);
                 return $cumpleStatus && $cumpleState;
             });

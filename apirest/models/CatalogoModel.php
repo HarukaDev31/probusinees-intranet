@@ -215,6 +215,8 @@ class CatalogoModel extends CI_Model
             $this->db->from($this->table);
             $this->db->where('status', 'COTIZADO');
             $this->db->or_where('status', 'EN TIENDA');
+            //limit 1000
+            $this->db->limit(1000);
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
                 return array('status' => true, 'data' => $query->result());
