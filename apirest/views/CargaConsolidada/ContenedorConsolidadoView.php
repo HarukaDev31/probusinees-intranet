@@ -100,8 +100,10 @@ Search for
           </div>
 
           <div class="col-2 col-xl-1">
-            <button type="button" id="btn-crear" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
-          </div>
+          <?php if ($this->user->No_Grupo == "Coordinación") { ?>
+          <button type="button" id="btn-crear" class="btn btn-primary btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Crear</button>
+          <?php } ?>
+        </div>
         <?php } else { ?>
 
           <div class="col-12 col-xl-2"></div>
