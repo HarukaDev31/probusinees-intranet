@@ -5372,7 +5372,6 @@ $(document).ready(async function () {
 
 
   if (window.location.href.includes("listarCompletados")) {
-    $(".filter-contenedor").hide();
 
     $("#table-contenedor-completados").show();
 
