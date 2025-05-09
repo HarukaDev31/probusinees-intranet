@@ -3696,6 +3696,7 @@ async function getTableCotizacionEmbarqueHeaders() {
   $("#txt-CBM_Total_Peru").html(result.cbm_total);
   $("#txt-CBM_Total_China").html(result.cbm_total_china);
   $("#txt-CBM_Total_Pendiente").html(result.cbm_total_pendiente);
+  $("#txt-CBM_Total_Logistica").html(result.total_logistica);
   //if result.lista_embarque_url is not null add button to download else file input with button to upload remember remove and add event listener
   if (result.lista_embarque_url) {
     $("#packing-list-container").empty();

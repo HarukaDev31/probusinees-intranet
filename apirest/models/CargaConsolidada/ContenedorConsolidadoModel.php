@@ -3417,7 +3417,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $this->db->select('
             COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
             COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total,
-            COALESCE(SUM(IF(cc.estado_cotizador != "CONFIRMADO", cc.volumen, 0)), 0) as cbm_total_pendiente')
+            COALESCE(SUM(IF(cc.estado_cotizador != "CONFIRMADO", cc.volumen, 0)), 0) as cbm_total_pendiente,
+            COALESCE(SUM(IF(cc.estado_cotizador != "CONFIRMADO", cc.valor_cot, 0)), 0) as total_logistica'
+            
+            )
                 ->from($this->table_contenedor_cotizacion_proveedores . ' cccp') // Usando alias
                 ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id') // Usando alias
                 ->where('cccp.id_contenedor', $idContenedor);
@@ -3438,12 +3441,15 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'cbm_total_china' => $result->cbm_total_china,
                     'cbm_total' => $result->cbm_total,
                     'cbm_total_pendiente' => $result->cbm_total_pendiente,
+                    'total_logistica'=> $result->total_logistica,
                     'bl_file_url' => $result2->bl_file_url,
                     'lista_embarque_url' => $result2->lista_embarque_url
                 ];
             } else {
                 return ['status' => "error", 'error' => false, "data" => [
                     'cbm_total_china' => 0,
+                    'cbm_total_pendiente' => 0,
+                    'total_logistica' => 0,
                     'cbm_total' => 0,
                     'bl_file_url' => '',
                     'lista_embarque_url' => ''

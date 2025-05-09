@@ -855,7 +855,7 @@ Filters
           </div>
         <?php } ?>
 
-        <div class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-5 col-sm-12 col-md-4 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
           <span>CBM Total:</span>
           <div class="">
@@ -871,14 +871,24 @@ Filters
             </div>
           </div>
         <?php } ?>
-        <div class="col-5 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <div class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
           <span>CBM Total:</span>
           <div class="">
             <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score" disabled></span></strong>
           </div>
         </div>
-
+        <?php if ($this->user->No_Grupo=="Coordinación" ) { ?>
+      
+        <div class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+          <!-- icon with dollar icon-->
+          <i class="fas fa-dollar-sign"></i>
+          <span>Total Logistica:</span>
+          <div class="">
+            <strong><span type="number" id="txt-CBM_Total_Logistica" class="cbm_score" disabled></span></strong>
+          </div>
+        </div>
+          <?php } ?>
       </div>
       <!-- Body de la tabla -->
       <div class="table-responsive">
