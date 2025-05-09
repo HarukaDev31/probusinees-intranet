@@ -202,7 +202,9 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata[] = $row->mes;
 				$subdata[] = $row->No_Pais;
 				$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
-				if ($this->user->No_Grupo == "Coordinación") {
+				if ($this->user->No_Grupo == "Coordinación"
+				|| $this->user->No_Grupo == "Cotizador"
+				) {
 					$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
 					$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 				}
@@ -210,9 +212,9 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata[] = $row->empresa;
 				if ($this->user->No_Grupo == "ContenedorAlmacen") {
 					$divEstado = '<select
-		onchange="updateEstado(' . $row->id . ')"
-				 id="estado-' . $row->id . '"
-			class="form-control
+					onchange="updateEstado(' . $row->id . ')"
+							id="estado-' . $row->id . '"
+						class="form-control
 					' . ($row->estado_china == "PENDIENTE" ||  !$row->estado_china  ? "bg-warning" : "") .
 						($row->estado_china == "RECIBIENDO" ? "bg-primary" : "") .
 						($row->estado_china == "COMPLETADO" ? "bg-success" : "") . '">
@@ -222,12 +224,12 @@ class ContenedorConsolidado extends CI_Controller
 				</select>';
 				} else if ($this->user->No_Grupo == "Documentacion") {
 					$divEstado = '<select 
-				class="form-control
-				' . ($row->estado_documentacion == "PENDIENTE" ||  !$row->estado_documentacion ? "bg-warning" : "") .
-						($row->estado_documentacion == "DOCUMENTACION" ? "bg-primary" : "") .
-						($row->estado_documentacion == "COMPLETADO" ? "bg-success" : "") . '
-				
-				" id="estado-documentacion-' . $row->id . '" name="estado" onchange="updateEstadoDocumentacion(' . $row->id . ')">
+					class="form-control
+					' . ($row->estado_documentacion == "PENDIENTE" ||  !$row->estado_documentacion ? "bg-warning" : "") .
+							($row->estado_documentacion == "DOCUMENTACION" ? "bg-primary" : "") .
+							($row->estado_documentacion == "COMPLETADO" ? "bg-success" : "") . '
+					
+					" id="estado-documentacion-' . $row->id . '" name="estado" onchange="updateEstadoDocumentacion(' . $row->id . ')">
 					<option 
 					value="PENDIENTE" ' . ($row->estado_documentacion == "PENDIENTE" ? "selected" : "") . '>Pendiente</option>
 					<option value="DOCUMENTACION" ' . ($row->estado_documentacion == "DOCUMENTACION" ? "selected" : "") . '>Documentacion</option>
@@ -235,7 +237,7 @@ class ContenedorConsolidado extends CI_Controller
 					<option value="COMPLETADO" ' . ($row->estado_documentacion == "COMPLETADO" ? "selected" : "") . '>Completado</option>
 				</select>';
 				} else {
-					$divEstado = '<select 
+					$divEstado = '<select disabled
 				class="form-control
 				' . ($row->estado == "PENDIENTE" ||  !$row->estado ? "bg-warning" : "") .
 						($row->estado == "RECIBIENDO" ? "bg-primary" : "") .
@@ -259,7 +261,6 @@ class ContenedorConsolidado extends CI_Controller
 				//if user is coordinacion show
 				if ($this->user->No_Grupo == "Coordinación") {
 					$divAcciones .= '<i class="fas fa-edit text-warning" style="cursor:pointer; padding:10px;" onclick="view(' . $row->id . ')"></i>';
-					$divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="deleteCarga(' . $row->id . ')"></i>';
 				}
 
 				$divAcciones .= '</div>';
