@@ -539,8 +539,9 @@ class ContenedorConsolidadoModel extends CI_Model
             ->where('id_contenedor', $idContenedor)
             //WHERE ESTADO NOT NULL
             ->where('estado_cliente IS NOT NULL');
-        if ($this->input->post('estado') != "0") {
-            $this->db->where('estado_cliente', $this->input->post('estado'));
+        $estado=$this->input->post('estado')??"0";
+        if ($estado != "0") {
+            $this->db->where('estado_cliente', $estado);
         }
         $query = $this->db->get();
         return $query->result();
