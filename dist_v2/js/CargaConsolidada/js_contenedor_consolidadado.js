@@ -2718,6 +2718,8 @@ const openStepFunction = async (step, id) => {
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "embarque";
                         data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
+                        data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
+                        data.Filtro_State = $("#txt-ID_States_Cliente").val();
                         validateListEmbarque(idContenedor);
                         $(".input-date").datepicker({
                           autoclose: true,
@@ -2729,6 +2731,8 @@ const openStepFunction = async (step, id) => {
                       },
                     },
                     initComplete: function (settings, json) {
+                      console.log("Init embarque");      
+                      enableHorizontalAutoScrollForAllTables();                
                       $(".input-date").datepicker({
                         autoclose: true,
                         startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2738,9 +2742,14 @@ const openStepFunction = async (step, id) => {
                       });
                     },
                     complete: function () {
+                      enableHorizontalAutoScrollForAllTables();
                       $("#aplicar-btn-cotizacion").off("click");
                       $("#aplicar-btn-cotizacion").click(function () {
-                        tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                        if (currentTableCotizacion == "prospectos") {
+                          tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                        } else {
+                          tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+                        }
                       });
                     },
                   });
@@ -2749,6 +2758,7 @@ const openStepFunction = async (step, id) => {
                     "search-table",
                     "table-cotizacion-embarque_info"
                   );
+                  spinner.hide();
                   await getTableCotizacionEmbarqueHeaders();
 
                 }
@@ -2811,6 +2821,7 @@ const openStepFunction = async (step, id) => {
             },
             complete: async function () {
               console.log("Init propectos")
+              enableHorizontalAutoScrollForAllTables();
               $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
               $("#aplicar-btn-cotizacion").off("click");
               $("#aplicar-btn-cotizacion").click(function () {
@@ -7647,7 +7658,6 @@ function updateTableScrollArrows(tableWrapper, leftArrow, rightArrow) {
   // Busca la tabla visible
   const innerTable = Array.from(tableWrapper.querySelectorAll('table'))
     .find(tbl => tbl.offsetParent !== null);
-    console.log(innerTable, "innerTable");
 
   // Si no hay tabla visible o su ancho es <= 900, oculta ambas flechas
   if (!innerTable || innerTable.offsetWidth <= 900) {

@@ -334,6 +334,9 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
             ->order_by('main.id', 'asc');
+        // Aplicar filtros solo si no son "0" (valor por defecto)
+        $filtroState = $this->input->post('Filtro_State');
+        $filtroStatus = $this->input->post('Filtro_Status');
         if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
 
@@ -345,6 +348,39 @@ class ContenedorConsolidadoModel extends CI_Model
                 ];
                 $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
+            // Filtro State (1:1) - Tabla consolidado_proveedores
+            if ($filtroState != "0") {
+                $state = $this->db->escape_str($filtroState);
+                $this->db->join(
+                    $this->table_contenedor_cotizacion_proveedores . ' AS ccp',
+                    'ccp.id_cotizacion = main.id',
+                    'inner'
+                )->where('ccp.estados', $state);
+            }
+
+            // Filtro Status (1:N) - Tabla cotizacion_proveedores
+            if ($filtroStatus != "0") {
+                $status = $this->db->escape_str($filtroStatus);
+                $this->db->where("EXISTS (
+                    SELECT 1 FROM " . $this->table_contenedor_cotizacion_proveedores . " p 
+                    WHERE p.id_cotizacion = main.id 
+                    AND p.estados_proveedor = '$status'
+                )", null, false);
+            }
+
+            // Condición combinada cuando ambos filtros están activos
+            if ($filtroState != "0" && $filtroStatus != "0") {
+                $this->db->group_start()
+                    ->where('ccp.estados', $state)
+                    ->where("EXISTS (
+                        SELECT 1 FROM " . $this->table_contenedor_cotizacion_proveedores . " p 
+                        WHERE p.id_cotizacion = main.id 
+                        AND p.estados_proveedor = '$status'
+                        AND p.estados = '$state'
+                    )", null, false)
+                    ->group_end();
+            }
+
         } else if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
             $this->db->where('main.id_usuario', $this->user->ID_Usuario);
             $this->db->order_by('fecha_confirmacion', 'asc');
@@ -359,7 +395,57 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->order_by('main.fecha_confirmacion', 'asc');
         }
         $query = $this->db->get();
-        return $query->result();
+        $data = $query->result();
+        // Aplicar filtro al JSON de proveedores si hay filtro activo
+        if ($this->input->post('Filtro_Status') != "0") {
+            $statusFiltro = $this->input->post('Filtro_Status');
+            foreach ($data as $item) {
+                $proveedores = json_decode($item->proveedores, true);
+                if ($proveedores) {
+                    $item->proveedores = json_encode(array_filter($proveedores, function($prov) use ($statusFiltro) {
+                        return $prov['estados_proveedor'] == $statusFiltro;
+                    }));
+                }
+            }
+        }
+        if ($this->input->post('Filtro_State') != "0") {
+            $stateFiltro = $this->input->post('Filtro_State');
+            foreach ($data as $item) {
+                $proveedores = json_decode($item->proveedores, true);
+                if ($proveedores) {
+                    $item->proveedores = json_encode(array_filter($proveedores, function($prov) use ($stateFiltro) {
+                        return $prov['estados'] == $stateFiltro;
+                    }));
+                }
+            }
+        }
+        // Obtener valores de los filtros (con validación básica)
+        $filtroStatus = $this->input->post('Filtro_Status') ?? "0";
+        $filtroState = $this->input->post('Filtro_State') ?? "0";
+
+        // Aplicar filtros combinados en una sola pasada
+        foreach ($data as $item) {
+            if (empty($item->proveedores)) {
+                continue;
+            }
+
+            $proveedores = json_decode($item->proveedores, true);
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($proveedores)) {
+                continue;
+            }
+
+            // Filtrado combinado en una sola operación
+            $proveedoresFiltrados = array_filter($proveedores, function($prov) use ($filtroStatus, $filtroState) {
+                $cumpleStatus = ($filtroStatus === "0" || $prov['estados_proveedor'] === $filtroStatus);
+                $cumpleState = ($filtroState === "0" || $prov['estados'] === $filtroState);
+                return $cumpleStatus && $cumpleState;
+            });
+
+            // Reconstruir el JSON manteniendo la estructura
+            $item->proveedores = json_encode(array_values($proveedoresFiltrados), JSON_UNESCAPED_UNICODE);
+        }
+
+        return $data;
     }
     public function downloadContenedorCotizacionProveedoresExcel($idContenedor)
     {

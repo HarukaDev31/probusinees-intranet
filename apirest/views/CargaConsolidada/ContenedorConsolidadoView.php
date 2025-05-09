@@ -750,6 +750,22 @@ Filters
                         <option value="RECIBIENDO">RECIBIENDO</option>
                         <option value="COMPLETADO">COMPLETADO</option>
                       </select>
+                      <select id="txt-ID_States_Cliente" name="ID_States_Cliente" class="form-control input-estado">
+                        <option value="0" selected>Todos</option>
+                        <option value="ROTULADO">ROTULADO</option>
+                        <option value="COBRANDO">COBRANDO</option>
+                        <option value="DATOS DEL PROVEEDOR">DATOS DEL PROVEEDOR</option>
+                      </select>
+                      <select id="txt-ID_Estatus_Cotizacion" name="ID_Status" class="form-control input-estado">
+                        <option value="0" selected>Todos</option>
+                        <option value="NC">NC</option>
+                        <option value="C">C</option>
+                        <option value="R">R</option>
+                        <option value="NS">NS</option>
+                        <option value="INSPECTION">INSPECTION</option>
+                        <option value="LOADED">LOADED</option>
+                        <option value="NO LOADED">NO LOADED</option>
+                      </select>
                     </div>
 
                   </div>
