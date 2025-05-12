@@ -2553,11 +2553,13 @@ const openStepFunction = async (step, id) => {
                   //display block
                   $("#table-cotizacion-prospectos").attr("style", "");
                   $("#table-cotizacion-prospectos_wrapper").show();
+                  limpiarFiltroDataTable("table-cotizacion-prospectos");
                   reloadTableCotizacion();
                   enableHorizontalAutoScrollForAllTables();
                 } else {
                   $("#table-cotizacion-prospectos").attr("style", "");
                   $("#table-cotizacion-prospectos_wrapper").show();
+                  limpiarFiltroDataTable("table-cotizacion-prospectos");
                   reloadTableCotizacion();
                   enableHorizontalAutoScrollForAllTables();
                 }
@@ -2581,6 +2583,7 @@ const openStepFunction = async (step, id) => {
                 if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
                   $("#table-cotizacion-embarque").attr("style", "");
                   $("#table-cotizacion-embarque_wrapper").show();
+                  limpiarFiltroDataTable("table-cotizacion-embarque");
                   reloadTableCotizacionEmbarque();
                   enableHorizontalAutoScrollForAllTables();
                 } else {
@@ -2615,6 +2618,7 @@ const openStepFunction = async (step, id) => {
                             )
                           ) {
                             $("#table-cotizacion-prospectos_wrapper").show();
+                            limpiarFiltroDataTable("table-cotizacion-prospectos");
 
                             $("#table-cotizacion-prospectos").attr("style", "");
                             reloadTableCotizacion();
@@ -2624,7 +2628,13 @@ const openStepFunction = async (step, id) => {
                             reloadTableCotizacion();
                             enableHorizontalAutoScrollForAllTables();
                           }
+                          limpiarFiltroDataTable("table-cotizacion-prospectos");
+                          limpiarInputBuscadorPersonalizado("search-table");
                           currentTableCotizacion = "prospectos";
+                          configurarBuscador(
+                            "table-cotizacion-prospectos",
+                            "search-table", "table-cotizacion-prospectos_info"
+                          );
                         },
                       },
                       {
@@ -2658,6 +2668,10 @@ const openStepFunction = async (step, id) => {
                             format: "dd/mm/yyyy",
                             dateFormat: "dd/mm/yyyy",
                           });
+                          limpiarInputBuscadorPersonalizado("search-table");
+                          limpiarFiltroDataTable("table-cotizacion-embarque");
+                          reloadTableCotizacionEmbarque();
+                          enableHorizontalAutoScrollForAllTables();
                           currentTableCotizacion = "embarque";
                         },
                       },
@@ -2753,6 +2767,8 @@ const openStepFunction = async (step, id) => {
                       });
                     },
                   });
+                  limpiarFiltroDataTable("table-cotizacion-embarque");
+                  limpiarInputBuscadorPersonalizado("search-table");
                   configurarBuscador(
                     "table-cotizacion-embarque",
                     "search-table",
@@ -2922,12 +2938,15 @@ const openStepFunction = async (step, id) => {
                 //display block
                 $("#table-clientes-general").attr("style", "");
                 $("#table-clientes-general_wrapper").show();
+                limpiarFiltroDataTable("table-clientes-general");
                 reloadTableClientesGeneral();
               } else {
                 $("#table-clientes-general").attr("style", "");
                 $("#table-clientes-general_wrapper").show();
+                limpiarFiltroDataTable("table-clientes-general");
                 reloadTableClientesGeneral();
               }
+              limpiarInputBuscadorPersonalizado("search-table");
             },
             className: "btn btn-light",
           },
@@ -2999,6 +3018,7 @@ const openStepFunction = async (step, id) => {
                             )
                           ) {
                             $("#table-clientes-general_wrapper").show();
+                            limpiarFiltroDataTable("table-clientes-general");
 
                             $("#table-clientes-general").attr("style", "");
                             reloadTableClientesGeneral();
@@ -3149,6 +3169,7 @@ const openStepFunction = async (step, id) => {
                     "table-clientes-variacion_info"
                   );
                 }
+                limpiarInputBuscadorPersonalizado("search-table");
               },
             }
             : null,
@@ -3311,6 +3332,16 @@ function configurarExportarExcel(buttonId, url, fileName) {
 }
 
 async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
+  // Limpiar el buscador y el filtro de DataTable antes de configurar el nuevo buscador
+  $('.dataTables_filter input[type="search"]').each(function () {
+    $(this).val('');
+    const tableId = $(this).closest('.dataTables_wrapper').find('table').attr('id');
+    if (tableId && $.fn.DataTable.isDataTable('#' + tableId)) {
+      $('#' + tableId).DataTable().search('').draw();
+    }
+  });
+  // Limpiar el input personalizado si existe
+  $("." + searchInputClass).val('');
   // Obtener la instancia de DataTable
   var table = $("#" + tableId).DataTable();
   console.log(table);
@@ -3321,10 +3352,12 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
   });
 
-  // Función para limpiar el buscador y el filtro
+  // Función para limpiar el buscador y el filtro (por si la necesitas en otro lado)
   window["resetBuscador_" + tableId] = function() {
     $("." + searchInputClass).val("");
     table.search("").draw();
+    // También limpia el input de DataTables
+    $('.dataTables_filter input[type="search"]').val('');
   };
 
   // Actualizar el mensaje de información después de cada búsqueda
@@ -3338,18 +3371,17 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     }
   });
 }
-$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
-  // Busca todos los inputs de búsqueda de DataTables y límpialos
-  $('.dataTables_filter input[type="search"]').each(function () {
-    $(this).val('');
-    // Busca la tabla asociada y limpia el filtro
-    const tableId = $(this).closest('.dataTables_wrapper').find('table').attr('id');
-    if (tableId && $.fn.DataTable.isDataTable('#' + tableId)) {
-      $('#' + tableId).DataTable().search('').draw();
-    }
-  });
-});
-
+function limpiarFiltroDataTable(tableId) {
+  // Limpia el input de búsqueda de DataTables SOLO de la tabla indicada
+  const $dtInput = $(`#${tableId}_filter input[type="search"]`);
+  $dtInput.val('');
+  if ($.fn.DataTable.isDataTable('#' + tableId)) {
+    $('#' + tableId).DataTable().search('').draw();
+  }
+}
+function limpiarInputBuscadorPersonalizado(inputClass) {
+  $("." + inputClass).val('');
+}
 async function viewFacturaGuia() {
   $("#factura-guia-title").html(`
     Cotizacion #${currentCargaNumber}
@@ -5392,6 +5424,7 @@ $(document).ready(async function () {
   if (window.location.href.includes("listarCompletados")) {
 
     $("#table-contenedor-completados").show();
+    limpiarFiltroDataTable("table-contenedor-completados");
 
     url = base_url + "CargaConsolidada/ContenedorConsolidado/indexCompletados";
 
@@ -5502,6 +5535,7 @@ $(document).ready(async function () {
         ],
       });
       applyDynamicStylesForTableRows();
+      configurarBuscador('table-contenedor-completados', 'search-table-completados', 'table-contenedor-completados_filter');
     } else {
       $("#table-contenedor-completados").html("");
       table_Entidad = $("#table-contenedor").DataTable({
@@ -5612,6 +5646,8 @@ $(document).ready(async function () {
         ],
       });
       applyDynamicStylesForTableRows();
+      limpiarFiltroDataTable("table-contenedor");
+      configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
       const isMobile = window.matchMedia("(max-width: 768px)");
     function handleRowClickByDevice() {
       if (isMobile.matches) {
@@ -5625,6 +5661,8 @@ $(document).ready(async function () {
     handleRowClickByDevice();
     }
     applyDynamicStylesForTableRows();
+    limpiarFiltroDataTable("table-contenedor");
+    configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
   } else {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     table_Entidad = $("#table-contenedor").DataTable({
@@ -5711,6 +5749,8 @@ $(document).ready(async function () {
           $("#aplicar-btn").click(function () {
             table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
           });
+          limpiarFiltroDataTable("table-contenedor");
+          configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
         },
       },
       columnDefs: [
@@ -5734,6 +5774,7 @@ $(document).ready(async function () {
         [100, 1000, "Todos"],
       ],
     });
+    limpiarFiltroDataTable("table-contenedor");
     configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
     applyDynamicStylesForTableRows();
     const isMobile = window.matchMedia("(max-width: 768px)");

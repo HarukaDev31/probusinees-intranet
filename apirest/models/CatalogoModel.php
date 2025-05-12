@@ -126,6 +126,29 @@ class CatalogoModel extends CI_Model
                             'aditional_image2_url' => $aditionalImage2Url,
                             'aditional_video1_url' => $aditionalVideo1Url
                         );
+                        if (isset($data['nombre']) && !empty($data['nombre'])) {
+                            // Obtener todos los IDs ordenados
+                            $this->db->select('id');
+                            $this->db->from($this->table);
+                            $this->db->order_by('id', 'ASC');
+                            $ids = $this->db->get()->result_array();
+                            // Buscar la posición del producto actual
+                            $correlativo = 1;
+                            foreach ($ids as $index => $row) {
+                                if ($row['id'] == $data['productId']) {
+                                    $correlativo = $index; // +1 porque el array es base 0
+                                    break;
+                                }
+                            }
+                            $correlativo = str_pad($correlativo, 4, '0', STR_PAD_LEFT);
+                            $anio = date('y');
+                            $nombre = trim($data['nombre']);
+                            $primera_palabra = explode(' ', $nombre)[0];
+                            $iniciales = strtoupper(substr($primera_palabra, 0, 2));
+                            // Puedes usar el mismo ID como correlativo para mantener unicidad
+                            $codigo = "COD-{$anio}{$iniciales}{$correlativo}";
+                            $dataToInsert['cod_producto'] = $codigo;
+                        }
                     }
                     $this->db->where('id', $data['productId']);
                     $this->db->update($this->table, $dataToInsert);
@@ -209,7 +232,7 @@ class CatalogoModel extends CI_Model
     public function getCatalogo()
     {
         try {
-            $this->db->select('id,nombre,precio,moq,main_image_url,status');
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,status');
             $this->db->from($this->table);
             $this->db->where('status', 'PENDIENTE');
             $query = $this->db->get();
@@ -226,7 +249,7 @@ class CatalogoModel extends CI_Model
     public function getCatalogoCompletados()
     {
         try {
-            $this->db->select('id,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status');
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status');
             $this->db->from($this->table);
             $this->db->where('status', 'COTIZADO');
             $this->db->or_where('status', 'EN TIENDA');
@@ -258,6 +281,25 @@ class CatalogoModel extends CI_Model
             }
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
+        }
+    }
+    private function reordenarCodigosCatalogo() {
+        // Obtener todos los productos ordenados por ID ASC
+        $this->db->select('id, nombre');
+        $this->db->from($this->table);
+        $this->db->order_by('id', 'ASC');
+        $productos = $this->db->get()->result();
+
+        $anio = date('y');
+        foreach ($productos as $index => $producto) {
+            $correlativo = str_pad($index, 4, '0', STR_PAD_LEFT);
+            $nombre = trim($producto->nombre);
+            $primera_palabra = explode(' ', $nombre)[0];
+            $iniciales = strtoupper(substr($primera_palabra, 0, 2));
+            $codigo = "COD-{$anio}{$iniciales}{$correlativo}";
+
+            $this->db->where('id', $producto->id);
+            $this->db->update($this->table, ['cod_producto' => $codigo]);
         }
     }
     public function deleteProduct($id)
@@ -298,6 +340,8 @@ class CatalogoModel extends CI_Model
                 return array('status' => false, 'message' => 'Error al obtener el producto');
             }
             if ($this->db->error()['code'] == 0) {
+                // Reordenar los códigos después de borrar
+                $this->reordenarCodigosCatalogo();
                 return array('status' => true, 'message' => 'Producto eliminado correctamente');
             } else {
                 log_message('error', 'Error al eliminar el producto: ' . $this->db->error()['message']);
