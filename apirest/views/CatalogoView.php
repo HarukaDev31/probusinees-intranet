@@ -78,8 +78,7 @@
             </div>
 
             <!-- Product Grid -->
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4    p-3 h-full">
-
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-4  p-3 h-full">
 
             </div>
         </div>
