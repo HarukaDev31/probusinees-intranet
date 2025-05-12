@@ -548,16 +548,16 @@ $(document).ready(async function () {
         e.preventDefault();
         //change productsGrid to flex column
         const $grid = $('#productGrid');
-        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10');
-        $grid.addClass('flex flex-col gap-10');
+        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5');
+        $grid.addClass('flex flex-col gap-5');
 
     })
     $("#gridViewBtn").on("click", function (e) {
         e.preventDefault();
         //change productsGrid to grid
         const $grid = $('#productGrid');
-        $grid.removeClass('flex flex-col gap-10 ');
-        $grid.addClass('grid  gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3');
+        $grid.removeClass('flex flex-col gap-5 ');
+        $grid.addClass('grid  gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3');
     })
     $("#btnDelete").on("click", function (e) {
         e.preventDefault();
