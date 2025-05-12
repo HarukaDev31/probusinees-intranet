@@ -178,6 +178,21 @@ class CatalogoModel extends CI_Model
                         'aditional_image2_url' => $aditionalImage2Url,
                         'aditional_video1_url' => $aditionalVideo1Url
                     );
+                    // --- GENERAR CÓDIGO DE PRODUCTO ---
+                    // Año en dos dígitos
+                    $anio = date('y');
+                    // Primeras dos letras de la primera palabra del nombre
+                    $nombre = trim($data['nombre']);
+                    $primera_palabra = explode(' ', $nombre)[0];
+                    $iniciales = strtoupper(substr($primera_palabra, 0, 2));
+                    // Correlativo (productos existentes + 1)
+                    $this->db->select('COUNT(*) as total');
+                    $this->db->from($this->table);
+                    $query = $this->db->get();
+                    $correlativo = str_pad($query->row()->total + 1, 4, '0', STR_PAD_LEFT);
+                    // Código final
+                    $codigo = "COD-{$anio}{$iniciales}{$correlativo}";
+                    $dataToInsert['cod_producto'] = $codigo;
                 }
                 $this->db->insert($this->table, $dataToInsert);
                 if ($this->db->error()['code'] == 0) {

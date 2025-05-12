@@ -2717,7 +2717,7 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "embarque";
-                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
+                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
                         data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
                         data.Filtro_State = $("#txt-ID_States_Cliente").val();
                         validateListEmbarque(idContenedor);
@@ -2817,7 +2817,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "prospectos";
-              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
             },
             complete: async function () {
               console.log("Init propectos")
@@ -3321,6 +3321,12 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
   });
 
+  // Función para limpiar el buscador y el filtro
+  window["resetBuscador_" + tableId] = function() {
+    $("." + searchInputClass).val("");
+    table.search("").draw();
+  };
+
   // Actualizar el mensaje de información después de cada búsqueda
   table.on("draw", function () {
     var info = table.page.info();
@@ -3332,6 +3338,17 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     }
   });
 }
+$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
+  // Busca todos los inputs de búsqueda de DataTables y límpialos
+  $('.dataTables_filter input[type="search"]').each(function () {
+    $(this).val('');
+    // Busca la tabla asociada y limpia el filtro
+    const tableId = $(this).closest('.dataTables_wrapper').find('table').attr('id');
+    if (tableId && $.fn.DataTable.isDataTable('#' + tableId)) {
+      $('#' + tableId).DataTable().search('').draw();
+    }
+  });
+});
 
 async function viewFacturaGuia() {
   $("#factura-guia-title").html(`
