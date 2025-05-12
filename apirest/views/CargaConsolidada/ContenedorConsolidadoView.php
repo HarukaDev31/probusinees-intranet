@@ -743,6 +743,7 @@ Filters
                       <span class="help-block text-danger" id="error"></span>
                     </div>
                   </div>
+                  <?php if ($this->user->No_Grupo != "Coordinación") {  ?>
                   <div class="d-flex align-items-center p-2" style="width:300px;">
                     <div class="d-flex" style="width:60%">Estado</div>
                     <div style="width: 200px;">
@@ -752,13 +753,25 @@ Filters
                         <option value="RECIBIENDO">RECIBIENDO</option>
                         <option value="COMPLETADO">COMPLETADO</option>
                       </select>
-                      <select id="txt-ID_States_Cliente" name="ID_States_Cliente" class="form-control input-estado">
+                    </div>
+                  </div>
+                  <?php } ?>
+                  <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
+                  <div class="d-flex align-items-center p-2" style="width:300px;">
+                    <div class="d-flex" style="width:60%">State</div>
+                    <div style="width: 200px;">
+                    <select id="txt-ID_States_Cliente" name="ID_States_Cliente" class="form-control input-estado">
                         <option value="0" selected>Todos</option>
                         <option value="ROTULADO">ROTULADO</option>
                         <option value="COBRANDO">COBRANDO</option>
                         <option value="DATOS DEL PROVEEDOR">DATOS DEL PROVEEDOR</option>
                       </select>
-                      <select id="txt-ID_Estatus_Cotizacion" name="ID_Status" class="form-control input-estado">
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center p-2" style="width:300px;">
+                    <div class="d-flex" style="width:60%">Status</div>
+                    <div style="width: 200px;">
+                    <select id="txt-ID_Estatus_Cotizacion" name="ID_Status" class="form-control input-estado">
                         <option value="0" selected>Todos</option>
                         <option value="NC">NC</option>
                         <option value="C">C</option>
@@ -769,8 +782,9 @@ Filters
                         <option value="NO LOADED">NO LOADED</option>
                       </select>
                     </div>
-
                   </div>
+                  <?php } ?>
+                </div>
                 </div>
                 <div class="dropdown-divider"></div>
                 <!-- Botones -->

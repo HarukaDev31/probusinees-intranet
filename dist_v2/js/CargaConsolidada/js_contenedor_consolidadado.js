@@ -2717,7 +2717,7 @@ const openStepFunction = async (step, id) => {
                         data.stepIndex = stepIndex;
                         data.idContenedor = idContenedor;
                         data.tipoTabla = "embarque";
-                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
+                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
                         data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
                         data.Filtro_State = $("#txt-ID_States_Cliente").val();
                         validateListEmbarque(idContenedor);
@@ -2817,7 +2817,7 @@ const openStepFunction = async (step, id) => {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "prospectos";
-              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val();
+              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
             },
             complete: async function () {
               console.log("Init propectos")
