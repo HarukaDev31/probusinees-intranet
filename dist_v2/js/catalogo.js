@@ -183,6 +183,7 @@ $(document).ready(async function () {
             $product.find('h3').text(product.nombre);
             $product.find('.text-gray-600').text(`RMB: ¥${product.precio}`);
             $product.find('.text-gray-500').text(`MOQ: ${product.moq}`);
+            $product.find('.text-gray-400').text(`${product.cod_producto}`);
             $product.find('.precioPeru').text(`Precio Peru: S/. ${product.precio_peru}`);
             $product.find('.precioUSD').text(`Precio USD: $ ${product.precio_usd}`);
             if (product.status == "PENDIENTE") {

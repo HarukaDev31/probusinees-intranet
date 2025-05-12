@@ -609,9 +609,10 @@
                 <div class="absolute inset-0 "></div>
             </div>
 
-            <div class="px-2 py-4 w-3/5">
-                <h3 class="mb-2 font-bold text-2xl"></h3>
-                <div class="flex-col flex items-start justify-between text-sm">
+            <div class="px-2 pb-4 pt-2 w-3/5">
+                <span class="text-gray-400 text-sm"></span>
+                <h3 class="mb-2 font-bold text-md"></h3>
+                <div class="flex-col flex items-start justify-between text-sm py-1">
                     <span class="text-gray-600 text-md"></span>
                     <span class="text-gray-500 text-md"></span>
                     <span class="text-black-600 text-md precioPeru"></span>
@@ -751,7 +752,8 @@
 
     #productGrid {
         height: auto;
-        min-height: 70vh;
+        min-height: 40vh;
+        gap: 10px;
     }
 
     input[type="number"]::-webkit-inner-spin-button,
