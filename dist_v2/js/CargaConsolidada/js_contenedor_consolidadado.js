@@ -3321,6 +3321,12 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
   });
 
+  // Función para limpiar el buscador y el filtro
+  window["resetBuscador_" + tableId] = function() {
+    $("." + searchInputClass).val("");
+    table.search("").draw();
+  };
+
   // Actualizar el mensaje de información después de cada búsqueda
   table.on("draw", function () {
     var info = table.page.info();
@@ -3332,6 +3338,17 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     }
   });
 }
+$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
+  // Busca todos los inputs de búsqueda de DataTables y límpialos
+  $('.dataTables_filter input[type="search"]').each(function () {
+    $(this).val('');
+    // Busca la tabla asociada y limpia el filtro
+    const tableId = $(this).closest('.dataTables_wrapper').find('table').attr('id');
+    if (tableId && $.fn.DataTable.isDataTable('#' + tableId)) {
+      $('#' + tableId).DataTable().search('').draw();
+    }
+  });
+});
 
 async function viewFacturaGuia() {
   $("#factura-guia-title").html(`

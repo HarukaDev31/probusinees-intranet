@@ -26,7 +26,7 @@
 Buscar por
                           <?php } else { ?>
 Search for
-                          <?php } ?>: " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
+                          <?php } ?> " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
             </div>
           </div>
           <div class="col-1 col-xl-1 dropdown filter-contenedor px-0">
@@ -784,7 +784,6 @@ Filters
                     </div>
                   </div>
                   <?php } ?>
-                </div>
                 </div>
                 <div class="dropdown-divider"></div>
                 <!-- Botones -->
