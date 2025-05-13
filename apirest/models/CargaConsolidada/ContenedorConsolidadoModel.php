@@ -3418,7 +3418,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
             COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total,
             COALESCE(SUM(IF(cc.estado_cotizador != "CONFIRMADO", cc.volumen, 0)), 0) as cbm_total_pendiente,
-            COALESCE(SUM(IF(cc.estado_cotizador != "CONFIRMADO", cc.valor_cot, 0)), 0) as total_logistica'
+            COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cc.valor_cot, 0)), 0) as total_logistica'
             
             )
                 ->from($this->table_contenedor_cotizacion_proveedores . ' cccp') // Usando alias

@@ -252,7 +252,7 @@ class CatalogoModel extends CI_Model
             $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status');
             $this->db->from($this->table);
             $this->db->where('status', 'COTIZADO');
-            $this->db->or_where('status', 'EN TIENDA');
+            // $this->db->or_where('status', 'EN TIENDA');
             //limit 1000
             $this->db->limit(1000);
             $query = $this->db->get();

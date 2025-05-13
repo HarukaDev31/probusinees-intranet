@@ -9,6 +9,7 @@ var additionalVideo1 = null
 var contactCardContainer = null
 var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
 var isInCompleted = false;
+var checkedProducts = [];
 const EXCHANGE_RATE = 3.8;
 const ROLE_PERU = "CatalogoPeru";
 const ROLE_CHINA = "CatalogoChina";
@@ -74,19 +75,19 @@ $(document).ready(async function () {
             // Limpiar handlers anteriores si existieran
             trigger.removeEventListener('click', toggleDropdown);
             trigger.removeEventListener('touchstart', handleTouchStart); // Nuevo para Safari móvil
-            
+
             // Añadir nuevos event listeners
             trigger.addEventListener('click', toggleDropdown);
             trigger.addEventListener('touchstart', handleTouchStart); // Para Safari en iOS
         });
-    
+
         // Cerrar todos los dropdowns cuando se hace clic/touch en cualquier parte
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             closeAllDropdowns(event);
         });
-        
+
         // Manejar toques en iOS
-        document.addEventListener('touchstart', function(event) {
+        document.addEventListener('touchstart', function (event) {
             closeAllDropdowns(event);
         });
 
@@ -95,35 +96,35 @@ $(document).ready(async function () {
             trigger.addEventListener('blur', handleFocusOut);
         });
     }
-    
+
     // Nuevo: Manejar el primer toque en iOS
     function handleTouchStart(event) {
         // Prevenir el comportamiento por defecto para evitar problemas de doble toque
         event.preventDefault();
         toggleDropdown.call(this, event);
     }
-    
+
     // Función para alternar la visibilidad del dropdown
     function toggleDropdown(event) {
         event.stopPropagation();
         const dropdownMenu = this.nextElementSibling;
-    
+
         // Cerrar todos los otros dropdowns
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             if (menu !== dropdownMenu) {
                 menu.classList.add('hidden');
             }
         });
-    
+
         // Alternar el actual
         dropdownMenu.classList.toggle('hidden');
     }
-    
+
     // Función para cerrar todos los dropdowns excepto el actual
     function closeAllDropdowns(event) {
         const isDropdownTrigger = event.target.closest('.dropdown-trigger');
         const isDropdownMenu = event.target.closest('.dropdown-menu');
-    
+
         if (!isDropdownTrigger && !isDropdownMenu) {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.add('hidden');
@@ -158,7 +159,7 @@ $(document).ready(async function () {
         // Add products with staggered animation
         products.forEach((product, index) => {
             const $product = $($template.html());
-
+            const $checkbox = $product.find('.checkbox');
             //add badge in tienda 
             $product.find('.badge').text(product.status);
             switch (product.status) {
@@ -237,7 +238,23 @@ $(document).ready(async function () {
             $product.css('opacity', 0);
             //add product id to the card
             $product.attr('data-product-id', product.id);
+
             $grid.append($product);
+            $checkbox.attr('data-product-id', product.id);
+            if (checkedProducts.includes(product.id)) {
+                $checkbox.prop('checked', true);
+            } else {
+                $checkbox.prop('checked', false);
+            }
+            $checkbox.on('click', function (e) {
+                e.stopPropagation();
+                const productId = $(this).data('product-id');
+                if ($(this).is(':checked')) {
+                    checkedProducts.push(productId);
+                } else {
+                    checkedProducts = checkedProducts.filter(id => id !== productId);
+                }
+            });
             initializeProductDropdowns();
 
             setTimeout(() => {
@@ -249,6 +266,8 @@ $(document).ready(async function () {
             $grid.append($noResults);
             $noResults.show();
         }
+
+
     }
     function renderProductDetails(product) {
         productoFormSection.show();
@@ -358,6 +377,10 @@ $(document).ready(async function () {
         $(document).on('click', '.edit-btn', async function (e) {
             e.preventDefault();
             e.stopPropagation();
+            $(".checkbox").hide();
+            $('#btnEnviarProductos').show();
+            $('#btnCancelarEnvio').hide();
+            $('#btnConfirmarEnvio').hide();    
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
             // Redirect to edit page
@@ -520,17 +543,36 @@ $(document).ready(async function () {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
+    $('#btnEnviarProductos').on('click', function (e) {
+        e.preventDefault();
+        $('#btnEnviarProductos').hide();
+        $('#btnCancelarEnvio').show();
+        $('#btnConfirmarEnvio').show();
+        $(".checkbox").show();
+    })
+    $('#btnCancelarEnvio').on('click', function (e) {
+        e.preventDefault();
+        $('#btnEnviarProductos').show();
+        $('#btnCancelarEnvio').hide();
+        $('#btnConfirmarEnvio').hide();
+        $(".checkbox").hide();
+        checkedProducts = [];
+    })
+    $('#btnConfirmarEnvio').on('click', function (e) {
+        e.preventDefault();
+        if (checkedProducts.length == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Seleccione al menos un producto.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
+        //show modalConfirmacion
+        $('#modalConfirmacion').modal('show');
+    })
 
     $("#btnSave").on("click", function (e) {
         e.preventDefault();
@@ -920,9 +962,9 @@ $(document).ready(async function () {
         const igvTotal = 0.16 * baseImponible.valorCIFValue;
         const ipmTotal = (inputs.igvRate - 0.16) * baseImponible.valorCIFValue;
         const antidumpingTotal = inputs.antidumpingValue * inputs.moq;
-
+        const percepcionValue = (baseImponible.valorCIFValue + arancelValue + igvTotal) * inputs.percepcionRate;
         const subtotal = arancelValue + igvTotal + ipmTotal + antidumpingTotal;
-
+        const total = percepcionValue + subtotal;
         return {
             arancelValue,
             baseIGV,
@@ -930,7 +972,9 @@ $(document).ready(async function () {
             igvTotal,
             ipmTotal,
             antidumpingTotal,
-            subtotal
+            subtotal,
+            percepcionValue,
+            total
         };
     }
 
@@ -948,9 +992,8 @@ $(document).ready(async function () {
         const costoDestino = baseImponible.valorCIFValue * 0.4;
 
         const impuestosTotal = impuestos.arancelValue +
-            impuestos.igvValue +
-            (inputs.igvRate - 0.16) * baseImponible.valorCIFValue +
-            (inputs.antidumpingValue * inputs.moq) +
+            impuestos.igvTotal + impuestos.ipmTotal +
+            impuestos.antidumpingTotal +
             percepcionValue;
 
         const servicioTrading = 250;
@@ -1021,8 +1064,8 @@ $(document).ready(async function () {
         $('#montoTotal').text(formatCurrency(totals.montoTotalValue));
 
         // Actualizar costos unitarios
-        $('#costoUnitarioUSD').val(unitCosts.costoUnitarioUSDValue.toFixed(2));
-        $('#costoUnitarioPEN').val(unitCosts.costoUnitarioPENValue.toFixed(2));
+        $('#costoUnitarioUSD').text(formatCurrency(unitCosts.costoUnitarioUSDValue.toFixed(2), '$'));
+        $('#costoUnitarioPEN').text(formatCurrency(unitCosts.costoUnitarioPENValue.toFixed(2), 'S/'));
     }
 
     // Event listeners for input changes
