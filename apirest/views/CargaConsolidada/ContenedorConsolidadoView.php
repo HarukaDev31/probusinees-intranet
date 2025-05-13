@@ -22,7 +22,7 @@
           <!-- Buscador de la tabla -->
           <div class="col-9 col-xl-2 filter-contenedor">
             <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-table-wasa" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
 Buscar por
                           <?php } else { ?>
 Search for
@@ -112,7 +112,7 @@ Search for
           <div class="col-12 col-xl-3 flex justify-content-center gap-2 align-items-center filter-contenedor">
             <div class="col-9 col-xl-8 filter-contenedor px-0">
               <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
-                <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table-carga" id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                 Buscar por
                           <?php } else { ?>
                 Search for
