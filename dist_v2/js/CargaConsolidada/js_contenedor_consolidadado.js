@@ -2454,9 +2454,7 @@ const openStepFunction = async (step, id) => {
           },
           initComplete: function (settings, json) {
             console.log("initEmbarque");
-            // enableHorizontalAutoScrollForAllTables();
-            // limpiarFiltroDataTable("table-cotizacion-embarque");
-            // limpiarInputBuscadorPersonalizado("search-table");
+
             $(".input-date").datepicker({
               autoclose: true,
               startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2466,8 +2464,7 @@ const openStepFunction = async (step, id) => {
             });
           },
           complete: function () {
-            // limpiarFiltroDataTable("table-cotizacion-embarque");
-            // limpiarInputBuscadorPersonalizado("search-table");
+
             $(".input-date").datepicker({
               autoclose: true,
               startDate: new Date(fYear, fToday.getMonth(), fDay),
