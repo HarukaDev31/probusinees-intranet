@@ -36,10 +36,10 @@
                             Cancelar
                         </button>
                         <button id="btnConfirmarEnvio" class="hidden btn text-white text-sm   bg-orange-600 hover:bg-orange-700 inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                           
+
                             <span class="ml-2"> Confirmar Envio</span>
-                             <span class="i-lucide-send w-5 h-5">
-                                
+                            <span class="i-lucide-send w-5 h-5">
+
                             </span>
                         </button>
                     <?php } ?>
@@ -577,12 +577,10 @@
 </template>
 <template id="productTemplate">
     <div class="card edit-btn rounded-lg h-40 cursor-pointer flex flex-row w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative"> <!--status badge-->
-        <!--checkbox--> 
+        <!--checkbox-->
         <input type="checkbox" class="checkbox hidden h-6 w-6 absolute top-2 left-2 
         accent-orange-500
-        cursor-pointer checkbox" style="z-index: 100;"
-                
-        />
+        cursor-pointer checkbox" style="z-index: 100;" />
         <div class="absolute bottom-2 right-2 text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
 
         <!--dropdown menu trigger-->
@@ -657,34 +655,35 @@
     </div>
 </div>
 <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-labelledby="modalConfirmacion" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalConfirmacionLabel">Confirmación de envio</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Modal body content tailwind input dropdowns seleccionar la categoria label-->
-        <div class="flex flex-col">
-          <label for="categoria" class="mb-1 text-sm font-medium text-gray-400 flex items-center">
-            Seleccionar la categoría
-          </label>
-          <select id="categoria" name="categoria" class="form-select block w-full border-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-            <option value="">Seleccione una categoría</option>
-            <option value="Categoria 1">Categoria 1</option>
-            <option value="Categoria 2">Categoria 2</option>
-            <option value="Categoria 3">Categoria 3</option>
-          </select>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmacionLabel">Confirmación de envio</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="p-5">Antes de enviar el o los productos a la web, selecciona la categoría a la que pertenecen</p>
+                <!-- Modal body content tailwind input dropdowns seleccionar la categoria label-->
+                <div class="flex flex-col">
+                    <label for="categoria" class="mb-1 text-sm font-medium text-gray-400 flex items-center">
+                        Seleccionar la categoría
+                    </label>
+                    <select id="categoria" name="categoria" class="form-select block w-full border-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <option value="">Seleccione una categoría</option>
+                        <option value="Categoria 1">Categoria 1</option>
+                        <option value="Categoria 2">Categoria 2</option>
+                        <option value="Categoria 3">Categoria 3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
     </div>
-  </div>
 </div>
 </div>
 
@@ -794,9 +793,11 @@
     .i-lucide-file {
         mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z'%3E%3C/path%3E%3C/svg%3E");
     }
-    .i-lucide-send{
+
+    .i-lucide-send {
         mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 2 11 13'%3E%3C/path%3E%3Cpath d='M22 2l-4 20-2-8-8-2L2 2l20 20'%3E%3C/path%3E%3C/svg%3E");
     }
+
     #productGrid {
         height: auto;
         min-height: 40vh;
