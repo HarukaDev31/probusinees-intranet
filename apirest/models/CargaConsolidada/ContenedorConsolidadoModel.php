@@ -335,8 +335,8 @@ class ContenedorConsolidadoModel extends CI_Model
             ->where('main.id_contenedor', $idContenedor)
             ->order_by('main.id', 'asc');
         // Aplicar filtros solo si no son "0" (valor por defecto)
-        $filtroState = $this->input->post('Filtro_State')??"0";
-        $filtroStatus = $this->input->post('Filtro_Status')??"0";
+        $filtroState = $this->input->post('Filtro_State') ?? "0";
+        $filtroStatus = $this->input->post('Filtro_Status') ?? "0";
         if ($this->user->No_Grupo != "Cotizador") {
             $this->db->where('estado_cotizador', 'CONFIRMADO');
 
@@ -379,11 +379,9 @@ class ContenedorConsolidadoModel extends CI_Model
                     )", null, false)
                     ->group_end();
             }
-
         } else if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
             $this->db->where('main.id_usuario', $this->user->ID_Usuario);
             $this->db->order_by('fecha_confirmacion', 'asc');
-
         } else {
             if ($this->input->post('Filtro_Estado') != "0") {
 
@@ -401,7 +399,7 @@ class ContenedorConsolidadoModel extends CI_Model
             foreach ($data as $item) {
                 $proveedores = json_decode($item->proveedores, true);
                 if ($proveedores) {
-                    $item->proveedores = json_encode(array_filter($proveedores, function($prov) use ($statusFiltro) {
+                    $item->proveedores = json_encode(array_filter($proveedores, function ($prov) use ($statusFiltro) {
                         return $prov['estados_proveedor'] == $statusFiltro;
                     }));
                 }
@@ -412,7 +410,7 @@ class ContenedorConsolidadoModel extends CI_Model
             foreach ($data as $item) {
                 $proveedores = json_decode($item->proveedores, true);
                 if ($proveedores) {
-                    $item->proveedores = json_encode(array_filter($proveedores, function($prov) use ($stateFiltro) {
+                    $item->proveedores = json_encode(array_filter($proveedores, function ($prov) use ($stateFiltro) {
                         return $prov['estados'] == $stateFiltro;
                     }));
                 }
@@ -434,7 +432,7 @@ class ContenedorConsolidadoModel extends CI_Model
             }
 
             // Filtrado combinado en una sola operación
-            $proveedoresFiltrados = array_filter($proveedores, function($prov) use ($filtroStatus, $filtroState) {
+            $proveedoresFiltrados = array_filter($proveedores, function ($prov) use ($filtroStatus, $filtroState) {
                 $cumpleStatus = ($filtroStatus === "0" || $prov['estados_proveedor'] === $filtroStatus);
                 log_message('error', 'cumpleStatus: ' . $cumpleStatus);
                 $cumpleState = ($filtroState === "0" || $prov['estados'] === $filtroState);
@@ -539,7 +537,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->where('id_contenedor', $idContenedor)
             //WHERE ESTADO NOT NULL
             ->where('estado_cliente IS NOT NULL');
-        $estado=$this->input->post('estado')??"0";
+        $estado = $this->input->post('estado') ?? "0";
         if ($estado != "0") {
             $this->db->where('estado_cliente', $estado);
         }
@@ -3412,25 +3410,60 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     }
     public function getCotizacionEmbarqueHeaders($idContenedor)
     {
-        //get sum of cbm_total_china and cbm_total from each cotizacion proveedor
         try {
+            // Consulta para cbm_total_china usando DISTINCT para evitar duplicación
             $this->db->select('
-            COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
-            COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total, 0)), 0) as cbm_total,
-            COALESCE(SUM(IF(cc.estado_cotizador != "CONFIRMADO", cc.volumen, 0)), 0) as cbm_total_pendiente,
-            COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cc.monto, 0)), 0) as total_logistica'
-            
-            )
-                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp') // Usando alias
-                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id') // Usando alias
+            COALESCE(SUM( IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
+        ')
+                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
+                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
                 ->where('cccp.id_contenedor', $idContenedor);
+
+            // Subconsulta para cbm_total
+            $this->db->select('(
+            SELECT COALESCE(SUM(cbm_total), 0) 
+            FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+            WHERE id_contenedor = ' . $idContenedor . '
+            AND id_cotizacion IN (
+                SELECT id 
+                FROM ' . $this->table_contenedor_cotizacion . ' 
+                WHERE estado_cotizador = "CONFIRMADO"
+            )
+        ) as cbm_total', false);
+
+            // Subconsulta para cbm_total_pendiente
+            $this->db->select('(
+            SELECT COALESCE(SUM(volumen), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+            )
+            AND estado_cotizador != "CONFIRMADO"
+        ) as cbm_total_pendiente', false);
+
+            // Subconsulta para total_logistica
+            $this->db->select('(
+            SELECT COALESCE(SUM(monto), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+            )
+            AND estado_cotizador = "CONFIRMADO"
+        ) as total_logistica', false);
+
             $query = $this->db->get();
             $result = $query->row();
+
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error: ' . $this->db->error()['message']);
             }
-            //get bl_file_url and lista_empaque_file_url from contenedor
-            $this->db->select('bl_file_url,lista_embarque_url')
+
+            // Obtener bl_file_url y lista_empaque_file_url del contenedor
+            $this->db->select('bl_file_url, lista_embarque_url')
                 ->from($this->table)
                 ->where('id', $idContenedor);
             $query = $this->db->get();
@@ -3441,19 +3474,23 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'cbm_total_china' => $result->cbm_total_china,
                     'cbm_total' => $result->cbm_total,
                     'cbm_total_pendiente' => $result->cbm_total_pendiente,
-                    'total_logistica'=> $result->total_logistica,
+                    'total_logistica' => $result->total_logistica,
                     'bl_file_url' => $result2->bl_file_url,
                     'lista_embarque_url' => $result2->lista_embarque_url
                 ];
             } else {
-                return ['status' => "error", 'error' => false, "data" => [
-                    'cbm_total_china' => 0,
-                    'cbm_total_pendiente' => 0,
-                    'total_logistica' => 0,
-                    'cbm_total' => 0,
-                    'bl_file_url' => '',
-                    'lista_embarque_url' => ''
-                ]];
+                return [
+                    'status' => "error",
+                    'error' => false,
+                    "data" => [
+                        'cbm_total_china' => 0,
+                        'cbm_total_pendiente' => 0,
+                        'total_logistica' => 0,
+                        'cbm_total' => 0,
+                        'bl_file_url' => '',
+                        'lista_embarque_url' => ''
+                    ]
+                ];
             }
         } catch (Exception $e) {
             log_message('error', '' . $e->getMessage());
