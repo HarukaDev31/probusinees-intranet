@@ -252,9 +252,26 @@ class CatalogoModel extends CI_Model
             $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status');
             $this->db->from($this->table);
             $this->db->where('status', 'COTIZADO');
-            // $this->db->or_where('status', 'EN TIENDA');
-            //limit 1000
-            $this->db->limit(1000);
+
+            $query = $this->db->get();
+            if ($this->db->error()['code'] == 0) {
+                return array('status' => true, 'data' => $query->result());
+            } else {
+                log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
+                return array('status' => false, 'message' => 'Error al obtener el catálogo');
+            }
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+        }
+    }
+    public function getCatalogoSeleccionados(){
+        try {
+            $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,status,
+            catalogo_producto_category.name as category_name,
+            ');
+            $this->db->from($this->table);
+            $this->db->join('catalogo_producto_category', 'catalogo_producto_category.id = catalogo_producto.category_id', 'left');
+            $this->db->where('status', 'EN TIENDA');
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
                 return array('status' => true, 'data' => $query->result());
@@ -283,7 +300,8 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
-    private function reordenarCodigosCatalogo() {
+    private function reordenarCodigosCatalogo()
+    {
         // Obtener todos los productos ordenados por ID ASC
         $this->db->select('id, nombre');
         $this->db->from($this->table);
@@ -354,7 +372,7 @@ class CatalogoModel extends CI_Model
     public function sendCotizacion($productId)
     {
         try {
-           ///update status to COTIZADO
+            ///update status to COTIZADO
             $this->db->set('status', 'COTIZADO');
             $this->db->where('id', $productId);
             $this->db->update($this->table);
@@ -383,6 +401,55 @@ class CatalogoModel extends CI_Model
             }
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
+        }
+    }
+    public function getCategorias()
+    {
+        //get id name from catalogo_producto_category
+        $this->db->select('id,name');
+        $this->db->from('catalogo_producto_category');
+        $query = $this->db->get();
+        if ($this->db->error()['code'] == 0) {
+            return array('status' => true, 'data' => $query->result());
+        } else {
+            log_message('error', 'Error al obtener las categorias: ' . $this->db->error()['message']);
+            return array('status' => false, 'message' => 'Error al obtener las categorias');
+        }
+    }
+    public function createCategoria($categoria)
+    {
+        //insert into catalogo_producto_category
+
+        //create slug equal trim name  to lower and parse and separate words with -
+        $slug = strtolower(trim($categoria));
+        $slug = preg_replace('/[^a-z0-9]+/i', '-', $slug);
+        $slug = trim($slug, '-');
+        $dataToInsert = array(
+            'name' => $categoria,
+            'slug' => $slug
+        );
+        $this->db->insert('catalogo_producto_category', $dataToInsert);
+        if ($this->db->error()['code'] == 0) {
+            return array('status' => true, 'message' => 'Categoria creada correctamente');
+        } else {
+            log_message('error', 'Error al crear la categoria: ' . $this->db->error()['message']);
+            return array('status' => false, 'message' => 'Error al crear la categoria');
+        }
+    }
+    public function guardarCategoriaProductos($categoriaId, $productIds)
+    {
+        $productsIds = json_decode($productIds);
+        foreach ($productsIds as $productId) {
+            $this->db->set('category_id', $categoriaId);
+            $this->db->set('status', 'EN TIENDA');
+            $this->db->where('id', $productId);
+            $this->db->update($this->table);
+        }
+        if ($this->db->error()['code'] == 0) {
+            return array('status' => true, 'message' => 'Productos guardados correctamente');
+        } else {
+            log_message('error', 'Error al guardar los productos: ' . $this->db->error()['message']);
+            return array('status' => false, 'message' => 'Error al guardar los productos');
         }
     }
 }

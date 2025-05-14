@@ -9,7 +9,10 @@ var additionalVideo1 = null
 var contactCardContainer = null
 var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
 var isInCompleted = false;
+var isInTienda = false;
 var checkedProducts = [];
+var pricePEN= 0;
+var priceUSD = 0;
 const EXCHANGE_RATE = 3.8;
 const ROLE_PERU = "CatalogoPeru";
 const ROLE_CHINA = "CatalogoChina";
@@ -43,13 +46,18 @@ $(document).ready(async function () {
     async function loadProducts() {
         if (window.location.href.includes("listarCompletados")) {
             isInCompleted = true;
-        } else {
+        } else if (window.location.href.includes("listarSeleccionados")) {
+            isInTienda = true;
+        }else {
             isInCompleted = false;
+            isInTienda = false;
         }
 
         url = base_url + 'CatalogoController/getCatalogo';
         if (isInCompleted) {
             url = base_url + 'CatalogoController/getCatalogoCompletados';
+        }else if (isInTienda) {
+            url = base_url + 'CatalogoController/getCatalogoTienda';
         }
         const response = await fetch(url);
         if (response.ok) {
@@ -187,6 +195,10 @@ $(document).ready(async function () {
             $product.find('.text-gray-400').text(`${product.cod_producto}`);
             $product.find('.precioPeru').text(`Precio Peru: S/. ${product.precio_peru}`);
             $product.find('.precioUSD').text(`Precio USD: $ ${product.precio_usd}`);
+            //ifproducts has category_name key set text-gray-800 
+            if (product.category_name) {
+                $product.find('.text-gray-800').text(`${product.category_name}`);
+            }
             if (product.status == "PENDIENTE") {
                 $product.find('.precioUSD').hide();
                 $product.find('.precioPeru').hide();
@@ -366,7 +378,48 @@ $(document).ready(async function () {
             const value = $(this).val();
             sortProducts(value);
         });
+        $("#btnGuardarCategoriaProductos").on("click", function (e) {
+            e.preventDefault();
+            const categoriaId = $("#categoriaProductos").val();
+            if (categoriaId == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Seleccione una categoría válida.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return;
+            }
+            const formData = new FormData();
+            formData.append('categoriaId', categoriaId);
+            formData.append('productIds', JSON.stringify(checkedProducts));
+            const url = base_url + 'CatalogoController/guardarCategoriaProductos';
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+            }).then(async response => {
+                if (response.ok) {
+                    const data = await response.json();
+                    checkedProducts = [];
+                    $('#btnEnviarProductos').show();
+                    $('#btnCancelarEnvio').hide();
+                    $('#btnConfirmarEnvio').hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: 'Categoría guardada correctamente.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    $('#modalConfirmacion').modal('hide');
+                    await loadProducts();
 
+                } else {
+                    console.error('Network error:', response.statusText);
+                }
+            });
+        })
         // Filter button handler
         $('#filterBtn').on('click', function () {
             // Implement filter modal/dropdown
@@ -380,7 +433,7 @@ $(document).ready(async function () {
             $(".checkbox").hide();
             $('#btnEnviarProductos').show();
             $('#btnCancelarEnvio').hide();
-            $('#btnConfirmarEnvio').hide();    
+            $('#btnConfirmarEnvio').hide();
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
             // Redirect to edit page
@@ -558,7 +611,57 @@ $(document).ready(async function () {
         $(".checkbox").hide();
         checkedProducts = [];
     })
-    $('#btnConfirmarEnvio').on('click', function (e) {
+    // on show modalNuevaCategoria 
+    $('#modalNuevaCategoria').on('show.bs.modal', function (e) {
+
+        $("#nuevaCategoria").val("");
+    });
+    $("#btnCrearCategoria").on("click", async function (e) {
+        e.preventDefault();
+        const categoria = $("#nuevaCategoria").val();
+        if (categoria.trim() == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ingrese una categoría válida.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
+        const formData = new FormData();
+        formData.append('categoria', categoria);
+        const response = await fetch(base_url + 'CatalogoController/createCategoria', {
+            method: 'POST',
+            body: formData,
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Categoría creada correctamente.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                $('#modalNuevaCategoria').modal('hide');
+                await fillDropdownCategorias();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        } else {
+            console.error('Network error:', response.statusText);
+        }
+    })
+
+    $('#btnConfirmarEnvio').on('click', async function (e) {
         e.preventDefault();
         if (checkedProducts.length == 0) {
             Swal.fire({
@@ -572,6 +675,7 @@ $(document).ready(async function () {
         }
         //show modalConfirmacion
         $('#modalConfirmacion').modal('show');
+        await fillDropdownCategorias();
     })
 
     $("#btnSave").on("click", function (e) {
@@ -680,7 +784,23 @@ $(document).ready(async function () {
             }
         });
     });
+    async function fillDropdownCategorias() {
+        const url = base_url + 'CatalogoController/getCategorias';
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data, "data")
+            const categorias = data;
+            const $dropdown = $('#categoriaProductos');
+            $dropdown.empty();
+            categorias.forEach(categoria => {
+                $dropdown.append(new Option(categoria.name, categoria.id));
+            });
 
+        } else {
+            console.error('Network error:', response.statusText);
+        }
+    }
     async function validateForm() {
         let isValid = true;
         const requiredFields = document.querySelectorAll('#productForm [required]');
@@ -712,8 +832,8 @@ $(document).ready(async function () {
             formData.append('antidumping', $('#antidumping').val());
             formData.append('percepcion', $('#percepcion').val());
             //append precio_peru and precio_usd
-            formData.append('precio_peru', $('#costoUnitarioPEN').val());
-            formData.append('precio_usd', $('#costoUnitarioUSD').val());
+            formData.append('precio_peru', pricePEN);
+            formData.append('precio_usd', priceUSD);
             if (currentProductId) {
                 formData.append('productId', currentProductId);
             }
@@ -885,7 +1005,8 @@ $(document).ready(async function () {
 
         // 7. Calculamos costos unitarios
         const unitCosts = calculateUnitCosts(totalValues, inputValues.moq);
-
+        priceUSD = unitCosts.costoUnitarioUSDValue;
+        pricePEN = unitCosts.costoUnitarioPENValue;
         // 8. Actualizamos la UI con todos los valores calculados
         updateUI(
             derivedValues,

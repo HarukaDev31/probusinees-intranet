@@ -400,9 +400,9 @@
                                 <div class="form-group flex md:flex-row flex-col gap-3">
                                     <label class="block text-sm font-medium text-gray-700 w-full md:w-1/3">Arancel:</label>
                                     <select id="arancel" class="block w-full md:w-2/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                        <option value="0">0%</option>
-                                        <option value="6">6%</option>
-                                        <option value="11">11%</option>
+                                        <option value="0.00">0%</option>
+                                        <option value="6.00">6%</option>
+                                        <option value="11.00">11%</option>
                                     </select>
                                 </div>
 
@@ -624,6 +624,8 @@
 
             <div class="px-2 pb-4 pt-2 w-3/5">
                 <span class="text-gray-400 text-sm"></span>
+                <!--badge category_name-->
+                <span class=" badge-category text-gray-800 text-xs  font-semibold "></span>
                 <h3 class="mb-2 font-bold text-md"></h3>
                 <div class="flex-col flex items-start justify-between text-sm py-1">
                     <span class="text-gray-600 text-md"></span>
@@ -666,25 +668,67 @@
             <div class="modal-body">
                 <p class="p-5">Antes de enviar el o los productos a la web, selecciona la categoría a la que pertenecen</p>
                 <!-- Modal body content tailwind input dropdowns seleccionar la categoria label-->
-                <div class="flex flex-col">
-                    <label for="categoria" class="mb-1 text-sm font-medium text-gray-400 flex items-center">
-                        Seleccionar la categoría
-                    </label>
-                    <select id="categoria" name="categoria" class="form-select block w-full border-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                        <option value="">Seleccione una categoría</option>
-                        <option value="Categoria 1">Categoria 1</option>
-                        <option value="Categoria 2">Categoria 2</option>
-                        <option value="Categoria 3">Categoria 3</option>
-                    </select>
+                <div class="row px-5 mb-5">
+                    <div class="col-10">
+                        <label for="categoriaProductos" class="block text-sm font-medium text-gray-700">Selecciona la categoría</label>
+                        <select id="categoriaProductos" name="categoria" class="form-select block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+
+                        </select>
+                    </div>
+                    <!--button to add new category-->
+                    <div class="col-1">
+                        <button type="button" class="btn btn-primary bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-toggle="modal" data-target="#modalNuevaCategoria">
+                            +
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+            <div class="modal-footer row">
+                <button type="button" class="btn bg-white col-5
+                border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md mr-2" data-dismiss="modal">
+                    <span class="">Cancelar</span>
+                </button>
+                <button type="button" class="btn bg-green-700 text-white col-6" id="btnGuardarCategoriaProductos" >
+                    <span class="ml-2">Si, Enviar</span>
+                </button>
+
             </div>
         </div>
     </div>
 </div>
+<!--modal create new category-->
+<div class="modal fade" id="modalNuevaCategoria" tabindex="-1" aria-labelledby="modalNuevaCategoria" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevaCategoriaLabel">Crear nueva categoría</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="p-5">Ingresa el nombre de la nueva categoría</p>
+                <!-- Modal body content tailwind input dropdowns seleccionar la categoria label-->
+                <div class="row px-5">
+                    <div class="col-12">
+                        <label for="nuevaCategoria" class="block text-sm font-medium text-gray-700">Nombre de la nueva categoría</label>
+                        <input type="text" id="nuevaCategoria" name="nuevaCategoria" class="form-input block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer row">
+                <button type="button" class="btn bg-white col-5
+                border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md mr-2" data-dismiss="modal">
+                    <span class="">Cancelar
+                    </span>
+                </button>
+                <button type="button" class="btn bg-green-700 text-white col-6" id="btnCrearCategoria" data-dismiss="modal">
+                    <span class="ml-2">Crear</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
