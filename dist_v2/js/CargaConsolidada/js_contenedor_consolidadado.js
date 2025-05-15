@@ -2381,8 +2381,8 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-          scrollCollapse: true,
-          scrollY: '450px',
+          
+          
           buttons: [],
           paging: true,
           lengthChange: true,
@@ -2522,8 +2522,8 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-          scrollCollapse: true,
-          scrollY: '450px',
+          
+          
           buttons: [
             {
               extend: "excel",
@@ -2610,8 +2610,8 @@ const openStepFunction = async (step, id) => {
                       "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                       "<'row'<'col-sm-12'tr>>" +
                       "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-                    scrollCollapse: true,
-                    scrollY: '450px',
+                    
+                    
                     buttons: [
                       {
                         text: "Prospectos",
@@ -2921,8 +2921,8 @@ const openStepFunction = async (step, id) => {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-        scrollCollapse: true,
-        scrollY: '450px',
+        
+        
         buttons: [
           {
             extend: "excel",
@@ -2981,8 +2981,8 @@ const openStepFunction = async (step, id) => {
                       "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                       "<'row'<'col-sm-12'tr>>" +
                       "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-                    scrollCollapse: true,
-                    scrollY: '450px',
+                    
+                    
                     buttons: [
                       {
                         extend: "excel",
@@ -3383,8 +3383,8 @@ async function viewFacturaGuia() {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      scrollCollapse: true,
-      scrollY: '450px',
+      
+      
       buttons: [
         {
           extend: "excel",
@@ -3488,8 +3488,8 @@ async function viewCotizacionFinal() {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      scrollCollapse: true,
-      scrollY: '450px',
+      
+      
       buttons: [
         {
           extend: "excel",
@@ -5425,8 +5425,8 @@ $(document).ready(async function () {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-        scrollCollapse: true,
-        scrollY: '450px',
+        
+        
         buttons: [
           {
             extend: "excel",
@@ -5536,8 +5536,8 @@ $(document).ready(async function () {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-        scrollCollapse: true,
-        scrollY: '450px',
+        
+        
         buttons: [
           {
             extend: "excel",
@@ -5669,8 +5669,8 @@ $(document).ready(async function () {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      scrollCollapse: true,
-      scrollY: '450px',
+      
+      
       buttons: [
         {
           extend: "excel",
