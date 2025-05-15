@@ -172,7 +172,7 @@ $(document).ready(async function () {
             $product.find('.badge').text(product.status);
             switch (product.status) {
                 case "COTIZADO":
-                    $product.find('.badge').addClass('bg-blue-500');
+                    $product.find('.badge').addClass('bg-blue-500 hidden    ');
                     break;
                 case "PENDIENTE":
                     $product.find('.badge').addClass('bg-yellow-500');
@@ -193,8 +193,8 @@ $(document).ready(async function () {
             $product.find('.text-gray-600').text(`RMB: ¥${product.precio}`);
             $product.find('.text-gray-500').text(`MOQ: ${product.moq}`);
             $product.find('.text-gray-400').text(`${product.cod_producto}`);
-            $product.find('.precioPeru').text(`Precio Peru: S/. ${product.precio_peru}`);
-            $product.find('.precioUSD').text(`Precio USD: $ ${product.precio_usd}`);
+            $product.find('.precioPeru').text(`Precio Peru: S/. ${parseFloat(product.precio_peru).toFixed(2)}`);
+            $product.find('.precioUSD').text(`Precio USD: $ ${parseFloat(product.precio_usd).toFixed(2)}`);
             //ifproducts has category_name key set text-gray-800 
             if (product.category_name) {
                 $product.find('.text-gray-800').text(`${product.category_name}`);
@@ -731,6 +731,7 @@ $(document).ready(async function () {
         currentProductId = null;
         const $form = $('#productForm');
         $form[0].reset();
+        $('#wechatPhone').val('');
         $form.find('.form-error').addClass('hidden');
         $form.find('input, textarea').removeClass('border-red-500');
         $form.find('#mainImageContainer').attr('data-file', '');

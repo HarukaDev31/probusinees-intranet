@@ -758,13 +758,13 @@ Filters
                   <?php } ?>
                   <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
                   <div class="d-flex align-items-center p-2" style="width:300px;">
-                    <div class="d-flex" style="width:60%">State</div>
+                    <div class="d-flex" style="width:60%">Estado</div>
                     <div style="width: 200px;">
                     <select id="txt-ID_States_Cliente" name="ID_States_Cliente" class="form-control input-estado">
                         <option value="0" selected>Todos</option>
                         <option value="ROTULADO">ROTULADO</option>
                         <option value="COBRANDO">COBRANDO</option>
-                        <option value="DATOS DEL PROVEEDOR">DATOS DEL PROVEEDOR</option>
+                        <option value="DATOS PROVEEDOR">DATOS PROVEEDOR</option>
                       </select>
                     </div>
                   </div>
@@ -1106,7 +1106,7 @@ Filters
       </div>
 
       <div class="name_cliente col-12 p-6" style="border-bottom: #DFDFDF solid 2px;">
-        Nombre Cliente
+        
       </div>
 
     </div>

@@ -697,7 +697,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $selectEstadoCliente;
 					}
 					if ($this->user->No_Grupo == "Coordinación") {
-						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ')">
+						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes($row->nombre) . '\')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 						</div>' .
 							'<div class="d-flex" onclick="deleteCliente(' . $row->id_cotizacion . ')">
