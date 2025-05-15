@@ -8,7 +8,7 @@
             <div class="flex items-center
             flex-col flex-md-row flex-lg-row flex-xl-row
             justify-between mb-8 pt-3  border-b-2 border-gray-200 pb-2">
-                <h1 class="text-2xl font-bold text-gray-800">Listado de Productos</h1>
+                <h1 class="text-2xl font-bold text-gray-800">Listado de Cotizados</h1>
 
                 <div class="flex flex-col gap-2 flex-md-row flex-xs-row flex-xl-row">
                     <div class="relative">
@@ -597,14 +597,14 @@
             <!--dropdown menu content-->
             <div class="dropdown-menu2 absolute right-0 mt-1 w-80 bg-white rounded-md shadow-lg overflow-hidden z-40 hidden">
                 <div class="py-1">
-                    <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 w-full md:w-1/3 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
+                    <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 w-full hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                         Editar
                     </button>
-                    <button class="delete-btn w-full text-left px-4 py-2 text-sm text-gray-700 w-full md:w-1/3 hover:bg-red-50 text-red-600 flex items-center gap-2">
+                    <button class="delete-btn w-full text-left px-4 py-2 text-sm text-gray-700 w-full hover:bg-red-50 text-red-600 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -626,12 +626,12 @@
                 <span class="text-gray-400 text-sm"></span>
                 <!--badge category_name-->
                 <span class=" badge-category text-gray-800 text-xs  font-semibold "></span>
-                <h3 class="mb-2 font-bold text-md"></h3>
+                <h3 class="mb-0 font-bold text-md"></h3>
                 <div class="flex-col flex items-start justify-between text-sm py-1">
                     <span class="text-gray-600 text-md"></span>
-                    <span class="text-gray-500 text-md"></span>
                     <span class="text-black-600 text-md precioPeru"></span>
                     <span class="text-black-500 text-md precioUSD"></span>
+                    <span class="text-gray-500 text-md"></span>
                 </div>
                 <button class="btn btn-primary btnTienda mx-auto mt-4 bg-blue-50 text-blue-600 py-2 rounded-md transition-colors flex items-center justify-center gap-1 w-full">
                     <span>PASAR A TIENDA</span>
