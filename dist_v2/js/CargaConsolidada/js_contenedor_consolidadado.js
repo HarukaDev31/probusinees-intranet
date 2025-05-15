@@ -2455,6 +2455,8 @@ const openStepFunction = async (step, id) => {
             },
           },
           initComplete: function (settings, json) {
+            console.log("initEmbarque");
+
             $(".input-date").datepicker({
               autoclose: true,
               startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2464,6 +2466,7 @@ const openStepFunction = async (step, id) => {
             });
           },
           complete: function () {
+
             $(".input-date").datepicker({
               autoclose: true,
               startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2474,6 +2477,7 @@ const openStepFunction = async (step, id) => {
 
           },
           drawCallback: function (settings) {
+            enableHorizontalAutoScrollForAllTables();
             $(".input-date").datepicker({
               autoclose: true,
               startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2483,6 +2487,8 @@ const openStepFunction = async (step, id) => {
             });
           },
         });
+        limpiarFiltroDataTable("table-cotizacion-embarque");
+        limpiarInputBuscadorPersonalizado("search-table");
 
         // FUNCION PARA CONFIGURAR EL BUSCADOR
         configurarBuscador(
@@ -2557,11 +2563,15 @@ const openStepFunction = async (step, id) => {
                   //display block
                   $("#table-cotizacion-prospectos").attr("style", "");
                   $("#table-cotizacion-prospectos_wrapper").show();
+                  limpiarFiltroDataTable("table-cotizacion-prospectos");
+                  limpiarInputBuscadorPersonalizado("search-table");
                   reloadTableCotizacion();
                   enableHorizontalAutoScrollForAllTables();
                 } else {
                   $("#table-cotizacion-prospectos").attr("style", "");
                   $("#table-cotizacion-prospectos_wrapper").show();
+                  limpiarFiltroDataTable("table-cotizacion-prospectos");
+                  limpiarInputBuscadorPersonalizado("search-table");
                   reloadTableCotizacion();
                   enableHorizontalAutoScrollForAllTables();
                 }
@@ -2585,6 +2595,8 @@ const openStepFunction = async (step, id) => {
                 if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
                   $("#table-cotizacion-embarque").attr("style", "");
                   $("#table-cotizacion-embarque_wrapper").show();
+                  limpiarFiltroDataTable("table-cotizacion-embarque");
+                  limpiarInputBuscadorPersonalizado("search-table");
                   reloadTableCotizacionEmbarque();
                   enableHorizontalAutoScrollForAllTables();
                 } else {
@@ -2621,6 +2633,8 @@ const openStepFunction = async (step, id) => {
                             )
                           ) {
                             $("#table-cotizacion-prospectos_wrapper").show();
+                            limpiarFiltroDataTable("table-cotizacion-prospectos");
+                            limpiarInputBuscadorPersonalizado("search-table");
 
                             $("#table-cotizacion-prospectos").attr("style", "");
                             reloadTableCotizacion();
@@ -2737,8 +2751,7 @@ const openStepFunction = async (step, id) => {
                       },
                     },
                     initComplete: function (settings, json) {
-                      console.log("Init embarque");
-                      enableHorizontalAutoScrollForAllTables();
+                      enableHorizontalAutoScrollForAllTables();                
                       $(".input-date").datepicker({
                         autoclose: true,
                         startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2867,6 +2880,9 @@ const openStepFunction = async (step, id) => {
           ],
         });
       }
+      limpiarFiltroDataTable("table-cotizacion-prospectos");
+      limpiarInputBuscadorPersonalizado("search-table");
+
       configurarBuscador(
         "table-cotizacion-prospectos",
         "search-table",
@@ -2898,6 +2914,7 @@ const openStepFunction = async (step, id) => {
       reloadTableClientesGeneral();
     } else {
       tableClientesGeneral.show();
+      limpiarFiltroDataTable("table-clientes-general");
 
       tableClientesGeneral = $("#table-clientes-general").DataTable({
         dom:
@@ -2927,7 +2944,6 @@ const openStepFunction = async (step, id) => {
                 $("#table-clientes-variacion_wrapper").hide();
               }
               if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-                //display block
                 $("#table-clientes-general").attr("style", "");
                 $("#table-clientes-general_wrapper").show();
                 reloadTableClientesGeneral();
@@ -2936,6 +2952,8 @@ const openStepFunction = async (step, id) => {
                 $("#table-clientes-general_wrapper").show();
                 reloadTableClientesGeneral();
               }
+              limpiarInputBuscadorPersonalizado("search-table");
+              configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
             },
             className: "btn btn-light",
           },
@@ -2950,6 +2968,7 @@ const openStepFunction = async (step, id) => {
                 if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
                   $("#table-clientes-variacion").attr("style", "");
                   $("#table-clientes-variacion_wrapper").show();
+                  limpiarFiltroDataTable("table-clientes-variacion");
                   reloadTableClientesVariacion();
                 } else {
                   url =
@@ -3014,8 +3033,12 @@ const openStepFunction = async (step, id) => {
                             reloadTableClientesGeneral();
                           } else {
                             $("#table-clientes-general").attr("style", "");
+                            $("#table-clientes-general_wrapper").show();
+                            limpiarFiltroDataTable("table-clientes-general");
                             reloadTableClientesGeneral();
                           }
+                          limpiarInputBuscadorPersonalizado("search-table");
+                          configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
                         },
                       },
                       {
@@ -3038,57 +3061,18 @@ const openStepFunction = async (step, id) => {
                               "#table-clientes-variacion"
                             )
                           ) {
+                            $("#table-clientes-variacion_wrapper").show();
+                            limpiarFiltroDataTable("table-clientes-variacion");
+
                             $("#table-clientes-variacion").attr("style", "");
+                            reloadTableClientesVariacion();
                           } else {
                             $("#table-clientes-variacion").attr("style", "");
+                            reloadTableClientesVariacion();
                           }
+                          
                         },
                       },
-                      // {
-                      //     text: "<i class='fa fa-upload'></i> Lista de embarque",
-                      //     action: function () {
-                      //         Swal.fire({
-                      //             title: "Subir lista de embarque",
-                      //             input: "file",
-                      //             inputAttributes: {
-                      //                 accept: "*",
-                      //                 "aria-label": "Sube tu archivo",
-                      //             },
-                      //             showCancelButton: true,
-                      //             confirmButtonText: "Subir",
-                      //             showLoaderOnConfirm: true,
-                      //             preConfirm: (file) => {
-                      //                 const formData = new FormData();
-                      //                 formData.append("file", file);
-                      //                 formData.append("idContenedor", idContenedor);
-                      //                 formData.append("idCotizacion", idCotizacion);
-                      //                 return fetch(base_url + "CargaConsolidada/ContenedorConsolidado/uploadListaEmbarque", {
-                      //                     method: "POST",
-                      //                     body: formData,
-                      //                 })
-                      //                     .then((response) => {
-                      //                         return response.json();
-                      //                     })
-                      //                     .catch((error) => {
-                      //                         Swal.showValidationMessage(
-                      //                             `Request failed: ${error}`
-                      //                         );
-                      //                     });
-                      //             },
-                      //             allowOutsideClick: () => !Swal.isLoading(),
-                      //         }).then((result) => {
-                      //             if (result.value) {
-                      //                 if (result.value.status == "success") {
-                      //                     Swal.fire("Correcto", result.value.message, "success");
-                      //                     reloadTableClientesVariacion();
-                      //                 } else {
-                      //                     Swal.fire("Error", result.value.message, "error");
-                      //                 }
-                      //             }
-                      //         });
-                      //     },
-                      //     className: "btn btn-secondary btn-lista-embarque"
-                      // }
                     ],
                     columnDefs: [
                       {
@@ -3153,12 +3137,15 @@ const openStepFunction = async (step, id) => {
                       },
                     },
                   });
-                  configurarBuscador(
+                  limpiarFiltroDataTable("table-clientes-variacion");
+                  reloadTableClientesVariacion();
+                }
+                limpiarInputBuscadorPersonalizado("search-table");
+                configurarBuscador(
                     "table-clientes-variacion",
                     "search-table",
                     "table-clientes-variacion_info"
                   );
-                }
               },
             }
             : null,
@@ -3224,15 +3211,16 @@ const openStepFunction = async (step, id) => {
             data.Filtro_Estado = "0";
           },
         },
-
       });
-      configurarBuscador(
+      limpiarFiltroDataTable("table-clientes-general");
+      reloadTableClientesGeneral();
+    }
+    limpiarInputBuscadorPersonalizado("search-table");
+    configurarBuscador(
         "table-clientes-general",
         "search-table",
         "table-clientes-general_info"
       );
-
-    }
   } else if (stepIndex == 3 && currentPrivilege == "Documentacion") {
     viewFormularioAduana();
   } else if (stepIndex == 3) {
@@ -3250,11 +3238,19 @@ const openStepFunction = async (step, id) => {
       contentHeader.show();
       cotizacionContainer.hide();
       clientesDocumentacionContainer.hide();
-      table_Entidad.ajax.reload()
+      table_Entidad.ajax.reload();
       stepsContainer.hide();
     } else {
       returnToSteps();
     }
+      limpiarFiltroDataTable("table-contenedor");
+      limpiarFiltroDataTable("table-clientes-general");
+      limpiarFiltroDataTable("table-clientes-variacion");
+      limpiarFiltroDataTable("table-cotizacion-prospectos");
+      limpiarFiltroDataTable("table-cotizacion-embarque");
+      limpiarFiltroDataTable("table-cotizacion-final");
+      limpiarFiltroDataTable("table-factura-guia");
+      limpiarInputBuscadorPersonalizado("search-table");
   });
   $(".btn-back-cotizacion-documentacion").off("click");
   $(".btn-back-cotizacion-documentacion").on("click", function () {
@@ -3291,7 +3287,17 @@ const openStepFunction = async (step, id) => {
 
   spinner.hide();
 };
-
+function limpiarFiltroDataTable(tableId) {
+  // Limpia el input de búsqueda de DataTables SOLO de la tabla indicada
+  const $dtInput = $(`#${tableId}_filter input[type="search"]`);
+  $dtInput.val('');
+  if ($.fn.DataTable.isDataTable('#' + tableId)) {
+    $('#' + tableId).DataTable().search('').draw();
+  }
+}
+function limpiarInputBuscadorPersonalizado(inputClass) {
+  $("." + inputClass).val('');
+}
 function configurarExportarExcel(buttonId, url, fileName) {
   $("#" + buttonId).on("click", function () {
     $.ajax({
@@ -5406,6 +5412,8 @@ $(document).ready(async function () {
   if (window.location.href.includes("listarCompletados")) {
 
     $("#table-contenedor-completados").show();
+    limpiarFiltroDataTable("table-contenedor-completados");
+    limpiarInputBuscadorPersonalizado("search-table-completados");
 
     url = base_url + "CargaConsolidada/ContenedorConsolidado/indexCompletados";
 
@@ -5518,6 +5526,9 @@ $(document).ready(async function () {
         ],
       });
       applyDynamicStylesForTableRows();
+      limpiarFiltroDataTable("table-contenedor-completados");
+      limpiarInputBuscadorPersonalizado("search-table-completados");
+      configurarBuscador('table-contenedor-completados', 'search-table-completados', 'table-contenedor-completados_filter');
     } else {
       $("#table-contenedor-completados").html("");
       table_Entidad = $("#table-contenedor").DataTable({
@@ -5630,6 +5641,9 @@ $(document).ready(async function () {
         ],
       });
       applyDynamicStylesForTableRows();
+      limpiarFiltroDataTable("table-contenedor");
+      limpiarInputBuscadorPersonalizado("search-table");
+      configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
       const isMobile = window.matchMedia("(max-width: 768px)");
       function handleRowClickByDevice() {
         if (isMobile.matches) {
@@ -5643,8 +5657,13 @@ $(document).ready(async function () {
       handleRowClickByDevice();
     }
     applyDynamicStylesForTableRows();
+    limpiarFiltroDataTable("table-contenedor");
+    limpiarInputBuscadorPersonalizado("search-table");
+    configurarBuscador('table-contenedor', 'search-table-carga', 'table-contenedor_filter'); //completados
   } else {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
+    limpiarFiltroDataTable("table-contenedor");
+    limpiarInputBuscadorPersonalizado("search-table");
     table_Entidad = $("#table-contenedor").DataTable({
       dom:
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -5725,12 +5744,16 @@ $(document).ready(async function () {
           //if url contains listarCompletados 
 
         },
+
         complete: function () {
           $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
           $("#aplicar-btn").off("click");
           $("#aplicar-btn").click(function () {
             table_Entidad.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
           });
+          limpiarInputBuscadorPersonalizado("search-table-carga");
+          limpiarFiltroDataTable("table-contenedor");
+          configurarBuscador('table-contenedor', 'search-table-carga', 'table-contenedor_filter'); //pendientes
         },
       },
       columnDefs: [
@@ -5754,7 +5777,9 @@ $(document).ready(async function () {
         [100, 1000, "Todos"],
       ],
     });
-    configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
+    limpiarFiltroDataTable("table-contenedor");
+    limpiarInputBuscadorPersonalizado("search-table");
+    configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter'); //pendientes coordinacion
     applyDynamicStylesForTableRows();
     const isMobile = window.matchMedia("(max-width: 768px)");
     function handleRowClickByDevice() {
