@@ -536,7 +536,8 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
             ->where('id_contenedor', $idContenedor)
             //WHERE ESTADO NOT NULL
-            ->where('estado_cliente IS NOT NULL');
+            ->where('estado_cliente IS NOT NULL')
+            ->where('estado_cotizador', 'CONFIRMADO');
         $estado = $this->input->post('estado') ?? "0";
         if ($estado != "0") {
             $this->db->where('estado_cliente', $estado);
