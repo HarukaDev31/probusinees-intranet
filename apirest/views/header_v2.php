@@ -365,7 +365,7 @@ $SectionNames=[
               <?php } ?>
             </ul>
           </nav>
-          <?php if ($this->user->No_Grupo != 'ContenedorAlmacen') { ?>
+          <?php if ($this->user->No_Grupo != 'ContenedorAlmacen' && $this->user->No_Grupo != 'CatalogoChina') { ?>
             <nav class="mt-2">
               <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
                 <li class="nav-header">Preferencias</li>
