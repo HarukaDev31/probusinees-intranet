@@ -3372,10 +3372,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
 
             foreach ($imagesUrls as $image) {
-                $this->sendMedia($image->file_path, $image->file_type, null, null, 1);
+                $this->sendMediaInspection($image->file_path, $image->file_type, null, null, 1, $image->id);
             }
             foreach ($videosUrls as $video) {
-                $this->sendMedia($video->file_path, $video->file_type, null, null, 1);
+                $this->sendMediaInspection($video->file_path, $video->file_type, null, null, 1, $video->id);
             }
             return true;
         }
