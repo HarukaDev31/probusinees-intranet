@@ -32,6 +32,14 @@ class CatalogoController extends CI_Controller
 			$this->load->view('footer_v2', array("js_catalogo" => true));
 		}
 	}
+	public function listarSeleccionados(){
+		if (!$this->MenuModel->verificarAccesoMenu()) redirect('Inicio/InicioView');
+		if (isset($this->session->userdata['usuario'])) {
+			$this->load->view('header_v2');
+			$this->load->view('CatalogoView');
+			$this->load->view('footer_v2', array("js_catalogo" => true));
+		}
+	}
 	public function saveProduct()
 	{
 		$data = $this->input->post();
@@ -49,6 +57,12 @@ class CatalogoController extends CI_Controller
 	{
 		$data = $this->input->post();
 		$response = $this->CatalogoModel->getCatalogoCompletados($data);
+		echo json_encode($response);
+	}
+	public function getCatalogoTienda()
+	{
+		$data = $this->input->post();
+		$response = $this->CatalogoModel->getCatalogoSeleccionados($data);
 		echo json_encode($response);
 	}
 	public function getProductDetails($id)
@@ -71,6 +85,21 @@ class CatalogoController extends CI_Controller
 	public function pasarTienda(){
 		$productId = $this->input->post('productId');
 		$response = $this->CatalogoModel->pasarTienda($productId);
+		echo json_encode($response);
+	}
+	public function getCategorias(){
+		$response = $this->CatalogoModel->getCategorias();
+		echo json_encode($response['data']);
+	}
+	public function createCategoria(){
+		$categoria = $this->input->post('categoria');	
+		$response = $this->CatalogoModel->createCategoria($categoria);
+		echo json_encode($response);
+	}
+	public function guardarCategoriaProductos(){
+		$categoriaId= $this->input->post('categoriaId');
+		$productIds= $this->input->post('productIds');
+		$response = $this->CatalogoModel->guardarCategoriaProductos($categoriaId, $productIds);
 		echo json_encode($response);
 	}
 }

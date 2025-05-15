@@ -18,11 +18,29 @@
                         <input type="text" id="searchInput"
                             placeholder="Buscar por"
                             class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <!-- button enviar productos -->
+
                     </div>
+
                     <?php if ($this->user->No_Grupo == "CatalogoChina") { ?>
                         <button id="btnAddProduct" class="gap-2 bg-orange-600 hover:bg-orange-700 text-white py-2 px-10 rounded-md transition-colors flex items-center justify-center shadow-sm">
                             <span>Agregar Producto</span>
                             <span class="i-lucide-plus text-lg"></span>
+                        </button>
+                    <?php } ?>
+                    <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
+                        <button id="btnEnviarProductos" class=" btn text-white text-sm bg-orange-600 hover:bg-orange-700inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                            Enviar Productos
+                        </button>
+                        <button id="btnCancelarEnvio" class="hidden btn text-white text-sm bg-white hover:bg-white-200 border border-orange-600 hover:border-orange-600 inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                            Cancelar
+                        </button>
+                        <button id="btnConfirmarEnvio" class="hidden btn text-white text-sm   bg-orange-600 hover:bg-orange-700 inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+
+                            <span class="ml-2"> Confirmar Envio</span>
+                            <span class="i-lucide-send w-5 h-5">
+
+                            </span>
                         </button>
                     <?php } ?>
                 </div>
@@ -78,8 +96,7 @@
             </div>
 
             <!-- Product Grid -->
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4    p-3 h-full">
-
+            <div id="productGrid" class="grid grid-cols-1 grid-rows-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3  gap-5  p-3 h-full">
 
             </div>
         </div>
@@ -130,12 +147,12 @@
                     <div class=" mt-2 shadow-sm border border-gray-200 overflow-hidden">
                         <!-- Main Image Upload -->
                         <div class="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory">
-                        <div id="additionalImage1Container"
-                            class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
-                        <div id="additionalImage2Container"
-                            class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
-                        <div id="additionalVideo1Container"
-                            class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg video-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
+                            <div id="additionalImage1Container"
+                                class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
+                            <div id="additionalImage2Container"
+                                class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg additional-image-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
+                            <div id="additionalVideo1Container"
+                                class="min-w-[70vw] md:min-w-0 snap-center bg-white p-2 rounded-lg video-container relative bg-gray-50 border-2 border-dashed border-gray-300 transition-all hover:bg-gray-100 hover:border-blue-300 h-full flex items-center justify-center"></div>
                         </div>
                     </div>
 
@@ -360,194 +377,186 @@
             </div>
             <!-- both columns -->
             <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
+                <div class="lg:col-span-3"></div>
                 <div class="lg:col-span-5">
+                    <div class=" bg-white rounded-lg shadow-lg ">
+                        <h1 class="text-2xl font-bold mb-6 p-6  border-b-2 border-gray-300">Costos de importación</h1>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-6">
+                            <div class="md:grid-cols-1 grid grid-cols-1 ">
+                                <div class="form-group flex md:flex-row flex-col gap-3">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">Total USD:</label>
+                                    <input type="number" id="totalUSD" class="block w-full md:w-1/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
+                                </div>
 
-                    <div class=" bg-white rounded-lg shadow-lg p-6">
-                        <h1 class="text-2xl font-bold mb-6">COSTOS DE IMPORTACIÓN:</h1>
+                                <div class="form-group flex md:flex-row flex-col gap-3">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">Total CBM:</label>
+                                    <input type="number" id="totalCBM" class="block w-full md:w-1/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01" disabled>
+                                </div>
+                                <div class="form-group flex md:flex-row flex-col gap-3">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-1/3">Servicio Impo:</label>
+                                    <input type="number" id="servicioImpo" class="block w-full md:w-2/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
+                                </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                            <div class="input-group">
-                                <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
-                                <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
+                                <div class="form-group flex md:flex-row flex-col gap-3">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-1/3">Arancel:</label>
+                                    <select id="arancel" class="block w-full md:w-2/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                        <option value="0.00">0%</option>
+                                        <option value="6.00">6%</option>
+                                        <option value="11.00">11%</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group flex md:flex-row flex-col gap-3">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">IGV:</label>
+                                    <input type="number" id="igv" class="block w-full md:w-2/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
+                                </div>
+
+                                <div class="form-group flex md:flex-row flex-col gap-3">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">Antidumping:</label>
+                                    <div class="relative w-full md:w-2/3">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                        <input type="number" id="antidumping" class="border-gray-300 block w-full  text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group flex md:flex-row flex-col gap-1">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">Percepción:</label>
+                                    <input type="number" id="percepcion" class="block w-full md:w-1/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="3.5">
+                                </div>
                             </div>
+                            <div class="md:grid-cols-1 grid grid-cols-1 text-start ">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr>
+                                            <th class="border border-1 bg-gray-300 border-gray-200 text-center">Calculo de base imponible</th>
+                                            <th class="border border-1 bg-gray-300 border-gray-200 text-center">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300">Valor de carga</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="valorCarga">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300">Flete</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="flete">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300">Seguro</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="seguro">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 font-bold">Valor cif</td>
+                                            <td class="border border-1 border-gray-300 text-center font-bold" id="valorCIF">$ 0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="w-full mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th class="border border-1 bg-gray-300 border-gray-200 text-center">Calculo de tributos</th>
+                                            <td class="border border-1 bg-gray-300 border-gray-200 text-center">Monto</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 ">Ad valorem </td>
+                                            <td class="border border-1 border-gray-30 text-center" id="adValorem">$ 0.00</td>
 
-                            <div class="input-group">
-                                <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
-                                <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                    <option value="0">0%</option>
-                                    <option value="6">6%</option>
-                                    <option value="11">11%</option>
-                                </select>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300">IGV</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="igvTotal">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300">IPM</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="ipmTotal">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 ">Antidumping</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="antidumpingTotal">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 font-bold">Sub Total</td>
+                                            <td class="border border-1 border-gray-300 text-center font-bold" id="subtotal">$ 0.00</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 ">Percepción</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="percepcionTotal">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 font-bold">Total</td>
+                                            <td class="border border-1 border-gray-300 text-center font-bold" id="total">$ 0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!--table with only head for costo en destino-->
+                                <table class="w-full mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th class="border bg-gray-300 text-center">Costo en destino</th>
+                                            <td class="border  bg-gray-300" id="costoDestino">$ 0.00</td>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
+                            <div class="md:grid-cols-1 grid grid-cols-1 text-start ">
+                                <!--table base imponible-->
+                                <table class="w-full">
+                                    <thead>
+                                        <tr>
+                                            <th class="border border-1 bg-gray-500 text-white border-gray-200 text-center">Calculo de base imponible</th>
+                                            <td class="border border-1 bg-gray-500 text-white border-gray-200 text-center">Monto</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 ">Valor carga(pago China)</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="valorCargaResumen">$ 0.00</td>
 
-                            <div class="input-group">
-                                <label class="block text-sm font-medium text-gray-700">IGV:</label>
-                                <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
-                            </div>
-
-                            <div class="input-group">
-                                <label class="block text-sm font-medium text-gray-700">*Antidumping:</label>
-                                <input type="number" id="antidumping" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
-                            </div>
-                        </div>
-
-
-                        <div class="input-group">
-                            <label class="block text-sm font-medium text-gray-700">Total USD:</label>
-                            <input type="number" id="totalUSD" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
-                        </div>
-
-                        <div class="input-group">
-                            <label class="block text-sm font-medium text-gray-700">Total CBM:</label>
-                            <input type="number" id="totalCBM" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01" disabled>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <div class="input-group">
-                            <label class="block text-sm font-medium text-gray-700">Servicio Impo:</label>
-                            <input type="number" id="servicioImpo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00">
-                        </div>
-
-                        <div class="input-group">
-                            <label class="block text-sm font-medium text-gray-700">*Arancel:</label>
-                            <select id="arancel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                <option value="0.00">0%</option>
-                                <option value="6.00">6%</option>
-                                <option value="11.00">11%</option>
-                            </select>
-                        </div>
-
-                        <div class="input-group">
-                            <label class="block text-sm font-medium text-gray-700">IGV:</label>
-                            <input type="number" id="igv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18">
-                        </div>
-
-                        <div class="input-group">
-                            <label class="block text-sm font-medium text-gray-700">*Antidumping:</label>
-                            <input type="number" id="antidumping" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="0">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <div class="input-group">
-                            <label class="block text-sm font-medium text-gray-700">Percepción:</label>
-                            <input type="number" id="percepcion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="3.5">
-                        </div>
-                    </div>
-
-                    <!-- Calculation Tables -->
-                    <div class="grid grid-cols-1 md:grid-cols-2">
-                        <!-- Base Imponible Table -->
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULO DE BASE IMPONIBLE</h2>
-                            <table class="w-full">
-                                <tr>
-                                    <td class="py-2">Valor de carga</td>
-                                    <td class="py-2 text-right" id="valorCarga">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Flete</td>
-                                    <td class="py-2 text-right" id="flete">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Seguro</td>
-                                    <td class="py-2 text-right" id="seguro">$ 0.00</td>
-                                </tr>
-                                <tr class="font-bold">
-                                    <td class="py-2">VALOR CIF</td>
-                                    <td class="py-2 text-right" id="valorCIF">$ 0.00</td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <!-- Resumen Table -->
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h2 class="text-lg font-semibold mb-4 bg-orange-500 text-white p-2">RESUMEN DE COTIZACIÓN</h2>
-                            <table class="w-full">
-                                <tr>
-                                    <td class="py-2">Valor de carga (pago China)</td>
-                                    <td class="py-2 text-right" id="valorCargaResumen">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Servicio trading (pago China)</td>
-                                    <td class="py-2 text-right" id="servicioTrading">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Servicio importación</td>
-                                    <td class="py-2 text-right" id="servicioImportacion">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Impuestos</td>
-                                    <td class="py-2 text-right" id="impuestos">$ 0.00</td>
-                                </tr>
-                                <tr class="font-bold">
-                                    <td class="py-2">MONTO TOTAL</td>
-                                    <td class="py-2 text-right" id="montoTotal">$ 0.00</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h2 class="text-lg font-semibold mb-4 bg-teal-600 text-white p-2">CÁLCULOS DE TRIBUTOS</h2>
-                            <table class="w-full">
-                                <!-- ADD FOR AD VALOREM IGV IPM ANTIDUMPING SUBTOTAL IN BOLD, PERCEPCION AND TOTAL INPUTS-->
-                                <tr>
-                                    <td class="py-2">Ad Valorem</td>
-                                    <td class="py-2 text-right" id="adValorem">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">IGV</td>
-                                    <td class="py-2 text-right" id="igvTotal">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">IPM</td>
-                                    <td class="py-2 text-right" id="ipmTotal">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Antidumping</td>
-                                    <td class="py-2 text-right" id="antidumpingTotal">$ 0.00</td>
-                                </tr>
-                                <tr class="font-bold">
-                                    <td class="py-2">Subtotal</td>
-                                    <td class="py-2 text-right" id="subtotal">$ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Percepción</td>
-                                    <td class="py-2 text-right" id="percepcionTotal">$ 0.00</td>
-                                </tr>
-                                <tr class="font-bold">
-                                    <td class="py-2">TOTAL</td>
-                                    <td class="py-2 text-right" id="total">$ 0.00</td>
-                                </tr>
-                                <!-- costo en destiono -->
-                                <tr class="font-bold">
-                                    <td class="py-2">Costo en destino</td>
-                                    <td class="py-2 text-right" id="costoDestino">$ 0.00</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Cost Results -->
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-orange-500 text-white p-4 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                                $ <input disabled id="costoUnitarioUSD" style="background: transparent;">
-                            </div>
-                        </div>
-                        <div class="bg-orange-500 text-white p-4 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <span>COSTO UNITARIO DE IMPORTACIÓN</span>
-                                S/ <input disabled id="costoUnitarioPEN" style="background: transparent;">
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300">Servicio trading(pago China)</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="servicioTrading">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300">Servicio importación</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="servicioImportacion">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 ">Impuestos</td>
+                                            <td class="border border-1 border-gray-300 text-center" id="impuestos">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-1 border-gray-300 font-bold">Sub Total</td>
+                                            <td class="border border-1 border-gray-300 text-center font-bold" id="montoTotal">$ 0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="w-full mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th class="border bg-gray-500 text-white text-center">Costo unitario de importación </th>
+                                            <td class="border  bg-gray-500 text-white" id="costoUnitarioUSD">$ 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="border bg-gray-500 text-white text-center">Costo unitario de importación </th>
+                                            <td class="border  bg-gray-500 text-white" id="costoUnitarioPEN">S/ 0.00</td>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                         </div>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-6">
 
-
+                    </div>
                 </div>
         </div>
-    <?php } ?>
+</div>
+<?php } ?>
 </div>
 
 </section>
@@ -568,6 +577,10 @@
 </template>
 <template id="productTemplate">
     <div class="card edit-btn rounded-lg h-40 cursor-pointer flex flex-row w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative"> <!--status badge-->
+        <!--checkbox-->
+        <input type="checkbox" class="checkbox hidden h-6 w-6 absolute top-2 left-2 
+        accent-orange-500
+        cursor-pointer checkbox" style="z-index: 100;" />
         <div class="absolute bottom-2 right-2 text-white text-xs badge font-semibold px-2 py-1 rounded-full" style="z-index: 200;"></div>
 
         <!--dropdown menu trigger-->
@@ -584,14 +597,14 @@
             <!--dropdown menu content-->
             <div class="dropdown-menu2 absolute right-0 mt-1 w-80 bg-white rounded-md shadow-lg overflow-hidden z-40 hidden">
                 <div class="py-1">
-                    <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
+                    <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 w-full md:w-1/3 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                         Editar
                     </button>
-                    <button class="delete-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 text-red-600 flex items-center gap-2">
+                    <button class="delete-btn w-full text-left px-4 py-2 text-sm text-gray-700 w-full md:w-1/3 hover:bg-red-50 text-red-600 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -611,6 +624,8 @@
 
             <div class="px-2 pb-4 pt-2 w-3/5">
                 <span class="text-gray-400 text-sm"></span>
+                <!--badge category_name-->
+                <span class=" badge-category text-gray-800 text-xs  font-semibold "></span>
                 <h3 class="mb-2 font-bold text-md"></h3>
                 <div class="flex-col flex items-start justify-between text-sm py-1">
                     <span class="text-gray-600 text-md"></span>
@@ -641,6 +656,79 @@
         <p class="text-gray-500">Aún no hay productos ingresados</p>
     </div>
 </div>
+<div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-labelledby="modalConfirmacion" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmacionLabel">Confirmación de envio</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="p-5">Antes de enviar el o los productos a la web, selecciona la categoría a la que pertenecen</p>
+                <!-- Modal body content tailwind input dropdowns seleccionar la categoria label-->
+                <div class="row px-5 mb-5">
+                    <div class="col-10">
+                        <label for="categoriaProductos" class="block text-sm font-medium text-gray-700">Selecciona la categoría</label>
+                        <select id="categoriaProductos" name="categoria" class="form-select block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+
+                        </select>
+                    </div>
+                    <!--button to add new category-->
+                    <div class="col-1">
+                        <button type="button" class="btn btn-primary bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-toggle="modal" data-target="#modalNuevaCategoria">
+                            +
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer row">
+                <button type="button" class="btn bg-white col-5
+                border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md mr-2" data-dismiss="modal">
+                    <span class="">Cancelar</span>
+                </button>
+                <button type="button" class="btn bg-green-700 text-white col-6" id="btnGuardarCategoriaProductos" >
+                    <span class="ml-2">Si, Enviar</span>
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--modal create new category-->
+<div class="modal fade" id="modalNuevaCategoria" tabindex="-1" aria-labelledby="modalNuevaCategoria" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevaCategoriaLabel">Crear nueva categoría</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="p-5">Ingresa el nombre de la nueva categoría</p>
+                <!-- Modal body content tailwind input dropdowns seleccionar la categoria label-->
+                <div class="row px-5">
+                    <div class="col-12">
+                        <label for="nuevaCategoria" class="block text-sm font-medium text-gray-700">Nombre de la nueva categoría</label>
+                        <input type="text" id="nuevaCategoria" name="nuevaCategoria" class="form-input block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer row">
+                <button type="button" class="btn bg-white col-5
+                border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md mr-2" data-dismiss="modal">
+                    <span class="">Cancelar
+                    </span>
+                </button>
+                <button type="button" class="btn bg-green-700 text-white col-6" id="btnCrearCategoria" data-dismiss="modal">
+                    <span class="ml-2">Crear</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -750,6 +838,10 @@
         mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z'%3E%3C/path%3E%3C/svg%3E");
     }
 
+    .i-lucide-send {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 2 11 13'%3E%3C/path%3E%3Cpath d='M22 2l-4 20-2-8-8-2L2 2l20 20'%3E%3C/path%3E%3C/svg%3E");
+    }
+
     #productGrid {
         height: auto;
         min-height: 40vh;
@@ -765,12 +857,15 @@
     body {
         font-family: 'Epilogue', sans-serif;
     }
+
     .dropdown-trigger {
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent; /* Elimina el resaltado azul en iOS */
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        /* Elimina el resaltado azul en iOS */
     }
 
     .dropdown-menu {
-        -webkit-overflow-scrolling: touch; /* Mejor scrolling en iOS */
+        -webkit-overflow-scrolling: touch;
+        /* Mejor scrolling en iOS */
     }
 </style>

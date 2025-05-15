@@ -9,6 +9,10 @@ var additionalVideo1 = null
 var contactCardContainer = null
 var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
 var isInCompleted = false;
+var isInTienda = false;
+var checkedProducts = [];
+var pricePEN= 0;
+var priceUSD = 0;
 const EXCHANGE_RATE = 3.8;
 const ROLE_PERU = "CatalogoPeru";
 const ROLE_CHINA = "CatalogoChina";
@@ -42,13 +46,18 @@ $(document).ready(async function () {
     async function loadProducts() {
         if (window.location.href.includes("listarCompletados")) {
             isInCompleted = true;
-        } else {
+        } else if (window.location.href.includes("listarSeleccionados")) {
+            isInTienda = true;
+        }else {
             isInCompleted = false;
+            isInTienda = false;
         }
 
         url = base_url + 'CatalogoController/getCatalogo';
         if (isInCompleted) {
             url = base_url + 'CatalogoController/getCatalogoCompletados';
+        }else if (isInTienda) {
+            url = base_url + 'CatalogoController/getCatalogoTienda';
         }
         const response = await fetch(url);
         if (response.ok) {
@@ -74,19 +83,19 @@ $(document).ready(async function () {
             // Limpiar handlers anteriores si existieran
             trigger.removeEventListener('click', toggleDropdown);
             trigger.removeEventListener('touchstart', handleTouchStart); // Nuevo para Safari móvil
-            
+
             // Añadir nuevos event listeners
             trigger.addEventListener('click', toggleDropdown);
             trigger.addEventListener('touchstart', handleTouchStart); // Para Safari en iOS
         });
-    
+
         // Cerrar todos los dropdowns cuando se hace clic/touch en cualquier parte
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             closeAllDropdowns(event);
         });
-        
+
         // Manejar toques en iOS
-        document.addEventListener('touchstart', function(event) {
+        document.addEventListener('touchstart', function (event) {
             closeAllDropdowns(event);
         });
 
@@ -95,35 +104,35 @@ $(document).ready(async function () {
             trigger.addEventListener('blur', handleFocusOut);
         });
     }
-    
+
     // Nuevo: Manejar el primer toque en iOS
     function handleTouchStart(event) {
         // Prevenir el comportamiento por defecto para evitar problemas de doble toque
         event.preventDefault();
         toggleDropdown.call(this, event);
     }
-    
+
     // Función para alternar la visibilidad del dropdown
     function toggleDropdown(event) {
         event.stopPropagation();
         const dropdownMenu = this.nextElementSibling;
-    
+
         // Cerrar todos los otros dropdowns
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             if (menu !== dropdownMenu) {
                 menu.classList.add('hidden');
             }
         });
-    
+
         // Alternar el actual
         dropdownMenu.classList.toggle('hidden');
     }
-    
+
     // Función para cerrar todos los dropdowns excepto el actual
     function closeAllDropdowns(event) {
         const isDropdownTrigger = event.target.closest('.dropdown-trigger');
         const isDropdownMenu = event.target.closest('.dropdown-menu');
-    
+
         if (!isDropdownTrigger && !isDropdownMenu) {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.add('hidden');
@@ -158,7 +167,7 @@ $(document).ready(async function () {
         // Add products with staggered animation
         products.forEach((product, index) => {
             const $product = $($template.html());
-
+            const $checkbox = $product.find('.checkbox');
             //add badge in tienda 
             $product.find('.badge').text(product.status);
             switch (product.status) {
@@ -186,6 +195,10 @@ $(document).ready(async function () {
             $product.find('.text-gray-400').text(`${product.cod_producto}`);
             $product.find('.precioPeru').text(`Precio Peru: S/. ${product.precio_peru}`);
             $product.find('.precioUSD').text(`Precio USD: $ ${product.precio_usd}`);
+            //ifproducts has category_name key set text-gray-800 
+            if (product.category_name) {
+                $product.find('.text-gray-800').text(`${product.category_name}`);
+            }
             if (product.status == "PENDIENTE") {
                 $product.find('.precioUSD').hide();
                 $product.find('.precioPeru').hide();
@@ -237,7 +250,23 @@ $(document).ready(async function () {
             $product.css('opacity', 0);
             //add product id to the card
             $product.attr('data-product-id', product.id);
+
             $grid.append($product);
+            $checkbox.attr('data-product-id', product.id);
+            if (checkedProducts.includes(product.id)) {
+                $checkbox.prop('checked', true);
+            } else {
+                $checkbox.prop('checked', false);
+            }
+            $checkbox.on('click', function (e) {
+                e.stopPropagation();
+                const productId = $(this).data('product-id');
+                if ($(this).is(':checked')) {
+                    checkedProducts.push(productId);
+                } else {
+                    checkedProducts = checkedProducts.filter(id => id !== productId);
+                }
+            });
             initializeProductDropdowns();
 
             setTimeout(() => {
@@ -249,6 +278,8 @@ $(document).ready(async function () {
             $grid.append($noResults);
             $noResults.show();
         }
+
+
     }
     function renderProductDetails(product) {
         productoFormSection.show();
@@ -347,7 +378,48 @@ $(document).ready(async function () {
             const value = $(this).val();
             sortProducts(value);
         });
+        $("#btnGuardarCategoriaProductos").on("click", function (e) {
+            e.preventDefault();
+            const categoriaId = $("#categoriaProductos").val();
+            if (categoriaId == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Seleccione una categoría válida.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return;
+            }
+            const formData = new FormData();
+            formData.append('categoriaId', categoriaId);
+            formData.append('productIds', JSON.stringify(checkedProducts));
+            const url = base_url + 'CatalogoController/guardarCategoriaProductos';
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+            }).then(async response => {
+                if (response.ok) {
+                    const data = await response.json();
+                    checkedProducts = [];
+                    $('#btnEnviarProductos').show();
+                    $('#btnCancelarEnvio').hide();
+                    $('#btnConfirmarEnvio').hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: 'Categoría guardada correctamente.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    $('#modalConfirmacion').modal('hide');
+                    await loadProducts();
 
+                } else {
+                    console.error('Network error:', response.statusText);
+                }
+            });
+        })
         // Filter button handler
         $('#filterBtn').on('click', function () {
             // Implement filter modal/dropdown
@@ -358,6 +430,10 @@ $(document).ready(async function () {
         $(document).on('click', '.edit-btn', async function (e) {
             e.preventDefault();
             e.stopPropagation();
+            $(".checkbox").hide();
+            $('#btnEnviarProductos').show();
+            $('#btnCancelarEnvio').hide();
+            $('#btnConfirmarEnvio').hide();
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
             // Redirect to edit page
@@ -520,17 +596,87 @@ $(document).ready(async function () {
     }
 
 
+    $('#btnEnviarProductos').on('click', function (e) {
+        e.preventDefault();
+        $('#btnEnviarProductos').hide();
+        $('#btnCancelarEnvio').show();
+        $('#btnConfirmarEnvio').show();
+        $(".checkbox").show();
+    })
+    $('#btnCancelarEnvio').on('click', function (e) {
+        e.preventDefault();
+        $('#btnEnviarProductos').show();
+        $('#btnCancelarEnvio').hide();
+        $('#btnConfirmarEnvio').hide();
+        $(".checkbox").hide();
+        checkedProducts = [];
+    })
+    // on show modalNuevaCategoria 
+    $('#modalNuevaCategoria').on('show.bs.modal', function (e) {
 
+        $("#nuevaCategoria").val("");
+    });
+    $("#btnCrearCategoria").on("click", async function (e) {
+        e.preventDefault();
+        const categoria = $("#nuevaCategoria").val();
+        if (categoria.trim() == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ingrese una categoría válida.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
+        const formData = new FormData();
+        formData.append('categoria', categoria);
+        const response = await fetch(base_url + 'CatalogoController/createCategoria', {
+            method: 'POST',
+            body: formData,
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Categoría creada correctamente.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                $('#modalNuevaCategoria').modal('hide');
+                await fillDropdownCategorias();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        } else {
+            console.error('Network error:', response.statusText);
+        }
+    })
 
-
-
-
-
-
-
-
-
-
+    $('#btnConfirmarEnvio').on('click', async function (e) {
+        e.preventDefault();
+        if (checkedProducts.length == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Seleccione al menos un producto.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
+        //show modalConfirmacion
+        $('#modalConfirmacion').modal('show');
+        await fillDropdownCategorias();
+    })
 
     $("#btnSave").on("click", function (e) {
         e.preventDefault();
@@ -549,16 +695,16 @@ $(document).ready(async function () {
         e.preventDefault();
         //change productsGrid to flex column
         const $grid = $('#productGrid');
-        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4');
-        $grid.addClass('flex flex-col gap-4');
+        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5');
+        $grid.addClass('flex flex-col gap-5');
 
     })
     $("#gridViewBtn").on("click", function (e) {
         e.preventDefault();
         //change productsGrid to grid
         const $grid = $('#productGrid');
-        $grid.removeClass('flex flex-col gap-4 ');
-        $grid.addClass('grid  gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4');
+        $grid.removeClass('flex flex-col gap-5 ');
+        $grid.addClass('grid  gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3');
     })
     $("#btnDelete").on("click", function (e) {
         e.preventDefault();
@@ -638,7 +784,23 @@ $(document).ready(async function () {
             }
         });
     });
+    async function fillDropdownCategorias() {
+        const url = base_url + 'CatalogoController/getCategorias';
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data, "data")
+            const categorias = data;
+            const $dropdown = $('#categoriaProductos');
+            $dropdown.empty();
+            categorias.forEach(categoria => {
+                $dropdown.append(new Option(categoria.name, categoria.id));
+            });
 
+        } else {
+            console.error('Network error:', response.statusText);
+        }
+    }
     async function validateForm() {
         let isValid = true;
         const requiredFields = document.querySelectorAll('#productForm [required]');
@@ -670,8 +832,8 @@ $(document).ready(async function () {
             formData.append('antidumping', $('#antidumping').val());
             formData.append('percepcion', $('#percepcion').val());
             //append precio_peru and precio_usd
-            formData.append('precio_peru', $('#costoUnitarioPEN').val());
-            formData.append('precio_usd', $('#costoUnitarioUSD').val());
+            formData.append('precio_peru', pricePEN);
+            formData.append('precio_usd', priceUSD);
             if (currentProductId) {
                 formData.append('productId', currentProductId);
             }
@@ -843,7 +1005,8 @@ $(document).ready(async function () {
 
         // 7. Calculamos costos unitarios
         const unitCosts = calculateUnitCosts(totalValues, inputValues.moq);
-
+        priceUSD = unitCosts.costoUnitarioUSDValue;
+        pricePEN = unitCosts.costoUnitarioPENValue;
         // 8. Actualizamos la UI con todos los valores calculados
         updateUI(
             derivedValues,
@@ -920,9 +1083,9 @@ $(document).ready(async function () {
         const igvTotal = 0.16 * baseImponible.valorCIFValue;
         const ipmTotal = (inputs.igvRate - 0.16) * baseImponible.valorCIFValue;
         const antidumpingTotal = inputs.antidumpingValue * inputs.moq;
-
+        const percepcionValue = (baseImponible.valorCIFValue + arancelValue + igvTotal) * inputs.percepcionRate;
         const subtotal = arancelValue + igvTotal + ipmTotal + antidumpingTotal;
-
+        const total = percepcionValue + subtotal;
         return {
             arancelValue,
             baseIGV,
@@ -930,7 +1093,9 @@ $(document).ready(async function () {
             igvTotal,
             ipmTotal,
             antidumpingTotal,
-            subtotal
+            subtotal,
+            percepcionValue,
+            total
         };
     }
 
@@ -948,9 +1113,8 @@ $(document).ready(async function () {
         const costoDestino = baseImponible.valorCIFValue * 0.4;
 
         const impuestosTotal = impuestos.arancelValue +
-            impuestos.igvValue +
-            (inputs.igvRate - 0.16) * baseImponible.valorCIFValue +
-            (inputs.antidumpingValue * inputs.moq) +
+            impuestos.igvTotal + impuestos.ipmTotal +
+            impuestos.antidumpingTotal +
             percepcionValue;
 
         const servicioTrading = 250;
@@ -1021,8 +1185,8 @@ $(document).ready(async function () {
         $('#montoTotal').text(formatCurrency(totals.montoTotalValue));
 
         // Actualizar costos unitarios
-        $('#costoUnitarioUSD').val(unitCosts.costoUnitarioUSDValue.toFixed(2));
-        $('#costoUnitarioPEN').val(unitCosts.costoUnitarioPENValue.toFixed(2));
+        $('#costoUnitarioUSD').text(formatCurrency(unitCosts.costoUnitarioUSDValue.toFixed(2), '$'));
+        $('#costoUnitarioPEN').text(formatCurrency(unitCosts.costoUnitarioPENValue.toFixed(2), 'S/'));
     }
 
     // Event listeners for input changes

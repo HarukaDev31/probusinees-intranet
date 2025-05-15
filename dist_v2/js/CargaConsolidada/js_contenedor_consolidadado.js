@@ -2381,6 +2381,8 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          scrollCollapse: true,
+          scrollY: '450px',
           buttons: [],
           paging: true,
           lengthChange: true,
@@ -2520,6 +2522,8 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          scrollCollapse: true,
+          scrollY: '450px',
           buttons: [
             {
               extend: "excel",
@@ -2606,6 +2610,8 @@ const openStepFunction = async (step, id) => {
                       "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                       "<'row'<'col-sm-12'tr>>" +
                       "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+                    scrollCollapse: true,
+                    scrollY: '450px',
                     buttons: [
                       {
                         text: "Prospectos",
@@ -2638,13 +2644,7 @@ const openStepFunction = async (step, id) => {
                             reloadTableCotizacion();
                             enableHorizontalAutoScrollForAllTables();
                           }
-                          limpiarFiltroDataTable("table-cotizacion-prospectos");
-                          limpiarInputBuscadorPersonalizado("search-table");
                           currentTableCotizacion = "prospectos";
-                          configurarBuscador(
-                            "table-cotizacion-prospectos",
-                            "search-table", "table-cotizacion-prospectos_info"
-                          );
                         },
                       },
                       {
@@ -2678,10 +2678,6 @@ const openStepFunction = async (step, id) => {
                             format: "dd/mm/yyyy",
                             dateFormat: "dd/mm/yyyy",
                           });
-                          limpiarInputBuscadorPersonalizado("search-table");
-                          limpiarFiltroDataTable("table-cotizacion-embarque");
-                          reloadTableCotizacionEmbarque();
-                          enableHorizontalAutoScrollForAllTables();
                           currentTableCotizacion = "embarque";
                         },
                       },
@@ -2776,8 +2772,6 @@ const openStepFunction = async (step, id) => {
                       });
                     },
                   });
-                  limpiarFiltroDataTable("table-cotizacion-embarque");
-                  limpiarInputBuscadorPersonalizado("search-table");
                   configurarBuscador(
                     "table-cotizacion-embarque",
                     "search-table",
@@ -2927,6 +2921,8 @@ const openStepFunction = async (step, id) => {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+        scrollCollapse: true,
+        scrollY: '450px',
         buttons: [
           {
             extend: "excel",
@@ -2950,12 +2946,10 @@ const openStepFunction = async (step, id) => {
               if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
                 $("#table-clientes-general").attr("style", "");
                 $("#table-clientes-general_wrapper").show();
-                limpiarFiltroDataTable("table-clientes-general");
                 reloadTableClientesGeneral();
               } else {
                 $("#table-clientes-general").attr("style", "");
                 $("#table-clientes-general_wrapper").show();
-                limpiarFiltroDataTable("table-clientes-general");
                 reloadTableClientesGeneral();
               }
               limpiarInputBuscadorPersonalizado("search-table");
@@ -2987,6 +2981,8 @@ const openStepFunction = async (step, id) => {
                       "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                       "<'row'<'col-sm-12'tr>>" +
                       "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+                    scrollCollapse: true,
+                    scrollY: '450px',
                     buttons: [
                       {
                         extend: "excel",
@@ -3032,7 +3028,6 @@ const openStepFunction = async (step, id) => {
                             )
                           ) {
                             $("#table-clientes-general_wrapper").show();
-                            limpiarFiltroDataTable("table-clientes-general");
 
                             $("#table-clientes-general").attr("style", "");
                             reloadTableClientesGeneral();
@@ -3292,7 +3287,17 @@ const openStepFunction = async (step, id) => {
 
   spinner.hide();
 };
-
+function limpiarFiltroDataTable(tableId) {
+  // Limpia el input de búsqueda de DataTables SOLO de la tabla indicada
+  const $dtInput = $(`#${tableId}_filter input[type="search"]`);
+  $dtInput.val('');
+  if ($.fn.DataTable.isDataTable('#' + tableId)) {
+    $('#' + tableId).DataTable().search('').draw();
+  }
+}
+function limpiarInputBuscadorPersonalizado(inputClass) {
+  $("." + inputClass).val('');
+}
 function configurarExportarExcel(buttonId, url, fileName) {
   $("#" + buttonId).on("click", function () {
     $.ajax({
@@ -3322,16 +3327,6 @@ function configurarExportarExcel(buttonId, url, fileName) {
 }
 
 async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
-  // Limpiar el buscador y el filtro de DataTable antes de configurar el nuevo buscador
-  $('.dataTables_filter input[type="search"]').each(function () {
-    $(this).val('');
-    const tableId = $(this).closest('.dataTables_wrapper').find('table').attr('id');
-    if (tableId && $.fn.DataTable.isDataTable('#' + tableId)) {
-      $('#' + tableId).DataTable().search('').draw();
-    }
-  });
-  // Limpiar el input personalizado si existe
-  $("." + searchInputClass).val('');
   // Obtener la instancia de DataTable
   var table = $("#" + tableId).DataTable();
   console.log(table);
@@ -3342,12 +3337,10 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
   });
 
-  // Función para limpiar el buscador y el filtro (por si la necesitas en otro lado)
-  window["resetBuscador_" + tableId] = function() {
+  // Función para limpiar el buscador y el filtro
+  window["resetBuscador_" + tableId] = function () {
     $("." + searchInputClass).val("");
     table.search("").draw();
-    // También limpia el input de DataTables
-    $('.dataTables_filter input[type="search"]').val('');
   };
 
   // Actualizar el mensaje de información después de cada búsqueda
@@ -3361,17 +3354,18 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     }
   });
 }
-function limpiarFiltroDataTable(tableId) {
-  // Limpia el input de búsqueda de DataTables SOLO de la tabla indicada
-  const $dtInput = $(`#${tableId}_filter input[type="search"]`);
-  $dtInput.val('');
-  if ($.fn.DataTable.isDataTable('#' + tableId)) {
-    $('#' + tableId).DataTable().search('').draw();
-  }
-}
-function limpiarInputBuscadorPersonalizado(inputClass) {
-  $("." + inputClass).val('');
-}
+$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
+  // Busca todos los inputs de búsqueda de DataTables y límpialos
+  $('.dataTables_filter input[type="search"]').each(function () {
+    $(this).val('');
+    // Busca la tabla asociada y limpia el filtro
+    const tableId = $(this).closest('.dataTables_wrapper').find('table').attr('id');
+    if (tableId && $.fn.DataTable.isDataTable('#' + tableId)) {
+      $('#' + tableId).DataTable().search('').draw();
+    }
+  });
+});
+
 async function viewFacturaGuia() {
   $("#factura-guia-title").html(`
     Cotizacion #${currentCargaNumber}
@@ -3389,6 +3383,8 @@ async function viewFacturaGuia() {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      scrollCollapse: true,
+      scrollY: '450px',
       buttons: [
         {
           extend: "excel",
@@ -3492,6 +3488,8 @@ async function viewCotizacionFinal() {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      scrollCollapse: true,
+      scrollY: '450px',
       buttons: [
         {
           extend: "excel",
@@ -5427,6 +5425,8 @@ $(document).ready(async function () {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+        scrollCollapse: true,
+        scrollY: '450px',
         buttons: [
           {
             extend: "excel",
@@ -5536,6 +5536,8 @@ $(document).ready(async function () {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+        scrollCollapse: true,
+        scrollY: '450px',
         buttons: [
           {
             extend: "excel",
@@ -5643,16 +5645,16 @@ $(document).ready(async function () {
       limpiarInputBuscadorPersonalizado("search-table");
       configurarBuscador('table-contenedor', 'search-table', 'table-contenedor_filter');
       const isMobile = window.matchMedia("(max-width: 768px)");
-    function handleRowClickByDevice() {
-      if (isMobile.matches) {
-        setupRowClickDetalleContenedor('#table-contenedor');
-        setupRowClickDetalleContenedor('#table-contenedor-completados');
-      } else {
-        $('#table-contenedor tbody').off('click', 'tr');
+      function handleRowClickByDevice() {
+        if (isMobile.matches) {
+          setupRowClickDetalleContenedor('#table-contenedor');
+          setupRowClickDetalleContenedor('#table-contenedor-completados');
+        } else {
+          $('#table-contenedor tbody').off('click', 'tr');
+        }
       }
-    }
-    isMobile.addEventListener("change", handleRowClickByDevice);
-    handleRowClickByDevice();
+      isMobile.addEventListener("change", handleRowClickByDevice);
+      handleRowClickByDevice();
     }
     applyDynamicStylesForTableRows();
     limpiarFiltroDataTable("table-contenedor");
@@ -5667,6 +5669,8 @@ $(document).ready(async function () {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      scrollCollapse: true,
+      scrollY: '450px',
       buttons: [
         {
           extend: "excel",
@@ -5788,7 +5792,7 @@ $(document).ready(async function () {
     }
     isMobile.addEventListener("change", handleRowClickByDevice);
     handleRowClickByDevice();
-    
+
 
   }
   //if current windows route includes listarCompletados hide .filter-contenedor
@@ -5835,7 +5839,7 @@ $(document).ready(async function () {
       },
     });
   });
-      
+
   // Listeners para subir archivos
   $('#btn-guardar-doc-not').click(async () => {
     try {
@@ -6955,7 +6959,7 @@ window.addEventListener("load", () => {
           });
         }
       }
-      if (action=="new-confirmado"){
+      if (action == "new-confirmado") {
         if ($("#table-cotizacion-embarque").is(":visible")) {
           text = "Actualización de estado de proveedor";
           text += "¿Desea actualizar?";
@@ -7246,7 +7250,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
 // Funcion para subir archivos multiples
 
-function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], automaticUpload = false,removeFileButtonId = '.remove-file-button') {
+function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], automaticUpload = false, removeFileButtonId = '.remove-file-button') {
   const container = document.getElementById(containerId);
   const fileInput = $(`#${inputId}`)[0];
   const fileLabel = container.querySelector('.file-label');
@@ -7376,35 +7380,35 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
   fileLabel.addEventListener('drop', (e) => {
     e.preventDefault();
     fileLabel.style.borderColor = '#cccccc';
-    
+
     if (e.dataTransfer.files.length > 0) {
       // Convertir FileList existente y nuevos archivos a arrays
       const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
       const newFiles = Array.from(e.dataTransfer.files);
-      
+
       // Filtrar y validar los nuevos archivos
       const validFiles = newFiles.filter(file => {
         const fileType = file.type;
         const fileExtension = file.name.split('.').pop().toLowerCase();
         return allowedFileTypes.includes(fileType) || allowedFileTypes.includes(fileExtension);
       });
-      
+
       if (validFiles.length !== newFiles.length) {
         alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
       }
-      
+
       if (validFiles.length > 0) {
         // Combinar archivos existentes con los nuevos válidos
         const combinedFiles = [...existingFiles, ...validFiles];
-        
+
         // Crear nuevo FileList usando DataTransfer
         const dataTransfer = new DataTransfer();
         combinedFiles.forEach(file => dataTransfer.items.add(file));
         fileInput.files = dataTransfer.files;
-        
+
         // Limpiar la lista antes de volver a renderizar
         $(".file-list-item").remove(); // Eliminar el elemento de la lista
-        
+
         // Disparar el evento change para mostrar los archivos
         fileInput.dispatchEvent(new Event('change'));
       }
@@ -7428,78 +7432,78 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
   const fileLabel = container.querySelector('.file-label');
   const fileList = container.querySelector('.file-lista');
   const uploadButton = container.querySelector('.upload-button');
-  
+
   // Abrir el diálogo de selección de archivos al hacer clic en el botón
   uploadButton.addEventListener('click', (e) => {
     e.preventDefault();
-    
+
     // Guardamos una referencia a los archivos existentes
     const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
-    
+
     // Reseteamos el input para que se pueda seleccionar el mismo archivo múltiples veces
     // y almacenamos el listener original
     const originalChangeHandler = fileInput.onchange;
     fileInput.value = "";
-    
+
     // Creamos un nuevo manejador para el evento change
-    fileInput.onchange = function(event) {
+    fileInput.onchange = function (event) {
       // Obtener los nuevos archivos seleccionados
       const newFiles = Array.from(event.target.files);
-      
+
       // Filtrar y validar los nuevos archivos
       const validFiles = newFiles.filter(file => {
         const fileType = file.type;
         const fileExtension = file.name.split('.').pop().toLowerCase();
-        return allowedFileTypes.length === 0 || 
-               allowedFileTypes.includes(fileType) || 
-               allowedFileTypes.includes(fileExtension);
+        return allowedFileTypes.length === 0 ||
+          allowedFileTypes.includes(fileType) ||
+          allowedFileTypes.includes(fileExtension);
       });
-      
+
       if (validFiles.length !== newFiles.length) {
         alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
       }
-      
+
       if (validFiles.length > 0) {
         // Combinar archivos existentes con los nuevos válidos
         const combinedFiles = [...existingFiles, ...validFiles];
-        
+
         // Crear nuevo FileList usando DataTransfer
         const dataTransfer = new DataTransfer();
         combinedFiles.forEach(file => dataTransfer.items.add(file));
         fileInput.files = dataTransfer.files;
-        
+
         // Limpiar la lista visual de archivos
         fileList.innerHTML = '';
-        
+
         // Restaurar el manejador original
         fileInput.onchange = originalChangeHandler;
-        
+
         // Ahora actualizamos la vista manualmente
         updateFileListView(fileInput.files, fileList, allowedFileTypes);
       }
     };
-    
+
     // Ahora abrimos el selector de archivos
     fileInput.click();
   });
-  
+
   // Función para actualizar la vista de la lista de archivos
   function updateFileListView(files, listElement, allowedTypes) {
     if (files.length > 0) {
       listElement.classList.remove('hidden');
-      
+
       // Recorrer los archivos seleccionados
       Array.from(files).forEach((file, index) => {
         const fileType = file.type;
         const fileExtension = file.name.split('.').pop().toLowerCase();
-        
+
         // Determinar el ícono correspondiente usando getIconByType
         const fileIcon = getIconByType(fileType || fileExtension);
-        
+
         // Crear un elemento de lista para cada archivo
         const fileItem = document.createElement('div');
         fileItem.classList.add('file-list-item');
-        
+
         // Mostrar el nombre y el tamaño del archivo
         fileItem.innerHTML = `
           <div class="file-icon-container"> 
@@ -7513,10 +7517,10 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
             </div>
           </div>
         `;
-        
+
         // Agregar el elemento a la lista
         listElement.appendChild(fileItem);
-        
+
         // Agregar funcionalidad de vista previa para imágenes y videos
         if (fileType.startsWith('image/') || fileType.startsWith('video/')) {
           const fileIconElement = fileItem.querySelector('.file-icon');
@@ -7552,7 +7556,7 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
       });
     }
   }
-  
+
   // Mostrar la lista de archivos seleccionados (evento change original)
   fileInput.addEventListener('change', (e) => {
     if (fileInput.files.length > 0) {
@@ -7560,7 +7564,7 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
       updateFileListView(fileInput.files, fileList, allowedFileTypes);
     }
   });
-  
+
   // Manejar la eliminación de archivos individuales
   fileList.addEventListener('click', (e) => {
     if (
@@ -7575,7 +7579,7 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
       // Convertir FileList a un array para poder eliminar el archivo
       const files = Array.from(fileInput.files);
       files.splice(index, 1); // Eliminar el archivo del array
-      
+
       // Crear un nuevo FileList (no es mutable, así que usamos DataTransfer)
       const dataTransfer = new DataTransfer();
       files.forEach((file) => dataTransfer.items.add(file));
@@ -7601,34 +7605,34 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
   fileLabel.addEventListener('drop', (e) => {
     e.preventDefault();
     fileLabel.style.borderColor = '#cccccc';
-    
+
     if (e.dataTransfer.files.length > 0) {
       // Convertir FileList existente y nuevos archivos a arrays
       const existingFiles = fileInput.files ? Array.from(fileInput.files) : [];
       const newFiles = Array.from(e.dataTransfer.files);
-      
+
       // Filtrar y validar los nuevos archivos
       const validFiles = newFiles.filter(file => {
         const fileType = file.type;
         const fileExtension = file.name.split('.').pop().toLowerCase();
-        return allowedFileTypes.length === 0 || 
-               allowedFileTypes.includes(fileType) || 
-               allowedFileTypes.includes(fileExtension);
+        return allowedFileTypes.length === 0 ||
+          allowedFileTypes.includes(fileType) ||
+          allowedFileTypes.includes(fileExtension);
       });
-      
+
       if (validFiles.length !== newFiles.length) {
         alert('Algunos archivos no tienen el formato permitido y no se agregarán.');
       }
-      
+
       if (validFiles.length > 0) {
         // Combinar archivos existentes con los nuevos válidos
         const combinedFiles = [...existingFiles, ...validFiles];
-        
+
         // Crear nuevo FileList usando DataTransfer
         const dataTransfer = new DataTransfer();
         combinedFiles.forEach(file => dataTransfer.items.add(file));
         fileInput.files = dataTransfer.files;
-        
+
         // Limpiar la lista y actualizarla
         fileList.innerHTML = '';
         updateFileListView(fileInput.files, fileList, allowedFileTypes);
@@ -7637,21 +7641,21 @@ function setupMultiFileUploadv2(containerId, inputId, allowedFileTypes = [], aut
   });
 }
 
-function validateWhatsappServiceAreActives(){
-  try{
-   $.ajax({
-    url: 'https://whatsapp2.probusiness.pe/api/sessions',
-    type: 'GET',
-    dataType: 'json',
-    success: function(response) {
+function validateWhatsappServiceAreActives() {
+  try {
+    $.ajax({
+      url: 'https://whatsapp2.probusiness.pe/api/sessions',
+      type: 'GET',
+      dataType: 'json',
+      success: function (response) {
         $(".sessions-container").html('');
-         // Inicializamos los estados como inactivos
+        // Inicializamos los estados como inactivos
         let coordinacionActiva = false;
         let ventasActivas = false;
 
         // Verificamos las sesiones si existen
         if (response.sessions && response.sessions.length > 0) {
-          response.sessions.forEach(function(session) {
+          response.sessions.forEach(function (session) {
             if (session.status == 'authenticated') {
               switch (session.phoneNumber) {
                 case '51986223673':
@@ -7663,7 +7667,7 @@ function validateWhatsappServiceAreActives(){
               }
             }
           });
-        }else {
+        } else {
           $(".sessions-container").html(`
             <div class="text-danger">
               <i class="bi bi-exclamation-circle-fill me-2"></i>
@@ -7686,8 +7690,8 @@ function validateWhatsappServiceAreActives(){
         $(".sessions-container").append(createStatusElement('Coordinación', coordinacionActiva));
         $(".sessions-container").append(createStatusElement('Ventas', ventasActivas));
 
-    },
-      error: function(error) {
+      },
+      error: function (error) {
         $(".sessions-container").html(`
           <div class="text-danger">
             <i class="bi bi-exclamation-circle-fill me-2"></i>
@@ -7697,17 +7701,17 @@ function validateWhatsappServiceAreActives(){
         console.error(error);
       }
     });
-    }catch(e){
-      $(".sessions-container").html(`
+  } catch (e) {
+    $(".sessions-container").html(`
         <div class="text-danger">
           <i class="bi bi-exclamation-circle-fill me-2"></i>
           Error inesperado
         </div>
       `);
-      console.error(e);
+    console.error(e);
   }
 }
- validateWhatsappServiceAreActives()
+validateWhatsappServiceAreActives()
 setInterval(() => {
   validateWhatsappServiceAreActives()
 }, 300000); // 5 minutes
@@ -8000,17 +8004,17 @@ function applyDynamicStylesForTableRows() {
     const fechaInicio = $("#txt-Fe_Inicio_Carga").val();
     const fechaFin = $("#txt-Fe_Fin_Carga").val();
     const estado = $("#txt-ID_Estado").val();
-  
+
     // Validar los campos (opcional)
     if (!fechaInicio || !fechaFin) {
       Swal.fire("Error", "Por favor, selecciona las fechas de inicio y fin.", "error");
       return;
     }
-  
+
     // Recargar la tabla con los filtros aplicados
     table_Entidad.ajax.reload(null, false); // Recargar la tabla sin reiniciar la paginación
   }
-  
+
   // Asociar la función al botón "Aplicar"
   $("#aplicar-btn").on("click", aplicarFiltros);
   // Ejecutar la función inmediatamente
@@ -8047,6 +8051,6 @@ function setupRowClickDetalleContenedor(tableSelector) {
 setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 
 
-setupMultiFileUploadv2("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'],false,'#remove-file-button-inspeccion');
+setupMultiFileUploadv2("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'], false, '#remove-file-button-inspeccion');
 setupMultiFileUpload("multiple-file-upload-aduana", "file-input-aduana", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
