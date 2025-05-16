@@ -1126,7 +1126,7 @@ $(document).ready(async function () {
      * Calcula los totales
      */
     function calculateTotals(derived, baseImponible, impuestos, percepcionValue, inputs) {
-        const costoDestino = baseImponible.valorCIFValue * 0.4;
+        const costoDestino = baseImponible.valorCIFValue * 0.3;
 
         const impuestosTotal = impuestos.arancelValue +
             impuestos.igvTotal + impuestos.ipmTotal +
@@ -1191,7 +1191,7 @@ $(document).ready(async function () {
 
         // Actualizar totales de impuestos
         $('#total').text(formatCurrency(totals.impuestosTotal));
-        $("#costoDestino").text(formatCurrency(totals.costoDestino));
+        // $("#costoDestino").text(formatCurrency(totals.costoDestino));
 
         // Actualizar resumen
         $('#valorCargaResumen').text(formatCurrency(baseImponible.valorCargaValue));
