@@ -1057,9 +1057,8 @@ $(document).ready(async function () {
      * Calcula valores derivados de los inputs
      */
     function calculateDerivedValues(inputs) {
-        // Calcula precio en USD según fórmula (precio en yuanes + 7) / 7
-        const precioUSD = (inputs.precioYuanes + inputs.profit + (inputs.delivery / inputs.moq) / YUAN_TO_USD)
-
+        const precioUSD = ((inputs.precioYuanes + inputs.profit + (inputs.delivery / inputs.moq))/ YUAN_TO_USD)
+        console.log(precioUSD)
         // Calcula total USD como MOQ * precio USD
         const totalUSDValue = inputs.moq * precioUSD;
 
@@ -1170,7 +1169,7 @@ $(document).ready(async function () {
      * Actualiza la interfaz de usuario con todos los valores calculados
      */
     function updateUI(derived, baseImponible, impuestos, percepcionValue, totals, unitCosts,inputs) {
-        // Actualizar valores derivados
+        console.log(derived,"derived")
         $("#precioUSD").val(derived.precioUSD.toFixed(2));
         $('#totalUSD').val(derived.totalUSDValue.toFixed(2));
         $('#totalCBM').val(derived.totalCBMValue.toFixed(2));
