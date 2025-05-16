@@ -1,22 +1,26 @@
-
 <?php
-$SectionNames=[
-  "ContenedorAlmacen"=>[
-    "Carga Consolidada"=>"Waiting",
-    "Completados"=>"Finished",
+$SectionNames = [
+  "ContenedorAlmacen" => [
+    "Carga Consolidada" => "Waiting",
+    "Completados" => "Finished",
   ],
-  "Documentacion"=>[
-    "Carga Consolidada"=>"Pendientes",
-    "Completados"=>"Completados",
+  "Documentacion" => [
+    "Carga Consolidada" => "Pendientes",
+    "Completados" => "Completados",
   ],
-  "Coordinación"=>[
-    "Carga Consolidada"=>"Abiertos",
-    "Completados"=>"Embarcados",
+  "Coordinación" => [
+    "Carga Consolidada" => "Abiertos",
+    "Completados" => "Embarcados",
   ],
-  "Cotizador"=>[
-    "Carga Consolidada"=>"Abiertos",
-    "Completados"=>"Embarcados",
+  "Cotizador" => [
+    "Carga Consolidada" => "Abiertos",
+    "Completados" => "Embarcados",
   ],
+  "CatalogoPeru" => [
+    "Productos" => "Nuevos",
+    "Cotizados" => "Cotizados",
+    "Seleccionados" => "Seleccionados"
+  ]
 ]
 ?>
 <!DOCTYPE html>
@@ -301,31 +305,30 @@ $SectionNames=[
                     <?php if ($arrMenuPadre->Nu_Cantidad_Menu_Padre > 0): ?>
                       <ul class="nav nav-treeview">
                         <?php
-                   
+
                         foreach ($arrMenuPadre->Hijos as $arrHijos):
-                          $menuEndUrl= explode('/', $arrHijos->No_Menu_Url);
-                          $menuEndUrl= end($menuEndUrl);
+                          $menuEndUrl = explode('/', $arrHijos->No_Menu_Url);
+                          $menuEndUrl = end($menuEndUrl);
                           $No_Class_Li = "nav-item";
                           if ($this->router->directory != $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0)
                             $No_Class_Li = "nav-item";
-                          else if ($this->router->directory == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0
-                          
+                          else if (
+                            $this->router->directory == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos > 0
+
                           )
                             $No_Class_Li = "nav-item active  menu-open";
-                          else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0 && $menuEndUrl==$this->router->method)
+                          else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0 && $menuEndUrl == $this->router->method)
                             $No_Class_Li = "nav-item active  menu-open"; ?>
                           <li class="<?php echo $No_Class_Li; ?>">
-                            <a class="nav-link 1 <?php echo ($this->router->class == $arrHijos->No_Class_Controller && $this->router->method == $arrSubHijos->No_Menu_Url ? 'nav-item active' : 'nav-item'); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
+                            <a class="nav-link 1 <?php echo ( $this->router->method == $menuEndUrl && $this->router->class == $arrHijos->No_Class_Controller  ? 'active' : ''); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
                               <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
-                              <p>&nbsp;<?php 
-                                          if(array_key_exists($arrHijos->No_Menu, $SectionNames[$this->user->No_Grupo])){
-                                            echo $SectionNames[$this->user->No_Grupo][$arrHijos->No_Menu];
-                                          }
-
-                                          else {
-                                            echo $arrHijos->No_Menu;
-                                          }
-                                         ?></p>
+                              <p>&nbsp;<?php
+                                        if (array_key_exists($arrHijos->No_Menu, $SectionNames[$this->user->No_Grupo])) {
+                                          echo $SectionNames[$this->user->No_Grupo][$arrHijos->No_Menu];
+                                        } else {
+                                          echo $arrHijos->No_Menu;
+                                        }
+                                        ?></p>
                               <?php if ($arrHijos->Nu_Cantidad_Menu_Hijos > 0): ?>
                                 <i class="right fas fa-angle-left"></i>
                               <?php endif; ?>
@@ -334,12 +337,12 @@ $SectionNames=[
                               <ul class="nav nav-treeview">
                                 <?php foreach ($arrHijos->SubHijos as $arrSubHijos): ?>
                                   <li class="<?php
-                                              echo ($this->router->class == $arrSubHijos->No_Class_Controller 
-                                              
-                                              ? 'nav-item active' : 'nav-item'); ?>">
-                                    <a class="nav-link 2 <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller 
-                                    && $this->router->method == $arrSubHijos->No_Menu_Url
-                                    ? 'nav-item active' : 'nav-item'); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
+                                              echo ($this->router->class == $arrSubHijos->No_Class_Controller || $menuEndUrl == $this->router->method
+
+                                                ? 'nav-item active' : ''); ?>">
+                                    <a class="nav-link 2 <?php echo ($this->router->class == $arrSubHijos->No_Class_Controller
+                                                            && $this->router->method == $arrSubHijos->No_Menu_Url
+                                                            ? 'nav-item active' : ''); ?>" title="<?php echo $arrSubHijos->No_Menu; ?>" href="<?php echo base_url() . $arrSubHijos->No_Menu_Url; ?>">
                                       <i class="<?php echo $arrSubHijos->Txt_Css_Icons; ?>"></i>
                                       <p>&nbsp;<?php echo $arrSubHijos->No_Menu; ?></p>
                                     </a>
@@ -355,13 +358,13 @@ $SectionNames=[
                   <?php } ?>
                 </li>
               <?php endforeach; ?>
-              <?php if($this->user->No_Grupo=='Coordinacion'){ ?>
-              <li class="nav-item">
-                <a class="nav-link" href="<?php echo base_url('Ventas/ReglasVenta/ClienteView'); ?>" title="Crear Cliente">
-                  <i class="nav-icon fas fa-user-plus"></i>
-                  <p>&nbsp;Crear Cliente</p>
-                </a>
-              </li>
+              <?php if ($this->user->No_Grupo == 'Coordinacion') { ?>
+                <li class="nav-item">
+                  <a class="nav-link" href="<?php echo base_url('Ventas/ReglasVenta/ClienteView'); ?>" title="Crear Cliente">
+                    <i class="nav-icon fas fa-user-plus"></i>
+                    <p>&nbsp;Crear Cliente</p>
+                  </a>
+                </li>
               <?php } ?>
             </ul>
           </nav>
@@ -426,8 +429,6 @@ $SectionNames=[
           <!-- /. log out -->
         </div>
 
-
-
       </div>
       <!-- /.sidebar -->
     </aside>
@@ -480,6 +481,7 @@ $SectionNames=[
         align-items: center;
         border-bottom: 0px !important;
       }
+
       .brand-link:hover {
         text-decoration: none;
         color: #151515;
@@ -489,6 +491,11 @@ $SectionNames=[
       .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active,
       a.nav-link.\31 .nav-item.active.nav-item.active.menu-open,
       [class*=sidebar-light-] .nav-treeview>.nav-item>.nav-link.active:hover {
+        background-color: rgba(0, 0, 0, .1);
+        color: #ff500b !important;
+      }
+
+      .nav-sidebar>.nav-item>.nav-link.active {
         background-color: rgba(0, 0, 0, .1);
         color: #ff500b !important;
       }
@@ -513,20 +520,20 @@ $SectionNames=[
       }
 
       @media (max-width: 991.98px) {
-      .main-sidebar .brand-link {
-        display: none !important;
+        .main-sidebar .brand-link {
+          display: none !important;
+        }
+
+        .main-header .brand-link {
+          display: flex !important;
+        }
       }
-      .main-header .brand-link {
-        display: flex !important;
+
+      @media (min-width: 992px) {
+        .main-header .brand-link {
+          display: none !important;
+        }
       }
-    }
-    @media (min-width: 992px) {
-      .main-header .brand-link {
-        display: none !important;
-      }
-    }
-    @media (min-width: 768px){
-      
-    }
+
+      @media (min-width: 768px) {}
     </style>
-  

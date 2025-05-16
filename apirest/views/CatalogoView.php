@@ -384,8 +384,18 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-6">
                             <div class="md:grid-cols-1 grid grid-cols-1 ">
                                 <div class="form-group flex md:flex-row flex-col gap-3">
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">Precio USD:</label>
+                                    <div class="relative w-full md:w-2/3">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                        <input type="number" id="precioUSD" class="block w-full text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group flex md:flex-row flex-col gap-3">
                                     <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">Total USD:</label>
-                                    <input type="number" id="totalUSD" class="block w-full md:w-1/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
+                                    <div class="relative w-full md:w-2/3">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                        <input type="number" id="totalUSD" class="block w-full  text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" disabled>
+                                    </div>
                                 </div>
 
                                 <div class="form-group flex md:flex-row flex-col gap-3">
@@ -393,8 +403,11 @@
                                     <input type="number" id="totalCBM" class="block w-full md:w-1/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" step="0.01" disabled>
                                 </div>
                                 <div class="form-group flex md:flex-row flex-col gap-3">
-                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-1/3">Servicio Impo:</label>
-                                    <input type="number" id="servicioImpo" class="block w-full md:w-2/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
+                                    <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">Servicio Impo:</label>
+                                    <div class="relative w-full md:w-2/3">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                        <input type="number" id="servicioImpo" class="border-gray-300 block w-full  text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="350.00" readonly>
+                                    </div>
                                 </div>
 
                                 <div class="form-group flex md:flex-row flex-col gap-3">
@@ -408,7 +421,10 @@
 
                                 <div class="form-group flex md:flex-row flex-col gap-3">
                                     <label class="block text-sm font-medium text-gray-700 w-full md:w-2/3">IGV:</label>
-                                    <input type="number" id="igv" class="block w-full md:w-2/3 text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
+                                    <div class="relative w-full md:w-2/3">
+                                        <input type="number" id="igv" class="border-gray-300 block w-full  text-end rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" value="18" readonly>
+                                        <span class="absolute bottom-2 left-0 flex items-center pl-3 text-gray-500">%</span>
+                                    </div>
                                 </div>
 
                                 <div class="form-group flex md:flex-row flex-col gap-3">
@@ -688,7 +704,7 @@
                 border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md mr-2" data-dismiss="modal">
                     <span class="">Cancelar</span>
                 </button>
-                <button type="button" class="btn bg-green-700 text-white col-6" id="btnGuardarCategoriaProductos" >
+                <button type="button" class="btn bg-green-700 text-white col-6" id="btnGuardarCategoriaProductos">
                     <span class="ml-2">Si, Enviar</span>
                 </button>
 

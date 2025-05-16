@@ -19,7 +19,9 @@
     }
   }
 }
-
+.nav-link.active.nav-item{
+  color: theme-color("primary");
+}
 // Vertical Tabs
 .nav-tabs.flex-column {
   border-bottom: 0;
