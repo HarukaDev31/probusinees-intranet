@@ -1119,8 +1119,7 @@ $(document).ready(async function () {
      * Calcula la percepción
      */
     function calculatePercepcion(baseImponible, impuestos, inputs) {
-        console.log("datos",baseImponible.valorCIFValue,impuestos.arancelValue,impuestos.igvValue,inputs.percepcionRate)
-        return (impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
+        return (baseImponible.valorCIFValue+impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
     }
 
     /**
