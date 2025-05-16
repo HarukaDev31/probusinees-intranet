@@ -1208,16 +1208,16 @@ $(document).ready(async function () {
         const cbmParsed = Number(cbm.toFixed(2));
         if (cbmParsed >= 0.1 && cbmParsed <= 0.59) {
             return 280;
-        } else if (cbmParsed >= 0.6 && cbmParsed <= 1.0) {
+        } else if (cbmParsed >= 0.60 && cbmParsed <= 1.00) {
             return 375;
         }
-        else if (cbmParsed > 1.0 && cbmParsed <= 2.0) {
+        else if (cbmParsed > 1.00 && cbmParsed <= 2.00) {
             return 375 * cbmParsed;
-        } else if (cbmParsed > 2.1 && cbmParsed <= 3.0) {
+        } else if (cbmParsed > 2.10 && cbmParsed <= 3.00) {
             return 350 * cbmParsed;
-        } else if (cbmParsed > 3.1 && cbmParsed <= 4.0) {
+        } else if (cbmParsed > 3.10 && cbmParsed <= 4.00) {
             return 325 * cbmParsed;
-        } else if (cbmParsed > 4.1) {
+        } else if (cbmParsed > 4.10) {
             return 300 * cbmParsed;
         }
         return 0;
