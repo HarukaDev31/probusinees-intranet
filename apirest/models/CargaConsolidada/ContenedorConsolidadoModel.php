@@ -5701,31 +5701,32 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             }
 
             // 4. Si NO hay archivos SENDED para este proveedor, obtener datos y enviar mensaje (1-2 consultas)
+
+            // Obtener datos del proveedor y cliente (1 consulta)
+            $proveedorInfo = $this->db->select('p.code_supplier, p.qty_box_china, p.qty_box, c.nombre as cliente, c.telefono')
+                ->from($this->table_contenedor_cotizacion_proveedores . ' p')
+                ->join($this->table_contenedor_cotizacion . ' c', 'c.id = p.id_cotizacion')
+                ->where('p.id', $idProveedor)
+                ->get()
+                ->row();
+
+            if (!$proveedorInfo) {
+                throw new Exception("Datos del proveedor no encontrados");
+            }
+
+            // Actualizar estado (1 consulta)
+            $this->db->where('id', $idProveedor)
+                ->update($this->table_contenedor_cotizacion_proveedores, [
+                    'estados_proveedor' => 'INSPECTION',
+                    'estados' => 'INSPECCIONADO',
+                ]);
+
+            // Preparar y enviar mensaje
+            $telefono = preg_replace('/\s+/', '', $proveedorInfo->telefono) . ($proveedorInfo->telefono ? '@c.us' : '');
+            $this->phoneNumberId = $telefono;
+
+            $qty = $proveedorInfo->qty_box_china ?? $proveedorInfo->qty_box;
             if (!$hasSendedFiles) {
-                // Obtener datos del proveedor y cliente (1 consulta)
-                $proveedorInfo = $this->db->select('p.code_supplier, p.qty_box_china, p.qty_box, c.nombre as cliente, c.telefono')
-                    ->from($this->table_contenedor_cotizacion_proveedores . ' p')
-                    ->join($this->table_contenedor_cotizacion . ' c', 'c.id = p.id_cotizacion')
-                    ->where('p.id', $idProveedor)
-                    ->get()
-                    ->row();
-
-                if (!$proveedorInfo) {
-                    throw new Exception("Datos del proveedor no encontrados");
-                }
-
-                // Actualizar estado (1 consulta)
-                $this->db->where('id', $idProveedor)
-                    ->update($this->table_contenedor_cotizacion_proveedores, [
-                        'estados_proveedor' => 'INSPECTION',
-                        'estados' => 'INSPECCIONADO',
-                    ]);
-
-                // Preparar y enviar mensaje
-                $telefono = preg_replace('/\s+/', '', $proveedorInfo->telefono) . ($proveedorInfo->telefono ? '@c.us' : '');
-                $this->phoneNumberId = $telefono;
-
-                $qty = $proveedorInfo->qty_box_china ?? $proveedorInfo->qty_box;
                 $message = $proveedorInfo->cliente . '----' . $proveedorInfo->code_supplier . '----' . $qty . ' boxes. ' . "\n\n" .
                     '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
 
