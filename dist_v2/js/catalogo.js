@@ -1058,9 +1058,8 @@ $(document).ready(async function () {
      */
     function calculateDerivedValues(inputs) {
         const precioUSD = ((inputs.precioYuanes + inputs.profit + (inputs.delivery / inputs.moq))/ YUAN_TO_USD)
-        console.log(precioUSD)
         // Calcula total USD como MOQ * precio USD
-        const totalUSDValue = inputs.moq * precioUSD;
+        const totalUSDValue = inputs.moq * Number(precioUSD.toFixed(2));
 
         // Calcula CBM total según fórmula MOQ / cantidad por caja * CBM por caja
         const totalCBMValue = inputs.moq / inputs.qtyXbox * inputs.cbmXbox;
