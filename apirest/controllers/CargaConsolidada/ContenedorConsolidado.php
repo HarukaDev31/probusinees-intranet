@@ -1532,6 +1532,14 @@ class ContenedorConsolidado extends CI_Controller
 		$arrResponse = $this->ContenedorConsolidadoModel->getCotizacionEmbarqueHeaders($idContenedor);
 		echo json_encode($arrResponse);
 	}
+	public function saveInspectionSingle(){
+		$idFile= $this->input->post('idFile');
+		$idProveedor= $this->input->post('idProveedor');
+		$arrResponse = $this->ContenedorConsolidadoModel->saveInspectionSingle($idFile,$idProveedor);
+		echo json_encode($arrResponse);
+
+		
+	}
 	public function saveInspection()
 	{
 		$idProveedor = $this->input->post('idProveedor');
