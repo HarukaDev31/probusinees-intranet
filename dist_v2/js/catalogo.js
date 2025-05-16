@@ -1095,7 +1095,7 @@ $(document).ready(async function () {
     function calculateImpuestos(baseImponible, inputs) {
         const arancelValue = baseImponible.valorCIFValue * inputs.arancelRate;
         const baseIGV = baseImponible.valorCIFValue + arancelValue;
-        const igvValue = baseIGV * inputs.igvRate;
+        const igvValue = baseIGV * inputs.igvRate/100;
         const igvTotal = 0.16 * (baseImponible.valorCIFValue + arancelValue);
         const ipmTotal = 0.02 * (arancelValue + baseImponible.valorCIFValue);
         const antidumpingTotal = inputs.antidumpingValue * inputs.moq;
@@ -1119,7 +1119,8 @@ $(document).ready(async function () {
      * Calcula la percepción
      */
     function calculatePercepcion(baseImponible, impuestos, inputs) {
-        return (baseImponible.valorCIFValue + impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
+        console.log("datos",baseImponible.valorCIFValue,impuestos.arancelValue,impuestos.igvValue,inputs.percepcionRate)
+        return (impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
     }
 
     /**
