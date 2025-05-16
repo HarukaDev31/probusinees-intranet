@@ -192,6 +192,42 @@ async function saveDocumentation() {
 
 
 }
+async function saveInspectionSingle(id){
+  event.preventDefault();
+  const formData = new FormData();
+  formData.append("idFile", id);
+  formData.append("idProveedor", currentProveedor);
+  spinner.show();
+  url = base_url + "CargaConsolidada/ContenedorConsolidado/saveInspectionSingle";
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      const result = JSON.parse(response);
+      if (result.status == true) {
+        Swal.fire(successConfig.title, result.message, "success");
+      } else {
+        Swal.fire(errorConfig.title, result.message, "error");
+      }
+      spinner.hide();
+      //clear input and file-lista
+      $("#file-lista-inspection").html("");
+      getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
+        (files) => {
+          files.forEach((file) =>
+            addFileToList(file, null, "file-lista-inspection",false,true)
+          );
+        });
+    },
+    error: function () {
+      spinner.hide();
+    },
+  });
+
+}
 async function saveInspection() {
   event.preventDefault();
   //show confirm swall
@@ -229,7 +265,7 @@ async function saveInspection() {
       getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
         (files) => {
           files.forEach((file) =>
-            addFileToList(file, null, "file-lista-inspection")
+            addFileToList(file, null, "file-lista-inspection",false,true)
           );
         }
       );
@@ -463,7 +499,7 @@ function deleteFile(fileId, cardElement, deleteFileList) {
     },
   });
 }
-function addFileToList(file, fileList = null, id = null, deleteHidden = false) {
+function addFileToList(file, fileList = null, id = null, deleteHidden = false, showAction = false) {
   if (fileList == null) {
     fileList = $(".file-lista");
   }
@@ -477,8 +513,8 @@ function addFileToList(file, fileList = null, id = null, deleteHidden = false) {
 
   // Verificar si el usuario pertenece al grupo "Cotizador"
   const isCotizador = currentPrivilege === "Cotizador";
-
-
+  const isGerencia = currentPrivilege === "GERENCIA";
+  console.log(showAction, "showAction", isGerencia, file?.send_status);
   // Crear el elemento HTML para el archivo
   const fileItem = $(`
         <div class="file-item">
@@ -496,8 +532,11 @@ function addFileToList(file, fileList = null, id = null, deleteHidden = false) {
                       </button>`
       : ""
     }
-            </div>
-        </div>
+      ${showAction && isGerencia && file?.send_status=="PENDING" ? `<button class="btn-sm action-btn"
+        onclick="saveInspectionSingle(${file.id})"
+        >
+                      <i class="fas fa-check"></i>
+                    </button>` : ""}
     `);
 
   // Botón de descarga
@@ -676,7 +715,7 @@ async function verCotizacionEmbarque(
   });
   $("#file-lista-inspection").empty();
   getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
-    files.forEach((file) => addFileToList(file, null, "file-lista-inspection"));
+    files.forEach((file) => addFileToList(file, null, "file-lista-inspection",false,true));
   });
 
   // fileManager = new FileManager({
@@ -2381,8 +2420,8 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-          
-          
+
+
           buttons: [],
           paging: true,
           lengthChange: true,
@@ -2522,8 +2561,8 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-          
-          
+
+
           buttons: [
             {
               extend: "excel",
@@ -2610,8 +2649,8 @@ const openStepFunction = async (step, id) => {
                       "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                       "<'row'<'col-sm-12'tr>>" +
                       "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-                    
-                    
+
+
                     buttons: [
                       {
                         text: "Prospectos",
@@ -2751,7 +2790,7 @@ const openStepFunction = async (step, id) => {
                       },
                     },
                     initComplete: function (settings, json) {
-                      enableHorizontalAutoScrollForAllTables();                
+                      enableHorizontalAutoScrollForAllTables();
                       $(".input-date").datepicker({
                         autoclose: true,
                         startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2921,8 +2960,8 @@ const openStepFunction = async (step, id) => {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-        
-        
+
+
         buttons: [
           {
             extend: "excel",
@@ -2981,8 +3020,8 @@ const openStepFunction = async (step, id) => {
                       "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                       "<'row'<'col-sm-12'tr>>" +
                       "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-                    
-                    
+
+
                     buttons: [
                       {
                         extend: "excel",
@@ -3070,7 +3109,7 @@ const openStepFunction = async (step, id) => {
                             $("#table-clientes-variacion").attr("style", "");
                             reloadTableClientesVariacion();
                           }
-                          
+
                         },
                       },
                     ],
@@ -3142,10 +3181,10 @@ const openStepFunction = async (step, id) => {
                 }
                 limpiarInputBuscadorPersonalizado("search-table");
                 configurarBuscador(
-                    "table-clientes-variacion",
-                    "search-table",
-                    "table-clientes-variacion_info"
-                  );
+                  "table-clientes-variacion",
+                  "search-table",
+                  "table-clientes-variacion_info"
+                );
               },
             }
             : null,
@@ -3217,10 +3256,10 @@ const openStepFunction = async (step, id) => {
     }
     limpiarInputBuscadorPersonalizado("search-table");
     configurarBuscador(
-        "table-clientes-general",
-        "search-table",
-        "table-clientes-general_info"
-      );
+      "table-clientes-general",
+      "search-table",
+      "table-clientes-general_info"
+    );
   } else if (stepIndex == 3 && currentPrivilege == "Documentacion") {
     viewFormularioAduana();
   } else if (stepIndex == 3) {
@@ -3243,14 +3282,14 @@ const openStepFunction = async (step, id) => {
     } else {
       returnToSteps();
     }
-      limpiarFiltroDataTable("table-contenedor");
-      limpiarFiltroDataTable("table-clientes-general");
-      limpiarFiltroDataTable("table-clientes-variacion");
-      limpiarFiltroDataTable("table-cotizacion-prospectos");
-      limpiarFiltroDataTable("table-cotizacion-embarque");
-      limpiarFiltroDataTable("table-cotizacion-final");
-      limpiarFiltroDataTable("table-factura-guia");
-      limpiarInputBuscadorPersonalizado("search-table");
+    limpiarFiltroDataTable("table-contenedor");
+    limpiarFiltroDataTable("table-clientes-general");
+    limpiarFiltroDataTable("table-clientes-variacion");
+    limpiarFiltroDataTable("table-cotizacion-prospectos");
+    limpiarFiltroDataTable("table-cotizacion-embarque");
+    limpiarFiltroDataTable("table-cotizacion-final");
+    limpiarFiltroDataTable("table-factura-guia");
+    limpiarInputBuscadorPersonalizado("search-table");
   });
   $(".btn-back-cotizacion-documentacion").off("click");
   $(".btn-back-cotizacion-documentacion").on("click", function () {
@@ -3383,8 +3422,8 @@ async function viewFacturaGuia() {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      
-      
+
+
       buttons: [
         {
           extend: "excel",
@@ -3488,8 +3527,8 @@ async function viewCotizacionFinal() {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      
-      
+
+
       buttons: [
         {
           extend: "excel",
@@ -5425,8 +5464,8 @@ $(document).ready(async function () {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-        
-        
+
+
         buttons: [
           {
             extend: "excel",
@@ -5536,8 +5575,8 @@ $(document).ready(async function () {
           "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-        
-        
+
+
         buttons: [
           {
             extend: "excel",
@@ -5669,8 +5708,8 @@ $(document).ready(async function () {
         "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-      
-      
+
+
       buttons: [
         {
           extend: "excel",

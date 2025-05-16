@@ -3263,7 +3263,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     }
     public function getFilesAlmacenInspection($idProveedor)
     {
-        $this->db->select('id,file_name as file_name,file_path as file_url,file_type as type,file_size as size,last_modified as lastModified,file_type as file_ext')
+        $this->db->select('id,file_name as file_name,file_path as file_url,file_type as type,file_size as size,last_modified as lastModified,file_type as file_ext,send_status')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor);
         $query = $this->db->get();
@@ -3275,10 +3275,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     {
         log_message('error', "validateToSendInspectionMessage: " . $idProveedor);
         //find if exists more two files type image and one type video
-        $this->db->select('id, file_path,file_type')
+        $this->db->select('id, file_path,file_type,send_status')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor)
-            ->group_start() // Agrupa las condiciones de file_type
+            ->group_start()
             ->where('file_type', 'image/jpeg')
             ->or_where('file_type', 'image/png')
             ->or_where('file_type', 'image/jpg')
@@ -3286,7 +3286,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $query = $this->db->get();
         $imagesUrls = $query->result();
         $images = $query->num_rows();
-        $this->db->select('id,file_path,file_type')
+        $this->db->select('id,file_path,file_type,send_status')
             ->from($this->table_contenedor_almacen_inspection)
             ->where('id_proveedor', $idProveedor)
             ->where('file_type', 'video/mp4');
@@ -3332,55 +3332,59 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $fCierre = str_replace('October', 'Octubre', $fCierre);
         $fCierre = str_replace('November', 'Noviembre', $fCierre);
         $fCierre = str_replace('December', 'Diciembre', $fCierre);
-        if ($estadoChina != "INSPECTION") {
-            //set estado_china to INSPECTION
-            $this->db->where('id', $idProveedor);
-            $this->db->update($this->table_contenedor_cotizacion_proveedores, [
-                'estados_proveedor' => 'INSPECTION',
-                'estados' => 'INSPECCIONADO',
-            ]);
-            $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado INSPECCIONADO";
-            // $socketResponse = $this->sendEvent([
-            //     "project" => "0",
-            //     "role" => $this->roleCotizador,
-            //     "user" => "0",
-            //     "action" => $this->cambioEstadoProveedor,
-            //     "message" => $message,
-            // ]);
-            // $socketResponse = $this->sendEvent([
-            //     "project" => "0",
-            //     "role" => $this->roleCoordinacion,
-            //     "user" => "0",
-            //     "action" => $this->cambioEstadoProveedor,
-            //     "message" => $message,
-            // ]);
-            //get nombre from table cotizaciones, get qtyboxchina y suppliercode from table proveedor
-            $this->db->select('nombre,telefono')
-                ->from($this->table_contenedor_cotizacion)
-                ->where('id', $idCotizacion);
-            $query = $this->db->get();
-            $cliente = $query->row()->nombre;
-            $telefono = $query->row()->telefono;
-            //remove spaces from telefono
-            $telefono = preg_replace('/\s+/', '', $telefono);
-            $telefono .= $telefono ? '@c.us' : '';
-            $this->phoneNumberId = $telefono;
-            //message = cliente code supplieer qtyboxchina??qtybox
+
+        //set estado_china to INSPECTION
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, [
+            'estados_proveedor' => 'INSPECTION',
+            'estados' => 'INSPECCIONADO',
+        ]);
+        $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado INSPECCIONADO";
+
+        $this->db->select('nombre,telefono')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $idCotizacion);
+        $query = $this->db->get();
+        $cliente = $query->row()->nombre;
+        $telefono = $query->row()->telefono;
+        //remove spaces from telefono
+        $telefono = preg_replace('/\s+/', '', $telefono);
+        $telefono .= $telefono ? '@c.us' : '';
+        $this->phoneNumberId = $telefono;
+        //if some image or vide has send_status = 'SENDED' NOT SEND MESSAGE
+        $sendStatus = true;
+        foreach ($imagesUrls as $image) {
+            if ($image->send_status == 'SENDED') {
+                $sendStatus = false;
+            }
+        }
+        foreach ($videosUrls as $video) {
+            if ($video->send_status == 'SENDED') {
+                $sendStatus = false;
+            }
+        }
+        if ($sendStatus) {
             $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
                 '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
 
             $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
-
-            foreach ($imagesUrls as $image) {
-                $this->sendMediaInspection($image->file_path, $image->file_type, null, null, 1, $image->id);
-            }
-            foreach ($videosUrls as $video) {
-                $this->sendMediaInspection($video->file_path, $video->file_type, null, null, 1, $video->id);
-            }
-            return true;
         }
+        //filter imagesUrls and videosUrls to get only the files that has send_status = 0
+        $imagesUrls = array_filter($imagesUrls, function ($image) {
+            return $image->send_status == "PENDING";
+        });
+        $videosUrls = array_filter($videosUrls, function ($video) {
+            return $video->send_status == "PENDING";
+        });
+        //send media inspection
 
-        return false;
+        foreach ($imagesUrls as $image) {
+            $this->sendMediaInspection($image->file_path, $image->file_type, null, null, 1, $image->id);
+        }
+        foreach ($videosUrls as $video) {
+            $this->sendMediaInspection($video->file_path, $video->file_type, null, null, 1, $video->id);
+        }
+        return true;
     }
     public function getClientesHeader($idContenedor)
     {
@@ -5665,6 +5669,77 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         } catch (Exception $e) {
             log_message('error', 'Error en updateFormularioAduana: ' . $e->getMessage());
             return false;
+        }
+    }
+    public function saveInspectionSingle($idFile, $idProveedor)
+    {
+        try {
+            // 1. Verificar si hay algún archivo SENDED para este proveedor (1 consulta)
+            $hasSendedFiles = $this->db->select('id')
+                ->from($this->table_contenedor_almacen_inspection)
+                ->where('id_proveedor', $idProveedor)
+                ->where('send_status', 'SENDED')
+                ->limit(1)
+                ->get()
+                ->num_rows() > 0;
+
+            // 2. Obtener datos del archivo específico (1 consulta)
+            $fileData = $this->db->select('file_path, file_type, send_status')
+                ->from($this->table_contenedor_almacen_inspection)
+                ->where('id', $idFile)
+                ->where('id_proveedor', $idProveedor)
+                ->where_in('file_type', ['image/jpeg', 'image/png', 'image/jpg', 'video/mp4'])
+                ->get()
+                ->row();
+
+            if (!$fileData) {
+                throw new Exception("Archivo de inspección no encontrado");
+            }
+
+            // 3. Si el archivo ya está SENDED, no hacer nada
+            if ($fileData->send_status == 'SENDED') {
+                return ['status' => false, 'message' => 'El archivo ya fue enviado'];
+            }
+
+            // 4. Si NO hay archivos SENDED para este proveedor, obtener datos y enviar mensaje (1-2 consultas)
+            if (!$hasSendedFiles) {
+                // Obtener datos del proveedor y cliente (1 consulta)
+                $proveedorInfo = $this->db->select('p.code_supplier, p.qty_box_china, p.qty_box, c.nombre as cliente, c.telefono')
+                    ->from($this->table_contenedor_cotizacion_proveedores . ' p')
+                    ->join($this->table_contenedor_cotizacion . ' c', 'c.id = p.id_cotizacion')
+                    ->where('p.id', $idProveedor)
+                    ->get()
+                    ->row();
+
+                if (!$proveedorInfo) {
+                    throw new Exception("Datos del proveedor no encontrados");
+                }
+
+                // Actualizar estado (1 consulta)
+                $this->db->where('id', $idProveedor)
+                    ->update($this->table_contenedor_cotizacion_proveedores, [
+                        'estados_proveedor' => 'INSPECTION',
+                        'estados' => 'INSPECCIONADO',
+                    ]);
+
+                // Preparar y enviar mensaje
+                $telefono = preg_replace('/\s+/', '', $proveedorInfo->telefono) . ($proveedorInfo->telefono ? '@c.us' : '');
+                $this->phoneNumberId = $telefono;
+
+                $qty = $proveedorInfo->qty_box_china ?? $proveedorInfo->qty_box;
+                $message = $proveedorInfo->cliente . '----' . $proveedorInfo->code_supplier . '----' . $qty . ' boxes. ' . "\n\n" .
+                    '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
+
+                $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
+            }
+
+            // 5. Enviar el archivo (si no está SENDED)
+            $this->sendMediaInspection($fileData->file_path, $fileData->file_type, null, null, 1, $idFile);
+
+            return ['status' => true, 'message' => 'Proceso completado'];
+        } catch (Exception $e) {
+            log_message('error', 'Error en saveInspectionSingle: ' . $e->getMessage());
+            return ['status' => false, 'message' => $e->getMessage()];
         }
     }
     public function saveInspection($idProveedor, $idCotizacion, $files)
