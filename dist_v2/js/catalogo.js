@@ -349,7 +349,7 @@ $(document).ready(async function () {
             contactCardContainer.loadFromURL(product.contact_card_url);
         }
         if (currentPrivilege == ROLE_PERU) {
-            const cbm = Number(product.cbm_box) * Number(product.qty_box) / Number(product.moq);
+            const cbm = Number(product.cbm_box)*Number(product.moq)/ Number(product.qty_box);
             $('#servicioImpo').val(product.servicio_impo ?? getServicioPerCbm(cbm));
             $('#arancel').val(product.arancel ?? "6.00");
             $('#igv').val(product.igv ?? 16);
@@ -1206,6 +1206,7 @@ $(document).ready(async function () {
     }
     function getServicioPerCbm(cbm) {
         const cbmParsed = Number(cbm.toFixed(2));
+        console.log(cbmParsed)
         if (cbmParsed >= 0.1 && cbmParsed <= 0.59) {
             return 280;
         } else if (cbmParsed >= 0.60 && cbmParsed <= 1.00) {
