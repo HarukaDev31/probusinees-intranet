@@ -352,7 +352,7 @@ $(document).ready(async function () {
             const cbm = Number(product.cbm_box)*Number(product.moq)/ Number(product.qty_box);
             $('#servicioImpo').val(product.servicio_impo ?? getServicioPerCbm(cbm));
             $('#arancel').val(product.arancel ?? "6.00");
-            $('#igv').val(product.igv ?? 16);
+            $('#igv').val(product.igv ?? 18);
             $('#antidumping').val(product.antidumping ?? 0.00);
             $('#percepcion').val(product.percepcion ?? 3.50);
         }
