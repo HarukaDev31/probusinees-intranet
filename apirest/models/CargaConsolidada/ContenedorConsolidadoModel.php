@@ -434,7 +434,6 @@ class ContenedorConsolidadoModel extends CI_Model
             // Filtrado combinado en una sola operación
             $proveedoresFiltrados = array_filter($proveedores, function ($prov) use ($filtroStatus, $filtroState) {
                 $cumpleStatus = ($filtroStatus === "0" || $prov['estados_proveedor'] === $filtroStatus);
-                log_message('error', 'cumpleStatus: ' . $cumpleStatus);
                 $cumpleState = ($filtroState === "0" || $prov['estados'] === $filtroState);
                 return $cumpleStatus && $cumpleState;
             });
@@ -5732,7 +5731,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
                 $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
             }
-
+            log_message('error', 'FileData: ' . json_encode($fileData));
             // 5. Enviar el archivo (si no está SENDED)
             $this->sendMediaInspection($fileData->file_path, $fileData->file_type, null, null, 1, $idFile);
 
