@@ -349,10 +349,10 @@ $(document).ready(async function () {
             contactCardContainer.loadFromURL(product.contact_card_url);
         }
         if (currentPrivilege == ROLE_PERU) {
-            const cbm = Number(product.cbm_box) * Number(product.qty_box) / Number(product.moq);
+            const cbm = Number(product.cbm_box)*Number(product.moq)/ Number(product.qty_box);
             $('#servicioImpo').val(product.servicio_impo ?? getServicioPerCbm(cbm));
             $('#arancel').val(product.arancel ?? "6.00");
-            $('#igv').val(product.igv ?? 16);
+            $('#igv').val(product.igv ?? 18);
             $('#antidumping').val(product.antidumping ?? 0.00);
             $('#percepcion').val(product.percepcion ?? 3.50);
         }
@@ -1057,11 +1057,9 @@ $(document).ready(async function () {
      * Calcula valores derivados de los inputs
      */
     function calculateDerivedValues(inputs) {
-        // Calcula precio en USD según fórmula (precio en yuanes + 7) / 7
-        const precioUSD = (inputs.precioYuanes + inputs.profit + (inputs.delivery / inputs.moq) / YUAN_TO_USD)
-
+        const precioUSD = ((inputs.precioYuanes + inputs.profit + (inputs.delivery / inputs.moq))/ YUAN_TO_USD)
         // Calcula total USD como MOQ * precio USD
-        const totalUSDValue = inputs.moq * precioUSD;
+        const totalUSDValue = inputs.moq * Number(precioUSD.toFixed(2));
 
         // Calcula CBM total según fórmula MOQ / cantidad por caja * CBM por caja
         const totalCBMValue = inputs.moq / inputs.qtyXbox * inputs.cbmXbox;
@@ -1097,7 +1095,7 @@ $(document).ready(async function () {
     function calculateImpuestos(baseImponible, inputs) {
         const arancelValue = baseImponible.valorCIFValue * inputs.arancelRate;
         const baseIGV = baseImponible.valorCIFValue + arancelValue;
-        const igvValue = baseIGV * inputs.igvRate;
+        const igvValue = baseIGV * inputs.igvRate/100;
         const igvTotal = 0.16 * (baseImponible.valorCIFValue + arancelValue);
         const ipmTotal = 0.02 * (arancelValue + baseImponible.valorCIFValue);
         const antidumpingTotal = inputs.antidumpingValue * inputs.moq;
@@ -1121,14 +1119,14 @@ $(document).ready(async function () {
      * Calcula la percepción
      */
     function calculatePercepcion(baseImponible, impuestos, inputs) {
-        return (baseImponible.valorCIFValue + impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
+        return (baseImponible.valorCIFValue+impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
     }
 
     /**
      * Calcula los totales
      */
     function calculateTotals(derived, baseImponible, impuestos, percepcionValue, inputs) {
-        const costoDestino = baseImponible.valorCIFValue * 0.4;
+        const costoDestino = baseImponible.valorCIFValue * 0.3;
 
         const impuestosTotal = impuestos.arancelValue +
             impuestos.igvTotal + impuestos.ipmTotal +
@@ -1170,7 +1168,7 @@ $(document).ready(async function () {
      * Actualiza la interfaz de usuario con todos los valores calculados
      */
     function updateUI(derived, baseImponible, impuestos, percepcionValue, totals, unitCosts,inputs) {
-        // Actualizar valores derivados
+        console.log(derived,"derived")
         $("#precioUSD").val(derived.precioUSD.toFixed(2));
         $('#totalUSD').val(derived.totalUSDValue.toFixed(2));
         $('#totalCBM').val(derived.totalCBMValue.toFixed(2));
@@ -1193,7 +1191,7 @@ $(document).ready(async function () {
 
         // Actualizar totales de impuestos
         $('#total').text(formatCurrency(totals.impuestosTotal));
-        $("#costoDestino").text(formatCurrency(totals.costoDestino));
+        // $("#costoDestino").text(formatCurrency(totals.costoDestino));
 
         // Actualizar resumen
         $('#valorCargaResumen').text(formatCurrency(baseImponible.valorCargaValue));
@@ -1208,18 +1206,19 @@ $(document).ready(async function () {
     }
     function getServicioPerCbm(cbm) {
         const cbmParsed = Number(cbm.toFixed(2));
+        console.log(cbmParsed)
         if (cbmParsed >= 0.1 && cbmParsed <= 0.59) {
             return 280;
-        } else if (cbmParsed >= 0.6 && cbmParsed <= 1.0) {
+        } else if (cbmParsed >= 0.60 && cbmParsed <= 1.00) {
             return 375;
         }
-        else if (cbmParsed > 1.0 && cbmParsed <= 2.0) {
+        else if (cbmParsed > 1.00 && cbmParsed <= 2.00) {
             return 375 * cbmParsed;
-        } else if (cbmParsed > 2.1 && cbmParsed <= 3.0) {
+        } else if (cbmParsed > 2.10 && cbmParsed <= 3.00) {
             return 350 * cbmParsed;
-        } else if (cbmParsed > 3.1 && cbmParsed <= 4.0) {
+        } else if (cbmParsed > 3.10 && cbmParsed <= 4.00) {
             return 325 * cbmParsed;
-        } else if (cbmParsed > 4.1) {
+        } else if (cbmParsed > 4.10) {
             return 300 * cbmParsed;
         }
         return 0;

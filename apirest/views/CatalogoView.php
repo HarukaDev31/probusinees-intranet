@@ -509,14 +509,14 @@
                                     </tbody>
                                 </table>
                                 <!--table with only head for costo en destino-->
-                                <table class="w-full mt-2">
+                                <!-- <table class="w-full mt-2">
                                     <thead>
                                         <tr>
                                             <th class="border bg-gray-300 text-center">Costo en destino</th>
                                             <td class="border  bg-gray-300" id="costoDestino">$ 0.00</td>
                                         </tr>
                                     </thead>
-                                </table>
+                                </table> -->
                             </div>
                             <div class="md:grid-cols-1 grid grid-cols-1 text-start ">
                                 <!--table base imponible-->
