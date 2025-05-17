@@ -4519,7 +4519,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                 <input type="number"
                 value="${provider.volumen_doc}"
                 onchange="validateVolumenDocumentacion(this.value)"
-                id="txt-Vol_Doc" class="w-25 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="volumen_doc">
+                id="txt-Vol_Doc" class="w-25 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" step="any" name="volumen_doc">
               </div>
               <div class="flex align-items-center justify-flex-start gap-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1 w-full">Valor documento</label>
@@ -4528,7 +4528,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                   <input type="number"
                   value="${provider.valor_doc}"
                   onchange="validateValorDocumentacion(this.value)"
-                  id="txt-Valor_Doc" class="w-75 pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name="valor_doc">
+                  id="txt-Valor_Doc" class="w-75 pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" step="any" name="valor_doc">
                 </div>
               </div>
             </div>
@@ -4832,7 +4832,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
             <div class="form-group">
                 <div class="file-upload-box">
                     <input type="file" id="file-input-factura" class="file-input" name="file_comercial"
-                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" />
+                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg,.pdf" />
                     <label for="file-input-factura" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
@@ -4915,7 +4915,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
             <div class="form-group">
                 <div class="file-upload-box">
                     <input type="file" id="file-input-packing" class="file-input" name="packing_list"
-                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" />
+                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg,.pdf" />
                     <label for="file-input-packing" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
@@ -5001,7 +5001,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
             <div class="form-group">
                 <div class="file-upload-box">
                     <input type="file" id="file-input-confirmacion" class="file-input" name="excel_confirmacion"
-                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" />
+                        accept=".xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg,.pdf" />
                     <label for="file-input-confirmacion" class="file-label d-flex">
                         <i class="fas fa-upload"></i>
                         <div class="file-group-text">
@@ -5087,18 +5087,18 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
       setupSingleFileUpload(
         "single-file-upload-factura",
         "file-input-factura",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg"]
+        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg","pdf"]
       );
     }
     if (!excelConfirmacion) {
       setupSingleFileUpload(
         "single-file-upload-confirmacion",
         "file-input-confirmacion",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg"]
+        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg","pdf"]
       );
     }
     if (!packingList) {
-      setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg']);
+      setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg','pdf']);
     }
     $("#file-input-factura").on("change", function () {
       shouldSaveDocumentacion = true;
@@ -6613,6 +6613,9 @@ $(document).ready(async function () {
     e.preventDefault();
     const formData = new FormData($("#form-documentacion")[0]);
     const check = $("#form-documentacion")[0].checkValidity();
+    //check formdata validators
+    console.log(formData);
+    console.log(check);
     if (!check) {
       $("#form-documentacion")[0].classList.add("was-validated");
       return;
