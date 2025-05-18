@@ -47,9 +47,12 @@ $(document).ready(async function () {
     async function loadProducts() {
         if (window.location.href.includes("listarCompletados")) {
             isInCompleted = true;
+            $("#section-title").text("Listado de Cotizados");
         } else if (window.location.href.includes("listarSeleccionados")) {
             isInTienda = true;
+            $("#section-title").text("Listado de Seleccionados");
         } else {
+            $("#section-title").text("Listado de Nuevos");
             isInCompleted = false;
             isInTienda = false;
         }
@@ -1173,7 +1176,7 @@ $(document).ready(async function () {
         $('#totalUSD').val(derived.totalUSDValue.toFixed(2));
         $('#totalCBM').val(derived.totalCBMValue.toFixed(2));
 
-        // Actualizar base imponible
+        // Actualizar base imponiblelis
         $('#valorCarga').text(formatCurrency(baseImponible.valorCargaValue));
         $('#flete').text(formatCurrency(baseImponible.fleteValue));
         $('#seguro').text(formatCurrency(baseImponible.seguroValue));

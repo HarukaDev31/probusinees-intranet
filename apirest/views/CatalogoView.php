@@ -8,7 +8,7 @@
             <div class="flex items-center
             flex-col flex-md-row flex-lg-row flex-xl-row
             justify-between mb-8 pt-3  border-b-2 border-gray-200 pb-2">
-                <h1 class="text-2xl font-bold text-gray-800">Listado de Cotizados</h1>
+                <h1 class="text-2xl font-bold text-gray-800" id="section-title">Listado de Cotizados</h1>
 
                 <div class="flex flex-col gap-2 flex-md-row flex-xs-row flex-xl-row">
                     <div class="relative">
