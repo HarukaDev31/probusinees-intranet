@@ -2482,6 +2482,10 @@ const openStepFunction = async (step, id) => {
               data.idContenedor = idContenedor;
               data.tipoTabla = "embarque";
               data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+              data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val() ?? 0;
+              data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+              data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+              data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
               validateListEmbarque(idContenedor);
               $(".input-date").datepicker({
                 autoclose: true,
@@ -2493,8 +2497,12 @@ const openStepFunction = async (step, id) => {
               getTableCotizacionEmbarqueHeaders();
             },
           },
-          initComplete: function (settings, json) {
+          initComplete: function () {
             console.log("initEmbarque");
+            $("#aplicar-btn-cotizacion").off("click");
+            $("#aplicar-btn-cotizacion").click(function () {
+              tableCotizacionEmbarque.ajax.reload();
+            });
 
             $(".input-date").datepicker({
               autoclose: true,
@@ -2778,7 +2786,7 @@ const openStepFunction = async (step, id) => {
                         data.tipoTabla = "embarque";
                         data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
                         data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
-                        data.Filtro_State = $("#txt-ID_States_Cliente").val();
+                        data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
                         validateListEmbarque(idContenedor);
                         $(".input-date").datepicker({
                           autoclose: true,
