@@ -13,7 +13,7 @@ class FileUploader {
       // Clase de icono para placeholder
       ...config
     };
-
+    this.currentUrl = null; // URL actual del archivo
     // Validar que se proporcionó un ID de contenedor
     if (!this.config.containerId) {
       throw new Error('Se requiere un ID de contenedor');
@@ -114,7 +114,7 @@ class FileUploader {
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
         modal.innerHTML = `
           <div class="bg-white rounded-lg shadow-lg p-4 relative max-w-2xl max-h-screen">
-            <img src="${this.placeholder.querySelector('img').src}" alt="${this.file.name}" class="max-w-full max-h-[80vh] object-contain" />
+            <img src="${this.currentUrl}" alt="${this.file.name}" class="max-w-full max-h-[80vh] object-contain" />
             <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="close-modal">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"> 
                 <path d="M1 1L15 15" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
@@ -447,7 +447,7 @@ class FileUploader {
 
       // Obtener la imagen de la URL
       const response = await fetch(url);
-
+      this.currentUrl = url;
       if (!response.ok) {
         throw new Error(`Error al cargar la imagen: ${response.status} ${response.statusText}`);
       }
