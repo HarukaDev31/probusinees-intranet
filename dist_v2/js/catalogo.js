@@ -1,4 +1,3 @@
-const { default: R } = require("raphael");
 
 var spinner = null;
 var productoFormSection = null
