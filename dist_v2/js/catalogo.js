@@ -1210,7 +1210,7 @@ $(document).ready(async function () {
     function getServicioPerCbm(cbm) {
         const cbmParsed = Number(cbm.toFixed(2));
         console.log(cbmParsed)
-        if (cbmParsed >= 0.1 && cbmParsed <= 0.59) {
+        if (cbmParsed >= 0.00 && cbmParsed <= 0.59) {
             return 280;
         } else if (cbmParsed >= 0.60 && cbmParsed <= 1.00) {
             return 375;
