@@ -4756,6 +4756,10 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     <div>
                       <span class="file-name">${decodeURIComponent(facturaComercial.split('_').pop())}</span>
                     </div>
+                    <a href="${facturaComercial}" target="_blank" class="btn btn-primary">
+
+                    <i class="fas fa-download"></i>
+                    </a>
                   `
           : `
                     <div class="py-2">No hay archivo disponible</div>
@@ -4772,7 +4776,9 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     <div>
                       <span class="file-name">${decodeURIComponent(excelConfirmacion.split('_').pop())}</span>
                     </div>
-                  `
+                    <a href="${excelConfirmacion}" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    </a>`
           : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
