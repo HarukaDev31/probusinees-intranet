@@ -8,7 +8,9 @@ class FileUploader {
       maxSize: 5 * 1024 * 1024, // Tamaño máximo en bytes (5MB por defecto)
       placeholderText: 'Arrastra o sube tu archivo aquí',
       placeholderIcon: 'i-lucide-file',
-      showPreview: true, // Clase de icono para placeholder
+      showPreview: true,
+      showAsModal: false, // Mostrar como modal
+      // Clase de icono para placeholder
       ...config
     };
 
@@ -101,8 +103,45 @@ class FileUploader {
 
 
   initEvents() {
-    // Eventos del contenedor principal
-    const handleContainerClick = () => this.input.click();
+    //if showAsModal is true, open modal with image else clik on the input
+    let handleContainerClick;
+    if (this.config.showAsModal) {
+      handleContainerClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Crear y mostrar el modal
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+          <div class="bg-white rounded-lg shadow-lg p-4 relative max-w-2xl max-h-screen">
+            <img src="${this.placeholder.querySelector('img').src}" alt="${this.file.name}" class="max-w-full max-h-[80vh] object-contain" />
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="close-modal">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"> 
+                <path d="M1 1L15 15" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
+                <path d="M1 15L15 1" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        // Evento para cerrar el modal
+        document.getElementById('close-modal').addEventListener('click', () => {
+          document.body.removeChild(modal);
+        });
+        // También cerrar al hacer clic fuera del contenido del modal
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            document.body.removeChild(modal);
+          }
+        });
+      };
+    } else {
+      handleContainerClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.input.click();
+      };
+    // const handleContainerClick = () => this.input.click();
     this.addEventListenerWithTracking(this.container, 'click', handleContainerClick);
 
     const handleDragOver = (e) => {
