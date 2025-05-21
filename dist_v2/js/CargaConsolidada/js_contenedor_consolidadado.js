@@ -192,7 +192,7 @@ async function saveDocumentation() {
 
 
 }
-async function saveInspectionSingle(id){
+async function saveInspectionSingle(id) {
   event.preventDefault();
   const formData = new FormData();
   formData.append("idFile", id);
@@ -218,7 +218,7 @@ async function saveInspectionSingle(id){
       getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
         (files) => {
           files.forEach((file) =>
-            addFileToList(file, null, "file-lista-inspection",false,true)
+            addFileToList(file, null, "file-lista-inspection", false, true)
           );
         });
     },
@@ -265,7 +265,7 @@ async function saveInspection() {
       getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
         (files) => {
           files.forEach((file) =>
-            addFileToList(file, null, "file-lista-inspection",false,true)
+            addFileToList(file, null, "file-lista-inspection", false, true)
           );
         }
       );
@@ -532,7 +532,7 @@ function addFileToList(file, fileList = null, id = null, deleteHidden = false, s
                       </button>`
       : ""
     }
-      ${showAction && isGerencia && file?.send_status=="PENDING" ? `<button class="btn-sm action-btn"
+      ${showAction && isGerencia && file?.send_status == "PENDING" ? `<button class="btn-sm action-btn"
         onclick="saveInspectionSingle(${file.id})"
         >
                       <i class="fas fa-check"></i>
@@ -715,7 +715,7 @@ async function verCotizacionEmbarque(
   });
   $("#file-lista-inspection").empty();
   getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
-    files.forEach((file) => addFileToList(file, null, "file-lista-inspection",false,true));
+    files.forEach((file) => addFileToList(file, null, "file-lista-inspection", false, true));
   });
 
   // fileManager = new FileManager({
@@ -4759,7 +4759,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     <button class="btn-sm download-btn" data-url="${facturaComercial}">
                     <i class="fas fa-download"></i>
                     </a>`
-                 
+
           : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
@@ -4831,6 +4831,12 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
         </div>
       </div>
     `);
+      $(".download-btn").off("click").on("click", function () {
+        const url = $(this).data("url");
+        if (url) {
+          window.open(url, "_blank");
+        }
+      });
       filteredFiles.forEach((file) => {
         addFileToList(file, null, 'file-lista-documentacion-documentacion', true)
       })
@@ -5102,18 +5108,18 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
       setupSingleFileUpload(
         "single-file-upload-factura",
         "file-input-factura",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg","pdf"]
+        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg", "pdf"]
       );
     }
     if (!excelConfirmacion) {
       setupSingleFileUpload(
         "single-file-upload-confirmacion",
         "file-input-confirmacion",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg","pdf"]
+        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg", "pdf"]
       );
     }
     if (!packingList) {
-      setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg','pdf']);
+      setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg', 'pdf']);
     }
     $("#file-input-factura").on("change", function () {
       shouldSaveDocumentacion = true;
