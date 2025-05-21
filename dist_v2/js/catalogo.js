@@ -1,3 +1,5 @@
+const { default: R } = require("raphael");
+
 var spinner = null;
 var productoFormSection = null
 var productListSection = null
@@ -309,25 +311,32 @@ $(document).ready(async function () {
         mainImage = new FileUploader({
             containerId: 'mainImageContainer',
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
-            maxSize: 5 * 1024 * 1024
+            maxSize: 5 * 1024 * 1024,
+            showAsModal: currentPrivilege == ROLE_PERU ? true : false
         });
 
 
         additionalImage1 = new FileUploader({
             containerId: 'additionalImage1Container',
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
-            maxSize: 5 * 1024 * 1024
+            maxSize: 5 * 1024 * 1024,
+            showAsModal: currentPrivilege == ROLE_PERU ? true : false
+
         });
         additionalImage2 = new FileUploader({
             containerId: 'additionalImage2Container',
             acceptedTypes: "image/jpeg,image/png,image/gif,image/webp",// Tipos de archivos aceptados
-            maxSize: 5 * 1024 * 1024
+            maxSize: 5 * 1024 * 1024,
+            showAsModal: currentPrivilege == ROLE_PERU ? true : false
+
         });
 
         additionalVideo1 = new FileUploader({
             containerId: 'additionalVideo1Container',
             acceptedTypes: "video/mp4,video/webm,video/ogg,video/quicktime,.mov,.mp4",
-            maxSize: 20 * 1024 * 1024
+            maxSize: 20 * 1024 * 1024,
+            showAsModal: currentPrivilege == ROLE_PERU ? true : false
+
         });
 
         contactCardContainer = new FileUploader({
@@ -352,7 +361,7 @@ $(document).ready(async function () {
             contactCardContainer.loadFromURL(product.contact_card_url);
         }
         if (currentPrivilege == ROLE_PERU) {
-            const cbm = Number(product.cbm_box)*Number(product.moq)/ Number(product.qty_box);
+            const cbm = Number(product.cbm_box) * Number(product.moq) / Number(product.qty_box);
             $('#servicioImpo').val(product.servicio_impo ?? getServicioPerCbm(cbm));
             $('#arancel').val(product.arancel ?? "6.00");
             $('#igv').val(product.igv ?? 18);
@@ -1060,7 +1069,7 @@ $(document).ready(async function () {
      * Calcula valores derivados de los inputs
      */
     function calculateDerivedValues(inputs) {
-        const precioUSD = ((inputs.precioYuanes + inputs.profit + (inputs.delivery / inputs.moq))/ YUAN_TO_USD)
+        const precioUSD = ((inputs.precioYuanes + inputs.profit + (inputs.delivery / inputs.moq)) / YUAN_TO_USD)
         // Calcula total USD como MOQ * precio USD
         const totalUSDValue = inputs.moq * Number(precioUSD.toFixed(2));
 
@@ -1098,11 +1107,11 @@ $(document).ready(async function () {
     function calculateImpuestos(baseImponible, inputs) {
         const arancelValue = baseImponible.valorCIFValue * inputs.arancelRate;
         const baseIGV = baseImponible.valorCIFValue + arancelValue;
-        const igvValue = baseIGV * inputs.igvRate/100;
+        const igvValue = baseIGV * inputs.igvRate / 100;
         const igvTotal = 0.16 * (baseImponible.valorCIFValue + arancelValue);
         const ipmTotal = 0.02 * (arancelValue + baseImponible.valorCIFValue);
         const antidumpingTotal = inputs.antidumpingValue * inputs.moq;
-        const percepcionValue = (baseImponible.valorCIFValue + arancelValue + igvTotal+ipmTotal) * inputs.percepcionRate;
+        const percepcionValue = (baseImponible.valorCIFValue + arancelValue + igvTotal + ipmTotal) * inputs.percepcionRate;
         const subtotal = arancelValue + igvTotal + ipmTotal + antidumpingTotal;
         const total = percepcionValue + subtotal;
         return {
@@ -1122,7 +1131,7 @@ $(document).ready(async function () {
      * Calcula la percepción
      */
     function calculatePercepcion(baseImponible, impuestos, inputs) {
-        return (baseImponible.valorCIFValue+impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
+        return (baseImponible.valorCIFValue + impuestos.arancelValue + impuestos.igvValue) * inputs.percepcionRate;
     }
 
     /**
@@ -1170,8 +1179,8 @@ $(document).ready(async function () {
     /**
      * Actualiza la interfaz de usuario con todos los valores calculados
      */
-    function updateUI(derived, baseImponible, impuestos, percepcionValue, totals, unitCosts,inputs) {
-        console.log(derived,"derived")
+    function updateUI(derived, baseImponible, impuestos, percepcionValue, totals, unitCosts, inputs) {
+        console.log(derived, "derived")
         $("#precioUSD").val(derived.precioUSD.toFixed(2));
         $('#totalUSD').val(derived.totalUSDValue.toFixed(2));
         $('#totalCBM').val(derived.totalCBMValue.toFixed(2));
