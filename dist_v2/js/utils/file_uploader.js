@@ -109,14 +109,15 @@ class FileUploader {
       handleContainerClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        // Crear y mostrar el modal
+        //get if is video with extension
+        const isVideo = this.currentUrl && (this.currentUrl.endsWith('.mp4') || this.currentUrl.endsWith('.webm') || this.currentUrl.endsWith('.ogg'))|| this.currentUrl.endsWith('.mov');
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
         modal.innerHTML = `
           <div class="bg-white rounded-lg shadow-lg p-4 relative max-w-2xl w-1/2 max-h-screen">
-            <img src="${this.currentUrl}" alt="${this.file.name}" class="max-w-full  w-full max-h-[80vh] object-contain"
-               />
-            />
+            ${ !isVideo?`<img src="${this.currentUrl}" alt="${this.file.name}" class="max-w-full  w-full max-h-[80vh] object-contain"
+               />`:
+            `<video src="${this.currentUrl}" controls class="max-w-full w-full max-h-[80vh]"></video>`}
             <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="close-modal">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"> 
                 <path d="M1 1L15 15" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
