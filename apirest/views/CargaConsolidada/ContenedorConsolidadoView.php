@@ -1105,9 +1105,9 @@ Filters
               <th>Volumen</th>
               <th>Monto</th>
               <th>Tarifa</th>
+              <?php } ?>
 
               <th>Estados</th>
-            <?php } ?>
             <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
               <th>Acciones</th>
             <?php } ?>
