@@ -1599,7 +1599,7 @@ async function showDocumentacionDocumentacionContainer(id) {
       color = "bg-purple-50";
     }
 
-    if (file.file_url) {
+    if (file.file_url || (file.folder_name=='Packing China' && file.lista_embarque_url )) {
       // $("#documentacion-documentacion").append(`
       //           <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria
       //   }">
@@ -1625,17 +1625,17 @@ async function showDocumentacionDocumentacionContainer(id) {
                   ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>` : ""}
                 </label>
                 <div class="file-upload-box">
-                    ${file.file_url ? `
+                    ${file.file_url || (file.folder_name=='Packing China' && file.lista_embarque_url ) ? `
                             <div class="file-info">
                               <div class="file-iconic">
-                                ${getIconByType(file.type)}
+                                ${getIconByType(file.type??'xlsx')}
                               </div>
                                 <span class="file-name">${file.folder_name}</span>
                                 
                                 <div 
                                 class="d-flex flex-row gap-5"
                                 >
-                                <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
+                                <button class="download-file-button" onclick=window.location.href='${file.file_url??file.lista_embarque_url}'>
                                 <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12.7436 8.61328H1.25641C0.56718 8.61328 0 9.18046 0 9.86969V11.3056C0 11.9948 0.56718 12.562 1.25641 12.562H12.7436C13.4328 12.562 14 11.9948 14 11.3056V9.86969C14 9.18046 13.4328 8.61328 12.7436 8.61328ZM12.9231 11.3056C12.9231 11.4061 12.8441 11.4851 12.7436 11.4851H1.25641C1.1559 11.4851 1.07692 11.4061 1.07692 11.3056V9.86969C1.07692 9.76918 1.1559 9.6902 1.25641 9.6902H12.7436C12.8441 9.6902 12.9231 9.76918 12.9231 9.86969V11.3056Z" fill="#585858"/>
                                 <path d="M8.4638 4.46608L7.22893 5.70096L7.22893 0.538904C7.22893 0.244545 6.98483 0.000441819 6.69047 0.000441793C6.39611 0.000441767 6.15201 0.244545 6.15201 0.538903L6.15201 5.70096L4.91714 4.46608C4.80944 4.35839 4.67303 4.30813 4.53662 4.30813C4.40021 4.30813 4.2638 4.35839 4.15611 4.46608C3.9479 4.67429 3.9479 5.0189 4.15611 5.22711L6.30996 7.38096C6.51816 7.58916 6.86278 7.58916 7.07098 7.38096L9.22483 5.22711C9.43303 5.0189 9.43303 4.67429 9.22483 4.46608C9.01662 4.25788 8.67201 4.25788 8.4638 4.46608Z" fill="#585858"/>
@@ -1644,7 +1644,7 @@ async function showDocumentacionDocumentacionContainer(id) {
                                 </button>
                                 <div  
                                 style="cursor: pointer;${sectionsDisabled ? "display: none;" : ""}"
-                                onclick="deleteDocumentacionFileDocumentacion(${file.id_file})">
+                                onclick="deleteDocumentacionFileDocumentacion(${file.id_file??0})">
                                   <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M1 3.32031H2.16H11.44" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
                                   <path d="M10.2799 3.32V11.44C10.2799 11.7477 10.1577 12.0427 9.94016 12.2602C9.72261 12.4778 9.42756 12.6 9.11991 12.6H3.31991C3.01226 12.6 2.71721 12.4778 2.49967 12.2602C2.28213 12.0427 2.15991 11.7477 2.15991 11.44V3.32M3.89991 3.32V2.16C3.89991 1.85235 4.02213 1.5573 4.23967 1.33976C4.45721 1.12221 4.75226 1 5.05991 1H7.37991C7.68756 1 7.98261 1.12221 8.20016 1.33976C8.4177 1.5573 8.53991 1.85235 8.53991 2.16V3.32" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>

@@ -1577,7 +1577,9 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
     public function getDocumentationFolderFiles($id)
     {
         //select * from folders where id_cotizacion is null or $id and left join files where id_folder = id
-        $this->db->select("main.*,files.id AS id_file,files.file_url,SUBSTRING_INDEX(SUBSTRING_INDEX(files.file_url, '.', -1), '/', 1) AS type")
+        $this->db->select("main.*,files.id AS id_file,files.file_url,SUBSTRING_INDEX(SUBSTRING_INDEX(files.file_url, '.', -1), '/', 1) AS type,
+        (select lista_embarque_url from carga_consolidada_contenedor cc where cc.id ='" . $id . "') as lista_embarque_url
+        ")
             ->from($this->table_contenedor_documentacion_folders . " as main")
             ->join($this->table_contenedor_documentacion_files . ' AS files', 'files.id_folder = main.id and files.id_contenedor = ' . $id, 'left');
 

@@ -273,17 +273,31 @@ $SectionNames = [
 
               foreach ($this->menu as $arrMenuPadre):
                 $menu_padre = explode('/', $this->router->directory);
-                $menu_pdre = $menu_padre[0];
+                $menu_padre = $menu_padre[0];
+                //get current url window
+                $current_url = explode('/', $this->router->class);
+             
+                
                 $No_Class_Li_Padre = "nav-item";
                 $No_Class_A_Padre_Active = "";
-                if ($menu_padre != $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
-                  $No_Class_Li_Padre = "nav-item";
+                $childrens = array_filter($arrMenuPadre->Hijos, function ($child) use ($arrMenuPadre) {
+                  //return if arrmenupadre is included in child no_menu_url 
+                  return strpos($child->No_Menu_Url, $this->router->class) !== false;
+                });
+                if (count($childrens) > 0) {
+                  $No_Class_Li_Padre = "nav-item active menu-open";
                   $No_Class_A_Padre_Active = "";
-                } else if ($menu_padre == $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
+                } else if ($menu_padre != $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0) {
+                  $No_Class_Li_Padre = "nav-item ";
+                  $No_Class_A_Padre_Active = "";
+                } else if (
+                  $menu_padre == $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre > 0
+
+                ) {
                   $No_Class_Li_Padre = "nav-item active menu-open";
                   $No_Class_A_Padre_Active = "active";
                 } else if ($this->router->class == $arrMenuPadre->No_Class_Controller && $arrMenuPadre->Nu_Cantidad_Menu_Padre == 0) {
-                  $No_Class_Li_Padre = "nav-item active menu-open";
+                  $No_Class_Li_Padre = "nav-item active ";
                   $No_Class_A_Padre_Active = "active";
                 }
               ?>
@@ -293,7 +307,8 @@ $SectionNames = [
                       <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
                       <p>&nbsp;<?php
                                 if ($this->user->No_Grupo == 'ContenedorAlmacen') {
-                                  echo $arrMenuPadre->No_Menu_China;
+                                  echo $arrMenuPadre->No_Menu_China ;
+
                                 } else {
                                   echo $arrMenuPadre->No_Menu;
                                 } ?>
@@ -320,7 +335,7 @@ $SectionNames = [
                           else if ($this->router->class == $arrHijos->No_Class_Controller && $arrHijos->Nu_Cantidad_Menu_Hijos == 0 && $menuEndUrl == $this->router->method)
                             $No_Class_Li = "nav-item active  menu-open"; ?>
                           <li class="<?php echo $No_Class_Li; ?>">
-                            <a class="nav-link 1 <?php echo ( $this->router->method == $menuEndUrl && $this->router->class == $arrHijos->No_Class_Controller  ? 'active' : ''); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
+                            <a class="nav-link 1 <?php echo ($this->router->method == $menuEndUrl && $this->router->class == $arrHijos->No_Class_Controller  ? 'active' : ''); ?> <?php echo $No_Class_Li; ?>" title="<?php echo $arrHijos->No_Menu; ?>" href="<?php echo base_url() . $arrHijos->No_Menu_Url; ?>">
                               <i class="<?php echo $arrHijos->Txt_Css_Icons; ?>"></i>
                               <p>&nbsp;<?php
                                         if (array_key_exists($arrHijos->No_Menu, $SectionNames[$this->user->No_Grupo])) {
