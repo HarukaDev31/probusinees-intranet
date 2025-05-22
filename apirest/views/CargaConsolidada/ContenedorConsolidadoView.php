@@ -1083,10 +1083,42 @@ Filters
       </div>
     </div>
 
-    <div class="table-responsive" class="table table-bordered table-hover table-striped">
-      <div class="row pl-3 mb-4" style="border-bottom: #DFDFDF solid 2px;max-width: 100%;">
+    <div class="table-responsive" class="table table-bordered table-hover table-striped">     
+       <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 py-3  " style="border-bottom: #DFDFDF solid 2px">
+
+      <div class="row pl-3" >
         <div class="d-flex align-items-center" style="width:10%; padding:15px 10px">
           <span>Clientes</span>
+           <div class="col-4 col-md-4 px-0">
+              <span class="px-1" id="cotizacion_Cliente_name" ></span>
+            </div>
+        </div>
+      </div>
+
+      <?php if($this->user->No_Grupo =="Coordinación"){?>
+       
+      <div class="col-5 col-sm-12 col-md-4 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg" class="country-icons" alt="Perú">
+        <span>CBM Total:</span>
+        <div class="">
+          <strong><span  id="txt-CBM_Cliente_Total_Peru" class="cbm_score" ></span></strong>
+        </div>
+      </div>
+      <div class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" alt="China" class="country-icons">
+          <span>CBM Total:</span>
+          <div class="">
+            <strong><span  id="txt-CBM_Cliente_Total_China" class="cbm_score" ></span></strong>
+          </div>
+      </div>
+      <?php } ?>
+        <div class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+          <!-- icon with dollar icon-->
+          <i class="fas fa-dollar-sign"></i>
+          <span>Total Logistica:</span>
+          <div class="">
+            <strong><span  id="txt-CBM_Cliente_Total_Logistica" class="cbm_score" ></span></strong>
+          </div>
         </div>
       </div>
       <table id="table-clientes-general" class="table table-hover dataTable no-footer">

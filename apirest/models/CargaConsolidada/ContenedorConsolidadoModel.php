@@ -2292,6 +2292,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             $this->db->where('estados IS NULL');
             $this->db->or_where('estados', 'RESERVADO');
             $this->db->or_where('estados', 'ROTULADO');
+            $this->db->or_where('estados', 'COBRANDO');
             $this->db->or_where('estados', 'DATOS PROVEEDOR');
             $this->db->or_where('estados', 'INSPECCIONADO');
             $this->db->group_end();
@@ -3388,18 +3389,108 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     public function getClientesHeader($idContenedor)
     {
         //get sum of cbm_total_china from proveedor where states is LOADED, and get total monto from cotizacion
-        $this->db->select('SUM(ifnull(cbm_total_china,0)) as cbm_total_china')
-            ->from($this->table_contenedor_cotizacion_proveedores)
-            ->where('id_contenedor', $idContenedor)
-            ->where('estados_proveedor', 'LOADED');
-        $query = $this->db->get();
-        $result = $query->row();
-        $this->db->select('SUM(ifnull(monto,0)) as monto')
-            ->from($this->table_contenedor_cotizacion)
-            ->where('id_contenedor', $idContenedor)
-            ->where('estado_cotizador', 'CONFIRMADO');
-        $query = $this->db->get();
-        $result2 = $query->row();
+        // $this->db->select('SUM(ifnull(cbm_total_china,0)) as cbm_total_china')
+        //     ->from($this->table_contenedor_cotizacion_proveedores)
+        //     ->where('id_contenedor', $idContenedor)
+        //     ->where('estados_proveedor', 'LOADED');
+        // $query = $this->db->get();
+        // $result = $query->row();
+        // $this->db->select('SUM(ifnull(monto,0)) as monto')
+        //     ->from($this->table_contenedor_cotizacion)
+        //     ->where('id_contenedor', $idContenedor)
+        //     ->where('estado_cotizador', 'CONFIRMADO');
+        // $query = $this->db->get();
+        // $result2 = $query->row();
+          try {
+            // Consulta para cbm_total_china usando DISTINCT para evitar duplicación
+            $this->db->select('
+            COALESCE(SUM( IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
+        ')
+                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
+                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
+                ->where('cccp.id_contenedor', $idContenedor)
+                ->where('cccp.estados_proveedor', 'LOADED');
+
+            // Subconsulta para cbm_total
+            $this->db->select('(
+            SELECT COALESCE(SUM(cbm_total), 0) 
+            FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+            WHERE id_contenedor = ' . $idContenedor . '
+            AND id_cotizacion IN (
+                SELECT id 
+                FROM ' . $this->table_contenedor_cotizacion . ' 
+                WHERE estado_cotizador = "CONFIRMADO"
+            )
+        ) as cbm_total', false);
+
+         
+
+            // Subconsulta para total_logistica
+            $this->db->select('(
+            SELECT COALESCE(SUM(monto), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+            )
+            AND estado_cotizador = "CONFIRMADO"
+            AND id IN (
+                SELECT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+                AND estados_proveedor = "LOADED"
+            )
+        ) as total_logistica', false);
+            //get carga
+            $this->db->select('carga')
+                ->from($this->table.' as c')
+                ->where('c.id', $idContenedor);
+
+            $query = $this->db->get();
+            $result = $query->row();
+
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error: ' . $this->db->error()['message']);
+            }
+
+            // Obtener bl_file_url y lista_empaque_file_url del contenedor
+            $this->db->select('bl_file_url, lista_embarque_url')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $result2 = $query->row();
+
+            if ($result) {
+                return [
+                    'cbm_total_china' => $result->cbm_total_china,
+                    'cbm_total' => $result->cbm_total,
+                    'cbm_total_pendiente' => $result->cbm_total_pendiente,
+                    'total_logistica' => $result->total_logistica,
+                    'bl_file_url' => $result2->bl_file_url,
+                    'carga' => $result->carga,
+                    'lista_embarque_url' => $result2->lista_embarque_url
+                ];
+            } else {
+                return [
+                    'status' => "error",
+                    'error' => false,
+                    "data" => [
+                        'cbm_total_china' => 0,
+                        'cbm_total_pendiente' => 0,
+                        'total_logistica' => 0,
+                        'cbm_total' => 0,
+                        'bl_file_url' => '',
+                        'carga' => '',
+                        'lista_embarque_url' => ''
+                    ]
+                ];
+            }
+        } catch (Exception $e) {
+            log_message('error', '' . $e->getMessage());
+            return $e->getMessage();
+        }
+
         if ($result) {
             return [
                 'cbm_total_china' => $result->cbm_total_china,

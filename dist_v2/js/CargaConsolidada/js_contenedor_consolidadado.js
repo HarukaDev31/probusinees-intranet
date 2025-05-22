@@ -684,9 +684,12 @@ async function getClientesHeader() {
     idContenedor;
   const response = await fetch(url);
   const result = await response.json();
-  $("#txt-Monto_Total").val(result.monto);
-  $("#cotizacion_name").val('#' + result.carga);
-  $("#txt-CBM_Total_China_Clientes").val(result.cbm_total_china);
+  console.log(result.cbm_total);
+  $("#txt-CBM_Cliente_Total_Peru").html(result.cbm_total);
+  $("#cotizacion_Cliente_name").html('#' + result.carga);
+  $("#txt-CBM_Cliente_Total_Logistica").html(result.total_logistica);
+
+  $("#txt-CBM_Cliente_Total_China").html(result.cbm_total_china);
   console.log(result);
   spinner.hide();
 }
@@ -2420,8 +2423,6 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
           buttons: [],
           paging: true,
           lengthChange: true,
@@ -4733,7 +4734,30 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
 
       });
     } else {
-      // Vista para otros usuarios (como en la imagen)
+      let aditionalFiles = ``;
+      console.log("filteredFilesF", filteredFilesF);
+      filteredFilesF.forEach((file) => {
+        if (file.file_url) {
+          aditionalFiles += `<div>
+              <p>${file.folder_name}</p>
+              <div class="flex align-items-center py-2 gap-5">
+                ${file.file_url
+                ? `
+                    <div class="file-iconic">${getIconByType(file.file_url.split('.').pop().toLowerCase())}</div>
+                    <div>
+                      <span class="file-name">${decodeURIComponent(file.file_url.split('_').pop())}</span>
+                    </div>
+                    <button class="btn-sm download-btn"
+                    data-url="${file.file_url}"
+                    >
+                    <i class="fas fa-download"></i>
+                    </a>`
+                : `
+                    <div class="py-2">No hay archivo disponible</div>
+                  `}
+              </div>
+              </div>`;
+        }});
       $(".documentos-clientes-content").append(`
       <div class="flex col-4 h-25">
         <div class="bg-white rounded-lg shadow-md w-100">
@@ -4770,7 +4794,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
               <p>Excel Confirmacion</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${excelConfirmacion
-          ? `
+                ? `
                     <div class="file-iconic">${getIconByType(excelConfirmacion.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(excelConfirmacion.split('_').pop())}</span>
@@ -4780,14 +4804,32 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     >
                     <i class="fas fa-download"></i>
                     </a>`
-          : `
+                : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
             </div>
-            
             <div>
-
+              <p>Packing List</p>
+              <div class="flex align-items-center py-2 gap-5">
+                ${packingList
+                ? `
+                    <div class="file-iconic">${getIconByType(packingList.split('.').pop().toLowerCase())}</div>
+                    <div>
+                      <span class="file-name">${decodeURIComponent(packingList.split('_').pop())}</span>
+                    </div>
+                    <button class="btn-sm download-btn"
+                    data-url="${packingList}"
+                    >
+                    <i class="fas fa-download"></i>
+                    </a>`
+                : `
+                    <div class="py-2">No hay archivo disponible</div>
+                  `}
+              </div>
+            </div>
+            <div>
+                ${aditionalFiles}
             </div>
           </div>
         </div>
