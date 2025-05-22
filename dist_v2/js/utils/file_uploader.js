@@ -140,8 +140,7 @@ class FileUploader {
       };
     } else {
       handleContainerClick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+       
         this.input.click();
       };
     }
