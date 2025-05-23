@@ -31,6 +31,9 @@ $(function () {
       titleAttr : 'Excel',
       exportOptions: {
         columns: ':visible'
+      },
+      attr:{
+        class:"hidden"
       }
     },
     {
@@ -39,6 +42,9 @@ $(function () {
       titleAttr : 'PDF',
       exportOptions: {
         columns: ':visible'
+      },
+      attr:{
+        class:"hidden"
       }
     },
     {
@@ -47,6 +53,9 @@ $(function () {
       titleAttr : 'Columnas',
       exportOptions: {
         columns: ':visible'
+      },
+      attr:{
+        class:"hidden"
       }
     }],
     'searching'   : true,

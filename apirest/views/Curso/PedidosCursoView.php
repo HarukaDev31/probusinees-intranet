@@ -58,8 +58,8 @@
               </div>
 
               <div class="table-responsive div-Listar">
-                <table id="table-Pedidos" class="table table-bordered table-hover table-striped">
-                  <thead class="thead-light">
+                <table id="table-Pedidos" class="table table-hover dataTable no-footer">
+                  <thead class="thead-default">
                     <tr>
                       <th>Pedido</th>
                       <th>Fecha</th>

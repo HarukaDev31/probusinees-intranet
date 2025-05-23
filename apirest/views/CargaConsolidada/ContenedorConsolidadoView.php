@@ -677,9 +677,9 @@ Search for
             <!-- Buscador -->
             <div class="dataTables_filter">
               <input type="search" class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
-Buscar por
+                Buscar por
                           <?php } else { ?>
-Search for
+                  Search for
                           <?php } ?> " aria-controls="table-contenedor" style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 16px; font-size: 14px;">
             </div>
 
@@ -711,13 +711,13 @@ Search for
             <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
                           <?php } else { ?>
-Filters
+              Filters
                           <?php } ?>-->
             <div class=" col-6 col-sm-2 dropdown">
               <!-- Botón de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                            Filtros
                           <?php } else { ?>
-Filters
+                          Filters
                           <?php } ?> -->
               <button class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>

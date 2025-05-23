@@ -3004,7 +3004,7 @@ const openStepFunction = async (step, id) => {
             },
             className: "btn btn-light",
           },
-          currentPrivilege != "Documentacion"
+          currentPrivilege != "Documentacion" && currentPrivilege != "Cotizador"
             ? {
               text: "Variación",
               action: function () {
