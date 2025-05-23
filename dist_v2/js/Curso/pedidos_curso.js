@@ -57,7 +57,19 @@ $(function () {
       attr:{
         class:"hidden"
       }
-    }],
+    },
+    {
+      text:"Alumnos",
+      action: function(){
+      },
+      className: "btn btn-light",
+    },
+    {
+      text:"Pagos",
+      action: function(){
+      }
+    },
+  ],
     'searching'   : true,
     'bStateSave'  : true,
     "lengthChange": true,
@@ -97,15 +109,19 @@ $(function () {
     },
     'columnDefs': [
       {
-        'targets': 'no-hidden',
-        "visible": false, 
+        targets: 'no-hidden',
+        visible: false, 
       },{
-      'className' : 'text-center',
-      'targets'   : 'no-sort',
-      'orderable' : false,
-    },],
+      className : 'text-center',
+      targets   : 'no-sort',
+      orderable : false,
+    },{
+          targets: "",
+          orderable: false,
+        },],
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
+  configurarBuscador('table-Pedidos', 'search-table', 'info-container');
 
   $('#table-Pedidos_filter input').removeClass('form-control-sm');
   $('#table-Pedidos_filter input').addClass('form-control-md');
@@ -204,5 +220,153 @@ function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
         }
       }
     });
+  });
+}
+
+async function viewCliente(id) {
+  var url = base_url + 'Curso/PedidosCurso/ViewCliente/' + id;
+  const response = await fetch(url);
+  $.ajax({
+    url: url,
+    type: "GET",
+    dataType: "JSON",
+    success: function (response) {
+      if (response.status == 'success') {
+        $("#cliente-nombres").val(response.data.nombres);
+        $("#cliente-sexo").val(response.data.sexo);
+        $("#cliente-dni").val(response.data.dni);
+        $("#cliente-redsocial").val(response.data.red_social);
+        $("#cliente-correo").val(response.data.correo);
+        $("#cliente-pais").val(response.data.pais);
+        $("#cliente-whatsapp").val(response.data.whatsapp);
+        $("#cliente-departamento").val(response.data.departamento);
+        $("#cliente-provincia").val(response.data.provincia);
+        $("#cliente-distrito").val(response.data.distrito);
+        $("#cliente-edad").val(response.data.nacimiento);
+        $("#cliente-moodle-usuario").val(response.data.usuario_moodle);
+        $("#cliente-moodle-password").val(response.data.password_moodle);
+
+        // Siempre deja los campos en readonly y muestra solo el botón editar
+        $('.cliente-input').prop('readonly', true);
+        $('#btn-editar-cliente').show();
+        $('#btn-guardar-cliente').hide();
+
+        // Cambia el content-header
+        $('.content-header').html(`
+            <div class="container-fluid">
+              <div class="row mb-2 px-3 d-flex justify-content-between">
+                <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
+                  <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion"onclick="ocultarSectionDatosCliente()"><i class="fa fa-arrow-left"></i> Regresar</button>
+                </div>
+                <div class="col-xl-3 col-md-2"></div>
+                <div class="col-6 col-md-0 col-xl-1">
+                </div>
+                <div class="col-12 col-md-2 col-xl-1">
+                </div>
+                <div class="col-12 col-md-0 col-xl-2 justify-content-center d-flex">
+                  <button id="btn-editar-cliente" class="btn p-1 ml-4" title="Editar">
+                      <i class="fas fa-edit"></i>
+                  </button>
+                  <button id="btn-cancel" class="hidden btn p-1 ml-4" title="Cancelar">
+                      <i class="fas fa-times"></i>
+                  </button>
+                  <div id="btn-guardar-cliente" class="col-3 col-xl-10 py-sm-3 py-xl-0 py-md-0">
+                    <button type="button" class="text-white bg-[#fd7e14] py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion"><i class="fa fa-save"></i> Guardar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+        `);
+
+        $('#section-listar-pedidos').hide();
+        $('#section-datos-cliente').show();
+
+        $('#btn-editar-cliente').on('click', function() {
+          $('.cliente-input').prop('readonly', false);
+          $('#btn-guardar-cliente').show();
+          $('#btn-cancel').show();
+          $(this).hide();
+        });
+        $('#btn-cancel').on('click', function() {
+          $('.cliente-input').prop('readonly', true);
+          $('#btn-editar-cliente').show();
+          $(this).hide();
+        });
+        $('#btn-guardar-cliente').on('click', function() {
+          $('.cliente-input').prop('readonly', true);
+          $('#btn-editar-cliente').show();
+          // Aquí tu lógica para guardar
+        });
+
+      } else {
+        ocultarSectionDatosCliente();
+      }
+    }
+  });
+}
+
+function ocultarSectionDatosCliente() {
+  $('#section-listar-pedidos').show();
+  $('#section-datos-cliente').hide();
+
+  // Cambia el content-header
+  $('.content-header').html(headerOriginal);
+  reload_table_Entidad();
+
+  // Muestra la sección de la tabla y oculta la de cliente
+  $('#section-listar-pedidos').show();
+  $('#section-datos-cliente').hide();
+}
+
+
+let headerOriginal = '';
+$(document).ready(async function () {
+  $('.dropdown-menu').on('click', function (event) {
+    event.stopPropagation(); // Evita que el evento se propague
+  });
+
+  // Cierra el menú al hacer clic en "Cancelar" o "Aplicar"
+  $('#cancelar-btn, #aplicar-btn').on('click', function () {
+    $('#filtros-btn').dropdown('hide'); // Cierra el menú
+  });
+
+  // Cierra el menú al hacer clic en el botón "Filtros" si ya está abierto
+  $('#filtros-btn').on('click', function (event) {
+    if ($(this).attr('aria-expanded') === 'true') {
+      $(this).dropdown('hide'); // Cierra el menú si ya está abierto
+    }
+  });
+  headerOriginal = $('.content-header').html();
+  $sectionlistarpedidos = $('#section-listar-pedidos');
+  $sectionlistarpedidos.show();
+  $sectiondatoscliente = $('#section-datos-cliente');
+  $sectiondatoscliente.hide();
+});
+async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
+  // Obtener la instancia de DataTable
+  var table = $("#" + tableId).DataTable();
+
+  // Escuchar el evento "input" en el buscador
+  $("." + searchInputClass).on("input", function () {
+    var searchTerm = $(this).val(); // Obtener el valor del buscador
+    table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
+  });
+
+  // Función para limpiar el buscador y el filtro
+  window["resetBuscador_" + tableId] = function () {
+    $("." + searchInputClass).val("");
+    table.search("").draw();
+  };
+
+  // Actualizar el mensaje de información después de cada búsqueda
+  table.on("draw", function () {
+    var info = table.page.info();
+    if (infoContainerId) {
+      $("#" + infoContainerId).html(
+        `Mostrando ${info.start + 1} a ${info.end} de ${info.recordsTotal
+        } registros`
+      );
+    }
   });
 }

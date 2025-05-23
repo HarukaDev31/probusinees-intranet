@@ -49,64 +49,34 @@ class PedidosCurso extends CI_Controller {
 				$sWhatsAppCliente = ' <a href="https://api.whatsapp.com/send?phone=' . $sCodigoPaisCelular . $row->Nu_Celular_Entidad . '&text=' . $sMensaje . '" target="_blank"><i class="fab fa-whatsapp" style="color: #25d366;"></i></a>';
 			}
 
-            $rows[] = $row->No_Entidad . "<br>" . $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad . "<br>" . $row->Nu_Celular_Entidad . $sWhatsAppCliente . "<br>" . $row->Txt_Email_Entidad;
-		
-			$rows[] = $row->No_Signo . ' ' . round($row->Ss_Total, 2);
+            $rows[] = $row->No_Entidad . "<br>" . $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad . "<br>" . $row->Nu_Celular_Entidad . $sWhatsAppCliente . "<br>" . $row->Txt_Email_Entidad; //cliente
+			$btn_compartir = '<button class="btn btn-xs btn-link" alt="Enviar email" title="Enviar email" href="javascript:void(0)"  onclick="enviarEmailUsuarioMoodle(\'' . $row->ID_Usuario . '\', \'' . $row->ID_Pedido_Curso . '\')"><i class="far fa-envelope fa-2x" aria-hidden="true"></i></button>';
+			if($row->Nu_Estado==4)
+				$btn_compartir ='';
+			$rows[] = $btn_compartir; //compartir
 			
-			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroPagosArray($row->Nu_Estado);
-            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 			
-			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoProcesoUsuarioCursoArray($row->Nu_Estado_Usuario_Externo);
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoProcesoUsuarioCursoArray($row->Nu_Estado_Usuario_Externo); //estado usuario
             $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 
 			$btn_usuario_moodle ='';
 			if($row->Nu_Estado==2 && $row->Nu_Estado_Usuario_Externo!="2")
 			$btn_usuario_moodle = '<button class="btn btn-primary" alt="Crear usuario" title="Crear usuario" href="javascript:void(0)"  onclick="crearUsuarioCursosMoodle(\'' . $row->ID_Usuario . '\', \'' . $row->ID_Pedido_Curso . '\')">Crear</button>';
-            $rows[] = $row->No_Usuario . "<br>" . $this->encryption->decrypt($row->No_Password) . "<br>" . $btn_usuario_moodle;
+            $rows[] = $row->No_Usuario . "<br>" . $this->encryption->decrypt($row->No_Password) . "<br>" . $btn_usuario_moodle; //moodle
 
-			$rows[] = $row->ID_Referencia_Pago_Online;
+			$rows[] = $row->ID_Referencia_Pago_Online; //rf pago
+			$rows[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" readonly/>';	//importe		
+			$arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroPagosArray($row->Nu_Estado); //estado
+            $rows[] = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
 
-			$btn_compartir = '<button class="btn btn-xs btn-link" alt="Enviar email" title="Enviar email" href="javascript:void(0)"  onclick="enviarEmailUsuarioMoodle(\'' . $row->ID_Usuario . '\', \'' . $row->ID_Pedido_Curso . '\')"><i class="far fa-envelope fa-2x" aria-hidden="true"></i></button>';
-			if($row->Nu_Estado==4)
-				$btn_compartir ='';
-			$rows[] = $btn_compartir;
-
-			$rows[] = $row->Nu_Celular_Entidad;//celular
-			$rows[] = $row->No_Tipo_Documento_Identidad_Breve;//tdi
-			$rows[] = $row->Nu_Documento_Identidad;//nro
-			$rows[] = $row->No_Entidad;//nombres y apellidos
-			$rows[] = (!empty($row->Fe_Nacimiento) ? ToDateBD($row->Fe_Nacimiento) : '');
-
-			$sNombreSexo = 'Hombre';
-			if($row->Nu_Tipo_Sexo==2)
-				$sNombreSexo = 'Mujer';
-			else if($row->Nu_Tipo_Sexo==3)
-				$sNombreSexo = 'Otros';
-			$rows[] = $sNombreSexo;//sexo
 			
-			//1=Tiktok, 2=Facebook, 3=Instagram, 4=Youtube, 5=Familiares/Amigos, 6=LinkedIn, 7=Google, 8=Otros
-			$sNombreRedSocial = 'Tiktok';
-			if($row->Nu_Como_Entero_Empresa==2)
-				$sNombreRedSocial = 'Facebook';
-			else if($row->Nu_Como_Entero_Empresa==3)
-				$sNombreRedSocial = 'Instagram';
-			else if($row->Nu_Como_Entero_Empresa==4)
-				$sNombreRedSocial = 'Youtube';
-			else if($row->Nu_Como_Entero_Empresa==5)
-				$sNombreRedSocial = 'Familiares/Amigos';
-			else if($row->Nu_Como_Entero_Empresa==6)
-				$sNombreRedSocial = 'LinkedIn';
-			else if($row->Nu_Como_Entero_Empresa==7)
-				$sNombreRedSocial = 'Google';
-			else if($row->Nu_Como_Entero_Empresa==8)
-				$sNombreRedSocial = 'Otros: ';
+			
+			$divAcciones = '<div>';//Acciones
+			$divAcciones .= '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewCliente(\'' . $row->ID_Pedido_Curso . '\')"></i>';
+			$divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="eliminarPedido(\'' . $row->ID_Pedido_Curso . '\')"></i>';
 
-            $rows[] = $sNombreRedSocial . (!empty($row->No_Otros_Como_Entero_Empresa) && $row->No_Otros_Como_Entero_Empresa != '1' ? $row->No_Otros_Como_Entero_Empresa : '');
-
-            $rows[] = $row->No_Pais;
-			$rows[] = $row->No_Departamento;//depa
-			$rows[] = $row->No_Provincia;//pro
-			$rows[] = $row->No_Distrito;//dis
+			$divAcciones .= '</div>';
+			$rows[] = $divAcciones;
 
             $data[] = $rows;
         }
@@ -119,6 +89,53 @@ class PedidosCurso extends CI_Controller {
         echo json_encode($output);
     }
 	
+	public function ViewCliente($id_pedido) {
+		$data = $this->PedidosCursoModel->getDatosClientePorPedido($id_pedido);
+		if ($data) {
+			// Desencripta la contraseña si existe
+			if (isset($data['password_moodle']) && !empty($data['password_moodle'])) {
+				$data['password_moodle'] = $this->encryption->decrypt($data['password_moodle']);
+			}
+
+			// Sexo: mostrar número y texto
+			$sexo_num = $data['sexo'];
+			$sexo_text = 'Hombre';
+			if ($sexo_num == 2) $sexo_text = 'Mujer';
+			else if ($sexo_num == 3) $sexo_text = 'Otros';
+
+			// Red social: mostrar texto descriptivo
+			$red_social_num = $data['red_social'];
+			$red_social_text = 'Tiktok';
+			if ($red_social_num == 2) $red_social_text = 'Facebook';
+			else if ($red_social_num == 3) $red_social_text = 'Instagram';
+			else if ($red_social_num == 4) $red_social_text = 'Youtube';
+			else if ($red_social_num == 5) $red_social_text = 'Familiares/Amigos';
+			else if ($red_social_num == 6) $red_social_text = 'LinkedIn';
+			else if ($red_social_num == 7) $red_social_text = 'Google';
+			else if ($red_social_num == 8) $red_social_text = 'Otros: ' . ($data['No_Otros_Como_Entero_Empresa'] ?? '');
+
+			// Prepara la respuesta
+			$response = [
+				'nombres' => $data['nombres'],
+				'sexo' => $sexo_text,
+				'dni' => $data['dni'],
+				'red_social' => $red_social_text,
+				'correo' => $data['correo'],
+				'pais' => $data['pais'],
+				'whatsapp' => $data['whatsapp'],
+				'departamento' => $data['departamento'],
+				'provincia' => $data['provincia'],
+				'distrito' => $data['distrito'],
+				'nacimiento' => (!empty($data['nacimiento']) ? date('d/m/Y', strtotime($data['nacimiento'])) : ''),
+				'usuario_moodle' => $data['usuario_moodle'],
+				'password_moodle' => $data['password_moodle'],
+			];
+
+			echo json_encode(['status' => 'success', 'data' => $response]);
+		} else {
+			echo json_encode(['status' => 'error', 'message' => 'No se encontró el pedido']);
+		}
+	}
 	public function crearUsuarioCursosMoodle($id, $ID_Pedido_Curso){
 		$id_pedido_curso = $ID_Pedido_Curso;
 		//buscar usuario

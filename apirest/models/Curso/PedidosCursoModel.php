@@ -5,6 +5,7 @@ class PedidosCursoModel extends CI_Model{
 	var $table_organizacion = 'organizacion';
 	var $table_configuracion = 'configuracion';
 	var $table_moneda = 'moneda';
+	var $table_importe = 'importe';
 	var $table_cliente = 'entidad';
 	var $table_medio_pago = 'medio_pago';
 	var $table_departamento = 'departamento';
@@ -43,6 +44,35 @@ class PedidosCursoModel extends CI_Model{
 			$this->db->order_by(key($order), $order[key($order)]);
 		}
     }
+
+	public function getDatosClientePorPedido($id_pedido) {
+		$this->db->select('
+			CLI.No_Entidad as nombres,
+			CLI.Nu_Tipo_Sexo as sexo,
+			CLI.Nu_Documento_Identidad as dni,
+			CLI.Nu_Celular_Entidad as whatsapp,
+			CLI.Txt_Email_Entidad as correo,
+			CLI.Fe_Nacimiento as nacimiento,
+			CLI.Nu_Como_Entero_Empresa as red_social,
+			P.No_Pais as pais,
+			D.No_Departamento as departamento,
+			PR.No_Provincia as provincia,
+			DI.No_Distrito as distrito,
+			USR.No_Usuario as usuario_moodle,
+			USR.No_Password as password_moodle
+		')
+		->from($this->table)
+		->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
+		->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
+		->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'left')
+		->join($this->table_distrito . ' AS DI', 'DI.ID_Distrito = CLI.ID_Distrito', 'left')
+		->join($this->table_provincia . ' AS PR', 'PR.ID_Provincia = CLI.ID_Provincia', 'left')
+		->join($this->table_departamento . ' AS D', 'D.ID_Departamento = CLI.ID_Departamento', 'left')
+		->where($this->table . '.ID_Pedido_Curso', $id_pedido);
+
+		$query = $this->db->get();
+		return $query->row_array();
+	}
     
     function get_datatables(){
         $this->_get_datatables_query();
