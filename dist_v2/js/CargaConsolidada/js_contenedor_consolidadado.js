@@ -82,6 +82,7 @@ var cotizacionContainer = null;
 var clientesContainer = null;
 var tableCotizacion = null;
 var tableCotizacionEmbarque = null;
+var tableCotizacionPagos = null;
 var tableClientesGeneral = null;
 var tableClientesVariacion = null;
 var clientesDocumentacionContainer = null;
@@ -1599,7 +1600,7 @@ async function showDocumentacionDocumentacionContainer(id) {
       color = "bg-purple-50";
     }
 
-    if (file.file_url || (file.folder_name=='Packing China' && file.lista_embarque_url )) {
+    if (file.file_url || (file.folder_name == 'Packing China' && file.lista_embarque_url)) {
       // $("#documentacion-documentacion").append(`
       //           <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria
       //   }">
@@ -1625,17 +1626,17 @@ async function showDocumentacionDocumentacionContainer(id) {
                   ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>` : ""}
                 </label>
                 <div class="file-upload-box">
-                    ${file.file_url || (file.folder_name=='Packing China' && file.lista_embarque_url ) ? `
+                    ${file.file_url || (file.folder_name == 'Packing China' && file.lista_embarque_url) ? `
                             <div class="file-info">
                               <div class="file-iconic">
-                                ${getIconByType(file.type??'xlsx')}
+                                ${getIconByType(file.type ?? 'xlsx')}
                               </div>
                                 <span class="file-name">${file.folder_name}</span>
                                 
                                 <div 
                                 class="d-flex flex-row gap-5"
                                 >
-                                <button class="download-file-button" onclick=window.location.href='${file.file_url??file.lista_embarque_url}'>
+                                <button class="download-file-button" onclick=window.location.href='${file.file_url ?? file.lista_embarque_url}'>
                                 <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12.7436 8.61328H1.25641C0.56718 8.61328 0 9.18046 0 9.86969V11.3056C0 11.9948 0.56718 12.562 1.25641 12.562H12.7436C13.4328 12.562 14 11.9948 14 11.3056V9.86969C14 9.18046 13.4328 8.61328 12.7436 8.61328ZM12.9231 11.3056C12.9231 11.4061 12.8441 11.4851 12.7436 11.4851H1.25641C1.1559 11.4851 1.07692 11.4061 1.07692 11.3056V9.86969C1.07692 9.76918 1.1559 9.6902 1.25641 9.6902H12.7436C12.8441 9.6902 12.9231 9.76918 12.9231 9.86969V11.3056Z" fill="#585858"/>
                                 <path d="M8.4638 4.46608L7.22893 5.70096L7.22893 0.538904C7.22893 0.244545 6.98483 0.000441819 6.69047 0.000441793C6.39611 0.000441767 6.15201 0.244545 6.15201 0.538903L6.15201 5.70096L4.91714 4.46608C4.80944 4.35839 4.67303 4.30813 4.53662 4.30813C4.40021 4.30813 4.2638 4.35839 4.15611 4.46608C3.9479 4.67429 3.9479 5.0189 4.15611 5.22711L6.30996 7.38096C6.51816 7.58916 6.86278 7.58916 7.07098 7.38096L9.22483 5.22711C9.43303 5.0189 9.43303 4.67429 9.22483 4.46608C9.01662 4.25788 8.67201 4.25788 8.4638 4.46608Z" fill="#585858"/>
@@ -1644,7 +1645,7 @@ async function showDocumentacionDocumentacionContainer(id) {
                                 </button>
                                 <div  
                                 style="cursor: pointer;${sectionsDisabled ? "display: none;" : ""}"
-                                onclick="deleteDocumentacionFileDocumentacion(${file.id_file??0})">
+                                onclick="deleteDocumentacionFileDocumentacion(${file.id_file ?? 0})">
                                   <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M1 3.32031H2.16H11.44" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
                                   <path d="M10.2799 3.32V11.44C10.2799 11.7477 10.1577 12.0427 9.94016 12.2602C9.72261 12.4778 9.42756 12.6 9.11991 12.6H3.31991C3.01226 12.6 2.71721 12.4778 2.49967 12.2602C2.28213 12.0427 2.15991 11.7477 2.15991 11.44V3.32M3.89991 3.32V2.16C3.89991 1.85235 4.02213 1.5573 4.23967 1.33976C4.45721 1.12221 4.75226 1 5.05991 1H7.37991C7.68756 1 7.98261 1.12221 8.20016 1.33976C8.4177 1.5573 8.53991 1.85235 8.53991 2.16V3.32" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2377,6 +2378,10 @@ const reloadTableCotizacion = async () => {
   tableCotizacion.ajax.reload();
   await getTableCotizacionEmbarqueHeaders();
 };
+const reloadTableCotizacionPagos = async () => {
+  tableCotizacionPagos.ajax.reload();
+  await getTableCotizacionEmbarqueHeaders();
+};
 const updateEstadoCliente = (id) => {
   const estado = $(`#estado-cliente-${id}`).val();
   url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCliente";
@@ -2410,7 +2415,6 @@ const openStepFunction = async (step, id) => {
       currentPrivilege == "ContenedorAlmacen" ||
       currentPrivilege == "Documentacion"
     ) {
-      $("#table-cotizacion-prospectos").attr("style", "display:none");
       if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
         reloadTableCotizacionEmbarque();
         enableHorizontalAutoScrollForAllTables();
@@ -2553,283 +2557,119 @@ const openStepFunction = async (step, id) => {
       }
       spinner.hide();
     } else {
-      if (currentTableCotizacion != "prospectos") {
-        reloadTableCotizacionEmbarque();
-        enableHorizontalAutoScrollForAllTables();
-      }
-      if (
-        $.fn.DataTable.isDataTable("#table-cotizacion-prospectos") &&
-        currentTableCotizacion != "embarque"
-      ) {
-        reloadTableCotizacion();
-        enableHorizontalAutoScrollForAllTables();
-      } else if (currentTableCotizacion == "prospectos") {
-        url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-        tableCotizacion = $("#table-cotizacion-prospectos").DataTable({
-          dom:
-            "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-            "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      $(".tab-cotizacion").removeClass("active");
+     
+      $(".tab-cotizacion").off("click").click(function () {
+        $(".tab-cotizacion").removeClass("active");
 
-
-          buttons: [
-            {
-              extend: "excel",
-              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-              titleAttr: "Excel",
-              exportOptions: {
-                columns: ":visible",
+        let table = this.getAttribute("data-table");
+        this.classList.add("active");
+        if (table == "embarque") {
+          $("#table-cotizacion-embarque").attr("style", "");
+          $("#table-cotizacion-prospectos").hide();
+          $("#table-cotizacion-pagos").hide();
+          if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+            $("#table-cotizacion-embarque").attr("style", "");
+            $("#table-cotizacion-embarque").show();
+            $("#table-cotizacion-embarque_wrapper").show();
+            $("#table-cotizacion-prospectos_wrapper").hide();
+            $("#table-cotizacion-pagos_wrapper").hide();
+            limpiarFiltroDataTable("table-cotizacion-embarque");
+            limpiarInputBuscadorPersonalizado("search-table");
+            reloadTableCotizacionEmbarque();
+            enableHorizontalAutoScrollForAllTables();
+          } else {
+            url =
+              base_url + "CargaConsolidada/ContenedorConsolidado/step";
+            tableCotizacionEmbarque.show();
+            tableCotizacionEmbarque = $(
+              "#table-cotizacion-embarque"
+            ).DataTable({
+              dom:
+                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+              buttons: [],
+              paging: true,
+              lengthChange: true,
+              searching: true,
+              ordering: false,
+              info: true,
+              autoWidth: false,
+              responsive: false,
+              serverSide: false,
+              pagingType: "full_numbers",
+              oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                  sFirst: "<<",
+                  sLast: ">>",
+                  sPrevious: "<",
+                  sNext: ">",
+                },
               },
-              attr: {
-                id: "export-excel-main",
-                class: "hidden",
-              },
-            },
-
-            {
-              extend: "pdf",
-              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-              titleAttr: "PDF",
-              exportOptions: {
-                columns: ":visible",
-              },
-              attr: {
-                id: "export-pdf-main",
-                class: "hidden",
-              },
-            },
-            {
-              text: "Prospectos",
-              action: function () {
-                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
-                  $("#table-cotizacion-embarque").attr("style", "display:none");
-                  $("#table-cotizacion-embarque_wrapper").hide();
-                }
-                if (
-                  $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
-                ) {
-                  //display block
-                  $("#table-cotizacion-prospectos").attr("style", "");
-                  $("#table-cotizacion-prospectos_wrapper").show();
-                  limpiarFiltroDataTable("table-cotizacion-prospectos");
-                  limpiarInputBuscadorPersonalizado("search-table");
-                  reloadTableCotizacion();
-                  enableHorizontalAutoScrollForAllTables();
-                } else {
-                  $("#table-cotizacion-prospectos").attr("style", "");
-                  $("#table-cotizacion-prospectos_wrapper").show();
-                  limpiarFiltroDataTable("table-cotizacion-prospectos");
-                  limpiarInputBuscadorPersonalizado("search-table");
-                  reloadTableCotizacion();
-                  enableHorizontalAutoScrollForAllTables();
-                }
-
-                currentTableCotizacion = "prospectos";
-              },
-              className: "btn btn-light",
-            },
-            {
-              text: "Por Embarcar",
-              action: async function () {
-                if (
-                  $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
-                ) {
-                  $("#table-cotizacion-prospectos").attr(
-                    "style",
-                    "display:none"
-                  );
-                  $("#table-cotizacion-prospectos_wrapper").hide();
-                }
-                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
-                  $("#table-cotizacion-embarque").attr("style", "");
-                  $("#table-cotizacion-embarque_wrapper").show();
-                  limpiarFiltroDataTable("table-cotizacion-embarque");
-                  limpiarInputBuscadorPersonalizado("search-table");
-                  reloadTableCotizacionEmbarque();
-                  enableHorizontalAutoScrollForAllTables();
-                } else {
-                  url =
-                    base_url + "CargaConsolidada/ContenedorConsolidado/step";
-                  tableCotizacionEmbarque.show();
-                  tableCotizacionEmbarque = $(
-                    "#table-cotizacion-embarque"
-                  ).DataTable({
-                    dom:
-                      "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
-                      "<'row'<'col-sm-12'tr>>" +
-                      "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-                    buttons: [
-                      {
-                        text: "Prospectos",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-embarque"
-                            )
-                          ) {
-                            $("#table-cotizacion-embarque").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-cotizacion-embarque_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-prospectos"
-                            )
-                          ) {
-                            $("#table-cotizacion-prospectos_wrapper").show();
-                            limpiarFiltroDataTable("table-cotizacion-prospectos");
-                            limpiarInputBuscadorPersonalizado("search-table");
-
-                            $("#table-cotizacion-prospectos").attr("style", "");
-                            reloadTableCotizacion();
-                            enableHorizontalAutoScrollForAllTables();
-                          } else {
-                            $("#table-cotizacion-prospectos").attr("style", "");
-                            reloadTableCotizacion();
-                            enableHorizontalAutoScrollForAllTables();
-                          }
-                          currentTableCotizacion = "prospectos";
-                        },
-                      },
-                      {
-                        text: "Por Embarcar",
-                        className: "btn btn-light",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-prospectos"
-                            )
-                          ) {
-                            $("#table-cotizacion-prospectos").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-cotizacion-prospectos_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-embarque"
-                            )
-                          ) {
-                            $("#table-cotizacion-embarque").attr("style", "");
-                          } else {
-                            $("#table-cotizacion-embarque").attr("style", "");
-                          }
-                          $(".input-date").datepicker({
-                            autoclose: true,
-                            startDate: new Date(fYear, fToday.getMonth(), fDay),
-                            todayHighlight: true,
-                            format: "dd/mm/yyyy",
-                            dateFormat: "dd/mm/yyyy",
-                          });
-                          currentTableCotizacion = "embarque";
-                        },
-                      },
-                    ],
-                    paging: true,
-                    lengthChange: true,
-                    searching: true,
-                    ordering: false,
-                    info: true,
-                    autoWidth: false,
-                    responsive: false,
-                    serverSide: false,
-                    pagingType: "full_numbers",
-                    oLanguage: {
-                      sInfo:
-                        "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-                      sLengthMenu: "_MENU_",
-                      sSearch: "Buscar por: ",
-                      sSearchPlaceholder: "",
-                      sZeroRecords: "No se encontraron registros",
-                      sInfoEmpty: "No hay registros",
-                      sLoadingRecords: "Cargando...",
-                      sProcessing: "Procesando...",
-                      oPaginate: {
-                        sFirst: "<<",
-                        sLast: ">>",
-                        sPrevious: "<",
-                        sNext: ">",
-                      },
-                    },
-                    //hide last two columns
-                    columnDefs: [
-                      {
-                        targets: "no-hidden",
-                        visible: false,
-                      },
-                      {
-                        className: "text-center",
-                        targets: "no-sort",
-                        orderable: false,
-                      },
-                      {
-                        targets: "",
-                        orderable: false,
-                      },
-                    ],
-                    pageLength: 100, // Mostrar 100 elementos por página
-                    lengthMenu: [
-                      [100, 1000, -1],
-                      [100, 1000, "Todos"],
-                    ],
-                    ajax: {
-                      url: url,
-                      type: "POST",
-                      dataType: "JSON",
-                      data: function (data) {
-                        data.stepIndex = stepIndex;
-                        data.idContenedor = idContenedor;
-                        data.tipoTabla = "embarque";
-                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
-                        data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
-                        data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
-                        validateListEmbarque(idContenedor);
-                        $(".input-date").datepicker({
-                          autoclose: true,
-                          startDate: new Date(fYear, fToday.getMonth(), fDay),
-                          todayHighlight: true,
-                          format: "dd/mm/yyyy",
-                          dateFormat: "dd/mm/yyyy",
-                        });
-                      },
-                    },
-                    initComplete: function (settings, json) {
-                      enableHorizontalAutoScrollForAllTables();
-                      $(".input-date").datepicker({
-                        autoclose: true,
-                        startDate: new Date(fYear, fToday.getMonth(), fDay),
-                        todayHighlight: true,
-                        format: "dd/mm/yyyy",
-                        dateFormat: "dd/mm/yyyy",
-                      });
-                    },
-                    complete: function () {
-                      enableHorizontalAutoScrollForAllTables();
-                      $("#aplicar-btn-cotizacion").off("click");
-                      $("#aplicar-btn-cotizacion").click(function () {
-                        if (currentTableCotizacion == "prospectos") {
-                          tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                        } else {
-                          tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                        }
-                      });
-                    },
+              columnDefs: [
+                {
+                  targets: "no-hidden",
+                  visible: false,
+                },
+                {
+                  className: "text-center",
+                  targets: "no-sort",
+                  orderable: false,
+                },
+                {
+                  targets: "",
+                  orderable: false,
+                },
+                {
+                  targets: "sorting_asc",
+                  orderable: false,
+                },
+              ],
+              pageLength: 100, // Mostrar 100 elementos por página
+              lengthMenu: [
+                [100, 1000, -1],
+                [100, 1000, "Todos"],
+              ],
+              order: [[1, "asc"]],
+              ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                  data.stepIndex = stepIndex;
+                  data.idContenedor = idContenedor;
+                  data.tipoTabla = "embarque";
+                  data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+                  data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val() ?? 0;
+                  data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+                  data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+                  data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+                  validateListEmbarque(idContenedor);
+                  $(".input-date").datepicker({
+                    autoclose: true,
+                    startDate: new Date(fYear, fToday.getMonth(), fDay),
+                    todayHighlight: true,
+                    format: "dd/mm/yyyy",
+                    dateFormat: "dd/mm/yyyy",
                   });
-                  configurarBuscador(
-                    "table-cotizacion-embarque",
-                    "search-table",
-                    "table-cotizacion-embarque_info"
-                  );
-                  spinner.hide();
-                  await getTableCotizacionEmbarqueHeaders();
-
-                }
-                currentTableCotizacion = "embarque";
+                  getTableCotizacionEmbarqueHeaders();
+                },
+              },
+              initComplete: function () {
+                console.log("initEmbarque");
+                $("#aplicar-btn-cotizacion").off("click");
+                $("#aplicar-btn-cotizacion").click(function () {
+                  tableCotizacionEmbarque.ajax.reload();
+                });
                 $(".input-date").datepicker({
                   autoclose: true,
                   startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2838,117 +2678,745 @@ const openStepFunction = async (step, id) => {
                   dateFormat: "dd/mm/yyyy",
                 });
               },
-            },
-          ],
-          paging: true,
-          lengthChange: true,
-          searching: true,
-          ordering: true,
-          info: true,
-          autoWidth: false,
-          responsive: false,
-          serverSide: false,
-          pagingType: "full_numbers",
-          oLanguage: {
-            sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-            sLengthMenu: "_MENU_",
-            sSearch: "Buscar por: ",
-            sSearchPlaceholder: "",
-            sZeroRecords: "No se encontraron registros",
-            sInfoEmpty: "No hay registros",
-            sLoadingRecords: "Cargando...",
-            sProcessing: "Procesando...",
-            oPaginate: {
-              sFirst: "<<",
-              sLast: ">>",
-              sPrevious: "<",
-              sNext: ">",
-            },
-          },
-          columnDefs: [
-            {
-              targets: "no-hidden",
-              visible: false,
-            },
-          ],
-          pageLength: 100, // Mostrar 100 elementos por página
-          lengthMenu: [
-            [100, 1000, -1],
-            [100, 1000, "Todos"],
-          ],
-          ajax: {
-            url: url,
-            type: "POST",
-            dataType: "JSON",
-            data: function (data) {
-              data.stepIndex = stepIndex;
-              data.idContenedor = idContenedor;
-              data.tipoTabla = "prospectos";
-              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
-            },
-            complete: async function () {
-              console.log("Init propectos")
-              enableHorizontalAutoScrollForAllTables();
-              $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-              $("#aplicar-btn-cotizacion").off("click");
-              $("#aplicar-btn-cotizacion").click(function () {
-                if (currentTableCotizacion == "embarque") {
-                  tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                }
-                else {
-                  tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                }
-              });
-              spinner.hide();
-              // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
+              complete: function () {
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              drawCallback: function (settings) {
+                enableHorizontalAutoScrollForAllTables();
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+            });
+            limpiarFiltroDataTable("table-cotizacion-embarque");
+            limpiarInputBuscadorPersonalizado("search-table");
+            // FUNCION PARA CONFIGURAR EL BUSCADOR
+            configurarBuscador(
+              "table-cotizacion-embarque",
+              "search-table",
+              "table-cotizacion-embarque_info"
+            );
+            //Funcion para exportar a excel
+            configurarExportarExcel(
+              "export-excel-main",
+              url,
+              "Cotizacion-" + idContenedor
+            );
+          }
+          currentTableCotizacion = "embarque";
+        } else if (table == "prospectos") {
+          $("#table-cotizacion-prospectos").attr("style", "");
+          $("#table-cotizacion-embarque").hide();
+          $("#table-cotizacion-pagos").hide();
+          if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+            $("#table-cotizacion-prospectos").attr("style", "");
+            $("#table-cotizacion-prospectos_wrapper").show();
+            $("#table-cotizacion-embarque_wrapper").hide();
+            $("#table-cotizacion-pagos_wrapper").hide();
+            $("#table-cotizacion-prospectos").show();
+            limpiarFiltroDataTable("table-cotizacion-prospectos");
+            limpiarInputBuscadorPersonalizado("search-table");
+            reloadTableCotizacion();
+            enableHorizontalAutoScrollForAllTables();
+          } else {
+            url =
+              base_url + "CargaConsolidada/ContenedorConsolidado/step";
+            tableCotizacion.show();
+            tableCotizacion = $(
+              "#table-cotizacion-prospectos"
+            ).DataTable({
+              dom:
+                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+              buttons: [],
+              paging: true,
+              lengthChange: true,
+              searching: true,
+              ordering: false,
+              info: true,
+              autoWidth: false,
+              responsive: false,
+              serverSide: false,
+              pagingType: "full_numbers",
+              oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                  sFirst: "<<",
+                  sLast: ">>",
+                  sPrevious: "<",
+                  sNext: ">",
+                },
+              },
+              columnDefs: [
+                {
+                  targets: "no-hidden",
+                  visible: false,
+                },
+                {
+                  className: "text-center",
+                  targets: "no-sort",
+                  orderable: false,
+                },
+                {
+                  targets: "",
+                  orderable: false,
+                },
+                {
+                  targets: "sorting_asc",
+                  orderable: false,
+                },
+              ],
+              pageLength: 100, // Mostrar 100 elementos por página
+              lengthMenu: [
+                [100, 1000, -1],
+                [100, 1000, "Todos"],
+              ],
+              order: [[1, "asc"]],
+              ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                  data.stepIndex = stepIndex;
+                  data.idContenedor = idContenedor;
+                  data.tipoTabla = "prospectos";
+                  data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+                  data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val() ?? 0;
+                  data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+                  data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+                  data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+                  validateListEmbarque(idContenedor);
+                  $(".input-date").datepicker({
+                    autoclose: true,
+                    startDate: new Date(fYear, fToday.getMonth(), fDay),
+                    todayHighlight: true,
+                    format: "dd/mm/yyyy",
+                    dateFormat: "dd/mm/yyyy",
+                  });
+                  getTableCotizacionEmbarqueHeaders();
+                },
+              },
+              initComplete: function () {
+                console.log("initEmbarque");
+                $("#aplicar-btn-cotizacion").off("click");
+                $("#aplicar-btn-cotizacion").click(function () {
+                  tableCotizacionEmbarque.ajax.reload();
+                });
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              complete: function () {
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              drawCallback: function (settings) {
+                enableHorizontalAutoScrollForAllTables();
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
 
-              await getTableCotizacionEmbarqueHeaders();
 
-            },
-          },
-          columnDefs: [
-            {
-              targets: "no-hidden",
-              visible: false,
-            },
-            {
-              className: "text-center",
-              targets: "no-sort",
-              orderable: false,
-            },
-            {
-              targets: "",
-              orderable: false,
-            },
-          ],
-          pageLength: 100, // Mostrar 100 elementos por página
-          lengthMenu: [
-            [100, 1000, -1],
-            [100, 1000, "Todos"],
-          ],
-        });
-      }
-      limpiarFiltroDataTable("table-cotizacion-prospectos");
-      limpiarInputBuscadorPersonalizado("search-table");
+              }
 
-      configurarBuscador(
-        "table-cotizacion-prospectos",
-        "search-table",
-        "table-cotizacion-prospectos_info"
-      );
+            });
+            configurarBuscador(
+              "table-cotizacion-prospectos",
+              "search-table",
+              "table-cotizacion-embarque_info"
+            );
+            spinner.hide();
+            getTableCotizacionEmbarqueHeaders();
 
-      await getTipoCliente();
-      if (
-        currentPrivilege == "Cotizador"
-      ) {
-        $("#txt-ID_Estado_Cotizacion").empty();
-        $("#txt-ID_Estado_Cotizacion").append(
-          '<option value="0">Todos</option>' +
-          '<option value="PENDIENTE">Pendiente</option>' +
-          '<option value="CONFIRMADO">Confirmado</option>'
-        );
-      }
+
+            currentTableCotizacion = "prospectos";
+          }
+        }
+        else if (table == "pagos") {
+          $("#table-cotizacion-pagos").attr("style", "");
+          $("#table-cotizacion-embarque").hide();
+          $("#table-cotizacion-prospectos").hide();
+          if ($.fn.DataTable.isDataTable("#table-cotizacion-pagos")) {
+            $("#table-cotizacion-pagos").attr("style", "");
+            $("#table-cotizacion-prospectos_wrapper").show();
+            $("#table-cotizacion-embarque_wrapper").hide();
+            tableCotizacionPagos.show();
+            limpiarFiltroDataTable("table-cotizacion-pagos");
+            limpiarInputBuscadorPersonalizado("search-table");
+            reloadTableCotizacionPagos();
+            enableHorizontalAutoScrollForAllTables();
+          } else {
+            url =
+              base_url + "CargaConsolidada/ContenedorConsolidado/step";
+            tableCotizacionPagos.show();
+            tableCotizacionPagos = $(
+              "#table-cotizacion-pagos"
+            ).DataTable({
+              dom:
+                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+              buttons: [],
+              paging: true,
+              lengthChange: true,
+              searching: true,
+              ordering: false,
+              info: true,
+              autoWidth: false,
+              responsive: false,
+              serverSide: false,
+              pagingType: "full_numbers",
+              oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                  sFirst: "<<",
+                  sLast: ">>",
+                  sPrevious: "<",
+                  sNext: ">",
+                },
+              },
+              columnDefs: [
+                {
+                  targets: "no-hidden",
+                  visible: false,
+                },
+                {
+                  className: "text-center",
+                  targets: "no-sort",
+                  orderable: false,
+                },
+                {
+                  targets: "",
+                  orderable: false,
+                },
+                {
+                  targets: "sorting_asc",
+                  orderable: false,
+                },
+              ],
+              pageLength: 100, // Mostrar 100 elementos por página
+              lengthMenu: [
+                [100, 1000, -1],
+                [100, 1000, "Todos"],
+              ],
+              order: [[1, "asc"]],
+              ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                  data.stepIndex = stepIndex;
+                  data.idContenedor = idContenedor;
+                  data.tipoTabla = "pagos";
+                  data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+                  data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val() ?? 0;
+                  data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+                  data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+                  data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+                  validateListEmbarque(idContenedor);
+                  $(".input-date").datepicker({
+                    autoclose: true,
+                    startDate: new Date(fYear, fToday.getMonth(), fDay),
+                    todayHighlight: true,
+                    format: "dd/mm/yyyy",
+                    dateFormat: "dd/mm/yyyy",
+                  });
+                  getTableCotizacionEmbarqueHeaders();
+                },
+              },
+              initComplete: function () {
+                console.log("initEmbarque");
+                $("#aplicar-btn-cotizacion").off("click");
+                $("#aplicar-btn-cotizacion").click(function () {
+                  tableCotizacionPagos.ajax.reload();
+                });
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              complete: function () {
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              drawCallback: function (settings) {
+                enableHorizontalAutoScrollForAllTables();
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+
+
+              }
+
+            });
+            configurarBuscador(
+              "table-cotizacion-pagos",
+              "search-table",
+              "table-cotizacion-embarque_info"
+            );
+            spinner.hide();
+
+
+
+            currentTableCotizacion = "pagos";
+          }
+        }
+      });
+      //click the first tab
+      $(".tab-cotizacion").first().click();
     }
+
+
+    // if (currentTableCotizacion == "embarque") {
+    //   reloadTableCotizacionEmbarque();
+    //   enableHorizontalAutoScrollForAllTables();
+    // }else if (currentTableCotizacion=="pagos"){
+    //   reloadTablePagos();
+    //   enableHorizontalAutoScrollForAllTables();
+    // }
+    // if (
+    //   $.fn.DataTable.isDataTable("#table-cotizacion-prospectos") &&
+    //   currentTableCotizacion != "embarque"
+    // ) {
+    //   reloadTableCotizacion();
+    //   enableHorizontalAutoScrollForAllTables();
+    // } else if (currentTableCotizacion == "prospectos") {
+    //   url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+    //   tableCotizacion = $("#table-cotizacion-prospectos").DataTable({
+    //     dom:
+    //       "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+    //       "<'row'<'col-sm-12'tr>>" +
+    //       "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+
+
+    //     buttons: [
+    //       {
+    //         extend: "excel",
+    //         text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+    //         titleAttr: "Excel",
+    //         exportOptions: {
+    //           columns: ":visible",
+    //         },
+    //         attr: {
+    //           id: "export-excel-main",
+    //           class: "hidden",
+    //         },
+    //       },
+
+    //       {
+    //         extend: "pdf",
+    //         text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+    //         titleAttr: "PDF",
+    //         exportOptions: {
+    //           columns: ":visible",
+    //         },
+    //         attr: {
+    //           id: "export-pdf-main",
+    //           class: "hidden",
+    //         },
+    //       },
+    //       {
+    //         text: "Prospectos",
+    //         action: function () {
+    //           if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+    //             $("#table-cotizacion-embarque").attr("style", "display:none");
+    //             $("#table-cotizacion-embarque_wrapper").hide();
+    //           }
+    //           if (
+    //             $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
+    //           ) {
+    //             //display block
+    //             $("#table-cotizacion-prospectos").attr("style", "");
+    //             $("#table-cotizacion-prospectos_wrapper").show();
+    //             limpiarFiltroDataTable("table-cotizacion-prospectos");
+    //             limpiarInputBuscadorPersonalizado("search-table");
+    //             reloadTableCotizacion();
+    //             enableHorizontalAutoScrollForAllTables();
+    //           } else {
+    //             $("#table-cotizacion-prospectos").attr("style", "");
+    //             $("#table-cotizacion-prospectos_wrapper").show();
+    //             limpiarFiltroDataTable("table-cotizacion-prospectos");
+    //             limpiarInputBuscadorPersonalizado("search-table");
+    //             reloadTableCotizacion();
+    //             enableHorizontalAutoScrollForAllTables();
+    //           }
+
+    //           currentTableCotizacion = "prospectos";
+    //         },
+    //         className: "btn btn-light",
+    //       },
+    //       {
+    //         text: "Por Embarcar",
+    //         action: async function () {
+    //           if (
+    //             $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
+    //           ) {
+    //             $("#table-cotizacion-prospectos").attr(
+    //               "style",
+    //               "display:none"
+    //             );
+    //             $("#table-cotizacion-prospectos_wrapper").hide();
+    //           }
+    //           if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+    //             $("#table-cotizacion-embarque").attr("style", "");
+    //             $("#table-cotizacion-embarque_wrapper").show();
+    //             limpiarFiltroDataTable("table-cotizacion-embarque");
+    //             limpiarInputBuscadorPersonalizado("search-table");
+    //             reloadTableCotizacionEmbarque();
+    //             enableHorizontalAutoScrollForAllTables();
+    //           } else {
+    //             url =
+    //               base_url + "CargaConsolidada/ContenedorConsolidado/step";
+    //             tableCotizacionEmbarque.show();
+    //             tableCotizacionEmbarque = $(
+    //               "#table-cotizacion-embarque"
+    //             ).DataTable({
+    //               dom:
+    //                 "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+    //                 "<'row'<'col-sm-12'tr>>" +
+    //                 "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+
+
+    //               buttons: [
+    //                 {
+    //                   text: "Prospectos",
+    //                   action: function () {
+    //                     if (
+    //                       $.fn.DataTable.isDataTable(
+    //                         "#table-cotizacion-embarque"
+    //                       )
+    //                     ) {
+    //                       $("#table-cotizacion-embarque").attr(
+    //                         "style",
+    //                         "display:none"
+    //                       );
+    //                       $("#table-cotizacion-embarque_wrapper").hide();
+    //                     }
+    //                     if (
+    //                       $.fn.DataTable.isDataTable(
+    //                         "#table-cotizacion-prospectos"
+    //                       )
+    //                     ) {
+    //                       $("#table-cotizacion-prospectos_wrapper").show();
+    //                       limpiarFiltroDataTable("table-cotizacion-prospectos");
+    //                       limpiarInputBuscadorPersonalizado("search-table");
+
+    //                       $("#table-cotizacion-prospectos").attr("style", "");
+    //                       reloadTableCotizacion();
+    //                       enableHorizontalAutoScrollForAllTables();
+    //                     } else {
+    //                       $("#table-cotizacion-prospectos").attr("style", "");
+    //                       reloadTableCotizacion();
+    //                       enableHorizontalAutoScrollForAllTables();
+    //                     }
+    //                     currentTableCotizacion = "prospectos";
+    //                   },
+    //                 },
+    //                 {
+    //                   text: "Por Embarcar",
+    //                   className: "btn btn-light",
+    //                   action: function () {
+    //                     if (
+    //                       $.fn.DataTable.isDataTable(
+    //                         "#table-cotizacion-prospectos"
+    //                       )
+    //                     ) {
+    //                       $("#table-cotizacion-prospectos").attr(
+    //                         "style",
+    //                         "display:none"
+    //                       );
+    //                       $("#table-cotizacion-prospectos_wrapper").hide();
+    //                     }
+    //                     if (
+    //                       $.fn.DataTable.isDataTable(
+    //                         "#table-cotizacion-embarque"
+    //                       )
+    //                     ) {
+    //                       $("#table-cotizacion-embarque").attr("style", "");
+    //                     } else {
+    //                       $("#table-cotizacion-embarque").attr("style", "");
+    //                     }
+    //                     $(".input-date").datepicker({
+    //                       autoclose: true,
+    //                       startDate: new Date(fYear, fToday.getMonth(), fDay),
+    //                       todayHighlight: true,
+    //                       format: "dd/mm/yyyy",
+    //                       dateFormat: "dd/mm/yyyy",
+    //                     });
+    //                     currentTableCotizacion = "embarque";
+    //                   },
+    //                 },
+
+    //               ],
+    //               paging: true,
+    //               lengthChange: true,
+    //               searching: true,
+    //               ordering: false,
+    //               info: true,
+    //               autoWidth: false,
+    //               responsive: false,
+    //               serverSide: false,
+    //               pagingType: "full_numbers",
+    //               oLanguage: {
+    //                 sInfo:
+    //                   "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+    //                 sLengthMenu: "_MENU_",
+    //                 sSearch: "Buscar por: ",
+    //                 sSearchPlaceholder: "",
+    //                 sZeroRecords: "No se encontraron registros",
+    //                 sInfoEmpty: "No hay registros",
+    //                 sLoadingRecords: "Cargando...",
+    //                 sProcessing: "Procesando...",
+    //                 oPaginate: {
+    //                   sFirst: "<<",
+    //                   sLast: ">>",
+    //                   sPrevious: "<",
+    //                   sNext: ">",
+    //                 },
+    //               },
+    //               //hide last two columns
+    //               columnDefs: [
+    //                 {
+    //                   targets: "no-hidden",
+    //                   visible: false,
+    //                 },
+    //                 {
+    //                   className: "text-center",
+    //                   targets: "no-sort",
+    //                   orderable: false,
+    //                 },
+    //                 {
+    //                   targets: "",
+    //                   orderable: false,
+    //                 },
+    //               ],
+    //               pageLength: 100, // Mostrar 100 elementos por página
+    //               lengthMenu: [
+    //                 [100, 1000, -1],
+    //                 [100, 1000, "Todos"],
+    //               ],
+    //               ajax: {
+    //                 url: url,
+    //                 type: "POST",
+    //                 dataType: "JSON",
+    //                 data: function (data) {
+    //                   data.stepIndex = stepIndex;
+    //                   data.idContenedor = idContenedor;
+    //                   data.tipoTabla = "embarque";
+    //                   data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+    //                   data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
+    //                   data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+    //                   validateListEmbarque(idContenedor);
+    //                   $(".input-date").datepicker({
+    //                     autoclose: true,
+    //                     startDate: new Date(fYear, fToday.getMonth(), fDay),
+    //                     todayHighlight: true,
+    //                     format: "dd/mm/yyyy",
+    //                     dateFormat: "dd/mm/yyyy",
+    //                   });
+    //                 },
+    //               },
+    //               initComplete: function (settings, json) {
+    //                 enableHorizontalAutoScrollForAllTables();
+    //                 $(".input-date").datepicker({
+    //                   autoclose: true,
+    //                   startDate: new Date(fYear, fToday.getMonth(), fDay),
+    //                   todayHighlight: true,
+    //                   format: "dd/mm/yyyy",
+    //                   dateFormat: "dd/mm/yyyy",
+    //                 });
+    //               },
+    //               complete: function () {
+    //                 enableHorizontalAutoScrollForAllTables();
+    //                 $("#aplicar-btn-cotizacion").off("click");
+    //                 $("#aplicar-btn-cotizacion").click(function () {
+    //                   if (currentTableCotizacion == "prospectos") {
+    //                     tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+    //                   } else {
+    //                     tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+    //                   }
+    //                 });
+    //               },
+    //             });
+    //             configurarBuscador(
+    //               "table-cotizacion-embarque",
+    //               "search-table",
+    //               "table-cotizacion-embarque_info"
+    //             );
+    //             spinner.hide();
+    //             await getTableCotizacionEmbarqueHeaders();
+
+    //           }
+    //           currentTableCotizacion = "embarque";
+    //           $(".input-date").datepicker({
+    //             autoclose: true,
+    //             startDate: new Date(fYear, fToday.getMonth(), fDay),
+    //             todayHighlight: true,
+    //             format: "dd/mm/yyyy",
+    //             dateFormat: "dd/mm/yyyy",
+    //           });
+    //         },
+    //       },
+    //     ],
+    //     paging: true,
+    //     lengthChange: true,
+    //     searching: true,
+    //     ordering: true,
+    //     info: true,
+    //     autoWidth: false,
+    //     responsive: false,
+    //     serverSide: false,
+    //     pagingType: "full_numbers",
+    //     oLanguage: {
+    //       sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+    //       sLengthMenu: "_MENU_",
+    //       sSearch: "Buscar por: ",
+    //       sSearchPlaceholder: "",
+    //       sZeroRecords: "No se encontraron registros",
+    //       sInfoEmpty: "No hay registros",
+    //       sLoadingRecords: "Cargando...",
+    //       sProcessing: "Procesando...",
+    //       oPaginate: {
+    //         sFirst: "<<",
+    //         sLast: ">>",
+    //         sPrevious: "<",
+    //         sNext: ">",
+    //       },
+    //     },
+    //     columnDefs: [
+    //       {
+    //         targets: "no-hidden",
+    //         visible: false,
+    //       },
+    //     ],
+    //     pageLength: 100, // Mostrar 100 elementos por página
+    //     lengthMenu: [
+    //       [100, 1000, -1],
+    //       [100, 1000, "Todos"],
+    //     ],
+    //     ajax: {
+    //       url: url,
+    //       type: "POST",
+    //       dataType: "JSON",
+    //       data: function (data) {
+    //         data.stepIndex = stepIndex;
+    //         data.idContenedor = idContenedor;
+    //         data.tipoTabla = "prospectos";
+    //         data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+    //       },
+    //       complete: async function () {
+    //         console.log("Init propectos")
+    //         enableHorizontalAutoScrollForAllTables();
+    //         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
+    //         $("#aplicar-btn-cotizacion").off("click");
+    //         $("#aplicar-btn-cotizacion").click(function () {
+    //           if (currentTableCotizacion == "embarque") {
+    //             tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+    //           }
+    //           else {
+    //             tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
+    //           }
+    //         });
+    //         spinner.hide();
+    //         // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
+
+    //         await getTableCotizacionEmbarqueHeaders();
+
+    //       },
+    //     },
+    //     columnDefs: [
+    //       {
+    //         targets: "no-hidden",
+    //         visible: false,
+    //       },
+    //       {
+    //         className: "text-center",
+    //         targets: "no-sort",
+    //         orderable: false,
+    //       },
+    //       {
+    //         targets: "",
+    //         orderable: false,
+    //       },
+    //     ],
+    //     pageLength: 100, // Mostrar 100 elementos por página
+    //     lengthMenu: [
+    //       [100, 1000, -1],
+    //       [100, 1000, "Todos"],
+    //     ],
+    //   });
+    // }
+    // limpiarFiltroDataTable("table-cotizacion-prospectos");
+    // limpiarInputBuscadorPersonalizado("search-table");
+
+    // configurarBuscador(
+    //   "table-cotizacion-prospectos",
+    //   "search-table",
+    //   "table-cotizacion-prospectos_info"
+    // );
+
+    // await getTipoCliente();
+    // if (
+    //   currentPrivilege == "Cotizador"
+    // ) {
+    //   $("#txt-ID_Estado_Cotizacion").empty();
+    //   $("#txt-ID_Estado_Cotizacion").append(
+    //     '<option value="0">Todos</option>' +
+    //     '<option value="PENDIENTE">Pendiente</option>' +
+    //     '<option value="CONFIRMADO">Confirmado</option>'
+    //   );
+    // }
+
   } else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
     showDocumentacionDocumentacionContainer(id);
   } else if (
@@ -4735,14 +5203,13 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
       });
     } else {
       let aditionalFiles = ``;
-      console.log("filteredFilesF", filteredFilesF);
       filteredFilesF.forEach((file) => {
         if (file.file_url) {
           aditionalFiles += `<div>
               <p>${file.folder_name}</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${file.file_url
-                ? `
+              ? `
                     <div class="file-iconic">${getIconByType(file.file_url.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(file.file_url.split('_').pop())}</span>
@@ -4752,12 +5219,13 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     >
                     <i class="fas fa-download"></i>
                     </a>`
-                : `
+              : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
-              </div>`;
-        }});
+            </div>`;
+        }
+      });
       $(".documentos-clientes-content").append(`
       <div class="flex col-4 h-25">
         <div class="bg-white rounded-lg shadow-md w-100">
@@ -4794,7 +5262,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
               <p>Excel Confirmacion</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${excelConfirmacion
-                ? `
+          ? `
                     <div class="file-iconic">${getIconByType(excelConfirmacion.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(excelConfirmacion.split('_').pop())}</span>
@@ -4804,7 +5272,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     >
                     <i class="fas fa-download"></i>
                     </a>`
-                : `
+          : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
@@ -4813,7 +5281,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
               <p>Packing List</p>
               <div class="flex align-items-center py-2 gap-5">
                 ${packingList
-                ? `
+          ? `
                     <div class="file-iconic">${getIconByType(packingList.split('.').pop().toLowerCase())}</div>
                     <div>
                       <span class="file-name">${decodeURIComponent(packingList.split('_').pop())}</span>
@@ -4823,7 +5291,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     >
                     <i class="fas fa-download"></i>
                     </a>`
-                : `
+          : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
@@ -5452,6 +5920,7 @@ $(document).ready(async function () {
   cotizacionContainer.hide();
   tableCotizacion = $("#table-cotizacion-prospectos");
   tableCotizacionEmbarque = $("#table-cotizacion-embarque");
+  tableCotizacionPagos = $("#table-cotizacion-pagos");
   tableCotizacionEmbarque.hide();
   clientesContainer = $("#clientes-container");
   clientesContainer.hide();
