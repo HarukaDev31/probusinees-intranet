@@ -203,22 +203,22 @@
             </div>
           </div>
         </div>
-        <hr>
-        <div class="row mt-4">
-          <div class="col-md-12">
-            <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group flex align-items-center">
-              <label class="w-[40%] mb-0">Usuario:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" readonly>
+          <hr>
+          <div id="acceso-aula-virtual" class="row mt-4">
+            <div class="col-md-12">
+              <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
             </div>
-            <div class="form-group flex align-items-center">
-              <label class="w-[40%] mb-0">Contraseña:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-moodle-password" readonly>
+            <div class="col-md-6">
+              <div class="form-group flex align-items-center">
+                <label class="w-[40%] mb-0">Usuario:</label>
+                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" readonly>
+              </div>
+              <div class="form-group flex align-items-center">
+                <label class="w-[40%] mb-0">Contraseña:</label>
+                <input type="text" class="form-control cliente-input" id="cliente-moodle-password" readonly>
+              </div>
             </div>
           </div>
-        </div>
       </form>
     </div>
   </div>

@@ -243,8 +243,15 @@ async function viewCliente(id) {
         $("#cliente-provincia").val(response.data.provincia);
         $("#cliente-distrito").val(response.data.distrito);
         $("#cliente-edad").val(response.data.nacimiento);
-        $("#cliente-moodle-usuario").val(response.data.usuario_moodle);
-        $("#cliente-moodle-password").val(response.data.password_moodle);
+        if(response.data.usuario_moodle && response.data.password_moodle){
+          $('#acceso-aula-virtual').show();
+          $('#cliente-moodle-usuario').val(response.data.usuario_moodle);
+          $('#cliente-moodle-password').val(response.data.password_moodle);
+        } else{
+          $('#acceso-aula-virtual').hide();
+          $('#cliente-moodle-usuario').val('');
+          $('#cliente-moodle-password').val('');
+        }
 
         // Siempre deja los campos en readonly y muestra solo el botón editar
         $('.cliente-input').prop('readonly', true);
@@ -284,6 +291,8 @@ async function viewCliente(id) {
 
         $('#btn-editar-cliente').on('click', function() {
           $('.cliente-input').prop('readonly', false);
+          $('#cliente-moodle-usuario').prop('readonly', true);
+          $('#cliente-moodle-password').prop('readonly', true);
           $('#btn-guardar-cliente').show();
           $('#btn-cancel').show();
           $(this).hide();
