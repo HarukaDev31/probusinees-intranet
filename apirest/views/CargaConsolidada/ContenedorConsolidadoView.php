@@ -1135,9 +1135,9 @@ Filters
                         <thead class="thead-default">
                             <tr>
                                 <?php if (
-                $this->user->No_Grupo != "ContenedorAlmacen"
-                && $this->user->No_Grupo != "Documentacion"
-              ) {  ?>
+                        $this->user->No_Grupo != "ContenedorAlmacen"
+                        && $this->user->No_Grupo != "Documentacion"
+                      ) {  ?>
                                 <th>Asesor</th>
                                 <?php } ?>
                                 <th style="min-width: 8em;" class="no-sort">Status</th>
@@ -1175,7 +1175,7 @@ Filters
                             </tr>
                         </thead>
                     </table>
-                    <table id="table-cotizacion-pagos" class="table table-hover dataTable no-footer  hidden">
+                    <table id="table-cotizacion-pagos" class="table table-hover dataTable no-footer hidden">
                         <thead class="thead-default">
                             <tr>
                                 <th>N.</th>

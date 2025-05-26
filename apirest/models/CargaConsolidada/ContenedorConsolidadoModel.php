@@ -300,6 +300,41 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         return $query->result();
     }
+    public function getContenedorCotizacionPagos($idContenedor){
+         $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
+            ->from($this->table_contenedor_cotizacion)
+            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
+            ->where('id_contenedor', $idContenedor)
+            ->order_by('id_cotizacion', 'asc');
+        // Si el usuario es "Cotizador", filtrar por el id del usuario actual
+        if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
+            $this->db->where($this->table_contenedor_cotizacion . '.id_usuario', $this->user->ID_Usuario);
+            //order by fecha_confirmacion asc
+
+        }
+        if ($this->user->No_Grupo != "Cotizador") {
+            $this->db->where('estado_cotizador', 'CONFIRMADO');
+
+            if ($this->input->post('Filtro_Estado') != "0") {
+                $fieldToFilter = [
+                    'Coordinación' => 'estado',
+                    'ContenedorAlmacen' => 'estado_china',
+                    'Documentacion' => 'estado',
+                ];
+                $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
+            }
+        } else {
+            if ($this->input->post('Filtro_Estado') != "0") {
+
+                $this->db->where('estado_cotizador', $this->input->post('Filtro_Estado'));
+            }
+        }
+        if ($this->user->No_Grupo == "Cotizador") {
+            $this->db->order_by('fecha_confirmacion', 'asc');
+        }
+        $query = $this->db->get();
+        return $query->result();
+    }
     public function getContenedorCotizacionProveedores($idContenedor)
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion

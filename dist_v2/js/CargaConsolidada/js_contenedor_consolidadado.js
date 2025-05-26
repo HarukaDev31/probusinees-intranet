@@ -2561,7 +2561,9 @@ const openStepFunction = async (step, id) => {
      
       $(".tab-cotizacion").off("click").click(function () {
         $(".tab-cotizacion").removeClass("active");
-
+        $("#table-cotizacion-prospectos_wrapper").hide();
+        $("#table-cotizacion-embarque_wrapper").hide();
+        $("#table-cotizacion-pagos_wrapper").hide();
         let table = this.getAttribute("data-table");
         this.classList.add("active");
         if (table == "embarque") {
@@ -2864,14 +2866,15 @@ const openStepFunction = async (step, id) => {
           }
         }
         else if (table == "pagos") {
-          $("#table-cotizacion-pagos").attr("style", "");
+          $("#table-cotizacion-pagos").show();
           $("#table-cotizacion-embarque").hide();
           $("#table-cotizacion-prospectos").hide();
           if ($.fn.DataTable.isDataTable("#table-cotizacion-pagos")) {
             $("#table-cotizacion-pagos").attr("style", "");
-            $("#table-cotizacion-prospectos_wrapper").show();
+            $("#table-cotizacion-prospectos_wrapper").hide();
             $("#table-cotizacion-embarque_wrapper").hide();
-            tableCotizacionPagos.show();
+            $("#table-cotizacion-pagos_wrapper").show();
+            $("#table-cotizacion-pagos").show();
             limpiarFiltroDataTable("table-cotizacion-pagos");
             limpiarInputBuscadorPersonalizado("search-table");
             reloadTableCotizacionPagos();
