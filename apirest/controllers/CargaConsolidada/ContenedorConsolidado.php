@@ -1612,7 +1612,7 @@ class ContenedorConsolidado extends CI_Controller
 		]);
 	}
 	public function forceSendRotulado($idProveedor){
-		$arrResponse = $this->ContenedorConsolidadoModel->validateToSendInspectionMessage($idProveedor);
+		$arrResponse = $this->ContenedorConsolidadoModel->validateToSendInspectionMessage2($idProveedor);
 		echo json_encode([
 			"status" => $arrResponse
 		]);

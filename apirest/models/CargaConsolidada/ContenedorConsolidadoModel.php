@@ -3388,6 +3388,112 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
         return true;
     }
+    function validateToSendInspectionMessage2($idProveedor)
+    {
+        log_message('error', "validateToSendInspectionMessage: " . $idProveedor);
+        $this->db->select('id, file_path,file_type,send_status')
+            ->from($this->table_contenedor_almacen_inspection)
+            ->where('id_proveedor', $idProveedor)
+            ->group_start()
+            ->where('file_type', 'image/jpeg')
+            ->or_where('file_type', 'image/png')
+            ->or_where('file_type', 'image/jpg')
+            ->group_end(); 
+        $query = $this->db->get();
+        $imagesUrls = $query->result();
+        $images = $query->num_rows();
+        $this->db->select('id,file_path,file_type,send_status')
+            ->from($this->table_contenedor_almacen_inspection)
+            ->where('id_proveedor', $idProveedor)
+            ->where('file_type', 'video/mp4');
+        $query = $this->db->get();
+        $videosUrls = $query->result();
+        $videos = $query->num_rows();
+        $this->db->select('estados_proveedor,code_supplier,qty_box_china,qty_box,id_cotizacion')
+            ->from($this->table_contenedor_cotizacion_proveedores)
+            ->where('id', $idProveedor);
+        $query = $this->db->get();
+        $estadoChina = $query->row()->estados_proveedor;
+        $supplierCode = $query->row()->code_supplier;
+        $qtyBoxChina = $query->row()->qty_box_china;
+        $qtyBox = $query->row()->qty_box;
+        $idCotizacion = $query->row()->id_cotizacion;
+        $this->db->select('volumen,monto,id_contenedor')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $idCotizacion);
+        $query = $this->db->get();
+        $volumen = $query->row()->volumen;
+        $valorCot = $query->row()->monto;
+        $idContenedor = $query->row()->id_contenedor;
+        $this->db->select('f_cierre')
+            ->from($this->table)
+            ->where('id', $idContenedor);
+        $query = $this->db->get();
+        $fCierre = $query->row()->f_cierre;
+        $fCierre = date('d F', strtotime($fCierre));
+        $fCierre = str_replace('January', 'Enero', $fCierre);
+        $fCierre = str_replace('February', 'Febrero', $fCierre);
+        $fCierre = str_replace('March', 'Marzo', $fCierre);
+        $fCierre = str_replace('April', 'Abril', $fCierre);
+        $fCierre = str_replace('May', 'Mayo', $fCierre);
+        $fCierre = str_replace('June', 'Junio', $fCierre);
+        $fCierre = str_replace('July', 'Julio', $fCierre);
+        $fCierre = str_replace('August', 'Agosto', $fCierre);
+        $fCierre = str_replace('September', 'Septiembre', $fCierre);
+        $fCierre = str_replace('October', 'Octubre', $fCierre);
+        $fCierre = str_replace('November', 'Noviembre', $fCierre);
+        $fCierre = str_replace('December', 'Diciembre', $fCierre);
+
+        $this->db->where('id', $idProveedor);
+        $this->db->update($this->table_contenedor_cotizacion_proveedores, [
+            'estados_proveedor' => 'INSPECTION',
+            'estados' => 'INSPECCIONADO',
+        ]);
+        
+        $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado INSPECCIONADO";
+        $this->db->select('nombre,telefono')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $idCotizacion);
+        $query = $this->db->get();
+        $cliente = $query->row()->nombre;
+        $telefono = $query->row()->telefono;
+        $telefono = preg_replace('/\s+/', '', $telefono);
+        $telefono .= $telefono ? '@c.us' : '';
+        $this->phoneNumberId = $telefono;
+        $sendStatus = true;
+        foreach ($imagesUrls as $image) {
+            if ($image->send_status == 'SENDED') {
+                $sendStatus = false;
+            }
+        }
+        foreach ($videosUrls as $video) {
+            if ($video->send_status == 'SENDED') {
+                $sendStatus = false;
+            }
+        }
+        if ($sendStatus) {
+            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
+                '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
+
+            $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
+        }
+        //filter imagesUrls and videosUrls to get only the files that has send_status = 0
+        // $imagesUrls = array_filter($imagesUrls, function ($image) {
+        //     return $image->send_status == "PENDING";
+        // });
+        // $videosUrls = array_filter($videosUrls, function ($video) {
+        //     return $video->send_status == "PENDING";
+        // });
+        //send media inspection
+
+        foreach ($imagesUrls as $image) {
+            $this->sendMediaInspection($image->file_path, $image->file_type, null, null, 1, $image->id);
+        }
+        foreach ($videosUrls as $video) {
+            $this->sendMediaInspection($video->file_path, $video->file_type, null, null, 1, $video->id);
+        }
+        return true;
+    }
     public function getClientesHeader($idContenedor)
     {
         //get sum of cbm_total_china from proveedor where states is LOADED, and get total monto from cotizacion
