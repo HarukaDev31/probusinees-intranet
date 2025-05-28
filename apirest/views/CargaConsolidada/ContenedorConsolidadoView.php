@@ -1092,18 +1092,36 @@ Filters
                                     disabled></span></strong>
                         </div>
                     </div>
+
+                    <?php } ?>
+                    <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
+                    <div
+                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        <!-- icon with dollar icon-->
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Total Pagado:</span>
+                        <div class="">
+                            <strong><span type="number" id="txt-CBM_Total_Pagado" class="cbm_score"
+                                    disabled></span></strong>
+                        </div>
+                    </div>
                     <?php } ?>
                 </div>
                 <div class="row">
-                    <div data-table="prospectos" class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
-                      Prospectos
+                    <div data-table="prospectos"
+                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        Prospectos
                     </div>
-                    <div data-table="embarque" class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
-                      Por Embarcar
+                    <div data-table="embarque"
+                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        Por Embarcar
                     </div>
-                    <div data-table="pagos" class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
-                      Pagos
+                    <?php if ($this->user->No_Grupo =="Coordinación"){  ?>
+                    <div data-table="pagos"
+                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        Pagos
                     </div>
+                    <?php } ?>
                 </div>
                 <div class="table-responsive">
                     <table id="table-cotizacion-prospectos" class="table table-hover dataTable no-footer hidden">
@@ -1117,7 +1135,9 @@ Filters
                                 <th>Whatsapp</th>
                                 <th>T. Cliente</th>
                                 <th>Volumen</th>
-                                <th>Precio Cbm</th>
+                                <th>Fob</th>
+                                <th>Logistica</th>
+                                <th>Impuesto</th>
                                 <th>Tarifa</th>
                                 <th>Cotizacion</th>
                                 <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
@@ -1301,6 +1321,22 @@ Filters
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div data-table="general"
+                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    General
+                </div>
+                <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
+                <div data-table="variacion"
+                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    Variación
+                </div>
+                <div data-table="pagos"
+                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    Pagos
+                </div>
+                <?php } ?>
+            </div>
             <table id="table-clientes-general" class="table table-hover dataTable no-footer">
                 <thead class="thead-default">
                     <tr>
@@ -1315,11 +1351,13 @@ Filters
                         <th>T. Cliente</th>
                         <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
                         <th>Volumen</th>
-                        <th>Monto</th>
+                        <th>Fob</th>
+                        <th>Logistica</th>
+                        <th>Impuesto</th>
                         <th>Tarifa</th>
                         <?php } ?>
 
-                        <th>Estados</th>
+                        <th style="min-width: 8em;">Estados</th>
                         <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
                         <th>Acciones</th>
                         <?php } ?>
@@ -1340,6 +1378,23 @@ Filters
                         <th>Valor Cot</th>
                         <th>Valor Doc</th>
                         <th>Variación</th>
+                    </tr>
+                </thead>
+            </table>
+            <table id="table-clientes-pagos" class="table table-hover dataTable no-footer hidden">
+                <thead class="thead-default">
+                    <tr>
+                        <th>N.</th>
+                        <th>Nombre</th>
+                        <th>DNI/RUC</th>
+                        <th>Whatsapp</th>
+                        <th>T. Cliente</th>
+                        <th>Estado</th>
+                        <th>Conceptop</th>
+                        <th>Importe</th>
+                        <th>Pagado</th>
+                        <th>Adelantos</th>
+
                     </tr>
                 </thead>
             </table>
@@ -1797,6 +1852,19 @@ Filters
                     <div class="fa fa-arrow-left"></div>
                 </button>
             </div>
+            <div class="row">
+                <div data-table="general"
+                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes-final">
+                    General
+                </div>
+                <?php if ($this->user->No_Grupo != "Coordinacion") {  ?>
+                
+                <div data-table="pagos"
+                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes-final">
+                    Pagos
+                </div>
+                <?php } ?>
+            </div>
             <div class="table-responsive" class="table table-bordered table-hover table-striped">
                 <table id="table-cotizacion-final" class="table table-bordered table-hover table-striped">
                     <thead class="thead-light">
@@ -1815,6 +1883,20 @@ Filters
                         </tr>
                     </thead>
                 </table>
+                <table id="table-cotizacion-final-pagos" class="table table-bordered table-hover table-striped hidden">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>N.</th>
+                            <th>Nombre</th>
+                            <th>DNI/RUC</th>
+                            <th>Whatsapp</th>
+                            <th>T. Cliente</th>
+                            <th>Importe</th>
+                            <th>Pagado</th>
+                            <th>Adelantos</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
     </section>
     <section class="content card" id="factura-guia-container">
@@ -1825,9 +1907,7 @@ Filters
       justify-end
 
       ">
-                <!--3 empty divs-->
 
-                <!--button back-->
                 <button id="btn-back-factura-guia"
                     class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
                     <div class="fa fa-arrow-left"></div>
@@ -1872,6 +1952,37 @@ Filters
             </div>
         </div>
     </div>
+    <!-- modal with table and id modalClientePagosCoordination -->
+    <div class="modal fade" id="modalClientePagosCoordination" tabindex="-1" role="dialog"
+        aria-labelledby="modalClientePagosCoordinationLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalClientePagosCoordinationLabel">Pagos del Cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="table-pagos-tracking-coordinacion" class="table table-hover dataTable no-footer">
+                        <thead class="thead-default">
+                            <tr>
+                                <th>N°</th>
+                                <th>Fecha</th>
+                                <th>Banco</th>
+                                <th>Monto</th>
+                                <th>Voucher</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="uploadModalInspection" tabindex="-1" aria-labelledby="uploadModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -3085,5 +3196,16 @@ label>i {
 
 .scroll-arrow:hover {
     background-color: rgba(0, 0, 0, 0.8);
+}
+
+.swal2-input {
+    width: 80%;
+    height: 40px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    transition: border-color 0.3s ease;
 }
 </style>

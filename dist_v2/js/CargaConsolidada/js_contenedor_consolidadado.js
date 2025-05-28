@@ -23,6 +23,7 @@ var shouldSaveDocumentacion = false;
 var originalVolumenDocumento = "";
 var originalValorDocumento = "";
 var sectionsDisabled = false;
+var tableCotizacionTrackingPagos = null;
 var meses = [
   {
     id: "ENERO",
@@ -85,6 +86,7 @@ var tableCotizacionEmbarque = null;
 var tableCotizacionPagos = null;
 var tableClientesGeneral = null;
 var tableClientesVariacion = null;
+var tableClientesPagos = null;
 var clientesDocumentacionContainer = null;
 var documentationContainer = null;
 var idCotizacion = 0;
@@ -95,6 +97,7 @@ var fileList;
 var cotizacionAlmacenContainer = null;
 var cotizacionFinalContainer = null;
 var tableCotizacionFinal = null;
+var tableCotizacionFinalPagos = null;
 var facturaGuiaContainer = null;
 var tableFacturaGuia = null;
 var documentationContainerProfile = null;
@@ -1186,6 +1189,156 @@ async function uploadFacturaGeneral(idCotizacion) {
       },
     });
   }
+}
+async function addPagosCoordination(idCotizacion, nombreCliente) {
+  //showm modal with fields monto banco text , voucher file , fecha date required
+  const { value: formValues } = await Swal.fire({
+    title: `Pagos de Coordinación - ${nombreCliente}`,
+    html: `
+      <input type="number" id="monto" class="swal2-input" placeholder="Monto" step="0.01" required>
+      <select id="banco" class="swal2-input" required>
+        <option value="" disabled selected>Seleccione un banco</option>
+        <option value="BCP" class="bg-primary">BCP</option>
+        <option value="INTERBANK" class="bg-success">INTERBANK</option>
+        </select>
+      <input type="file" id="voucher" class="swal2-input" accept="image/*;application/pdf" required>
+      <input type="date" id="fecha" class="swal2-input" required>
+
+    `,
+    focusConfirm: false,
+    preConfirm: () => {
+      const monto = $("#monto").val();
+      const banco = $("#banco").val();
+      const voucher = $("#voucher")[0].files[0];
+      const fecha = $("#fecha").val();
+      if (!monto || !banco || !voucher || !fecha) {
+        Swal.showValidationMessage("Por favor, completa todos los campos.");
+      } else {
+        const formData = new FormData();
+        formData.append("monto", monto);
+        formData.append("banco", banco);
+        formData.append("voucher", voucher);
+        formData.append("fecha", fecha);
+        formData.append("idCotizacion", idCotizacion);
+        formData.append("idContenedor", idContenedor);
+        return formData;
+      }
+    },
+    showCancelButton: true,
+    confirmButtonText: "Guardar",
+    cancelButtonText: "Cancelar",
+  });
+  if (formValues) {
+    const formData = formValues;
+    url =
+      base_url + "CargaConsolidada/ContenedorConsolidado/saveClientePagosCoordination";
+    $.ajax({
+      url: url,
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        const result = JSON.parse(response);
+        if (result.status == "success") {
+          Swal.fire("Correcto!", result.message, "success");
+          // Reload the table or perform any other action needed
+          tableCotizacionPagos.ajax.reload();
+        } else {
+          Swal.fire("Error!", result.message, "error");
+        }
+      },
+    });
+  }
+
+
+}
+async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
+  //show modal with table of pagos coordination
+  $("#modalClientePagosCoordination").modal("show");
+  $("#modalClientePagosCoordination .modal-title").text(`Pagos de Coordinación - ${nombreCliente}`);
+  url =
+    base_url + "CargaConsolidada/ContenedorConsolidado/getPagosCoordination/" + idCotizacion;
+  if (!$.fn.DataTable.isDataTable("#table-pagos-tracking-coordinacion")) {
+    tableCotizacionTrackingPagos = $("#table-pagos-tracking-coordinacion").DataTable({
+      dom:
+        "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      buttons: [],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      },
+      columnDefs: [
+        {
+          targets: "no-hidden",
+          visible: false,
+        },
+        {
+          className: "text-center",
+          targets: "no-sort",
+          orderable: false,
+        },
+        {
+          targets: "",
+          orderable: false,
+        },
+        {
+          targets: "sorting_asc",
+          orderable: false,
+        },
+      ],
+      pageLength: 100, // Mostrar 100 elementos por página
+      lengthMenu: [
+        [100, 1000, -1],
+        [100, 1000, "Todos"],
+      ],
+      order: [[1, "asc"]],
+      ajax: {
+        url: url,
+        type: "POST",
+        dataType: "JSON",
+        data: function (data) {
+
+        },
+      },
+      initComplete: function () {
+
+      },
+      complete: function () {
+
+
+      },
+      drawCallback: function (settings) {
+
+      },
+    });
+  } else {
+    tableCotizacionTrackingPagos.ajax.url(url).load();
+  }
+
 }
 async function uploadGuiaRemision(idCotizacion) {
   //swall with file input
@@ -2558,7 +2711,6 @@ const openStepFunction = async (step, id) => {
       spinner.hide();
     } else {
       $(".tab-cotizacion").removeClass("active");
-     
       $(".tab-cotizacion").off("click").click(function () {
         $(".tab-cotizacion").removeClass("active");
         $("#table-cotizacion-prospectos_wrapper").hide();
@@ -2997,10 +3149,7 @@ const openStepFunction = async (step, id) => {
                   format: "dd/mm/yyyy",
                   dateFormat: "dd/mm/yyyy",
                 });
-
-
               }
-
             });
             configurarBuscador(
               "table-cotizacion-pagos",
@@ -3008,34 +3157,329 @@ const openStepFunction = async (step, id) => {
               "table-cotizacion-embarque_info"
             );
             spinner.hide();
-
-
-
             currentTableCotizacion = "pagos";
           }
         }
       });
-      //click the first tab
       $(".tab-cotizacion").first().click();
     }
+  } else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
+    showDocumentacionDocumentacionContainer(id);
+  } else if (
+    stepIndex == 2 ||
+    (currentPrivilege == "Documentacion" && stepIndex == 1)
+  ) {
+    await getClientesHeader();
+    clientesContainer.show();
+    $(".tab-clientes").removeClass("active");
+    $(".tab-clientes").off("click").click(function () {
+      $(".tab-clientes").removeClass("active");
+      $("#table-clientes-general_wrapper").hide();
+      $("#table-clientes-variacion_wrapper").hide();
+      $("#table-clientes-pagos_wrapper").hide();
 
+      let table = this.getAttribute("data-table");
+      this.classList.add("active");
 
-    // if (currentTableCotizacion == "embarque") {
-    //   reloadTableCotizacionEmbarque();
-    //   enableHorizontalAutoScrollForAllTables();
-    // }else if (currentTableCotizacion=="pagos"){
-    //   reloadTablePagos();
-    //   enableHorizontalAutoScrollForAllTables();
-    // }
-    // if (
-    //   $.fn.DataTable.isDataTable("#table-cotizacion-prospectos") &&
-    //   currentTableCotizacion != "embarque"
-    // ) {
-    //   reloadTableCotizacion();
-    //   enableHorizontalAutoScrollForAllTables();
-    // } else if (currentTableCotizacion == "prospectos") {
-    //   url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-    //   tableCotizacion = $("#table-cotizacion-prospectos").DataTable({
+      if (table == "general") {
+        $("#table-clientes-general").attr("style", "");
+        $("#table-clientes-variacion").hide();
+        $("#table-clientes-pagos").hide();
+
+        if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+          $("#table-clientes-general").show();
+          $("#table-clientes-general_wrapper").show();
+          reloadTableClientesGeneral();
+        } else {
+          url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+          tableClientesGeneral = $("#table-clientes-general").DataTable({
+            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [],
+            columnDefs: [
+              {
+                targets: "no-hidden",
+                visible: false,
+              },
+              {
+                className: "text-center",
+                targets: "no-sort",
+                orderable: false,
+              },
+              {
+                targets: "",
+                orderable: false,
+              },
+              {
+                targets: "sorting_asc",
+                orderable: false,
+              },
+            ],
+            pageLength: 100, // Mostrar 100 elementos por página
+            lengthMenu: [
+              [100, 1000, -1],
+              [100, 1000, "Todos"],
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+              sInfo:
+                "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+              sLengthMenu: "_MENU_",
+              sSearch: "Buscar por: ",
+              sSearchPlaceholder: "",
+              sZeroRecords: "No se encontraron registros",
+              sInfoEmpty: "No hay registros",
+              sLoadingRecords: "Cargando...",
+              sProcessing: "Procesando...",
+              oPaginate: {
+                sFirst: "<<",
+                sLast: ">>",
+                sPrevious: "<",
+                sNext: ">",
+              },
+            },
+            ajax: {
+              url: url,
+              type: "POST",
+              dataType: "JSON",
+              data: function (data) {
+                data.stepIndex = stepIndex;
+                data.idContenedor = idContenedor;
+                data.tipoTabla = "general";
+                data.Filtro_Estado = $("#txt-ID_Estado").val();
+                validateListEmbarque(idContenedor);
+              },
+            },
+          });
+          limpiarFiltroDataTable("table-clientes-general");
+          limpiarInputBuscadorPersonalizado("search-table");
+          // FUNCION PARA CONFIGURAR EL BUSCADOR
+          configurarBuscador(
+            "table-clientes-general",
+            "search-table",
+            "table-clientes-general_info"
+          );
+          //Funcion para exportar a excel
+          configurarExportarExcel(
+            "export-excel-main",
+            url,
+            "Clientes-" + idContenedor
+          );
+          $("#table-clientes-general").show();
+        }
+        currentTableClientes = "general";
+      }
+      else if (table == "variacion") {
+        // Lógica similar para variación
+        if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+          $("#table-clientes-variacion").show();
+          $("#table-clientes-variacion_wrapper").show();
+          reloadTableClientesVariacion();
+        } else {
+          url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+          tableClientesVariacion = $("#table-clientes-variacion").DataTable({
+            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [],
+            columnDefs: [
+              {
+                targets: "no-hidden",
+                visible: false,
+              },
+              {
+                className: "text-center",
+                targets: "no-sort",
+                orderable: false,
+              },
+              {
+                targets: "",
+                orderable: false,
+              },
+              {
+                targets: "sorting_asc",
+                orderable: false,
+              },
+            ],
+            pageLength: 100, // Mostrar 100 elementos por página
+            lengthMenu: [
+              [100, 1000, -1],
+              [100, 1000, "Todos"],
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+              sInfo:
+                "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+              sLengthMenu: "_MENU_",
+              sSearch: "Buscar por: ",
+              sSearchPlaceholder: "",
+              sZeroRecords: "No se encontraron registros",
+              sInfoEmpty: "No hay registros",
+              sLoadingRecords: "Cargando...",
+              sProcessing: "Procesando...",
+              oPaginate: {
+                sFirst: "<<",
+                sLast: ">>",
+                sPrevious: "<",
+                sNext: ">",
+              },
+            },
+            ajax: {
+              url: url,
+              type: "POST",
+              dataType: "JSON",
+              data: function (data) {
+                data.stepIndex = stepIndex;
+                data.idContenedor = idContenedor;
+                data.tipoTabla = "variacion";
+                data.Filtro_Estado = $("#txt-ID_Estado").val();
+                validateListEmbarque(idContenedor);
+              },
+            },
+          });
+          limpiarFiltroDataTable("table-clientes-variacion");
+          limpiarInputBuscadorPersonalizado("search-table");
+          // FUNCION PARA CONFIGURAR EL BUSCADOR
+          configurarBuscador(
+            "table-clientes-variacion",
+            "search-table",
+            "table-clientes-variacion_info"
+          );
+          //Funcion para exportar a excel
+          configurarExportarExcel(
+            "export-excel-main",
+            url,
+            "Clientes-Variacion-" + idContenedor
+          );
+          $("#table-clientes-variacion").show();
+          currentTableClientes = "variacion";
+        }
+
+      }
+      else if (table == "pagos") {
+        // Lógica similar para pagos
+        if ($.fn.DataTable.isDataTable("#table-clientes-pagos")) {
+          $("#table-clientes-pagos").show();
+          $("#table-clientes-pagos_wrapper").show();
+          reloadTableClientesPagos();
+        } else {
+          url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+          tableClientesPagos = $("#table-clientes-pagos").DataTable({
+            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [],
+            columnDefs: [
+              {
+                targets: "no-hidden",
+                visible: false,
+              },
+              {
+                className: "text-center",
+                targets: "no-sort",
+                orderable: false,
+              },
+              {
+                targets: "",
+                orderable: false,
+              },
+              {
+                targets: "sorting_asc",
+                orderable: false,
+              },
+            ],
+            pageLength: 100, // Mostrar 100 elementos por página
+            lengthMenu: [
+              [100, 1000, -1],
+              [100, 1000, "Todos"],
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+              sInfo:
+                "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+              sLengthMenu: "_MENU_",
+              sSearch: "Buscar por: ",
+              sSearchPlaceholder: "",
+              sZeroRecords: "No se encontraron registros",
+              sInfoEmpty: "No hay registros",
+              sLoadingRecords: "Cargando...",
+              sProcessing: "Procesando...",
+              oPaginate: {
+                sFirst: "<<",
+                sLast: ">>",
+                sPrevious: "<",
+                sNext: ">",
+              },
+            },
+            ajax: {
+              url: url,
+              type: "POST",
+              dataType: "JSON",
+              data: function (data) {
+                data.stepIndex = stepIndex;
+                data.idContenedor = idContenedor;
+                data.tipoTabla = "pagos";
+                data.Filtro_Estado = $("#txt-ID_Estado").val();
+                validateListEmbarque(idContenedor);
+              },
+            },
+          });
+          limpiarFiltroDataTable("table-clientes-pagos");
+          limpiarInputBuscadorPersonalizado("search-table");
+          // FUNCION PARA CONFIGURAR EL BUSCADOR
+          configurarBuscador(
+            "table-clientes-pagos",
+            "search-table",
+            "table-clientes-pagos_info"
+          );
+          //Funcion para exportar a excel
+          configurarExportarExcel(
+            "export-excel-main",
+            url,
+            "Clientes-Pagos-" + idContenedor
+          );
+          $("#table-clientes-pagos").show();
+          currentTableClientes = "pagos";
+
+        }
+      }
+    });
+    $(".tab-clientes").first().click();
+
+    // url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+    // clientesContainer.show();
+    // if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+    //   reloadTableClientesGeneral();
+    // } else {
+    //   tableClientesGeneral.show();
+    //   limpiarFiltroDataTable("table-clientes-general");
+
+    //   tableClientesGeneral = $("#table-clientes-general").DataTable({
     //     dom:
     //       "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
     //       "<'row'<'col-sm-12'tr>>" +
@@ -3055,262 +3499,222 @@ const openStepFunction = async (step, id) => {
     //           class: "hidden",
     //         },
     //       },
-
     //       {
-    //         extend: "pdf",
-    //         text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-    //         titleAttr: "PDF",
-    //         exportOptions: {
-    //           columns: ":visible",
-    //         },
-    //         attr: {
-    //           id: "export-pdf-main",
-    //           class: "hidden",
-    //         },
-    //       },
-    //       {
-    //         text: "Prospectos",
+    //         text: "General",
     //         action: function () {
-    //           if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
-    //             $("#table-cotizacion-embarque").attr("style", "display:none");
-    //             $("#table-cotizacion-embarque_wrapper").hide();
+    //           if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+    //             $("#table-clientes-variacion").attr("style", "display:none");
+    //             $("#table-clientes-variacion_wrapper").hide();
     //           }
-    //           if (
-    //             $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
-    //           ) {
-    //             //display block
-    //             $("#table-cotizacion-prospectos").attr("style", "");
-    //             $("#table-cotizacion-prospectos_wrapper").show();
-    //             limpiarFiltroDataTable("table-cotizacion-prospectos");
-    //             limpiarInputBuscadorPersonalizado("search-table");
-    //             reloadTableCotizacion();
-    //             enableHorizontalAutoScrollForAllTables();
+    //           if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+    //             $("#table-clientes-general").attr("style", "");
+    //             $("#table-clientes-general_wrapper").show();
+    //             reloadTableClientesGeneral();
     //           } else {
-    //             $("#table-cotizacion-prospectos").attr("style", "");
-    //             $("#table-cotizacion-prospectos_wrapper").show();
-    //             limpiarFiltroDataTable("table-cotizacion-prospectos");
-    //             limpiarInputBuscadorPersonalizado("search-table");
-    //             reloadTableCotizacion();
-    //             enableHorizontalAutoScrollForAllTables();
+    //             $("#table-clientes-general").attr("style", "");
+    //             $("#table-clientes-general_wrapper").show();
+    //             reloadTableClientesGeneral();
     //           }
-
-    //           currentTableCotizacion = "prospectos";
+    //           limpiarInputBuscadorPersonalizado("search-table");
+    //           configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
     //         },
     //         className: "btn btn-light",
     //       },
-    //       {
-    //         text: "Por Embarcar",
-    //         action: async function () {
-    //           if (
-    //             $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
-    //           ) {
-    //             $("#table-cotizacion-prospectos").attr(
-    //               "style",
-    //               "display:none"
-    //             );
-    //             $("#table-cotizacion-prospectos_wrapper").hide();
-    //           }
-    //           if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
-    //             $("#table-cotizacion-embarque").attr("style", "");
-    //             $("#table-cotizacion-embarque_wrapper").show();
-    //             limpiarFiltroDataTable("table-cotizacion-embarque");
-    //             limpiarInputBuscadorPersonalizado("search-table");
-    //             reloadTableCotizacionEmbarque();
-    //             enableHorizontalAutoScrollForAllTables();
-    //           } else {
-    //             url =
-    //               base_url + "CargaConsolidada/ContenedorConsolidado/step";
-    //             tableCotizacionEmbarque.show();
-    //             tableCotizacionEmbarque = $(
-    //               "#table-cotizacion-embarque"
-    //             ).DataTable({
-    //               dom:
-    //                 "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
-    //                 "<'row'<'col-sm-12'tr>>" +
-    //                 "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+    //       currentPrivilege != "Documentacion"
+    //         ? {
+    //           text: "Variación",
+    //           action: function () {
+    //             if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+    //               $("#table-clientes-general").attr("style", "display:none");
+    //               $("#table-clientes-general_wrapper").hide();
+    //             }
+    //             if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+    //               $("#table-clientes-variacion").attr("style", "");
+    //               $("#table-clientes-variacion_wrapper").show();
+    //               limpiarFiltroDataTable("table-clientes-variacion");
+    //               reloadTableClientesVariacion();
+    //             } else {
+    //               url =
+    //                 base_url + "CargaConsolidada/ContenedorConsolidado/step";
+    //               tableClientesVariacion.show();
+    //               tableClientesVariacion = $(
+    //                 "#table-clientes-variacion"
+    //               ).DataTable({
+    //                 dom:
+    //                   "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+    //                   "<'row'<'col-sm-12'tr>>" +
+    //                   "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
 
 
-    //               buttons: [
-    //                 {
-    //                   text: "Prospectos",
-    //                   action: function () {
-    //                     if (
-    //                       $.fn.DataTable.isDataTable(
-    //                         "#table-cotizacion-embarque"
-    //                       )
-    //                     ) {
-    //                       $("#table-cotizacion-embarque").attr(
-    //                         "style",
-    //                         "display:none"
-    //                       );
-    //                       $("#table-cotizacion-embarque_wrapper").hide();
-    //                     }
-    //                     if (
-    //                       $.fn.DataTable.isDataTable(
-    //                         "#table-cotizacion-prospectos"
-    //                       )
-    //                     ) {
-    //                       $("#table-cotizacion-prospectos_wrapper").show();
-    //                       limpiarFiltroDataTable("table-cotizacion-prospectos");
+    //                 buttons: [
+    //                   {
+    //                     extend: "excel",
+    //                     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+    //                     titleAttr: "Excel",
+    //                     exportOptions: {
+    //                       columns: ":visible",
+    //                     },
+    //                     attr: {
+    //                       id: "export-excel-main",
+    //                       class: "hidden",
+    //                     },
+    //                   },
+    //                   {
+    //                     extend: "pdf",
+    //                     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+    //                     titleAttr: "PDF",
+    //                     exportOptions: {
+    //                       columns: ":visible",
+    //                     },
+    //                     attr: {
+    //                       id: "export-pdf-main",
+    //                       class: "hidden",
+    //                     },
+    //                   },
+    //                   {
+    //                     text: "General",
+    //                     action: function () {
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-variacion"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-variacion").attr(
+    //                           "style",
+    //                           "display:none"
+    //                         );
+    //                         $("#table-clientes-variacion_wrapper").hide();
+    //                       }
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-general"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-general_wrapper").show();
+
+    //                         $("#table-clientes-general").attr("style", "");
+    //                         reloadTableClientesGeneral();
+    //                       } else {
+    //                         $("#table-clientes-general").attr("style", "");
+    //                         $("#table-clientes-general_wrapper").show();
+    //                         limpiarFiltroDataTable("table-clientes-general");
+    //                         reloadTableClientesGeneral();
+    //                       }
     //                       limpiarInputBuscadorPersonalizado("search-table");
+    //                       configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
+    //                     },
+    //                   },
+    //                   {
+    //                     text: "Variación",
+    //                     className: "btn btn-light",
+    //                     action: function () {
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-general"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-general").attr(
+    //                           "style",
+    //                           "display:none"
+    //                         );
+    //                         $("#table-clientes-general_wrapper").hide();
+    //                       }
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-variacion"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-variacion_wrapper").show();
+    //                         limpiarFiltroDataTable("table-clientes-variacion");
 
-    //                       $("#table-cotizacion-prospectos").attr("style", "");
-    //                       reloadTableCotizacion();
-    //                       enableHorizontalAutoScrollForAllTables();
-    //                     } else {
-    //                       $("#table-cotizacion-prospectos").attr("style", "");
-    //                       reloadTableCotizacion();
-    //                       enableHorizontalAutoScrollForAllTables();
-    //                     }
-    //                     currentTableCotizacion = "prospectos";
+    //                         $("#table-clientes-variacion").attr("style", "");
+    //                         reloadTableClientesVariacion();
+    //                       } else {
+    //                         $("#table-clientes-variacion").attr("style", "");
+    //                         reloadTableClientesVariacion();
+    //                       }
+
+    //                     },
+    //                   },
+    //                 ],
+    //                 columnDefs: [
+    //                   {
+    //                     targets: "no-hidden",
+    //                     visible: false,
+    //                   },
+    //                   {
+    //                     className: "text-center",
+    //                     targets: "no-sort",
+    //                     orderable: false,
+    //                   },
+    //                   {
+    //                     targets: "",
+    //                     orderable: false,
+    //                   },
+    //                   {
+    //                     targets: "sorting_asc",
+    //                     orderable: false,
+    //                   },
+    //                 ],
+    //                 pageLength: 100, // Mostrar 100 elementos por página
+    //                 lengthMenu: [
+    //                   [100, 1000, -1],
+    //                   [100, 1000, "Todos"],
+    //                 ],
+    //                 paging: true,
+    //                 lengthChange: true,
+    //                 searching: true,
+    //                 ordering: true,
+    //                 info: true,
+    //                 autoWidth: false,
+    //                 responsive: false,
+    //                 serverSide: false,
+    //                 pagingType: "full_numbers",
+    //                 oLanguage: {
+    //                   sInfo:
+    //                     "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+    //                   sLengthMenu: "_MENU_",
+    //                   sSearch: "Buscar por: ",
+    //                   sSearchPlaceholder: "",
+    //                   sZeroRecords: "No se encontraron registros",
+    //                   sInfoEmpty: "No hay registros",
+    //                   sLoadingRecords: "Cargando...",
+    //                   sProcessing: "Procesando...",
+    //                   oPaginate: {
+    //                     sFirst: "<<",
+    //                     sLast: ">>",
+    //                     sPrevious: "<",
+    //                     sNext: ">",
     //                   },
     //                 },
-    //                 {
-    //                   text: "Por Embarcar",
-    //                   className: "btn btn-light",
-    //                   action: function () {
-    //                     if (
-    //                       $.fn.DataTable.isDataTable(
-    //                         "#table-cotizacion-prospectos"
-    //                       )
-    //                     ) {
-    //                       $("#table-cotizacion-prospectos").attr(
-    //                         "style",
-    //                         "display:none"
-    //                       );
-    //                       $("#table-cotizacion-prospectos_wrapper").hide();
-    //                     }
-    //                     if (
-    //                       $.fn.DataTable.isDataTable(
-    //                         "#table-cotizacion-embarque"
-    //                       )
-    //                     ) {
-    //                       $("#table-cotizacion-embarque").attr("style", "");
-    //                     } else {
-    //                       $("#table-cotizacion-embarque").attr("style", "");
-    //                     }
-    //                     $(".input-date").datepicker({
-    //                       autoclose: true,
-    //                       startDate: new Date(fYear, fToday.getMonth(), fDay),
-    //                       todayHighlight: true,
-    //                       format: "dd/mm/yyyy",
-    //                       dateFormat: "dd/mm/yyyy",
-    //                     });
-    //                     currentTableCotizacion = "embarque";
+    //                 ajax: {
+    //                   url: url,
+    //                   type: "POST",
+    //                   dataType: "JSON",
+    //                   data: function (data) {
+    //                     data.stepIndex = stepIndex;
+    //                     data.idContenedor = idContenedor;
+    //                     data.tipoTabla = "variacion";
+    //                     data.Filtro_Estado = $("#txt-ID_Estado").val();
+    //                     validateListEmbarque(idContenedor);
     //                   },
     //                 },
-
-    //               ],
-    //               paging: true,
-    //               lengthChange: true,
-    //               searching: true,
-    //               ordering: false,
-    //               info: true,
-    //               autoWidth: false,
-    //               responsive: false,
-    //               serverSide: false,
-    //               pagingType: "full_numbers",
-    //               oLanguage: {
-    //                 sInfo:
-    //                   "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-    //                 sLengthMenu: "_MENU_",
-    //                 sSearch: "Buscar por: ",
-    //                 sSearchPlaceholder: "",
-    //                 sZeroRecords: "No se encontraron registros",
-    //                 sInfoEmpty: "No hay registros",
-    //                 sLoadingRecords: "Cargando...",
-    //                 sProcessing: "Procesando...",
-    //                 oPaginate: {
-    //                   sFirst: "<<",
-    //                   sLast: ">>",
-    //                   sPrevious: "<",
-    //                   sNext: ">",
-    //                 },
-    //               },
-    //               //hide last two columns
-    //               columnDefs: [
-    //                 {
-    //                   targets: "no-hidden",
-    //                   visible: false,
-    //                 },
-    //                 {
-    //                   className: "text-center",
-    //                   targets: "no-sort",
-    //                   orderable: false,
-    //                 },
-    //                 {
-    //                   targets: "",
-    //                   orderable: false,
-    //                 },
-    //               ],
-    //               pageLength: 100, // Mostrar 100 elementos por página
-    //               lengthMenu: [
-    //                 [100, 1000, -1],
-    //                 [100, 1000, "Todos"],
-    //               ],
-    //               ajax: {
-    //                 url: url,
-    //                 type: "POST",
-    //                 dataType: "JSON",
-    //                 data: function (data) {
-    //                   data.stepIndex = stepIndex;
-    //                   data.idContenedor = idContenedor;
-    //                   data.tipoTabla = "embarque";
-    //                   data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
-    //                   data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
-    //                   data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
-    //                   validateListEmbarque(idContenedor);
-    //                   $(".input-date").datepicker({
-    //                     autoclose: true,
-    //                     startDate: new Date(fYear, fToday.getMonth(), fDay),
-    //                     todayHighlight: true,
-    //                     format: "dd/mm/yyyy",
-    //                     dateFormat: "dd/mm/yyyy",
-    //                   });
-    //                 },
-    //               },
-    //               initComplete: function (settings, json) {
-    //                 enableHorizontalAutoScrollForAllTables();
-    //                 $(".input-date").datepicker({
-    //                   autoclose: true,
-    //                   startDate: new Date(fYear, fToday.getMonth(), fDay),
-    //                   todayHighlight: true,
-    //                   format: "dd/mm/yyyy",
-    //                   dateFormat: "dd/mm/yyyy",
-    //                 });
-    //               },
-    //               complete: function () {
-    //                 enableHorizontalAutoScrollForAllTables();
-    //                 $("#aplicar-btn-cotizacion").off("click");
-    //                 $("#aplicar-btn-cotizacion").click(function () {
-    //                   if (currentTableCotizacion == "prospectos") {
-    //                     tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-    //                   } else {
-    //                     tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-    //                   }
-    //                 });
-    //               },
-    //             });
+    //               });
+    //               limpiarFiltroDataTable("table-clientes-variacion");
+    //               reloadTableClientesVariacion();
+    //             }
+    //             limpiarInputBuscadorPersonalizado("search-table");
     //             configurarBuscador(
-    //               "table-cotizacion-embarque",
+    //               "table-clientes-variacion",
     //               "search-table",
-    //               "table-cotizacion-embarque_info"
+    //               "table-clientes-variacion_info"
     //             );
-    //             spinner.hide();
-    //             await getTableCotizacionEmbarqueHeaders();
-
-    //           }
-    //           currentTableCotizacion = "embarque";
-    //           $(".input-date").datepicker({
-    //             autoclose: true,
-    //             startDate: new Date(fYear, fToday.getMonth(), fDay),
-    //             todayHighlight: true,
-    //             format: "dd/mm/yyyy",
-    //             dateFormat: "dd/mm/yyyy",
-    //           });
-    //         },
-    //       },
-    //     ],
+    //           },
+    //         }
+    //         : null,
+    //     ]
+    //       //filter null
+    //       .filter(Boolean),
     //     paging: true,
     //     lengthChange: true,
     //     searching: true,
@@ -3320,6 +3724,29 @@ const openStepFunction = async (step, id) => {
     //     responsive: false,
     //     serverSide: false,
     //     pagingType: "full_numbers",
+    //     columnDefs: [
+    //       {
+    //         targets: "no-hidden",
+    //         visible: false,
+    //       },
+    //       {
+    //         targets: "no-sort",
+    //         orderable: false,
+    //       },
+    //       {
+    //         targets: "",
+    //         orderable: false,
+    //       },
+    //       {
+    //         targets: "sorting_asc",
+    //         orderable: false,
+    //       },
+    //     ],
+    //     pageLength: 100, // Mostrar 100 elementos por página
+    //     lengthMenu: [
+    //       [100, 1000, -1],
+    //       [100, 1000, "Todos"],
+    //     ],
     //     oLanguage: {
     //       sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
     //       sLengthMenu: "_MENU_",
@@ -3336,17 +3763,6 @@ const openStepFunction = async (step, id) => {
     //         sNext: ">",
     //       },
     //     },
-    //     columnDefs: [
-    //       {
-    //         targets: "no-hidden",
-    //         visible: false,
-    //       },
-    //     ],
-    //     pageLength: 100, // Mostrar 100 elementos por página
-    //     lengthMenu: [
-    //       [100, 1000, -1],
-    //       [100, 1000, "Todos"],
-    //     ],
     //     ajax: {
     //       url: url,
     //       type: "POST",
@@ -3354,386 +3770,14 @@ const openStepFunction = async (step, id) => {
     //       data: function (data) {
     //         data.stepIndex = stepIndex;
     //         data.idContenedor = idContenedor;
-    //         data.tipoTabla = "prospectos";
-    //         data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
-    //       },
-    //       complete: async function () {
-    //         console.log("Init propectos")
-    //         enableHorizontalAutoScrollForAllTables();
-    //         $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-    //         $("#aplicar-btn-cotizacion").off("click");
-    //         $("#aplicar-btn-cotizacion").click(function () {
-    //           if (currentTableCotizacion == "embarque") {
-    //             tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-    //           }
-    //           else {
-    //             tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-    //           }
-    //         });
-    //         spinner.hide();
-    //         // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
-
-    //         await getTableCotizacionEmbarqueHeaders();
-
+    //         data.tipoTabla = "general";
+    //         data.Filtro_Estado = "0";
     //       },
     //     },
-    //     columnDefs: [
-    //       {
-    //         targets: "no-hidden",
-    //         visible: false,
-    //       },
-    //       {
-    //         className: "text-center",
-    //         targets: "no-sort",
-    //         orderable: false,
-    //       },
-    //       {
-    //         targets: "",
-    //         orderable: false,
-    //       },
-    //     ],
-    //     pageLength: 100, // Mostrar 100 elementos por página
-    //     lengthMenu: [
-    //       [100, 1000, -1],
-    //       [100, 1000, "Todos"],
-    //     ],
     //   });
+    //   limpiarFiltroDataTable("table-clientes-general");
+    //   reloadTableClientesGeneral();
     // }
-    // limpiarFiltroDataTable("table-cotizacion-prospectos");
-    // limpiarInputBuscadorPersonalizado("search-table");
-
-    // configurarBuscador(
-    //   "table-cotizacion-prospectos",
-    //   "search-table",
-    //   "table-cotizacion-prospectos_info"
-    // );
-
-    // await getTipoCliente();
-    // if (
-    //   currentPrivilege == "Cotizador"
-    // ) {
-    //   $("#txt-ID_Estado_Cotizacion").empty();
-    //   $("#txt-ID_Estado_Cotizacion").append(
-    //     '<option value="0">Todos</option>' +
-    //     '<option value="PENDIENTE">Pendiente</option>' +
-    //     '<option value="CONFIRMADO">Confirmado</option>'
-    //   );
-    // }
-
-  } else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
-    showDocumentacionDocumentacionContainer(id);
-  } else if (
-    stepIndex == 2 ||
-    (currentPrivilege == "Documentacion" && stepIndex == 1)
-  ) {
-    await getClientesHeader();
-    url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-    clientesContainer.show();
-    if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-      reloadTableClientesGeneral();
-    } else {
-      tableClientesGeneral.show();
-      limpiarFiltroDataTable("table-clientes-general");
-
-      tableClientesGeneral = $("#table-clientes-general").DataTable({
-        dom:
-          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-          "<'row'<'col-sm-12'tr>>" +
-          "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-        buttons: [
-          {
-            extend: "excel",
-            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-            titleAttr: "Excel",
-            exportOptions: {
-              columns: ":visible",
-            },
-            attr: {
-              id: "export-excel-main",
-              class: "hidden",
-            },
-          },
-          {
-            text: "General",
-            action: function () {
-              if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
-                $("#table-clientes-variacion").attr("style", "display:none");
-                $("#table-clientes-variacion_wrapper").hide();
-              }
-              if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-                $("#table-clientes-general").attr("style", "");
-                $("#table-clientes-general_wrapper").show();
-                reloadTableClientesGeneral();
-              } else {
-                $("#table-clientes-general").attr("style", "");
-                $("#table-clientes-general_wrapper").show();
-                reloadTableClientesGeneral();
-              }
-              limpiarInputBuscadorPersonalizado("search-table");
-              configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
-            },
-            className: "btn btn-light",
-          },
-          currentPrivilege != "Documentacion"
-            ? {
-              text: "Variación",
-              action: function () {
-                if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-                  $("#table-clientes-general").attr("style", "display:none");
-                  $("#table-clientes-general_wrapper").hide();
-                }
-                if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
-                  $("#table-clientes-variacion").attr("style", "");
-                  $("#table-clientes-variacion_wrapper").show();
-                  limpiarFiltroDataTable("table-clientes-variacion");
-                  reloadTableClientesVariacion();
-                } else {
-                  url =
-                    base_url + "CargaConsolidada/ContenedorConsolidado/step";
-                  tableClientesVariacion.show();
-                  tableClientesVariacion = $(
-                    "#table-clientes-variacion"
-                  ).DataTable({
-                    dom:
-                      "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
-                      "<'row'<'col-sm-12'tr>>" +
-                      "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-                    buttons: [
-                      {
-                        extend: "excel",
-                        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                        titleAttr: "Excel",
-                        exportOptions: {
-                          columns: ":visible",
-                        },
-                        attr: {
-                          id: "export-excel-main",
-                          class: "hidden",
-                        },
-                      },
-                      {
-                        extend: "pdf",
-                        text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-                        titleAttr: "PDF",
-                        exportOptions: {
-                          columns: ":visible",
-                        },
-                        attr: {
-                          id: "export-pdf-main",
-                          class: "hidden",
-                        },
-                      },
-                      {
-                        text: "General",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-variacion"
-                            )
-                          ) {
-                            $("#table-clientes-variacion").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-clientes-variacion_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-general"
-                            )
-                          ) {
-                            $("#table-clientes-general_wrapper").show();
-
-                            $("#table-clientes-general").attr("style", "");
-                            reloadTableClientesGeneral();
-                          } else {
-                            $("#table-clientes-general").attr("style", "");
-                            $("#table-clientes-general_wrapper").show();
-                            limpiarFiltroDataTable("table-clientes-general");
-                            reloadTableClientesGeneral();
-                          }
-                          limpiarInputBuscadorPersonalizado("search-table");
-                          configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
-                        },
-                      },
-                      {
-                        text: "Variación",
-                        className: "btn btn-light",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-general"
-                            )
-                          ) {
-                            $("#table-clientes-general").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-clientes-general_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-variacion"
-                            )
-                          ) {
-                            $("#table-clientes-variacion_wrapper").show();
-                            limpiarFiltroDataTable("table-clientes-variacion");
-
-                            $("#table-clientes-variacion").attr("style", "");
-                            reloadTableClientesVariacion();
-                          } else {
-                            $("#table-clientes-variacion").attr("style", "");
-                            reloadTableClientesVariacion();
-                          }
-
-                        },
-                      },
-                    ],
-                    columnDefs: [
-                      {
-                        targets: "no-hidden",
-                        visible: false,
-                      },
-                      {
-                        className: "text-center",
-                        targets: "no-sort",
-                        orderable: false,
-                      },
-                      {
-                        targets: "",
-                        orderable: false,
-                      },
-                      {
-                        targets: "sorting_asc",
-                        orderable: false,
-                      },
-                    ],
-                    pageLength: 100, // Mostrar 100 elementos por página
-                    lengthMenu: [
-                      [100, 1000, -1],
-                      [100, 1000, "Todos"],
-                    ],
-                    paging: true,
-                    lengthChange: true,
-                    searching: true,
-                    ordering: true,
-                    info: true,
-                    autoWidth: false,
-                    responsive: false,
-                    serverSide: false,
-                    pagingType: "full_numbers",
-                    oLanguage: {
-                      sInfo:
-                        "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-                      sLengthMenu: "_MENU_",
-                      sSearch: "Buscar por: ",
-                      sSearchPlaceholder: "",
-                      sZeroRecords: "No se encontraron registros",
-                      sInfoEmpty: "No hay registros",
-                      sLoadingRecords: "Cargando...",
-                      sProcessing: "Procesando...",
-                      oPaginate: {
-                        sFirst: "<<",
-                        sLast: ">>",
-                        sPrevious: "<",
-                        sNext: ">",
-                      },
-                    },
-                    ajax: {
-                      url: url,
-                      type: "POST",
-                      dataType: "JSON",
-                      data: function (data) {
-                        data.stepIndex = stepIndex;
-                        data.idContenedor = idContenedor;
-                        data.tipoTabla = "variacion";
-                        data.Filtro_Estado = $("#txt-ID_Estado").val();
-                        validateListEmbarque(idContenedor);
-                      },
-                    },
-                  });
-                  limpiarFiltroDataTable("table-clientes-variacion");
-                  reloadTableClientesVariacion();
-                }
-                limpiarInputBuscadorPersonalizado("search-table");
-                configurarBuscador(
-                  "table-clientes-variacion",
-                  "search-table",
-                  "table-clientes-variacion_info"
-                );
-              },
-            }
-            : null,
-        ]
-          //filter null
-          .filter(Boolean),
-        paging: true,
-        lengthChange: true,
-        searching: true,
-        ordering: true,
-        info: true,
-        autoWidth: false,
-        responsive: false,
-        serverSide: false,
-        pagingType: "full_numbers",
-        columnDefs: [
-          {
-            targets: "no-hidden",
-            visible: false,
-          },
-          {
-            targets: "no-sort",
-            orderable: false,
-          },
-          {
-            targets: "",
-            orderable: false,
-          },
-          {
-            targets: "sorting_asc",
-            orderable: false,
-          },
-        ],
-        pageLength: 100, // Mostrar 100 elementos por página
-        lengthMenu: [
-          [100, 1000, -1],
-          [100, 1000, "Todos"],
-        ],
-        oLanguage: {
-          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-          sLengthMenu: "_MENU_",
-          sSearch: "Buscar por: ",
-          sSearchPlaceholder: "",
-          sZeroRecords: "No se encontraron registros",
-          sInfoEmpty: "No hay registros",
-          sLoadingRecords: "Cargando...",
-          sProcessing: "Procesando...",
-          oPaginate: {
-            sFirst: "<<",
-            sLast: ">>",
-            sPrevious: "<",
-            sNext: ">",
-          },
-        },
-        ajax: {
-          url: url,
-          type: "POST",
-          dataType: "JSON",
-          data: function (data) {
-            data.stepIndex = stepIndex;
-            data.idContenedor = idContenedor;
-            data.tipoTabla = "general";
-            data.Filtro_Estado = "0";
-          },
-        },
-      });
-      limpiarFiltroDataTable("table-clientes-general");
-      reloadTableClientesGeneral();
-    }
     limpiarInputBuscadorPersonalizado("search-table");
     configurarBuscador(
       "table-clientes-general",
@@ -3997,103 +4041,186 @@ async function viewCotizacionFinal() {
     Cotización Final`);
   spinner.show();
   url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-  if ($.fn.DataTable.isDataTable("#table-cotizacion-final")) {
-    tableCotizacionFinal.ajax.reload();
-  } else {
-    tableCotizacionFinal.show();
+  // Handle tab clicks for final and pagos tables
+  $(".tab-clientes-final").removeClass("active");
+  $(".tab-clientes-final").off("click").click(function () {
+    $(".tab-clientes-final").removeClass("active");
+    $("#table-cotizacion-final_wrapper").hide();
+    $("#table-cotizacion-final-pagos_wrapper").hide();
 
-    tableCotizacionFinal = $("#table-cotizacion-final").DataTable({
-      dom:
-        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+    let table = this.getAttribute("data-table");
+    this.classList.add("active");
 
+    if (table == "general") {
+      // Handle final table
+      $("#table-cotizacion-final").attr("style", "");
+      $("#table-cotizacion-final-pagos").hide();
 
-      buttons: [
-        {
-          extend: "excel",
-          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-          titleAttr: "Excel",
-          exportOptions: {
-            columns: ":visible",
+      if ($.fn.DataTable.isDataTable("#table-cotizacion-final")) {
+        $("#table-cotizacion-final").show();
+        $("#table-cotizacion-final_wrapper").show();
+        tableCotizacionFinal.ajax.reload();
+      } else {
+        tableCotizacionFinal.show();
+        tableCotizacionFinal = $("#table-cotizacion-final").DataTable({
+          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          buttons: [
+            {
+              extend: "excel",
+              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+              titleAttr: "Excel",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "pdf",
+              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+              titleAttr: "PDF",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "colvis",
+              text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+              titleAttr: "Columnas",
+              exportOptions: { columns: ":visible" }
+            }
+          ],
+          paging: true,
+          lengthChange: true,
+          searching: true,
+          ordering: true,
+          info: true,
+          autoWidth: false,
+          responsive: false,
+          serverSide: false,
+          pagingType: "full_numbers",
+          oLanguage: {
+            sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+            sLengthMenu: "_MENU_",
+            sSearch: "Buscar por: ",
+            sSearchPlaceholder: "",
+            sZeroRecords: "No se encontraron registros",
+            sInfoEmpty: "No hay registros",
+            sLoadingRecords: "Cargando...",
+            sProcessing: "Procesando...",
+            oPaginate: {
+              sFirst: "<<",
+              sLast: ">>",
+              sPrevious: "<",
+              sNext: ">"
+            }
           },
-        },
-        {
-          extend: "pdf",
-          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-          titleAttr: "PDF",
-          exportOptions: {
-            columns: ":visible",
+          columnDefs: [
+            { targets: "no-hidden", visible: false },
+            { className: "text-center", targets: "no-sort", orderable: false },
+            { targets: "", orderable: false }
+          ],
+          pageLength: 100,
+          lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
+          ajax: {
+            url: url,
+            type: "POST",
+            dataType: "JSON",
+            data: function (data) {
+              data.stepIndex = stepIndex;
+              data.idContenedor = idContenedor;
+              data.tipoTabla = "general";
+            }
           },
-        },
-        {
-          extend: "colvis",
-          text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-          titleAttr: "Columnas",
-          exportOptions: {
-            columns: ":visible",
+          initComplete: function (settings, json) {
+            spinner.hide();
+          }
+        });
+      }
+    }
+    else if (table == "pagos") {
+      // Handle pagos table
+      $("#table-cotizacion-final-pagos").attr("style", "");
+      $("#table-cotizacion-final").hide();
+
+      if ($.fn.DataTable.isDataTable("#table-cotizacion-final-pagos")) {
+        $("#table-cotizacion-final-pagos").show();
+        $("#table-cotizacion-final-pagos_wrapper").show();
+        tableCotizacionFinalPagos.ajax.reload();
+      } else {
+        tableCotizacionFinalPagos.show();
+        tableCotizacionFinalPagos = $("#table-cotizacion-final-pagos").DataTable({
+          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          buttons: [
+            {
+              extend: "excel",
+              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+              titleAttr: "Excel",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "pdf",
+              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+              titleAttr: "PDF",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "colvis",
+              text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+              titleAttr: "Columnas",
+              exportOptions: { columns: ":visible" }
+            }
+          ],
+          paging: true,
+          lengthChange: true,
+          searching: true,
+          ordering: true,
+          info: true,
+          autoWidth: false,
+          responsive: false,
+          serverSide: false,
+          pagingType: "full_numbers",
+          oLanguage: {
+            sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+            sLengthMenu: "_MENU_",
+            sSearch: "Buscar por: ",
+            sSearchPlaceholder: "",
+            sZeroRecords: "No se encontraron registros",
+            sInfoEmpty: "No hay registros",
+            sLoadingRecords: "Cargando...",
+            sProcessing: "Procesando...",
+            oPaginate: {
+              sFirst: "<<",
+              sLast: ">>",
+              sPrevious: "<",
+              sNext: ">"
+            }
           },
-        },
-      ],
-      paging: true,
-      lengthChange: true,
-      searching: true,
-      ordering: true,
-      info: true,
-      autoWidth: false,
-      responsive: false,
-      serverSide: false,
-      pagingType: "full_numbers",
-      oLanguage: {
-        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-        sLengthMenu: "_MENU_",
-        sSearch: "Buscar por: ",
-        sSearchPlaceholder: "",
-        sZeroRecords: "No se encontraron registros",
-        sInfoEmpty: "No hay registros",
-        sLoadingRecords: "Cargando...",
-        sProcessing: "Procesando...",
-        oPaginate: {
-          sFirst: "<<",
-          sLast: ">>",
-          sPrevious: "<",
-          sNext: ">",
-        },
-      },
-      columnDefs: [
-        {
-          targets: "no-hidden",
-          visible: false,
-        },
-        {
-          className: "text-center",
-          targets: "no-sort",
-          orderable: false,
-        },
-        {
-          targets: "",
-          orderable: false,
-        },
-      ],
-      pageLength: 100, // Mostrar 100 elementos por página
-      lengthMenu: [
-        [100, 1000, -1],
-        [100, 1000, "Todos"],
-      ],
-      ajax: {
-        url: url,
-        type: "POST",
-        dataType: "JSON",
-        data: function (data) {
-          data.stepIndex = stepIndex;
-          data.idContenedor = idContenedor;
-        },
-      },
-      initComplete: function (settings, json) {
-        spinner.hide();
-      },
-    });
-  }
+          columnDefs: [
+            { targets: "no-hidden", visible: false },
+            { className: "text-center", targets: "no-sort", orderable: false },
+            { targets: "", orderable: false }
+          ],
+          pageLength: 100,
+          lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
+          ajax: {
+            url: url,
+            type: "POST",
+            dataType: "JSON",
+            data: function (data) {
+              data.stepIndex = stepIndex;
+              data.idContenedor = idContenedor;
+              data.tipoTabla = "pagos"; // Add this to distinguish the data request
+            }
+          },
+          initComplete: function (settings, json) {
+            spinner.hide();
+          }
+        });
+      }
+    }
+  });
+
+  // Activate first tab
+  $(".tab-clientes-final").first().click();
 }
 async function deleteDocumentacionFolder(id) {
   Swal.fire({
@@ -4230,6 +4357,11 @@ async function reloadTableClientesVariacion() {
   await getClientesHeader();
   enableHorizontalAutoScrollForAllTables();
 }
+async function reloadTableClientesPagos() {
+  tableClientesPagos.ajax.reload();
+  await getClientesHeader();
+  enableHorizontalAutoScrollForAllTables();
+}
 
 async function reloadTableCotizacionEmbarque() {
   tableCotizacionEmbarque.ajax.reload();
@@ -4253,6 +4385,7 @@ async function getTableCotizacionEmbarqueHeaders() {
   $("#txt-CBM_Total_China").html(result.cbm_total_china);
   $("#txt-CBM_Total_Pendiente").html(result.cbm_total_pendiente);
   $("#txt-CBM_Total_Logistica").html(result.total_logistica);
+  $("#txt-CBM_Total_Pagado").html(result.total_logistica_pagado);
   //if result.lista_embarque_url is not null add button to download else file input with button to upload remember remove and add event listener
   if (result.lista_embarque_url) {
     $("#packing-list-container").empty();
@@ -5929,8 +6062,10 @@ $(document).ready(async function () {
   clientesContainer.hide();
   tableClientesGeneral = $("#table-clientes-general");
   tableClientesVariacion = $("#table-clientes-variacion");
+  tableClientesPagos = $("#table-clientes-pagos");
   tableClientesGeneral.hide();
   tableClientesVariacion.hide();
+  tableClientesPagos.hide();
   clientesDocumentacionContainer = $("#clientes-documentation-container");
   clientesDocumentacionContainer.hide();
   documentationContainer = $("#documentation-container");
@@ -5946,6 +6081,7 @@ $(document).ready(async function () {
   cotizacionFinalContainer.hide();
   tableCotizacionFinal = $("#table-cotizacion-final");
   tableCotizacionFinal.hide();
+  tableCotizacionFinalPagos = $("#table-cotizacion-final-pagos");
   facturaGuiaContainer = $("#factura-guia-container");
   facturaGuiaContainer.hide();
   tableFacturaGuia = $("#table-factura-guia");
@@ -5955,6 +6091,8 @@ $(document).ready(async function () {
   documentacionDocumentacionContainer = $(
     "#documentacion-documentacion-container"
   );
+  tableCotizacionTrackingPagos = $("#table-cotizacion-tracking-pagos");
+  tableCotizacionTrackingPagos.hide();
   documentacionDocumentacionContainer.hide();
   documentacionAduanaContainer = $("#documentacion-aduana-container");
   documentacionAduanaContainer.hide();
@@ -6366,8 +6504,6 @@ $(document).ready(async function () {
     }
     isMobile.addEventListener("change", handleRowClickByDevice);
     handleRowClickByDevice();
-
-
   }
   //if current windows route includes listarCompletados hide .filter-contenedor
 
