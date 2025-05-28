@@ -366,8 +366,13 @@ class ContenedorConsolidado extends CI_Controller
 			$arrResponse = [];
 			if ($tipoTabla == "prospectos") {
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
-			} else {
+			}else if($tipoTabla=="embarque"){
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
+
+			}
+			else {
+				$arrResponse = $this->ContenedorConsolidadoModel->getClientesDocumentacionPagos($idContenedor);
+
 			}
 			$data  = [];
 			$index = 1;
@@ -397,7 +402,9 @@ class ContenedorConsolidado extends CI_Controller
 						$divFile .= '
 						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFile(' . $row->id_cotizacion . ')"></i>';
 					}
+					$subdata[] = $row->fob;
 					$subdata[] = $row->monto;
+					$subdata[] = $row->impuestos;
 					$subdata[] = $row->tarifa;
 					$divFile .= '</div>';
 					$subdata[] = $divFile;
@@ -431,7 +438,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $divAcciones;
 					}
 					$data[] = $subdata;
-				} else {
+				} else if ($tipoTabla == "embarque"){
 					$subdata = [];
 					if ($this->user->No_Grupo != "ContenedorAlmacen") {
 						$subdata[] = $row->No_Nombres_Apellidos;
@@ -646,6 +653,42 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $divInputArriveDateChina;
 					$subdata[] = $divAcciones;
 					$data[]    = $subdata;
+				}else{
+					$subdata   = [];
+					$subdata[] = $index;
+					$subdata[] = $row->nombre;
+					$subdata[] = $row->documento;
+					$subdata[] = $row->telefono;
+					$subdata[] = $row->name;
+					//badge for estado_pagos_coordinacion gray is PENDIENTE,yellow if ADELANTO,green if PAGADO,red if SOBREPAGO
+					$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
+					if ($row->pagos_count==0) {
+						$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
+					} else if ($row->total_pagos<$row->monto) {
+						$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
+					} else if ($row->total_pagos==$row->monto) {
+						$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
+					} else if ($row->total_pagos>$row->monto) {
+						$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
+					}
+					$subdata[] = $estadoPagosCoordinacion;
+					$subdata[] = "Logistica";
+					$subdata[] = $row->monto;
+					$subdata[] = $row->total_pagos==0 ? "0" : number_format($row->total_pagos, 2);
+					//if pagos_count is minor than 4 add button plus to add new payment
+					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
+					if($row->pagos_count < 4) {
+						$divAcciones .='<div class="d-flex"  onclick="addPagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+					} 
+					if($row->pagos_count > 0) {
+						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
+						<i class="fas fa-eye" style="cursor:pointer;"></i>
+						</div>';
+					}
+					$divAcciones .=  '</div>';
+					$subdata[] = $divAcciones;
+
+					$data[]    = $subdata;
 				}
 				$index++;
 
@@ -657,7 +700,14 @@ class ContenedorConsolidado extends CI_Controller
 
 			// echo json_encode(['data' => $arrResponse,'status' => "success"]);
 		} else if ($stepIndex == 2 || ($stepIndex == 1 && $this->user->No_Grupo == "Documentacion")) {
-			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorClientes($idContenedor);
+			$arrResponse = [];
+			if ($tipoTabla == "general") {
+				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorClientes($idContenedor);
+			} else if ($tipoTabla == "variacion") {
+				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorClientes($idContenedor);
+			} else {
+				$arrResponse = $this->ContenedorConsolidadoModel->getClientesDocumentacionPagos($idContenedor);
+			}
 			$data        = [];
 			$index       = 1;
 			$tipoTabla   = $this->input->post('tipoTabla');
@@ -672,12 +722,11 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->name;
 					if ($this->user->No_Grupo != "Documentacion") {
 						$subdata[] = $row->volumen;
+						$subdata[] = $row->fob;
 						$subdata[] = $row->monto;
+						$subdata[] = $row->impuestos;
 						$subdata[] = $row->tarifa;
 					}
-
-
-
 
 					if ($this->user->No_Grupo == "Coordinación") {
 						$selectEstadoCliente = "";
@@ -714,7 +763,7 @@ class ContenedorConsolidado extends CI_Controller
 
 					$data[]    = $subdata;
 					$index++;
-				} else {
+				} else if ($tipoTabla == "variacion") {
 					$subdata       = [];
 					$volSelected   = $row->vol_selected;
 					$divValidacion = "";
@@ -734,16 +783,16 @@ class ContenedorConsolidado extends CI_Controller
 						: '<span class="px-3 py-2 bg-orange  rounded-sm">' . ($row->volumen ?? 0) . '</span>'
 					) . '
                     </div>
-                </div>';
+					</div>';
 
 
-					$divVolChina = '<div class="d-flex flex-row gap-2">
-					<div class="d-flex flex-row gap-2">
-					' . (($volSelected != "volumen_china")
-						? '<button class="px-3 py-2 bg-light rounded-sm border-0" onclick="updateVolSelected(' . $row->id_cotizacion . ',\'volumen_china\')">' . ($row->volumen_china ?? 0) . '</button>'
-						: '<span class="px-3 py-2 bg-orange rounded-sm">' . ($row->volumen_china ?? 0) . '</span>') . '
-					</div>
-				</div>';
+						$divVolChina = '<div class="d-flex flex-row gap-2">
+						<div class="d-flex flex-row gap-2">
+						' . (($volSelected != "volumen_china")
+							? '<button class="px-3 py-2 bg-light rounded-sm border-0" onclick="updateVolSelected(' . $row->id_cotizacion . ',\'volumen_china\')">' . ($row->volumen_china ?? 0) . '</button>'
+							: '<span class="px-3 py-2 bg-orange rounded-sm">' . ($row->volumen_china ?? 0) . '</span>') . '
+						</div>
+					</div>';
 
 					//     $divVolDoc = '<div class="d-flex flex-row gap-2">
 					// 	<div class="d-flex flex-row gap-2">
@@ -758,7 +807,7 @@ class ContenedorConsolidado extends CI_Controller
 						? '<button class="px-3 py-2 bg-light rounded-sm border-0" onclick="updateVolSelected(' . $row->id_cotizacion . ',\'volumen_doc\')">' . ($row->volumen_doc ?? 0) . '</button>'
 						: '<span class="px-3 py-2 bg-orange rounded-sm">' . ($row->volumen_doc ?? 0) . '</span>') . '
 					</div>
-				</div>';
+					</div>';
 					$divValorCot = '<div class="d-flex flex-row gap-2">
 					<div class="d-flex flex-row gap-2">
 					<span>' . ($row->valor_cot ?? 0) . '</span></div>';
@@ -780,6 +829,42 @@ class ContenedorConsolidado extends CI_Controller
 
 					$data[] = $subdata;
 					$index++;
+				}else{
+					$subdata   = [];
+					$subdata[] = $index;
+					$subdata[] = $row->nombre;
+					$subdata[] = $row->documento;
+					$subdata[] = $row->telefono;
+					$subdata[] = $row->name;
+					//badge for estado_pagos_coordinacion gray is PENDIENTE,yellow if ADELANTO,green if PAGADO,red if SOBREPAGO
+					$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
+					if ($row->pagos_count==0) {
+						$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
+					} else if ($row->total_pagos<$row->monto) {
+						$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
+					} else if ($row->total_pagos==$row->monto) {
+						$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
+					} else if ($row->total_pagos>$row->monto) {
+						$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
+					}
+					$subdata[] = $estadoPagosCoordinacion;
+					$subdata[] = "Logistica";
+					$subdata[] = $row->monto+$row->impuestos;
+					$subdata[] = $row->total_pagos==0 ? "0" : number_format($row->total_pagos, 2);
+					//if pagos_count is minor than 4 add button plus to add new payment
+					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
+					if($row->pagos_count < 4) {
+						$divAcciones .='<div class="d-flex"  onclick="addPagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+					} 
+					if($row->pagos_count > 0) {
+						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
+						<i class="fas fa-eye" style="cursor:pointer;"></i>
+						</div>';
+					}
+					$divAcciones .=  '</div>';
+					$subdata[] = $divAcciones;
+
+					$data[]    = $subdata;
 				}
 			}
 			$output = [
@@ -790,11 +875,17 @@ class ContenedorConsolidado extends CI_Controller
 			$arrResponse = $this->ContenedorConsolidadoModel->getDocumentationFolderFiles($idContenedor);
 			echo json_encode($arrResponse);
 		} else if ($stepIndex == 4) {
-			$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionesFinales($idContenedor);
+			$arrResponse = [];
+			if ($tipoTabla == "general") {
+				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionesFinales($idContenedor);
+			}  else {
+				$arrResponse = $this->ContenedorConsolidadoModel->getCotizacionFinalDocumentacionPagos($idContenedor);
+			}
 			$data        = [];
 			$index       = 1;
 			foreach ($arrResponse as $row) {
 				$subdata       = [];
+				if($tipoTabla == "general") {
 				$subdata[]     = $index;
 				$subdata[]     = $row->nombre;
 				$subdata[]     = $row->documento;
@@ -804,14 +895,19 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata[]     = $row->volumen_final;
 				$subdata[]     = $row->monto_final;
 				$subdata[]     = $row->tarifa_final;
+				//select for options C.FINAL,AJUSTADO,COTIZADO,PAGADO,SOBREPAGO
 				$selectEstados = '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
 					<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
+					<option value="C.FINAL" ' . ($row->estado_cotizacion_final == "C.FINAL" ? "selected" : "") . '>C.FINAL</option>
+					<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
 					<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
-					<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>';
+					<option value="PAGADO" ' . ($row->estado_cotizacion_final == "PAGADO" ? "selected" : "") . '>PAGADO</option>
+					<option value="SOBREPAGO" ' . ($row->estado_cotizacion_final == "SOBREPAGO" ? "selected" : "") . '>SOBREPAGO</option>
+					</select>';
 				$subdata[] = $selectEstados;
 				//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
 				$divFile = '<div>';
-				if (! empty($row->cotizacion_final_url)) {
+				if (!empty($row->cotizacion_final_url)) {
 					$divFile .= '<div class="d-flex flex-row gap-2">
 						<a href="' . $row->cotizacion_final_url . '" download>
 							<i class="fas fa-file-excel text-success"></i>
@@ -830,8 +926,33 @@ class ContenedorConsolidado extends CI_Controller
 				}
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
+			
 				$data[] = $subdata;
 				$index++;
+				}else {
+					$subdata   = [];
+					$subdata[] = $index;
+					$subdata[] = $row->nombre;
+					$subdata[] = $row->documento;
+					$subdata[] = $row->telefono;
+					$subdata[] = $row->name;	
+					$subdata[] = $row->monto;
+					$subdata[] = $row->total_pagos==0 ? "0" : number_format($row->total_pagos, 2);
+					//if pagos_count is minor than 4 add button plus to add new payment
+					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
+					
+					$divAcciones .='<div class="d-flex"  onclick="addPagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+					
+					if($row->pagos_count > 0) {
+						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
+						<i class="fas fa-eye" style="cursor:pointer;"></i>
+						</div>';
+					}
+					$divAcciones .=  '</div>';
+					$subdata[] = $divAcciones;
+
+					$data[]    = $subdata;
+				}
 			}
 
 			$output = array(
@@ -1615,6 +1736,76 @@ class ContenedorConsolidado extends CI_Controller
 		$arrResponse = $this->ContenedorConsolidadoModel->validateToSendInspectionMessage2($idProveedor);
 		echo json_encode([
 			"status" => $arrResponse
+		]);
+	}
+	public function saveClientePagosCoordination(){
+		$voucher = $_FILES['voucher'];
+		$idCotizacion = $this->input->post('idCotizacion');
+		$idContenedor = $this->input->post('idContenedor');
+		$amount = $this->input->post('monto');
+		$fecha= $this->input->post('fecha');
+		$banco= $this->input->post('banco');
+		$arrResponse = $this->ContenedorConsolidadoModel->saveClientePagosCoordination($voucher, $idCotizacion, $idContenedor,$amount, $fecha, $banco);
+		echo json_encode([
+			"status" => $arrResponse['status'],
+			"message" => $arrResponse['message']
+		]);
+	}
+	public function getPagosCoordination($idCotizacion)
+	{
+		$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($idCotizacion);
+		$data    = [];
+		$index   = 1;
+		foreach ($arrData as $row) {
+			$subdata = [];
+			$subdata[] = $index;
+			$subdata[] = $row->payment_date;
+			$subdata[] = $row->banco;
+			$subdata[] = $row->monto;
+			$subdata[] = '<a href='.$row->voucher_url.' download>
+				<i class="fas fa-file-excel text-success"></i>
+				</a>';
+			$data[] = $subdata;
+			$index++;
+		}
+		$output = array(
+			"data" => $data
+		);
+		echo json_encode($output);
+	}
+	public function getPagosClientes($idCotizacion)
+	{
+		$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($idCotizacion);
+		$data    = [];
+		$index   = 1;
+		foreach ($arrData as $row) {
+			$subdata = [];
+			$subdata[] = $index;
+			$subdata[] = $row->payment_date;
+			$subdata[] = $row->banco;
+			$subdata[] = $row->monto;
+			$subdata[] = '<a href='.$row->voucher_url.' download>
+				<i class="fas fa-file-excel text-success"></i>
+				</a>';
+			$data[] = $subdata;
+			$index++;
+		}
+		$output = array(
+			"data" => $data
+		);
+		echo json_encode($output);
+	}
+	public function saveClientePagosClientes(){
+		$voucher = $_FILES['voucher'];
+		$idCotizacion = $this->input->post('idCotizacion');
+		$idContenedor = $this->input->post('idContenedor');
+		$amount = $this->input->post('monto');
+		$fecha= $this->input->post('fecha');
+		$banco= $this->input->post('banco');
+		$arrResponse = $this->ContenedorConsolidadoModel->saveClientePagosClientes($voucher, $idCotizacion, $idContenedor,$amount, $fecha, $banco);
+		echo json_encode([
+			"status" => $arrResponse['status'],
+			"message" => $arrResponse['message']
 		]);
 	}
 }
