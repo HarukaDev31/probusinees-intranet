@@ -608,7 +608,7 @@ class ContenedorConsolidado extends CI_Controller
 						$divAcciones .=
 							'<div class="d-flex flex-row gap-1">';
 
-						$divAcciones .= '<div class="mb-1" onclick="verCotizacionEmbarque(' . $proveedor->id_proveedor . ',' . $row->id . ',\'' . addslashes($proveedor->code_supplier) . '\',\'' . addslashes($row->nombre) . '\')">
+						$divAcciones .= '<div class="mb-1" onclick="verCotizacionEmbarque(' . $proveedor->id_proveedor . ',' . $row->id . ',\'' . addslashes($proveedor->code_supplier) . '\',\'' . addslashes(trim($row->nombre)) . '\')">
 								<i class="far fa-eye" style="cursor:pointer;padding:10px;" "></i>
 								</div>';
 

@@ -3513,7 +3513,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
         return true;
     }
-
     function validateToSendInspectionMessage2($idProveedor)
     {
         log_message('error', "validateToSendInspectionMessage: " . $idProveedor);
