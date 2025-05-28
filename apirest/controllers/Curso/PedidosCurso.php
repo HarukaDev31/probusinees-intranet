@@ -116,6 +116,7 @@ class PedidosCurso extends CI_Controller {
 
 			// Prepara la respuesta
 			$response = [
+				'id_entidad' => $data['id_entidad'],
 				'nombres' => $data['nombres'],
 				'sexo' => $sexo_text,
 				'dni' => $data['dni'],
@@ -126,9 +127,13 @@ class PedidosCurso extends CI_Controller {
 				'departamento' => $data['departamento'],
 				'provincia' => $data['provincia'],
 				'distrito' => $data['distrito'],
-				'nacimiento' => (!empty($data['nacimiento']) ? date('d/m/Y', strtotime($data['nacimiento'])) : ''),
+				'nacimiento' => (!empty($data['nacimiento']) ? date('Y-m-d', strtotime($data['nacimiento'])) : ''),
 				'usuario_moodle' => $data['usuario_moodle'],
 				'password_moodle' => $data['password_moodle'],
+				'id_pais' => $data['id_pais'],
+				'id_departamento' => $data['id_departamento'],
+				'id_provincia' => $data['id_provincia'],
+				'id_distrito' => $data['id_distrito'],
 			];
 
 			echo json_encode(['status' => 'success', 'data' => $response]);
@@ -248,4 +253,37 @@ class PedidosCurso extends CI_Controller {
 			exit();
 		}
 	}
+	public function actualizarDatosCliente() {
+		$id_entidad = $this->input->post('ID_Entidad');
+		$data = array(
+			'No_Entidad' => $this->input->post('No_Entidad'),
+			'Nu_Documento_Identidad' => $this->input->post('Nu_Documento_Identidad'),
+			'Nu_Tipo_Sexo' => $this->input->post('Nu_Tipo_Sexo'),
+			'Nu_Como_Entero_Empresa' => $this->input->post('Nu_Como_Entero_Empresa'),
+			'Txt_Email_Entidad' => $this->input->post('Txt_Email_Entidad'),
+			'ID_Pais' => $this->input->post('ID_Pais'),
+			'Nu_Celular_Entidad' => $this->input->post('Nu_Celular_Entidad'),
+			'ID_Departamento' => $this->input->post('ID_Departamento'),
+			'Fe_Nacimiento' => $this->input->post('Fe_Nacimiento'),
+			'ID_Provincia' => $this->input->post('ID_Provincia'),
+			'ID_Distrito' => $this->input->post('ID_Distrito')
+		);
+		log_message('error', 'ID_Entidad: ' . print_r($id_entidad, true));
+		log_message('error', 'DATA: ' . print_r($data, true));
+		$result = $this->PedidosCursoModel->actualizarDatosCliente($id_entidad, $data);
+		echo json_encode($result);
+	}
+	public function getCampanas() {
+		$this->load->model('PedidosCursoModel');
+		$meses = $this->PedidosCursoModel->getCampanas();
+		echo json_encode(['status' => 'success', 'data' => $meses]);
+	}
+
+	public function guardarCampanas() {
+		$post = $this->input->post();
+		$this->load->model('PedidosCursoModel');
+		$result = $this->PedidosCursoModel->guardarCampanas($post);
+		echo json_encode($result);
+	}
+
 }

@@ -88,7 +88,7 @@
             </div>
           </div>
           <div class="col-12 col-md-2">
-            <button type="button" id="btn-crear-cotizacion" class="text-white bg-[#fd7e14] py-2 px-3 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Campaña</button>
+            <button type="button" id="btn-crear-campana" class="text-white bg-[#fd7e14] py-2 px-3 border border-transparent rounded btn-block btn-reporte" data-type="html"><i class="fa fa-plus"></i> Campaña</button>
           </div>
         </div>
       </div>
@@ -151,55 +151,60 @@
     </div>
     <div class="card-body">
       <form id="form-datos-cliente" autocomplete="off">
+        <input type="hidden" name="ID_Entidad" id="cliente-id" value="">
         <div class="row">
           <!-- Columna izquierda -->
           <div class="col-md-6">
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Nombre y apellidos:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-nombres" readonly>
+              <input type="text" class="form-control cliente-input" id="cliente-nombres" name="No_Entidad" readonly>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Dni / ID:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-dni" readonly>
+              <input type="text" class="form-control cliente-input" id="cliente-dni" name="Nu_Documento_Identidad" readonly>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Correo:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-correo" readonly>
+              <input type="text" class="form-control cliente-input" id="cliente-correo" name="Txt_Email_Entidad" readonly>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">WhatsApp:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-whatsapp" readonly>
+              <input type="text" class="form-control cliente-input" id="cliente-whatsapp" name="Nu_Celular_Entidad" readonly>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Fecha de nacimiento:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-edad" readonly>
+              <input type="date" class="form-control cliente-input" id="cliente-edad" name="Fe_Nacimiento" readonly>
             </div>
           </div>
           <!-- Columna derecha -->
           <div class="col-md-6">
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Sexo:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-sexo" readonly>
+              <input type="text" class="form-control cliente-input" id="cliente-sexo" name="Nu_Tipo_Sexo" readonly>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Red social:</label>
-              <input type="text" class="form-control cliente-input" id="cliente-redsocial" readonly>
+              <input type="text" class="form-control cliente-input" id="cliente-redsocial" name="Nu_Como_Entero_Empresa" readonly>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">País:</label>
               <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
+              <select id="select-pais" class="hidden form-control cliente-input" name="ID_Pais"></select>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Departamento:</label>
               <input type="text" class="form-control cliente-input" id="cliente-departamento" readonly>
+              <select id="select-departamento" class="hidden form-control cliente-input" name="ID_Departamento"></select>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Provincia:</label>
               <input type="text" class="form-control cliente-input" id="cliente-provincia" readonly>
+              <select id="select-provincia" class="hidden form-control cliente-input" name="ID_Provincia"></select>
             </div>
             <div class="form-group flex align-items-center">
               <label class="w-[40%] mb-0">Distrito:</label>
               <input type="text" class="form-control cliente-input" id="cliente-distrito" readonly>
+              <select id="select-distrito" class="hidden form-control cliente-input" name="ID_Distrito"></select>
             </div>
           </div>
         </div>
@@ -222,6 +227,13 @@
       </form>
     </div>
   </div>
+</section>
+  <!-- Section para campañas de cursos -->
+<section id="section-campanas-cursos" class="container my-4 none">
+    <div class="card-body">
+      <div id="contenedor-campanas" class="row justify-content-center"></div>
+    </div>
+
 </section>
   <!-- /.content -->
 </div>
@@ -268,4 +280,9 @@
     justify-content: center;
     gap: 12px;
   }
+  .selected-dia {
+  background: #3b82f6 !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+}
 </style>

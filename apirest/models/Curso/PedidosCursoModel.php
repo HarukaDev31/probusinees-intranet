@@ -47,6 +47,7 @@ class PedidosCursoModel extends CI_Model{
 
 	public function getDatosClientePorPedido($id_pedido) {
 		$this->db->select('
+			CLI.ID_Entidad as id_entidad,
 			CLI.No_Entidad as nombres,
 			CLI.Nu_Tipo_Sexo as sexo,
 			CLI.Nu_Documento_Identidad as dni,
@@ -54,6 +55,10 @@ class PedidosCursoModel extends CI_Model{
 			CLI.Txt_Email_Entidad as correo,
 			CLI.Fe_Nacimiento as nacimiento,
 			CLI.Nu_Como_Entero_Empresa as red_social,
+			P.ID_Pais as id_pais,
+			D.ID_Departamento as id_departamento,
+			PR.ID_Provincia as id_provincia,
+			DI.ID_Distrito as id_distrito,
 			P.No_Pais as pais,
 			D.No_Departamento as departamento,
 			PR.No_Provincia as provincia,
@@ -123,5 +128,38 @@ class PedidosCursoModel extends CI_Model{
 			'status' => 'warning',
 			'message' => 'No se encontro registro',
 		);
+	}
+	public function actualizarDatosCliente($id_entidad, $data) {
+		$this->db->where('ID_Entidad', $id_entidad);
+		$this->db->update('entidad', $data);
+		if ($this->db->affected_rows() > 0) {
+			return array('status' => 'success', 'message' => 'Datos del cliente actualizados');
+		}
+		return array('status' => 'warning', 'message' => 'No se modificó ningún dato');
+	}
+	public function getCampanas() {
+		// Simulación de campañas, reemplaza por tu consulta real
+		$dias=[
+			1 => [5, 10, 15], //los días 5, 10 y 15 de enero
+			2 => [14,28], //los días 14 y 28 de febrero
+			3 => [1, 8, 15, 22], //los días 1, 8, 15 y 22 de marzo
+		];
+		$meses=[];
+		for ($m = 1; $m <= 12; $m++) {
+			$dias_del_mes = cal_days_in_month(CAL_GREGORIAN, $m, date('Y'));
+			$meses[] = [
+				'numero' => $m,
+				'nombre' => date('F', mktime(0, 0, 0, $m, 10)),
+				'dias' => range(1, $dias_del_mes),
+				'seleccionados' => isset($dias[$m]) ? $dias[$m] : []
+			];
+		}
+		return $meses;
+	}
+
+	public function guardarCampanas($data) {
+		// Procesa y guarda los datos recibidos
+		// Ejemplo: $this->db->update('campanas', ...);
+		return ['status' => 'success', 'message' => 'Campañas guardadas'];
 	}
 }
