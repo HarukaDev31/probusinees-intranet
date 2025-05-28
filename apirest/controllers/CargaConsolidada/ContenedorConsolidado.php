@@ -936,7 +936,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->documento;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;	
-					$subdata[] = $row->monto;
+					$subdata[] = $row->monto+$row->impuestos;
 					$subdata[] = $row->total_pagos==0 ? "0" : number_format($row->total_pagos, 2);
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
