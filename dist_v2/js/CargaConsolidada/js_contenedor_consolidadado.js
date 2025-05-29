@@ -692,7 +692,7 @@ async function getClientesHeader() {
   $("#txt-CBM_Cliente_Total_Peru").html(result.cbm_total);
   $("#cotizacion_Cliente_name").html('#' + result.carga);
   $("#txt-CBM_Cliente_Total_Logistica").html(result.total_logistica);
-
+  $("#txt-CBM_Cliente_Total_Logistica_Pagado").html(result.total_logistica_pagado);
   $("#txt-CBM_Cliente_Total_China").html(result.cbm_total_china);
   console.log(result);
   spinner.hide();

@@ -886,49 +886,51 @@ class ContenedorConsolidado extends CI_Controller
 			foreach ($arrResponse as $row) {
 				$subdata       = [];
 				if($tipoTabla == "general") {
-				$subdata[]     = $index;
-				$subdata[]     = $row->nombre;
-				$subdata[]     = $row->documento;
-				$subdata[]     = $row->correo;
-				$subdata[]     = $row->telefono;
-				$subdata[]     = $row->name;
-				$subdata[]     = $row->volumen_final;
-				$subdata[]     = $row->monto_final;
-				$subdata[]     = $row->tarifa_final;
-				//select for options C.FINAL,AJUSTADO,COTIZADO,PAGADO,SOBREPAGO
-				$selectEstados = '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
-					<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
-					<option value="C.FINAL" ' . ($row->estado_cotizacion_final == "C.FINAL" ? "selected" : "") . '>C.FINAL</option>
-					<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
-					<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
-					<option value="PAGADO" ' . ($row->estado_cotizacion_final == "PAGADO" ? "selected" : "") . '>PAGADO</option>
-					<option value="SOBREPAGO" ' . ($row->estado_cotizacion_final == "SOBREPAGO" ? "selected" : "") . '>SOBREPAGO</option>
-					</select>';
-				$subdata[] = $selectEstados;
-				//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
-				$divFile = '<div>';
-				if (!empty($row->cotizacion_final_url)) {
-					$divFile .= '<div class="d-flex flex-row gap-2">
-						<a href="' . $row->cotizacion_final_url . '" download>
-							<i class="fas fa-file-excel text-success"></i>
+					$subdata[]     = $index;
+					$subdata[]     = $row->nombre;
+					$subdata[]     = $row->documento;
+					$subdata[]     = $row->correo;
+					$subdata[]     = $row->telefono;
+					$subdata[]     = $row->name;
+					$subdata[]     = $row->volumen_final;
+					$subdata[]     = $row->monto_final;
+					$subdata[]     = $row->fob_final;
+					$subdata[]     = $row->impuestos_final;
+					$subdata[]     = $row->tarifa_final;
+					//select for options C.FINAL,AJUSTADO,COTIZADO,PAGADO,SOBREPAGO
+					$selectEstados = '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
+						<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
+						<option value="C.FINAL" ' . ($row->estado_cotizacion_final == "C.FINAL" ? "selected" : "") . '>C.FINAL</option>
+						<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
+						<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
+						<option value="PAGADO" ' . ($row->estado_cotizacion_final == "PAGADO" ? "selected" : "") . '>PAGADO</option>
+						<option value="SOBREPAGO" ' . ($row->estado_cotizacion_final == "SOBREPAGO" ? "selected" : "") . '>SOBREPAGO</option>
+						</select>';
+					$subdata[] = $selectEstados;
+					//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
+					$divFile = '<div>';
+					if (!empty($row->cotizacion_final_url)) {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+							<a href="' . $row->cotizacion_final_url . '" download>
+								<i class="fas fa-file-excel text-success"></i>
 
-						</a>
-						<i class="fas fa-file-pdf text-danger"
-						onclick="descargarBoletaPDF(' . $row->id_cotizacion . ')" ></i>
+							</a>
+							<i class="fas fa-file-pdf text-danger"
+							onclick="descargarBoletaPDF(' . $row->id_cotizacion . ')" ></i>
 
-						<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacionFinalFile(' . $row->id_cotizacion . ')"></i>
+							<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacionFinalFile(' . $row->id_cotizacion . ')"></i>
 
-						</div>
-						';
-				} else {
-					$divFile .= '
-						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFinal(' . $row->id_cotizacion . ')"></i>';
-				}
-				$divFile .= '</div>';
-				$subdata[] = $divFile;
-			
-				$data[] = $subdata;
-				$index++;
+							</div>
+							';
+					} else {
+						$divFile .= '
+							<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFinal(' . $row->id_cotizacion . ')"></i>';
+					}
+					$divFile .= '</div>';
+					$subdata[] = $divFile;
+				
+					$data[] = $subdata;
+					$index++;
 				}else {
 					$subdata   = [];
 					$subdata[] = $index;
@@ -936,8 +938,8 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->documento;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;	
-					$subdata[] = $row->monto;
-					$subdata[] = $row->total_pagos==0 ? "0" : number_format($row->total_pagos, 2);
+					$subdata[] = "$".($row->monto_final+$row->impuestos_final);
+					$subdata[] =$row->total_pagos==0 ? "$0" : "$".  number_format($row->total_pagos, 2);
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
 					
@@ -950,7 +952,7 @@ class ContenedorConsolidado extends CI_Controller
 					}
 					$divAcciones .=  '</div>';
 					$subdata[] = $divAcciones;
-
+					$index++;
 					$data[]    = $subdata;
 				}
 			}
@@ -1761,7 +1763,7 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $index;
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
-			$subdata[] = $row->monto;
+			$subdata[] = "$".round($row->monto, 2);
 			$subdata[] = '<a href='.$row->voucher_url.' download>
 				<i class="fas fa-file-excel text-success"></i>
 				</a>';

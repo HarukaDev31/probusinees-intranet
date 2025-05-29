@@ -405,33 +405,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         return $query->result();
     }
-    public function getCotizacionFinalDocumentacionPagos($idContenedor){
-         $this->db->select(
-            "*,CC.id AS id_cotizacion, " .
-            "(
-                SELECT IFNULL(SUM(cccp.monto), 0) 
-                FROM " . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . " cccp
-                JOIN " . $this->table_pagos_concept . " ccp ON cccp.id_concept= ccp.id
-                WHERE cccp.id_cotizacion = CC.id
-                AND (ccp.name = 'LOGISTICA' OR ccp.name = 'IMPUESTOS')
-            ) AS total_pagos, " .
-            "(
-                SELECT COUNT(*) 
-                FROM " . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . " cccp
-                JOIN " . $this->table_pagos_concept . " ccp ON cccp.id_concept = ccp.id
-                WHERE cccp.id_cotizacion = CC.id
-                AND (ccp.name = 'LOGISTICA' OR ccp.name = 'IMPUESTOS')
-            ) AS pagos_count"
-        )
-        ->from($this->table_contenedor_cotizacion . " AS CC")
-        ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
-        ->where('CC.id_contenedor', $idContenedor)
-        ->where('CC.estado_cotizador!=', null)
-        ->order_by('CC.id', 'asc');
-      
-        $query = $this->db->get();
-        return $query->result();
-    }
+    
     public function getContenedorCotizacionProveedores($idContenedor)
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
@@ -3621,19 +3595,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     }
     public function getClientesHeader($idContenedor)
     {
-        //get sum of cbm_total_china from proveedor where states is LOADED, and get total monto from cotizacion
-        // $this->db->select('SUM(ifnull(cbm_total_china,0)) as cbm_total_china')
-        //     ->from($this->table_contenedor_cotizacion_proveedores)
-        //     ->where('id_contenedor', $idContenedor)
-        //     ->where('estados_proveedor', 'LOADED');
-        // $query = $this->db->get();
-        // $result = $query->row();
-        // $this->db->select('SUM(ifnull(monto,0)) as monto')
-        //     ->from($this->table_contenedor_cotizacion)
-        //     ->where('id_contenedor', $idContenedor)
-        //     ->where('estado_cotizador', 'CONFIRMADO');
-        // $query = $this->db->get();
-        // $result2 = $query->row();
+
           try {
             // Consulta para cbm_total_china usando DISTINCT para evitar duplicación
             $this->db->select('
@@ -3675,6 +3637,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 AND estados_proveedor = "LOADED"
             )
         ) as total_logistica', false);
+    $this->db->select('(SELECT COALESCE(SUM(monto), 0)
+            FROM ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . ' 
+            JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
+            WHERE id_contenedor = ' . $idContenedor . '
+            AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
+        ) as total_logistica_pagado', false);
             //get carga
             $this->db->select('carga')
                 ->from($this->table.' as c')
@@ -3700,6 +3668,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'cbm_total' => $result->cbm_total,
                     'cbm_total_pendiente' => $result->cbm_total_pendiente,
                     'total_logistica' => $result->total_logistica,
+                    'total_logistica_pagado' => round($result->total_logistica_pagado, 2),
                     'bl_file_url' => $result2->bl_file_url,
                     'carga' => $result->carga,
                     'lista_embarque_url' => $result2->lista_embarque_url
@@ -3712,6 +3681,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         'cbm_total_china' => 0,
                         'cbm_total_pendiente' => 0,
                         'total_logistica' => 0,
+                        'total_logistica_pagado' => 0,
                         'cbm_total' => 0,
                         'bl_file_url' => '',
                         'carga' => '',
@@ -3809,7 +3779,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'cbm_total' => $result->cbm_total,
                     'cbm_total_pendiente' => $result->cbm_total_pendiente,
                     'total_logistica' => $result->total_logistica,
-                    'total_logistica_pagado' => $result->total_logistica_pagado,
+                    'total_logistica_pagado' => round($result->total_logistica_pagado, 2),
                     'bl_file_url' => $result2->bl_file_url,
                     'lista_embarque_url' => $result2->lista_embarque_url
                 ];
@@ -4377,6 +4347,15 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $cbmTotal = 0;
             $pesoTotal = 0;
             $tarifa = $data['cliente']['tarifa'];
+            $sheet1=$objPHPExcel->getSheet(0);
+            if($sheet1->getCell('A23')->getValue() == "ANTIDUMPING"){
+                $fob= $sheet1->getCell('J30')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('J32')->getCalculatedValue();
+            } else {
+                $fob= $sheet1->getCell('J29')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('J31')->getCalculatedValue();
+            }
+
             //first iterate for tributes zone, set values and apply styles to cells
             foreach ($data['cliente']['productos'] as $producto) {
                 //validate if $InitialColumn is more than Z then set A$
@@ -4944,6 +4923,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 'volumen_final' => $data['cliente']['productos'][0]['cbm'],
                 'monto_final' => $montoFinal,
                 'tarifa_final' => $data['cliente']['tarifa'],
+                'impuestos_final'=> $impuestos,
+                'fob_final' => $fob,
                 'estado' => 'PENDIENTE',
                 "excel_file_name" => $excelFileName,
                 "excel_file_path" => $excelFilePath
@@ -5484,6 +5465,32 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
         return $clients;
     }
+    public function getCotizacionFinalDocumentacionPagos($idContenedor){
+         $this->db->select(
+            "*,CC.id AS id_cotizacion, " .
+            "(
+                SELECT IFNULL(SUM(cccp.monto), 0) 
+                FROM " . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . " cccp
+                JOIN " . $this->table_pagos_concept . " ccp ON cccp.id_concept= ccp.id
+                WHERE cccp.id_cotizacion = CC.id
+                AND (ccp.name = 'LOGISTICA' OR ccp.name = 'IMPUESTOS')
+            ) AS total_pagos, " .
+            "(
+                SELECT COUNT(*) 
+                FROM " . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . " cccp
+                JOIN " . $this->table_pagos_concept . " ccp ON cccp.id_concept = ccp.id
+                WHERE cccp.id_cotizacion = CC.id
+                AND (ccp.name = 'LOGISTICA' OR ccp.name = 'IMPUESTOS')
+            ) AS pagos_count"
+        )
+        ->from($this->table_contenedor_cotizacion . " AS CC")
+        ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
+        ->where('CC.id_contenedor', $idContenedor)
+        ->where('CC.estado_cliente!=', null);
+      
+        $query = $this->db->get();
+        return $query->result();
+    }
     public function getContenedorCotizacionesFinales($idContenedor)
     {
         $this->db->select('*,contenedor_consolidado_cotizacion.id as id_cotizacion')
@@ -5502,6 +5509,36 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $this->db->set('estado_cotizacion_final', $estado);
             $this->db->where('id', $idCotizacionFinal);
             $this->db->update($this->table_contenedor_cotizacion);
+            if($estado=='COTIZADO'){
+                //get phone from cotizacion table where id=idCotizacionFinal
+                $this->db->select("CC.telefono,CC.impuestos_final,CC.volumen_final,CC.monto_final,CC.tarifa_final,
+                (
+                SELECT IFNULL(SUM(cccp.monto), 0) 
+                FROM " . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . " cccp
+                JOIN " . $this->table_pagos_concept . " ccp ON cccp.id_concept= ccp.id
+                WHERE cccp.id_cotizacion = CC.id
+                AND ccp.name = 'LOGISTICA'
+                OR ccp.name = 'IMPUESTOS'
+                ) AS total_pagos");
+                $this->db->from($this->table_contenedor_cotizacion . " AS CC");
+                $this->db->where('id', $idCotizacionFinal);
+                //get sum of montos from pagos where concept is 'LOGISTICA' or 'IMPUESTOS' and id_cotizacion=idCotizacionFinal
+            
+                $query = $this->db->get();
+                $telefono = $query->row()->telefono;
+                $telefono = preg_replace('/\s+/', '', $telefono);
+                $this->phoneNumberId = $telefono ? $telefono . '@c.us' : ''; 
+                $totalPagos = $query->row()->total_pagos;
+                $totalAPagar= $query->row()->monto_final + $query->row()->impuestos_final -$totalPagos;
+                $volumen = $query->row()->volumen_final;
+                $message= "Su cotización ha sido actualizada a COTIZADO. \n" .
+                "Monto a pagar: S/." . number_format($totalAPagar, 2) . "\n" .
+                "Volumen: " . number_format($volumen, 2) . " m³\n" .
+                "Tarifa: S/." . number_format($query->row()->tarifa_final, 2) . "\n" ;
+                
+                $this->sendMessage($message);
+                //SEND SIMPLE MESSAGE TO CLIENT
+            }
             //if db error is diferent to 0 return false
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error en updateEstadoCotizacionFinal: ' . $this->db->error()['message']);

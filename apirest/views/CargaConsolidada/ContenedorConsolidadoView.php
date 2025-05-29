@@ -1320,6 +1320,15 @@ Filters
                         <strong><span id="txt-CBM_Cliente_Total_Logistica" class="cbm_score"></span></strong>
                     </div>
                 </div>
+                <div
+                    class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                    <!-- icon with dollar icon-->
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Total Pagado:</span>
+                    <div class="">
+                        <strong><span id="txt-CBM_Cliente_Total_Logistica_Pagado" class="cbm_score"></span></strong>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div data-table="general"
@@ -1875,9 +1884,11 @@ Filters
                             <th>Correo</th>
                             <th>Whatsapp</th>
                             <th>T. Cliente</th>
-                            <th>Volumen F</th>
-                            <th>Precio Cbm</th>
-                            <th>Tarifa F</th>
+                            <th>Volumen </th>
+                            <th>FOB</th>
+                            <th>Logistica</th>
+                            <th>Impuesto</th>
+                            <th>Tarifa </th>
                             <th>Estados</th>
                             <th>C Final</th>
                         </tr>
