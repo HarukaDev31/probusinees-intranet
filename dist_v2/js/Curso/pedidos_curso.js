@@ -560,7 +560,7 @@ async function viewCliente(id) {
             
         `);
 
-        $('#section-listar-pedidos').hide();
+        $('#section-listar-pedidos').show();
         $('#section-datos-cliente').show();
 
         $('#btn-editar-cliente').on('click', function () {
@@ -676,9 +676,161 @@ function ocultarSectionDatosCliente() {
   $('#section-campanas-cursos').hide();
 }
 
-// Botón para crear campaña
-$(document).on('click', '#btn-crear-campana', function () {
-  estadoCampanas = [];
+
+
+function cargarTablaCampanas() {
+  if ($.fn.DataTable.isDataTable('#table-campanas')) {
+    table_Campanas.reload();
+    return;
+  }
+  table_Campanas.show();
+  url= base_url + 'Curso/PedidosCurso/getCampanasTabla';  
+  table_Campanas = $("#table-campanas").DataTable({
+    dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+    "<'row'<'col-sm-12'tr>>" +
+    "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+    buttons: [
+      {
+        extend: 'excel',
+        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+        titleAttr: 'Exportar a Excel',
+        exportOptions: {
+          columns: ':visible'
+        },
+        attr: {
+          class: "hidden"
+        }
+      },
+      {
+        extend: 'pdf',
+        text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+        titleAttr: 'Exportar a PDF',
+        exportOptions: {
+          columns: ':visible'
+        },
+        attr: {
+          class: "hidden"
+        }
+      },
+      {
+        extend: 'colvis',
+        text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+        titleAttr: 'Columnas',
+        exportOptions: {
+          columns: ':visible'
+        },
+        attr: {
+          class: "hidden"
+        }
+      }
+    ],
+    'searching'   : true,
+    'bStateSave'  : true,
+    "lengthChange": true,
+    'processing'  : true,
+    'serverSide'  : false,
+    'info'        : true,
+    'autoWidth'   : false,
+    'pagingType'  : 'full_numbers',
+    'oLanguage' : {
+      'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
+      'sLengthMenu'        : '_MENU_',
+      'sSearch'            : 'Buscar por: ',
+      'sSearchPlaceholder' : '',
+      'sZeroRecords'       : 'No se encontraron registros',
+      'sInfoEmpty'         : 'No hay registros',
+      'sLoadingRecords'    : 'Cargando...',
+      'sProcessing'        : 'Procesando...',
+      'oPaginate'          : {
+        'sFirst'    : '<<',
+        'sLast'     : '>>',
+        'sPrevious' : '<',
+        'sNext'     : '>',
+      },
+    },
+    'order': [],
+    'ajax': {
+      'url'       : url,
+      'type'      : 'GET',
+      'dataType'  : 'JSON',
+      'data'      : function ( data ) {
+        data.sMethod = $('#hidden-sMethod').val();
+      },
+    },
+    'columnDefs': [
+      {
+        targets: 'no-hidden',
+        visible: false,  
+      },{
+      className : 'text-center',
+      targets   : 'no-sort',
+      orderable : false,
+    },{
+          targets: "",
+          orderable: false,
+        },],
+    'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
+  });
+  configurarBuscador('table-campanas', 'search-table-campanas', 'table-campanas_info');
+}
+function editarCampana(id) {
+  $.ajax({
+    url: base_url + "Curso/PedidosCurso/getCampanaById",
+    type: "POST",
+    data: { ID_Campana: id },
+    dataType: "json",
+    success: function(response) {
+      if(response.status === "success") {
+        // Llena los campos del modal
+        $('#modalNuevaCampanaLabel').text('Editar Campaña');
+        $('#id-campana-editar').val(response.data.ID_Campana);
+        $('#fecha-inicio-campana').val(response.data.Fe_Inicio);
+        $('#fecha-fin-campana').val(response.data.Fe_Fin);
+        // Abre el modal
+        $('#modal-nueva-campana').modal('show');
+        table_Campanas.ajax.reload();
+      } else {
+        Swal.fire('Error', 'No se pudo obtener la campaña', 'error');
+      }
+    }
+  });
+}
+// Para crear, limpia el formulario y cambia el título
+$('#btn-crear-campana').on('click', function() {
+  $('#modalNuevaCampanaLabel').text('Registrar Nueva Campaña');
+  $('#form-nueva-campana')[0].reset();
+  $('#id-campana-editar').val('');
+});
+function borrarCampana(id) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: "Esta acción eliminará la campaña.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: base_url + "Curso/PedidosCurso/borrarCampana",
+        type: "POST",
+        data: { ID_Campana: id },
+        dataType: "json",
+        success: function(response) {
+          if(response.status === "success") {
+            table_Campanas.ajax.reload();
+            Swal.fire('¡Eliminado!', response.message, 'success');
+          } else {
+            Swal.fire('Error', response.message, 'error');
+          }
+        }
+      });
+    }
+  });
+}
+
+// Botón para mostrar campañas
+$(document).on('click', '#btn-crear-campana', function() {
   $('#section-listar-pedidos').hide();
   $('#section-campanas-cursos').show();
   $('#contenedor-campanas').html('');
@@ -695,140 +847,39 @@ $(document).on('click', '#btn-crear-campana', function () {
                 </div>
                 <div class="col-12 col-md-0 col-xl-2 justify-content-center d-flex">
                   <div class="col-3 col-xl-10 py-sm-3 py-xl-0 py-md-0">
-                    <button id="btn-guardar-campana" type="button" class="text-white bg-[#fd7e14] py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte "><i class="fa fa-save"></i> Guardar</button>
+                    <button id="btn-nueva-campana" type="button" class="text-white bg-[#fd7e14] py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte "><i class="fa fa-plus"></i>Nuevo</button>
                   </div>
                 </div>
               </div>
             </div>
             
         `);
-  cargarCampanas();
+  cargarTablaCampanas();
 });
 
 
-function renderizarCampanas(meses) {
-  let html = '';
-  meses.forEach(mes => {
-    // Días seleccionados como badges
-    let seleccionadosHtml = '';
-    if (mes.seleccionados.length) {
-      seleccionadosHtml = mes.seleccionados.map(dia =>
-        `<span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">${dia}</span>`
-      ).join('');
-    } else {
-      seleccionadosHtml = '<span class="text-muted pb-2">No hay días seleccionados</span>';
-    }
 
-    // Renderiza el calendario
-    let diasHtml = '';
-    let diasSemana = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
-    diasHtml += '<div class="row mb-1">';
-    diasSemana.forEach(dia => {
-      diasHtml += `<div class="col text-center font-weight-bold">${dia}</div>`;
-    });
-    diasHtml += '</div>';
 
-    let primerDia = new Date(new Date().getFullYear(), mes.numero - 1, 1).getDay();
-    let totalDias = mes.dias.length;
-    let diaActual = 1;
-    let filas = Math.ceil((primerDia + totalDias) / 7);
-
-    for (let f = 0; f < filas; f++) {
-      diasHtml += '<div class="row mb-1">';
-      for (let d = 0; d < 7; d++) {
-        let cell = '';
-        let cellClass = 'text-center';
-        if (f === 0 && d < primerDia) {
-          cell = '';
-        } else if (diaActual <= totalDias) {
-          let selected = mes.seleccionados.includes(diaActual) ? 'inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-800 text-sm font-medium' : '';
-          cell = `<button type="button" class="btn btn-sm btn-dia ${selected}" data-mes="${mes.numero}" data-dia="${diaActual}">${diaActual}</button>`;
-          diaActual++;
-        }
-        diasHtml += `<div class="col ${cellClass}">${cell || '&nbsp;'}</div>`;
-      }
-      diasHtml += '</div>';
-    }
-
-    html += `
-      <div class="card m-4 w-[40%]" data-mes="${mes.numero}">
-        <div class="card-header d-flex align-items-center">
-          <i class="fa fa-calendar mr-2"></i>
-          <b class="mr-auto">${mes.nombre.toUpperCase()}</b>
-          <a href="#" class="ml-auto seleccionar-todos" data-mes="${mes.numero}">Seleccionar todos</a>
-        </div>
-        <div class="card-body">
-          <div class="mb-2 flex flex-wrap gap-2 seleccionados-badges">${seleccionadosHtml}</div>
-          <div>${diasHtml}</div>
-        </div>
-      </div>
-    `;
-  });
-  $('#contenedor-campanas').html(html);
-}
-
-let estadoCampanas = [];
-
-function cargarCampanas() {
-  $.ajax({
-    url: base_url + "Curso/PedidosCurso/getCampanas",
-    type: "GET",
-    dataType: "json",
-    success: function (response) {
-      console.log('Respuesta de getCampanas:', response);
-      if (response.status === "success") {
-        estadoCampanas = response.data; // Guardamos el estado inicial
-        renderizarCampanas(estadoCampanas);
-      } else {
-        $('#contenedor-campanas').html('<div class="col-12 text-center text-danger">No hay campañas disponibles.</div>');
-      }
-    }
-  });
-}
-
-// Delegación de eventos para los días
-$('#contenedor-campanas').on('click', '.btn-dia', function () {
-  const mes = parseInt($(this).data('mes'));
-  const dia = parseInt($(this).data('dia'));
-  const mesObj = estadoCampanas.find(m => m.numero === mes);
-  if (!mesObj) return;
-  const idx = mesObj.seleccionados.indexOf(dia);
-  if (idx === -1) {
-    mesObj.seleccionados.push(dia);
-  } else {
-    mesObj.seleccionados.splice(idx, 1);
-  }
-  // Ordena los días seleccionados
-  mesObj.seleccionados.sort((a, b) => a - b);
-  renderizarCampanas(estadoCampanas);
+$(document).on('click', '#btn-nueva-campana', function() {
+  $('#form-nueva-campana')[0].reset();
+  $('#modal-nueva-campana').modal('show');
 });
-$('#contenedor-campanas').on('click', '.seleccionar-todos', function (e) {
+
+// Guardar la campaña al enviar el formulario
+$('#form-nueva-campana').on('submit', function(e) {
   e.preventDefault();
-  const mes = parseInt($(this).data('mes'));
-  const mesObj = estadoCampanas.find(m => m.numero === mes);
-  if (!mesObj) return;
-  if (mesObj.seleccionados.length === mesObj.dias.length) {
-    mesObj.seleccionados = [];
-  } else {
-    mesObj.seleccionados = [...mesObj.dias];
-  }
-  renderizarCampanas(estadoCampanas);
-});
-
-$('#section-campanas-cursos').on('click', '#btn-guardar-campana', function () {
-  // Puedes enviar solo los días seleccionados por mes
-  const dataToSend = estadoCampanas.map(mes => ({
-    mes: mes.numero,
-    seleccionados: mes.seleccionados
-  }));
+  var id = $('#id-campana-editar').val();
+  var url = id ? base_url + "Curso/PedidosCurso/editarCampana" : base_url + "Curso/PedidosCurso/crearCampana";
   $.ajax({
-    url: base_url + "Curso/PedidosCurso/guardarCampanas",
+    url: url,
     type: "POST",
-    data: { campanas: JSON.stringify(dataToSend) },
+    data: $(this).serialize(),
     dataType: "json",
-    success: function (response) {
-      if (response.status === "success") {
-        Swal.fire('¡Guardado!', 'Las campañas se guardaron correctamente.', 'success');
+    success: function(response) {
+      if(response.status === "success") {
+        $('#modal-nueva-campana').modal('hide');
+        Swal.fire('¡Guardado!', response.message, 'success');
+        table_Campanas.ajax.reload(null, false);
       } else {
         Swal.fire('Error', response.message || 'No se pudo guardar.', 'error');
       }
@@ -836,6 +887,73 @@ $('#section-campanas-cursos').on('click', '#btn-guardar-campana', function () {
   });
 });
 
+// Asignar campaña al pedido
+$(document).on('change', 'select[name="ID_Campana"]', function() {
+    var idCampana = $(this).val();
+    // Encuentra el ID del pedido en la misma fila
+    var idPedido = $(this).closest('tr').find('td').eq(0).text(); // Ajusta el índice si tu ID está en otra columna
+
+    if(idCampana) {
+        $.ajax({
+            url: base_url + "Curso/PedidosCurso/asignarCampanaPedido",
+            type: "POST",
+            data: { ID_Pedido_Curso: idPedido, ID_Campana: idCampana },
+            dataType: "json",
+            success: function(response) {
+                if(response.status === "success") {
+                    Swal.fire('¡Guardado!', response.message, 'success');
+                } else {
+                    Swal.fire('Error', response.message, 'error');
+                }
+            }
+        });
+    }
+});
+
+// Delegación para inputs de importe en la tabla
+$(document).on('keydown', 'input[name="importe_pedido"]', function(e) {
+    // Solo permitir números y máximo 2 decimales
+    if (
+        // Permitir teclas de control
+        $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+        // Permitir Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+        ((e.keyCode == 65 || e.keyCode == 67 || e.keyCode == 86 || e.keyCode == 88) && (e.ctrlKey === true || e.metaKey === true)) ||
+        // Permitir flechas
+        (e.keyCode >= 35 && e.keyCode <= 39)
+    ) {
+        // Enter: guardar
+        if (e.keyCode === 13) {
+            e.preventDefault();
+            var $input = $(this);
+            var valor = $input.val();
+            // Validar formato decimal
+            if (!/^\d+(\.\d{1,2})?$/.test(valor)) {
+                Swal.fire('Error', 'Solo se permiten números con hasta 2 decimales.', 'error');
+                return false;
+            }
+            // Obtener ID del pedido (ajusta el índice si tu tabla cambia)
+            var idPedido = $input.closest('tr').find('td').eq(0).text();
+            $.ajax({
+                url: base_url + "Curso/PedidosCurso/actualizarImportePedido",
+                type: "POST",
+                data: { ID_Pedido_Curso: idPedido, importe: valor },
+                dataType: "json",
+                success: function(response) {
+                    if(response.status === "success") {
+                        Swal.fire('¡Guardado!', response.message, 'success');
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                }
+            });
+        }
+        return; // Permitir
+    }
+    // Bloquear cualquier otra tecla que no sea número o punto
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+    }
+});
 
 
 let headerOriginal = '';
@@ -897,6 +1015,8 @@ function cargarDistritos(idProvincia) {
     }
   });
 }
+
+
 $(document).ready(async function () {
   $('.dropdown-menu').on('click', function (event) {
     event.stopPropagation(); // Evita que el evento se propague
@@ -918,6 +1038,8 @@ $(document).ready(async function () {
   $sectionlistarpedidos.show();
   $sectiondatoscliente = $('#section-datos-cliente');
   $sectiondatoscliente.hide();
+  table_Campanas = $("#table-campanas");
+  table_Campanas.hide();
 
   // Cargar los select de país, departamento, provincia y distrito
   cargarPaises();
@@ -960,5 +1082,13 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
       );
     }
   });
-
+  $(document).on('change', '.select-usuario-externo', function() {
+    var estado = $(this).val();
+    var idUsuario = $(this).data('id-usuario');
+    var idPedido = $(this).data('id-pedido');
+    if (estado == '2') {
+        // Ejecuta la función de compartir (enviar email Moodle)
+        enviarEmailUsuarioMoodle(idUsuario, idPedido);
+    }
+});
 }

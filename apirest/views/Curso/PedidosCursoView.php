@@ -111,193 +111,257 @@
                     </div>
                 </div>
             </div>
-        </div><!-- /.container-fluid -->
-    </section>
-    <?php //array_debug($this->user); ?>
-    <section class="content" id="section-listar-pedidos">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
-                        value="<?php echo $this->router->method; ?>">
+        </div>
+</section>
+<?php //array_debug($this->user); ?>
+<section class="content" id="section-listar-pedidos">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
+                    value="<?php echo $this->router->method; ?>">
 
-                    <div class="col-6 col-sm-3 hidden">
-                        <label>F. Inicio</label>
-                        <div class="form-group">
-                            <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
-                                value="<?php echo dateNow('month_date_ini_report'); ?>">
-                            <span class="help-block text-danger" id="error"></span>
-                        </div>
+                <div class="col-6 col-sm-3 hidden">
+                    <label>F. Inicio</label>
+                    <div class="form-group">
+                        <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
+                            value="<?php echo dateNow('month_date_ini_report'); ?>">
+                        <span class="help-block text-danger" id="error"></span>
                     </div>
-                    <div class="col-6 col-sm-3 hidden">
-                        <label>F. Fin</label>
-                        <div class="form-group">
-                            <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                                value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                            <span class="help-block text-danger" id="error"></span>
-                        </div>
+                </div>
+                <div class="col-6 col-sm-3 hidden">
+                    <label>F. Fin</label>
+                    <div class="form-group">
+                        <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
+                            value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                        <span class="help-block text-danger" id="error"></span>
                     </div>
-                    <div class="row">
-                        <div data-table="alumnos"
-                            class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
-                            Alumnos
-                        </div>
-                        <div data-table="pagos"
-                            class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
-                            Pagos
-                        </div>
+                </div>
 
-                    </div>
-                    <div class="table-responsive div-Listar">
-                        <table id="table-curso-pedidos" class="table table-hover dataTable no-footer hidden">
-                            <thead class="thead-default">
-                                <tr>
-                                    <th>Pedido</th>
-                                    <th>Fecha</th>
-                                    <th>Cliente</th>
-                                    <th>Compartir</th>
 
-                                    <th>Usuario</th>
-                                    <th>Moodle</th>
-                                    <th>Ref. Pago</th>
-                                    <th>Importe</th>
-                                    <th>Estados</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <table id="table-curso-pagos" class="table table-hover dataTable no-footer hidden">
-                            <thead class="thead-default">
-                                <tr>
-                                    <th>N.</th>
-                                    <th>Fecha</th>
-                                    <th>Nombre</th>
-                                    <th>DNI/RUC</th>
-                                    <th>WhatsApp</th>
-                                    <th>Precio</th>
-                                    <th>Pagado</th>
-                                    <th>Adelanto</th>
-                                </tr>
-                            </thead>
-                        </table>
+                <div class="col-6 col-sm-3 hidden">
+                    <label>F. Inicio</label>
+                    <div class="form-group">
+                        <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
+                            value="<?php echo dateNow('month_date_ini_report'); ?>">
+                        <span class="help-block text-danger" id="error"></span>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-3 hidden">
+                    <label>F. Fin</label>
+                    <div class="form-group">
+                        <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
+                            value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                        <span class="help-block text-danger" id="error"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div data-table="alumnos"
+                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
+                        Alumnos
+                    </div>
+                    <div data-table="pagos"
+                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
+                        Pagos
                     </div>
 
                 </div>
+                <div class="table-responsive div-Listar">
+                    <table id="table-curso-pedidos" class="table table-hover dataTable no-footer hidden">
+                        <thead class="thead-default">
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Compartir</th>
+
+                                <th>Usuario</th>
+                                <th>Moodle</th>
+                                <th>Ref. Pago</th>
+                                <th>Importe</th>
+                                <th>Estados</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <table id="table-curso-pagos" class="table table-hover dataTable no-footer hidden">
+                        <thead class="thead-default">
+                            <tr>
+                                <th>N.</th>
+                                <th>Fecha</th>
+                                <th>Nombre</th>
+                                <th>DNI/RUC</th>
+                                <th>WhatsApp</th>
+                                <th>Precio</th>
+                                <th>Pagado</th>
+                                <th>Adelanto</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
 
             </div>
-            <!-- /.row -->
+
         </div>
-        <!-- /.container-fluid -->
-    </section>
-    <!-- Section para mostrar datos del cliente de un pedido de curso -->
-    <section id="section-datos-cliente" class="container my-4" style="display:none;">
-        <div class="card shadow">
-            <div class="card-header text-white bg-secondary d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fa fa-user"></i> Datos del Cliente</h5>
-            </div>
-            <div class="card-body">
-                <form id="form-datos-cliente" autocomplete="off">
-                    <input type="hidden" name="ID_Entidad" id="cliente-id" value="">
-                    <div class="row">
-                        <!-- Columna izquierda -->
-                        <div class="col-md-6">
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Nombre y apellidos:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-nombres"
-                                    name="No_Entidad" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Dni / ID:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-dni"
-                                    name="Nu_Documento_Identidad" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Correo:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-correo"
-                                    name="Txt_Email_Entidad" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">WhatsApp:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-whatsapp"
-                                    name="Nu_Celular_Entidad" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Fecha de nacimiento:</label>
-                                <input type="date" class="form-control cliente-input" id="cliente-edad"
-                                    name="Fe_Nacimiento" readonly>
-                            </div>
-                        </div>
-                        <!-- Columna derecha -->
-                        <div class="col-md-6">
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Sexo:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-sexo"
-                                    name="Nu_Tipo_Sexo" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Red social:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-redsocial"
-                                    name="Nu_Como_Entero_Empresa" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">País:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
-                                <select id="select-pais" class="hidden form-control cliente-input"
-                                    name="ID_Pais"></select>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Departamento:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-departamento"
-                                    readonly>
-                                <select id="select-departamento" class="hidden form-control cliente-input"
-                                    name="ID_Departamento"></select>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Provincia:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-provincia" readonly>
-                                <select id="select-provincia" class="hidden form-control cliente-input"
-                                    name="ID_Provincia"></select>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Distrito:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-distrito" readonly>
-                                <select id="select-distrito" class="hidden form-control cliente-input"
-                                    name="ID_Distrito"></select>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div id="acceso-aula-virtual" class="row mt-4">
-                        <div class="col-md-12">
-                            <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Usuario:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario"
-                                    readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Contraseña:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-moodle-password"
-                                    readonly>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<!-- Section para mostrar datos del cliente de un pedido de curso -->
+<section id="section-datos-cliente" class="container my-4" style="display:none;">
+    <div class="card shadow">
+        <div class="card-header text-white bg-secondary d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fa fa-user"></i> Datos del Cliente</h5>
         </div>
-    </section>
-    <!-- Section para campañas de cursos -->
-    <section id="section-campanas-cursos" class="container my-4 none">
         <div class="card-body">
-            <div id="contenedor-campanas" class="row justify-content-center"></div>
+            <form id="form-datos-cliente" autocomplete="off">
+                <input type="hidden" name="ID_Entidad" id="cliente-id" value="">
+                <div class="row">
+                    <!-- Columna izquierda -->
+                    <div class="col-md-6">
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Nombre y apellidos:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-nombres" name="No_Entidad"
+                                readonly>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Dni / ID:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-dni"
+                                name="Nu_Documento_Identidad" readonly>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Correo:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-correo"
+                                name="Txt_Email_Entidad" readonly>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">WhatsApp:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-whatsapp"
+                                name="Nu_Celular_Entidad" readonly>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Fecha de nacimiento:</label>
+                            <input type="date" class="form-control cliente-input" id="cliente-edad" name="Fe_Nacimiento"
+                                readonly>
+                        </div>
+                    </div>
+                    <!-- Columna derecha -->
+                    <div class="col-md-6">
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Sexo:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-sexo" name="Nu_Tipo_Sexo"
+                                readonly>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Red social:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-redsocial"
+                                name="Nu_Como_Entero_Empresa" readonly>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">País:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
+                            <select id="select-pais" class="hidden form-control cliente-input" name="ID_Pais"></select>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Departamento:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-departamento" readonly>
+                            <select id="select-departamento" class="hidden form-control cliente-input"
+                                name="ID_Departamento"></select>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Provincia:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-provincia" readonly>
+                            <select id="select-provincia" class="hidden form-control cliente-input"
+                                name="ID_Provincia"></select>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Distrito:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-distrito" readonly>
+                            <select id="select-distrito" class="hidden form-control cliente-input"
+                                name="ID_Distrito"></select>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div id="acceso-aula-virtual" class="row mt-4">
+                    <div class="col-md-12">
+                        <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Usuario:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" readonly>
+                        </div>
+                        <div class="form-group flex align-items-center">
+                            <label class="w-[40%] mb-0">Contraseña:</label>
+                            <input type="text" class="form-control cliente-input" id="cliente-moodle-password" readonly>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
+    </div>
+    </form>
+    </div>
+    </div>
+</section>
+<!-- Section para campañas de cursos -->
+<section id="section-campanas-cursos" class="container my-4 none hidden">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="table-campanas" class="table table-hover table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha de Creación</th>
+                        <th>Nombre de Campaña</th>
+                        <th>Fecha de Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Cantidad de Personas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    </section>
-    <!-- /.content -->
+</section>
+<!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+<!-- Modal Nueva Campaña -->
+<div class="modal fade" id="modal-nueva-campana" tabindex="-1" aria-labelledby="modalNuevaCampanaLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="form-nueva-campana">
+            <input type="hidden" id="id-campana-editar" name="ID_Campana">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNuevaCampanaLabel">Registrar Nueva Campaña</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="fecha-inicio-campana">Fecha de inicio</label>
+                        <input type="date" class="form-control" id="fecha-inicio-campana" name="Fe_Inicio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha-fin-campana">Fecha fin</label>
+                        <input type="date" class="form-control" id="fecha-fin-campana" name="Fe_Fin" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 <style>
 * {
     font-family: Epilogue;
@@ -351,7 +415,9 @@ i {
     background: #3b82f6 !important;
     color: #fff !important;
     border-radius: 50% !important;
-}.swal2-input {
+}
+
+.swal2-input {
     width: 80%;
     height: 40px;
     padding: 10px;
