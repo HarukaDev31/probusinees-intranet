@@ -65,6 +65,9 @@ class PedidosCursoModel extends CI_Model{
 			DI.No_Distrito as distrito,
 			USR.No_Usuario as usuario_moodle,
 			USR.No_Password as password_moodle
+			PC.ID_Campana,
+			MONTH(CC.Fe_Inicio) as mes_numero,
+			CC.No_Campana as nombre_campana
 		')
 		->from($this->table)
 		->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
@@ -73,10 +76,25 @@ class PedidosCursoModel extends CI_Model{
 		->join($this->table_distrito . ' AS DI', 'DI.ID_Distrito = CLI.ID_Distrito', 'left')
 		->join($this->table_provincia . ' AS PR', 'PR.ID_Provincia = CLI.ID_Provincia', 'left')
 		->join($this->table_departamento . ' AS D', 'D.ID_Departamento = CLI.ID_Departamento', 'left')
+   		->join('campana_curso AS CC', 'CC.ID_Campana = PC.ID_Campana', 'left')
 		->where($this->table . '.ID_Pedido_Curso', $id_pedido);
 
 		$query = $this->db->get();
-		return $query->row_array();
+		$data = $query->row_array();
+
+		// Traduce el mes a español
+		if ($data && isset($data['mes_numero'])) {
+			$meses_es = [
+				1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+				5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+				9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+			];
+			$data['mes_nombre'] = $meses_es[(int)$data['mes_numero']];
+		} else {
+			$data['mes_nombre'] = '';
+		}
+
+		return $data;
 	}
     
     function get_datatables(){
@@ -137,29 +155,175 @@ class PedidosCursoModel extends CI_Model{
 		}
 		return array('status' => 'warning', 'message' => 'No se modificó ningún dato');
 	}
-	public function getCampanas() {
-		// Simulación de campañas, reemplaza por tu consulta real
-		$dias=[
-			1 => [5, 10, 15], //los días 5, 10 y 15 de enero
-			2 => [14,28], //los días 14 y 28 de febrero
-			3 => [1, 8, 15, 22], //los días 1, 8, 15 y 22 de marzo
+	public function getCampanas()
+	{
+		$this->db->select('
+			c.ID_Campana,
+			c.Fe_Creacion,
+			c.Fe_Inicio,
+			c.Fe_Fin,
+			MONTH(c.Fe_Inicio) as Mes_Numero,
+			(SELECT COUNT(*) FROM pedido_curso p WHERE p.ID_Campana = c.ID_Campana) as cantidad_personas
+		');
+		$this->db->from('campana_curso c');
+		$this->db->where('c.Fe_Borrado IS NULL');
+		$query = $this->db->get();
+		$result = $query->result_array();
+
+		// Traduce el mes a español
+		$meses_es = [
+			1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+			5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+			9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
 		];
-		$meses=[];
-		for ($m = 1; $m <= 12; $m++) {
-			$dias_del_mes = cal_days_in_month(CAL_GREGORIAN, $m, date('Y'));
-			$meses[] = [
-				'numero' => $m,
-				'nombre' => date('F', mktime(0, 0, 0, $m, 10)),
-				'dias' => range(1, $dias_del_mes),
-				'seleccionados' => isset($dias[$m]) ? $dias[$m] : []
-			];
+		foreach ($result as &$row) {
+			$row['No_Campana'] = $meses_es[(int)$row['Mes_Numero']];
 		}
-		return $meses;
+		return $result;
 	}
 
-	public function guardarCampanas($data) {
-		// Procesa y guarda los datos recibidos
-		// Ejemplo: $this->db->update('campanas', ...);
-		return ['status' => 'success', 'message' => 'Campañas guardadas'];
+	public function crearCampana($fe_inicio, $fe_fin)
+	{
+		// Insertar campaña
+		$data = [
+			'Fe_Inicio'   => $fe_inicio,
+			'Fe_Fin'      => $fe_fin,
+			'Fe_Creacion' => date('Y-m-d H:i:s')
+		];
+		$this->db->insert('campana_curso', $data);
+
+		if ($this->db->affected_rows() > 0) {
+			// Obtener la campaña recién creada
+			$id = $this->db->insert_id();
+			$this->db->select('
+				c.ID_Campana,
+				c.Fe_Creacion,
+				c.Fe_Inicio,
+				c.Fe_Fin,
+				MONTH(c.Fe_Inicio) as Mes_Numero,
+				(SELECT COUNT(*) FROM pedido_curso p WHERE p.ID_Campana = c.ID_Campana) as cantidad_personas
+			');
+			$this->db->from('campana_curso c');
+			$this->db->where('c.ID_Campana', $id);
+			$row = $this->db->get()->row_array();
+
+			// Traduce el mes a español
+			$meses_es = [
+				1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+				5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+				9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+			];
+			$no_campana = $meses_es[(int)$row['Mes_Numero']];
+
+			// Armar array por posición (igual que en getCampanas)
+			$data_row = [
+				$row['ID_Campana'],
+				$row['Fe_Creacion'],
+				$no_campana,
+				$row['Fe_Inicio'],
+				$row['Fe_Fin'],
+				$row['cantidad_personas'],
+				'<div>
+					<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;"></i>
+					<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="borrarCampana(\'' . $row['ID_Campana'] . '\')"></i>
+				</div>'
+			];
+
+			return [
+				'status' => 'success',
+				'message' => 'Campaña registrada correctamente',
+				'row' => $data_row // <-- array por posición
+			];
+		} else {
+			return ['status' => 'error', 'message' => 'No se pudo registrar la campaña'];
+		}
+	} 
+	public function editarCampana($id, $fe_inicio, $fe_fin)
+	{
+		$data = [
+			'Fe_Inicio' => $fe_inicio,
+			'Fe_Fin'    => $fe_fin
+		];
+		$this->db->where('ID_Campana', $id);
+		$this->db->update('campana_curso', $data);
+		if ($this->db->affected_rows() > 0) {
+			return ['status' => 'success', 'message' => 'Campaña actualizada correctamente'];
+		} else {
+			return ['status' => 'warning', 'message' => 'No se modificó ningún dato'];
+		}
+	}
+	public function getCampanaById($id) {
+		$this->db->where('ID_Campana', $id);
+		$query = $this->db->get('campana_curso');
+		return $query->row_array();
+	}
+
+	public function borrarCampana($id)
+	{
+		$this->db->where('ID_Campana', $id);
+		$this->db->update('campana_curso', ['Fe_Borrado' => date('Y-m-d H:i:s')]);
+		if ($this->db->affected_rows() > 0) {
+			return ['status' => 'success', 'message' => 'Campaña eliminada correctamente'];
+		} else {
+			return ['status' => 'error', 'message' => 'No se pudo eliminar la campaña'];
+		}
+	}
+	public function getCampanasActivas()
+	{
+		$this->db->select('ID_Campana, Fe_Inicio');
+		$this->db->from('campana_curso');
+		$this->db->where('Fe_Borrado IS NULL');
+		$this->db->order_by('Fe_Inicio', 'DESC');
+		$query = $this->db->get();
+		$result = $query->result_array();
+
+		$meses_es = [
+			1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+			5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+			9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+		];
+		foreach ($result as &$row) {
+			$mes = (int)date('m', strtotime($row['Fe_Inicio']));
+			$row['nombre_campana'] = $meses_es[$mes] . ' ' . date('Y', strtotime($row['Fe_Inicio']));
+		}
+		return $result;
+	}
+
+	public function asignarCampanaPedido($id_pedido, $id_campana) {
+		$this->db->where('ID_Pedido_Curso', $id_pedido);
+		$this->db->update('pedido_curso', ['ID_Campana' => $id_campana]);
+		if ($this->db->affected_rows() > 0) {
+			return ['status' => 'success', 'message' => 'Campaña asignada correctamente'];
+		} else {
+			return ['status' => 'warning', 'message' => 'No se modificó ningún dato'];
+		}
+	}
+	public function actualizarImportePedido($id_pedido, $importe) {
+		$this->db->where('ID_Pedido_Curso', $id_pedido);
+		$this->db->update('pedido_curso', ['Ss_Total' => $importe]);
+		if ($this->db->affected_rows() > 0) {
+			return ['status' => 'success', 'message' => 'Importe actualizado correctamente'];
+		} else {
+			return ['status' => 'warning', 'message' => 'No se modificó ningún dato'];
+		}
+	}
+	public function getPrefijoPais($id_pais)
+    {
+        $this->db->select("prefijo_pais")
+				 ->from($this->table_pais)
+				 ->where("ID_Pais", $id_pais);
+        $query = $this->db->get();
+        return $query->result();
+    }
+	public function getEntidadByIdPedido($id_pedido) {
+		$this->db->select('CLI.ID_Entidad,CLI.ID_Pais,CLI.Nu_Celular_Entidad')
+				 ->from($this->table)
+				 ->join($this->table_cliente.' as CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
+				 ->where('ID_Pedido_Curso', $id_pedido);
+		$query = $this->db->get();
+		if ($query->num_rows() > 0) {
+			return $query->row();
+		}
+		return null;
 	}
 }

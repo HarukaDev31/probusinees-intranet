@@ -123,8 +123,7 @@
                       <th>Pedido</th>
                       <th>Fecha</th>
                       <th>Cliente</th>
-                      <th>Compartir</th>
-                      
+                      <th>Mes</th>
                       <th>Usuario</th>
                       <th>Moodle</th>
                       <th>Ref. Pago</th>
@@ -229,15 +228,61 @@
   </div>
 </section>
   <!-- Section para campañas de cursos -->
-<section id="section-campanas-cursos" class="container my-4 none">
+<section id="section-campanas-cursos" class="container my-4 none hidden">
     <div class="card-body">
-      <div id="contenedor-campanas" class="row justify-content-center"></div>
+      <div class="table-responsive">
+      <table id="table-campanas" class="table table-hover table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>ID</th>
+            <th>Fecha de Creación</th>
+            <th>Nombre de Campaña</th>
+            <th>Fecha de Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Cantidad de Personas</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
     </div>
 
 </section>
   <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+ <!-- Modal Nueva Campaña -->
+<div class="modal fade" id="modal-nueva-campana" tabindex="-1" aria-labelledby="modalNuevaCampanaLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="form-nueva-campana">
+      <input type="hidden" id="id-campana-editar" name="ID_Campana">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalNuevaCampanaLabel">Registrar Nueva Campaña</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="fecha-inicio-campana">Fecha de inicio</label>
+            <input type="date" class="form-control" id="fecha-inicio-campana" name="Fe_Inicio" required>
+          </div>
+          <div class="form-group">
+            <label for="fecha-fin-campana">Fecha fin</label>
+            <input type="date" class="form-control" id="fecha-fin-campana" name="Fe_Fin" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 <style>
   * {
     font-family: Epilogue;
