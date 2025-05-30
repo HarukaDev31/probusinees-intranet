@@ -7,133 +7,406 @@ let search_global_autocomplete = caractes_no_validos_global_autocomplete.split('
 let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
 //28 caracteres
 // FIN AUTOCOMPLETE
-
+var currentTableCurso = 'alumnos';
+var tableCursoPagos;
+var tableCursoPedidos;
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
+async function addPagosCurso(idPedido, nombreCliente) {
+  const { value: formValues } = await Swal.fire({
+    title: `Pagos de Curso - ${nombreCliente}`,
+    html: `
+      <input type="number" id="monto" class="swal2-input" placeholder="Monto" step="0.01" required>
+      <select id="banco" class="swal2-input" required>
+        <option value="" disabled selected>Seleccione un banco</option>
+        <option value="BCP" class="bg-primary">BCP</option>
+        <option value="INTERBANK" class="bg-success">INTERBANK</option>
+        </select>
+      <input type="file" id="voucher" class="swal2-input" accept="image/*;application/pdf" required>
+      <input type="date" id="fecha" class="swal2-input" required>
 
+    `,
+    focusConfirm: false,
+    preConfirm: () => {
+      const monto = $("#monto").val();
+      const banco = $("#banco").val();
+      const voucher = $("#voucher")[0].files[0];
+      const fecha = $("#fecha").val();
+      if (!monto || !banco || !voucher || !fecha) {
+        Swal.showValidationMessage("Por favor, completa todos los campos.");
+      } else {
+        const formData = new FormData();
+        formData.append("monto", monto);
+        formData.append("banco", banco);
+        formData.append("voucher", voucher);
+        formData.append("fecha", fecha);
+        formData.append("idPedido", idPedido);
+
+        return formData;
+      }
+    },
+    showCancelButton: true,
+    confirmButtonText: "Guardar",
+    cancelButtonText: "Cancelar",
+  });
+  if (formValues) {
+    const formData = formValues;
+    url =
+      base_url + "Curso/PedidosCurso/saveClientePagosCurso"
+    $.ajax({
+      url: url,
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        const result = JSON.parse(response);
+        if (result.status == "success") {
+          Swal.fire("Correcto!", result.message, "success");
+          // Reload the table or perform any other action needed
+          tableCursoPagos.ajax.reload();
+        } else {
+          Swal.fire("Error!", result.message, "error");
+        }
+      },
+    });
+  }
+}
 $(function () {
-  //Date picker invoice
-  $( '.input-report' ).datepicker({
-    autoclose : true,
+  tableCursoPagos = $("#table-curso-pagos");
+  tableCursoPedidos = $("#table-curso-pedidos");
+  $(".tab-curso").removeClass("active");
+  $(".tab-curso").off("click").click(function () {
+    $(".tab-curso").removeClass("active");
+    $("#table-curso-pagos_wrapper").hide();
+    $("#table-curso-variacion_wrapper").hide();
+    $("#table-curso-pagos_wrapper").hide();
+
+    let table = this.getAttribute("data-table");
+    this.classList.add("active");
+
+    if (table == "alumnos") {
+      $("#table-curso-pedidos").attr("style", "");
+      $("#table-curso-pagos").hide();
+      url = base_url + 'Curso/PedidosCurso/ajax_list';
+
+      if ($.fn.DataTable.isDataTable("#table-curso-pedidos")) {
+
+        $("#table-curso-pedidos").show();
+        $("#table-curso-pedidos_wrapper").show();
+        tableCursoPedidos.ajax.reload(null, false);
+      } else {
+        tableCursoPedidos = $("#table-curso-pedidos").DataTable({
+          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          buttons: [{
+            extend: 'excel',
+            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+            titleAttr: 'Excel',
+            exportOptions: {
+              columns: ':visible'
+            },
+            attr: {
+              class: "hidden"
+            }
+          },
+          {
+            extend: 'pdf',
+            text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+            titleAttr: 'PDF',
+            exportOptions: {
+              columns: ':visible'
+            },
+            attr: {
+              class: "hidden"
+            }
+          },
+          {
+            extend: 'colvis',
+            text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+            titleAttr: 'Columnas',
+            exportOptions: {
+              columns: ':visible'
+            },
+            attr: {
+              class: "hidden"
+            }
+          },
+
+          ],
+          'searching': true,
+          'bStateSave': true,
+          "lengthChange": true,
+          'processing': true,
+          'serverSide': false,
+          'info': true,
+          'autoWidth': false,
+          'pagingType': 'full_numbers',
+          'oLanguage': {
+            'sInfo': 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
+            'sLengthMenu': '_MENU_',
+            'sSearch': 'Buscar por: ',
+            'sSearchPlaceholder': '',
+            'sZeroRecords': 'No se encontraron registros',
+            'sInfoEmpty': 'No hay registros',
+            'sLoadingRecords': 'Cargando...',
+            'sProcessing': 'Procesando...',
+            'oPaginate': {
+              'sFirst': '<<',
+              'sLast': '>>',
+              'sPrevious': '<',
+              'sNext': '>',
+            },
+          },
+          'order': [],
+          'ajax': {
+            'url': url,
+            'type': 'POST',
+            'dataType': 'JSON',
+            'data': function (data) {
+              data.sMethod = $('#hidden-sMethod').val(),
+                data.estado_pago = $('#cbo-filtro-estado_pago').val(),
+                data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/'),
+                data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
+              data.tipoTabla = "alumnos";
+            },
+          },
+          'columnDefs': [
+            {
+              targets: 'no-hidden',
+              visible: false,
+            }, {
+              className: 'text-center',
+              targets: 'no-sort',
+              orderable: false,
+            }, {
+              targets: "",
+              orderable: false,
+            },],
+          'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
+        });
+
+        // FUNCION PARA CONFIGURAR EL BUSCADOR
+        configurarBuscador(
+          "table-curso-pedidos",
+          "search-table",
+          "table-curso-pedidos_info"
+        );
+        //Funcion para exportar a excel
+
+        $("#table-curso-pedidos").show();
+      }
+      currentTableCurso = "alumnos";
+    }
+
+    else if (table == "pagos") {
+      $("#table-curso-pedidos").hide();
+      $("#table-curso-pedidos_wrapper").hide();
+
+      if ($.fn.DataTable.isDataTable("#table-curso-pagos")) {
+
+        $("#table-curso-pagos").show();
+        $("#table-curso-pagos_wrapper").show();
+        tableCursoPagos.ajax.reload(null, false);
+      } else {
+        url = base_url + 'Curso/PedidosCurso/ajax_list';
+
+        tableCursoPagos = $("#table-curso-pagos").DataTable({
+          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          buttons: [],
+          columnDefs: [
+            {
+              targets: "no-hidden",
+              visible: false,
+            },
+            {
+              className: "text-center",
+              targets: "no-sort",
+              orderable: false,
+            },
+            {
+              targets: "",
+              orderable: false,
+            },
+            {
+              targets: "sorting_asc",
+              orderable: false,
+            },
+          ],
+          pageLength: 100, // Mostrar 100 elementos por página
+          lengthMenu: [
+            [100, 1000, -1],
+            [100, 1000, "Todos"],
+          ],
+          paging: true,
+          lengthChange: true,
+          searching: true,
+          ordering: true,
+          info: true,
+          autoWidth: false,
+          responsive: false,
+          serverSide: false,
+          pagingType: "full_numbers",
+          oLanguage: {
+            sInfo:
+              "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+            sLengthMenu: "_MENU_",
+            sSearch: "Buscar por: ",
+            sSearchPlaceholder: "",
+            sZeroRecords: "No se encontraron registros",
+            sInfoEmpty: "No hay registros",
+            sLoadingRecords: "Cargando...",
+            sProcessing: "Procesando...",
+            oPaginate: {
+              sFirst: "<<",
+              sLast: ">>",
+              sPrevious: "<",
+              sNext: ">",
+            },
+          },
+          ajax: {
+            url: url,
+            type: "POST",
+            dataType: "JSON",
+            data: function (data) {
+              data.sMethod = $('#hidden-sMethod').val();
+              data.estado_pago = $('#cbo-filtro-estado_pago').val();
+              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/');
+              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
+              data.tipoTabla = "pagos";
+
+            },
+          },
+        });
+        // FUNCION PARA CONFIGURAR EL BUSCADOR
+        configurarBuscador(
+          "table-curso-pagos",
+          "search-table",
+          "table-curso-pagos_info"
+        );
+        //Funcion para exportar a excel
+
+        $("#table-curso-pagos").show();
+        currentTableCurso = "pagos";
+
+      }
+    }
+  });
+  $(".tab-curso").first().click();
+
+  $('.input-report').datepicker({
+    autoclose: true,
     //startDate : new Date(fYear, fToday.getMonth(), '01'),
-    todayHighlight  : true,
+    todayHighlight: true,
     dateFormat: 'dd/mm/yyyy',
     format: 'dd/mm/yyyy',
   });
 
-  url = base_url + 'Curso/PedidosCurso/ajax_list';
-  table_Entidad = $("#table-Pedidos").DataTable({
-    dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-    "<'row'<'col-sm-12'tr>>" +
-    "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-    buttons     : [{
-      extend    : 'excel',
-      text      : '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-      titleAttr : 'Excel',
-      exportOptions: {
-        columns: ':visible'
-      },
-      attr:{
-        class:"hidden"
-      }
-    },
-    {
-      extend    : 'pdf',
-      text      : '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-      titleAttr : 'PDF',
-      exportOptions: {
-        columns: ':visible'
-      },
-      attr:{
-        class:"hidden"
-      }
-    },
-    {
-      extend    : 'colvis',
-      text      : '<i class="fa fa-ellipsis-v"></i> Columnas',
-      titleAttr : 'Columnas',
-      exportOptions: {
-        columns: ':visible'
-      },
-      attr:{
-        class:"hidden"
-      }
-    },
-    {
-      text:"Alumnos",
-      action: function(){
-      },
-      className: "btn btn-light",
-    },
-    {
-      text:"Pagos",
-      action: function(){
-      }
-    },
-  ],
-    'searching'   : true,
-    'bStateSave'  : true,
-    "lengthChange": true,
-    'processing'  : true,
-    'serverSide'  : false,
-    'info'        : true,
-    'autoWidth'   : false,
-    'pagingType'  : 'full_numbers',
-    'oLanguage' : {
-      'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-      'sLengthMenu'        : '_MENU_',
-      'sSearch'            : 'Buscar por: ',
-      'sSearchPlaceholder' : '',
-      'sZeroRecords'       : 'No se encontraron registros',
-      'sInfoEmpty'         : 'No hay registros',
-      'sLoadingRecords'    : 'Cargando...',
-      'sProcessing'        : 'Procesando...',
-      'oPaginate'          : {
-        'sFirst'    : '<<',
-        'sLast'     : '>>',
-        'sPrevious' : '<',
-        'sNext'     : '>',
-      },
-    },
-    'order': [],
-    'ajax': {
-      'url'       : url,
-      'type'      : 'POST',
-      'dataType'  : 'JSON',
-      'data'      : function ( data ) {
-        data.sMethod = $('#hidden-sMethod').val(),
-        data.estado_pago = $( '#cbo-filtro-estado_pago' ).val(),
-        data.Filtro_Fe_Inicio = ParseDateString($( '#txt-Fe_Inicio' ).val(), 'fecha', '/'),
-        data.Filtro_Fe_Fin = ParseDateString($( '#txt-Fe_Fin' ).val(), 'fecha', '/');
-        
-      },
-    },
-    'columnDefs': [
-      {
-        targets: 'no-hidden',
-        visible: false, 
-      },{
-      className : 'text-center',
-      targets   : 'no-sort',
-      orderable : false,
-    },{
-          targets: "",
-          orderable: false,
-        },],
-    'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
-  });
-  configurarBuscador('table-Pedidos', 'search-table', 'table-Pedidos_info');
+  // table_Entidad = $("#table-curso-pedidos").DataTable({
+  //   dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+  //     "<'row'<'col-sm-12'tr>>" +
+  //     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+  //   buttons: [{
+  //     extend: 'excel',
+  //     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+  //     titleAttr: 'Excel',
+  //     exportOptions: {
+  //       columns: ':visible'
+  //     },
+  //     attr: {
+  //       class: "hidden"
+  //     }
+  //   },
+  //   {
+  //     extend: 'pdf',
+  //     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+  //     titleAttr: 'PDF',
+  //     exportOptions: {
+  //       columns: ':visible'
+  //     },
+  //     attr: {
+  //       class: "hidden"
+  //     }
+  //   },
+  //   {
+  //     extend: 'colvis',
+  //     text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+  //     titleAttr: 'Columnas',
+  //     exportOptions: {
+  //       columns: ':visible'
+  //     },
+  //     attr: {
+  //       class: "hidden"
+  //     }
+  //   },
 
-  $('#table-Pedidos_filter input').removeClass('form-control-sm');
-  $('#table-Pedidos_filter input').addClass('form-control-md');
-  $('#table-Pedidos_filter input').addClass("width_full");
+  //   ],
+  //   'searching': true,
+  //   'bStateSave': true,
+  //   "lengthChange": true,
+  //   'processing': true,
+  //   'serverSide': false,
+  //   'info': true,
+  //   'autoWidth': false,
+  //   'pagingType': 'full_numbers',
+  //   'oLanguage': {
+  //     'sInfo': 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
+  //     'sLengthMenu': '_MENU_',
+  //     'sSearch': 'Buscar por: ',
+  //     'sSearchPlaceholder': '',
+  //     'sZeroRecords': 'No se encontraron registros',
+  //     'sInfoEmpty': 'No hay registros',
+  //     'sLoadingRecords': 'Cargando...',
+  //     'sProcessing': 'Procesando...',
+  //     'oPaginate': {
+  //       'sFirst': '<<',
+  //       'sLast': '>>',
+  //       'sPrevious': '<',
+  //       'sNext': '>',
+  //     },
+  //   },
+  //   'order': [],
+  //   'ajax': {
+  //     'url': url,
+  //     'type': 'POST',
+  //     'dataType': 'JSON',
+  //     'data': function (data) {
+  //       data.sMethod = $('#hidden-sMethod').val(),
+  //         data.estado_pago = $('#cbo-filtro-estado_pago').val(),
+  //         data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/'),
+  //         data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
+
+  //     },
+  //   },
+  //   'columnDefs': [
+  //     {
+  //       targets: 'no-hidden',
+  //       visible: false,
+  //     }, {
+  //       className: 'text-center',
+  //       targets: 'no-sort',
+  //       orderable: false,
+  //     }, {
+  //       targets: "",
+  //       orderable: false,
+  //     },],
+  //   'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
+  // });
+  // configurarBuscador('table-curso-pedidos', 'search-table', 'table-curso-pedidos_info');
+
+  // $('#table-curso-pedidos_filter input').removeClass('form-control-sm');
+  // $('#table-curso-pedidos_filter input').addClass('form-control-md');
+  // $('#table-curso-pedidos_filter input').addClass("width_full");
 
   $('#btn-html_reporte').click(function () {
     reload_table_Entidad();
   });
 })
 
-function reload_table_Entidad(){
-  table_Entidad.ajax.reload(null,false);
+function reload_table_Entidad() {
+  table_Entidad.ajax.reload(null, false);
 }
 
 function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
@@ -146,10 +419,10 @@ function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
   $('#modal-title').text('¿Deseas crear usuario Moodle?');
 
   $('#btn-save-delete').off('click').click(function () {
-    
-    $( '#btn-save-delete' ).text('');
-    $( '#btn-save-delete' ).attr('disabled', true);
-    $( '#btn-save-delete' ).append( 'Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    $('#btn-save-delete').text('');
+    $('#btn-save-delete').attr('disabled', true);
+    $('#btn-save-delete').append('Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>');
 
     url = base_url + 'Curso/PedidosCurso/crearUsuarioCursosMoodle/' + id + '/' + ID_Pedido_Curso;
     $.ajax({
@@ -158,20 +431,20 @@ function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
       dataType: "JSON",
       success: function (response) {
         $modal_delete.modal('hide');
-        $( '#btn-save-delete' ).text('');
-        $( '#btn-save-delete' ).append( 'Aceptar' );
-        $( '#btn-save-delete' ).attr('disabled', false);
+        $('#btn-save-delete').text('');
+        $('#btn-save-delete').append('Aceptar');
+        $('#btn-save-delete').attr('disabled', false);
 
         $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
         $('#modal-message').modal('show');
 
         if (response.status == 'success') {
-          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('#moda-message-content').addClass('bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
           reload_table_Entidad();
         } else {
-          $('#moda-message-content').addClass( 'bg-danger' );
+          $('#moda-message-content').addClass('bg-danger');
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
         }
@@ -190,10 +463,10 @@ function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
   $('#modal-title').text('¿Deseas enviar credenciales Moodle?');
 
   $('#btn-save-delete').off('click').click(function () {
-    
-    $( '#btn-save-delete' ).text('');
-    $( '#btn-save-delete' ).attr('disabled', true);
-    $( '#btn-save-delete' ).append( 'Enviando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>' );
+
+    $('#btn-save-delete').text('');
+    $('#btn-save-delete').attr('disabled', true);
+    $('#btn-save-delete').append('Enviando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>');
 
     url = base_url + 'Curso/PedidosCurso/enviarEmailUsuarioMoodle/' + id + '/' + ID_Pedido_Curso;
     $.ajax({
@@ -202,19 +475,19 @@ function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
       dataType: "JSON",
       success: function (response) {
         $modal_delete.modal('hide');
-        $( '#btn-save-delete' ).text('');
-        $( '#btn-save-delete' ).append( 'Aceptar' );
-        $( '#btn-save-delete' ).attr('disabled', false);
+        $('#btn-save-delete').text('');
+        $('#btn-save-delete').append('Aceptar');
+        $('#btn-save-delete').attr('disabled', false);
 
         $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
         $('#modal-message').modal('show');
 
         if (response.status == 'success') {
-          $('#moda-message-content').addClass( 'bg-' + response.status);
+          $('#moda-message-content').addClass('bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
         } else {
-          $('#moda-message-content').addClass( 'bg-danger' );
+          $('#moda-message-content').addClass('bg-danger');
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
         }
@@ -244,11 +517,11 @@ async function viewCliente(id) {
         $("#cliente-provincia").val(response.data.provincia);
         $("#cliente-distrito").val(response.data.distrito);
         $("#cliente-edad").val(response.data.nacimiento);
-        if(response.data.usuario_moodle && response.data.password_moodle){
+        if (response.data.usuario_moodle && response.data.password_moodle) {
           $('#acceso-aula-virtual').show();
           $('#cliente-moodle-usuario').val(response.data.usuario_moodle);
           $('#cliente-moodle-password').val(response.data.password_moodle);
-        } else{
+        } else {
           $('#acceso-aula-virtual').hide();
           $('#cliente-moodle-usuario').val('');
           $('#cliente-moodle-password').val('');
@@ -290,7 +563,7 @@ async function viewCliente(id) {
         $('#section-listar-pedidos').hide();
         $('#section-datos-cliente').show();
 
-        $('#btn-editar-cliente').on('click', function() {
+        $('#btn-editar-cliente').on('click', function () {
           $('.cliente-input').prop('readonly', false);
           $('#cliente-moodle-usuario').prop('readonly', true);
           $('#cliente-moodle-password').prop('readonly', true);
@@ -316,7 +589,7 @@ async function viewCliente(id) {
             }, 200);
           }, 200);
         });
-        $('#btn-cancel').on('click', function() {
+        $('#btn-cancel').on('click', function () {
           $('.cliente-input').prop('readonly', true);
           $('#btn-editar-cliente').show();
           $(this).hide();
@@ -329,7 +602,7 @@ async function viewCliente(id) {
           $('#cliente-distrito').show();
           $('#select-distrito').hide();
         });
-        $('#btn-guardar-cliente').on('click', function(e) {
+        $('#btn-guardar-cliente').on('click', function (e) {
           console.log($('#cliente-id').val());
           console.log($('#form-datos-cliente').serialize());
           e.preventDefault();
@@ -348,8 +621,8 @@ async function viewCliente(id) {
             type: "POST",
             data: $('#form-datos-cliente').serialize(),
             dataType: "json",
-            success: function(response){
-              if(response.status === "success"){
+            success: function (response) {
+              if (response.status === "success") {
                 Swal.close();
                 $('#cliente-pais').val($('#select-pais option:selected').text());
                 $('#cliente-departamento').val($('#select-departamento option:selected').text());
@@ -404,7 +677,7 @@ function ocultarSectionDatosCliente() {
 }
 
 // Botón para crear campaña
-$(document).on('click', '#btn-crear-campana', function() {
+$(document).on('click', '#btn-crear-campana', function () {
   estadoCampanas = [];
   $('#section-listar-pedidos').hide();
   $('#section-campanas-cursos').show();
@@ -501,9 +774,9 @@ function cargarCampanas() {
     url: base_url + "Curso/PedidosCurso/getCampanas",
     type: "GET",
     dataType: "json",
-    success: function(response) {
+    success: function (response) {
       console.log('Respuesta de getCampanas:', response);
-      if(response.status === "success") {
+      if (response.status === "success") {
         estadoCampanas = response.data; // Guardamos el estado inicial
         renderizarCampanas(estadoCampanas);
       } else {
@@ -514,7 +787,7 @@ function cargarCampanas() {
 }
 
 // Delegación de eventos para los días
-$('#contenedor-campanas').on('click', '.btn-dia', function() {
+$('#contenedor-campanas').on('click', '.btn-dia', function () {
   const mes = parseInt($(this).data('mes'));
   const dia = parseInt($(this).data('dia'));
   const mesObj = estadoCampanas.find(m => m.numero === mes);
@@ -529,7 +802,7 @@ $('#contenedor-campanas').on('click', '.btn-dia', function() {
   mesObj.seleccionados.sort((a, b) => a - b);
   renderizarCampanas(estadoCampanas);
 });
-$('#contenedor-campanas').on('click', '.seleccionar-todos', function(e) {
+$('#contenedor-campanas').on('click', '.seleccionar-todos', function (e) {
   e.preventDefault();
   const mes = parseInt($(this).data('mes'));
   const mesObj = estadoCampanas.find(m => m.numero === mes);
@@ -542,7 +815,7 @@ $('#contenedor-campanas').on('click', '.seleccionar-todos', function(e) {
   renderizarCampanas(estadoCampanas);
 });
 
-$('#section-campanas-cursos').on('click', '#btn-guardar-campana', function() {
+$('#section-campanas-cursos').on('click', '#btn-guardar-campana', function () {
   // Puedes enviar solo los días seleccionados por mes
   const dataToSend = estadoCampanas.map(mes => ({
     mes: mes.numero,
@@ -553,8 +826,8 @@ $('#section-campanas-cursos').on('click', '#btn-guardar-campana', function() {
     type: "POST",
     data: { campanas: JSON.stringify(dataToSend) },
     dataType: "json",
-    success: function(response) {
-      if(response.status === "success") {
+    success: function (response) {
+      if (response.status === "success") {
         Swal.fire('¡Guardado!', 'Las campañas se guardaron correctamente.', 'success');
       } else {
         Swal.fire('Error', response.message || 'No se pudo guardar.', 'error');
@@ -571,9 +844,9 @@ function cargarPaises() {
     url: base_url + "HelperController/getPaises",
     type: "POST",
     dataType: "json",
-    success: function(paises) {
+    success: function (paises) {
       $("#select-pais").empty().append('<option value="">Seleccione un país</option>');
-      paises.forEach(function(pais) {
+      paises.forEach(function (pais) {
         $("#select-pais").append(`<option value="${pais.ID_Pais}">${pais.No_Pais}</option>`);
       });
     }
@@ -586,9 +859,9 @@ function cargarDepartamentos(idPais) {
     type: "POST",
     data: { ID_Pais: idPais },
     dataType: "json",
-    success: function(departamentos) {
+    success: function (departamentos) {
       $("#select-departamento").empty().append('<option value="">Seleccione un departamento</option>');
-      departamentos.forEach(function(dep) {
+      departamentos.forEach(function (dep) {
         $("#select-departamento").append(`<option value="${dep.ID_Departamento}">${dep.No_Departamento}</option>`);
       });
     }
@@ -601,9 +874,9 @@ function cargarProvincias(idDepartamento) {
     type: "POST",
     data: { ID_Departamento: idDepartamento },
     dataType: "json",
-    success: function(provincias) {
+    success: function (provincias) {
       $("#select-provincia").empty().append('<option value="">Seleccione una provincia</option>');
-      provincias.forEach(function(prov) {
+      provincias.forEach(function (prov) {
         $("#select-provincia").append(`<option value="${prov.ID_Provincia}">${prov.No_Provincia}</option>`);
       });
     }
@@ -616,9 +889,9 @@ function cargarDistritos(idProvincia) {
     type: "POST",
     data: { ID_Provincia: idProvincia },
     dataType: "json",
-    success: function(distritos) {
+    success: function (distritos) {
       $("#select-distrito").empty().append('<option value="">Seleccione un distrito</option>');
-      distritos.forEach(function(dist) {
+      distritos.forEach(function (dist) {
         $("#select-distrito").append(`<option value="${dist.ID_Distrito}">${dist.No_Distrito}</option>`);
       });
     }
@@ -648,16 +921,16 @@ $(document).ready(async function () {
 
   // Cargar los select de país, departamento, provincia y distrito
   cargarPaises();
-  $("#select-pais").on("change", function() {
+  $("#select-pais").on("change", function () {
     cargarDepartamentos($(this).val());
     $("#select-provincia").empty();
     $("#select-distrito").empty();
   });
-  $("#select-departamento").on("change", function() {
+  $("#select-departamento").on("change", function () {
     cargarProvincias($(this).val());
     $("#select-distrito").empty();
   });
-  $("#select-provincia").on("change", function() {
+  $("#select-provincia").on("change", function () {
     cargarDistritos($(this).val());
   });
 });
@@ -687,4 +960,5 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
       );
     }
   });
+
 }

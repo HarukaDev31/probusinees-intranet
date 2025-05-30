@@ -8,10 +8,12 @@ class FileUploader {
       maxSize: 5 * 1024 * 1024, // Tamaño máximo en bytes (5MB por defecto)
       placeholderText: 'Arrastra o sube tu archivo aquí',
       placeholderIcon: 'i-lucide-file',
-      showPreview: true, // Clase de icono para placeholder
+      showPreview: true,
+      showAsModal: false, // Mostrar como modal
+      // Clase de icono para placeholder
       ...config
     };
-
+    this.currentUrl = null; // URL actual del archivo
     // Validar que se proporcionó un ID de contenedor
     if (!this.config.containerId) {
       throw new Error('Se requiere un ID de contenedor');
@@ -52,8 +54,8 @@ class FileUploader {
     const inputId = `${this.prefix}-input`;
     const removeId = `${this.prefix}-remove`;
 
-     // Obtener formatos aceptados en texto legible
-  const acceptedTypesText = this.getAcceptedTypesText();
+    // Obtener formatos aceptados en texto legible
+    const acceptedTypesText = this.getAcceptedTypesText();
 
     // Guardar referencias para usar más tarde
     this.ids = { previewId, placeholderId, inputId, removeId };
@@ -83,7 +85,7 @@ class FileUploader {
         </div>
         <input id="${inputId}" type="file" accept="${this.config.acceptedTypes}" class="hidden" />
       </div>
-      ${this.config.showPreview?`<button id="${removeId}" class="absolute top-2 right-2 hidden ">
+      ${this.config.showPreview ? `<button id="${removeId}" class="absolute top-2 right-2 hidden ">
         <svg width="16" height="15" viewBox="0 0 16 15" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7.8335 14H14.6671" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M11.2504 1.47176C11.5524 1.1697 11.9621 1 12.3893 1C12.6008 1 12.8103 1.04166 13.0057 1.12261C13.2011 1.20355 13.3787 1.32219 13.5282 1.47176C13.6778 1.62133 13.7964 1.79889 13.8774 1.99431C13.9583 2.18972 14 2.39917 14 2.61069C14 2.82221 13.9583 3.03166 13.8774 3.22708C13.7964 3.42249 13.6778 3.60006 13.5282 3.74962L4.03715 13.2407L1 14L1.75929 10.9629L11.2504 1.47176Z" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -101,8 +103,48 @@ class FileUploader {
 
 
   initEvents() {
-    // Eventos del contenedor principal
-    const handleContainerClick = () => this.input.click();
+    //if showAsModal is true, open modal with image else clik on the input
+    let handleContainerClick;
+    if (this.config.showAsModal) {
+      handleContainerClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        //get if is video with extension
+        const isVideo = this.currentUrl && (this.currentUrl.endsWith('.mp4') || this.currentUrl.endsWith('.webm') || this.currentUrl.endsWith('.ogg'))|| this.currentUrl.endsWith('.mov');
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+          <div class="bg-white rounded-lg shadow-lg p-4 relative max-w-2xl w-1/2 max-h-screen">
+            ${ !isVideo?`<img src="${this.currentUrl}" alt="${this.file.name}" class="max-w-full  w-full max-h-[80vh] object-contain"
+               />`:
+            `<video src="${this.currentUrl}" controls class="max-w-full w-full max-h-[80vh]"></video>`}
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="close-modal">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"> 
+                <path d="M1 1L15 15" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
+                <path d="M1 15L15 1" stroke="#585858" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        // Evento para cerrar el modal
+        document.getElementById('close-modal').addEventListener('click', () => {
+          document.body.removeChild(modal);
+        });
+        // También cerrar al hacer clic fuera del contenido del modal
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            document.body.removeChild(modal);
+          }
+        });
+      };
+    } else {
+      handleContainerClick = (e) => {
+       
+        this.input.click();
+      };
+    }
+    // const handleContainerClick = () => this.input.click();
     this.addEventListenerWithTracking(this.container, 'click', handleContainerClick);
 
     const handleDragOver = (e) => {
@@ -407,7 +449,7 @@ class FileUploader {
 
       // Obtener la imagen de la URL
       const response = await fetch(url);
-
+      this.currentUrl = url;
       if (!response.ok) {
         throw new Error(`Error al cargar la imagen: ${response.status} ${response.statusText}`);
       }
@@ -492,10 +534,10 @@ class FileUploader {
   getAcceptedTypesText() {
     if (this.config.acceptedTypes === '*/*') return 'Cualquier archivo';
     const types = this.config.acceptedTypes.split(',').map(type => type.trim().toLowerCase());
-  
+
     let hasImage = false, hasVideo = false, hasAudio = false;
     let hasPdf = false, hasExcel = false, hasWord = false, hasPowerPoint = false, others = [];
-  
+
     types.forEach(type => {
       if (
         type === 'image/png' ||
@@ -544,7 +586,7 @@ class FileUploader {
       ) hasPowerPoint = true;
       else others.push(type.replace(/^\s*\.\s*/, '').toUpperCase());
     });
-  
+
     const result = [];
     if (hasImage) result.push('Imágenes');
     if (hasVideo) result.push('Videos');
@@ -554,7 +596,7 @@ class FileUploader {
     if (hasWord) result.push('Word');
     if (hasPowerPoint) result.push('PowerPoint');
     if (others.length) result.push(...others);
-  
+
     return result.join(', ');
   }
 }

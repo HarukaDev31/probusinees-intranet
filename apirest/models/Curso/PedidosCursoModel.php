@@ -1,5 +1,8 @@
 <?php
+require_once APPPATH . 'traits/FileTrait.php';
+
 class PedidosCursoModel extends CI_Model{
+	use FileTrait;
 	var $table = 'pedido_curso';
 	var $table_empresa = 'empresa';
 	var $table_organizacion = 'organizacion';
@@ -14,7 +17,9 @@ class PedidosCursoModel extends CI_Model{
 	var $table_tipo_documento_identidad = 'tipo_documento_identidad';
 	var $table_usuario = 'usuario';
 	var $table_pais = 'pais';
-	
+	var $table_pedido_curso_pagos= 'pedido_curso_pagos';
+	var $table_pedido_curso_pagos_conceptos = 'pedido_curso_pagos_concept';
+	var $CONCEPT_PAGO_ADELANTO = 1; // Define el concepto de pago de adelanto
     var $order = array('Fe_Registro' => 'desc');
 		
 	public function __construct(){
@@ -162,4 +167,97 @@ class PedidosCursoModel extends CI_Model{
 		// Ejemplo: $this->db->update('campanas', ...);
 		return ['status' => 'success', 'message' => 'Campañas guardadas'];
 	}
+	public function getPagosCurso(){
+		 $this->db->select("CC.*
+		  ,CLI.Fe_Nacimiento,
+		   CLI.Nu_Como_Entero_Empresa,
+		    CLI.No_Otros_Como_Entero_Empresa,
+			 No_Distrito, No_Provincia, 
+			 No_Departamento, 
+			 TDI.No_Tipo_Documento_Identidad_Breve,
+			  P.No_Pais, CLI.Nu_Tipo_Sexo, 
+			  CLI.No_Entidad, CLI.Nu_Documento_Identidad,
+			   CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad,
+			    CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password,
+         (                 
+             SELECT COUNT(*)                  
+             FROM pedido_curso_pagos as cccp                 
+             JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept = ccp.id                 
+             WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
+             AND (ccp.name = 'ADELANTO')             
+         ) AS pagos_count,
+         (                 
+             SELECT IFNULL(SUM(cccp.monto), 0)                  
+             FROM pedido_curso_pagos as cccp                 
+             JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept= ccp.id                 
+             WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
+             AND (ccp.name = 'ADELANTO')           
+         ) AS total_pagos"
+     ) 
+		->from($this->table . ' AS CC')  // Add the CC alias here!
+		->join($this->table_pais . ' AS P', 'P.ID_Pais = CC.ID_Pais', 'join')  // Update references
+		->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = CC.ID_Entidad', 'join')  // Update references
+		->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join')
+		->join($this->table_moneda . ' AS M', 'M.ID_Moneda = CC.ID_Moneda', 'join')  // Update references
+		->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'join') 
+		->join($this->table_distrito, $this->table_distrito . '.ID_Distrito = CLI.ID_Distrito', 'left')
+		->join($this->table_provincia, $this->table_provincia . '.ID_Provincia = CLI.ID_Provincia', 'left')
+		->join($this->table_departamento, $this->table_departamento . '.ID_Departamento = CLI.ID_Departamento', 'left')
+		->where('CC.ID_Empresa', $this->user->ID_Empresa);  // Update reference
+
+	if(!empty($this->input->post('estado_pago'))) 
+		$this->db->where("CC.Nu_Estado=", $this->input->post('estado_pago'));  // Update reference
+
+	$this->db->where("CC.Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
+
+	if(isset($this->order)) { 
+		$order = $this->order; 
+		$this->db->order_by(key($order), $order[key($order)]); 
+	}
+	     $query = $this->db->get();
+        return $query->result();
+	}
+	public function saveClientePagosCurso($voucher,$idPedido,$amount,$fecha,$banco){
+        try {
+            $voucherUrl= $this->uploadSingleFile(
+                [
+                    "name" => $voucher['name'],
+                    "type" => $voucher['type'],
+                    "tmp_name" => $voucher['tmp_name'],
+                    "error" => $voucher['error'],
+                    "size" => $voucher['size']
+                ],
+                'assets/curso/pagos'
+            );
+            $data = [
+                'voucher_url' => $voucherUrl,
+                'id_pedido_curso' => $idPedido,
+                'id_concept'=>$this->CONCEPT_PAGO_ADELANTO,
+                'monto' => $amount,
+                'payment_date' => date('Y-m-d', strtotime($fecha)),
+                'banco' => $banco
+            ];
+            $this->db->insert($this->table_pedido_curso_pagos, $data);
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error en saveClientePagoCurso: ' . $this->db->error()['message']);
+                return [
+                    'status' => "error",
+                    'message' => 'Error al guardar el pago: ' . $this->db->error()['message']
+                ];
+            
+            } else {
+                return [
+                    'status' => "success",
+                    'message' => 'Pago guardado exitosamente',
+                    'data' => $data
+                ];
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en saveClientePagosCoordination: ' . $e->getMessage());
+            return [
+                'status' => "error",
+                'message' => 'Error al guardar el pago: ' . $e->getMessage()
+            ];
+        }
+    }
 }

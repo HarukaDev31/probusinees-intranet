@@ -23,6 +23,7 @@ var shouldSaveDocumentacion = false;
 var originalVolumenDocumento = "";
 var originalValorDocumento = "";
 var sectionsDisabled = false;
+var tableCotizacionTrackingPagos = null;
 var meses = [
   {
     id: "ENERO",
@@ -82,8 +83,10 @@ var cotizacionContainer = null;
 var clientesContainer = null;
 var tableCotizacion = null;
 var tableCotizacionEmbarque = null;
+var tableCotizacionPagos = null;
 var tableClientesGeneral = null;
 var tableClientesVariacion = null;
+var tableClientesPagos = null;
 var clientesDocumentacionContainer = null;
 var documentationContainer = null;
 var idCotizacion = 0;
@@ -94,6 +97,7 @@ var fileList;
 var cotizacionAlmacenContainer = null;
 var cotizacionFinalContainer = null;
 var tableCotizacionFinal = null;
+var tableCotizacionFinalPagos = null;
 var facturaGuiaContainer = null;
 var tableFacturaGuia = null;
 var documentationContainerProfile = null;
@@ -192,7 +196,7 @@ async function saveDocumentation() {
 
 
 }
-async function saveInspectionSingle(id){
+async function saveInspectionSingle(id) {
   event.preventDefault();
   const formData = new FormData();
   formData.append("idFile", id);
@@ -218,7 +222,7 @@ async function saveInspectionSingle(id){
       getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
         (files) => {
           files.forEach((file) =>
-            addFileToList(file, null, "file-lista-inspection",false,true)
+            addFileToList(file, null, "file-lista-inspection", false, true)
           );
         });
     },
@@ -265,7 +269,7 @@ async function saveInspection() {
       getFilesAlmacenInspection(currentProveedor, currentCotizacion).then(
         (files) => {
           files.forEach((file) =>
-            addFileToList(file, null, "file-lista-inspection",false,true)
+            addFileToList(file, null, "file-lista-inspection", false, true)
           );
         }
       );
@@ -532,7 +536,7 @@ function addFileToList(file, fileList = null, id = null, deleteHidden = false, s
                       </button>`
       : ""
     }
-      ${showAction && isGerencia && file?.send_status=="PENDING" ? `<button class="btn-sm action-btn"
+      ${showAction && isGerencia && file?.send_status == "PENDING" ? `<button class="btn-sm action-btn"
         onclick="saveInspectionSingle(${file.id})"
         >
                       <i class="fas fa-check"></i>
@@ -684,9 +688,12 @@ async function getClientesHeader() {
     idContenedor;
   const response = await fetch(url);
   const result = await response.json();
-  $("#txt-Monto_Total").val(result.monto);
-  $("#cotizacion_name").val('#' + result.carga);
-  $("#txt-CBM_Total_China_Clientes").val(result.cbm_total_china);
+  console.log(result.cbm_total);
+  $("#txt-CBM_Cliente_Total_Peru").html(result.cbm_total);
+  $("#cotizacion_Cliente_name").html('#' + result.carga);
+  $("#txt-CBM_Cliente_Total_Logistica").html(result.total_logistica);
+  $("#txt-CBM_Cliente_Total_Logistica_Pagado").html(result.total_logistica_pagado);
+  $("#txt-CBM_Cliente_Total_China").html(result.cbm_total_china);
   console.log(result);
   spinner.hide();
 }
@@ -715,7 +722,7 @@ async function verCotizacionEmbarque(
   });
   $("#file-lista-inspection").empty();
   getFilesAlmacenInspection(idProveedor, idCotizacion).then((files) => {
-    files.forEach((file) => addFileToList(file, null, "file-lista-inspection",false,true));
+    files.forEach((file) => addFileToList(file, null, "file-lista-inspection", false, true));
   });
 
   // fileManager = new FileManager({
@@ -1183,6 +1190,156 @@ async function uploadFacturaGeneral(idCotizacion) {
     });
   }
 }
+async function addPagosCoordination(idCotizacion, nombreCliente) {
+  //showm modal with fields monto banco text , voucher file , fecha date required
+  const { value: formValues } = await Swal.fire({
+    title: `Pagos de Coordinación - ${nombreCliente}`,
+    html: `
+      <input type="number" id="monto" class="swal2-input" placeholder="Monto" step="0.01" required>
+      <select id="banco" class="swal2-input" required>
+        <option value="" disabled selected>Seleccione un banco</option>
+        <option value="BCP" class="bg-primary">BCP</option>
+        <option value="INTERBANK" class="bg-success">INTERBANK</option>
+        </select>
+      <input type="file" id="voucher" class="swal2-input" accept="image/*;application/pdf" required>
+      <input type="date" id="fecha" class="swal2-input" required>
+
+    `,
+    focusConfirm: false,
+    preConfirm: () => {
+      const monto = $("#monto").val();
+      const banco = $("#banco").val();
+      const voucher = $("#voucher")[0].files[0];
+      const fecha = $("#fecha").val();
+      if (!monto || !banco || !voucher || !fecha) {
+        Swal.showValidationMessage("Por favor, completa todos los campos.");
+      } else {
+        const formData = new FormData();
+        formData.append("monto", monto);
+        formData.append("banco", banco);
+        formData.append("voucher", voucher);
+        formData.append("fecha", fecha);
+        formData.append("idCotizacion", idCotizacion);
+        formData.append("idContenedor", idContenedor);
+        return formData;
+      }
+    },
+    showCancelButton: true,
+    confirmButtonText: "Guardar",
+    cancelButtonText: "Cancelar",
+  });
+  if (formValues) {
+    const formData = formValues;
+    url =
+      base_url + "CargaConsolidada/ContenedorConsolidado/saveClientePagosCoordination";
+    $.ajax({
+      url: url,
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        const result = JSON.parse(response);
+        if (result.status == "success") {
+          Swal.fire("Correcto!", result.message, "success");
+          // Reload the table or perform any other action needed
+          tableCotizacionPagos.ajax.reload();
+        } else {
+          Swal.fire("Error!", result.message, "error");
+        }
+      },
+    });
+  }
+
+
+}
+async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
+  //show modal with table of pagos coordination
+  $("#modalClientePagosCoordination").modal("show");
+  $("#modalClientePagosCoordination .modal-title").text(`Pagos de Coordinación - ${nombreCliente}`);
+  url =
+    base_url + "CargaConsolidada/ContenedorConsolidado/getPagosCoordination/" + idCotizacion;
+  if (!$.fn.DataTable.isDataTable("#table-pagos-tracking-coordinacion")) {
+    tableCotizacionTrackingPagos = $("#table-pagos-tracking-coordinacion").DataTable({
+      dom:
+        "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      buttons: [],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      },
+      columnDefs: [
+        {
+          targets: "no-hidden",
+          visible: false,
+        },
+        {
+          className: "text-center",
+          targets: "no-sort",
+          orderable: false,
+        },
+        {
+          targets: "",
+          orderable: false,
+        },
+        {
+          targets: "sorting_asc",
+          orderable: false,
+        },
+      ],
+      pageLength: 100, // Mostrar 100 elementos por página
+      lengthMenu: [
+        [100, 1000, -1],
+        [100, 1000, "Todos"],
+      ],
+      order: [[1, "asc"]],
+      ajax: {
+        url: url,
+        type: "POST",
+        dataType: "JSON",
+        data: function (data) {
+
+        },
+      },
+      initComplete: function () {
+
+      },
+      complete: function () {
+
+
+      },
+      drawCallback: function (settings) {
+
+      },
+    });
+  } else {
+    tableCotizacionTrackingPagos.ajax.url(url).load();
+  }
+
+}
 async function uploadGuiaRemision(idCotizacion) {
   //swall with file input
   const { value: file } = await Swal.fire({
@@ -1596,7 +1753,7 @@ async function showDocumentacionDocumentacionContainer(id) {
       color = "bg-purple-50";
     }
 
-    if (file.file_url) {
+    if (file.file_url || (file.folder_name == 'Packing China' && file.lista_embarque_url)) {
       // $("#documentacion-documentacion").append(`
       //           <div class="doc-card opacity-0 ${color} p-4 rounded-lg transition-all duration-300" data-type="${file.categoria
       //   }">
@@ -1622,17 +1779,17 @@ async function showDocumentacionDocumentacionContainer(id) {
                   ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>` : ""}
                 </label>
                 <div class="file-upload-box">
-                    ${file.file_url ? `
+                    ${file.file_url || (file.folder_name == 'Packing China' && file.lista_embarque_url) ? `
                             <div class="file-info">
                               <div class="file-iconic">
-                                ${getIconByType(file.type)}
+                                ${getIconByType(file.type ?? 'xlsx')}
                               </div>
                                 <span class="file-name">${file.folder_name}</span>
                                 
                                 <div 
                                 class="d-flex flex-row gap-5"
                                 >
-                                <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
+                                <button class="download-file-button" onclick=window.location.href='${file.file_url ?? file.lista_embarque_url}'>
                                 <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12.7436 8.61328H1.25641C0.56718 8.61328 0 9.18046 0 9.86969V11.3056C0 11.9948 0.56718 12.562 1.25641 12.562H12.7436C13.4328 12.562 14 11.9948 14 11.3056V9.86969C14 9.18046 13.4328 8.61328 12.7436 8.61328ZM12.9231 11.3056C12.9231 11.4061 12.8441 11.4851 12.7436 11.4851H1.25641C1.1559 11.4851 1.07692 11.4061 1.07692 11.3056V9.86969C1.07692 9.76918 1.1559 9.6902 1.25641 9.6902H12.7436C12.8441 9.6902 12.9231 9.76918 12.9231 9.86969V11.3056Z" fill="#585858"/>
                                 <path d="M8.4638 4.46608L7.22893 5.70096L7.22893 0.538904C7.22893 0.244545 6.98483 0.000441819 6.69047 0.000441793C6.39611 0.000441767 6.15201 0.244545 6.15201 0.538903L6.15201 5.70096L4.91714 4.46608C4.80944 4.35839 4.67303 4.30813 4.53662 4.30813C4.40021 4.30813 4.2638 4.35839 4.15611 4.46608C3.9479 4.67429 3.9479 5.0189 4.15611 5.22711L6.30996 7.38096C6.51816 7.58916 6.86278 7.58916 7.07098 7.38096L9.22483 5.22711C9.43303 5.0189 9.43303 4.67429 9.22483 4.46608C9.01662 4.25788 8.67201 4.25788 8.4638 4.46608Z" fill="#585858"/>
@@ -1641,7 +1798,7 @@ async function showDocumentacionDocumentacionContainer(id) {
                                 </button>
                                 <div  
                                 style="cursor: pointer;${sectionsDisabled ? "display: none;" : ""}"
-                                onclick="deleteDocumentacionFileDocumentacion(${file.id_file})">
+                                onclick="deleteDocumentacionFileDocumentacion(${file.id_file ?? 0})">
                                   <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M1 3.32031H2.16H11.44" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
                                   <path d="M10.2799 3.32V11.44C10.2799 11.7477 10.1577 12.0427 9.94016 12.2602C9.72261 12.4778 9.42756 12.6 9.11991 12.6H3.31991C3.01226 12.6 2.71721 12.4778 2.49967 12.2602C2.28213 12.0427 2.15991 11.7477 2.15991 11.44V3.32M3.89991 3.32V2.16C3.89991 1.85235 4.02213 1.5573 4.23967 1.33976C4.45721 1.12221 4.75226 1 5.05991 1H7.37991C7.68756 1 7.98261 1.12221 8.20016 1.33976C8.4177 1.5573 8.53991 1.85235 8.53991 2.16V3.32" stroke="#585858" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2374,6 +2531,10 @@ const reloadTableCotizacion = async () => {
   tableCotizacion.ajax.reload();
   await getTableCotizacionEmbarqueHeaders();
 };
+const reloadTableCotizacionPagos = async () => {
+  tableCotizacionPagos.ajax.reload();
+  await getTableCotizacionEmbarqueHeaders();
+};
 const updateEstadoCliente = (id) => {
   const estado = $(`#estado-cliente-${id}`).val();
   url = base_url + "CargaConsolidada/ContenedorConsolidado/updateEstadoCliente";
@@ -2407,7 +2568,6 @@ const openStepFunction = async (step, id) => {
       currentPrivilege == "ContenedorAlmacen" ||
       currentPrivilege == "Documentacion"
     ) {
-      $("#table-cotizacion-prospectos").attr("style", "display:none");
       if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
         reloadTableCotizacionEmbarque();
         enableHorizontalAutoScrollForAllTables();
@@ -2420,8 +2580,6 @@ const openStepFunction = async (step, id) => {
             "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
           buttons: [],
           paging: true,
           lengthChange: true,
@@ -2552,283 +2710,120 @@ const openStepFunction = async (step, id) => {
       }
       spinner.hide();
     } else {
-      if (currentTableCotizacion != "prospectos") {
-        reloadTableCotizacionEmbarque();
-        enableHorizontalAutoScrollForAllTables();
-      }
-      if (
-        $.fn.DataTable.isDataTable("#table-cotizacion-prospectos") &&
-        currentTableCotizacion != "embarque"
-      ) {
-        reloadTableCotizacion();
-        enableHorizontalAutoScrollForAllTables();
-      } else if (currentTableCotizacion == "prospectos") {
-        url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-        tableCotizacion = $("#table-cotizacion-prospectos").DataTable({
-          dom:
-            "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-            "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-          buttons: [
-            {
-              extend: "excel",
-              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-              titleAttr: "Excel",
-              exportOptions: {
-                columns: ":visible",
+      $(".tab-cotizacion").removeClass("active");
+      $(".tab-cotizacion").off("click").click(function () {
+        $(".tab-cotizacion").removeClass("active");
+        $("#table-cotizacion-prospectos_wrapper").hide();
+        $("#table-cotizacion-embarque_wrapper").hide();
+        $("#table-cotizacion-pagos_wrapper").hide();
+        let table = this.getAttribute("data-table");
+        this.classList.add("active");
+        if (table == "embarque") {
+          $("#table-cotizacion-embarque").attr("style", "");
+          $("#table-cotizacion-prospectos").hide();
+          $("#table-cotizacion-pagos").hide();
+          if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
+            $("#table-cotizacion-embarque").attr("style", "");
+            $("#table-cotizacion-embarque").show();
+            $("#table-cotizacion-embarque_wrapper").show();
+            $("#table-cotizacion-prospectos_wrapper").hide();
+            $("#table-cotizacion-pagos_wrapper").hide();
+            limpiarFiltroDataTable("table-cotizacion-embarque");
+            limpiarInputBuscadorPersonalizado("search-table");
+            reloadTableCotizacionEmbarque();
+            enableHorizontalAutoScrollForAllTables();
+          } else {
+            url =
+              base_url + "CargaConsolidada/ContenedorConsolidado/step";
+            tableCotizacionEmbarque.show();
+            tableCotizacionEmbarque = $(
+              "#table-cotizacion-embarque"
+            ).DataTable({
+              dom:
+                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+              buttons: [],
+              paging: true,
+              lengthChange: true,
+              searching: true,
+              ordering: false,
+              info: true,
+              autoWidth: false,
+              responsive: false,
+              serverSide: false,
+              pagingType: "full_numbers",
+              oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                  sFirst: "<<",
+                  sLast: ">>",
+                  sPrevious: "<",
+                  sNext: ">",
+                },
               },
-              attr: {
-                id: "export-excel-main",
-                class: "hidden",
-              },
-            },
-
-            {
-              extend: "pdf",
-              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-              titleAttr: "PDF",
-              exportOptions: {
-                columns: ":visible",
-              },
-              attr: {
-                id: "export-pdf-main",
-                class: "hidden",
-              },
-            },
-            {
-              text: "Prospectos",
-              action: function () {
-                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
-                  $("#table-cotizacion-embarque").attr("style", "display:none");
-                  $("#table-cotizacion-embarque_wrapper").hide();
-                }
-                if (
-                  $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
-                ) {
-                  //display block
-                  $("#table-cotizacion-prospectos").attr("style", "");
-                  $("#table-cotizacion-prospectos_wrapper").show();
-                  limpiarFiltroDataTable("table-cotizacion-prospectos");
-                  limpiarInputBuscadorPersonalizado("search-table");
-                  reloadTableCotizacion();
-                  enableHorizontalAutoScrollForAllTables();
-                } else {
-                  $("#table-cotizacion-prospectos").attr("style", "");
-                  $("#table-cotizacion-prospectos_wrapper").show();
-                  limpiarFiltroDataTable("table-cotizacion-prospectos");
-                  limpiarInputBuscadorPersonalizado("search-table");
-                  reloadTableCotizacion();
-                  enableHorizontalAutoScrollForAllTables();
-                }
-
-                currentTableCotizacion = "prospectos";
-              },
-              className: "btn btn-light",
-            },
-            {
-              text: "Por Embarcar",
-              action: async function () {
-                if (
-                  $.fn.DataTable.isDataTable("#table-cotizacion-prospectos")
-                ) {
-                  $("#table-cotizacion-prospectos").attr(
-                    "style",
-                    "display:none"
-                  );
-                  $("#table-cotizacion-prospectos_wrapper").hide();
-                }
-                if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
-                  $("#table-cotizacion-embarque").attr("style", "");
-                  $("#table-cotizacion-embarque_wrapper").show();
-                  limpiarFiltroDataTable("table-cotizacion-embarque");
-                  limpiarInputBuscadorPersonalizado("search-table");
-                  reloadTableCotizacionEmbarque();
-                  enableHorizontalAutoScrollForAllTables();
-                } else {
-                  url =
-                    base_url + "CargaConsolidada/ContenedorConsolidado/step";
-                  tableCotizacionEmbarque.show();
-                  tableCotizacionEmbarque = $(
-                    "#table-cotizacion-embarque"
-                  ).DataTable({
-                    dom:
-                      "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
-                      "<'row'<'col-sm-12'tr>>" +
-                      "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-                    buttons: [
-                      {
-                        text: "Prospectos",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-embarque"
-                            )
-                          ) {
-                            $("#table-cotizacion-embarque").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-cotizacion-embarque_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-prospectos"
-                            )
-                          ) {
-                            $("#table-cotizacion-prospectos_wrapper").show();
-                            limpiarFiltroDataTable("table-cotizacion-prospectos");
-                            limpiarInputBuscadorPersonalizado("search-table");
-
-                            $("#table-cotizacion-prospectos").attr("style", "");
-                            reloadTableCotizacion();
-                            enableHorizontalAutoScrollForAllTables();
-                          } else {
-                            $("#table-cotizacion-prospectos").attr("style", "");
-                            reloadTableCotizacion();
-                            enableHorizontalAutoScrollForAllTables();
-                          }
-                          currentTableCotizacion = "prospectos";
-                        },
-                      },
-                      {
-                        text: "Por Embarcar",
-                        className: "btn btn-light",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-prospectos"
-                            )
-                          ) {
-                            $("#table-cotizacion-prospectos").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-cotizacion-prospectos_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-cotizacion-embarque"
-                            )
-                          ) {
-                            $("#table-cotizacion-embarque").attr("style", "");
-                          } else {
-                            $("#table-cotizacion-embarque").attr("style", "");
-                          }
-                          $(".input-date").datepicker({
-                            autoclose: true,
-                            startDate: new Date(fYear, fToday.getMonth(), fDay),
-                            todayHighlight: true,
-                            format: "dd/mm/yyyy",
-                            dateFormat: "dd/mm/yyyy",
-                          });
-                          currentTableCotizacion = "embarque";
-                        },
-                      },
-                    ],
-                    paging: true,
-                    lengthChange: true,
-                    searching: true,
-                    ordering: false,
-                    info: true,
-                    autoWidth: false,
-                    responsive: false,
-                    serverSide: false,
-                    pagingType: "full_numbers",
-                    oLanguage: {
-                      sInfo:
-                        "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-                      sLengthMenu: "_MENU_",
-                      sSearch: "Buscar por: ",
-                      sSearchPlaceholder: "",
-                      sZeroRecords: "No se encontraron registros",
-                      sInfoEmpty: "No hay registros",
-                      sLoadingRecords: "Cargando...",
-                      sProcessing: "Procesando...",
-                      oPaginate: {
-                        sFirst: "<<",
-                        sLast: ">>",
-                        sPrevious: "<",
-                        sNext: ">",
-                      },
-                    },
-                    //hide last two columns
-                    columnDefs: [
-                      {
-                        targets: "no-hidden",
-                        visible: false,
-                      },
-                      {
-                        className: "text-center",
-                        targets: "no-sort",
-                        orderable: false,
-                      },
-                      {
-                        targets: "",
-                        orderable: false,
-                      },
-                    ],
-                    pageLength: 100, // Mostrar 100 elementos por página
-                    lengthMenu: [
-                      [100, 1000, -1],
-                      [100, 1000, "Todos"],
-                    ],
-                    ajax: {
-                      url: url,
-                      type: "POST",
-                      dataType: "JSON",
-                      data: function (data) {
-                        data.stepIndex = stepIndex;
-                        data.idContenedor = idContenedor;
-                        data.tipoTabla = "embarque";
-                        data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
-                        data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val();
-                        data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
-                        validateListEmbarque(idContenedor);
-                        $(".input-date").datepicker({
-                          autoclose: true,
-                          startDate: new Date(fYear, fToday.getMonth(), fDay),
-                          todayHighlight: true,
-                          format: "dd/mm/yyyy",
-                          dateFormat: "dd/mm/yyyy",
-                        });
-                      },
-                    },
-                    initComplete: function (settings, json) {
-                      enableHorizontalAutoScrollForAllTables();
-                      $(".input-date").datepicker({
-                        autoclose: true,
-                        startDate: new Date(fYear, fToday.getMonth(), fDay),
-                        todayHighlight: true,
-                        format: "dd/mm/yyyy",
-                        dateFormat: "dd/mm/yyyy",
-                      });
-                    },
-                    complete: function () {
-                      enableHorizontalAutoScrollForAllTables();
-                      $("#aplicar-btn-cotizacion").off("click");
-                      $("#aplicar-btn-cotizacion").click(function () {
-                        if (currentTableCotizacion == "prospectos") {
-                          tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                        } else {
-                          tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                        }
-                      });
-                    },
+              columnDefs: [
+                {
+                  targets: "no-hidden",
+                  visible: false,
+                },
+                {
+                  className: "text-center",
+                  targets: "no-sort",
+                  orderable: false,
+                },
+                {
+                  targets: "",
+                  orderable: false,
+                },
+                {
+                  targets: "sorting_asc",
+                  orderable: false,
+                },
+              ],
+              pageLength: 100, // Mostrar 100 elementos por página
+              lengthMenu: [
+                [100, 1000, -1],
+                [100, 1000, "Todos"],
+              ],
+              order: [[1, "asc"]],
+              ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                  data.stepIndex = stepIndex;
+                  data.idContenedor = idContenedor;
+                  data.tipoTabla = "embarque";
+                  data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+                  data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val() ?? 0;
+                  data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+                  data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+                  data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+                  validateListEmbarque(idContenedor);
+                  $(".input-date").datepicker({
+                    autoclose: true,
+                    startDate: new Date(fYear, fToday.getMonth(), fDay),
+                    todayHighlight: true,
+                    format: "dd/mm/yyyy",
+                    dateFormat: "dd/mm/yyyy",
                   });
-                  configurarBuscador(
-                    "table-cotizacion-embarque",
-                    "search-table",
-                    "table-cotizacion-embarque_info"
-                  );
-                  spinner.hide();
-                  await getTableCotizacionEmbarqueHeaders();
-
-                }
-                currentTableCotizacion = "embarque";
+                  getTableCotizacionEmbarqueHeaders();
+                },
+              },
+              initComplete: function () {
+                console.log("initEmbarque");
+                $("#aplicar-btn-cotizacion").off("click");
+                $("#aplicar-btn-cotizacion").click(function () {
+                  tableCotizacionEmbarque.ajax.reload();
+                });
                 $(".input-date").datepicker({
                   autoclose: true,
                   startDate: new Date(fYear, fToday.getMonth(), fDay),
@@ -2837,116 +2832,336 @@ const openStepFunction = async (step, id) => {
                   dateFormat: "dd/mm/yyyy",
                 });
               },
-            },
-          ],
-          paging: true,
-          lengthChange: true,
-          searching: true,
-          ordering: true,
-          info: true,
-          autoWidth: false,
-          responsive: false,
-          serverSide: false,
-          pagingType: "full_numbers",
-          oLanguage: {
-            sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-            sLengthMenu: "_MENU_",
-            sSearch: "Buscar por: ",
-            sSearchPlaceholder: "",
-            sZeroRecords: "No se encontraron registros",
-            sInfoEmpty: "No hay registros",
-            sLoadingRecords: "Cargando...",
-            sProcessing: "Procesando...",
-            oPaginate: {
-              sFirst: "<<",
-              sLast: ">>",
-              sPrevious: "<",
-              sNext: ">",
-            },
-          },
-          columnDefs: [
-            {
-              targets: "no-hidden",
-              visible: false,
-            },
-          ],
-          pageLength: 100, // Mostrar 100 elementos por página
-          lengthMenu: [
-            [100, 1000, -1],
-            [100, 1000, "Todos"],
-          ],
-          ajax: {
-            url: url,
-            type: "POST",
-            dataType: "JSON",
-            data: function (data) {
-              data.stepIndex = stepIndex;
-              data.idContenedor = idContenedor;
-              data.tipoTabla = "prospectos";
-              data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
-            },
-            complete: async function () {
-              console.log("Init propectos")
-              enableHorizontalAutoScrollForAllTables();
-              $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
-              $("#aplicar-btn-cotizacion").off("click");
-              $("#aplicar-btn-cotizacion").click(function () {
-                if (currentTableCotizacion == "embarque") {
-                  tableCotizacionEmbarque.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                }
-                else {
-                  tableCotizacion.ajax.reload(); // Recargar la tabla sin reiniciar la paginación
-                }
-              });
-              spinner.hide();
-              // clean options in select txt-ID_Estado and add option todos value 0 , PENDIENTE VALUE PENDIENTE AND CONFIRMADO VALUE CONFIRMADO IF currentPrivilege =="Cotizador
+              complete: function () {
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              drawCallback: function (settings) {
+                enableHorizontalAutoScrollForAllTables();
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+            });
+            limpiarFiltroDataTable("table-cotizacion-embarque");
+            limpiarInputBuscadorPersonalizado("search-table");
+            // FUNCION PARA CONFIGURAR EL BUSCADOR
+            configurarBuscador(
+              "table-cotizacion-embarque",
+              "search-table",
+              "table-cotizacion-embarque_info"
+            );
+            //Funcion para exportar a excel
+            configurarExportarExcel(
+              "export-excel-main",
+              url,
+              "Cotizacion-" + idContenedor
+            );
+          }
+          currentTableCotizacion = "embarque";
+        } else if (table == "prospectos") {
+          $("#table-cotizacion-prospectos").attr("style", "");
+          $("#table-cotizacion-embarque").hide();
+          $("#table-cotizacion-pagos").hide();
+          if ($.fn.DataTable.isDataTable("#table-cotizacion-prospectos")) {
+            $("#table-cotizacion-prospectos").attr("style", "");
+            $("#table-cotizacion-prospectos_wrapper").show();
+            $("#table-cotizacion-embarque_wrapper").hide();
+            $("#table-cotizacion-pagos_wrapper").hide();
+            $("#table-cotizacion-prospectos").show();
+            limpiarFiltroDataTable("table-cotizacion-prospectos");
+            limpiarInputBuscadorPersonalizado("search-table");
+            reloadTableCotizacion();
+            enableHorizontalAutoScrollForAllTables();
+          } else {
+            url =
+              base_url + "CargaConsolidada/ContenedorConsolidado/step";
+            tableCotizacion.show();
+            tableCotizacion = $(
+              "#table-cotizacion-prospectos"
+            ).DataTable({
+              dom:
+                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+              buttons: [],
+              paging: true,
+              lengthChange: true,
+              searching: true,
+              ordering: false,
+              info: true,
+              autoWidth: false,
+              responsive: false,
+              serverSide: false,
+              pagingType: "full_numbers",
+              oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                  sFirst: "<<",
+                  sLast: ">>",
+                  sPrevious: "<",
+                  sNext: ">",
+                },
+              },
+              columnDefs: [
+                {
+                  targets: "no-hidden",
+                  visible: false,
+                },
+                {
+                  className: "text-center",
+                  targets: "no-sort",
+                  orderable: false,
+                },
+                {
+                  targets: "",
+                  orderable: false,
+                },
+                {
+                  targets: "sorting_asc",
+                  orderable: false,
+                },
+              ],
+              pageLength: 100, // Mostrar 100 elementos por página
+              lengthMenu: [
+                [100, 1000, -1],
+                [100, 1000, "Todos"],
+              ],
+              order: [[1, "asc"]],
+              ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                  data.stepIndex = stepIndex;
+                  data.idContenedor = idContenedor;
+                  data.tipoTabla = "prospectos";
+                  data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+                  data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val() ?? 0;
+                  data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+                  data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+                  data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+                  validateListEmbarque(idContenedor);
+                  $(".input-date").datepicker({
+                    autoclose: true,
+                    startDate: new Date(fYear, fToday.getMonth(), fDay),
+                    todayHighlight: true,
+                    format: "dd/mm/yyyy",
+                    dateFormat: "dd/mm/yyyy",
+                  });
+                  getTableCotizacionEmbarqueHeaders();
+                },
+              },
+              initComplete: function () {
+                console.log("initEmbarque");
+                $("#aplicar-btn-cotizacion").off("click");
+                $("#aplicar-btn-cotizacion").click(function () {
+                  tableCotizacionEmbarque.ajax.reload();
+                });
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              complete: function () {
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              drawCallback: function (settings) {
+                enableHorizontalAutoScrollForAllTables();
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
 
-              await getTableCotizacionEmbarqueHeaders();
 
-            },
-          },
-          columnDefs: [
-            {
-              targets: "no-hidden",
-              visible: false,
-            },
-            {
-              className: "text-center",
-              targets: "no-sort",
-              orderable: false,
-            },
-            {
-              targets: "",
-              orderable: false,
-            },
-          ],
-          pageLength: 100, // Mostrar 100 elementos por página
-          lengthMenu: [
-            [100, 1000, -1],
-            [100, 1000, "Todos"],
-          ],
-        });
-      }
-      limpiarFiltroDataTable("table-cotizacion-prospectos");
-      limpiarInputBuscadorPersonalizado("search-table");
+              }
 
-      configurarBuscador(
-        "table-cotizacion-prospectos",
-        "search-table",
-        "table-cotizacion-prospectos_info"
-      );
+            });
+            configurarBuscador(
+              "table-cotizacion-prospectos",
+              "search-table",
+              "table-cotizacion-embarque_info"
+            );
+            spinner.hide();
+            getTableCotizacionEmbarqueHeaders();
 
-      await getTipoCliente();
-      if (
-        currentPrivilege == "Cotizador"
-      ) {
-        $("#txt-ID_Estado_Cotizacion").empty();
-        $("#txt-ID_Estado_Cotizacion").append(
-          '<option value="0">Todos</option>' +
-          '<option value="PENDIENTE">Pendiente</option>' +
-          '<option value="CONFIRMADO">Confirmado</option>'
-        );
-      }
+
+            currentTableCotizacion = "prospectos";
+          }
+        }
+        else if (table == "pagos") {
+          $("#table-cotizacion-pagos").show();
+          $("#table-cotizacion-embarque").hide();
+          $("#table-cotizacion-prospectos").hide();
+          if ($.fn.DataTable.isDataTable("#table-cotizacion-pagos")) {
+            $("#table-cotizacion-pagos").attr("style", "");
+            $("#table-cotizacion-prospectos_wrapper").hide();
+            $("#table-cotizacion-embarque_wrapper").hide();
+            $("#table-cotizacion-pagos_wrapper").show();
+            $("#table-cotizacion-pagos").show();
+            limpiarFiltroDataTable("table-cotizacion-pagos");
+            limpiarInputBuscadorPersonalizado("search-table");
+            reloadTableCotizacionPagos();
+            enableHorizontalAutoScrollForAllTables();
+          } else {
+            url =
+              base_url + "CargaConsolidada/ContenedorConsolidado/step";
+            tableCotizacionPagos.show();
+            tableCotizacionPagos = $(
+              "#table-cotizacion-pagos"
+            ).DataTable({
+              dom:
+                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+              buttons: [],
+              paging: true,
+              lengthChange: true,
+              searching: true,
+              ordering: false,
+              info: true,
+              autoWidth: false,
+              responsive: false,
+              serverSide: false,
+              pagingType: "full_numbers",
+              oLanguage: {
+                sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+                sLengthMenu: "_MENU_",
+                sSearch: "Buscar por: ",
+                sSearchPlaceholder: "",
+                sZeroRecords: "No se encontraron registros",
+                sInfoEmpty: "No hay registros",
+                sLoadingRecords: "Cargando...",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                  sFirst: "<<",
+                  sLast: ">>",
+                  sPrevious: "<",
+                  sNext: ">",
+                },
+              },
+              columnDefs: [
+                {
+                  targets: "no-hidden",
+                  visible: false,
+                },
+                {
+                  className: "text-center",
+                  targets: "no-sort",
+                  orderable: false,
+                },
+                {
+                  targets: "",
+                  orderable: false,
+                },
+                {
+                  targets: "sorting_asc",
+                  orderable: false,
+                },
+              ],
+              pageLength: 100, // Mostrar 100 elementos por página
+              lengthMenu: [
+                [100, 1000, -1],
+                [100, 1000, "Todos"],
+              ],
+              order: [[1, "asc"]],
+              ajax: {
+                url: url,
+                type: "POST",
+                dataType: "JSON",
+                data: function (data) {
+                  data.stepIndex = stepIndex;
+                  data.idContenedor = idContenedor;
+                  data.tipoTabla = "pagos";
+                  data.Filtro_Estado = $("#txt-ID_Estado_Cotizacion").val() ?? 0;
+                  data.Filtro_Status = $("#txt-ID_Estatus_Cotizacion").val() ?? 0;
+                  data.Filtro_State = $("#txt-ID_States_Cliente").val() ?? 0;
+                  data.Fe_Inicio_Carga = $("#txt-Fe_Inicio_Carga").val();
+                  data.Fe_Fin_Carga = $("#txt-Fe_Fin_Carga").val();
+                  validateListEmbarque(idContenedor);
+                  $(".input-date").datepicker({
+                    autoclose: true,
+                    startDate: new Date(fYear, fToday.getMonth(), fDay),
+                    todayHighlight: true,
+                    format: "dd/mm/yyyy",
+                    dateFormat: "dd/mm/yyyy",
+                  });
+                  getTableCotizacionEmbarqueHeaders();
+                },
+              },
+              initComplete: function () {
+                console.log("initEmbarque");
+                $("#aplicar-btn-cotizacion").off("click");
+                $("#aplicar-btn-cotizacion").click(function () {
+                  tableCotizacionPagos.ajax.reload();
+                });
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              complete: function () {
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              },
+              drawCallback: function (settings) {
+                enableHorizontalAutoScrollForAllTables();
+                $(".input-date").datepicker({
+                  autoclose: true,
+                  startDate: new Date(fYear, fToday.getMonth(), fDay),
+                  todayHighlight: true,
+                  format: "dd/mm/yyyy",
+                  dateFormat: "dd/mm/yyyy",
+                });
+              }
+            });
+            configurarBuscador(
+              "table-cotizacion-pagos",
+              "search-table",
+              "table-cotizacion-embarque_info"
+            );
+            spinner.hide();
+            currentTableCotizacion = "pagos";
+          }
+        }
+      });
+      $(".tab-cotizacion").first().click();
     }
   } else if (stepIndex == 2 && currentPrivilege == "Documentacion") {
     showDocumentacionDocumentacionContainer(id);
@@ -2955,313 +3170,614 @@ const openStepFunction = async (step, id) => {
     (currentPrivilege == "Documentacion" && stepIndex == 1)
   ) {
     await getClientesHeader();
-    url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
     clientesContainer.show();
-    if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-      reloadTableClientesGeneral();
-    } else {
-      tableClientesGeneral.show();
-      limpiarFiltroDataTable("table-clientes-general");
+    $(".tab-clientes").removeClass("active");
+    $(".tab-clientes").off("click").click(function () {
+      $(".tab-clientes").removeClass("active");
+      $("#table-clientes-general_wrapper").hide();
+      $("#table-clientes-variacion_wrapper").hide();
+      $("#table-clientes-pagos_wrapper").hide();
 
-      tableClientesGeneral = $("#table-clientes-general").DataTable({
-        dom:
-          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-          "<'row'<'col-sm-12'tr>>" +
-          "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      let table = this.getAttribute("data-table");
+      this.classList.add("active");
 
+      if (table == "general") {
+        $("#table-clientes-general").attr("style", "");
+        $("#table-clientes-variacion").hide();
+        $("#table-clientes-pagos").hide();
 
-        buttons: [
-          {
-            extend: "excel",
-            text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-            titleAttr: "Excel",
-            exportOptions: {
-              columns: ":visible",
-            },
-            attr: {
-              id: "export-excel-main",
-              class: "hidden",
-            },
-          },
-          {
-            text: "General",
-            action: function () {
-              if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
-                $("#table-clientes-variacion").attr("style", "display:none");
-                $("#table-clientes-variacion_wrapper").hide();
-              }
-              if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-                $("#table-clientes-general").attr("style", "");
-                $("#table-clientes-general_wrapper").show();
-                reloadTableClientesGeneral();
-              } else {
-                $("#table-clientes-general").attr("style", "");
-                $("#table-clientes-general_wrapper").show();
-                reloadTableClientesGeneral();
-              }
-              limpiarInputBuscadorPersonalizado("search-table");
-              configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
-            },
-            className: "btn btn-light",
-          },
-          currentPrivilege != "Documentacion" && currentPrivilege != "Cotizador"
-            ? {
-              text: "Variación",
-              action: function () {
-                if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-                  $("#table-clientes-general").attr("style", "display:none");
-                  $("#table-clientes-general_wrapper").hide();
-                }
-                if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
-                  $("#table-clientes-variacion").attr("style", "");
-                  $("#table-clientes-variacion_wrapper").show();
-                  limpiarFiltroDataTable("table-clientes-variacion");
-                  reloadTableClientesVariacion();
-                } else {
-                  url =
-                    base_url + "CargaConsolidada/ContenedorConsolidado/step";
-                  tableClientesVariacion.show();
-                  tableClientesVariacion = $(
-                    "#table-clientes-variacion"
-                  ).DataTable({
-                    dom:
-                      "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
-                      "<'row'<'col-sm-12'tr>>" +
-                      "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-                    buttons: [
-                      {
-                        extend: "excel",
-                        text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                        titleAttr: "Excel",
-                        exportOptions: {
-                          columns: ":visible",
-                        },
-                        attr: {
-                          id: "export-excel-main",
-                          class: "hidden",
-                        },
-                      },
-                      {
-                        extend: "pdf",
-                        text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-                        titleAttr: "PDF",
-                        exportOptions: {
-                          columns: ":visible",
-                        },
-                        attr: {
-                          id: "export-pdf-main",
-                          class: "hidden",
-                        },
-                      },
-                      {
-                        text: "General",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-variacion"
-                            )
-                          ) {
-                            $("#table-clientes-variacion").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-clientes-variacion_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-general"
-                            )
-                          ) {
-                            $("#table-clientes-general_wrapper").show();
-
-                            $("#table-clientes-general").attr("style", "");
-                            reloadTableClientesGeneral();
-                          } else {
-                            $("#table-clientes-general").attr("style", "");
-                            $("#table-clientes-general_wrapper").show();
-                            limpiarFiltroDataTable("table-clientes-general");
-                            reloadTableClientesGeneral();
-                          }
-                          limpiarInputBuscadorPersonalizado("search-table");
-                          configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
-                        },
-                      },
-                      {
-                        text: "Variación",
-                        className: "btn btn-light",
-                        action: function () {
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-general"
-                            )
-                          ) {
-                            $("#table-clientes-general").attr(
-                              "style",
-                              "display:none"
-                            );
-                            $("#table-clientes-general_wrapper").hide();
-                          }
-                          if (
-                            $.fn.DataTable.isDataTable(
-                              "#table-clientes-variacion"
-                            )
-                          ) {
-                            $("#table-clientes-variacion_wrapper").show();
-                            limpiarFiltroDataTable("table-clientes-variacion");
-
-                            $("#table-clientes-variacion").attr("style", "");
-                            reloadTableClientesVariacion();
-                          } else {
-                            $("#table-clientes-variacion").attr("style", "");
-                            reloadTableClientesVariacion();
-                          }
-
-                        },
-                      },
-                    ],
-                    columnDefs: [
-                      {
-                        targets: "no-hidden",
-                        visible: false,
-                      },
-                      {
-                        className: "text-center",
-                        targets: "no-sort",
-                        orderable: false,
-                      },
-                      {
-                        targets: "",
-                        orderable: false,
-                      },
-                      {
-                        targets: "sorting_asc",
-                        orderable: false,
-                      },
-                    ],
-                    pageLength: 100, // Mostrar 100 elementos por página
-                    lengthMenu: [
-                      [100, 1000, -1],
-                      [100, 1000, "Todos"],
-                    ],
-                    paging: true,
-                    lengthChange: true,
-                    searching: true,
-                    ordering: true,
-                    info: true,
-                    autoWidth: false,
-                    responsive: false,
-                    serverSide: false,
-                    pagingType: "full_numbers",
-                    oLanguage: {
-                      sInfo:
-                        "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-                      sLengthMenu: "_MENU_",
-                      sSearch: "Buscar por: ",
-                      sSearchPlaceholder: "",
-                      sZeroRecords: "No se encontraron registros",
-                      sInfoEmpty: "No hay registros",
-                      sLoadingRecords: "Cargando...",
-                      sProcessing: "Procesando...",
-                      oPaginate: {
-                        sFirst: "<<",
-                        sLast: ">>",
-                        sPrevious: "<",
-                        sNext: ">",
-                      },
-                    },
-                    ajax: {
-                      url: url,
-                      type: "POST",
-                      dataType: "JSON",
-                      data: function (data) {
-                        data.stepIndex = stepIndex;
-                        data.idContenedor = idContenedor;
-                        data.tipoTabla = "variacion";
-                        data.Filtro_Estado = $("#txt-ID_Estado").val();
-                        validateListEmbarque(idContenedor);
-                      },
-                    },
-                  });
-                  limpiarFiltroDataTable("table-clientes-variacion");
-                  reloadTableClientesVariacion();
-                }
-                limpiarInputBuscadorPersonalizado("search-table");
-                configurarBuscador(
-                  "table-clientes-variacion",
-                  "search-table",
-                  "table-clientes-variacion_info"
-                );
+        if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+          $("#table-clientes-general").show();
+          $("#table-clientes-general_wrapper").show();
+          reloadTableClientesGeneral();
+        } else {
+          url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+          tableClientesGeneral = $("#table-clientes-general").DataTable({
+            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [],
+            columnDefs: [
+              {
+                targets: "no-hidden",
+                visible: false,
               },
-            }
-            : null,
-        ]
-          //filter null
-          .filter(Boolean),
-        paging: true,
-        lengthChange: true,
-        searching: true,
-        ordering: true,
-        info: true,
-        autoWidth: false,
-        responsive: false,
-        serverSide: false,
-        pagingType: "full_numbers",
-        columnDefs: [
-          {
-            targets: "no-hidden",
-            visible: false,
-          },
-          {
-            targets: "no-sort",
-            orderable: false,
-          },
-          {
-            targets: "",
-            orderable: false,
-          },
-          {
-            targets: "sorting_asc",
-            orderable: false,
-          },
-        ],
-        pageLength: 100, // Mostrar 100 elementos por página
-        lengthMenu: [
-          [100, 1000, -1],
-          [100, 1000, "Todos"],
-        ],
-        oLanguage: {
-          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-          sLengthMenu: "_MENU_",
-          sSearch: "Buscar por: ",
-          sSearchPlaceholder: "",
-          sZeroRecords: "No se encontraron registros",
-          sInfoEmpty: "No hay registros",
-          sLoadingRecords: "Cargando...",
-          sProcessing: "Procesando...",
-          oPaginate: {
-            sFirst: "<<",
-            sLast: ">>",
-            sPrevious: "<",
-            sNext: ">",
-          },
-        },
-        ajax: {
-          url: url,
-          type: "POST",
-          dataType: "JSON",
-          data: function (data) {
-            data.stepIndex = stepIndex;
-            data.idContenedor = idContenedor;
-            data.tipoTabla = "general";
-            data.Filtro_Estado = "0";
-          },
-        },
-      });
-      limpiarFiltroDataTable("table-clientes-general");
-      reloadTableClientesGeneral();
-    }
+              {
+                className: "text-center",
+                targets: "no-sort",
+                orderable: false,
+              },
+              {
+                targets: "",
+                orderable: false,
+              },
+              {
+                targets: "sorting_asc",
+                orderable: false,
+              },
+            ],
+            pageLength: 100, // Mostrar 100 elementos por página
+            lengthMenu: [
+              [100, 1000, -1],
+              [100, 1000, "Todos"],
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+              sInfo:
+                "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+              sLengthMenu: "_MENU_",
+              sSearch: "Buscar por: ",
+              sSearchPlaceholder: "",
+              sZeroRecords: "No se encontraron registros",
+              sInfoEmpty: "No hay registros",
+              sLoadingRecords: "Cargando...",
+              sProcessing: "Procesando...",
+              oPaginate: {
+                sFirst: "<<",
+                sLast: ">>",
+                sPrevious: "<",
+                sNext: ">",
+              },
+            },
+            ajax: {
+              url: url,
+              type: "POST",
+              dataType: "JSON",
+              data: function (data) {
+                data.stepIndex = stepIndex;
+                data.idContenedor = idContenedor;
+                data.tipoTabla = "general";
+                data.Filtro_Estado = $("#txt-ID_Estado").val();
+                validateListEmbarque(idContenedor);
+              },
+            },
+          });
+          limpiarFiltroDataTable("table-clientes-general");
+          limpiarInputBuscadorPersonalizado("search-table");
+          // FUNCION PARA CONFIGURAR EL BUSCADOR
+          configurarBuscador(
+            "table-clientes-general",
+            "search-table",
+            "table-clientes-general_info"
+          );
+          //Funcion para exportar a excel
+          configurarExportarExcel(
+            "export-excel-main",
+            url,
+            "Clientes-" + idContenedor
+          );
+          $("#table-clientes-general").show();
+        }
+        currentTableClientes = "general";
+      }
+      else if (table == "variacion") {
+        // Lógica similar para variación
+        if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+          $("#table-clientes-variacion").show();
+          $("#table-clientes-variacion_wrapper").show();
+          reloadTableClientesVariacion();
+        } else {
+          url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+          tableClientesVariacion = $("#table-clientes-variacion").DataTable({
+            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [],
+            columnDefs: [
+              {
+                targets: "no-hidden",
+                visible: false,
+              },
+              {
+                className: "text-center",
+                targets: "no-sort",
+                orderable: false,
+              },
+              {
+                targets: "",
+                orderable: false,
+              },
+              {
+                targets: "sorting_asc",
+                orderable: false,
+              },
+            ],
+            pageLength: 100, // Mostrar 100 elementos por página
+            lengthMenu: [
+              [100, 1000, -1],
+              [100, 1000, "Todos"],
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+              sInfo:
+                "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+              sLengthMenu: "_MENU_",
+              sSearch: "Buscar por: ",
+              sSearchPlaceholder: "",
+              sZeroRecords: "No se encontraron registros",
+              sInfoEmpty: "No hay registros",
+              sLoadingRecords: "Cargando...",
+              sProcessing: "Procesando...",
+              oPaginate: {
+                sFirst: "<<",
+                sLast: ">>",
+                sPrevious: "<",
+                sNext: ">",
+              },
+            },
+            ajax: {
+              url: url,
+              type: "POST",
+              dataType: "JSON",
+              data: function (data) {
+                data.stepIndex = stepIndex;
+                data.idContenedor = idContenedor;
+                data.tipoTabla = "variacion";
+                data.Filtro_Estado = $("#txt-ID_Estado").val();
+                validateListEmbarque(idContenedor);
+              },
+            },
+          });
+          limpiarFiltroDataTable("table-clientes-variacion");
+          limpiarInputBuscadorPersonalizado("search-table");
+          // FUNCION PARA CONFIGURAR EL BUSCADOR
+          configurarBuscador(
+            "table-clientes-variacion",
+            "search-table",
+            "table-clientes-variacion_info"
+          );
+          //Funcion para exportar a excel
+          configurarExportarExcel(
+            "export-excel-main",
+            url,
+            "Clientes-Variacion-" + idContenedor
+          );
+          $("#table-clientes-variacion").show();
+          currentTableClientes = "variacion";
+        }
+
+      }
+      else if (table == "pagos") {
+        // Lógica similar para pagos
+        if ($.fn.DataTable.isDataTable("#table-clientes-pagos")) {
+          $("#table-clientes-pagos").show();
+          $("#table-clientes-pagos_wrapper").show();
+          reloadTableClientesPagos();
+        } else {
+          url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+          tableClientesPagos = $("#table-clientes-pagos").DataTable({
+            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+            buttons: [],
+            columnDefs: [
+              {
+                targets: "no-hidden",
+                visible: false,
+              },
+              {
+                className: "text-center",
+                targets: "no-sort",
+                orderable: false,
+              },
+              {
+                targets: "",
+                orderable: false,
+              },
+              {
+                targets: "sorting_asc",
+                orderable: false,
+              },
+            ],
+            pageLength: 100, // Mostrar 100 elementos por página
+            lengthMenu: [
+              [100, 1000, -1],
+              [100, 1000, "Todos"],
+            ],
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: false,
+            serverSide: false,
+            pagingType: "full_numbers",
+            oLanguage: {
+              sInfo:
+                "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+              sLengthMenu: "_MENU_",
+              sSearch: "Buscar por: ",
+              sSearchPlaceholder: "",
+              sZeroRecords: "No se encontraron registros",
+              sInfoEmpty: "No hay registros",
+              sLoadingRecords: "Cargando...",
+              sProcessing: "Procesando...",
+              oPaginate: {
+                sFirst: "<<",
+                sLast: ">>",
+                sPrevious: "<",
+                sNext: ">",
+              },
+            },
+            ajax: {
+              url: url,
+              type: "POST",
+              dataType: "JSON",
+              data: function (data) {
+                data.stepIndex = stepIndex;
+                data.idContenedor = idContenedor;
+                data.tipoTabla = "pagos";
+                data.Filtro_Estado = $("#txt-ID_Estado").val();
+                validateListEmbarque(idContenedor);
+              },
+            },
+          });
+          limpiarFiltroDataTable("table-clientes-pagos");
+          limpiarInputBuscadorPersonalizado("search-table");
+          // FUNCION PARA CONFIGURAR EL BUSCADOR
+          configurarBuscador(
+            "table-clientes-pagos",
+            "search-table",
+            "table-clientes-pagos_info"
+          );
+          //Funcion para exportar a excel
+          configurarExportarExcel(
+            "export-excel-main",
+            url,
+            "Clientes-Pagos-" + idContenedor
+          );
+          $("#table-clientes-pagos").show();
+          currentTableClientes = "pagos";
+
+        }
+      }
+    });
+    $(".tab-clientes").first().click();
+
+    // url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+    // clientesContainer.show();
+    // if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+    //   reloadTableClientesGeneral();
+    // } else {
+    //   tableClientesGeneral.show();
+    //   limpiarFiltroDataTable("table-clientes-general");
+
+    //   tableClientesGeneral = $("#table-clientes-general").DataTable({
+    //     dom:
+    //       "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+    //       "<'row'<'col-sm-12'tr>>" +
+    //       "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+
+
+    //     buttons: [
+    //       {
+    //         extend: "excel",
+    //         text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+    //         titleAttr: "Excel",
+    //         exportOptions: {
+    //           columns: ":visible",
+    //         },
+    //         attr: {
+    //           id: "export-excel-main",
+    //           class: "hidden",
+    //         },
+    //       },
+    //       {
+    //         text: "General",
+    //         action: function () {
+    //           if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+    //             $("#table-clientes-variacion").attr("style", "display:none");
+    //             $("#table-clientes-variacion_wrapper").hide();
+    //           }
+    //           if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+    //             $("#table-clientes-general").attr("style", "");
+    //             $("#table-clientes-general_wrapper").show();
+    //             reloadTableClientesGeneral();
+    //           } else {
+    //             $("#table-clientes-general").attr("style", "");
+    //             $("#table-clientes-general_wrapper").show();
+    //             reloadTableClientesGeneral();
+    //           }
+    //           limpiarInputBuscadorPersonalizado("search-table");
+    //           configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
+    //         },
+    //         className: "btn btn-light",
+    //       },
+    //       currentPrivilege != "Documentacion"
+    //         ? {
+    //           text: "Variación",
+    //           action: function () {
+    //             if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
+    //               $("#table-clientes-general").attr("style", "display:none");
+    //               $("#table-clientes-general_wrapper").hide();
+    //             }
+    //             if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
+    //               $("#table-clientes-variacion").attr("style", "");
+    //               $("#table-clientes-variacion_wrapper").show();
+    //               limpiarFiltroDataTable("table-clientes-variacion");
+    //               reloadTableClientesVariacion();
+    //             } else {
+    //               url =
+    //                 base_url + "CargaConsolidada/ContenedorConsolidado/step";
+    //               tableClientesVariacion.show();
+    //               tableClientesVariacion = $(
+    //                 "#table-clientes-variacion"
+    //               ).DataTable({
+    //                 dom:
+    //                   "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+    //                   "<'row'<'col-sm-12'tr>>" +
+    //                   "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+
+
+    //                 buttons: [
+    //                   {
+    //                     extend: "excel",
+    //                     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+    //                     titleAttr: "Excel",
+    //                     exportOptions: {
+    //                       columns: ":visible",
+    //                     },
+    //                     attr: {
+    //                       id: "export-excel-main",
+    //                       class: "hidden",
+    //                     },
+    //                   },
+    //                   {
+    //                     extend: "pdf",
+    //                     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+    //                     titleAttr: "PDF",
+    //                     exportOptions: {
+    //                       columns: ":visible",
+    //                     },
+    //                     attr: {
+    //                       id: "export-pdf-main",
+    //                       class: "hidden",
+    //                     },
+    //                   },
+    //                   {
+    //                     text: "General",
+    //                     action: function () {
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-variacion"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-variacion").attr(
+    //                           "style",
+    //                           "display:none"
+    //                         );
+    //                         $("#table-clientes-variacion_wrapper").hide();
+    //                       }
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-general"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-general_wrapper").show();
+
+    //                         $("#table-clientes-general").attr("style", "");
+    //                         reloadTableClientesGeneral();
+    //                       } else {
+    //                         $("#table-clientes-general").attr("style", "");
+    //                         $("#table-clientes-general_wrapper").show();
+    //                         limpiarFiltroDataTable("table-clientes-general");
+    //                         reloadTableClientesGeneral();
+    //                       }
+    //                       limpiarInputBuscadorPersonalizado("search-table");
+    //                       configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
+    //                     },
+    //                   },
+    //                   {
+    //                     text: "Variación",
+    //                     className: "btn btn-light",
+    //                     action: function () {
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-general"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-general").attr(
+    //                           "style",
+    //                           "display:none"
+    //                         );
+    //                         $("#table-clientes-general_wrapper").hide();
+    //                       }
+    //                       if (
+    //                         $.fn.DataTable.isDataTable(
+    //                           "#table-clientes-variacion"
+    //                         )
+    //                       ) {
+    //                         $("#table-clientes-variacion_wrapper").show();
+    //                         limpiarFiltroDataTable("table-clientes-variacion");
+
+    //                         $("#table-clientes-variacion").attr("style", "");
+    //                         reloadTableClientesVariacion();
+    //                       } else {
+    //                         $("#table-clientes-variacion").attr("style", "");
+    //                         reloadTableClientesVariacion();
+    //                       }
+
+    //                     },
+    //                   },
+    //                 ],
+    //                 columnDefs: [
+    //                   {
+    //                     targets: "no-hidden",
+    //                     visible: false,
+    //                   },
+    //                   {
+    //                     className: "text-center",
+    //                     targets: "no-sort",
+    //                     orderable: false,
+    //                   },
+    //                   {
+    //                     targets: "",
+    //                     orderable: false,
+    //                   },
+    //                   {
+    //                     targets: "sorting_asc",
+    //                     orderable: false,
+    //                   },
+    //                 ],
+    //                 pageLength: 100, // Mostrar 100 elementos por página
+    //                 lengthMenu: [
+    //                   [100, 1000, -1],
+    //                   [100, 1000, "Todos"],
+    //                 ],
+    //                 paging: true,
+    //                 lengthChange: true,
+    //                 searching: true,
+    //                 ordering: true,
+    //                 info: true,
+    //                 autoWidth: false,
+    //                 responsive: false,
+    //                 serverSide: false,
+    //                 pagingType: "full_numbers",
+    //                 oLanguage: {
+    //                   sInfo:
+    //                     "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+    //                   sLengthMenu: "_MENU_",
+    //                   sSearch: "Buscar por: ",
+    //                   sSearchPlaceholder: "",
+    //                   sZeroRecords: "No se encontraron registros",
+    //                   sInfoEmpty: "No hay registros",
+    //                   sLoadingRecords: "Cargando...",
+    //                   sProcessing: "Procesando...",
+    //                   oPaginate: {
+    //                     sFirst: "<<",
+    //                     sLast: ">>",
+    //                     sPrevious: "<",
+    //                     sNext: ">",
+    //                   },
+    //                 },
+    //                 ajax: {
+    //                   url: url,
+    //                   type: "POST",
+    //                   dataType: "JSON",
+    //                   data: function (data) {
+    //                     data.stepIndex = stepIndex;
+    //                     data.idContenedor = idContenedor;
+    //                     data.tipoTabla = "variacion";
+    //                     data.Filtro_Estado = $("#txt-ID_Estado").val();
+    //                     validateListEmbarque(idContenedor);
+    //                   },
+    //                 },
+    //               });
+    //               limpiarFiltroDataTable("table-clientes-variacion");
+    //               reloadTableClientesVariacion();
+    //             }
+    //             limpiarInputBuscadorPersonalizado("search-table");
+    //             configurarBuscador(
+    //               "table-clientes-variacion",
+    //               "search-table",
+    //               "table-clientes-variacion_info"
+    //             );
+    //           },
+    //         }
+    //         : null,
+    //     ]
+    //       //filter null
+    //       .filter(Boolean),
+    //     paging: true,
+    //     lengthChange: true,
+    //     searching: true,
+    //     ordering: true,
+    //     info: true,
+    //     autoWidth: false,
+    //     responsive: false,
+    //     serverSide: false,
+    //     pagingType: "full_numbers",
+    //     columnDefs: [
+    //       {
+    //         targets: "no-hidden",
+    //         visible: false,
+    //       },
+    //       {
+    //         targets: "no-sort",
+    //         orderable: false,
+    //       },
+    //       {
+    //         targets: "",
+    //         orderable: false,
+    //       },
+    //       {
+    //         targets: "sorting_asc",
+    //         orderable: false,
+    //       },
+    //     ],
+    //     pageLength: 100, // Mostrar 100 elementos por página
+    //     lengthMenu: [
+    //       [100, 1000, -1],
+    //       [100, 1000, "Todos"],
+    //     ],
+    //     oLanguage: {
+    //       sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+    //       sLengthMenu: "_MENU_",
+    //       sSearch: "Buscar por: ",
+    //       sSearchPlaceholder: "",
+    //       sZeroRecords: "No se encontraron registros",
+    //       sInfoEmpty: "No hay registros",
+    //       sLoadingRecords: "Cargando...",
+    //       sProcessing: "Procesando...",
+    //       oPaginate: {
+    //         sFirst: "<<",
+    //         sLast: ">>",
+    //         sPrevious: "<",
+    //         sNext: ">",
+    //       },
+    //     },
+    //     ajax: {
+    //       url: url,
+    //       type: "POST",
+    //       dataType: "JSON",
+    //       data: function (data) {
+    //         data.stepIndex = stepIndex;
+    //         data.idContenedor = idContenedor;
+    //         data.tipoTabla = "general";
+    //         data.Filtro_Estado = "0";
+    //       },
+    //     },
+    //   });
+    //   limpiarFiltroDataTable("table-clientes-general");
+    //   reloadTableClientesGeneral();
+    // }
     limpiarInputBuscadorPersonalizado("search-table");
     configurarBuscador(
       "table-clientes-general",
@@ -3525,103 +4041,186 @@ async function viewCotizacionFinal() {
     Cotización Final`);
   spinner.show();
   url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-  if ($.fn.DataTable.isDataTable("#table-cotizacion-final")) {
-    tableCotizacionFinal.ajax.reload();
-  } else {
-    tableCotizacionFinal.show();
+  // Handle tab clicks for final and pagos tables
+  $(".tab-clientes-final").removeClass("active");
+  $(".tab-clientes-final").off("click").click(function () {
+    $(".tab-clientes-final").removeClass("active");
+    $("#table-cotizacion-final_wrapper").hide();
+    $("#table-cotizacion-final-pagos_wrapper").hide();
 
-    tableCotizacionFinal = $("#table-cotizacion-final").DataTable({
-      dom:
-        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+    let table = this.getAttribute("data-table");
+    this.classList.add("active");
 
+    if (table == "general") {
+      // Handle final table
+      $("#table-cotizacion-final").attr("style", "");
+      $("#table-cotizacion-final-pagos").hide();
 
-      buttons: [
-        {
-          extend: "excel",
-          text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-          titleAttr: "Excel",
-          exportOptions: {
-            columns: ":visible",
+      if ($.fn.DataTable.isDataTable("#table-cotizacion-final")) {
+        $("#table-cotizacion-final").show();
+        $("#table-cotizacion-final_wrapper").show();
+        tableCotizacionFinal.ajax.reload();
+      } else {
+        tableCotizacionFinal.show();
+        tableCotizacionFinal = $("#table-cotizacion-final").DataTable({
+          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          buttons: [
+            {
+              extend: "excel",
+              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+              titleAttr: "Excel",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "pdf",
+              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+              titleAttr: "PDF",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "colvis",
+              text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+              titleAttr: "Columnas",
+              exportOptions: { columns: ":visible" }
+            }
+          ],
+          paging: true,
+          lengthChange: true,
+          searching: true,
+          ordering: true,
+          info: true,
+          autoWidth: false,
+          responsive: false,
+          serverSide: false,
+          pagingType: "full_numbers",
+          oLanguage: {
+            sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+            sLengthMenu: "_MENU_",
+            sSearch: "Buscar por: ",
+            sSearchPlaceholder: "",
+            sZeroRecords: "No se encontraron registros",
+            sInfoEmpty: "No hay registros",
+            sLoadingRecords: "Cargando...",
+            sProcessing: "Procesando...",
+            oPaginate: {
+              sFirst: "<<",
+              sLast: ">>",
+              sPrevious: "<",
+              sNext: ">"
+            }
           },
-        },
-        {
-          extend: "pdf",
-          text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-          titleAttr: "PDF",
-          exportOptions: {
-            columns: ":visible",
+          columnDefs: [
+            { targets: "no-hidden", visible: false },
+            { className: "text-center", targets: "no-sort", orderable: false },
+            { targets: "", orderable: false }
+          ],
+          pageLength: 100,
+          lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
+          ajax: {
+            url: url,
+            type: "POST",
+            dataType: "JSON",
+            data: function (data) {
+              data.stepIndex = stepIndex;
+              data.idContenedor = idContenedor;
+              data.tipoTabla = "general";
+            }
           },
-        },
-        {
-          extend: "colvis",
-          text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-          titleAttr: "Columnas",
-          exportOptions: {
-            columns: ":visible",
+          initComplete: function (settings, json) {
+            spinner.hide();
+          }
+        });
+      }
+    }
+    else if (table == "pagos") {
+      // Handle pagos table
+      $("#table-cotizacion-final-pagos").attr("style", "");
+      $("#table-cotizacion-final").hide();
+
+      if ($.fn.DataTable.isDataTable("#table-cotizacion-final-pagos")) {
+        $("#table-cotizacion-final-pagos").show();
+        $("#table-cotizacion-final-pagos_wrapper").show();
+        tableCotizacionFinalPagos.ajax.reload();
+      } else {
+        tableCotizacionFinalPagos.show();
+        tableCotizacionFinalPagos = $("#table-cotizacion-final-pagos").DataTable({
+          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+          buttons: [
+            {
+              extend: "excel",
+              text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+              titleAttr: "Excel",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "pdf",
+              text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
+              titleAttr: "PDF",
+              exportOptions: { columns: ":visible" }
+            },
+            {
+              extend: "colvis",
+              text: '<i class="fa fa-ellipsis-v"></i> Columnas',
+              titleAttr: "Columnas",
+              exportOptions: { columns: ":visible" }
+            }
+          ],
+          paging: true,
+          lengthChange: true,
+          searching: true,
+          ordering: true,
+          info: true,
+          autoWidth: false,
+          responsive: false,
+          serverSide: false,
+          pagingType: "full_numbers",
+          oLanguage: {
+            sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+            sLengthMenu: "_MENU_",
+            sSearch: "Buscar por: ",
+            sSearchPlaceholder: "",
+            sZeroRecords: "No se encontraron registros",
+            sInfoEmpty: "No hay registros",
+            sLoadingRecords: "Cargando...",
+            sProcessing: "Procesando...",
+            oPaginate: {
+              sFirst: "<<",
+              sLast: ">>",
+              sPrevious: "<",
+              sNext: ">"
+            }
           },
-        },
-      ],
-      paging: true,
-      lengthChange: true,
-      searching: true,
-      ordering: true,
-      info: true,
-      autoWidth: false,
-      responsive: false,
-      serverSide: false,
-      pagingType: "full_numbers",
-      oLanguage: {
-        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-        sLengthMenu: "_MENU_",
-        sSearch: "Buscar por: ",
-        sSearchPlaceholder: "",
-        sZeroRecords: "No se encontraron registros",
-        sInfoEmpty: "No hay registros",
-        sLoadingRecords: "Cargando...",
-        sProcessing: "Procesando...",
-        oPaginate: {
-          sFirst: "<<",
-          sLast: ">>",
-          sPrevious: "<",
-          sNext: ">",
-        },
-      },
-      columnDefs: [
-        {
-          targets: "no-hidden",
-          visible: false,
-        },
-        {
-          className: "text-center",
-          targets: "no-sort",
-          orderable: false,
-        },
-        {
-          targets: "",
-          orderable: false,
-        },
-      ],
-      pageLength: 100, // Mostrar 100 elementos por página
-      lengthMenu: [
-        [100, 1000, -1],
-        [100, 1000, "Todos"],
-      ],
-      ajax: {
-        url: url,
-        type: "POST",
-        dataType: "JSON",
-        data: function (data) {
-          data.stepIndex = stepIndex;
-          data.idContenedor = idContenedor;
-        },
-      },
-      initComplete: function (settings, json) {
-        spinner.hide();
-      },
-    });
-  }
+          columnDefs: [
+            { targets: "no-hidden", visible: false },
+            { className: "text-center", targets: "no-sort", orderable: false },
+            { targets: "", orderable: false }
+          ],
+          pageLength: 100,
+          lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
+          ajax: {
+            url: url,
+            type: "POST",
+            dataType: "JSON",
+            data: function (data) {
+              data.stepIndex = stepIndex;
+              data.idContenedor = idContenedor;
+              data.tipoTabla = "pagos"; // Add this to distinguish the data request
+            }
+          },
+          initComplete: function (settings, json) {
+            spinner.hide();
+          }
+        });
+      }
+    }
+  });
+
+  // Activate first tab
+  $(".tab-clientes-final").first().click();
 }
 async function deleteDocumentacionFolder(id) {
   Swal.fire({
@@ -3758,6 +4357,11 @@ async function reloadTableClientesVariacion() {
   await getClientesHeader();
   enableHorizontalAutoScrollForAllTables();
 }
+async function reloadTableClientesPagos() {
+  tableClientesPagos.ajax.reload();
+  await getClientesHeader();
+  enableHorizontalAutoScrollForAllTables();
+}
 
 async function reloadTableCotizacionEmbarque() {
   tableCotizacionEmbarque.ajax.reload();
@@ -3781,6 +4385,7 @@ async function getTableCotizacionEmbarqueHeaders() {
   $("#txt-CBM_Total_China").html(result.cbm_total_china);
   $("#txt-CBM_Total_Pendiente").html(result.cbm_total_pendiente);
   $("#txt-CBM_Total_Logistica").html(result.total_logistica);
+  $("#txt-CBM_Total_Pagado").html(result.total_logistica_pagado);
   //if result.lista_embarque_url is not null add button to download else file input with button to upload remember remove and add event listener
   if (result.lista_embarque_url) {
     $("#packing-list-container").empty();
@@ -4733,7 +5338,30 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
 
       });
     } else {
-      // Vista para otros usuarios (como en la imagen)
+      let aditionalFiles = ``;
+      filteredFilesF.forEach((file) => {
+        if (file.file_url) {
+          aditionalFiles += `<div>
+              <p>${file.folder_name}</p>
+              <div class="flex align-items-center py-2 gap-5">
+                ${file.file_url
+              ? `
+                    <div class="file-iconic">${getIconByType(file.file_url.split('.').pop().toLowerCase())}</div>
+                    <div>
+                      <span class="file-name">${decodeURIComponent(file.file_url.split('_').pop())}</span>
+                    </div>
+                    <button class="btn-sm download-btn"
+                    data-url="${file.file_url}"
+                    >
+                    <i class="fas fa-download"></i>
+                    </a>`
+              : `
+                    <div class="py-2">No hay archivo disponible</div>
+                  `}
+              </div>
+            </div>`;
+        }
+      });
       $(".documentos-clientes-content").append(`
       <div class="flex col-4 h-25">
         <div class="bg-white rounded-lg shadow-md w-100">
@@ -4756,7 +5384,10 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     <div>
                       <span class="file-name">${decodeURIComponent(facturaComercial.split('_').pop())}</span>
                     </div>
-                  `
+                    <button class="btn-sm download-btn" data-url="${facturaComercial}">
+                    <i class="fas fa-download"></i>
+                    </a>`
+
           : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
@@ -4772,15 +5403,37 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                     <div>
                       <span class="file-name">${decodeURIComponent(excelConfirmacion.split('_').pop())}</span>
                     </div>
-                  `
+                    <button class="btn-sm download-btn"
+                    data-url="${excelConfirmacion}"
+                    >
+                    <i class="fas fa-download"></i>
+                    </a>`
           : `
                     <div class="py-2">No hay archivo disponible</div>
                   `}
               </div>
             </div>
-            
             <div>
-
+              <p>Packing List</p>
+              <div class="flex align-items-center py-2 gap-5">
+                ${packingList
+          ? `
+                    <div class="file-iconic">${getIconByType(packingList.split('.').pop().toLowerCase())}</div>
+                    <div>
+                      <span class="file-name">${decodeURIComponent(packingList.split('_').pop())}</span>
+                    </div>
+                    <button class="btn-sm download-btn"
+                    data-url="${packingList}"
+                    >
+                    <i class="fas fa-download"></i>
+                    </a>`
+          : `
+                    <div class="py-2">No hay archivo disponible</div>
+                  `}
+              </div>
+            </div>
+            <div>
+                ${aditionalFiles}
             </div>
           </div>
         </div>
@@ -4824,6 +5477,12 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
         </div>
       </div>
     `);
+      $(".download-btn").off("click").on("click", function () {
+        const url = $(this).data("url");
+        if (url) {
+          window.open(url, "_blank");
+        }
+      });
       filteredFiles.forEach((file) => {
         addFileToList(file, null, 'file-lista-documentacion-documentacion', true)
       })
@@ -5095,18 +5754,18 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
       setupSingleFileUpload(
         "single-file-upload-factura",
         "file-input-factura",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg","pdf"]
+        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg", "pdf"]
       );
     }
     if (!excelConfirmacion) {
       setupSingleFileUpload(
         "single-file-upload-confirmacion",
         "file-input-confirmacion",
-        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg","pdf"]
+        ["xlsx", "xls", "csv", "xlsb", "xlsm", "jpg", "png", "jpeg", "pdf"]
       );
     }
     if (!packingList) {
-      setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg','pdf']);
+      setupSingleFileUpload('single-file-upload-packing', 'file-input-packing', ['xlsx', 'xls', 'csv', 'xlsb', 'xlsm', 'jpg', 'png', 'jpeg', 'pdf']);
     }
     $("#file-input-factura").on("change", function () {
       shouldSaveDocumentacion = true;
@@ -5397,13 +6056,16 @@ $(document).ready(async function () {
   cotizacionContainer.hide();
   tableCotizacion = $("#table-cotizacion-prospectos");
   tableCotizacionEmbarque = $("#table-cotizacion-embarque");
+  tableCotizacionPagos = $("#table-cotizacion-pagos");
   tableCotizacionEmbarque.hide();
   clientesContainer = $("#clientes-container");
   clientesContainer.hide();
   tableClientesGeneral = $("#table-clientes-general");
   tableClientesVariacion = $("#table-clientes-variacion");
+  tableClientesPagos = $("#table-clientes-pagos");
   tableClientesGeneral.hide();
   tableClientesVariacion.hide();
+  tableClientesPagos.hide();
   clientesDocumentacionContainer = $("#clientes-documentation-container");
   clientesDocumentacionContainer.hide();
   documentationContainer = $("#documentation-container");
@@ -5419,6 +6081,7 @@ $(document).ready(async function () {
   cotizacionFinalContainer.hide();
   tableCotizacionFinal = $("#table-cotizacion-final");
   tableCotizacionFinal.hide();
+  tableCotizacionFinalPagos = $("#table-cotizacion-final-pagos");
   facturaGuiaContainer = $("#factura-guia-container");
   facturaGuiaContainer.hide();
   tableFacturaGuia = $("#table-factura-guia");
@@ -5428,6 +6091,8 @@ $(document).ready(async function () {
   documentacionDocumentacionContainer = $(
     "#documentacion-documentacion-container"
   );
+  tableCotizacionTrackingPagos = $("#table-cotizacion-tracking-pagos");
+  tableCotizacionTrackingPagos.hide();
   documentacionDocumentacionContainer.hide();
   documentacionAduanaContainer = $("#documentacion-aduana-container");
   documentacionAduanaContainer.hide();
@@ -5839,8 +6504,6 @@ $(document).ready(async function () {
     }
     isMobile.addEventListener("change", handleRowClickByDevice);
     handleRowClickByDevice();
-
-
   }
   //if current windows route includes listarCompletados hide .filter-contenedor
 

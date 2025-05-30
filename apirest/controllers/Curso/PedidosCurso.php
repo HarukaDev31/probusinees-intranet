@@ -32,9 +32,19 @@ class PedidosCurso extends CI_Controller {
 
 	public function ajax_list(){
 		$sMethod = $this->input->post('sMethod');
-		$arrData = $this->PedidosCursoModel->get_datatables();
+		$arrData=[];
+		$index = 1;
+		$tipoTabla = $this->input->post('tipoTabla');
+		if($tipoTabla=="alumnos"){
+			$arrData = $this->PedidosCursoModel->get_datatables();
+
+		}else{
+			$arrData = $this->PedidosCursoModel->getPagosCurso();
+			log_message('error', 'arrData: ' . print_r($arrData, true));
+		}
         $data = array();
-        foreach ($arrData as $row) {
+        if($tipoTabla=="alumnos"){
+			foreach ($arrData as $row) {
 			$rows = array();
 
             $rows[] = $row->ID_Pedido_Curso;
@@ -80,6 +90,33 @@ class PedidosCurso extends CI_Controller {
 
             $data[] = $rows;
         }
+		}else{
+				foreach ($arrData as $row) {
+					$subdata   = array();
+					$subdata[] =  $row->ID_Pedido_Curso;
+					$subdata[] = allTypeDate($row->Fe_Registro, '-', 0);
+					$subdata[] = $row->No_Entidad ; 
+					$subdata[] = $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad;
+					$subdata[] = $row->Nu_Celular_Entidad;
+					$subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" readonly/>';	//importe		
+					$subdata[] = "S/".round($row->total_pagos, 2);
+					//if pagos_count is minor than 4 add button plus to add new payment
+					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
+					
+					$divAcciones .='<div class="d-flex"  onclick="addPagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+					
+					if($row->pagos_count > 0) {
+						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
+						<i class="fas fa-eye" style="cursor:pointer;"></i>
+						</div>';
+					}
+					$divAcciones .=  '</div>';
+					$subdata[] = $divAcciones;
+					$data[]= $subdata;
+
+				}
+
+		}
         $output = array(
 	        'draw' => $this->input->post('draw'),
 	        'recordsTotal' => $this->PedidosCursoModel->count_all(),
@@ -284,6 +321,19 @@ class PedidosCurso extends CI_Controller {
 		$this->load->model('PedidosCursoModel');
 		$result = $this->PedidosCursoModel->guardarCampanas($post);
 		echo json_encode($result);
+	}
+
+	public function saveClientePagosCurso(){
+		$voucher = $_FILES['voucher'];
+		$idPedido= $this->input->post('idPedido');
+		$amount = $this->input->post('monto');
+		$fecha= $this->input->post('fecha');
+		$banco= $this->input->post('banco');
+		$arrResponse = $this->PedidosCursoModel->saveClientePagosCurso($voucher, $idPedido,$amount, $fecha, $banco);
+		echo json_encode([
+			"status" => $arrResponse['status'],
+			"message" => $arrResponse['message']
+		]);
 	}
 
 }

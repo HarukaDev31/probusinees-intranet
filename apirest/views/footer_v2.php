@@ -149,6 +149,10 @@
 <script src="<?php echo base_url() . 'dist_v2/js/AgenteCompra/pedidos_pagados.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<?php if (isset($js_contenedor_consolidado_crons) && $js_contenedor_consolidado_crons==true) : ?>
+  <script src="<?php echo base_url() . 'dist_v2/js/CargaConsolidada/js_contenedor_consolidado_crons.js?ver=' . $iControlVersionDashboard; ?>"></script>
+
+<?php endif; ?>
 <?php if (isset($js_contenedor_consolidadado) && $js_contenedor_consolidadado==true) : ?>
 <!-- datepicker -->
 
