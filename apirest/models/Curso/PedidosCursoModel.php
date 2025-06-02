@@ -102,11 +102,18 @@ class PedidosCursoModel extends CI_Model{
 	}
     
     function get_datatables(){
-        $this->_get_datatables_query();
+       try{
+		 $this->_get_datatables_query();
         if($_POST['length'] != -1)
         $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
+		if($this->db->error()['code'] != 0){
+			log_message('error', 'Error en get_datatables: ' . $this->db->error()['message']);
+		}
         return $query->result();
+	   }catch(Exception $e){
+			log_message('error', 'Error en get_datatables: ' . $e->getMessage());
+	   }
     }
     
     function count_filtered(){
