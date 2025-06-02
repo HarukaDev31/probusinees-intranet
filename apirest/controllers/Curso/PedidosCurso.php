@@ -57,7 +57,6 @@ class PedidosCurso extends CI_Controller
         if($tipoTabla=="alumnos"){
 			foreach ($arrData as $row) {
 			$rows = array();
-        foreach ($arrData as $row) {
             $rows = [];
 
             $rows[] = $row->ID_Pedido_Curso;
@@ -111,7 +110,7 @@ class PedidosCurso extends CI_Controller
             $rows[] = $divAcciones;
 
             $data[] = $rows;
-        }
+        
 			}
 		}else{
 				foreach ($arrData as $row) {
