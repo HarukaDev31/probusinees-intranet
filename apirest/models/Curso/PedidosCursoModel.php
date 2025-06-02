@@ -42,7 +42,7 @@ class PedidosCursoModel extends CI_Model{
 		if(!empty($this->input->post('estado_pago')))
 			$this->db->where( $this->table . ".Nu_Estado=", $this->input->post('estado_pago'));
 
-		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
+		// $this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
 
 		if(isset($this->order)) {
 			$order = $this->order;
