@@ -39,10 +39,9 @@ class PedidosCursoModel extends CI_Model{
     	->join($this->table_departamento, $this->table_departamento . '.ID_Departamento = CLI.ID_Departamento', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
 
-		if(!empty($this->input->post('estado_pago')))
+		if(!empty($this->input->post('estado_pago'))){
 			$this->db->where( $this->table . ".Nu_Estado=", $this->input->post('estado_pago'));
-
-		// $this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
+		}
 
 		if(isset($this->order)) {
 			$order = $this->order;
