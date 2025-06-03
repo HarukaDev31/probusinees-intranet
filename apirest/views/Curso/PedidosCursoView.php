@@ -35,7 +35,7 @@
                                     <div style="width: 200px;">
                                         <input type="text" id="txt-Fe_Inicio_Carga"
                                             class="form-control text-center input-date input-report required"
-                                            value="<?php echo dateNow('month_date_ini_report'); ?>">
+                                            value="<?php echo dateNow('fecha_actual_dmy'); ?>">
                                         <span class="help-block text-danger" id="error"></span>
                                     </div>
                                 </div>
