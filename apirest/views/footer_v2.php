@@ -57,12 +57,19 @@
 
 <!-- JS INTERNO DE EMPRESA -->
 <!-- Inicio -->
-<?php if (isset($js_inicio) && $js_inicio==true) : ?>
+<?php if (isset($js_administracion) && $js_inicio==true) : ?>
 <!-- datepicker -->
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
 <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
 <script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/inicio.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+<?php if (isset($js_administracion) && $js_administracion==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/Administracion\js_administracion.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
 <?php if (isset($js_cliente) && $js_cliente==true) : ?>

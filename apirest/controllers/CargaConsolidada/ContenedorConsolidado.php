@@ -174,8 +174,6 @@ class ContenedorConsolidado extends CI_Controller
 	}
 	public function indexCompletados()
 	{
-
-
 		$arrData = $this->ContenedorConsolidadoModel->indexCompletados();
 		$data    = [];
 		usort($arrData, function ($a, $b) {
