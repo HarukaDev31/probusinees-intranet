@@ -14,6 +14,7 @@ class PedidosCursoModel extends CI_Model{
 	var $table_departamento = 'departamento';
 	var $table_provincia = 'provincia';
 	var $table_distrito = 'distrito';
+	var $table_tipo_curso = 'tipo_curso';
 	var $table_tipo_documento_identidad = 'tipo_documento_identidad';
 	var $table_usuario = 'usuario';
 	var $table_pais = 'pais';
@@ -27,7 +28,8 @@ class PedidosCursoModel extends CI_Model{
 	}
 	
 	public function _get_datatables_query(){
-        $this->db->select($this->table . '.*, CLI.Fe_Nacimiento, CLI.Nu_Como_Entero_Empresa, CLI.No_Otros_Como_Entero_Empresa, No_Distrito, No_Provincia, No_Departamento, TDI.No_Tipo_Documento_Identidad_Breve, P.No_Pais, CLI.Nu_Tipo_Sexo, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password')
+		try{
+			     $this->db->select($this->table . '.*, CLI.Fe_Nacimiento, CLI.Nu_Como_Entero_Empresa, CLI.No_Otros_Como_Entero_Empresa, No_Distrito, No_Provincia, No_Departamento, TDI.No_Tipo_Documento_Identidad_Breve, P.No_Pais, CLI.Nu_Tipo_Sexo, CLI.No_Entidad, CLI.Nu_Documento_Identidad, CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad, CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password')
 		->from($this->table)
     	->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
     	->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
@@ -39,14 +41,13 @@ class PedidosCursoModel extends CI_Model{
     	->join($this->table_departamento, $this->table_departamento . '.ID_Departamento = CLI.ID_Departamento', 'left')
     	->where($this->table . '.ID_Empresa', $this->user->ID_Empresa);
 
-		if(!empty($this->input->post('estado_pago')))
-			$this->db->where( $this->table . ".Nu_Estado=", $this->input->post('estado_pago'));
-
-		$this->db->where("Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
 
 		if(isset($this->order)) {
 			$order = $this->order;
 			$this->db->order_by(key($order), $order[key($order)]);
+		}
+		}catch(Exception $e){
+			log_message('error', 'Error en _get_datatables_query: ' . $e->getMessage());
 		}
     }
 
@@ -68,21 +69,25 @@ class PedidosCursoModel extends CI_Model{
 			D.No_Departamento as departamento,
 			PR.No_Provincia as provincia,
 			DI.No_Distrito as distrito,
+			USR.ID_Usuario as id_usuario, 
 			USR.No_Usuario as usuario_moodle,
-			USR.No_Password as password_moodle
+			USR.No_Password as password_moodle,
 			PC.ID_Campana,
+			PC.tipo_curso as tipo_curso,
+			PC.Nu_Estado as Nu_Estado, 
+			PC.Nu_Estado_Usuario_Externo as Nu_Estado_Usuario_Externo,
+			PC.ID_Pedido_Curso as id_pedido_curso,
 			MONTH(CC.Fe_Inicio) as mes_numero,
-			CC.No_Campana as nombre_campana
 		')
-		->from($this->table)
-		->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
-		->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
+		->from($this->table . ' AS PC')
+		->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = PC.ID_Entidad', 'join')
+		->join($this->table_pais . ' AS P', 'P.ID_Pais = PC.ID_Pais', 'join')
 		->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'left')
 		->join($this->table_distrito . ' AS DI', 'DI.ID_Distrito = CLI.ID_Distrito', 'left')
 		->join($this->table_provincia . ' AS PR', 'PR.ID_Provincia = CLI.ID_Provincia', 'left')
 		->join($this->table_departamento . ' AS D', 'D.ID_Departamento = CLI.ID_Departamento', 'left')
    		->join('campana_curso AS CC', 'CC.ID_Campana = PC.ID_Campana', 'left')
-		->where($this->table . '.ID_Pedido_Curso', $id_pedido);
+		->where('PC.ID_Pedido_Curso', $id_pedido);
 
 		$query = $this->db->get();
 		$data = $query->row_array();
@@ -103,11 +108,18 @@ class PedidosCursoModel extends CI_Model{
 	}
     
     function get_datatables(){
-        $this->_get_datatables_query();
+       try{
+		 $this->_get_datatables_query();
         if($_POST['length'] != -1)
         $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
+		if($this->db->error()['code'] != 0){
+			log_message('error', 'Error en get_datatables: ' . $this->db->error()['message']);
+		}
         return $query->result();
+	   }catch(Exception $e){
+			log_message('error', 'Error en get_datatables: ' . $e->getMessage());
+	   }
     }
     
     function count_filtered(){
@@ -369,10 +381,9 @@ class PedidosCursoModel extends CI_Model{
 		->join($this->table_departamento, $this->table_departamento . '.ID_Departamento = CLI.ID_Departamento', 'left')
 		->where('CC.ID_Empresa', $this->user->ID_Empresa);  // Update reference
 
-		if(!empty($this->input->post('estado_pago'))) 
+		if(!empty($this->input->post('estado_pago'))) {
 			$this->db->where("CC.Nu_Estado=", $this->input->post('estado_pago'));  // Update reference
-
-		$this->db->where("CC.Fe_Emision BETWEEN '" . $this->input->post('Filtro_Fe_Inicio') . " 00:00:00' AND '" . $this->input->post('Filtro_Fe_Fin') . " 23:59:59'");
+}
 
 		if(isset($this->order)) { 
 			$order = $this->order; 
