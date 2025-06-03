@@ -169,7 +169,7 @@ $(function () {
             'data': function (data) {
               data.sMethod = $('#hidden-sMethod').val(),
                 data.estado_pago = $('#cbo-filtro-estado_pago').val(),
-                data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/'),
+                data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
                 data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "alumnos";
             },
@@ -283,7 +283,7 @@ $(function () {
             data: function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/'),
+              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
                 data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "pagos";
 

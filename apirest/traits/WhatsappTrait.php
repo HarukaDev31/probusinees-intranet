@@ -222,7 +222,15 @@
                 'sleep' => $sleep
             ]);
         }
-    
+        public function sendMessageVentas($message, $phoneNumberId = null,$sleep=0): array {
+            $phoneNumberId= $phoneNumberId ? $phoneNumberId : $this->phoneNumberId;
+
+            return $this->_callApi('/message-ventas', [
+                'message' => $message,
+                'phoneNumberId' => $phoneNumberId,
+                'sleep' => $sleep
+            ]);
+        }
         public function sendMedia($filePath, $mimeType = null, $message = null, $phoneNumberId = null,$sleep=0) {
             $phoneNumberId= $phoneNumberId ? $phoneNumberId : $this->phoneNumberId;
 
