@@ -398,7 +398,7 @@ class PedidosCurso extends CI_Controller
                 $message .= "Contraseña: {$this->encryption->decrypt($result->No_Password)}\n\n";
                 $message .= "Puedes acceder a tu cuenta en el siguiente enlace: https://probusiness.com.pe/cursos\n\n";
                 $message .= "Saludos,\nEl equipo de ProBusiness";
-                $this->sendMessage($message, $telefono);
+                $this->sendMessageVentas($message, $telefono);
             } else {
                 $response = [
                     'status'  => 'error',
