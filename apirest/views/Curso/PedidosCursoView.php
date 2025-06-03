@@ -43,6 +43,7 @@
                                     <div class="d-flex" style="width:60%">Fecha Fin</div>
                                     <div style="width: 200px;">
                                         <input type="text" id="txt-Fe_Fin_Carga"
+                                        value="<?php echo date('Y-m-t'); ?>"
                                             class="form-control input-date input-report required">
                                         <span class="help-block text-danger" id="error"></span>
                                     </div>
