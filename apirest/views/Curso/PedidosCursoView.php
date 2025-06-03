@@ -51,12 +51,14 @@
                                 <div class="d-flex align-items-center p-2" style="width:300px;">
                                     <div class="d-flex" style="width:60%">Pago</div>
                                     <div style="width: 200px;">
-                                        <select id="txt-ID_Estado_Cotizacion" name="ID_Estado"
+                                        <select id="cbo-filtro-estado_pago" name="ID_Estado"
                                             class="form-control input-estado">
                                             <option value="0" selected>Todos</option>
-                                            <option value="PENDIENTE">PENDIENTE</option>
-                                            <option value="RECIBIENDO">RECIBIENDO</option>
-                                            <option value="COMPLETADO">COMPLETADO</option>
+                                            <option value="pendiente">PENDIENTE</option>
+                                            <option value="adelanto">ADELANTO</option>
+                                            <option value="pagado">PAGADO</option>
+                                            <option value="sobrepagado">SOBREPAGADO</option>
+                                            <option value="constancia">CONSTANCIA</option>
                                         </select>
                                     </div>
                                 </div>
@@ -112,223 +114,221 @@
                 </div>
             </div>
         </div>
-</section>
-<?php //array_debug($this->user); ?>
-<section class="content" id="section-listar-pedidos">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
-                    value="<?php echo $this->router->method; ?>">
+    </section>
+    <section class="content" id="section-listar-pedidos">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
+                        value="<?php echo $this->router->method; ?>">
 
-                <div class="col-6 col-sm-3 hidden">
-                    <label>F. Inicio</label>
-                    <div class="form-group">
-                        <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
-                            value="<?php echo dateNow('month_date_ini_report'); ?>">
-                        <span class="help-block text-danger" id="error"></span>
+                    <div class="col-6 col-sm-3 hidden">
+                        <label>F. Inicio</label>
+                        <div class="form-group">
+                            <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
+                                value="<?php echo dateNow('month_date_ini_report'); ?>">
+                            <span class="help-block text-danger" id="error"></span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6 col-sm-3 hidden">
-                    <label>F. Fin</label>
-                    <div class="form-group">
-                        <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                            value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                        <span class="help-block text-danger" id="error"></span>
-                    </div>
-                </div>
-
-
-                <div class="col-6 col-sm-3 hidden">
-                    <label>F. Inicio</label>
-                    <div class="form-group">
-                        <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
-                            value="<?php echo dateNow('month_date_ini_report'); ?>">
-                        <span class="help-block text-danger" id="error"></span>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-3 hidden">
-                    <label>F. Fin</label>
-                    <div class="form-group">
-                        <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                            value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                        <span class="help-block text-danger" id="error"></span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div data-table="alumnos"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
-                        Alumnos
-                    </div>
-                    <div data-table="pagos"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
-                        Pagos
+                    <div class="col-6 col-sm-3 hidden">
+                        <label>F. Fin</label>
+                        <div class="form-group">
+                            <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
+                                value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                            <span class="help-block text-danger" id="error"></span>
+                        </div>
                     </div>
 
-                </div>
-                <div class="table-responsive div-Listar">
-                    <table id="table-curso-pedidos" class="table table-hover dataTable no-footer hidden">
-                        <thead class="thead-default">
-                            <tr>
-                                <th>Pedido</th>
-                                <th>Fecha</th>
-                                <th>Cliente</th>
-                                <th>Compartir</th>
 
-                                <th>Usuario</th>
-                                <th>Moodle</th>
-                                <th>Ref. Pago</th>
-                                <th>Importe</th>
-                                <th>Estados</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                    </table>
-                    <table id="table-curso-pagos" class="table table-hover dataTable no-footer hidden">
-                        <thead class="thead-default">
-                            <tr>
-                                <th>N.</th>
-                                <th>Fecha</th>
-                                <th>Nombre</th>
-                                <th>DNI/RUC</th>
-                                <th>WhatsApp</th>
-                                <th>Precio</th>
-                                <th>Pagado</th>
-                                <th>Adelanto</th>
-                            </tr>
-                        </thead>
-                    </table>
+                    <div class="col-6 col-sm-3 hidden">
+                        <label>F. Inicio</label>
+                        <div class="form-group">
+                            <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
+                                value="<?php echo dateNow('month_date_ini_report'); ?>">
+                            <span class="help-block text-danger" id="error"></span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-3 hidden">
+                        <label>F. Fin</label>
+                        <div class="form-group">
+                            <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
+                                value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                            <span class="help-block text-danger" id="error"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="flex col-xl-6">
+                            <div data-table="alumnos"
+                                class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
+                                Alumnos
+                            </div>
+                            <div data-table="pagos"
+                                class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
+                                Pagos
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-xl-2 d-flex align-items-center">
+                            Total Importe:
+                            <span id="span-total-importe" class=" pl-2 font-weight-bold"></span>
+                        </div>    
+                    </div>
+                    <div class="table-responsive div-Listar">
+                        <table id="table-curso-pedidos" class="table table-hover dataTable no-footer hidden">
+                            <thead class="thead-default">
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Curso</th>
+                                    <th>Mes</th>
+                                    <th>Usuario</th>
+                                    <th>Importe</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <table id="table-curso-pagos" class="table table-hover dataTable no-footer hidden">
+                            <thead class="thead-default">
+                                <tr>
+                                    <th>N.</th>
+                                    <th>Fecha</th>
+                                    <th>Nombre</th>
+                                    <th>DNI/RUC</th>
+                                    <th>WhatsApp</th>
+                                    <th>Precio</th>
+                                    <th>Pagado</th>
+                                    <th>Adelanto</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
                 </div>
 
             </div>
-
+            <!-- /.row -->
         </div>
-        <!-- /.row -->
-    </div>
-    <!-- /.container-fluid -->
-</section>
-<!-- Section para mostrar datos del cliente de un pedido de curso -->
-<section id="section-datos-cliente" class="container my-4" style="display:none;">
-    <div class="card shadow">
-        <div class="card-header text-white bg-secondary d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fa fa-user"></i> Datos del Cliente</h5>
-        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <section id="section-campanas-cursos" class="container my-4 none hidden">
         <div class="card-body">
-            <form id="form-datos-cliente" autocomplete="off">
-                <input type="hidden" name="ID_Entidad" id="cliente-id" value="">
-                <div class="row">
-                    <!-- Columna izquierda -->
-                    <div class="col-md-6">
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Nombre y apellidos:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-nombres" name="No_Entidad"
-                                readonly>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Dni / ID:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-dni"
-                                name="Nu_Documento_Identidad" readonly>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Correo:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-correo"
-                                name="Txt_Email_Entidad" readonly>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">WhatsApp:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-whatsapp"
-                                name="Nu_Celular_Entidad" readonly>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Fecha de nacimiento:</label>
-                            <input type="date" class="form-control cliente-input" id="cliente-edad" name="Fe_Nacimiento"
-                                readonly>
-                        </div>
-                    </div>
-                    <!-- Columna derecha -->
-                    <div class="col-md-6">
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Sexo:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-sexo" name="Nu_Tipo_Sexo"
-                                readonly>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Red social:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-redsocial"
-                                name="Nu_Como_Entero_Empresa" readonly>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">País:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
-                            <select id="select-pais" class="hidden form-control cliente-input" name="ID_Pais"></select>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Departamento:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-departamento" readonly>
-                            <select id="select-departamento" class="hidden form-control cliente-input"
-                                name="ID_Departamento"></select>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Provincia:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-provincia" readonly>
-                            <select id="select-provincia" class="hidden form-control cliente-input"
-                                name="ID_Provincia"></select>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Distrito:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-distrito" readonly>
-                            <select id="select-distrito" class="hidden form-control cliente-input"
-                                name="ID_Distrito"></select>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <div id="acceso-aula-virtual" class="row mt-4">
-                    <div class="col-md-12">
-                        <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Usuario:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" readonly>
-                        </div>
-                        <div class="form-group flex align-items-center">
-                            <label class="w-[40%] mb-0">Contraseña:</label>
-                            <input type="text" class="form-control cliente-input" id="cliente-moodle-password" readonly>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            <div class="table-responsive">
+                <table id="table-campanas" class="table table-hover table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha de Creación</th>
+                            <th>Nombre de Campaña</th>
+                            <th>Fecha de Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Cantidad de Personas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    </form>
-    </div>
-    </div>
-</section>
-<!-- Section para campañas de cursos -->
-<section id="section-campanas-cursos" class="container my-4 none hidden">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="table-campanas" class="table table-hover table-bordered">
-                <thead class="thead-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Fecha de Creación</th>
-                        <th>Nombre de Campaña</th>
-                        <th>Fecha de Inicio</th>
-                        <th>Fecha Fin</th>
-                        <th>Cantidad de Personas</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
-</section>
-<!-- /.content -->
+    </section>
+    <section id="section-datos-cliente" class="container my-4" style="display:none;">
+        <div class="card shadow">
+            <div class="card-header text-white bg-secondary d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa fa-user"></i> Datos del Cliente</h5>
+            </div>
+            <div class="card-body">
+                <form id="form-datos-cliente" autocomplete="off">
+                    <input type="hidden" name="ID_Entidad" id="cliente-id" value="">
+                    <div class="row">
+                        <!-- Columna izquierda -->
+                        <div class="col-md-6">
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Nombre y apellidos:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-nombres" name="No_Entidad"
+                                    readonly>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Dni / ID:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-dni"
+                                    name="Nu_Documento_Identidad" readonly>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Correo:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-correo"
+                                    name="Txt_Email_Entidad" readonly>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">WhatsApp:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-whatsapp"
+                                    name="Nu_Celular_Entidad" readonly>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Fecha de nacimiento:</label>
+                                <input type="date" class="form-control cliente-input" id="cliente-edad" name="Fe_Nacimiento"
+                                    readonly>
+                            </div>
+                        </div>
+                        <!-- Columna derecha -->
+                        <div class="col-md-6">
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Sexo:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-sexo" name="Nu_Tipo_Sexo"
+                                    readonly>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Red social:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-redsocial"
+                                    name="Nu_Como_Entero_Empresa" readonly>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">País:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
+                                <select id="select-pais" class="hidden form-control cliente-input" name="ID_Pais"></select>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Departamento:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-departamento" readonly>
+                                <select id="select-departamento" class="hidden form-control cliente-input"
+                                    name="ID_Departamento"></select>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Provincia:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-provincia" readonly>
+                                <select id="select-provincia" class="hidden form-control cliente-input"
+                                    name="ID_Provincia"></select>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Distrito:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-distrito" readonly>
+                                <select id="select-distrito" class="hidden form-control cliente-input"
+                                    name="ID_Distrito"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div id="acceso-aula-virtual" class="row mt-4">
+                        <div class="col-md-12">
+                            <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Usuario:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" readonly>
+                            </div>
+                            <div class="form-group flex align-items-center">
+                                <label class="w-[40%] mb-0">Contraseña:</label>
+                                <input type="text" class="form-control cliente-input" id="cliente-moodle-password" readonly>
+                            </div>
+                        </div>
+                        <div id="contenedor-boton-usuario"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>    
+    <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
 <!-- Modal Nueva Campaña -->
@@ -426,5 +426,8 @@ i {
     border: 1px solid #ccc;
     box-shadow: none;
     transition: border-color 0.3s ease;
+}
+.dataTables_filter{
+    display: none;
 }
 </style>
