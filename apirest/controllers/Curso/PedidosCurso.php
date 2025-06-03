@@ -46,8 +46,46 @@ class PedidosCurso extends CI_Controller
 		$arrData=[];
 		$index = 1;
 		$tipoTabla = $this->input->post('tipoTabla');
+        $filtro_estado_pago = $this->input->post('estado_pago');
 		if($tipoTabla=="alumnos"){
 			$arrData = $this->PedidosCursoModel->get_datatables();
+            // FILTRAR POR ESTADO DE PAGO EN PHP
+            if ($filtro_estado_pago && $filtro_estado_pago != "0") {
+                $arrData = array_filter($arrData, function($row) use ($filtro_estado_pago) {
+                    // Calcula el estado de pago igual que en tu foreach
+                    $fecha_hoy = date('Y-m-d');
+                    $fecha_inicio = isset($row->Fe_Inicio) ? $row->Fe_Inicio : null;
+                    $fecha_fin = isset($row->Fe_Fin) ? $row->Fe_Fin : null;
+                    $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null;
+                    $estado_pago = 'pendiente';
+                    if ($row->total_pagos == 0) {
+                        $estado_pago = 'pendiente';
+                    } elseif ($row->total_pagos < $row->Ss_Total) {
+                        if (
+                            $tipo_curso == 1 &&
+                            $fecha_inicio &&
+                            (strtotime($fecha_inicio) - strtotime($fecha_hoy)) <= 2 * 86400 &&
+                            (strtotime($fecha_inicio) - strtotime($fecha_hoy)) >= 0
+                        ) {
+                            $estado_pago = 'cobrando';
+                        } else {
+                            $estado_pago = 'adelanto';
+                        }
+                    } elseif ($row->total_pagos == $row->Ss_Total) {
+                        $estado_pago = 'pagado';
+                    } elseif ($row->total_pagos > $row->Ss_Total) {
+                        $estado_pago = 'sobrepagado';
+                    }
+                    if (
+                        $tipo_curso == 1 &&
+                        $fecha_fin &&
+                        strtotime($fecha_hoy) > strtotime($fecha_fin)
+                    ) {
+                        $estado_pago = 'constancia';
+                    }
+                    return $estado_pago == $filtro_estado_pago;
+                });
+            }
 
 		}else{
 			$arrData = $this->PedidosCursoModel->getPagosCurso();
@@ -91,7 +129,7 @@ class PedidosCurso extends CI_Controller
             }
             $select .= '</select>';
             $rows[] = $select; //mes
-            $select_usuario = '<select class="select-usuario-externo form-control bg-' . $arrEstadoRegistro['No_Class_Estado'] . '" data-id-usuario="' . $row->ID_Usuario . '" data-id-pedido="' . $row->ID_Pedido_Curso . '">';
+            $select_usuario = '<select class="select-usuario-externo form-control" data-id-usuario="' . $row->ID_Usuario . '" data-id-pedido="' . $row->ID_Pedido_Curso . '">';
             $select_usuario .= '<option value="1"' . ($row->Nu_Estado_Usuario_Externo == 1 ? ' selected' : '') . '>Pendiente</option>';
             $select_usuario .= '<option class="bg-' . $arrEstadoRegistro['No_Class_Estado'] . '" value="2"' . ($row->Nu_Estado_Usuario_Externo == 2 ? ' selected' : '') . '>Creado</option>';
             $select_usuario .= '</select>';

@@ -138,7 +138,7 @@ $(function () {
           'bStateSave': true,
           "lengthChange": true,
           'processing': true,
-          'serverSide': false,
+          'serverSide': true,
           'info': true,
           'autoWidth': false,
           'pagingType': 'full_numbers',
@@ -166,8 +166,8 @@ $(function () {
             'data': function (data) {
               data.sMethod = $('#hidden-sMethod').val(),
                 data.estado_pago = $('#cbo-filtro-estado_pago').val(),
-                data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/'),
-                data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
+                data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/'),
+                data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "alumnos";
             },
           },
@@ -1125,6 +1125,11 @@ function cargarDistritos(idProvincia) {
 
 
 $(document).ready(async function () {
+  $('#aplicar-btn-cotizacion').off('click').on('click', function () {
+    if (typeof tableCursoPedidos !== 'undefined' && tableCursoPedidos !== null) {
+        tableCursoPedidos.ajax.reload();
+    }
+  });
   $('.dropdown-menu').on('click', function (event) {
     event.stopPropagation(); // Evita que el evento se propague
   });

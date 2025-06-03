@@ -51,14 +51,14 @@
                                 <div class="d-flex align-items-center p-2" style="width:300px;">
                                     <div class="d-flex" style="width:60%">Pago</div>
                                     <div style="width: 200px;">
-                                        <select id="txt-ID_Estado_Cotizacion" name="ID_Estado"
+                                        <select id="cbo-filtro-estado_pago" name="ID_Estado"
                                             class="form-control input-estado">
                                             <option value="0" selected>Todos</option>
-                                            <option value="PENDIENTE">PENDIENTE</option>
-                                            <option value="RECIBIENDO">ADELANTO</option>
-                                            <option value="COMPLETADO">PAGADO</option>
-                                            <option value="COMPLETADO">SOBREPAGADO</option>
-                                            <option value="COMPLETADO">CONSTANCIA</option>
+                                            <option value="pendiente">PENDIENTE</option>
+                                            <option value="adelanto">ADELANTO</option>
+                                            <option value="pagado">PAGADO</option>
+                                            <option value="sobrepagado">SOBREPAGADO</option>
+                                            <option value="constancia">CONSTANCIA</option>
                                         </select>
                                     </div>
                                 </div>
