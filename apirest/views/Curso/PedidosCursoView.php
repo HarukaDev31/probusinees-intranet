@@ -115,22 +115,12 @@
             </div>
         </div>
     </section>
-<<<<<<< HEAD
-<?php //array_debug($this->user); ?>
-<section class="content" id="section-listar-pedidos">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
-                    value="<?php echo $this->router->method; ?>">
-=======
     <section class="content" id="section-listar-pedidos">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
                     <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
                         value="<?php echo $this->router->method; ?>">
->>>>>>> 0a9c02b6c72ede72bf91aba77bd5741b0c89701b
 
                     <div class="col-6 col-sm-3 hidden">
                         <label>F. Inicio</label>
@@ -186,7 +176,7 @@
                         <table id="table-curso-pedidos" class="table table-hover dataTable no-footer hidden">
                             <thead class="thead-default">
                                 <tr>
-                                    <th>Pedido</th>
+                                    <th>N°</th>
                                     <th>Fecha</th>
                                     <th>Cliente</th>
                                     <th>Curso</th>

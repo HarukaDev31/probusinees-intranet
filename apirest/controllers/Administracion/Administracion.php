@@ -44,59 +44,62 @@ class Administracion extends CI_Controller
 			log_message('error', 'ContenedorConsolidado : listar() => ' . $e->getMessage());
 		}
 	}
-    public function getConsolidadoPagos(){
-        try {
-            $arrData= $this->AdministracionModel->getConsolidadoPagos();
-            $data    = [];
-            $index  = 1;
-            foreach ($arrData as $key => $value) {
-                $subdata   = [];
-                $subdata[]= $index ;
-                $subdata[]= date('d-m-Y', strtotime($value->fecha));
-                $subdata[]= $value->nombre;
-                $subdata[]= $value->documento;
-                $subdata[]= $value->telefono;
-                $subdata[]= "Consolidado";
-                $subdata[]= "#".$value->carga;
-                $subdata[]= "Acciones";
-                $estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $value->estado_pagos_coordinacion . '</span>';
-					if ($value->total_pagos==0) {
-						$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
-					} else if ($value->total_pagos_monto<($value->monto_final+ $value->impuestos_final)) {
-						$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
-					} else if ($value->total_pagos_monto==($value->monto_final+ $value->impuestos_final)) {
-						$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
-					} else if ($value->total_pagos_monto>($value->monto_final+ $value->impuestos_final)) {
-						$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
-					}
-                $subdata[]= $estadoPagosCoordinacion;
-                $subdata[]= $value->monto_final+ $value->impuestos_final;
-                $subdata[]= $value->total_pagos_monto;
-                $divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
-					if($value->total_pagos < 4) {
-						$divAcciones .='<div class="d-flex"  onclick="addPagosCoordination(' . $value->id . ', \'' . addslashes(trim($value->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
-					} 
-					if($value->total_pagos > 0) {
-						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $value->id . ', \'' . addslashes(trim($value->nombre)) . '\')">
+	public function getConsolidadoPagos()
+	{
+		try {
+			$arrData = $this->AdministracionModel->getConsolidadoPagos();
+			$data    = [];
+			$index  = 1;
+			foreach ($arrData as $key => $value) {
+				$subdata   = [];
+				$subdata[] = $index;
+				$subdata[] = date('d-m-Y', strtotime($value->fecha));
+				$subdata[] = $value->nombre;
+				$subdata[] = $value->documento;
+				$subdata[] = $value->telefono;
+				$subdata[] = "Consolidado";
+				$subdata[] = "#" . $value->carga;
+
+				$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $value->estado_pagos_coordinacion . '</span>';
+				$aPagar = ($value->monto_final + $value->impuestos_final) == 0 ? $value->monto : ($value->monto_final + $value->impuestos_final);
+				if ($value->total_pagos == 0) {
+					$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
+				} else if ($value->total_pagos_monto < ($aPagar)) {
+					$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
+				} else if ($value->total_pagos_monto == ($aPagar)) {
+					$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
+				} else if ($value->total_pagos_monto > ($aPagar)) {
+					$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
+				}
+				$subdata[] = //eye with onclick funcion
+					'<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ')">
+						<i class="fas fa-eye" style="cursor:pointer;"></i>
+					</div>';
+				$subdata[] = $estadoPagosCoordinacion;
+				$subdata[] = "$ " . (($aPagar) == 0 ? $value->monto : number_format($aPagar, 2, '.', ''));
+				$subdata[] = "$ " . number_format($value->total_pagos_monto, 2, '.', '');
+				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
+
+				if ($value->total_pagos > 0) {
+					$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $value->id . ', \'' . addslashes(trim($value->nombre)) . '\')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 						</div>';
-					}
-					$divAcciones .=  '</div>';
-					$subdata[] = $divAcciones;
-                $data[] = $subdata;
-                
-                $index++;
+				}
+				$divAcciones .=  '</div>';
+				$subdata[] = $divAcciones;
+				$data[] = $subdata;
 
-            }
-            $output = array(
-			"data" => $data
-		);
-		echo json_encode($output);
-        }catch (Exception $e) {
-            log_message('error', 'ContenedorConsolidado : getConsolidado() => ' . $e->getMessage());
-        }
-    }
-    public function getPagosCoordination($idCotizacion)
+				$index++;
+			}
+			$output = array(
+				"data" => $data
+			);
+			echo json_encode($output);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getConsolidado() => ' . $e->getMessage());
+		}
+	}
+	public function getPagosCoordination($idCotizacion)
 	{
 		$arrData = $this->AdministracionModel->getPagosCoordination($idCotizacion);
 		$data    = [];
@@ -106,8 +109,8 @@ class Administracion extends CI_Controller
 			$subdata[] = $index;
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
-			$subdata[] = "$".round($row->monto, 2);
-			$subdata[] = '<a href='.$row->voucher_url.' download>
+			$subdata[] = "$" . round($row->monto, 2);
+			$subdata[] = '<a href=' . $row->voucher_url . ' download>
 				<i class="fas fa-file-excel text-success"></i>
 				</a>';
 			$data[] = $subdata;
@@ -118,79 +121,169 @@ class Administracion extends CI_Controller
 		);
 		echo json_encode($output);
 	}
-    public function getCursosPagos(){
-        try {
-            $arrData = $this->AdministracionModel->getCursosPagos();
-            $data    = [];
-            $index   = 1;
-            foreach ($arrData as $row) {
-					$subdata   = array();
-					$subdata[] =  $row->ID_Pedido_Curso;
-					$subdata[] = allTypeDate($row->Fe_Registro, '-', 0);
-					$subdata[] = $row->No_Entidad ; 
-					$subdata[] = $row->Nu_Celular_Entidad;
-                    $subdata[] = "Curso";
-                    $subdata[] = "CAMPAÑA";
-                    $subdata[] = "ACCIONES";
-					
-                    $estadoCurso = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
-					if ($row->total_pagos==0) {
-						$estadoCurso = '<span class="badge badge-secondary">PENDIENTE</span>';
-					} else if ($row->total_pagos<($row->Ss_Total)) {
-						$estadoCurso = '<span class="badge badge-warning">ADELANTO</span>';
-					} else if ($row->total_pagos==($row->Ss_Total)) {
-						$estadoCurso = '<span class="badge badge-success">PAGADO</span>';
-					} else if ($row->total_pagos>($row->Ss_Total)) {
-						$estadoCurso = '<span class="badge badge-danger">SOBREPAGO</span>';
-					}
-                    $subdata[]= $estadoCurso;
-                    $subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" readonly/>';	//importe		
-					$subdata[] = "S/".round($row->total_pagos, 2);
-                    $divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
-					
-					
-					if($row->pagos_count > 0) {
-						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')">
+	public function getCursosPagos()
+	{
+		try {
+			$arrData = $this->AdministracionModel->getCursosPagos();
+			$data    = [];
+			$index   = 1;
+			foreach ($arrData as $row) {
+				$subdata   = array();
+				$subdata[] =  $row->ID_Pedido_Curso;
+				$subdata[] = allTypeDate($row->Fe_Registro, '-', 0);
+				$subdata[] = $row->No_Entidad;
+				$subdata[] = $row->Nu_Celular_Entidad;
+				$subdata[] = "Curso";
+				$campanas = $this->AdministracionModel->getCampanasActivas();
+				// Armar el select
+				$select = '<select name="ID_Campana" class="form-control" disabled>';
+				if (empty($row->ID_Campana)) {
+					$select .= '<option value="">Seleccionar</option>';
+				}
+				foreach ($campanas as $campana) {
+					$selected = ($row->ID_Campana == $campana['ID_Campana']) ? 'selected' : '';
+					$select .= '<option value="' . $campana['ID_Campana'] . '" ' . $selected . '>' . $campana['nombre_campana'] . '</option>';
+				}
+				$select .= '</select>';
+				$subdata[] = $select; //mes
+				$subdata[] = //eye with onclick funcion
+					'<div class="d-flex"  onclick="viewDetailsPagosCurso(' . $row->ID_Pedido_Curso . ',' . $row->Ss_Total . ',' . $row->total_pagos . ')">
+						<i class="fas fa-eye" style="cursor:pointer;"></i>
+					</div>';
+
+				$estadoCurso = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
+				if ($row->total_pagos == 0) {
+					$estadoCurso = '<span class="badge badge-secondary">PENDIENTE</span>';
+				} else if ($row->total_pagos < ($row->Ss_Total)) {
+					$estadoCurso = '<span class="badge badge-warning">ADELANTO</span>';
+				} else if ($row->total_pagos == ($row->Ss_Total)) {
+					$estadoCurso = '<span class="badge badge-success">PAGADO</span>';
+				} else if ($row->total_pagos > ($row->Ss_Total)) {
+					$estadoCurso = '<span class="badge badge-danger">SOBREPAGO</span>';
+				}
+				$subdata[] = $estadoCurso;
+				$subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" readonly/>';	//importe		
+				$subdata[] = "S/" . round($row->total_pagos, 2);
+				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
+
+
+				if ($row->pagos_count > 0) {
+					$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')">
 												<i class="fas fa-eye" style="cursor:pointer;"></i>
 
                         </div>';
-					}
-					$divAcciones .=  '</div>';
-                    $subdata[] = $divAcciones;
-					$data[]= $subdata;
-
 				}
-            $output = array(
-                "data" => $data
-            );
-            echo json_encode($output);
-        }catch (Exception $e) {
-            log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
-        }
-    }
-    public function getPagosCurso($idPedidoCurso){
-        try {
-            $arrData = $this->AdministracionModel->getPagosCurso($idPedidoCurso);
-            $data    = [];
-            $index   = 1;
-            foreach ($arrData as $row) {
-                $subdata = [];
-                $subdata[] = $index;
-                $subdata[] = allTypeDate($row->Fe_Registro, '-', 0);
-                $subdata[] = $row->No_Entidad;
-                $subdata[] = "$".round($row->Monto, 2);
-                $subdata[] = '<a href='.$row->Voucher_Url.' download>
+				$divAcciones .=  '</div>';
+				$subdata[] = $divAcciones;
+				$data[] = $subdata;
+			}
+			$output = array(
+				"data" => $data
+			);
+			echo json_encode($output);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
+		}
+	}
+	public function getPagosCurso($idPedidoCurso)
+	{
+		try {
+			$arrData = $this->AdministracionModel->getPagosCurso($idPedidoCurso);
+			$data    = [];
+			$index   = 1;
+			foreach ($arrData as $row) {
+				$subdata = [];
+				$subdata[] = $index;
+				$subdata[] = allTypeDate($row->payment_date, '-', 0);
+				$subdata[] = $row->banco;
+				$subdata[] = "$" . round($row->monto, 2);
+				$subdata[] = '<a href=' . $row->Voucher_Url . ' download>
                     <i class="fas fa-file-excel text-success"></i>
                     </a>';
-                $data[] = $subdata;
-                $index++;
-            }
-            $output = array(
-                "data" => $data
-            );
-            echo json_encode($output);
-        } catch (Exception $e) {
-            log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
-        }
-    }
+				$data[] = $subdata;
+				$index++;
+			}
+			$output = array(
+				"data" => $data
+			);
+			echo json_encode($output);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
+		}
+	}
+	public function getCampanasSelect()
+	{
+		$data = $this->AdministracionModel->getCampanasActivas();
+		echo json_encode(['status' => 'success', 'data' => $data]);
+	}
+	public function getDetailsPagosConsolidado($idCotizacion)
+	{
+		try {
+			$arrResponse = $this->AdministracionModel->getDetailsPagosConsolidado($idCotizacion);
+			echo json_encode([
+				'status' => 'success',
+				'data'   => $arrResponse
+			]);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getDetailsPagosConsolidado() => ' . $e->getMessage());
+		}
+	}
+	public function handlePayment() {
+		$idPago = $this->input->post('idPago');
+		$isConfirmed = $this->input->post('isConfirmed');
+		$result = $this->AdministracionModel->handlePayment($idPago, $isConfirmed);
+		echo json_encode($result);
+	}
+	public function handlePaymentCurso(){
+		$idPagoCurso = $this->input->post('idPago');
+		$isConfirmed = $this->input->post('isConfirmed');
+		$result = $this->AdministracionModel->handlePaymentCurso($idPagoCurso, $isConfirmed);
+		echo json_encode($result);
+	}
+	public function saveNote(){
+		$idCotizacion = $this->input->post('idCotizacion');
+		$note = $this->input->post('note');
+		$result = $this->AdministracionModel->saveNote($idCotizacion, $note);
+		echo json_encode($result);
+	}
+	public function saveNoteCurso(){
+		$idPedidoCurso = $this->input->post('idCotizacion');
+		$note = $this->input->post('note');
+		$result = $this->AdministracionModel->saveNoteCurso($idPedidoCurso, $note);
+		echo json_encode($result);
+	}
+	public function getDetailsPagosCurso($idPedidoCurso)
+	{
+		try {
+			$arrResponse = $this->AdministracionModel->getDetailsPagosCurso($idPedidoCurso);
+			echo json_encode([
+				'status' => 'success',
+				'data'   => $arrResponse
+			]);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getDetailsPagosCurso() => ' . $e->getMessage());
+		}
+	}
+	public function getHeadersConsolidado(){
+		try {
+			$arrResponse = $this->AdministracionModel->getHeadersConsolidado();
+			echo json_encode([
+				'status' => 'success',
+				'data'   => $arrResponse
+			]);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getHeadersConsolidado() => ' . $e->getMessage());
+		}
+	}
+	public function getHeadersCurso(){
+		try {
+			$arrResponse = $this->AdministracionModel->getHeadersCurso();
+			echo json_encode([
+				'status' => 'success',
+				'data'   => $arrResponse
+			]);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getHeadersCurso() => ' . $e->getMessage());
+		}
+	}
 }

@@ -75,7 +75,8 @@ $(function () {
   tableCursoPagos = $("#table-curso-pagos");
   tableCursoPedidos = $("#table-curso-pedidos");
   $(".tab-curso").removeClass("active");
-  $(".tab-curso").off("click").click(function () {
+  $(".tab-curso").off("click").click(async function () {
+    await getCursosHeader();
     $(".tab-curso").removeClass("active");
     $("#table-curso-pagos_wrapper").hide();
     $("#table-curso-variacion_wrapper").hide();
@@ -85,6 +86,8 @@ $(function () {
     this.classList.add("active");
 
     if (table == "alumnos") {
+      currentTableCurso = "alumnos";
+
       $("#table-curso-pedidos").attr("style", "");
       $("#table-curso-pagos").hide();
       url = base_url + 'Curso/PedidosCurso/ajax_list';
@@ -134,7 +137,7 @@ $(function () {
           },
 
           ],
-          'searching': true,
+          'searching': false,
           'bStateSave': true,
           "lengthChange": true,
           'processing': true,
@@ -185,24 +188,28 @@ $(function () {
             },],
           'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
         });
-        tableCursoPedidos.on('draw', function() {
-            actualizarTotalImporte();
+        tableCursoPedidos.on('draw', async function () {
+          await getCursosHeader();
         });
 
         // FUNCION PARA CONFIGURAR EL BUSCADOR
-        configurarBuscador(
-          "table-curso-pedidos",
-          "search-table",
-          "table-curso-pedidos_info"
-        );
+
         //Funcion para exportar a excel
 
         $("#table-curso-pedidos").show();
+        tableCursoPedidos.on('init', async function () {
+          configurarBuscador(
+            "table-curso-pedidos",
+            "search-table",
+            "table-curso-pedidos_info"
+          );
+        })
       }
-      currentTableCurso = "alumnos";
+
     }
 
     else if (table == "pagos") {
+      currentTableCurso = "pagos";
       $("#table-curso-pedidos").hide();
       $("#table-curso-pedidos_wrapper").hide();
 
@@ -246,7 +253,7 @@ $(function () {
           paging: true,
           lengthChange: true,
           searching: true,
-          ordering: true,
+          ordering: false,
           info: true,
           autoWidth: false,
           responsive: false,
@@ -276,23 +283,24 @@ $(function () {
             data: function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/');
-              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
+              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/'),
+                data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "pagos";
 
             },
           },
         });
         // FUNCION PARA CONFIGURAR EL BUSCADOR
-        configurarBuscador(
-          "table-curso-pagos",
-          "search-table",
-          "table-curso-pagos_info"
-        );
+        tableCursoPagos.on('init', async function () {
+          configurarBuscador(
+            "table-curso-pagos",
+            "search-table",
+            "table-curso-pagos_info"
+          );
+        })
         //Funcion para exportar a excel
 
         $("#table-curso-pagos").show();
-        currentTableCurso = "pagos";
 
       }
     }
@@ -411,7 +419,12 @@ $(function () {
 
 function reload_table_Entidad() {
   if (typeof tableCursoPedidos !== 'undefined' && tableCursoPedidos !== null) {
-    tableCursoPedidos.ajax.reload();
+    if (currentTableCurso === 'alumnos') {
+      tableCursoPedidos.ajax.reload(null, false);
+    }
+    else if (currentTableCurso === 'pagos') {
+      tableCursoPagos.ajax.reload(null, false);
+    }
   }
 }
 
@@ -692,7 +705,19 @@ function ocultarSectionDatosCliente() {
 }
 // Función para aplicar los filtros y recargar la tabla
 function aplicarFiltrosContenedor() {
-  table_Entidad.ajax.reload(null, false); // Recarga la tabla sin reiniciar la paginación
+  try {
+    console.log(currentTableCurso)
+    if (currentTableCurso === 'alumnos') {
+      tableCursoPedidos.ajax.reload(null, false);
+    }
+    else if (currentTableCurso === 'pagos') {
+      console.log("Recargando tabla de pagos");
+      tableCursoPagos.ajax.reload(null, false);
+    }
+
+  } catch (e) {
+    console.error("Error al aplicar filtros:", e);
+  }
 }
 
 // Función para limpiar los filtros y recargar la tabla
@@ -700,8 +725,14 @@ function limpiarFiltrosContenedor() {
   $("#txt-Fe_Inicio_Carga").val('');
   $("#txt-Fe_Fin_Carga").val('');
   $("#txt-ID_Estado").val('0');
-  // Si tienes más filtros, agrégalos aquí
-  table_Entidad.ajax.reload(null, false);
+  if (currentTableCurso === 'alumnos') {
+    $("#cbo-filtro-estado_pago").val('0').trigger('change');
+    tableCursoPedidos.ajax.reload(null, false);
+  }
+  else if (currentTableCurso === 'pagos') {
+    $("#cbo-filtro-estado_pago").val('0').trigger('change');
+    tableCursoPagos.ajax.reload(null, false);
+  }
 }
 
 // Asocia los eventos a los botones
@@ -724,11 +755,11 @@ function cargarTablaCampanas() {
     return;
   }
   $('#table-campanas').show();
-  url= base_url + 'Curso/PedidosCurso/getCampanasTabla';  
+  url = base_url + 'Curso/PedidosCurso/getCampanasTabla';
   table_Campanas = $("#table-campanas").DataTable({
     dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-    "<'row'<'col-sm-12'tr>>" +
-    "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      "<'row'<'col-sm-12'tr>>" +
+      "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
     buttons: [
       {
         extend: 'excel',
@@ -764,51 +795,51 @@ function cargarTablaCampanas() {
         }
       }
     ],
-    'searching'   : true,
-    'bStateSave'  : true,
+    'searching': true,
+    'bStateSave': true,
     "lengthChange": true,
-    'processing'  : true,
-    'serverSide'  : false,
-    'info'        : true,
-    'autoWidth'   : false,
-    'pagingType'  : 'full_numbers',
-    'oLanguage' : {
-      'sInfo'              : 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-      'sLengthMenu'        : '_MENU_',
-      'sSearch'            : 'Buscar por: ',
-      'sSearchPlaceholder' : '',
-      'sZeroRecords'       : 'No se encontraron registros',
-      'sInfoEmpty'         : 'No hay registros',
-      'sLoadingRecords'    : 'Cargando...',
-      'sProcessing'        : 'Procesando...',
-      'oPaginate'          : {
-        'sFirst'    : '<<',
-        'sLast'     : '>>',
-        'sPrevious' : '<',
-        'sNext'     : '>',
+    'processing': true,
+    'serverSide': false,
+    'info': true,
+    'autoWidth': false,
+    'pagingType': 'full_numbers',
+    'oLanguage': {
+      'sInfo': 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
+      'sLengthMenu': '_MENU_',
+      'sSearch': 'Buscar por: ',
+      'sSearchPlaceholder': '',
+      'sZeroRecords': 'No se encontraron registros',
+      'sInfoEmpty': 'No hay registros',
+      'sLoadingRecords': 'Cargando...',
+      'sProcessing': 'Procesando...',
+      'oPaginate': {
+        'sFirst': '<<',
+        'sLast': '>>',
+        'sPrevious': '<',
+        'sNext': '>',
       },
     },
     'order': [],
     'ajax': {
-      'url'       : url,
-      'type'      : 'GET',
-      'dataType'  : 'JSON',
-      'data'      : function ( data ) {
+      'url': url,
+      'type': 'GET',
+      'dataType': 'JSON',
+      'data': function (data) {
         data.sMethod = $('#hidden-sMethod').val();
       },
     },
     'columnDefs': [
       {
         targets: 'no-hidden',
-        visible: false,  
-      },{
-      className : 'text-center',
-      targets   : 'no-sort',
-      orderable : false,
-    },{
-          targets: "",
-          orderable: false,
-        },],
+        visible: false,
+      }, {
+        className: 'text-center',
+        targets: 'no-sort',
+        orderable: false,
+      }, {
+        targets: "",
+        orderable: false,
+      },],
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
   configurarBuscador('table-campanas', 'search-table-campanas', 'table-campanas_info');
@@ -821,8 +852,8 @@ function editarCampana(id) {
     type: "POST",
     data: { ID_Campana: id },
     dataType: "json",
-    success: function(response) {
-      if(response.status === "success") {
+    success: function (response) {
+      if (response.status === "success") {
         // Llena los campos del modal
         $('#modalNuevaCampanaLabel').text('Editar Campaña');
         $('#id-campana-editar').val(response.data.ID_Campana);
@@ -838,7 +869,7 @@ function editarCampana(id) {
   });
 }
 // Para crear, limpia el formulario y cambia el título
-$('#btn-crear-campana').on('click', function() {
+$('#btn-crear-campana').on('click', function () {
   $('#modalNuevaCampanaLabel').text('Registrar Nueva Campaña');
   $('#form-nueva-campana')[0].reset();
   $('#id-campana-editar').val('');
@@ -860,8 +891,8 @@ function borrarCampana(id) {
         type: "POST",
         data: { ID_Campana: id },
         dataType: "json",
-        success: function(response) {
-          if(response.status === "success") {
+        success: function (response) {
+          if (response.status === "success") {
             table_Campanas.ajax.reload();
             Swal.fire('¡Eliminado!', response.message, 'success');
           } else {
@@ -874,7 +905,7 @@ function borrarCampana(id) {
 }
 
 // Botón para mostrar campañas
-$(document).on('click', '#btn-crear-campana', function() {
+$(document).on('click', '#btn-crear-campana', function () {
   $('#section-listar-pedidos').hide();
   $('#section-campanas-cursos').show();
   $('#contenedor-campanas').html('');
@@ -904,13 +935,13 @@ $(document).on('click', '#btn-crear-campana', function() {
 
 
 
-$(document).on('click', '#btn-nueva-campana', function() {
+$(document).on('click', '#btn-nueva-campana', function () {
   $('#form-nueva-campana')[0].reset();
   $('#modal-nueva-campana').modal('show');
 });
 
 // Guardar la campaña al enviar el formulario
-$('#form-nueva-campana').on('submit', function(e) {
+$('#form-nueva-campana').on('submit', function (e) {
   e.preventDefault();
   var id = $('#id-campana-editar').val();
   var url = id ? base_url + "Curso/PedidosCurso/editarCampana" : base_url + "Curso/PedidosCurso/crearCampana";
@@ -919,8 +950,8 @@ $('#form-nueva-campana').on('submit', function(e) {
     type: "POST",
     data: $(this).serialize(),
     dataType: "json",
-    success: function(response) {
-      if(response.status === "success") {
+    success: function (response) {
+      if (response.status === "success") {
         $('#modal-nueva-campana').modal('hide');
         Swal.fire('¡Guardado!', response.message, 'success');
         table_Campanas.ajax.reload(null, false);
@@ -932,134 +963,133 @@ $('#form-nueva-campana').on('submit', function(e) {
 });
 
 // Asignar campaña al pedido
-$(document).on('change', 'select[name="ID_Campana"]', function() {
-    var idCampana = $(this).val();
-    // Encuentra el ID del pedido en la misma fila
-    var idPedido = $(this).closest('tr').find('td').eq(0).text(); // Ajusta el índice si tu ID está en otra columna
+$(document).on('change', 'select[name="ID_Campana"]', function () {
+  var idCampana = $(this).val();
+  // Encuentra el ID del pedido en la misma fila
+  var idPedido = $(this).closest('tr').find('td').eq(0).text(); // Ajusta el índice si tu ID está en otra columna
 
-    if(idCampana) {
-        $.ajax({
-            url: base_url + "Curso/PedidosCurso/asignarCampanaPedido",
-            type: "POST",
-            data: { ID_Pedido_Curso: idPedido, ID_Campana: idCampana },
-            dataType: "json",
-            success: function(response) {
-                if(response.status === "success") {
-                    Swal.fire('¡Guardado!', response.message, 'success');
-                } else {
-                    Swal.fire('Error', response.message, 'error');
-                }
-            }
-        });
-    }
+  if (idCampana) {
+    $.ajax({
+      url: base_url + "Curso/PedidosCurso/asignarCampanaPedido",
+      type: "POST",
+      data: { ID_Pedido_Curso: idPedido, ID_Campana: idCampana },
+      dataType: "json",
+      success: function (response) {
+        if (response.status === "success") {
+          Swal.fire('¡Guardado!', response.message, 'success');
+        } else {
+          Swal.fire('Error', response.message, 'error');
+        }
+      }
+    });
+  }
 });
 
-function actualizarTotalImporte() {
-    var total = 0;
-    $('#table-curso-pedidos tbody tr').each(function() {
-        var valor = $(this).find('input[name="importe_pedido"]').val();
-        valor = valor ? parseFloat(valor) : 0;
-        if (!isNaN(valor)) total += valor;
-    });
-    $('#span-total-importe').text(total.toFixed(2));
+
+async function getCursosHeader() {
+  const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader");
+  const data = await response.json();
+  if (data.status === "success") {
+    console.log(data.data);
+    $("#span-total-importe").text((data.data.total_importe));
+  }
 }
-
 // Delegación para inputs de importe en la tabla
-$(document).on('keydown', 'input[name="importe_pedido"]', function(e) {
-    // Solo permitir números y máximo 2 decimales
-    if (
-        // Permitir teclas de control
-        $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
-        // Permitir Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-        ((e.keyCode == 65 || e.keyCode == 67 || e.keyCode == 86 || e.keyCode == 88) && (e.ctrlKey === true || e.metaKey === true)) ||
-        // Permitir flechas
-        (e.keyCode >= 35 && e.keyCode <= 39)
-    ) {
-        // Enter: guardar
-        if (e.keyCode === 13) {
-            e.preventDefault();
-            var $input = $(this);
-            var valor = $input.val();
-            // Validar formato decimal
-            if (!/^\d+(\.\d{1,2})?$/.test(valor)) {
-                Swal.fire('Error', 'Solo se permiten números con hasta 2 decimales.', 'error');
-                return false;
-            }
-            // Obtener ID del pedido (ajusta el índice si tu tabla cambia)
-            var idPedido = $input.closest('tr').find('td').eq(0).text();
-            $.ajax({
-                url: base_url + "Curso/PedidosCurso/actualizarImportePedido",
-                type: "POST",
-                data: { ID_Pedido_Curso: idPedido, importe: valor },
-                dataType: "json",
-                success: function(response) {
-                    if(response.status === "success") {
-                        Swal.fire('¡Guardado!', response.message, 'success');
-                        actualizarTotalImporte();
-                    } else {
-                        Swal.fire('Error', response.message, 'error');
-                    }
-                }
-            });
+$(document).on('keydown', 'input[name="importe_pedido"]', function (e) {
+  // Solo permitir números y máximo 2 decimales
+  if (
+    // Permitir teclas de control
+    $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+    // Permitir Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+    ((e.keyCode == 65 || e.keyCode == 67 || e.keyCode == 86 || e.keyCode == 88) && (e.ctrlKey === true || e.metaKey === true)) ||
+    // Permitir flechas
+    (e.keyCode >= 35 && e.keyCode <= 39)
+  ) {
+    // Enter: guardar
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      var $input = $(this);
+      var valor = $input.val();
+      // Validar formato decimal
+      if (!/^\d+(\.\d{1,2})?$/.test(valor)) {
+        Swal.fire('Error', 'Solo se permiten números con hasta 2 decimales.', 'error');
+        return false;
+      }
+      // Obtener ID del pedido (ajusta el índice si tu tabla cambia)
+      var idPedido = $input.closest('tr').find('td').eq(0).text();
+      $.ajax({
+        url: base_url + "Curso/PedidosCurso/actualizarImportePedido",
+        type: "POST",
+        data: { ID_Pedido_Curso: idPedido, importe: valor },
+        dataType: "json",
+        success: async function (response) {
+          if (response.status === "success") {
+            Swal.fire('¡Guardado!', response.message, 'success');
+            await getCursosHeader();
+          } else {
+            Swal.fire('Error', response.message, 'error');
+          }
         }
-        return; // Permitir
+      });
     }
-    // Bloquear cualquier otra tecla que no sea número o punto
-    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-        e.preventDefault();
-    }
+    return; // Permitir
+  }
+  // Bloquear cualquier otra tecla que no sea número o punto
+  if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+    e.preventDefault();
+  }
 });
 
-  // Delegación para el cambio de tipo de curso
-$(document).on('change', '.select-tipo-curso', function() {
-    var idPedido = $(this).data('id');
-    var idTipoCurso = $(this).val();
+// Delegación para el cambio de tipo de curso
+$(document).on('change', '.select-tipo-curso', function () {
+  var idPedido = $(this).data('id');
+  var idTipoCurso = $(this).val();
 
-    $.ajax({
-        url: base_url + 'Curso/PedidosCurso/asignarTipoCurso',
-        type: 'POST',
-        data: {
-            id_pedido: idPedido,
-            id_tipo_curso: idTipoCurso
-        },
-        dataType: 'json',
-        success: function(response) {
-            if(response.status === 'success') {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Guardado!',
-                    text: 'Tipo de curso actualizado correctamente',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-                // Opcional: recarga la tabla
-                // tableCursoPedidos.ajax.reload();
-            } else {
-                Swal.fire('Error', response.message || 'No se pudo actualizar el tipo de curso', 'error');
-            }
-        },
-        error: function() {
-            Swal.fire('Error', 'Error al actualizar el tipo de curso', 'error');
-        }
-    });
+  $.ajax({
+    url: base_url + 'Curso/PedidosCurso/asignarTipoCurso',
+    type: 'POST',
+    data: {
+      id_pedido: idPedido,
+      id_tipo_curso: idTipoCurso
+    },
+    dataType: 'json',
+    success: function (response) {
+      if (response.status === 'success') {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Guardado!',
+          text: 'Tipo de curso actualizado correctamente',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        // Opcional: recarga la tabla
+        // tableCursoPedidos.ajax.reload();
+      } else {
+        Swal.fire('Error', response.message || 'No se pudo actualizar el tipo de curso', 'error');
+      }
+    },
+    error: function () {
+      Swal.fire('Error', 'Error al actualizar el tipo de curso', 'error');
+    }
+  });
 });
 
-$(document).on('change', '.select-estado-pago', function() {
-    var idPedido = $(this).data('id');
-    var estado = $(this).val();
-    $.ajax({
-        url: base_url + 'Curso/PedidosCurso/asignarEstadoPago',
-        type: 'POST',
-        data: { id_pedido: idPedido, estado_pago: estado },
-        dataType: 'json',
-        success: function(response) {
-            if(response.status === 'success') {
-                Swal.fire('¡Guardado!', 'Estado de pago actualizado', 'success');
-            } else {
-                Swal.fire('Error', response.message || 'No se pudo actualizar el estado', 'error');
-            }
-        }
-    });
+$(document).on('change', '.select-estado-pago', function () {
+  var idPedido = $(this).data('id');
+  var estado = $(this).val();
+  $.ajax({
+    url: base_url + 'Curso/PedidosCurso/asignarEstadoPago',
+    type: 'POST',
+    data: { id_pedido: idPedido, estado_pago: estado },
+    dataType: 'json',
+    success: function (response) {
+      if (response.status === 'success') {
+        Swal.fire('¡Guardado!', 'Estado de pago actualizado', 'success');
+      } else {
+        Swal.fire('Error', response.message || 'No se pudo actualizar el estado', 'error');
+      }
+    }
+  });
 });
 
 
@@ -1125,9 +1155,15 @@ function cargarDistritos(idProvincia) {
 
 
 $(document).ready(async function () {
+
   $('#aplicar-btn-cotizacion').off('click').on('click', function () {
     if (typeof tableCursoPedidos !== 'undefined' && tableCursoPedidos !== null) {
-        tableCursoPedidos.ajax.reload();
+      if (currentTableCurso === 'alumnos') {
+        tableCursoPedidos.ajax.reload(null, false);
+      }
+      else if (currentTableCurso === 'pagos') {
+        tableCursoPagos.ajax.reload(null, false);
+      }
     }
   });
   $('.dropdown-menu').on('click', function (event) {
@@ -1168,52 +1204,50 @@ $(document).ready(async function () {
     cargarDistritos($(this).val());
   });
 });
-async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
-  // Obtener la instancia de DataTable
-  var table = $("#" + tableId).DataTable();
+async function configurarBuscador(tableId, searchInputId, infoContainerId) {
+  // Esperar a que la tabla esté completamente inicializada
+  await new Promise(resolve => setTimeout(resolve, 100));
 
-  // Escuchar el evento "input" en el buscador
-  $("." + searchInputClass).on("input", function () {
-    var searchTerm = $(this).val(); // Obtener el valor del buscador
-    table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
+  // Obtener la instancia de DataTable
+  var table = $('#' + tableId).DataTable();
+
+  // Limpiar eventos previos para evitar duplicados
+  $('#' + searchInputId).off('keyup input');
+
+  // Escuchar el evento "input" y "keyup" en el buscador personalizado
+  $('#' + searchInputId).on('input keyup', function () {
+    var searchValue = this.value;
+    console.log('Buscando:', searchValue); // Para debug
+    table.search(searchValue).draw();
   });
 
-  // Función para limpiar el buscador y el filtro
-  window["resetBuscador_" + tableId] = function () {
-    $("." + searchInputClass).val("");
-    table.search("").draw();
+  // Función para limpiar el buscador
+  window['resetBuscador_' + tableId] = function () {
+    $('#' + searchInputId).val('');
+    table.search('').draw();
   };
 
-  // Actualizar el mensaje de información después de cada búsqueda
-  table.on("draw", function () {
-    var info = table.page.info();
+  // Actualizar el mensaje de información
+  table.on('draw', function () {
     if (infoContainerId) {
-      $("#" + infoContainerId).html(
-        `Mostrando ${info.start + 1} a ${info.end} de ${info.recordsTotal
-        } registros`
+      var info = table.page.info();
+      $('#' + infoContainerId).html(
+        `Mostrando ${info.start + 1} a ${info.end} de ${info.recordsTotal} registros`
       );
     }
   });
+
+  // Ocultar el buscador nativo de DataTables para evitar conflictos
+  $('#' + tableId + '_filter').hide();
 }
-  $(document).on('change', '.select-usuario-externo', function() {
-    var estado = $(this).val();
-    var idUsuario = $(this).data('id-usuario');
-    var idPedido = $(this).data('id-pedido');
-    if (estado == '2') {
-        // Ejecuta la función de compartir (enviar email Moodle)
-        enviarEmailUsuarioMoodle(idUsuario, idPedido);
-    }
+
+$(document).on('change', '.select-usuario-externo', function () {
+  var estado = $(this).val();
+  var idUsuario = $(this).data('id-usuario');
+  var idPedido = $(this).data('id-pedido');
+  if (estado == '2') {
+    // Ejecuta la función de compartir (enviar email Moodle)
+    enviarEmailUsuarioMoodle(idUsuario, idPedido);
+  }
 });
-function actualizarTotalImporte() {
-    var total = 0;
-    // Cambia el selector y el índice de columna según tu estructura
-    $('#table-curso-pedidos tbody tr').each(function() {
-        // Si el importe es un input
-        var valor = $(this).find('input[name="importe_pedido"]').val();
-        // Si el importe es solo texto en una celda, usa:
-        // var valor = $(this).find('td').eq(5).text();
-        valor = valor ? parseFloat(valor) : 0;
-        if (!isNaN(valor)) total += valor;
-    });
-    $('#span-total-importe').text(total.toFixed(2));
-}
+
