@@ -226,7 +226,7 @@ class PedidosCurso extends CI_Controller
                 $divAcciones .= '<div class="d-flex"  onclick="addPagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
 
                 if ($row->pagos_count > 0) {
-                    $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
+                    $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->nombre)) . '\')">
 					<i class="fas fa-eye text-primary" style="cursor:pointer;"></i>	
                     </div>';
                 }
