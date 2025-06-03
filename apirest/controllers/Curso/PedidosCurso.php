@@ -135,7 +135,9 @@ class PedidosCurso extends CI_Controller
                 log_message('error', 'Nu_Estado_Usuario_Externo: ' . print_r($row->Nu_Estado_Usuario, true));
                 $rows[] = $select_usuario; //usuario
 
-                $rows[]            = $row->No_Signo . '<input name="importe_pedido" class="w-[50%]" value="' . round($row->Ss_Total, 2) . '" />'; //importe		
+                $rows[]            = $row->No_Signo . '<input name="importe_pedido" class="w-[50%]"
+                id="importe_pedido_' . $row->ID_Pedido_Curso . '" type="text"
+                value="' . number_format($row->Ss_Total, 2) . '" />'; //importe		
                 $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroPagosArray($row->Nu_Estado);                             //estado
 
                 $fecha_hoy = date('Y-m-d');
@@ -143,32 +145,32 @@ class PedidosCurso extends CI_Controller
                 $fecha_fin = isset($row->Fe_Fin) ? $row->Fe_Fin : null;
                 $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null; // 1 = En vivo
 
-                    $estado_pago = 'pendiente';
-                    if ($row->total_pagos == 0) {
-                        $estado_pago = '<span class="badge bg-secondary">Pendiente</span>';
-                    } elseif ($row->total_pagos < $row->Ss_Total) {
-                        if (
-                            $tipo_curso == 1 &&
-                            $fecha_inicio &&
-                            (strtotime($fecha_inicio) - strtotime($fecha_hoy)) <= 2 * 86400 &&
-                            (strtotime($fecha_inicio) - strtotime($fecha_hoy)) >= 0
-                        ) {
-                            $estado_pago = '<span class="badge bg-primary">Cobrando</span>';
-                        } else {
-                            $estado_pago = '<span class="badge bg-warning">Adelanto</span>';
-                        }
-                    } elseif ($row->total_pagos == $row->Ss_Total) {
-                        $estado_pago =  '<span class="badge bg-success">Pagado</span>';
-                    } elseif ($row->total_pagos > $row->Ss_Total) {
-                        $estado_pago = '<span class="badge bg-danger">Sobrepagado</span>';
-                    }
+                $estado_pago = 'pendiente';
+                if ($row->total_pagos == 0) {
+                    $estado_pago = '<span class="badge bg-secondary">Pendiente</span>';
+                } elseif ($row->total_pagos < $row->Ss_Total) {
                     if (
                         $tipo_curso == 1 &&
-                        $fecha_fin &&
-                        strtotime($fecha_hoy) > strtotime($fecha_fin)
+                        $fecha_inicio &&
+                        (strtotime($fecha_inicio) - strtotime($fecha_hoy)) <= 2 * 86400 &&
+                        (strtotime($fecha_inicio) - strtotime($fecha_hoy)) >= 0
                     ) {
-                        $estado_pago = '<span class="badge bg-info">Constancia</span>';
+                        $estado_pago = '<span class="badge bg-primary">Cobrando</span>';
+                    } else {
+                        $estado_pago = '<span class="badge bg-warning">Adelanto</span>';
                     }
+                } elseif ($row->total_pagos == $row->Ss_Total) {
+                    $estado_pago =  '<span class="badge bg-success">Pagado</span>';
+                } elseif ($row->total_pagos > $row->Ss_Total) {
+                    $estado_pago = '<span class="badge bg-danger">Sobrepagado</span>';
+                }
+                if (
+                    $tipo_curso == 1 &&
+                    $fecha_fin &&
+                    strtotime($fecha_hoy) > strtotime($fecha_fin)
+                ) {
+                    $estado_pago = '<span class="badge bg-info">Constancia</span>';
+                }
 
                 // Luego úsalo para el select:
                 $select_estado = '<select class="form-control 
@@ -201,7 +203,8 @@ class PedidosCurso extends CI_Controller
                 $divAcciones = '<div>'; //Acciones
                 $divAcciones .= '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewCliente(\'' . $row->ID_Pedido_Curso . '\')"></i>';
                 $divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="eliminarPedido(\'' . $row->ID_Pedido_Curso . '\')"></i>';
-
+                //div guardar
+                $divAcciones .= '<i class="fas fa-save text-success" style="cursor:pointer; padding:10px;" onclick="guardarCambiosPedido(\'' . $row->ID_Pedido_Curso . '\')"></i>';
                 $divAcciones .= '</div>';
                 $rows[] = $divAcciones;
 
@@ -396,7 +399,7 @@ class PedidosCurso extends CI_Controller
                 $message .= "Tu cuenta en ProBusiness ha sido creada exitosamente.\n\n";
                 $message .= "Usuario: {$result->No_Usuario}\n";
                 $message .= "Contraseña: {$this->encryption->decrypt($result->No_Password)}\n\n";
-                $message .= "Puedes acceder a tu cuenta en el siguiente enlace: https://probusiness.com.pe/cursos\n\n";
+                $message .= "Puedes acceder a tu cuenta en el siguiente enlace: https://aulavirtualprobusiness.com/login/\n\n";
                 $message .= "Saludos,\nEl equipo de ProBusiness";
                 $this->sendMessageVentas($message, $telefono);
             } else {

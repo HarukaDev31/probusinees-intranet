@@ -170,7 +170,7 @@ $(function () {
               data.sMethod = $('#hidden-sMethod').val(),
                 data.estado_pago = $('#cbo-filtro-estado_pago').val(),
                 data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
-                data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
+              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "alumnos";
             },
           },
@@ -284,7 +284,7 @@ $(function () {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
               data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
-                data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
+              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "pagos";
 
             },
@@ -429,6 +429,7 @@ function reload_table_Entidad() {
 }
 
 function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
+  event.preventDefault();
   var $modal_delete = $('#modal-message-delete');
   $modal_delete.modal('show');
 
@@ -1240,12 +1241,29 @@ async function configurarBuscador(tableId, searchInputId, infoContainerId) {
   // Ocultar el buscador nativo de DataTables para evitar conflictos
   $('#' + tableId + '_filter').hide();
 }
-
+async function guardarCambiosPedido(ID_Pedido_Curso) {
+  var nuevoImporte = $('#importe_pedido_' + ID_Pedido_Curso).val();
+  $.ajax({
+    url: base_url + "Curso/PedidosCurso/actualizarImportePedido",
+    type: "POST",
+    data: { ID_Pedido_Curso: ID_Pedido_Curso, importe: nuevoImporte },
+    dataType: "json",
+    success: async function (response) {
+      if (response.status === "success") {
+        Swal.fire('¡Guardado!', response.message, 'success');
+        await getCursosHeader();
+      } else {
+        Swal.fire('Error', response.message, 'error');
+      }
+    }
+  });
+}
 $(document).on('change', '.select-usuario-externo', function () {
   var estado = $(this).val();
   var idUsuario = $(this).data('id-usuario');
   var idPedido = $(this).data('id-pedido');
   if (estado == '2') {
+    crearUsuarioCursosMoodle(idUsuario, idPedido);
     // Ejecuta la función de compartir (enviar email Moodle)
     enviarEmailUsuarioMoodle(idUsuario, idPedido);
   }
