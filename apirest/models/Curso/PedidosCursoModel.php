@@ -14,6 +14,7 @@ class PedidosCursoModel extends CI_Model{
 	var $table_departamento = 'departamento';
 	var $table_provincia = 'provincia';
 	var $table_distrito = 'distrito';
+	var $table_tipo_curso = 'tipo_curso';
 	var $table_tipo_documento_identidad = 'tipo_documento_identidad';
 	var $table_usuario = 'usuario';
 	var $table_pais = 'pais';
@@ -71,21 +72,25 @@ class PedidosCursoModel extends CI_Model{
 			D.No_Departamento as departamento,
 			PR.No_Provincia as provincia,
 			DI.No_Distrito as distrito,
+			USR.ID_Usuario as id_usuario, 
 			USR.No_Usuario as usuario_moodle,
-			USR.No_Password as password_moodle
+			USR.No_Password as password_moodle,
 			PC.ID_Campana,
+			PC.tipo_curso as tipo_curso,
+			PC.Nu_Estado as Nu_Estado, 
+			PC.Nu_Estado_Usuario_Externo as Nu_Estado_Usuario_Externo,
+			PC.ID_Pedido_Curso as id_pedido_curso,
 			MONTH(CC.Fe_Inicio) as mes_numero,
-			CC.No_Campana as nombre_campana
 		')
-		->from($this->table)
-		->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = ' . $this->table . '.ID_Entidad', 'join')
-		->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.ID_Pais', 'join')
+		->from($this->table . ' AS PC')
+		->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = PC.ID_Entidad', 'join')
+		->join($this->table_pais . ' AS P', 'P.ID_Pais = PC.ID_Pais', 'join')
 		->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'left')
 		->join($this->table_distrito . ' AS DI', 'DI.ID_Distrito = CLI.ID_Distrito', 'left')
 		->join($this->table_provincia . ' AS PR', 'PR.ID_Provincia = CLI.ID_Provincia', 'left')
 		->join($this->table_departamento . ' AS D', 'D.ID_Departamento = CLI.ID_Departamento', 'left')
    		->join('campana_curso AS CC', 'CC.ID_Campana = PC.ID_Campana', 'left')
-		->where($this->table . '.ID_Pedido_Curso', $id_pedido);
+		->where('PC.ID_Pedido_Curso', $id_pedido);
 
 		$query = $this->db->get();
 		$data = $query->row_array();

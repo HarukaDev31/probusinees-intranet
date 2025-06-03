@@ -72,6 +72,13 @@ class PedidosCurso extends CI_Controller
             }
 
             $rows[]   = $row->No_Entidad . "<br>" . $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad . "<br>" . $row->Nu_Celular_Entidad . $sWhatsAppCliente . "<br>" . $row->Txt_Email_Entidad; //cliente
+            $tipo_curso = '<select class="form-control select-tipo-curso" data-id="'.$row->ID_Pedido_Curso.'">';
+            $tipo_curso .= '<option value="">Seleccionar</option>';
+            $tipo_curso .= '<option value="0" '.($row->tipo_curso === "0" || $row->tipo_curso === 0 ? 'selected' : '').'>Virtual</option>';
+            $tipo_curso .= '<option value="1" '.($row->tipo_curso === "1" || $row->tipo_curso === 1 ? 'selected' : '').'>En vivo</option>';
+            $tipo_curso .= '</select>';
+            $rows[] = $tipo_curso; //tipo curso
+
             $campanas = $this->PedidosCursoModel->getCampanasActivas();
             // Armar el select
             $select = '<select name="ID_Campana" class="form-control">';
@@ -83,24 +90,84 @@ class PedidosCurso extends CI_Controller
                 $select .= '<option value="' . $campana['ID_Campana'] . '" ' . $selected . '>' . $campana['nombre_campana'] . '</option>';
             }
             $select .= '</select>';
-            $rows[]         = $select;
-            $select_usuario = '<select class="select-usuario-externo form-control" data-id-usuario="' . $row->ID_Usuario . '" data-id-pedido="' . $row->ID_Pedido_Curso . '">';
+            $rows[] = $select; //mes
+            $select_usuario = '<select class="select-usuario-externo form-control bg-' . $arrEstadoRegistro['No_Class_Estado'] . '" data-id-usuario="' . $row->ID_Usuario . '" data-id-pedido="' . $row->ID_Pedido_Curso . '">';
             $select_usuario .= '<option value="1"' . ($row->Nu_Estado_Usuario_Externo == 1 ? ' selected' : '') . '>Pendiente</option>';
             $select_usuario .= '<option class="bg-' . $arrEstadoRegistro['No_Class_Estado'] . '" value="2"' . ($row->Nu_Estado_Usuario_Externo == 2 ? ' selected' : '') . '>Creado</option>';
             $select_usuario .= '</select>';
-            $rows[] = $select_usuario;
+            log_message('error', 'Nu_Estado_Usuario_Externo: ' . print_r($row->Nu_Estado_Usuario, true));
+            $rows[] = $select_usuario; //usuario
 
-            $btn_usuario_moodle = '';
-            if ($row->Nu_Estado == 2 && $row->Nu_Estado_Usuario_Externo != "2") {
-                $btn_usuario_moodle = '<button class="btn btn-primary" alt="Crear usuario" title="Crear usuario" href="javascript:void(0)"  onclick="crearUsuarioCursosMoodle(\'' . $row->ID_Usuario . '\', \'' . $row->ID_Pedido_Curso . '\')">Crear</button>';
-            }
-                                                                                                                                //usuario
-            $rows[] = $row->No_Usuario . "<br>" . $this->encryption->decrypt($row->No_Password) . "<br>" . $btn_usuario_moodle; //moodle
-
-            $rows[]            = $row->ID_Referencia_Pago_Online;                                                                             //rf pago
             $rows[]            = $row->No_Signo . '<input name="importe_pedido" class="w-[50%]" value="' . round($row->Ss_Total, 2) . '" />'; //importe		
             $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroPagosArray($row->Nu_Estado);                             //estado
-            $rows[]            = '<span class="badge bg-' . $arrEstadoRegistro['No_Class_Estado'] . '">' . $arrEstadoRegistro['No_Estado'] . '</span>';
+
+            $fecha_hoy = date('Y-m-d');
+            $fecha_inicio = isset($row->Fe_Inicio) ? $row->Fe_Inicio : null;
+            $fecha_fin = isset($row->Fe_Fin) ? $row->Fe_Fin : null;
+            $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null; // 1 = En vivo
+
+            if ($row->total_pagos == 0) {
+                $estado_pago = 'pendiente';
+            } elseif ($row->total_pagos < $row->Ss_Total) {
+                // Estado "cobrando" solo para EN VIVO, 2 días antes del inicio y aún no pagado
+                if (
+                    $tipo_curso == 1 &&
+                    $fecha_inicio &&
+                    (strtotime($fecha_inicio) - strtotime($fecha_hoy)) <= 2 * 86400 && // 2 días o menos
+                    (strtotime($fecha_inicio) - strtotime($fecha_hoy)) >= 0 // aún no inicia
+                ) {
+                    $estado_pago = 'cobrando';
+                    // Aquí puedes llamar a tu función para enviar WhatsApp si aún no lo enviaste
+                    // $this->WhatsappTrait->enviarMensajeCobrando($row->Nu_Celular_Entidad, ...);
+                } else {
+                    $estado_pago = 'adelanto';
+                }
+            } elseif ($row->total_pagos == $row->Ss_Total) {
+                $estado_pago = 'pagado';
+            } elseif ($row->total_pagos > $row->Ss_Total) {
+                $estado_pago = 'sobrepagado';
+            } else {
+                $estado_pago = 'pendiente';
+            }
+
+            // Estado "constancia" solo para EN VIVO, después de la fecha de fin
+            if (
+                $tipo_curso == 1 &&
+                $fecha_fin &&
+                strtotime($fecha_hoy) > strtotime($fecha_fin)
+            ) {
+                $estado_pago = 'constancia';
+                // Aquí puedes llamar a tu función para enviar la constancia por WhatsApp
+                // $this->WhatsappTrait->enviarConstancia($row->Nu_Celular_Entidad, ...);
+            }
+
+            // Luego úsalo para el select:
+            $select_estado = '<select class="form-control 
+                '.($estado_pago=='pendiente' ? 'bg-secondary':'').
+                ($estado_pago=='adelanto' ? 'bg-warning':'').'
+                '.($estado_pago=='cobrando' ? 'bg-primary':'').
+                ($estado_pago=='pagado' ? 'bg-success':'').
+                ($estado_pago=='sobrepagado' ? 'bg-danger':'').
+                ($estado_pago=='constancia' ? 'bg-secondary':'').'
+            select-estado-pago" data-id="'.$row->ID_Pedido_Curso.'">';
+
+            $select_estado .= '<option value="pendiente" class="bg-secondary" '.($estado_pago=='pendiente'?'selected':'').'>Pendiente</option>';
+            $select_estado .= '<option value="adelanto" class="bg-warning"'.($estado_pago=='adelanto'?'selected':'').'>Adelanto</option>';
+
+            // Solo mostrar "Cobrando" y "Constancia" si es EN VIVO
+            if ($tipo_curso == 1) {
+                $select_estado .= '<option value="cobrando" class="bg-primary"'.($estado_pago=='cobrando'?'selected':'').'>Cobrando</option>';
+            }
+
+            $select_estado .= '<option value="pagado" class="bg-success"'.($estado_pago=='pagado'?'selected':'').'>Pagado</option>';
+            $select_estado .= '<option value="sobrepagado" class="bg-danger"'.($estado_pago=='sobrepagado'?'selected':'').'>Sobrepagado</option>';
+
+            if ($tipo_curso == 1) {
+                $select_estado .= '<option value="constancia" class="bg-secondary"'.($estado_pago=='constancia'?'selected':'').'>Constancia</option>';
+            }
+
+            $select_estado .= '</select>';
+            $rows[] = $select_estado;
 
             $divAcciones = '<div>'; //Acciones
             $divAcciones .= '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewCliente(\'' . $row->ID_Pedido_Curso . '\')"></i>';
@@ -196,7 +263,12 @@ class PedidosCurso extends CI_Controller
                 'id_departamento' => $data['id_departamento'],
                 'id_provincia'    => $data['id_provincia'],
                 'id_distrito'     => $data['id_distrito'],
-            ];
+
+                'nu_estado'                   => $data['Nu_Estado'] ?? null,
+                'nu_estado_usuario_externo'   => $data['Nu_Estado_Usuario_Externo'] ?? null,
+                'id_usuario'                  => $data['usuario_moodle'] ?? null, // o el campo correcto de tu modelo
+                'id_pedido_curso'             => $id_pedido,
+                ];
 
             echo json_encode(['status' => 'success', 'data' => $response]);
         } else {
@@ -386,8 +458,6 @@ class PedidosCurso extends CI_Controller
             $data[] = $rows;
         }
         $output = [
-            'draw' => $this->input->post('draw'),
-
             'data' => $data,
         ];
         echo json_encode($output);
@@ -447,6 +517,39 @@ class PedidosCurso extends CI_Controller
         $result = $this->PedidosCursoModel->actualizarImportePedido($id_pedido, $importe);
         echo json_encode($result);
     }
+    public function asignarTipoCurso() {
+    $id_pedido = $this->input->post('id_pedido');
+    $id_tipo_curso = $this->input->post('id_tipo_curso');
+    if ($id_pedido !== null && $id_tipo_curso !== null) {
+        $this->db->where('ID_Pedido_Curso', $id_pedido)
+                 ->update('pedido_curso', ['tipo_curso' => $id_tipo_curso]);
+        echo json_encode(['status' => 'success', 'message' => 'Tipo de curso actualizado']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
+    }
+}
+public function asignarEstadoPago() {
+    $id_pedido = $this->input->post('id_pedido');
+    $estado_pago = $this->input->post('estado_pago');
+    if ($id_pedido && $estado_pago) {
+        $this->db->where('ID_Pedido_Curso', $id_pedido)
+                 ->update('pedido_curso', ['estado_pago' => $estado_pago]);
+        echo json_encode(['status' => 'success', 'message' => 'Estado de pago actualizado']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
+    }
+}
+public function calcularEstadoPago($id_pedido) {
+    $pedido = $this->getPedido($id_pedido);
+    $adelantos = $this->getTotalAdelantos($id_pedido); // suma de pagos
+    $importe = $pedido['importe'];
+
+    if ($adelantos == 0) return 'pendiente';
+    if ($adelantos < $importe) return 'adelanto';
+    if ($adelantos == $importe) return 'pagado';
+    if ($adelantos > $importe) return 'sobrepagado';
+    // lógica para "cobrando" y "constancia" según fechas y tipo_curso
+}
 
 	public function saveClientePagosCurso(){
 		$voucher = $_FILES['voucher'];

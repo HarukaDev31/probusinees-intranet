@@ -185,6 +185,9 @@ $(function () {
             },],
           'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
         });
+        tableCursoPedidos.on('draw', function() {
+            actualizarTotalImporte();
+        });
 
         // FUNCION PARA CONFIGURAR EL BUSCADOR
         configurarBuscador(
@@ -399,6 +402,7 @@ $(function () {
   // $('#table-curso-pedidos_filter input').removeClass('form-control-sm');
   // $('#table-curso-pedidos_filter input').addClass('form-control-md');
   // $('#table-curso-pedidos_filter input').addClass("width_full");
+  // })
 
   $('#btn-html_reporte').click(function () {
     reload_table_Entidad();
@@ -406,7 +410,9 @@ $(function () {
 })
 
 function reload_table_Entidad() {
-  table_Entidad.ajax.reload(null, false);
+  if (typeof tableCursoPedidos !== 'undefined' && tableCursoPedidos !== null) {
+    tableCursoPedidos.ajax.reload();
+  }
 }
 
 function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
@@ -526,9 +532,19 @@ async function viewCliente(id) {
           $('#cliente-moodle-usuario').val('');
           $('#cliente-moodle-password').val('');
         }
+        if (response.data.nu_estado == 2 && response.data.nu_estado_usuario_externo != "2") {
+          $('#contenedor-boton-usuario').html(
+            `<button class="btn btn-primary" onclick="crearUsuarioCursosMoodle('${response.data.id_usuario}', '${response.data.id_pedido_curso}')">
+              Crear usuario
+            </button>`
+          );
+        } else {
+          $('#contenedor-boton-usuario').empty();
+        }
 
         // Siempre deja los campos en readonly y muestra solo el botón editar
         $('.cliente-input').prop('readonly', true);
+        $('#section-listar-pedidos').hide();
         $('#btn-editar-cliente').show();
         $('#btn-guardar-cliente').hide();
 
@@ -560,7 +576,6 @@ async function viewCliente(id) {
             
         `);
 
-        $('#section-listar-pedidos').show();
         $('#section-datos-cliente').show();
 
         $('#btn-editar-cliente').on('click', function () {
@@ -675,15 +690,40 @@ function ocultarSectionDatosCliente() {
   // Oculta la sección de campañas y cursos
   $('#section-campanas-cursos').hide();
 }
+// Función para aplicar los filtros y recargar la tabla
+function aplicarFiltrosContenedor() {
+  table_Entidad.ajax.reload(null, false); // Recarga la tabla sin reiniciar la paginación
+}
 
+// Función para limpiar los filtros y recargar la tabla
+function limpiarFiltrosContenedor() {
+  $("#txt-Fe_Inicio_Carga").val('');
+  $("#txt-Fe_Fin_Carga").val('');
+  $("#txt-ID_Estado").val('0');
+  // Si tienes más filtros, agrégalos aquí
+  table_Entidad.ajax.reload(null, false);
+}
+
+// Asocia los eventos a los botones
+$("#aplicar-btn").off("click").on("click", function () {
+  aplicarFiltrosContenedor();
+});
+$("#cancelar-btn").off("click").on("click", function () {
+  limpiarFiltrosContenedor();
+});
+
+// Opcional: recargar automáticamente al cambiar un filtro
+$(".input-date, .input-estado").on("change", function () {
+  aplicarFiltrosContenedor();
+});
 
 
 function cargarTablaCampanas() {
   if ($.fn.DataTable.isDataTable('#table-campanas')) {
-    table_Campanas.reload();
+    table_Campanas.ajax.reload();
     return;
   }
-  table_Campanas.show();
+  $('#table-campanas').show();
   url= base_url + 'Curso/PedidosCurso/getCampanasTabla';  
   table_Campanas = $("#table-campanas").DataTable({
     dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -773,6 +813,8 @@ function cargarTablaCampanas() {
   });
   configurarBuscador('table-campanas', 'search-table-campanas', 'table-campanas_info');
 }
+
+
 function editarCampana(id) {
   $.ajax({
     url: base_url + "Curso/PedidosCurso/getCampanaById",
@@ -801,6 +843,8 @@ $('#btn-crear-campana').on('click', function() {
   $('#form-nueva-campana')[0].reset();
   $('#id-campana-editar').val('');
 });
+
+
 function borrarCampana(id) {
   Swal.fire({
     title: '¿Estás seguro?',
@@ -910,6 +954,16 @@ $(document).on('change', 'select[name="ID_Campana"]', function() {
     }
 });
 
+function actualizarTotalImporte() {
+    var total = 0;
+    $('#table-curso-pedidos tbody tr').each(function() {
+        var valor = $(this).find('input[name="importe_pedido"]').val();
+        valor = valor ? parseFloat(valor) : 0;
+        if (!isNaN(valor)) total += valor;
+    });
+    $('#span-total-importe').text(total.toFixed(2));
+}
+
 // Delegación para inputs de importe en la tabla
 $(document).on('keydown', 'input[name="importe_pedido"]', function(e) {
     // Solo permitir números y máximo 2 decimales
@@ -941,6 +995,7 @@ $(document).on('keydown', 'input[name="importe_pedido"]', function(e) {
                 success: function(response) {
                     if(response.status === "success") {
                         Swal.fire('¡Guardado!', response.message, 'success');
+                        actualizarTotalImporte();
                     } else {
                         Swal.fire('Error', response.message, 'error');
                     }
@@ -953,6 +1008,58 @@ $(document).on('keydown', 'input[name="importe_pedido"]', function(e) {
     if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
         e.preventDefault();
     }
+});
+
+  // Delegación para el cambio de tipo de curso
+$(document).on('change', '.select-tipo-curso', function() {
+    var idPedido = $(this).data('id');
+    var idTipoCurso = $(this).val();
+
+    $.ajax({
+        url: base_url + 'Curso/PedidosCurso/asignarTipoCurso',
+        type: 'POST',
+        data: {
+            id_pedido: idPedido,
+            id_tipo_curso: idTipoCurso
+        },
+        dataType: 'json',
+        success: function(response) {
+            if(response.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Guardado!',
+                    text: 'Tipo de curso actualizado correctamente',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                // Opcional: recarga la tabla
+                // tableCursoPedidos.ajax.reload();
+            } else {
+                Swal.fire('Error', response.message || 'No se pudo actualizar el tipo de curso', 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('Error', 'Error al actualizar el tipo de curso', 'error');
+        }
+    });
+});
+
+$(document).on('change', '.select-estado-pago', function() {
+    var idPedido = $(this).data('id');
+    var estado = $(this).val();
+    $.ajax({
+        url: base_url + 'Curso/PedidosCurso/asignarEstadoPago',
+        type: 'POST',
+        data: { id_pedido: idPedido, estado_pago: estado },
+        dataType: 'json',
+        success: function(response) {
+            if(response.status === 'success') {
+                Swal.fire('¡Guardado!', 'Estado de pago actualizado', 'success');
+            } else {
+                Swal.fire('Error', response.message || 'No se pudo actualizar el estado', 'error');
+            }
+        }
+    });
 });
 
 
@@ -1082,6 +1189,7 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
       );
     }
   });
+}
   $(document).on('change', '.select-usuario-externo', function() {
     var estado = $(this).val();
     var idUsuario = $(this).data('id-usuario');
@@ -1091,4 +1199,16 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
         enviarEmailUsuarioMoodle(idUsuario, idPedido);
     }
 });
+function actualizarTotalImporte() {
+    var total = 0;
+    // Cambia el selector y el índice de columna según tu estructura
+    $('#table-curso-pedidos tbody tr').each(function() {
+        // Si el importe es un input
+        var valor = $(this).find('input[name="importe_pedido"]').val();
+        // Si el importe es solo texto en una celda, usa:
+        // var valor = $(this).find('td').eq(5).text();
+        valor = valor ? parseFloat(valor) : 0;
+        if (!isNaN(valor)) total += valor;
+    });
+    $('#span-total-importe').text(total.toFixed(2));
 }
