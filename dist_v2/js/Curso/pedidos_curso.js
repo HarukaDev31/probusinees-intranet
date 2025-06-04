@@ -444,19 +444,7 @@ function reload_table_Entidad() {
 
 function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
   event.preventDefault();
-  var $modal_delete = $('#modal-message-delete');
-  $modal_delete.modal('show');
-
-  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
-  $('.modal-message-delete').addClass('modal-success');
-
-  $('#modal-title').text('¿Deseas crear usuario Moodle?');
-
-  $('#btn-save-delete').off('click').click(function () {
-
-    $('#btn-save-delete').text('');
-    $('#btn-save-delete').attr('disabled', true);
-    $('#btn-save-delete').append('Guardando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>');
+ 
 
     url = base_url + 'Curso/PedidosCurso/crearUsuarioCursosMoodle/' + id + '/' + ID_Pedido_Curso;
     $.ajax({
@@ -484,7 +472,7 @@ function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
         }
       }
     });
-  });
+  
 }
 
 function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
