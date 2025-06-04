@@ -442,83 +442,78 @@ function reload_table_Entidad() {
   }
 }
 
-function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
+async function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
   event.preventDefault();
- 
+  url = base_url + 'Curso/PedidosCurso/crearUsuarioCursosMoodle/' + id + '/' + ID_Pedido_Curso;
+  await $.ajax({
+    url: url,
+    type: "GET",
+    dataType: "JSON",
+    success: async function (response) {
+      $('#btn-save-delete').text('');
+      $('#btn-save-delete').append('Aceptar');
+      $('#btn-save-delete').attr('disabled', false);
 
-    url = base_url + 'Curso/PedidosCurso/crearUsuarioCursosMoodle/' + id + '/' + ID_Pedido_Curso;
-    $.ajax({
-      url: url,
-      type: "GET",
-      dataType: "JSON",
-      success: function (response) {
-        $modal_delete.modal('hide');
-        $('#btn-save-delete').text('');
-        $('#btn-save-delete').append('Aceptar');
-        $('#btn-save-delete').attr('disabled', false);
+      $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+      $('#modal-message').modal('show');
 
-        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-        $('#modal-message').modal('show');
+      if (response.status == 'success') {
+        $('#moda-message-content').addClass('bg-' + response.status);
+        $('.modal-title-message').text(response.message);
+        setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+        await enviarEmailUsuarioMoodle(id, ID_Pedido_Curso);
 
-        if (response.status == 'success') {
-          $('#moda-message-content').addClass('bg-' + response.status);
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
-          reload_table_Entidad();
-        } else {
-          $('#moda-message-content').addClass('bg-danger');
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
+        reload_table_Entidad();
+      } else {
+        if(response.debug_data) {
+          //usuario existe show No_Password  No_Usuario
+          $('#moda-message-content').addClass('bg-warning');
+          $('.modal-title-message').text(`Usuario ya existe en Moodle,
+            Usuario: ${response.debug_data.No_Usuario || 'No disponible'},
+            Password: ${response.debug_data.No_Password || 'No disponible'}.
+            `);
+            setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
+            return;
         }
+        $('#moda-message-content').addClass('bg-danger');
+        $('.modal-title-message').text(response.message);
+        setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
       }
-    });
-  
+    }
+  });
+
 }
 
-function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
-  var $modal_delete = $('#modal-message-delete');
-  $modal_delete.modal('show');
+async function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
+  event.preventDefault();
+  url = base_url + 'Curso/PedidosCurso/enviarEmailUsuarioMoodle/' + id + '/' + ID_Pedido_Curso;
+  $.ajax({
+    url: url,
+    type: "GET",
+    dataType: "JSON",
+    success: function (response) {
+      $modal_delete.modal('hide');
+      $('#btn-save-delete').text('');
+      $('#btn-save-delete').append('Aceptar');
+      $('#btn-save-delete').attr('disabled', false);
 
-  $('.modal-message-delete').removeClass('modal-danger modal-warning modal-success');
-  $('.modal-message-delete').addClass('modal-success');
+      $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
+      $('#modal-message').modal('show');
 
-  $('#modal-title').text('¿Deseas enviar credenciales Moodle?');
+      if (response.status == 'success') {
+        console.log(response, "console log");
 
-  $('#btn-save-delete').off('click').click(function () {
-
-    $('#btn-save-delete').text('');
-    $('#btn-save-delete').attr('disabled', true);
-    $('#btn-save-delete').append('Enviando <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>');
-
-    url = base_url + 'Curso/PedidosCurso/enviarEmailUsuarioMoodle/' + id + '/' + ID_Pedido_Curso;
-    $.ajax({
-      url: url,
-      type: "GET",
-      dataType: "JSON",
-      success: function (response) {
-        $modal_delete.modal('hide');
-        $('#btn-save-delete').text('');
-        $('#btn-save-delete').append('Aceptar');
-        $('#btn-save-delete').attr('disabled', false);
-
-        $('#moda-message-content').removeClass('bg-danger bg-warning bg-success');
-        $('#modal-message').modal('show');
-
-        if (response.status == 'success') {
-          console.log(response,"console log");
-          crearUsuarioCursosMoodle(id, ID_Pedido_Curso);
-
-          $('#moda-message-content').addClass('bg-' + response.status);
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
-        } else {
-          $('#moda-message-content').addClass('bg-danger');
-          $('.modal-title-message').text(response.message);
-          setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
-        }
+        $('#moda-message-content').addClass('bg-' + response.status);
+        $('.modal-title-message').text(response.message);
+        setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
+      } else {
+        $('#moda-message-content').addClass('bg-danger');
+        $('.modal-title-message').text(response.debug_data || response.message);
+        setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
       }
-    });
+    }
   });
+
 }
 
 async function viewCliente(id) {
@@ -1287,13 +1282,13 @@ async function guardarCambiosPedido(ID_Pedido_Curso) {
     }
   });
 }
-$(document).on('change', '.select-usuario-externo', function () {
+$(document).on('change', '.select-usuario-externo', async function () {
   var estado = $(this).val();
   var idUsuario = $(this).data('id-usuario');
   var idPedido = $(this).data('id-pedido');
   if (estado == '2') {
     // Ejecuta la función de compartir (enviar email Moodle)
-    enviarEmailUsuarioMoodle(idUsuario, idPedido);
+    await crearUsuarioCursosMoodle(idUsuario, idPedido);
   }
 });
 

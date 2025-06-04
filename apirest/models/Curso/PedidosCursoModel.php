@@ -102,7 +102,7 @@ class PedidosCursoModel extends CI_Model
 			PR.No_Provincia as provincia,
 			DI.No_Distrito as distrito,
 			USR.ID_Usuario as id_usuario, 
-			USR.No_Usuario as usuario_moodle,
+			USR.usuario_moodle as usuario_moodle,
 			USR.No_Password as password_moodle,
 			PC.ID_Campana,
 			PC.tipo_curso as tipo_curso,
@@ -176,7 +176,19 @@ class PedidosCursoModel extends CI_Model
 		$this->db->from($this->table);
 		return $this->db->count_all_results();
 	}
+	public function setUsuarioModdle($user,$password,$id_usuario){
+		$data = array(
+			'usuario_moodle' => $user,
+			'No_Password' => $password
+		);
+		$this->db->where('ID_Usuario', $id_usuario);
+		if ($this->db->update($this->table_usuario, $data)) {
+			return array('status' => 'success', 'message' => 'Usuario actualizado correctamente');
+		} else {
+			return array('status' => 'error', 'message' => 'Error al actualizar el usuario');
+		}
 
+	}
 	public function actualizarPedido($where, $data)
 	{
 		if ($this->db->update('pedido_curso', $data, $where) > 0)
@@ -186,7 +198,7 @@ class PedidosCursoModel extends CI_Model
 
 	public function getUsuario($id)
 	{
-		$query = "SELECT No_Usuario, No_Password, No_Nombres_Apellidos FROM usuario WHERE ID_Usuario = " . $id . " LIMIT 1";
+		$query = "SELECT No_Usuario, No_Password,usuario_moodle, No_Nombres_Apellidos FROM usuario WHERE ID_Usuario = " . $id . " LIMIT 1";
 
 		if (!$this->db->simple_query($query)) {
 			$error = $this->db->error();

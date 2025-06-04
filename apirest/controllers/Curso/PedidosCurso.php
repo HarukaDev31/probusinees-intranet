@@ -391,6 +391,9 @@ class PedidosCurso extends CI_Controller
                 // Buscar el usuario creado usando el nuevo username
                 $arrParams['criteria'][0]['key']   = 'username';
                 $arrParams['criteria'][0]['value'] = $username;
+                //set No_Usuario to  $username
+                $this->PedidosCursoModel->setUsuarioModdle($username,$this->encryption->encrypt($cleaned_password),
+            $id);
                 $response_usuario = $MoodleRestPro->getUser($arrParams);
 
                 if ($response_usuario['status'] == 'success') {
@@ -425,7 +428,7 @@ class PedidosCurso extends CI_Controller
                             'data' => [
                                 'original_username' => $original_username,
                                 'moodle_username' => $username,
-                                'moodle_id' => $id_usuario
+                                'moodle_id' => $id_usuario,
                             ]
                         ];
                         echo json_encode($response_success);
@@ -452,10 +455,14 @@ class PedidosCurso extends CI_Controller
                 if (isset($response_usuario_moodle['message'])) {
                     $error_message .= ': ' . $response_usuario_moodle['message'];
                 }
+                $arrPost=[];
+                //get no_usuario and no_password from response_usuario_bd
+                $arrPost['No_Usuario'] = $result->usuario_moodle;
+                $arrPost['No_Password'] = $this->encryption->decrypt($result->No_Password);
 
                 $response_error = [
                     'status' => 'error',
-                    'message' => $error_message,
+                    'message' => "El usuario ya existe en Moodle o hubo un error al crearlo: $error_message",
                     'debug_data' => $arrPost,
                     'validation_results' => $this->getValidationResults($arrPost)
                 ];
@@ -613,7 +620,7 @@ class PedidosCurso extends CI_Controller
                 }
                 $message = "Hola, {$result->No_Nombres_Apellidos},\n\n";
                 $message .= "Tu cuenta en ProBusiness ha sido creada exitosamente.\n\n";
-                $message .= "Usuario: {$result->No_Usuario}\n";
+                $message .= "Usuario: " . (isset($result->usuario_moodle) && $result->usuario_moodle ? $result->usuario_moodle : $result->No_Usuario) . "\n";
                 $message .= "Contraseña: {$this->encryption->decrypt($result->No_Password)}\n\n";
                 $message .= "Puedes acceder a tu cuenta en el siguiente enlace: https://aulavirtualprobusiness.com/login/\n\n";
                 $message .= "Saludos,\nEl equipo de ProBusiness";
@@ -628,7 +635,7 @@ class PedidosCurso extends CI_Controller
             }
             $this->load->library('email');
 
-            $data_email["email"]    = $result->No_Usuario;
+            $data_email["email"]    = $result->usuario_moodle ? $result->usuario_moodle : $result->No_Usuario;
             $data_email["password"] = $this->encryption->decrypt($result->No_Password);
             $data_email["name"]     = $result->No_Nombres_Apellidos;
             $message_email          = $this->load->view('correos/cuenta_moodle', $data_email, true);
