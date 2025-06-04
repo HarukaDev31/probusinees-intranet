@@ -11,6 +11,116 @@ var currentTableCurso = 'alumnos';
 var tableCursoPagos;
 var tableCursoPedidos;
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
+function showImageModal(url) {
+  ///create modal and show image
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.id = 'imageModal';
+  modal.tabIndex = -1;
+  modal.setAttribute('role', 'dialog');
+  const modalDialog = document.createElement('div');
+  modalDialog.className = 'modal-dialog modal-dialog-centered';
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+  const modalBody = document.createElement('div');
+  modalBody.className = 'modal-body';
+  modalBody.innerHTML = `<img src="${url}" alt="Image" class="img-fluid">`;
+  modalContent.appendChild(modalBody);
+  modalDialog.appendChild(modalContent);
+  modal.appendChild(modalDialog);
+  document.body.appendChild(modal);
+  $(modal).modal('show');
+  $(modal).on('hidden.bs.modal', function () {
+    $(this).remove(); // Remove modal from DOM after closing
+  });
+}
+async function viewClientePagosCurso(idPedidoCurso, nombreCliente) {
+  //show modal with table of pagos coordination
+  $("#modalClientePagosCoordination").modal("show");
+  $("#modalClientePagosCoordination .modal-title").text(`Pagos de Coordinación - ${nombreCliente}`);
+  url =
+    base_url + "Curso/PedidosCurso/getPagosCurso/" + idPedidoCurso;
+  if (!$.fn.DataTable.isDataTable("#table-pagos-tracking-coordinacion")) {
+    tableCotizacionTrackingPagos = $("#table-pagos-tracking-coordinacion").DataTable({
+      dom:
+        "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
+      buttons: [],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      },
+      columnDefs: [
+        {
+          targets: "no-hidden",
+          visible: false,
+        },
+        {
+          className: "text-center",
+          targets: "no-sort",
+          orderable: false,
+        },
+        {
+          targets: "",
+          orderable: false,
+        },
+        {
+          targets: "sorting_asc",
+          orderable: false,
+        },
+      ],
+      pageLength: 100, // Mostrar 100 elementos por página
+      lengthMenu: [
+        [100, 1000, -1],
+        [100, 1000, "Todos"],
+      ],
+      order: [[1, "asc"]],
+      ajax: {
+        url: url,
+        type: "POST",
+        dataType: "JSON",
+        data: function (data) {
+
+        },
+      },
+      initComplete: function () {
+      },
+      complete: function () {
+
+
+      },
+      drawCallback: function (settings) {
+
+      },
+    });
+  } else {
+    tableCotizacionTrackingPagos.ajax.url(url).load();
+  }
+
+}
+
 async function addPagosCurso(idPedido, nombreCliente) {
   const { value: formValues } = await Swal.fire({
     title: `Pagos de Curso - ${nombreCliente}`,
@@ -465,15 +575,15 @@ async function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
 
         reload_table_Entidad();
       } else {
-        if(response.debug_data) {
+        if (response.debug_data) {
           //usuario existe show No_Password  No_Usuario
           $('#moda-message-content').addClass('bg-warning');
           $('.modal-title-message').text(`Usuario ya existe en Moodle,
             Usuario: ${response.debug_data.No_Usuario || 'No disponible'},
             Password: ${response.debug_data.No_Password || 'No disponible'}.
             `);
-            setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
-            return;
+          setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
+          return;
         }
         $('#moda-message-content').addClass('bg-danger');
         $('.modal-title-message').text(response.message);
@@ -1282,6 +1392,7 @@ async function guardarCambiosPedido(ID_Pedido_Curso) {
     }
   });
 }
+
 $(document).on('change', '.select-usuario-externo', async function () {
   var estado = $(this).val();
   var idUsuario = $(this).data('id-usuario');
@@ -1291,4 +1402,3 @@ $(document).on('change', '.select-usuario-externo', async function () {
     await crearUsuarioCursosMoodle(idUsuario, idPedido);
   }
 });
-

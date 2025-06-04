@@ -829,4 +829,32 @@ class PedidosCurso extends CI_Controller
             echo json_encode(['status' => 'error', 'message' => 'Error al obtener cursos']);
         }
     }
+    public function getPagosCurso($idPedidoCurso)
+	{
+		try {
+			$arrData = $this->PedidosCursoModel->getPagosCursoPedido($idPedidoCurso);
+			$data    = [];
+			$index   = 1;
+			foreach ($arrData as $row) {
+				$subdata = [];
+				$subdata[] = $index;
+				$subdata[] = allTypeDate($row->payment_date, '-', 0);
+				$subdata[] = $row->banco;
+				$subdata[] = "$" . round($row->monto, 2);
+				$subdata[] = '<div data-url=' . $row->voucher_url . ' download
+                onclick="showImageModal(\'' . $row->voucher_url . '\')"
+                >
+                    <i class="fas fa-file"></i>
+                    </div>';
+				$data[] = $subdata;
+				$index++;
+			}
+			$output = array(
+				"data" => $data
+			);
+			echo json_encode($output);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
+		}
+	}
 }
