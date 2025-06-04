@@ -518,7 +518,7 @@ function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
 
         if (response.status == 'success') {
           console.log(response,"console log");
-          crearUsuarioCursosMoodle(idUsuario, idPedido);
+          crearUsuarioCursosMoodle(id, ID_Pedido_Curso);
 
           $('#moda-message-content').addClass('bg-' + response.status);
           $('.modal-title-message').text(response.message);
