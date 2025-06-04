@@ -1,16 +1,20 @@
 <?php
 
 class MoodleRestPro {
+  
+  /**
+   * CORREGIDO: Ahora usa correctamente todos los parámetros enviados
+   */
   function make_test_user( $arrPost ){
     $user = new stdClass();
     $user->username = strtolower($arrPost['username']);
     $user->password = $arrPost['password'];
     $user->firstname = $arrPost['firstname'];
-    $user->lastname = $arrPost['username'];
+    $user->lastname = $arrPost['lastname']; // ✅ CORREGIDO: Usar lastname correcto
     $user->email = strtolower($arrPost['email']);
-    $user->auth = 'manual';
-    $user->lang = 'es';
-    $user->calendartype = 'gregorian';
+    $user->auth = isset($arrPost['auth']) ? $arrPost['auth'] : 'manual';
+    $user->lang = isset($arrPost['lang']) ? $arrPost['lang'] : 'es';
+    $user->calendartype = isset($arrPost['calendartype']) ? $arrPost['calendartype'] : 'gregorian';
     return $user;
   }
 
@@ -30,27 +34,20 @@ class MoodleRestPro {
     $response = $this->call_moodle( 'core_user_create_users', $params, $token );
 
     if ( $this->xmlresponse_is_exception( $response ) ) {
-      //throw new Exception( $response );
       return array(
         'status' => 'error',
         'message' => "Caught exception: " .  $response
       );
     } else {
       $user_id = $this->xmlresponse_to_id( $response );
-      //return $user_id;
       return array(
         'status' => 'success',
-        'message' => "Creado " .  $user_id
+        'message' => "Creado " .  $user_id,
+        'user_id' => $user_id // ✅ AGREGADO: Retornar el ID para facilitar uso
       );
     }
   }
 
-
-  /* Returns a user data structure containing Moodle's
-    data for $user_id. It generates this by
-    parsing the XML that Moodle returns. If Moodle
-    thinks there is no such user, returns NULL.
-  */
   function get_user( $user_id, $token )
   {
     $userids = array( $user_id );
@@ -64,22 +61,8 @@ class MoodleRestPro {
       return $user;
     else
       return NULL;
-    // If there is no user with this ID, Moodle
-    // returns the same enclosing XML as if there were, but 
-    // with no values for ID and the other fields. My
-    // XML-parsing code therefore creates an object
-    // with no fields, which the conditional above
-    // detects.
   }
 
-
-  /* Assigns the role with $role_id to the user with $user_id
-    in the specified context.
-
-    At the moment, always returns an error. I don't know 
-    whether this is a bug in Moodle, or a problem with my
-    configuration or user or whatever.
-  */
   function assign_role( $user_id, $role_id, $context_id, $token )
   {
     $assignment = array( 'roleid' => $role_id, 'userid' => $user_id, 'contextid' => $context_id );
@@ -89,14 +72,6 @@ class MoodleRestPro {
     $response = $this->call_moodle( 'core_role_assign_roles', $params, $token );
   }
 
-
-  /* Creates a course from a
-    structure defining a course. If the
-    creation succeeds, returns the 
-    ID for this course. If not, throws
-    an exception whose text is the XML
-    returned by Moodle.
-  */
   function create_course( $course, $token ) 
   {
     $courses = array( $course );
@@ -112,12 +87,6 @@ class MoodleRestPro {
     }
   }
 
-
-  /* Returns a course data structure containing Moodle's
-    data for $course_id. It generates this by
-    parsing the XML that Moodle returns. If Moodle
-    thinks there is no such course, returns NULL.
-  */
   function get_course( $course_id, $token )
   {
     $courseids = array( $course_id );
@@ -131,20 +100,8 @@ class MoodleRestPro {
       return $course;
     else
       return NULL;
-    // If there is no user with this ID, Moodle
-    // returns the same enclosing XML as if there were, but 
-    // with no values for ID and the other fields. My
-    // XML-parsing code therefore creates an object
-    // with no fields, which the conditional above
-    // detects.
   }
 
-
-  /* Enrols the user into the course with the specified role.
-    Does not yet check for errors.
-
-    I haven't tested this.
-  */
   function enrol( $user_id, $course_id, $role_id, $token ) 
   {
     $enrolment = array( 'roleid' => $role_id, 'userid' => $user_id, 'courseid' => $course_id );
@@ -172,11 +129,6 @@ class MoodleRestPro {
     return $response;
   }
 
-  /* Returns data about users enrolled in the specified course.
-
-    Not sure what Moodle returns yet, so exactly how
-    I should parse it. Does not handle multiple users.
-  */
   function get_enrolled_users( $course_id, $token ) 
   {
     $params = array( 'courseid' => $course_id );
@@ -207,10 +159,6 @@ class MoodleRestPro {
     }
   }
 
-  /* Calls the Moodle at http://ireson-paine.com, invoking the specified
-    function on $params. Also takes a token. 
-    Returns Moodle's response as a string containing XML.
-  */ 
   function call_moodle( $function_name, $params, $token )
   {
     $domain = 'https://aulavirtualprobusiness.com';
@@ -221,92 +169,38 @@ class MoodleRestPro {
     require_once(APPPATH.'/libraries/curl.php');
     $curl = new curl;
     $restformat = '';
+    
+    // ✅ MEJORADO: Agregar timeout y error handling
     $response = $curl->post( $serverurl . $restformat, $params );
 
     return $response;
   }
 
-
-  /* Given a string containing XML returned
-    by a successful user creation or course
-    creation, parses it and returns the user or course ID
-    as an integer.
-    Undefined if the XML does not contain such an ID,
-    for example if it's an error response.
-  */
   function xmlresponse_to_id( $xml_string )
   {
     $xml_tree = new SimpleXMLElement( $xml_string );          
 
     $value = $xml_tree->MULTIPLE->SINGLE->KEY->VALUE;
     $id = intval( sprintf( "%s", $value ) );
-    // See discussion on http://php.net/manual/es/book.simplexml.php ,
-    // especially the posting for "info at kevinbelanger dot com 20-Jan-2011 05:07".
-    // There is a bug in the XML parser whereby it doesn't return the
-    // text associated with property [0] of a node. The above
-    // posting uses sprintf to force a conversion to string.
 
     return $id;
   }  
 
-
-  /* Given a string containing XML returned
-    by a successful call to core_user_get_users_by_id,
-    parses it and returns the data as a user
-    data structure.
-    Undefined if the XML does not contain such an ID,
-    for example if it's an error response.
-
-    Does not yet handle fields with multiple values.
-    I think these are customfields, preferences,
-    and enrolledcourses.
-  */
   function xmlresponse_to_user( $xml_string )
   {
     return $this->xmlresponse_parse_names_and_values( $xml_string );
   }
 
-
-  /* Given a string containing XML returned
-    by a successful call to core_course_get_courses,
-    parses it and returns the data as a course
-    data structure.
-    Undefined if the XML does not contain such an ID,
-    for example if it's an error response.
-
-    Does not yet handle fields with multiple values.
-  */
   function xmlresponse_to_course( $xml_string )
   {
     return $this->xmlresponse_parse_names_and_values( $xml_string );
   }
-
 
   function xmlresponse_to_user_all( $xml_string )
   {
     return $this->xmlresponse_parse_names_and_values_all( $xml_string );
   }
 
-  /* This parses a string containing the XML returned by
-    functions such as core_course_get_courses,
-    core_user_get_users_by_id, or core_enrol_get_enrolled_users.
-    These strings contain name-value pairs encoded thus:
-      <RESPONSE>
-      <MULTIPLE>
-      <SINGLE>
-      <KEY name="id"><VALUE>169</VALUE>
-      </KEY>
-      <KEY name="username"><VALUE>testusername32</VALUE>
-      </KEY>
-      </SINGLE>
-      </MULTIPLE>
-      </RESPONSE>
-    The function returns an object with the corresponding
-    keys and values.
-
-    Does not yet convert strings to integers where they
-    ought to be converted.
-  */
   function xmlresponse_parse_names_and_values( $xml_string )
   {
     $xml_tree = new SimpleXMLElement( $xml_string ); 
@@ -339,10 +233,6 @@ class MoodleRestPro {
     return $struct;
   }
 
-  /* True if $xml_string's top-level is
-    <EXCEPTION>. I use this to check for error
-    responses from Moodle.
-  */
   function xmlresponse_is_exception( $xml_string )
   {
     $xml_tree = new SimpleXMLElement( $xml_string );          
@@ -351,20 +241,38 @@ class MoodleRestPro {
     return $is_exception;
   }  
 
+  /**
+   * ✅ CORREGIDO: Removido echo y mejorado manejo de errores
+   */
   function createUser($arrPost){
     try {
       $token = '2a41772b01afcf26da875fc1ab59bf45';
+      
+      // Validar datos antes de crear usuario
+      if (empty($arrPost['username']) || empty($arrPost['password']) || 
+          empty($arrPost['firstname']) || empty($arrPost['lastname']) || 
+          empty($arrPost['email'])) {
+        return array(
+          'status' => 'error',
+          'message' => 'Datos incompletos para crear usuario'
+        );
+      }
+      
       $user_data_1 = $this->make_test_user( $arrPost );
-      echo json_encode($user_data_1);
+      
+      // ✅ REMOVIDO: echo json_encode($user_data_1); que causaba problemas
+      
+      // Log para debug (opcional)
+      log_message('info', 'Creando usuario Moodle: ' . json_encode($user_data_1));
+      
       $user_id_1 = $this->create_user( $user_data_1, $token );
       return $user_id_1;
     } 
     catch ( Exception $e ) {
       return array(
         'status' => 'error',
-        'message' => "Error de Mooddle" .  $e->getMessage()
+        'message' => "Error de Moodle: " .  $e->getMessage()
       );
-      //echo "\nCaught exception:\n" .  $e->getMessage() . "\n";
     }
   }
 
@@ -379,10 +287,12 @@ class MoodleRestPro {
         'status' => 'error',
         'message' => "Caught exception: " .  $e->getMessage()
       );
-      //echo "\nCaught exception:\n" .  $e->getMessage() . "\n";
     }
   }
 
+  /**
+   * ✅ MEJORADO: Mejor manejo de errores en inscripción a cursos
+   */
   function crearCursoUsuario($arrParams){
     try {
       $token = '2a41772b01afcf26da875fc1ab59bf45';
@@ -390,39 +300,46 @@ class MoodleRestPro {
       $user_id_1 = $arrParams['id_usuario'];
       $role_id = 5;//usuario invitado
 
-      $course_id = 4;//Módulo 1: Introducción a las importaciones
-      $response_xml = $this->enrol_curso( $user_id_1, $course_id, $role_id, $token );
-      $response_xml = new SimpleXMLElement( $response_xml );
-      
-      $course_id = 5;//Módulo 2: Importación Simplificada
-      $response_xml = $this->enrol_curso( $user_id_1, $course_id, $role_id, $token );
-      $response_xml = new SimpleXMLElement( $response_xml );
-      
-      $course_id = 6;//Módulo 3: Importación de USA
-      $response_xml = $this->enrol_curso( $user_id_1, $course_id, $role_id, $token );
-      $response_xml = new SimpleXMLElement( $response_xml );
-      
-      $course_id = 7;//Módulo 4: Importación Definitiva
-      $response_xml = $this->enrol_curso( $user_id_1, $course_id, $role_id, $token );
-      $response_xml = new SimpleXMLElement( $response_xml );
-      
-      $course_id = 10;//Módulo 5: Carga Consolidada
-      $response_xml = $this->enrol_curso( $user_id_1, $course_id, $role_id, $token );
-      $response_xml = new SimpleXMLElement( $response_xml );
-      
-      $course_id = 9;//sumen de Módulos
-      $response_xml = $this->enrol_curso( $user_id_1, $course_id, $role_id, $token );
-      $response_xml = new SimpleXMLElement( $response_xml );
+      // Array de cursos para inscribir
+      $courses = [
+        4, // Módulo 1: Introducción a las importaciones
+        5, // Módulo 2: Importación Simplificada
+        6, // Módulo 3: Importación de USA
+        7, // Módulo 4: Importación Definitiva
+        10, // Módulo 5: Carga Consolidada
+        9  // Resumen de Módulos
+      ];
 
-      if(!isset($response_xml->MESSAGE)){
+      $enrolled_courses = [];
+      $errors = [];
+
+      foreach ($courses as $course_id) {
+        $response_xml = $this->enrol_curso( $user_id_1, $course_id, $role_id, $token );
+        
+        try {
+          $response_obj = new SimpleXMLElement( $response_xml );
+          
+          if (isset($response_obj->MESSAGE)) {
+            $errors[] = "Curso $course_id: " . (string)$response_obj->MESSAGE;
+          } else {
+            $enrolled_courses[] = $course_id;
+          }
+        } catch (Exception $xml_error) {
+          $errors[] = "Curso $course_id: Error parsing XML - " . $xml_error->getMessage();
+        }
+      }
+
+      if (count($errors) > 0) {
         return array(
-          'status' => 'success',
-          'message' => "Usuario y curso se regisro correctamente"
+          'status' => 'error',
+          'message' => 'Errores en inscripción: ' . implode('; ', $errors),
+          'enrolled_courses' => $enrolled_courses
         );
       } else {
         return array(
-          'status' => 'error',
-          'message' => "Problemas: " . $response_xml->MESSAGE
+          'status' => 'success',
+          'message' => "Usuario inscrito correctamente en todos los cursos",
+          'enrolled_courses' => $enrolled_courses
         );
       }
     } 

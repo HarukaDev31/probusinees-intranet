@@ -599,7 +599,6 @@ async function viewCliente(id) {
 
         $('#btn-editar-cliente').on('click', function () {
           $('.cliente-input').prop('readonly', false);
-          $('#cliente-moodle-usuario').prop('readonly', true);
           $('#cliente-moodle-password').prop('readonly', true);
           $('#btn-guardar-cliente').show();
           $('#btn-cancel').show();

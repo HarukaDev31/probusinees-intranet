@@ -296,7 +296,7 @@ class PedidosCurso extends CI_Controller
 
                 'nu_estado'                   => $data['Nu_Estado'] ?? null,
                 'nu_estado_usuario_externo'   => $data['Nu_Estado_Usuario_Externo'] ?? null,
-                'id_usuario'                  => $data['usuario_moodle'] ?? null, // o el campo correcto de tu modelo
+                'id_usuario'                  => $data['id_usuario'] ?? null, // o el campo correcto de tu modelo
                 'id_pedido_curso'             => $id_pedido,
             ];
 
@@ -305,6 +305,7 @@ class PedidosCurso extends CI_Controller
             echo json_encode(['status' => 'error', 'message' => 'No se encontró el pedido']);
         }
     }
+   
     public function crearUsuarioCursosMoodle($id, $ID_Pedido_Curso)
     {
         $id_pedido_curso = $ID_Pedido_Curso;
@@ -312,69 +313,281 @@ class PedidosCurso extends CI_Controller
         $response_usuario_bd = $this->PedidosCursoModel->getUsuario($id);
         if ($response_usuario_bd['status'] == 'success') {
             $result = $response_usuario_bd['result'][0];
+            log_message('error', 'result: ' . print_r($result, true));
+
+            // Validar y limpiar datos antes de enviar a Moodle
+            $original_username = trim($result->No_Nombres_Apellidos);
+            $password = $this->encryption->decrypt($result->No_Password);
+            $nombres = trim($result->No_Nombres_Apellidos);
+            $email = trim($result->No_Usuario);
+
+            // Validaciones básicas
+            if (empty($original_username) || empty($password) || empty($nombres)) {
+                $response_error = [
+                    'status' => 'error',
+                    'message' => 'Datos de usuario incompletos'
+                ];
+                echo json_encode($response_error);
+                exit();
+            }
+
+            // Validar formato de email
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $response_error = [
+                    'status' => 'error',
+                    'message' => 'Formato de email inválido: ' . $email
+                ];
+                echo json_encode($response_error);
+                exit();
+            }
+
+            // ============ DEBUG: Probar con datos mínimos y seguros ============
+            // Crear username más seguro (solo letras y números)
+            $username = $this->generateSafeUsername($original_username);
+
+            // Crear contraseña más segura (solo letras y números)
+            $cleaned_password = $this->generateSafePassword($password);
+
+            // Separar nombres y apellidos con más validación
+            $nombres_array = explode(' ', $nombres);
+            $firstname = $this->cleanString(isset($nombres_array[0]) ? trim($nombres_array[0]) : 'Usuario');
+            $lastname = $this->cleanString(isset($nombres_array[1]) ? trim(implode(' ', array_slice($nombres_array, 1))) : 'Apellido');
+
+            // Si no hay apellido válido, usar algo simple
+            if (empty($lastname) || strlen($lastname) < 2) {
+                $lastname = 'Usuario';
+            }
+
+            // Asegurar longitudes mínimas y máximas
+            $username = $this->validateLength($username, 3, 20);
+            $firstname = $this->validateLength($firstname, 2, 50);
+            $lastname = $this->validateLength($lastname, 2, 50);
+
+            // ============ PROBAR CON DATOS ULTRA SIMPLES PRIMERO ============
+            $arrPost = [
+                'username'     => $username,
+                'password'     => $cleaned_password,
+                'firstname'    => $firstname,
+                'lastname'     => $lastname,
+                'email'        => $email,
+                'auth'         => 'manual',
+                'lang'         => 'es',
+            ];
+
+            // Log detallado para debug
+            log_message('error', 'Datos limpiados para Moodle: ' . json_encode($arrPost));
+
+            // Verificar cada campo individualmente
+            $this->validateMoodleFields($arrPost);
 
             //crear usuario y cursos para moodle
             $MoodleRestPro = new MoodleRestPro();
-            $arrPost       = [
-                'username'  => $result->No_Usuario,
-                'password'  => $this->encryption->decrypt($result->No_Password),
-                'firstname' => $result->No_Nombres_Apellidos,
-                "lastname"  => "lastname",
-                'email'     => $result->No_Usuario,
-            ];
-
             $response_usuario_moodle = $MoodleRestPro->createUser($arrPost);
+
+            // Log de respuesta de Moodle
+            log_message('error', 'Respuesta de Moodle: ' . json_encode($response_usuario_moodle));
+
             if ($response_usuario_moodle['status'] == 'success') {
-                // Property added to the object
+                // Buscar el usuario creado usando el nuevo username
                 $arrParams['criteria'][0]['key']   = 'username';
-                $arrParams['criteria'][0]['value'] = $result->No_Usuario;
-                $response_usuario                  = $MoodleRestPro->getUser($arrParams);
+                $arrParams['criteria'][0]['value'] = $username;
+                $response_usuario = $MoodleRestPro->getUser($arrParams);
 
                 if ($response_usuario['status'] == 'success') {
                     $result_usuario = $response_usuario['response'];
+                    $id_usuario = $result_usuario->id;
 
-                    $id_usuario     = $result_usuario->id;
                     $arrParamsCurso = [
-                        'id_usuario' => $id_usuario, //id_usuario
+                        'id_usuario' => $id_usuario,
                     ];
+
                     $response_curso = $MoodleRestPro->crearCursoUsuario($arrParamsCurso);
+
                     if ($response_curso['status'] != 'success') {
-                        $where    = ['ID_Pedido_Curso' => $id_pedido_curso];
-                        $data_upd = ['Nu_Estado_Usuario_Externo' => '3']; //usuario no creado en moodle
+                        $where = ['ID_Pedido_Curso' => $id_pedido_curso];
+                        $data_upd = ['Nu_Estado_Usuario_Externo' => '3'];
                         $this->PedidosCursoModel->actualizarPedido($where, $data_upd);
 
-                        echo json_encode($response_curso);
+                        $response_error = [
+                            'status' => 'error',
+                            'message' => 'Usuario creado pero error al asignar curso: ' . ($response_curso['message'] ?? 'Error desconocido')
+                        ];
+                        echo json_encode($response_error);
                         exit();
                     } else {
-                        $where    = ['ID_Pedido_Curso' => $id_pedido_curso];
-                        $data_upd = ['Nu_Estado_Usuario_Externo' => '2']; //usuario creado
+                        $where = ['ID_Pedido_Curso' => $id_pedido_curso];
+                        $data_upd = ['Nu_Estado_Usuario_Externo' => '2'];
                         $this->PedidosCursoModel->actualizarPedido($where, $data_upd);
 
-                        echo json_encode($response_curso);
+                        $response_success = [
+                            'status' => 'success',
+                            'message' => 'Usuario y curso creados exitosamente',
+                            'data' => [
+                                'original_username' => $original_username,
+                                'moodle_username' => $username,
+                                'moodle_id' => $id_usuario
+                            ]
+                        ];
+                        echo json_encode($response_success);
                         exit();
                     }
                 } else {
-                    $where    = ['ID_Pedido_Curso' => $id_pedido_curso];
-                    $data_upd = ['Nu_Estado_Usuario_Externo' => '3']; //usuario no creado en moodle
+                    $where = ['ID_Pedido_Curso' => $id_pedido_curso];
+                    $data_upd = ['Nu_Estado_Usuario_Externo' => '3'];
                     $this->PedidosCursoModel->actualizarPedido($where, $data_upd);
 
-                    echo json_encode($response_usuario);
+                    $response_error = [
+                        'status' => 'error',
+                        'message' => 'Usuario creado pero no se pudo recuperar: ' . ($response_usuario['message'] ?? 'Error desconocido')
+                    ];
+                    echo json_encode($response_error);
                     exit();
                 }
             } else {
-                $where    = ['ID_Pedido_Curso' => $id_pedido_curso];
-                $data_upd = ['Nu_Estado_Usuario_Externo' => '3']; //usuario no creado en moodle
+                $where = ['ID_Pedido_Curso' => $id_pedido_curso];
+                $data_upd = ['Nu_Estado_Usuario_Externo' => '3'];
                 $this->PedidosCursoModel->actualizarPedido($where, $data_upd);
 
-                echo json_encode($response_usuario_moodle);
+                $error_message = 'Error al crear usuario en Moodle';
+                if (isset($response_usuario_moodle['message'])) {
+                    $error_message .= ': ' . $response_usuario_moodle['message'];
+                }
+
+                $response_error = [
+                    'status' => 'error',
+                    'message' => $error_message,
+                    'debug_data' => $arrPost,
+                    'validation_results' => $this->getValidationResults($arrPost)
+                ];
+                echo json_encode($response_error);
                 exit();
             }
         } else {
-            echo json_encode($response_usuario_bd);
+            $response_error = [
+                'status' => 'error',
+                'message' => 'No se pudieron obtener los datos del usuario: ' . ($response_usuario_bd['message'] ?? 'Error desconocido')
+            ];
+            echo json_encode($response_error);
             exit();
         }
     }
 
+    /**
+     * Genera un username ultra seguro para Moodle
+     */
+    private function generateSafeUsername($email)
+    {
+        $email_parts = explode('@', $email);
+        $base = $email_parts[0];
+
+        // Solo letras y números
+        $clean = preg_replace('/[^a-zA-Z0-9]/', '', $base);
+
+        if (empty($clean) || strlen($clean) < 3) {
+            $clean = 'user' . rand(1000, 9999);
+        }
+
+        return strtolower(substr($clean, 0, 20)).rand(1000, 9999);
+    }
+
+    /**
+     * Genera una contraseña ultra segura para Moodle
+     */
+    private function generateSafePassword($password)
+    {
+        // Primero intentar limpiar la contraseña original
+        $clean = preg_replace('/[<>"\'\\\]/', '', $password);
+
+        // Si es muy corta o tiene caracteres problemáticos, generar nueva
+        if (strlen($clean) < 8 || preg_match('/[^\w\d!@#%&*]/', $clean)) {
+            return 'TempPass' . rand(1000, 9999) . '!';
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Limpia strings para Moodle
+     */
+    private function cleanString($string)
+    {
+        // Remover caracteres especiales peligrosos
+        $clean = preg_replace('/[<>"\'\\\&]/', '', $string);
+        $clean = trim($clean);
+
+        // Solo letras, números, espacios y algunos caracteres básicos
+        $clean = preg_replace('/[^\w\d\s\-\.]/', '', $clean);
+
+        return $clean;
+    }
+
+    /**
+     * Valida longitud de strings
+     */
+    private function validateLength($string, $min, $max)
+    {
+        if (strlen($string) < $min) {
+            return str_pad($string, $min, 'x');
+        }
+        if (strlen($string) > $max) {
+            return substr($string, 0, $max);
+        }
+        return $string;
+    }
+
+    /**
+     * Valida campos específicos de Moodle
+     */
+    private function validateMoodleFields($arrPost)
+    {
+        $errors = [];
+
+        // Validar username
+        if (!preg_match('/^[a-zA-Z0-9._-]+$/', $arrPost['username'])) {
+            $errors[] = 'Username contiene caracteres inválidos';
+        }
+
+        // Validar email
+        if (!filter_var($arrPost['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Email inválido';
+        }
+
+        // Validar nombres
+        if (empty($arrPost['firstname']) || strlen($arrPost['firstname']) < 2) {
+            $errors[] = 'Firstname muy corto';
+        }
+
+        if (empty($arrPost['lastname']) || strlen($arrPost['lastname']) < 2) {
+            $errors[] = 'Lastname muy corto';
+        }
+
+        // Validar contraseña
+        if (strlen($arrPost['password']) < 8) {
+            $errors[] = 'Password muy corto';
+        }
+
+        if (!empty($errors)) {
+            log_message('error', 'Errores de validación: ' . implode(', ', $errors));
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Obtiene resultados de validación para debug
+     */
+    private function getValidationResults($arrPost)
+    {
+        return [
+            'username_length' => strlen($arrPost['username']),
+            'username_chars' => preg_match('/^[a-zA-Z0-9._-]+$/', $arrPost['username']) ? 'valid' : 'invalid',
+            'email_valid' => filter_var($arrPost['email'], FILTER_VALIDATE_EMAIL) ? 'valid' : 'invalid',
+            'firstname_length' => strlen($arrPost['firstname']),
+            'lastname_length' => strlen($arrPost['lastname']),
+            'password_length' => strlen($arrPost['password']),
+            'password_chars' => preg_match('/^[a-zA-Z0-9!@#$%&*._-]+$/', $arrPost['password']) ? 'valid' : 'invalid'
+        ];
+    }
     public function enviarEmailUsuarioMoodle($id, $ID_Pedido_Curso)
     {
         $id_pedido_curso = $ID_Pedido_Curso;

@@ -302,7 +302,7 @@
                         <div class="col-md-6">
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Usuario:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" readonly>
+                                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" >
                             </div>
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Contraseña:</label>
