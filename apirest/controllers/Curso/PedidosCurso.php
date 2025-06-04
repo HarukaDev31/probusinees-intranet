@@ -305,7 +305,7 @@ class PedidosCurso extends CI_Controller
             echo json_encode(['status' => 'error', 'message' => 'No se encontró el pedido']);
         }
     }
-   
+
     public function crearUsuarioCursosMoodle($id, $ID_Pedido_Curso)
     {
         $id_pedido_curso = $ID_Pedido_Curso;
@@ -486,8 +486,10 @@ class PedidosCurso extends CI_Controller
         if (empty($clean) || strlen($clean) < 3) {
             $clean = 'user' . rand(1000, 9999);
         }
+        //get random chart of 10 characters
+        $randomChars = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 10);
 
-        return strtolower(substr($clean, 0, 20)).rand(1000, 9999);
+        return strtolower(substr($clean, 0, 20)) . $randomChars;
     }
 
     /**
