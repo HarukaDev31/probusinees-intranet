@@ -169,8 +169,8 @@ $(function () {
             'data': function (data) {
               data.sMethod = $('#hidden-sMethod').val(),
                 data.estado_pago = $('#cbo-filtro-estado_pago').val(),
-                data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
-              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
+                data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio_Carga').val() != "" ? ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/') : null;
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin_Carga').val() != "" ? ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/') : null;
               data.tipoTabla = "alumnos";
             },
           },
@@ -203,6 +203,13 @@ $(function () {
             "search-table",
             "table-curso-pedidos_info"
           );
+          $('.input-report').datepicker({
+            autoclose: true,
+            //startDate : new Date(fYear, fToday.getMonth(), '01'),
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yyyy',
+            format: 'dd/mm/yyyy',
+          });
         })
       }
 
@@ -283,8 +290,8 @@ $(function () {
             data: function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
-              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
+              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio_Carga').val() != "" ? ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/') : null;
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin_Carga').val() != "" ? ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/') : null;
               data.tipoTabla = "pagos";
 
             },
@@ -297,6 +304,13 @@ $(function () {
             "search-table",
             "table-curso-pagos_info"
           );
+          $('.input-report').datepicker({
+            autoclose: true,
+            //startDate : new Date(fYear, fToday.getMonth(), '01'),
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yyyy',
+            format: 'dd/mm/yyyy',
+          });
         })
         //Funcion para exportar a excel
 
@@ -503,6 +517,9 @@ function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
         $('#modal-message').modal('show');
 
         if (response.status == 'success') {
+          console.log(response,"console log");
+          crearUsuarioCursosMoodle(idUsuario, idPedido);
+
           $('#moda-message-content').addClass('bg-' + response.status);
           $('.modal-title-message').text(response.message);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
@@ -567,7 +584,7 @@ async function viewCliente(id) {
             <div class="container-fluid">
               <div class="row mb-2 px-3 d-flex justify-content-between">
                 <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
-                  <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion"onclick="ocultarSectionDatosCliente()"><i class="fa fa-arrow-left"></i> Regresar</button>
+                  <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion" onclick="ocultarSectionDatosCliente()"><i class="fa fa-arrow-left"></i> Regresar</button>
                 </div>
                 <div class="col-xl-3 col-md-2"></div>
                 <div class="col-6 col-md-0 col-xl-1">
@@ -700,9 +717,30 @@ function ocultarSectionDatosCliente() {
   // Cambia el content-header
   $('.content-header').html(headerOriginal);
   reload_table_Entidad();
+  $('#aplicar-btn-cotizacion').off('click').on('click', function () {
 
+    if (typeof tableCursoPedidos !== 'undefined' && tableCursoPedidos !== null) {
+      if (currentTableCurso === 'alumnos') {
+        tableCursoPedidos.ajax.reload(null, false);
+      }
+      else if (currentTableCurso === 'pagos') {
+        tableCursoPagos.ajax.reload(null, false);
+      }
+    }
+  });
+  $("#cancelar-btn").off("click").on("click", function () {
+    limpiarFiltrosContenedor();
+  });
+  $('.input-report').datepicker({
+    autoclose: true,
+    //startDate : new Date(fYear, fToday.getMonth(), '01'),
+    todayHighlight: true,
+    dateFormat: 'dd/mm/yyyy',
+    format: 'dd/mm/yyyy',
+  });
   // Oculta la sección de campañas y cursos
   $('#section-campanas-cursos').hide();
+
 }
 // Función para aplicar los filtros y recargar la tabla
 function aplicarFiltrosContenedor() {
@@ -734,6 +772,9 @@ function limpiarFiltrosContenedor() {
     $("#cbo-filtro-estado_pago").val('0').trigger('change');
     tableCursoPagos.ajax.reload(null, false);
   }
+  //dropdown-menu  remove show class
+  $('.dropdown-menu').removeClass('show');
+
 }
 
 // Asocia los eventos a los botones
@@ -1158,6 +1199,7 @@ function cargarDistritos(idProvincia) {
 $(document).ready(async function () {
 
   $('#aplicar-btn-cotizacion').off('click').on('click', function () {
+
     if (typeof tableCursoPedidos !== 'undefined' && tableCursoPedidos !== null) {
       if (currentTableCurso === 'alumnos') {
         tableCursoPedidos.ajax.reload(null, false);
@@ -1263,7 +1305,6 @@ $(document).on('change', '.select-usuario-externo', function () {
   var idUsuario = $(this).data('id-usuario');
   var idPedido = $(this).data('id-pedido');
   if (estado == '2') {
-    crearUsuarioCursosMoodle(idUsuario, idPedido);
     // Ejecuta la función de compartir (enviar email Moodle)
     enviarEmailUsuarioMoodle(idUsuario, idPedido);
   }

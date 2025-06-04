@@ -124,23 +124,8 @@
                     <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
                         value="<?php echo $this->router->method; ?>">
 
-                    <div class="col-6 col-sm-3 hidden">
-                        <label>F. Inicio</label>
-                        <div class="form-group">
-                            <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
-                                value="<?php echo dateNow('month_date_ini_report'); ?>">
-                            <span class="help-block text-danger" id="error"></span>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-3 hidden">
-                        <label>F. Fin</label>
-                        <div class="form-group">
-                            <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                                value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                            <span class="help-block text-danger" id="error"></span>
-                        </div>
-                    </div>
-
+                
+                
 
                     <div class="col-6 col-sm-3 hidden">
                         <label>F. Inicio</label>
@@ -154,7 +139,7 @@
                         <label>F. Fin</label>
                         <div class="form-group">
                             <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                                value="<?php echo dateNow('fecha_actual_dmy'); ?>">
+                                value="<?php echo dateNow('month_date_fin_report'); ?>">
                             <span class="help-block text-danger" id="error"></span>
                         </div>
                     </div>
