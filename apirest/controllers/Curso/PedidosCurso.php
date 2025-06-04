@@ -318,9 +318,25 @@ class PedidosCurso extends CI_Controller
             // Validar y limpiar datos antes de enviar a Moodle
             $original_username = trim($result->No_Nombres_Apellidos);
             $password = $this->encryption->decrypt($result->No_Password);
+            if($password === false) {
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-=+;:,.?';
+                $length = 12;
+                $password = '';
+                for ($i = 0; $i < $length; $i++) {
+                    $randomIndex = ord(random_bytes(1)) % strlen($chars);
+                    $password .= $chars[$randomIndex];
+                }                
+            }
             $nombres = trim($result->No_Nombres_Apellidos);
             $email = trim($result->No_Usuario);
-
+            log_message('error', 'Datos del usuario: ' . json_encode(
+                [
+                    'original_username' => $original_username,
+                    'password' => $password,
+                    'nombres' => $nombres,
+                    'email' => $email,
+                ]
+            ));
             // Validaciones básicas
             if (empty($original_username) || empty($password) || empty($nombres)) {
                 $response_error = [
@@ -487,16 +503,24 @@ class PedidosCurso extends CI_Controller
         $email_parts = explode('@', $email);
         $base = $email_parts[0];
 
-        // Solo letras y números
+        // Limpiar el nombre: solo letras y números
         $clean = preg_replace('/[^a-zA-Z0-9]/', '', $base);
 
+        // Si el nombre es muy corto o vacío, usar 'user' como base
         if (empty($clean) || strlen($clean) < 3) {
-            $clean = 'user' . rand(1000, 9999);
+            $clean = 'user';
+        } else {
+            $clean = strtolower(substr($clean, 0, 10)); // Tomar máximo 10 caracteres del nombre
         }
-        //get random chart of 10 characters
-        $randomChars = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 10);
 
-        return strtolower(substr($clean, 0, 20)) . $randomChars;
+        // Generar string aleatorio (4 caracteres alfanuméricos)
+        $randomChars = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 4);
+
+        // Construir el username final (max 20 chars)
+        $username = $clean . $randomChars;
+        
+        // Asegurar que no exceda 20 caracteres
+        return substr($username, 0, 20);
     }
 
     /**
