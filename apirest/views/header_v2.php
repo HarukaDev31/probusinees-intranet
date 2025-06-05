@@ -302,7 +302,7 @@ $SectionNames = [
                 }
               ?>
                 <li class="<?php echo $No_Class_Li_Padre; ?>">
-                  <?php if ($arrMenuPadre->ID_Padre == 0) { ?>
+                  <?php if ($arrMenuPadre->ID_Padre == 0 && $arrMenuPadre->show_father==1) { ?>
                     <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
                       <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
                       <p>&nbsp;<?php
@@ -370,7 +370,19 @@ $SectionNames = [
                         endforeach; ?>
                       </ul>
                     <?php endif; ?>
-                  <?php } ?>
+                  <?php } else if($arrMenuPadre->ID_Padre == 0 && $arrMenuPadre->show_father==0) { ?>
+                    <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
+                      <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
+                      <p>&nbsp;<?php
+                                if ($this->user->No_Grupo == 'ContenedorAlmacen') {
+                                  echo $arrMenuPadre->No_Menu_China ;
+
+                                } else {
+                                  echo $arrMenuPadre->No_Menu;
+                                } ?>
+                      </p>
+                    </a>
+                    <?php } ?>
                 </li>
               <?php endforeach; ?>
               <?php if ($this->user->No_Grupo == 'Coordinacion') { ?>
