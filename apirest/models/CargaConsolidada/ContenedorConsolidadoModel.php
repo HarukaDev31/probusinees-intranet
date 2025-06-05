@@ -1659,6 +1659,27 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             return false;
         }
     }
+    public function deletePackingList($id)
+    {
+        try {
+            $this->db->select('packing_list')
+                ->from($this->table_contenedor_cotizacion_proveedores)
+                ->where('id', $id);
+            $query = $this->db->get();
+            $fileUrl = $query->row()->packing_list;
+            if ($fileUrl && file_exists($fileUrl)) {
+                unlink($fileUrl);
+            }
+            $this->db->where('id', $id);
+            $this->db->update($this->table_contenedor_cotizacion_proveedores, ['packing_list' => null]);
+            if ($this->db->affected_rows() > 0) {
+                return "success";
+            }
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
     public function deleteExcelConfirmacion($id)
     {
         try {
