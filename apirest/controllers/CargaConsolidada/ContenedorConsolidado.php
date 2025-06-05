@@ -763,7 +763,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $selectEstadoCliente;
 					}
 					if ($this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Coordinación") {
-						$status = isset($row->status_cliente_doc) ? $row->status_cliente_doc : 'No carga';
+						$status = isset($row->status_cliente_doc) ? $row->status_cliente_doc : 'NO CARGA';
 						$colorClass = '';
 						switch ($status) {
 							case 'Pendiente':
@@ -778,11 +778,11 @@ class ContenedorConsolidado extends CI_Controller
 						}
 						$select_status = '<select class="select-status-cliente form-control ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
 						$select_status .= '<option value="Pendiente" class="bg-warning"'
-							. ($status == 'Pendiente' ? ' selected' : ' disabled') . '>Pendiente</option>';
+							. ($status == 'Pendiente' ? ' selected' : ' disabled') . '>PENDIENTE</option>';
 						$select_status .= '<option value="Incompleto" class="bg-danger"'
-							. ($status == 'Incompleto' ? ' selected' : '') . '>Incompleto</option>';
+							. ($status == 'Incompleto' ? ' selected' : '') . '>INCOMPLETO</option>';
 						$select_status .= '<option value="Completado" class="bg-success"'
-							. ($status == 'Completado' ? ' selected' : '') . '>Completado</option>';
+							. ($status == 'Completado' ? ' selected' : '') . '>COMPLETADO</option>';
 						$select_status .= '</select>';
 						$rows[] = $select_status;
 						$subdata[] = $select_status;

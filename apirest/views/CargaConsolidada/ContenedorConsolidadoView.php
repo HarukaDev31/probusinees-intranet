@@ -3221,4 +3221,7 @@ label>i {
     box-shadow: none;
     transition: border-color 0.3s ease;
 }
+.table-responsive{
+    overflow-x: hidden;
+}
 </style>
