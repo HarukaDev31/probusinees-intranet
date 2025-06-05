@@ -5630,7 +5630,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
                         <div class="file-info">
                             <div class="file-iconic"><a href="javascript:void(0)" class="file-icon-link">${getIconByType(packingList.split('.').pop().toLowerCase())}</a></div>
                             <span class="file-name">Packing List</span>
-                            <button class="remove-file-button" onclick="deleteFacturaComercial(${provider.id})">
+                            <button class="remove-file-button" onclick="deletePackingList(${provider.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -5954,6 +5954,37 @@ async function deleteFacturaComercial(id) {
       url =
         base_url +
         "CargaConsolidada/ContenedorConsolidado/deleteFacturaComercial/" +
+        id;
+      $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response) {
+          const result = JSON.parse(response);
+          if (result.status == "success") {
+            Swal.fire("Eliminado!", result.message, "success");
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+          viewClientesDocumentacion(idCotizacion);
+        },
+      });
+    }
+  });
+}
+async function deletePackingList(id) {
+  event.preventDefault();
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡No podrás revertir esto!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminarlo",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      url =
+        base_url +
+        "CargaConsolidada/ContenedorConsolidado/deletePackingList/" +
         id;
       $.ajax({
         url: url,

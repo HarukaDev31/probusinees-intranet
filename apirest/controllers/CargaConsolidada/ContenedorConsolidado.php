@@ -1232,6 +1232,13 @@ class ContenedorConsolidado extends CI_Controller
 			"status" => $arrResponse
 		]);
 	}
+	public function deletePackingList($id)
+	{
+		$arrResponse = $this->ContenedorConsolidadoModel->deletePackingList($id);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
 	public function deleteExcelConfirmacion($id)
 	{
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteExcelConfirmacion($id);
