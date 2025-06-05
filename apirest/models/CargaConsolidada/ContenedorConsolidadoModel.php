@@ -1141,7 +1141,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
     }
     public function updateStatusCliente($id_cotizacion, $status)
     {
-        if($this->user->No_Usuario != 'Documentacion')return 'success';
+        if($this->user->No_Grupo != 'Documentacion')return 'success';
 
        // Solo actualizar si el estado actual es "Pendiente"
         $this->db->select('status_cliente_doc');
@@ -1149,7 +1149,9 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         $this->db->where('id', $id_cotizacion);
         $current = $this->db->get()->row();
 
-        if ($current && $current->status_cliente_doc === 'Pendiente') {
+        if ($current &&( $current->status_cliente_doc === 'Pendiente' ||
+        $current->status_cliente_doc === 'Incompleto' ) 
+        ) {
             $this->db->where('id', $id_cotizacion);
             $this->db->update('contenedor_consolidado_cotizacion', ['status_cliente_doc' => $status]);
             if ($this->db->affected_rows() > 0) {
