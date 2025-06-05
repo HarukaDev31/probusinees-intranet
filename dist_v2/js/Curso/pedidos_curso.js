@@ -130,6 +130,7 @@ async function addPagosCurso(idPedido, nombreCliente) {
         <option value="" disabled selected>Seleccione un banco</option>
         <option value="BCP" class="bg-primary">BCP</option>
         <option value="INTERBANK" class="bg-success">INTERBANK</option>
+        <option value="YAPE" class="bg-[#742384] text-white">YAPE</option>
         </select>
       <input type="file" id="voucher" class="swal2-input" accept="image/*;application/pdf" required>
       <input type="date" id="fecha" class="swal2-input" required>
@@ -206,7 +207,7 @@ $(function () {
 
         $("#table-curso-pedidos").show();
         $("#table-curso-pedidos_wrapper").show();
-        tableCursoPedidos.ajax.reload(null, false);
+        tableCursoPedidos.ajax.reload();
       } else {
         tableCursoPedidos = $("#table-curso-pedidos").DataTable({
           dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
@@ -247,11 +248,11 @@ $(function () {
           },
 
           ],
-          'searching': false,
+          'searching': true,
           'bStateSave': true,
           "lengthChange": true,
           'processing': true,
-          'serverSide': true,
+          'serverSide': false,
           'info': true,
           'autoWidth': false,
           'pagingType': 'full_numbers',
@@ -316,7 +317,6 @@ $(function () {
 
         // FUNCION PARA CONFIGURAR EL BUSCADOR
 
-        //Funcion para exportar a excel
 
         $("#table-curso-pedidos").show();
         tableCursoPedidos.on('init', async function () {
@@ -1390,12 +1390,12 @@ async function configurarBuscador(tableId, searchInputId, infoContainerId) {
 
   // Obtener la instancia de DataTable
   var table = $('#' + tableId).DataTable();
-
+  console.log('tabla : ',table)
   // Limpiar eventos previos para evitar duplicados
-  $('#' + searchInputId).off('keyup input');
+  $('.' + searchInputId).off('keyup input');
 
   // Escuchar el evento "input" y "keyup" en el buscador personalizado
-  $('#' + searchInputId).on('input keyup', function () {
+  $('.' + searchInputId).on('input keyup', function () {
     var searchValue = this.value;
     console.log('Buscando:', searchValue); // Para debug
     table.search(searchValue).draw();
