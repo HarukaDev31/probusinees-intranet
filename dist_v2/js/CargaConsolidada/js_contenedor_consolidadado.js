@@ -5018,6 +5018,17 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
   if (nombrecliente) {
     $(".name_cliente").text(nombrecliente);
   }
+  // Cambiar status a "Incompleto" al ver el cliente
+  $.ajax({
+    url: base_url + "CargaConsolidada/ContenedorConsolidado/updateStatusCliente",
+    type: "POST",
+    data: { id_cotizacion: id, status: "Incompleto" },
+    success: function (response) {
+      // Opcional: puedes recargar la tabla o mostrar un mensaje si lo deseas
+      tableClientesGeneral.ajax.reload();
+      console.log(response)
+    }
+  });
   $(".aditional-file").remove();
   idCotizacion = id;
   clientesContainer.hide();
@@ -7519,6 +7530,23 @@ $(document).ready(async function () {
       },
     });
   });
+  $(document).on('change', '.select-status-cliente', function() {
+    var status = $(this).val();
+    var idEntidad = $(this).data('id');
+    $.ajax({
+        url: base_url + "Ruta/Controlador/actualizarStatusCliente", // Cambia la ruta según tu estructura
+        type: "POST",
+        data: { ID_Entidad: idEntidad, status_cliente: status },
+        dataType: "json",
+        success: function(response) {
+            if(response.status === "success") {
+                Swal.fire('¡Guardado!', response.message, 'success');
+            } else {
+                Swal.fire('Error', response.message, 'error');
+            }
+        }
+    });
+});
   $("#uploadFinal").click(() => {
     url =
       base_url +
