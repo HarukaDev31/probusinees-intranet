@@ -647,8 +647,10 @@ class PedidosCurso extends CI_Controller
                 $message .= "Usuario: " . (isset($result->usuario_moodle) && $result->usuario_moodle ? $result->usuario_moodle : $result->No_Usuario) . "\n";
                 $message .= "Contraseña: {$this->encryption->decrypt($result->No_Password)}\n\n";
                 $message .= "Puedes acceder a tu cuenta en el siguiente enlace: https://aulavirtualprobusiness.com/login/\n\n";
+                $mensaje = "El día del inicio del curso, te agregaremos a un grupo de whatsapp por donde compartiremos los links de acceso al zoom, los materiales de trabajo y las grabaciones de las clases dictadas.\n\n";
                 $message .= "Saludos,\nEl equipo de ProBusiness";
                 $this->sendMessageVentas($message, $telefono);
+                $this->sendMessageVentas($mensaje, $telefono, 2);
             } else {
                 $response = [
                     'status'  => 'error',

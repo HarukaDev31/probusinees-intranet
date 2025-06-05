@@ -1364,8 +1364,11 @@ Search for
                         <th>Impuesto</th>
                         <th>Tarifa</th>
                         <?php } ?>
-                        <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Documentacion") {  ?>
+                        <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
                         <th style="min-width: 8em;">Estados</th>
+                        <?php } ?>
+                        <?php if ($this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Coordinación") {  ?>
+                        <th style="min-width: 8em;">Status</th>
                         <?php } ?>
                         <th>Acciones</th>
                         
@@ -3217,5 +3220,8 @@ label>i {
     border: 1px solid #ccc;
     box-shadow: none;
     transition: border-color 0.3s ease;
+}
+.table-responsive{
+    overflow-x: hidden;
 }
 </style>

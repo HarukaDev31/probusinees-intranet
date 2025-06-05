@@ -745,7 +745,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $row->tarifa;
 					}
 
-					if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Documentacion") {
+					if ($this->user->No_Grupo == "Coordinación") {
 						$selectEstadoCliente = "";
 						$selectEstadoCliente = '<select class="form-control
 						' . ($row->estado_cliente == "RESERVADO" ? "bg-warning" : "") .
@@ -761,6 +761,31 @@ class ContenedorConsolidado extends CI_Controller
 						<option value="FACTURADO" ' . ($row->estado_cliente == "FACTURADO" ? "selected" : "") . '>FACTURADO</option>
 					</select>';
 						$subdata[] = $selectEstadoCliente;
+					}
+					if ($this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Coordinación") {
+						$status = isset($row->status_cliente_doc) ? $row->status_cliente_doc : 'NO CARGA';
+						$colorClass = '';
+						switch ($status) {
+							case 'Pendiente':
+								$colorClass = 'bg-warning';
+								break;
+							case 'Incompleto':
+								$colorClass = 'bg-danger';
+								break;
+							case 'Completado':
+								$colorClass = 'bg-success';
+								break;
+						}
+						$select_status = '<select class="select-status-cliente form-control ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
+						$select_status .= '<option value="Pendiente" class="bg-warning"'
+							. ($status == 'Pendiente' ? ' selected' : ' disabled') . '>PENDIENTE</option>';
+						$select_status .= '<option value="Incompleto" class="bg-danger"'
+							. ($status == 'Incompleto' ? ' selected' : '') . '>INCOMPLETO</option>';
+						$select_status .= '<option value="Completado" class="bg-success"'
+							. ($status == 'Completado' ? ' selected' : '') . '>COMPLETADO</option>';
+						$select_status .= '</select>';
+						$rows[] = $select_status;
+						$subdata[] = $select_status;
 					}
 					if ($this->user->No_Grupo == "Coordinación") {
 						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes($row->nombre) . '\')">
@@ -1123,6 +1148,14 @@ class ContenedorConsolidado extends CI_Controller
 		$id = $this->input->post('id');
 		$estado = $this->input->post('estado');
 		$arrResponse = $this->ContenedorConsolidadoModel->updateEstado($id, $estado);
+		echo json_encode([
+			"status" => $arrResponse
+		]);
+	}
+	public function updateStatusCliente(){
+		$id = $this->input->post('id_cotizacion');
+    	$status = $this->input->post('status');
+		$arrResponse = $this->ContenedorConsolidadoModel->updateStatusCliente($id, $status);
 		echo json_encode([
 			"status" => $arrResponse
 		]);
