@@ -490,6 +490,24 @@ class PedidosCursoModel extends CI_Model
 		$query = $this->db->get();
 		return $query->result();
 	}
+	 public function getPagosCursoPedido($idPedidoCurso)
+    {
+        try {
+            $this->db->select('pedido_curso_pagos.*, pedido_curso_pagos_concept.name as concepto')
+                ->from($this->table_pedido_curso_pagos)
+                ->join($this->table_pedido_curso_pagos_conceptos, 'pedido_curso_pagos.id_concept = pedido_curso_pagos_concept.id')
+                ->where('id_pedido_curso', $idPedidoCurso)
+                ->order_by('payment_date', 'DESC');
+            $query = $this->db->get();
+            return $query->result();
+        } catch (Exception $e) {
+            log_message('error', 'Error en getPagosCurso: ' . $e->getMessage());
+            return [
+                'status' => "error",
+                'message' => 'Error al obtener los pagos del curso: ' . $e->getMessage()
+            ];
+        }
+    }
 	public function saveClientePagosCurso($voucher, $idPedido, $amount, $fecha, $banco)
 	{
 		try {

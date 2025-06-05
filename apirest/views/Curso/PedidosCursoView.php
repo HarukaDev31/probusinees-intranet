@@ -43,9 +43,8 @@
                                     <div class="d-flex" style="width:60%">Fecha Fin</div>
                                     <div style="width: 200px;">
                                         <input type="text" id="txt-Fe_Fin_Carga"
-                                        class="form-control input-date input-report required"
-                                        value="<?php echo dateNow('fecha_actual_dmy'); ?>"
-                                            >
+                                            class="form-control input-date input-report required"
+                                            value="<?php echo dateNow('fecha_actual_dmy'); ?>">
                                         <span class="help-block text-danger" id="error"></span>
                                     </div>
                                 </div>
@@ -124,8 +123,8 @@
                     <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
                         value="<?php echo $this->router->method; ?>">
 
-                
-                
+
+
 
                     <div class="col-6 col-sm-3 hidden">
                         <label>F. Inicio</label>
@@ -157,7 +156,7 @@
                         <div class="col-12 col-md-4 col-xl-2 d-flex align-items-center">
                             Total Importe:
                             <span id="span-total-importe" class=" pl-2 font-weight-bold"></span>
-                        </div>    
+                        </div>
                     </div>
                     <div class="table-responsive div-Listar">
                         <table id="table-curso-pedidos" class="table table-hover dataTable no-footer hidden">
@@ -233,8 +232,8 @@
                         <div class="col-md-6">
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Nombre y apellidos:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-nombres" name="No_Entidad"
-                                    readonly>
+                                <input type="text" class="form-control cliente-input" id="cliente-nombres"
+                                    name="No_Entidad" readonly>
                             </div>
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Dni / ID:</label>
@@ -253,16 +252,16 @@
                             </div>
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Fecha de nacimiento:</label>
-                                <input type="date" class="form-control cliente-input" id="cliente-edad" name="Fe_Nacimiento"
-                                    readonly>
+                                <input type="date" class="form-control cliente-input" id="cliente-edad"
+                                    name="Fe_Nacimiento" readonly>
                             </div>
                         </div>
                         <!-- Columna derecha -->
                         <div class="col-md-6">
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Sexo:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-sexo" name="Nu_Tipo_Sexo"
-                                    readonly>
+                                <input type="text" class="form-control cliente-input" id="cliente-sexo"
+                                    name="Nu_Tipo_Sexo" readonly>
                             </div>
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Red social:</label>
@@ -272,11 +271,13 @@
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">País:</label>
                                 <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
-                                <select id="select-pais" class="hidden form-control cliente-input" name="ID_Pais"></select>
+                                <select id="select-pais" class="hidden form-control cliente-input"
+                                    name="ID_Pais"></select>
                             </div>
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Departamento:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-departamento" readonly>
+                                <input type="text" class="form-control cliente-input" id="cliente-departamento"
+                                    readonly>
                                 <select id="select-departamento" class="hidden form-control cliente-input"
                                     name="ID_Departamento"></select>
                             </div>
@@ -302,11 +303,12 @@
                         <div class="col-md-6">
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Usuario:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario" >
+                                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario">
                             </div>
                             <div class="form-group flex align-items-center">
                                 <label class="w-[40%] mb-0">Contraseña:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-moodle-password" readonly>
+                                <input type="text" class="form-control cliente-input" id="cliente-moodle-password"
+                                    readonly>
                             </div>
                         </div>
                         <div id="contenedor-boton-usuario"></div>
@@ -314,11 +316,40 @@
                 </form>
             </div>
         </div>
-    </section>    
+    </section>
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
 <!-- Modal Nueva Campaña -->
+<div class="modal fade" id="modalClientePagosCoordination" tabindex="-1" role="dialog"
+    aria-labelledby="modalClientePagosCoordinationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalClientePagosCoordinationLabel">Pagos del Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="table-pagos-tracking-coordinacion" class="table table-hover dataTable no-footer">
+                    <thead class="thead-default">
+                        <tr>
+                            <th>N°</th>
+                            <th>Fecha</th>
+                            <th>Banco</th>
+                            <th>Monto</th>
+                            <th>Voucher</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="modal-nueva-campana" tabindex="-1" aria-labelledby="modalNuevaCampanaLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -414,7 +445,8 @@ i {
     box-shadow: none;
     transition: border-color 0.3s ease;
 }
-.dataTables_filter{
+
+.dataTables_filter {
     display: none;
 }
 </style>

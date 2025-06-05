@@ -197,7 +197,7 @@ class Administracion extends CI_Controller
 				$subdata[] = allTypeDate($row->payment_date, '-', 0);
 				$subdata[] = $row->banco;
 				$subdata[] = "$" . round($row->monto, 2);
-				$subdata[] = '<a href=' . $row->Voucher_Url . ' download>
+				$subdata[] = '<a href=' . $row->voucher_url . ' download>
                     <i class="fas fa-file-excel text-success"></i>
                     </a>';
 				$data[] = $subdata;
