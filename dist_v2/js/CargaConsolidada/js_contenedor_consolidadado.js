@@ -5581,7 +5581,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
           });
         } else {
           // Si no es una imagen, redirigir al archivo
-          fileIconLink.href = excelConfirmacion;
+          fileIconLink.href = facturaComercial;
           fileIconLink.target = '_blank';
         }
       }
