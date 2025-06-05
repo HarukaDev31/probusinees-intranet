@@ -777,9 +777,12 @@ class ContenedorConsolidado extends CI_Controller
 								break;
 						}
 						$select_status = '<select class="select-status-cliente form-control ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
-						$select_status .= '<option value="Pendiente" style="background: #ffe066; color:#000;"' . ($status == 'Pendiente' ? ' selected' : '') . '>Pendiente</option>';
-						$select_status .= '<option value="Incompleto" style="background: #ff7675; color:#fff;"' . ($status == 'Incompleto' ? ' selected' : '') . '>Incompleto</option>';
-						$select_status .= '<option value="Completado" style="background: #55efc4; color:#000;"' . ($status == 'Completado' ? ' selected' : '') . '>Completado</option>';
+						$select_status .= '<option value="Pendiente" class="bg-warning"'
+							. ($status == 'Pendiente' ? ' selected' : ' disabled') . '>Pendiente</option>';
+						$select_status .= '<option value="Incompleto" class="bg-danger"'
+							. ($status == 'Incompleto' ? ' selected' : '') . '>Incompleto</option>';
+						$select_status .= '<option value="Completado" class="bg-success"'
+							. ($status == 'Completado' ? ' selected' : '') . '>Completado</option>';
 						$select_status .= '</select>';
 						$rows[] = $select_status;
 						$subdata[] = $select_status;

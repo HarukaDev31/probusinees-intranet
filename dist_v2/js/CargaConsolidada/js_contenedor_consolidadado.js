@@ -7532,14 +7532,19 @@ $(document).ready(async function () {
   });
   $(document).on('change', '.select-status-cliente', function() {
     var status = $(this).val();
-    var idEntidad = $(this).data('id');
+    var idCotizacion = $(this).data('id');
+    $(this).removeClass('bg-warning bg-danger bg-success');
+    if (status === 'Pendiente') $(this).addClass('bg-warning');
+    if (status === 'Incompleto') $(this).addClass('bg-danger');
+    if (status === 'Completado') $(this).addClass('bg-success');
     $.ajax({
-        url: base_url + "Ruta/Controlador/actualizarStatusCliente", // Cambia la ruta según tu estructura
+        url: base_url + "CargaConsolidada/ContenedorConsolidado/updateStatusCliente",
         type: "POST",
-        data: { ID_Entidad: idEntidad, status_cliente: status },
+        data: { id_cotizacion: idCotizacion, status: status },
         dataType: "json",
         success: function(response) {
             if(response.status === "success") {
+                tableClientesGeneral.ajax.reload();
                 Swal.fire('¡Guardado!', response.message, 'success');
             } else {
                 Swal.fire('Error', response.message, 'error');
