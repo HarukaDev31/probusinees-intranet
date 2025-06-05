@@ -123,8 +123,8 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago) {
     const data = await response.json();
 
     if (data.status == 'success') {
-      $("#total-amount").text(`$${Number(apagar).toFixed(2)}`);
-      $("#paid-amount").text(`$${Number(pago).toFixed(2)}`);
+      $("#total-amount").text(`$${Number(pago).toFixed(2)}`);
+      $("#paid-amount").text(`$${Number(apagar).toFixed(2)}`);
       console.log(data.data.nota);
       let index = 1; // Initialize index for payment cards
       $("#nota").val(data.data.nota || ""); // Set the note input value
@@ -245,13 +245,38 @@ async function getTableHeaders(table) {
     url += "getHeadersCurso";
   }
   try {
-    const response = await fetch(url);
+    const formData = new FormData();
+    formData.append("Filtro_Fe_Inicio", ParseDateString($('#txt-Fe_Inicio').val() == "" ?
+      //fin inicio 2 meses antes
+      new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+      : $('#txt-Fe_Inicio').val(), 'fecha', '/'),
+    );
+    formData.append("Filtro_Fe_Fin", ParseDateString($('#txt-Fe_Fin').val() == "" ?
+      new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+      : $('#txt-Fe_Fin').val(), 'fecha', '/'),
+    );
+    const response = await fetch(url,
+      {
+        method: "POST",
+
+        body: formData
+      }
+    );
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
     if (data.status == 'success') {
-      $("#span-total-importe").text("$"+Number(data.data.total_importe).toFixed(2));
+      let symbol= table == "consolidado" ? "$" : "S/";
+      $("#span-total-importe").text(symbol+ Number(data.data.total_importe).toFixed(2));
     } else {
       console.error("Error fetching headers:", data.message);
       return [];
@@ -556,11 +581,25 @@ $(".tab-administracion").off("click").click(function () {
           'type': 'POST',
           'dataType': 'JSON',
           'data': function (data) {
-            data.sMethod = $('#hidden-sMethod').val(),
-              data.estado_pago = $('#cbo-filtro-estado_pago').val(),
-              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/'),
-              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
-            data.tipoTabla = "alumnos";
+            data.sMethod = $('#hidden-sMethod').val();
+            data.estado_pago = $('#cbo-filtro-estado_pago').val();
+            console.log($('#txt-Fe_Inicio').val());
+            data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val() == "" ?
+              //fin inicio 2 meses antes 
+              new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              })
+              : $('#txt-Fe_Inicio').val(), 'fecha', '/');
+            data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val() == "" ?
+              new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              })
+              : $('#txt-Fe_Fin').val(), 'fecha', '/');
+            data.tipoTabla = "consolidado";
           },
         },
         'columnDefs': [
@@ -668,8 +707,21 @@ $(".tab-administracion").off("click").click(function () {
           data: function (data) {
             data.sMethod = $('#hidden-sMethod').val();
             data.estado_pago = $('#cbo-filtro-estado_pago').val();
-            data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/');
-            data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
+            data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val() == "" ?
+              new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              })
+              : $('#txt-Fe_Inicio').val(), 'fecha', '/');
+            data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val() == "" ?
+              new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              })
+              : $('#txt-Fe_Fin').val(), 'fecha', '/');
+            // Agregar tipoTabla para identificar el tipo de tabla
             data.tipoTabla = "pagos";
 
           },
@@ -704,6 +756,34 @@ function getIconByExtension(url) {
 
   return icon;
 }
+function viewNote(nota){
+  //show nota in modal
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.id = 'notaModal';
+  modal.tabIndex = -1;
+  modal.setAttribute('role', 'dialog');
+  const modalDialog = document.createElement('div');
+  modalDialog.className = 'modal-dialog modal-dialog-centered';
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+  const modalHeader = document.createElement('div');
+  modalHeader.className = 'modal-header';
+  modalHeader.innerHTML = `<h5 class="modal-title">Nota</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+  const modalBody = document.createElement('div');
+  modalBody.className = 'modal-body';
+  modalBody.innerHTML = `<p>${nota}</p>`;
+  modalContent.appendChild(modalHeader);
+  modalContent.appendChild(modalBody);
+  modalDialog.appendChild(modalContent);
+  modal.appendChild(modalDialog);
+  document.body.appendChild(modal);
+  $(modal).modal('show');
+  $(modal).on('hidden.bs.modal', function () {
+    $(this).remove(); // Remove modal from DOM after closing
+  });
+}
 function showImageModal(url) {
   ///create modal and show image
   const modal = document.createElement('div');
@@ -731,4 +811,24 @@ function showImageModal(url) {
 $(document).ready(function () {
   paymentSection = $("#payment-tracking-section");
   sectionListaPedidos = $("#section-listar-pedidos");
+  $('.dropdown-menu').on('click', function (event) {
+    event.stopPropagation(); // Evita que el evento se propague
+  });
+  $("#aplicar-btn-cotizacion").on("click", function () {
+    if (currentTableCurso == "consolidado") {
+      tableCursoPedidos.ajax.reload(null, false);
+      getTableHeaders("consolidado");
+    }
+    else if (currentTableCurso == "curso") {
+      tableCursoPagos.ajax.reload(null, false);
+      getTableHeaders("curso");
+    }
+  });
+});
+$('.input-report').datepicker({
+  autoclose: true,
+  //startDate : new Date(fYear, fToday.getMonth(), '01'),
+  todayHighlight: true,
+  dateFormat: 'dd/mm/yyyy',
+  format: 'dd/mm/yyyy',
 });

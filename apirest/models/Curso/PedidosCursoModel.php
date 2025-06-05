@@ -556,6 +556,14 @@ class PedidosCursoModel extends CI_Model
 		//get sum of importe from pedido_curso_pagos 
 		$this->db->select('SUM(Ss_Total) as total_importe');
 		$this->db->from($this->table);
+		
+        if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
+            $this->db->where($this->table.'.Fe_Emision >=', $this->input->post('Filtro_Fe_Inicio'));
+        }
+
+        if (!empty($this->input->post('Filtro_Fe_Fin'))) {
+            $this->db->where($this->table.'.Fe_Emision <=', $this->input->post('Filtro_Fe_Fin'));
+        }
 		$query = $this->db->get();
 		return $query->row();
 	}
