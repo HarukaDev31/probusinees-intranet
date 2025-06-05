@@ -132,7 +132,7 @@ class ContenedorConsolidado extends CI_Controller
 					<option value="COMPLETADO" ' . ($row->estado_documentacion == "COMPLETADO" ? "selected" : "") . '>Completado</option>
 				</select>';
 			} else {
-				$divEstado = '<select 
+				$divEstado = '<select disabled
 				class="form-control
 				' . ($row->estado == "PENDIENTE" ||  !$row->estado ? "bg-warning" : "") .
 					($row->estado == "RECIBIENDO" ? "bg-primary" : "") .
@@ -745,7 +745,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $row->tarifa;
 					}
 
-					if ($this->user->No_Grupo == "Coordinación") {
+					if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Documentacion") {
 						$selectEstadoCliente = "";
 						$selectEstadoCliente = '<select class="form-control
 						' . ($row->estado_cliente == "RESERVADO" ? "bg-warning" : "") .

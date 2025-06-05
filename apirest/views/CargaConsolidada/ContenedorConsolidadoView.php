@@ -1143,8 +1143,7 @@ Search for
                                 <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
                                 <th style="min-width: 8em;">Estado</th>
                                 <?php } ?>
-                                <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
-
+                                <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
                                 <th>Acciones
                                 </th>
                                 <?php } ?>
@@ -1365,11 +1364,11 @@ Search for
                         <th>Impuesto</th>
                         <th>Tarifa</th>
                         <?php } ?>
-
+                        <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Documentacion") {  ?>
                         <th style="min-width: 8em;">Estados</th>
-                        <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
-                        <th>Acciones</th>
                         <?php } ?>
+                        <th>Acciones</th>
+                        
                     </tr>
                 </thead>
             </table>
