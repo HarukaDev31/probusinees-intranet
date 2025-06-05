@@ -4297,17 +4297,17 @@ async function viewDocumentacion() {
                               ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>` : ""}
                             </label>
                             <div class="file-upload-box">
-                                ${file.file_url ? `
+                                ${file.file_url || (file.id == 1 && file.lista_embarque_url) ? `
                                         <div class="file-info">
                                           <div class="file-iconic">
-                                            ${getIconByType(file.type)}
+                                            ${getIconByType(file.file_url?file.type:'excel')}
                                           </div>
-                                            <span class="file-name">${file.folder_name}</span>
+                                            <span class="file-name">${file.folder_name??"Packing China"}</span>
                                             
-                                            <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
+                                            <button class="download-file-button" onclick=window.location.href='${file.file_url??file.lista_embarque_url}'>
                                             <i class="fas fa-download"></i>
                                             </button>
-                                            <div  onclick="deleteDocumentacionFile(${file.id_file})">
+                                            <div  ${file.id_file?"onclick=\"deleteDocumentacionFile(${file.id_file})\"":""}>
                                             <i class="fas fa-trash"></i>
                                             </div>
                                         </div>
