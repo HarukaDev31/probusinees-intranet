@@ -5018,7 +5018,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
   if (nombrecliente) {
     $(".name_cliente").text(nombrecliente);
   }
-  // Cambiar status a "Incompleto" al ver el cliente
+  // Cambiar status a "Incompleto" al ver el cliente 
   $.ajax({
     url: base_url + "CargaConsolidada/ContenedorConsolidado/updateStatusCliente",
     type: "POST",
