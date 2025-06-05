@@ -1141,9 +1141,9 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
     }
     public function updateStatusCliente($id_cotizacion, $status)
     {
-        $this->db->select("*, contenedor_consolidado_cotizacion.id AS id_cotizacion, contenedor_consolidado_cotizacion.status_cliente");
+        $this->db->select("*, contenedor_consolidado_cotizacion.id AS id_cotizacion, contenedor_consolidado_cotizacion.status_cliente_doc");
         $this->db->where('id', $id_cotizacion);
-        $this->db->update('contenedor_consolidado_cotizacion', ['status_cliente' => $status]);
+        $this->db->update('contenedor_consolidado_cotizacion', ['status_cliente_doc' => $status]);
         if ($this->db->affected_rows() > 0) {
             return 'success';
         } else {

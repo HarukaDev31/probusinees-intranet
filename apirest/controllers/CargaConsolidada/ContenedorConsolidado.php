@@ -763,7 +763,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $selectEstadoCliente;
 					}
 					if ($this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Coordinación") {
-						$status = isset($row->status_cliente) ? $row->status_cliente : 'No carga omm';
+						$status = isset($row->status_cliente_doc) ? $row->status_cliente_doc : 'No carga';
 						$colorClass = '';
 						switch ($status) {
 							case 'Pendiente':
