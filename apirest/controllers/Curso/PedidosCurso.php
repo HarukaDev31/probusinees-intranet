@@ -204,7 +204,7 @@ class PedidosCurso extends CI_Controller
                 $divAcciones .= '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewCliente(\'' . $row->ID_Pedido_Curso . '\')"></i>';
                 $divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="eliminarPedido(\'' . $row->ID_Pedido_Curso . '\')"></i>';
                 //div guardar
-                $divAcciones .= '<i class="fas fa-save text-success" style="cursor:pointer; padding:10px;" onclick="}(\'' . $row->ID_Pedido_Curso . '\')"></i>';
+                $divAcciones .= '<i class="fas fa-save text-success" style="cursor:pointer; padding:10px;" onclick="guardarCambiosPedido(\'' . $row->ID_Pedido_Curso . '\')"></i>';
                 $divAcciones .= '</div>';
                 $rows[] = $divAcciones;
 

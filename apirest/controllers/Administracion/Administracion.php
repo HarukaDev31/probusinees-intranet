@@ -71,10 +71,16 @@ class Administracion extends CI_Controller
 				} else if ($value->total_pagos_monto > ($aPagar)) {
 					$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
 				}
-				$subdata[] = //eye with onclick funcion
-					'<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ')">
+				$divAcciones1='<div class="d-flex gap-1">';
+				$divAcciones1.='<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 					</div>';
+				if ($value->note_administracion) {
+					$divAcciones1 .= '<div class="d-flex"  onclick="viewNote(\'' . addslashes(trim($value->note_administracion)) . '\')">
+						<i class="fas fa-sticky-note" style="cursor:pointer;"></i>
+					</div>';
+				}
+				$subdata[] = $divAcciones1;
 				$subdata[] = $estadoPagosCoordinacion;
 				$subdata[] = "$ " . (($aPagar) == 0 ? $value->monto : number_format($aPagar, 2, '.', ''));
 				$subdata[] = "$ " . number_format($value->total_pagos_monto, 2, '.', '');
@@ -110,9 +116,11 @@ class Administracion extends CI_Controller
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
 			$subdata[] = "$" . round($row->monto, 2);
-			$subdata[] = '<a href=' . $row->voucher_url . ' download>
-				<i class="fas fa-file-excel text-success"></i>
-				</a>';
+			$subdata[] = '<div data-url=' . $row->voucher_url . ' download
+                onclick="showImageModal(\'' . $row->voucher_url . '\')"
+                >
+                    <i class="fas fa-file"></i>
+                    </div>';
 			$data[] = $subdata;
 			$index++;
 		}
@@ -146,10 +154,16 @@ class Administracion extends CI_Controller
 				}
 				$select .= '</select>';
 				$subdata[] = $select; //mes
-				$subdata[] = //eye with onclick funcion
-					'<div class="d-flex"  onclick="viewDetailsPagosCurso(' . $row->ID_Pedido_Curso . ',' . $row->Ss_Total . ',' . $row->total_pagos . ')">
+				$divAcciones1 = '<div class="d-flex gap-1">';
+				$divAcciones1 .= '<div class="d-flex"  onclick="viewDetailsPagosCurso(' . $row->ID_Pedido_Curso . ',' . $row->Ss_Total . ',' . $row->total_pagos . ')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 					</div>';
+				if ($row->note_administracion) {
+					$divAcciones1 .= '<div class="d-flex"  onclick="viewNote(\'' . addslashes(trim($row->note_administracion)) . '\')">
+						<i class="fas fa-sticky-note" style="cursor:pointer;"></i>
+					</div>';
+				}
+				$subdata[] = $divAcciones1;
 
 				$estadoCurso = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
 				if ($row->total_pagos == 0) {

@@ -277,10 +277,22 @@ $(function () {
             'type': 'POST',
             'dataType': 'JSON',
             'data': function (data) {
-              data.sMethod = $('#hidden-sMethod').val(),
-                data.estado_pago = $('#cbo-filtro-estado_pago').val(),
-                data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio_Carga').val() != "" ? ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/') : null;
-              data.Filtro_Fe_Fin = $('#txt-Fe_Fin_Carga').val() != "" ? ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/') : null;
+              data.sMethod = $('#hidden-sMethod').val();
+              data.estado_pago = $('#cbo-filtro-estado_pago').val();
+              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val() == "" ?
+                new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })
+                : $('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
+              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val() == "" ?
+                new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })
+                : $('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "alumnos";
             },
           },
@@ -400,8 +412,20 @@ $(function () {
             data: function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio_Carga').val() != "" ? ParseDateString($('#txt-Fe_Inicio_Carga').val(), 'fecha', '/') : null;
-              data.Filtro_Fe_Fin = $('#txt-Fe_Fin_Carga').val() != "" ? ParseDateString($('#txt-Fe_Fin_Carga').val(), 'fecha', '/') : null;
+              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val() == "" ?
+                new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })
+                : $('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
+              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val() == "" ?
+                new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })
+                : $('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
               data.tipoTabla = "pagos";
 
             },
@@ -1121,11 +1145,32 @@ $(document).on('change', 'select[name="ID_Campana"]', function () {
 
 
 async function getCursosHeader() {
-  const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader");
+  const formData = new FormData();
+  formData.append("Filtro_Fe_Inicio", ParseDateString($('#txt-Fe_Inicio_Carga').val() == "" ?
+    //fin inicio 2 meses antes
+    new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+    : $('#txt-Fe_Inicio_Carga').val(), 'fecha', '/'),
+  );
+  formData.append("Filtro_Fe_Fin", ParseDateString($('#txt-Fe_Fin').val() == "" ?
+    new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+    : $('#txt-Fe_Fin').val(), 'fecha', '/'),
+  );
+  const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
+    method: "POST",
+    body: formData
+  });
   const data = await response.json();
   if (data.status === "success") {
     console.log(data.data);
-    $("#span-total-importe").text((data.data.total_importe));
+    $("#span-total-importe").text("S/."+(data.data.total_importe));
   }
 }
 // Delegación para inputs de importe en la tabla
