@@ -58,7 +58,7 @@ class Administracion extends CI_Controller
 				$subdata[] = $value->documento;
 				$subdata[] = $value->telefono;
 				$subdata[] = "Consolidado";
-				$subdata[] = "#" . $value->carga;
+				$subdata[] = "<span class='badge badge-secondary'>" ."#" . $value->carga. "</span>";
 
 				$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $value->estado_pagos_coordinacion . '</span>';
 				$aPagar = ($value->monto_final + $value->impuestos_final) == 0 ? $value->monto : ($value->monto_final + $value->impuestos_final);
@@ -138,25 +138,24 @@ class Administracion extends CI_Controller
 			foreach ($arrData as $row) {
 				$subdata   = array();
 				$subdata[] =  $row->ID_Pedido_Curso;
-				$subdata[] = allTypeDate($row->Fe_Registro, '-', 0);
+				$subdata[] = date('d-m-Y', strtotime($row->Fe_Registro));
 				$subdata[] = $row->No_Entidad;
 				$subdata[] = $row->Nu_Celular_Entidad;
 				$subdata[] = "Curso";
 				$campanas = $this->AdministracionModel->getCampanasActivas();
 				// Armar el select
-				$select = '<select name="ID_Campana" class="form-control" disabled>';
-				if (empty($row->ID_Campana)) {
-					$select .= '<option value="">Seleccionar</option>';
+				$select = '';
+				if (!empty($row->ID_Campana)) {
+					foreach ($campanas as $campana) {
+						if($row->ID_Campana == $campana['ID_Campana']) {
+							$select .= '<span class="badge badge-secondary">' . $campana['nombre_campana'] . '</span>';
+						} 
+					}
 				}
-				foreach ($campanas as $campana) {
-					$selected = ($row->ID_Campana == $campana['ID_Campana']) ? 'selected' : '';
-					$select .= '<option value="' . $campana['ID_Campana'] . '" ' . $selected . '>' . $campana['nombre_campana'] . '</option>';
-				}
-				$select .= '</select>';
 				$subdata[] = $select; //mes
 				$divAcciones1 = '<div class="d-flex gap-1">';
-				$divAcciones1 .= '<div class="d-flex"  onclick="viewDetailsPagosCurso(' . $row->ID_Pedido_Curso . ',' . $row->Ss_Total . ',' . $row->total_pagos . ')">
-						<i class="fas fa-eye" style="cursor:pointer;"></i>
+				$divAcciones1 .= '<div class="d-flex"  onclick="viewDetailsPagosCurso(' . $row->ID_Pedido_Curso . ',' . $row->Ss_Total . ',' . $row->total_pagos . ',\'' . addslashes(trim($row->No_Entidad)) . '\')">
+					<i class="fas fa-eye" style="cursor:pointer;"></i>
 					</div>';
 				if ($row->note_administracion) {
 					$divAcciones1 .= '<div class="d-flex"  onclick="viewNote(\'' . addslashes(trim($row->note_administracion)) . '\')">
@@ -176,18 +175,14 @@ class Administracion extends CI_Controller
 					$estadoCurso = '<span class="badge badge-danger">SOBREPAGO</span>';
 				}
 				$subdata[] = $estadoCurso;
-				$subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" readonly/>';	//importe		
+				$subdata[] = $row->No_Signo . round($row->Ss_Total, 2) ;		
 				$subdata[] = "S/" . round($row->total_pagos, 2);
 				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
-
-
-				if ($row->pagos_count > 0) {
-					$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')">
-												<i class="fas fa-eye" style="cursor:pointer;"></i>
-
-                        </div>';
+				$pagos_details=json_decode($row->pagos_details, true);
+				foreach ($pagos_details as $pago) {
+					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">' . $pago['monto'] . '</span>';
 				}
-				$divAcciones .=  '</div>';
+				$divAcciones.='</div>';
 				$subdata[] = $divAcciones;
 				$data[] = $subdata;
 			}
@@ -197,6 +192,21 @@ class Administracion extends CI_Controller
 			echo json_encode($output);
 		} catch (Exception $e) {
 			log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
+		}
+	}
+	public function getColorByStatus($status)
+	{
+		switch ($status) {
+			case 'PENDIENTE':
+				return 'badge-secondary';
+			case 'ADELANTO':
+				return 'badge-warning';
+			case 'CONFIRMADO':
+				return 'badge-success';
+			case 'OBSERVADO':
+				return 'badge-danger';
+			default:
+				return 'badge-secondary';
 		}
 	}
 	public function getPagosCurso($idPedidoCurso)
@@ -244,14 +254,14 @@ class Administracion extends CI_Controller
 	}
 	public function handlePayment() {
 		$idPago = $this->input->post('idPago');
-		$isConfirmed = $this->input->post('isConfirmed');
-		$result = $this->AdministracionModel->handlePayment($idPago, $isConfirmed);
+		$status = $this->input->post('status');
+		$result = $this->AdministracionModel->handlePayment($idPago, $status);
 		echo json_encode($result);
 	}
 	public function handlePaymentCurso(){
 		$idPagoCurso = $this->input->post('idPago');
-		$isConfirmed = $this->input->post('isConfirmed');
-		$result = $this->AdministracionModel->handlePaymentCurso($idPagoCurso, $isConfirmed);
+		$status = $this->input->post('status');
+		$result = $this->AdministracionModel->handlePaymentCurso($idPagoCurso, $status);
 		echo json_encode($result);
 	}
 	public function saveNote(){

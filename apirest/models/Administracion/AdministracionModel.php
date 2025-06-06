@@ -184,7 +184,19 @@ class AdministracionModel extends CI_Model
         JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept = ccp.id
         WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso
         AND (ccp.name = 'ADELANTO')
-    ) AS total_pagos"
+    ) AS total_pagos,
+    (SELECT JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'id_pago', cccp2.id,
+            'monto', cccp2.monto,
+            'status', cccp2.status
+         
+        )   
+    ) FROM pedido_curso_pagos as cccp2
+    where cccp2.id_pedido_curso = CC.ID_Pedido_Curso 
+    and cccp2.id_concept = " . $this->CONCEPT_PAGO_ADELANTO_CURSO . "   
+    ) as pagos_details,
+    "
         );
 
         $this->db->from($this->table_curso . ' AS CC');
@@ -390,12 +402,12 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
-    public function handlePayment($idPago, $isConfirmed)
+    public function handlePayment($idPago, $status)
     {
         try {
-            log_message("error", "handlePayment: idPago: $idPago, isConfirmed: $isConfirmed");
+            log_message("error", "handlePayment: idPago: $idPago, status: $status");
             $this->db->where('id', $idPago);
-            $this->db->update($this->table_consolidado_pagos, ['is_confirmed' => $isConfirmed]);
+            $this->db->update($this->table_consolidado_pagos, ['status' => $status]);
             return [
                 'status' => "success",
                 'message' => 'Pago actualizado correctamente'
@@ -408,12 +420,12 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
-    public function handlePaymentCurso($idPagoCurso, $isConfirmed)
+    public function handlePaymentCurso($idPagoCurso, $status)
     {
         try {
-            log_message("error", "handlePaymentCurso: idPagoCurso: $idPagoCurso, isConfirmed: $isConfirmed");
+            log_message("error", "handlePaymentCurso: idPagoCurso: $idPagoCurso, status: $status");
             $this->db->where('id', $idPagoCurso);
-            $this->db->update($this->table_pedido_curso_pagos, ['is_confirmed' => $isConfirmed]);
+            $this->db->update($this->table_pedido_curso_pagos, ['status' => $status]);
             return [
                 'status' => "success",
                 'message' => 'Pago del curso actualizado correctamente'

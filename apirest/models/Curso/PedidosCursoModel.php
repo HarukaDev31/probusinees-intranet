@@ -66,11 +66,11 @@ class PedidosCursoModel extends CI_Model
 
 			//if !empty isset Filtro_Fe_Inicio
 			if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
-				$this->db->where('PC.Fe_Registro >=', $this->input->post('Filtro_Fe_Inicio'));
+				$this->db->where('DATE(PC.Fe_Registro) >=', $this->input->post('Filtro_Fe_Inicio'));
 			}
 			//if !empty isset Filtro_Fe_Fin
 			if (!empty($this->input->post('Filtro_Fe_Fin'))) {
-				$this->db->where('PC.Fe_Registro <=', $this->input->post('Filtro_Fe_Fin'));
+				$this->db->where('DATE(PC.Fe_Registro) <=', $this->input->post('Filtro_Fe_Fin'));
 			}
 
 			if (isset($this->order)) {

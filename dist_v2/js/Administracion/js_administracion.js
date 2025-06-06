@@ -4,6 +4,7 @@ var currentCotizacion = 0;
 var aPagar = 0;
 var pagado = 0;
 var currentCurso = 0;
+var currentCliente = "";
 async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
   // Obtener la instancia de DataTable
   var table = $("#" + tableId).DataTable();
@@ -39,13 +40,21 @@ async function backToList() {
   currentCurso = 0; // Reset current course ID
   aPagar = 0; // Reset amount to be paid
   pagado = 0; // Reset amount already paid
-  $("#payment-tracking-section-cards").empty(); // Clear previous content in payment cards section
+  $("#payment-tracking-section-cards").empty(); 
+  if (currentTableCurso == "consolidado") {
+    tableCursoPedidos.ajax.reload(null, false); // Reload the consolidated payments table
+  }
+  else if (currentTableCurso == "curso") {
+    tableCursoPagos.ajax.reload(null, false); // Reload the course payments table
+  }
 }
-async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago) {
+async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago,nombreCliente) {
+  currentCliente = nombreCliente??currentCliente; // Store the current client name
   currentCurso = idPedidoCurso; // Store the current course ID
   aPagar = apagar; // Store the amount to be paid
   pagado = pago; // Store the amount already paid
   sectionListaPedidos.hide(); // Hide the section with the list of orders
+  $("#payment-tracking-title").text(`${nombreCliente}`); // Set the title of the payment section
   const paymentSectionCards = $("#payment-tracking-section-cards");
   paymentSectionCards.empty(); // Clear previous content
   const url = base_url + "Administracion/Administracion/getDetailsPagosCurso/" + idPedidoCurso;
@@ -57,14 +66,16 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago) {
     const data = await response.json();
 
     if (data.status == 'success') {
-      $("#total-amount").text(`$${Number(apagar).toFixed(2)}`);
-      $("#paid-amount").text(`$${Number(pago).toFixed(2)}`);
+      $("#total-amount").text(`S/.${Number(apagar).toFixed(2)}`);
+      $("#paid-amount").text(`S/.${Number(pago).toFixed(2)}`);
       console.log(data.data.nota);
       let index = 1; // Initialize index for payment cards
       $("#nota").val(data.data.nota || ""); // Set the note input value
       data.data.data.forEach(detail => {
 
-        paymentSectionCards.append(`<div class="payment-card bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
+        paymentSectionCards.append(`<div class="payment-card ${
+          detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white-100"
+        } rounded-xl ">
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Pago ${index}</h3>
                     <div class="space-y-4">
@@ -85,17 +96,13 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago) {
                             <input disabled type="text" value="${detail.payment_date}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
                         </div>
                     </div>
-                    <button
-                    onclick="confirmPayment('${detail.id}', '${detail.is_confirmed}','handlePaymentCurso')"
-                    id="payment-card-${detail.id}"
-                    class="confirm-btn w-full mt-6
-          font-semibold rounded-lg py-3 transition-all duration-300 transform hover:-translate-y-1
-            text-white text-lg
-                    ${detail.is_confirmed == "1" ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"}">
-                        ${detail.is_confirmed == "1" ? "Confirmado" : "Confirmar Pago"}
-                    </button>
+                    <select class="form-select mt-4 w-100" id="cbo-estado-pago-${detail.id}" onchange="confirmPayment('${detail.id}', this.value, 'handlePaymentCurso')">
+                      <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""} class="bg-light">Pendiente</option>
+                      <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""} class="bg-success">Confirmado</option>
+                      <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""} class="bg-danger">Observado</option>
+                  </select>
                 </div>
-            </div>`); 7
+            </div>`); 
         index++; // Increment index for next payment card
       });
       const cotizacionSection = $("#cotizaciones-container");
@@ -225,7 +232,7 @@ async function saveNote() {
       alert("Nota guardada exitosamente.");
       $("#note-input").val(""); // Clear the input field
       if (currentCurso > 0) {
-        viewDetailsPagosCurso(currentCurso, aPagar, pagado); // Refresh the payment details for course
+        viewDetailsPagosCurso(currentCurso, aPagar, pagado,currentCliente); // Refresh the payment details for course
       } else {
 
         viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado);
@@ -275,8 +282,8 @@ async function getTableHeaders(table) {
     }
     const data = await response.json();
     if (data.status == 'success') {
-      let symbol= table == "consolidado" ? "$" : "S/";
-      $("#span-total-importe").text(symbol+ Number(data.data.total_importe).toFixed(2));
+      let symbol = table == "consolidado" ? "$" : "S/";
+      $("#span-total-importe").text(symbol + Number(data.data.total_importe).toFixed(2));
     } else {
       console.error("Error fetching headers:", data.message);
       return [];
@@ -287,13 +294,13 @@ async function getTableHeaders(table) {
   }
 
 }
-async function confirmPayment(idPago, isConfirmed, type = "handlePayment") {
+async function confirmPayment(idPago, value, type = "handlePayment") {
   const url = base_url + "Administracion/Administracion/" + type;
   try {
     const formData = new FormData();
-    let confirmed = isConfirmed == "1" ? "0" : "1";
+    
     formData.append("idPago", idPago);
-    formData.append("isConfirmed", confirmed); // Toggle confirmation status
+    formData.append("status", value); // Toggle confirmation status
 
     const response = await fetch(url, {
       method: "POST",
@@ -308,7 +315,7 @@ async function confirmPayment(idPago, isConfirmed, type = "handlePayment") {
       if (type == "handlePayment") {
         viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado);
       } else if (type == "handlePaymentCurso") {
-        viewDetailsPagosCurso(currentCurso, aPagar, pagado);
+        viewDetailsPagosCurso(currentCurso, aPagar, pagado, currentCliente);
       }
       // Refresh the payment details
     }
@@ -756,7 +763,7 @@ function getIconByExtension(url) {
 
   return icon;
 }
-function viewNote(nota){
+function viewNote(nota) {
   //show nota in modal
   const modal = document.createElement('div');
   modal.className = 'modal fade';

@@ -385,7 +385,6 @@ class ContenedorConsolidado extends CI_Controller
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
 			}else if($tipoTabla=="embarque"){
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
-
 			}
 			else {
 				$arrResponse = $this->ContenedorConsolidadoModel->getClientesDocumentacionPagos($idContenedor);
