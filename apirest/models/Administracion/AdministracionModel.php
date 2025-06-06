@@ -7,6 +7,7 @@ class AdministracionModel extends CI_Model
     private $table_cursos_pagos_conceptos = "pedido_curso_pagos_concept";
     private $table_consolidado = "carga_consolidada_contenedor";
     private $table_consolidado_cotizacion = "contenedor_consolidado_cotizacion";
+    private $table_consolidado_cotizacion_providers = "contenedor_consolidado_cotizacion_proveedores";
     private $CONCEPT_PAGO_LOGISTICA = 1; // Assuming this is the ID for "LOGISTICA" concept
     private $CONCEPT_PAGO_IMPUESTOS = 2; // Assuming this is the ID for "IMPUESTOS" concept
     private $table_curso = 'pedido_curso';
@@ -83,12 +84,17 @@ class AdministracionModel extends CI_Model
             $this->db->where($this->table_consolidado_cotizacion . '.fecha <=', $this->input->post('Filtro_Fe_Fin'));
         }
 
-        // Usar IN con subconsulta como en tu ejemplo
+        //start or where group
         $this->db->where($this->table_consolidado_cotizacion . '.id IN (
         SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . ' 
         WHERE id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . ' 
         OR id_concept = ' . intval($this->CONCEPT_PAGO_IMPUESTOS) . '
-    )');
+        )');
+        //or where estado_cliente != null
+        $this->db->or_where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
+
+
+
 
         // Filtros opcionales adicionales si los necesitas
         if (!empty($this->input->post('estado'))) {
@@ -154,6 +160,7 @@ class AdministracionModel extends CI_Model
         }
 
         $this->db->where($this->table_consolidado_cotizacion . '.id IN (SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . ' WHERE id_concept = ' . $this->CONCEPT_PAGO_LOGISTICA . ' OR id_concept = ' . $this->CONCEPT_PAGO_IMPUESTOS . ')');
+        $this->db->or_where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
 
 
         $result = $this->db->get()->row_array();
@@ -295,7 +302,7 @@ class AdministracionModel extends CI_Model
             'total_importe' => $result['total'] ?? 0,
         ];
     }
-    
+
     public function getPagosCurso($idPedidoCurso)
     {
         try {
