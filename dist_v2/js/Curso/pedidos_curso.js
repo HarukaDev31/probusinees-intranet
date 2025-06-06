@@ -1175,6 +1175,7 @@ $(document).on('change', 'select[name="ID_Campana"]', function () {
 
 async function getCursosHeader() {
   const formData = new FormData();
+  console.log( $('#txt-Fe_Inicio').val(), $('#txt-Fe_Fin').val(),typeof $('#txt-Fe_Inicio').val(), typeof $('#txt-Fe_Fin').val());
   formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == ""  || typeof $('#txt-Fe_Inicio').val() == undefined ? ParseDateString(
     //fin inicio 2 meses antes
     new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
