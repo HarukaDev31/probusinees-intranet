@@ -72,7 +72,7 @@ class Administracion extends CI_Controller
 					$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
 				}
 				$divAcciones1='<div class="d-flex gap-1">';
-				$divAcciones1.='<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ')">
+				$divAcciones1.='<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ','. '\'' . addslashes(trim($value->nombre)) . '\')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 					</div>';
 				if ($value->note_administracion) {
@@ -85,13 +85,11 @@ class Administracion extends CI_Controller
 				$subdata[] = "$ " . (($aPagar) == 0 ? $value->monto : number_format($aPagar, 2, '.', ''));
 				$subdata[] = "$ " . number_format($value->total_pagos_monto, 2, '.', '');
 				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
-
-				if ($value->total_pagos > 0) {
-					$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $value->id . ', \'' . addslashes(trim($value->nombre)) . '\')">
-						<i class="fas fa-eye" style="cursor:pointer;"></i>
-						</div>';
+				$pagos_details=json_decode($value->pagos_details, true);
+				foreach ($pagos_details as $pago) {
+					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">' .'$'. $pago['monto'] . '</span>';
 				}
-				$divAcciones .=  '</div>';
+				$divAcciones.='</div>';
 				$subdata[] = $divAcciones;
 				$data[] = $subdata;
 
@@ -180,7 +178,7 @@ class Administracion extends CI_Controller
 				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
 				$pagos_details=json_decode($row->pagos_details, true);
 				foreach ($pagos_details as $pago) {
-					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">' . $pago['monto'] . '</span>';
+					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">S/.' . $pago['monto'] . '</span>';
 				}
 				$divAcciones.='</div>';
 				$subdata[] = $divAcciones;

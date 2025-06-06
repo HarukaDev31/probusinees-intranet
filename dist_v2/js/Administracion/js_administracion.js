@@ -114,12 +114,15 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago,nombreCliente) 
     console.error("Error fetching payment details:", error);
   }
 }
-async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago) {
+async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago, nombreCliente) {
   currentCotizacion = idCotizacion; // Store the current cotizacion ID
   aPagar = apagar; // Store the amount to be paid
   pagado = pago; // Store the amount already paid
+  currentCliente = nombreCliente ?? currentCliente; // Store the current client name
   sectionListaPedidos.hide(); // Hide the section with the list of orders
+  $("#payment-tracking-title").text(`${nombreCliente}`); // Set the title of the payment section
   const paymentSectionCards = $("#payment-tracking-section-cards");
+  $("#cotizaciones-container").show(); // Show the cotizaciones section
   paymentSectionCards.empty(); // Clear previous content
   const url = base_url + "Administracion/Administracion/getDetailsPagosConsolidado/" + idCotizacion;
   try {
@@ -137,7 +140,9 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago) {
       $("#nota").val(data.data.nota || ""); // Set the note input value
       data.data.data.forEach(detail => {
 
-        paymentSectionCards.append(`<div class="payment-card bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
+        paymentSectionCards.append(`<div class="payment-card ${
+          detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white-100"
+        } rounded-xl ">
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Pago ${index}</h3>
                     <div class="space-y-4">
@@ -158,15 +163,11 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago) {
                             <input disabled type="text" value="${detail.payment_date}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
                         </div>
                     </div>
-                    <button 
-                    onclick="confirmPayment('${detail.id}', '${detail.is_confirmed}')"
-                    id="payment-card-${detail.id}"
-                    class="confirm-btn w-full mt-6 
-          font-semibold rounded-lg py-3 transition-all duration-300 transform hover:-translate-y-1
-            text-white text-lg
-                    ${detail.is_confirmed == "1" ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"}">
-                        ${detail.is_confirmed == "1" ? "Confirmado" : "Confirmar Pago"}
-                    </button>
+                     <select class="form-select mt-4 w-100" id="cbo-estado-pago-${detail.id}" onchange="confirmPayment('${detail.id}', this.value, 'handlePayment')">
+                      <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""} class="bg-light">Pendiente</option>
+                      <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""} class="bg-success">Confirmado</option>
+                      <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""} class="bg-danger">Observado</option>
+                  </select>
                 </div>
             </div>`);
         index++; // Increment index for next payment card
@@ -235,7 +236,7 @@ async function saveNote() {
         viewDetailsPagosCurso(currentCurso, aPagar, pagado,currentCliente); // Refresh the payment details for course
       } else {
 
-        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado);
+        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado,currentCliente);
       }// Refresh the payment details
     } else {
       alert("Error al guardar la nota: " + data.message);
@@ -313,7 +314,7 @@ async function confirmPayment(idPago, value, type = "handlePayment") {
     console.log(data);
     if (data.status == 'success') {
       if (type == "handlePayment") {
-        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado);
+        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado,currentCliente);
       } else if (type == "handlePaymentCurso") {
         viewDetailsPagosCurso(currentCurso, aPagar, pagado, currentCliente);
       }
@@ -589,7 +590,7 @@ $(".tab-administracion").off("click").click(function () {
           'dataType': 'JSON',
           'data': function (data) {
             data.sMethod = $('#hidden-sMethod').val();
-            data.estado_pago = $('#cbo-filtro-estado_pago').val();
+            data.estado_pago = $('#txt-ID_Estado_Cotizacion').val();
             console.log($('#txt-Fe_Inicio').val());
             data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val() == "" ?
               //fin inicio 2 meses antes 
@@ -713,7 +714,7 @@ $(".tab-administracion").off("click").click(function () {
           dataType: "JSON",
           data: function (data) {
             data.sMethod = $('#hidden-sMethod').val();
-            data.estado_pago = $('#cbo-filtro-estado_pago').val();
+            data.estado_pago = $('#txt-ID_Estado_Cotizacion').val();
             data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val() == "" ?
               new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
                 day: '2-digit',
@@ -730,6 +731,7 @@ $(".tab-administracion").off("click").click(function () {
               : $('#txt-Fe_Fin').val(), 'fecha', '/');
             // Agregar tipoTabla para identificar el tipo de tabla
             data.tipoTabla = "pagos";
+
 
           },
         },

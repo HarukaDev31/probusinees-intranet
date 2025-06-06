@@ -58,8 +58,9 @@
                                                         class="form-control input-estado">
                                                         <option value="0" selected>Todos</option>
                                                         <option value="PENDIENTE">PENDIENTE</option>
-                                                        <option value="RECIBIENDO">RECIBIENDO</option>
-                                                        <option value="COMPLETADO">COMPLETADO</option>
+                                                        <option value="ADELANTO">ADELANTO</option>
+                                                        <option value="PAGADO">PAGADO</option>
+                                                        <option value="SOBREPAGO">SOBREPAGO</option>
                                                     </select>
                                                 </div>
                                             </div>
