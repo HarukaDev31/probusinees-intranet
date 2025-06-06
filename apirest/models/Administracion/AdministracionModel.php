@@ -295,6 +295,7 @@ class AdministracionModel extends CI_Model
             'total_importe' => $result['total'] ?? 0,
         ];
     }
+    
     public function getPagosCurso($idPedidoCurso)
     {
         try {

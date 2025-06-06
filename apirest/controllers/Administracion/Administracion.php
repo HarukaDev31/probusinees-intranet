@@ -58,21 +58,39 @@ class Administracion extends CI_Controller
 				$subdata[] = $value->documento;
 				$subdata[] = $value->telefono;
 				$subdata[] = "Consolidado";
-				$subdata[] = "<span class='badge badge-secondary'>" ."#" . $value->carga. "</span>";
-
+				$subdata[] = "<span class='badge badge-secondary'>" . "#" . $value->carga. "</span>";
+				//if input post campana is not 0 
+				if (!empty($this->input->post('campana')) && $this->input->post('campana') != '0') {
+					$campanaFiltro = $this->input->post('campana');
+					if ($value->carga != $campanaFiltro) {
+						continue; // Usar continue en lugar de return
+					}
+				}
 				$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $value->estado_pagos_coordinacion . '</span>';
 				$aPagar = ($value->monto_final + $value->impuestos_final) == 0 ? $value->monto : ($value->monto_final + $value->impuestos_final);
+				$estadoPago = '';
 				if ($value->total_pagos == 0) {
+					$estadoPago = 'PENDIENTE';
 					$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
-				} else if ($value->total_pagos_monto < ($aPagar)) {
+				} else if ($value->total_pagos_monto < $aPagar) {
+					$estadoPago = 'ADELANTO';
 					$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
-				} else if ($value->total_pagos_monto == ($aPagar)) {
+				} else if ($value->total_pagos_monto == $aPagar) {
+					$estadoPago = 'PAGADO';
 					$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
-				} else if ($value->total_pagos_monto > ($aPagar)) {
+				} else if ($value->total_pagos_monto > $aPagar) {
+					$estadoPago = 'SOBREPAGO';
 					$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
 				}
-				$divAcciones1='<div class="d-flex gap-1">';
-				$divAcciones1.='<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ','. '\'' . addslashes(trim($value->nombre)) . '\')">
+
+				if (!empty($this->input->post('estado_pago')) && $this->input->post('estado_pago') != '0') {
+					$estadoFiltro = $this->input->post('estado_pago');
+					if ($estadoPago !== $estadoFiltro) {
+						continue; // Usar continue en lugar de return
+					}
+				}
+				$divAcciones1 = '<div class="d-flex gap-1">';
+				$divAcciones1 .= '<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ',' . '\'' . addslashes(trim($value->nombre)) . '\')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 					</div>';
 				if ($value->note_administracion) {
@@ -85,11 +103,11 @@ class Administracion extends CI_Controller
 				$subdata[] = "$ " . (($aPagar) == 0 ? $value->monto : number_format($aPagar, 2, '.', ''));
 				$subdata[] = "$ " . number_format($value->total_pagos_monto, 2, '.', '');
 				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
-				$pagos_details=json_decode($value->pagos_details, true);
+				$pagos_details = json_decode($value->pagos_details, true);
 				foreach ($pagos_details as $pago) {
-					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">' .'$'. $pago['monto'] . '</span>';
+					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">' . '$' . $pago['monto'] . '</span>';
 				}
-				$divAcciones.='</div>';
+				$divAcciones .= '</div>';
 				$subdata[] = $divAcciones;
 				$data[] = $subdata;
 
@@ -127,6 +145,17 @@ class Administracion extends CI_Controller
 		);
 		echo json_encode($output);
 	}
+	public function getCampanasActivas(){
+		try {
+			$arrResponse = $this->AdministracionModel->getCampanasActivas();
+			echo json_encode([
+				'status' => 'success',
+				'data'   => $arrResponse
+			]);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getCampanasActivas() => ' . $e->getMessage());
+		}
+	}
 	public function getCursosPagos()
 	{
 		try {
@@ -145,9 +174,15 @@ class Administracion extends CI_Controller
 				$select = '';
 				if (!empty($row->ID_Campana)) {
 					foreach ($campanas as $campana) {
-						if($row->ID_Campana == $campana['ID_Campana']) {
+						if ($row->ID_Campana == $campana['ID_Campana']) {
 							$select .= '<span class="badge badge-secondary">' . $campana['nombre_campana'] . '</span>';
-						} 
+						}
+					}
+				}
+				if (!empty($this->input->post('campana')) && $this->input->post('campana') != '0') {
+					$campanaFiltro = $this->input->post('campana');
+					if ($row->ID_Campana != $campanaFiltro) {
+						continue; // Usar continue en lugar de return
 					}
 				}
 				$subdata[] = $select; //mes
@@ -161,26 +196,44 @@ class Administracion extends CI_Controller
 					</div>';
 				}
 				$subdata[] = $divAcciones1;
-
+				$estadoPago = "";
 				$estadoCurso = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
 				if ($row->total_pagos == 0) {
 					$estadoCurso = '<span class="badge badge-secondary">PENDIENTE</span>';
+					$estadoPago = 'PENDIENTE';
 				} else if ($row->total_pagos < ($row->Ss_Total)) {
 					$estadoCurso = '<span class="badge badge-warning">ADELANTO</span>';
+					$estadoPago = 'ADELANTO';
 				} else if ($row->total_pagos == ($row->Ss_Total)) {
 					$estadoCurso = '<span class="badge badge-success">PAGADO</span>';
+					$estadoPago = 'PAGADO';
 				} else if ($row->total_pagos > ($row->Ss_Total)) {
 					$estadoCurso = '<span class="badge badge-danger">SOBREPAGO</span>';
+					$estadoPago = 'SOBREPAGO';
+				}
+				if (!empty($this->input->post('estado_pago')) && $this->input->post('estado_pago') != '0') {
+					$estadoFiltro = $this->input->post('estado_pago');
+					if ($estadoPago !== $estadoFiltro) {
+						continue; // Usar continue en lugar de return
+					}
+				}
+				//get from input post estado_pago if !=0 filter by estado_curso if not in continue
+				if ($this->input->post('estado_pago') != 0) {
+					log_message('debug', 'ContenedorConsolidado : getCursosPagos() => estado_pago: ' . $this->input->post('estado_pago'));
+					//if estado_pago not includes in estadoCurso string continue
+					if (strpos($estadoCurso, $this->input->post('estado_pago')) === false) {
+						continue;
+					}
 				}
 				$subdata[] = $estadoCurso;
-				$subdata[] = $row->No_Signo . round($row->Ss_Total, 2) ;		
+				$subdata[] = $row->No_Signo . round($row->Ss_Total, 2);
 				$subdata[] = "S/" . round($row->total_pagos, 2);
 				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
-				$pagos_details=json_decode($row->pagos_details, true);
+				$pagos_details = json_decode($row->pagos_details, true);
 				foreach ($pagos_details as $pago) {
 					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">S/.' . $pago['monto'] . '</span>';
 				}
-				$divAcciones.='</div>';
+				$divAcciones .= '</div>';
 				$subdata[] = $divAcciones;
 				$data[] = $subdata;
 			}
@@ -250,25 +303,29 @@ class Administracion extends CI_Controller
 			log_message('error', 'ContenedorConsolidado : getDetailsPagosConsolidado() => ' . $e->getMessage());
 		}
 	}
-	public function handlePayment() {
+	public function handlePayment()
+	{
 		$idPago = $this->input->post('idPago');
 		$status = $this->input->post('status');
 		$result = $this->AdministracionModel->handlePayment($idPago, $status);
 		echo json_encode($result);
 	}
-	public function handlePaymentCurso(){
+	public function handlePaymentCurso()
+	{
 		$idPagoCurso = $this->input->post('idPago');
 		$status = $this->input->post('status');
 		$result = $this->AdministracionModel->handlePaymentCurso($idPagoCurso, $status);
 		echo json_encode($result);
 	}
-	public function saveNote(){
+	public function saveNote()
+	{
 		$idCotizacion = $this->input->post('idCotizacion');
 		$note = $this->input->post('note');
 		$result = $this->AdministracionModel->saveNote($idCotizacion, $note);
 		echo json_encode($result);
 	}
-	public function saveNoteCurso(){
+	public function saveNoteCurso()
+	{
 		$idPedidoCurso = $this->input->post('idCotizacion');
 		$note = $this->input->post('note');
 		$result = $this->AdministracionModel->saveNoteCurso($idPedidoCurso, $note);
@@ -286,7 +343,8 @@ class Administracion extends CI_Controller
 			log_message('error', 'ContenedorConsolidado : getDetailsPagosCurso() => ' . $e->getMessage());
 		}
 	}
-	public function getHeadersConsolidado(){
+	public function getHeadersConsolidado()
+	{
 		try {
 			$arrResponse = $this->AdministracionModel->getHeadersConsolidado();
 			echo json_encode([
@@ -297,7 +355,8 @@ class Administracion extends CI_Controller
 			log_message('error', 'ContenedorConsolidado : getHeadersConsolidado() => ' . $e->getMessage());
 		}
 	}
-	public function getHeadersCurso(){
+	public function getHeadersCurso()
+	{
 		try {
 			$arrResponse = $this->AdministracionModel->getHeadersCurso();
 			echo json_encode([

@@ -52,7 +52,7 @@
                                         </div>
                                         <?php if ($this->user->No_Grupo != "Coordinación") {  ?>
                                             <div class="d-flex align-items-center p-2" style="width:300px;">
-                                                <div class="d-flex" style="width:60%">Pago</div>
+                                                <div class="d-flex" style="width:60%">Estado</div>
                                                 <div style="width: 200px;">
                                                     <select id="txt-ID_Estado_Cotizacion" name="ID_Estado"
                                                         class="form-control input-estado">
@@ -60,7 +60,16 @@
                                                         <option value="PENDIENTE">PENDIENTE</option>
                                                         <option value="ADELANTO">ADELANTO</option>
                                                         <option value="PAGADO">PAGADO</option>
-                                                        <option value="SOBREPAGO">SOBREPAGO</option>
+                                                        <option value="CONFIRMADO">CONFIRMADO</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center p-2" style="width:300px;">
+                                                <div class="d-flex" style="width:60%">Campañas</div>
+                                                <div style="width: 200px;">
+                                                    <select id="txt-ID_Campana" name="ID_Campana"
+                                                        class="form-control input-estado">
+                                                     
                                                     </select>
                                                 </div>
                                             </div>
@@ -127,41 +136,6 @@
                     <div class="col-12">
                         <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
                             value="<?php echo $this->router->method; ?>">
-
-                        <div class="col-6 col-sm-3 hidden">
-                            <label>F. Inicio</label>
-                            <div class="form-group">
-                                <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
-                                    value="<?php echo dateNow('month_date_ini_report'); ?>">
-                                <span class="help-block text-danger" id="error"></span>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3 hidden">
-                            <label>F. Fin</label>
-                            <div class="form-group">
-                                <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                                    value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                                <span class="help-block text-danger" id="error"></span>
-                            </div>
-                        </div>
-
-
-                        <div class="col-6 col-sm-3 hidden">
-                            <label>F. Inicio</label>
-                            <div class="form-group">
-                                <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
-                                    value="<?php echo dateNow('month_date_ini_report'); ?>">
-                                <span class="help-block text-danger" id="error"></span>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3 hidden">
-                            <label>F. Fin</label>
-                            <div class="form-group">
-                                <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                                    value="<?php echo dateNow('fecha_actual_dmy'); ?>">
-                                <span class="help-block text-danger" id="error"></span>
-                            </div>
-                        </div>
                         <div class="row">
                             <div data-table="consolidado"
                                 class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-administracion">
