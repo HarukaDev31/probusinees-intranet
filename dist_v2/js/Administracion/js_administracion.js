@@ -545,9 +545,9 @@ $(".tab-administracion").off("click").click(function () {
       tableCursoPedidos.ajax.reload(null, false);
     } else {
       $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
-  $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
-  $("#txt-ID_Estado_Cotizacion").val('0');
-  $("#txt-ID_Campana").val('0');
+      $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+      $("#txt-ID_Estado_Cotizacion").val('0');
+      $("#txt-ID_Campana").val('0');
       tableCursoPedidos = $("#table-pagos-consolidado").DataTable({
         dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +

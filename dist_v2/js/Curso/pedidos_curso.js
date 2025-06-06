@@ -204,11 +204,22 @@ $(function () {
       url = base_url + 'Curso/PedidosCurso/ajax_list';
 
       if ($.fn.DataTable.isDataTable("#table-curso-pedidos")) {
+        limpiarFiltrosContenedor();
 
         $("#table-curso-pedidos").show();
         $("#table-curso-pedidos_wrapper").show();
         tableCursoPedidos.ajax.reload();
       } else {
+        $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }), 'fecha', '/'));
+        $("#txt-Fe_Fin").val(ParseDateString(new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }), 'fecha', '/'));
         tableCursoPedidos = $("#table-curso-pedidos").DataTable({
           dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
@@ -249,7 +260,6 @@ $(function () {
 
           ],
           'searching': true,
-          'bStateSave': true,
           "lengthChange": true,
           'processing': true,
           'serverSide': false,
@@ -280,21 +290,24 @@ $(function () {
             'data': function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val() == "" ?
+              console.log($('#txt-Fe_Inicio').val(), "txt-Fe_Inicio");
+              console.log(ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/'), "ParseDateString");
+              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" ? ParseDateString(
                 new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric'
-                })
-                : $('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
-              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val() == "" ?
+                }))
+                : $('#txt-Fe_Inicio').val();
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val() == "" ? ParseDateString(
                 new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric'
-                })
-                : $('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
+                }))
+                : $('#txt-Fe_Fin').val();
               data.tipoTabla = "alumnos";
+              data.campana = $('#txt-ID_Campana_Curso').val() ?? 0;
             },
           },
           'columnDefs': [
@@ -309,7 +322,7 @@ $(function () {
               targets: "",
               orderable: false,
             },],
-          'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
+          'lengthMenu': [[100, 1000, -1], [100, 1000, "Todos"]],
         });
         tableCursoPedidos.on('draw', async function () {
           await getCursosHeader();
@@ -319,22 +332,22 @@ $(function () {
 
 
         $("#table-curso-pedidos").show();
-        tableCursoPedidos.on('init', async function () {
-          configurarBuscador(
-            "table-curso-pedidos",
-            "search-table",
-            "table-curso-pedidos_info"
-          );
-          $('.input-report').datepicker({
-            autoclose: true,
-            //startDate : new Date(fYear, fToday.getMonth(), '01'),
-            todayHighlight: true,
-            dateFormat: 'dd/mm/yyyy',
-            format: 'dd/mm/yyyy',
-          });
-        })
-      }
 
+      }
+      tableCursoPedidos.on('draw', async function () {
+        configurarBuscador(
+          "table-curso-pedidos",
+          "search-table",
+          "table-curso-pedidos_info"
+        );
+        $('.input-report').datepicker({
+          autoclose: true,
+          //startDate : new Date(fYear, fToday.getMonth(), '01'),
+          todayHighlight: true,
+          dateFormat: 'dd/mm/yyyy',
+          format: 'dd/mm/yyyy',
+        });
+      })
     }
 
     else if (table == "pagos") {
@@ -343,11 +356,12 @@ $(function () {
       $("#table-curso-pedidos_wrapper").hide();
 
       if ($.fn.DataTable.isDataTable("#table-curso-pagos")) {
-
+        limpiarFiltrosContenedor();
         $("#table-curso-pagos").show();
         $("#table-curso-pagos_wrapper").show();
         tableCursoPagos.ajax.reload(null, false);
       } else {
+        
         url = base_url + 'Curso/PedidosCurso/ajax_list';
 
         tableCursoPagos = $("#table-curso-pagos").DataTable({
@@ -412,27 +426,28 @@ $(function () {
             data: function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio_Carga').val() == "" ?
+              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" ? ParseDateString(
                 new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric'
                 })
-                : $('#txt-Fe_Inicio_Carga').val(), 'fecha', '/');
-              data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin_Carga').val() == "" ?
+              ) : $('#txt-Fe_Inicio').val();
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val() == "" ? ParseDateString(
                 new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric'
                 })
-                : $('#txt-Fe_Fin_Carga').val(), 'fecha', '/');
+              ) : $('#txt-Fe_Fin').val();
               data.tipoTabla = "pagos";
+              data.campana = $('#txt-ID_Campana_Curso').val() ?? 0;
+
 
             },
           },
         });
-        // FUNCION PARA CONFIGURAR EL BUSCADOR
-        tableCursoPagos.on('init', async function () {
+        tableCursoPagos.on('draw', async function () {
           configurarBuscador(
             "table-curso-pagos",
             "search-table",
@@ -446,12 +461,16 @@ $(function () {
             format: 'dd/mm/yyyy',
           });
         })
+        // FUNCION PARA CONFIGURAR EL BUSCADOR
+
         //Funcion para exportar a excel
 
         $("#table-curso-pagos").show();
 
       }
+
     }
+    getCampanasActivas();
   });
   $(".tab-curso").first().click();
 
@@ -671,7 +690,7 @@ async function viewCliente(id) {
         $("#cliente-provincia").val(response.data.provincia);
         $("#cliente-distrito").val(response.data.distrito);
         $("#cliente-edad").val(response.data.nacimiento);
-        if (response.data.usuario_moodle && response.data.password_moodle) {
+        if (response.data.nu_estado_usuario_externo == "2") {
           $('#acceso-aula-virtual').show();
           $('#cliente-moodle-usuario').val(response.data.usuario_moodle);
           $('#cliente-moodle-password').val(response.data.password_moodle);
@@ -877,9 +896,21 @@ function aplicarFiltrosContenedor() {
 
 // Función para limpiar los filtros y recargar la tabla
 function limpiarFiltrosContenedor() {
-  $("#txt-Fe_Inicio_Carga").val('');
-  $("#txt-Fe_Fin_Carga").val('');
+  $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }), 'fecha', '/'));
+  $("#txt-Fe_Fin").val(ParseDateString(new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }), 'fecha', '/'));
+  $("#txt-ID_Campana_Curso").val('0');
   $("#txt-ID_Estado").val('0');
+  //emit event to set search input to empty
+  $(".search-table").val('');
+  $(".search-table").trigger('input');
   if (currentTableCurso === 'alumnos') {
     $("#cbo-filtro-estado_pago").val('0').trigger('change');
     tableCursoPedidos.ajax.reload(null, false);
@@ -954,9 +985,7 @@ function cargarTablaCampanas() {
       }
     ],
     'searching': true,
-    'bStateSave': true,
     "lengthChange": true,
-    'processing': true,
     'serverSide': false,
     'info': true,
     'autoWidth': false,
@@ -1146,23 +1175,21 @@ $(document).on('change', 'select[name="ID_Campana"]', function () {
 
 async function getCursosHeader() {
   const formData = new FormData();
-  formData.append("Filtro_Fe_Inicio", ParseDateString($('#txt-Fe_Inicio_Carga').val() == "" ?
+  formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == "" ? ParseDateString(
     //fin inicio 2 meses antes
     new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    })
-    : $('#txt-Fe_Inicio_Carga').val(), 'fecha', '/'),
-  );
-  formData.append("Filtro_Fe_Fin", ParseDateString($('#txt-Fe_Fin').val() == "" ?
+    })) : $('#txt-Fe_Inicio').val());
+
+  formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == "" ? ParseDateString(
     new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    })
-    : $('#txt-Fe_Fin').val(), 'fecha', '/'),
-  );
+    })) : $('#txt-Fe_Fin').val());
+
   const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
     method: "POST",
     body: formData
@@ -1170,7 +1197,7 @@ async function getCursosHeader() {
   const data = await response.json();
   if (data.status === "success") {
     console.log(data.data);
-    $("#span-total-importe").text("S/."+(data.data.total_importe));
+    $("#span-total-importe").text("S/." + (data.data.total_importe));
   }
 }
 // Delegación para inputs de importe en la tabla
@@ -1286,7 +1313,39 @@ function cargarPaises() {
     }
   });
 }
+async function eliminarPedido(idPedido) {
+  const confirm = await Swal.fire({
+    title: '¿Estás seguro?',
+    text: "No podrás deshacer esta acción",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  });
 
+  if (confirm.isConfirmed) {
+    $.ajax({
+      url: base_url + "Curso/PedidosCurso/eliminarPedido/" + idPedido,
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status === "success") {
+          Swal.fire('¡Eliminado!', response.message, 'success');
+          if (currentTableCurso === 'alumnos') {
+            tableCursoPedidos.ajax.reload(null, false);
+          } else if (currentTableCurso === 'pagos') {
+            tableCursoPagos.ajax.reload(null, false);
+          }
+        } else {
+          Swal.fire('Error', response.message || 'No se pudo eliminar el pedido', 'error');
+        }
+      },
+      error: function () {
+        Swal.fire('Error', 'Error al eliminar el pedido', 'error');
+      }
+    });
+  }
+}
 function cargarDepartamentos(idPais) {
   $.ajax({
     url: base_url + "HelperController/getDepartamentos",
@@ -1390,15 +1449,23 @@ async function configurarBuscador(tableId, searchInputId, infoContainerId) {
 
   // Obtener la instancia de DataTable
   var table = $('#' + tableId).DataTable();
-  console.log('tabla : ',table)
+  console.log('tabla : ', table)
   // Limpiar eventos previos para evitar duplicados
   $('.' + searchInputId).off('keyup input');
 
   // Escuchar el evento "input" y "keyup" en el buscador personalizado
   $('.' + searchInputId).on('input keyup', function () {
     var searchValue = this.value;
-    console.log('Buscando:', searchValue); // Para debug
-    table.search(searchValue).draw();
+    console.log('Buscando:', searchValue);
+    console.log('Tabla ID:', tableId);
+    if (currentTableCurso === 'alumnos') {
+      tableCursoPedidos.search(searchValue).draw();
+    } else if (currentTableCurso === 'pagos') {
+      if (!$.fn.DataTable.isDataTable('#table-curso-pagos')) {
+        return;
+      }
+      tableCursoPagos.search(searchValue).draw();
+    }
   });
 
   // Función para limpiar el buscador
@@ -1419,6 +1486,29 @@ async function configurarBuscador(tableId, searchInputId, infoContainerId) {
 
   // Ocultar el buscador nativo de DataTables para evitar conflictos
   $('#' + tableId + '_filter').hide();
+}
+async function getCampanasActivas() {
+  const url = base_url + "Administracion/Administracion/getCampanasActivas";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    if (data.status == 'success') {
+      const campanasSelect = $("#txt-ID_Campana_Curso");
+      campanasSelect.empty(); // Clear previous options
+      //add empty option
+      campanasSelect.append('<option value="0">Seleccione una campaña</option>');
+      data.data.forEach(campana => {
+        campanasSelect.append(`<option value="${campana.ID_Campana}">${campana.nombre_campana}</option>`);
+      });
+    } else {
+      console.error("Error fetching active campaigns:", data.message);
+    }
+  } catch (error) {
+    console.error("Error fetching active campaigns:", error);
+  }
 }
 async function guardarCambiosPedido(ID_Pedido_Curso) {
   var nuevoImporte = $('#importe_pedido_' + ID_Pedido_Curso).val();

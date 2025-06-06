@@ -46,49 +46,10 @@ class PedidosCurso extends CI_Controller
         $arrData = [];
         $index = 1;
         $tipoTabla = $this->input->post('tipoTabla');
-        $filtro_estado_pago = $this->input->post('estado_pago');
         if ($tipoTabla == "alumnos") {
             $arrData = $this->PedidosCursoModel->get_datatables();
-            // FILTRAR POR ESTADO DE PAGO EN PHP
-            if ($filtro_estado_pago && $filtro_estado_pago != "0") {
-                $arrData = array_filter($arrData, function ($row) use ($filtro_estado_pago) {
-                    // Calcula el estado de pago igual que en tu foreach
-                    $fecha_hoy = date('Y-m-d');
-                    $fecha_inicio = isset($row->Fe_Inicio) ? $row->Fe_Inicio : null;
-                    $fecha_fin = isset($row->Fe_Fin) ? $row->Fe_Fin : null;
-                    $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null;
-                    $estado_pago = 'pendiente';
-                    if ($row->total_pagos == 0) {
-                        $estado_pago = '<span class="badge bg-secondary">Pendiente</span>';
-                    } elseif ($row->total_pagos < $row->Ss_Total) {
-                        if (
-                            $tipo_curso == 1 &&
-                            $fecha_inicio &&
-                            (strtotime($fecha_inicio) - strtotime($fecha_hoy)) <= 2 * 86400 &&
-                            (strtotime($fecha_inicio) - strtotime($fecha_hoy)) >= 0
-                        ) {
-                            $estado_pago = '<span class="badge bg-primary">Cobrando</span>';
-                        } else {
-                            $estado_pago = '<span class="badge bg-warning">Adelanto</span>';
-                        }
-                    } elseif ($row->total_pagos == $row->Ss_Total) {
-                        $estado_pago =  '<span class="badge bg-success">Pagado</span>';
-                    } elseif ($row->total_pagos > $row->Ss_Total) {
-                        $estado_pago = '<span class="badge bg-danger">Sobrepagado</span>';
-                    }
-                    if (
-                        $tipo_curso == 1 &&
-                        $fecha_fin &&
-                        strtotime($fecha_hoy) > strtotime($fecha_fin)
-                    ) {
-                        $estado_pago = '<span class="badge bg-info">Constancia</span>';
-                    }
-                    return $estado_pago == $filtro_estado_pago;
-                });
-            }
         } else {
             $arrData = $this->PedidosCursoModel->getPagosCurso();
-            log_message('error', 'arrData: ' . print_r($arrData, true));
         }
         $data = array();
         if ($tipoTabla == "alumnos") {
@@ -126,7 +87,14 @@ class PedidosCurso extends CI_Controller
                     $selected = ($row->ID_Campana == $campana['ID_Campana']) ? 'selected' : '';
                     $select .= '<option value="' . $campana['ID_Campana'] . '" ' . $selected . '>' . $campana['nombre_campana'] . '</option>';
                 }
+                //if input campana !="0"
+
                 $select .= '</select>';
+                if ($this->input->post('campana') != "0" && !empty($this->input->post('campana'))) {
+                    if ($row->ID_Campana != $this->input->post('campana')) {
+                        continue;
+                    }
+                }
                 $rows[] = $select; //mes
                 $select_usuario = '<select class="select-usuario-externo form-control" data-id-usuario="' . $row->ID_Usuario . '" data-id-pedido="' . $row->ID_Pedido_Curso . '">';
                 $select_usuario .= '<option value="1"' . ($row->Nu_Estado_Usuario_Externo == 1 ? ' selected' : '') . '>Pendiente</option>';
@@ -146,23 +114,24 @@ class PedidosCurso extends CI_Controller
                 $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null; // 1 = En vivo
 
                 $estado_pago = 'pendiente';
+                $estado = 'pendiente';
                 if ($row->total_pagos == 0) {
                     $estado_pago = '<span class="badge bg-secondary">Pendiente</span>';
-                } elseif ($row->total_pagos < $row->Ss_Total) {
-                    if (
-                        $tipo_curso == 1 &&
-                        $fecha_inicio &&
-                        (strtotime($fecha_inicio) - strtotime($fecha_hoy)) <= 2 * 86400 &&
-                        (strtotime($fecha_inicio) - strtotime($fecha_hoy)) >= 0
-                    ) {
-                        $estado_pago = '<span class="badge bg-primary">Cobrando</span>';
-                    } else {
-                        $estado_pago = '<span class="badge bg-warning">Adelanto</span>';
-                    }
+                } elseif ($row->total_pagos < $row->Ss_Total && $row->total_pagos > 0) {
+                    $estado = 'adelanto';
+                    $estado_pago = '<span class="badge bg-warning">Adelanto</span>';
                 } elseif ($row->total_pagos == $row->Ss_Total) {
+                    $estado = 'pagado';
                     $estado_pago =  '<span class="badge bg-success">Pagado</span>';
                 } elseif ($row->total_pagos > $row->Ss_Total) {
+                    $estado = 'sobrepagado';
                     $estado_pago = '<span class="badge bg-danger">Sobrepagado</span>';
+                }
+                if (!empty($this->input->post('estado_pago')) && $this->input->post('estado_pago') != '0') {
+                    $estadoFiltro = $this->input->post('estado_pago');
+                    if ($estado !== $estadoFiltro) {
+                        continue; // Usar continue en lugar de return
+                    }
                 }
                 if (
                     $tipo_curso == 1 &&
@@ -224,7 +193,11 @@ class PedidosCurso extends CI_Controller
                 $divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
 
                 $divAcciones .= '<div class="d-flex"  onclick="addPagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
-
+                if ($this->input->post('campana') != "0" && !empty($this->input->post('campana'))) {
+                    if ($row->ID_Campana != $this->input->post('campana')) {
+                        continue;
+                    }
+                }
                 if ($row->pagos_count > 0) {
                     $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->nombre)) . '\')">
 					<i class="fas fa-eye text-primary" style="cursor:pointer;"></i>	
@@ -243,7 +216,10 @@ class PedidosCurso extends CI_Controller
         );
         echo json_encode($output);
     }
-
+    public function eliminarPedido($idPedido){
+        $response = $this->PedidosCursoModel->eliminarPedido($idPedido);
+        echo json_encode($response);    
+    }
     public function ViewCliente($id_pedido)
     {
         $data = $this->PedidosCursoModel->getDatosClientePorPedido($id_pedido);
@@ -318,14 +294,14 @@ class PedidosCurso extends CI_Controller
             // Validar y limpiar datos antes de enviar a Moodle
             $original_username = trim($result->No_Nombres_Apellidos);
             $password = $this->encryption->decrypt($result->No_Password);
-            if($password === false) {
+            if ($password === false) {
                 $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-=+;:,.?';
                 $length = 12;
                 $password = '';
                 for ($i = 0; $i < $length; $i++) {
                     $randomIndex = ord(random_bytes(1)) % strlen($chars);
                     $password .= $chars[$randomIndex];
-                }                
+                }
             }
             $nombres = trim($result->No_Nombres_Apellidos);
             $email = trim($result->No_Usuario);
@@ -408,8 +384,11 @@ class PedidosCurso extends CI_Controller
                 $arrParams['criteria'][0]['key']   = 'username';
                 $arrParams['criteria'][0]['value'] = $username;
                 //set No_Usuario to  $username
-                $this->PedidosCursoModel->setUsuarioModdle($username,$this->encryption->encrypt($cleaned_password),
-            $id);
+                $this->PedidosCursoModel->setUsuarioModdle(
+                    $username,
+                    $this->encryption->encrypt($cleaned_password),
+                    $id
+                );
                 $response_usuario = $MoodleRestPro->getUser($arrParams);
 
                 if ($response_usuario['status'] == 'success') {
@@ -471,9 +450,9 @@ class PedidosCurso extends CI_Controller
                 if (isset($response_usuario_moodle['message'])) {
                     $error_message .= ': ' . $response_usuario_moodle['message'];
                 }
-                $arrPost=[];
+                $arrPost = [];
                 //get no_usuario and no_password from response_usuario_bd
-                $arrPost['No_Usuario'] = $result->usuario_moodle;
+                $arrPost['No_Usuario'] = $result->usuario_moodle=="" ? $result->No_Usuario : $result->usuario_moodle; 
                 $arrPost['No_Password'] = $this->encryption->decrypt($result->No_Password);
 
                 $response_error = [
@@ -518,7 +497,7 @@ class PedidosCurso extends CI_Controller
 
         // Construir el username final (max 20 chars)
         $username = $clean . $randomChars;
-        
+
         // Asegurar que no exceda 20 caracteres
         return substr($username, 0, 20);
     }
@@ -856,31 +835,31 @@ class PedidosCurso extends CI_Controller
         }
     }
     public function getPagosCurso($idPedidoCurso)
-	{
-		try {
-			$arrData = $this->PedidosCursoModel->getPagosCursoPedido($idPedidoCurso);
-			$data    = [];
-			$index   = 1;
-			foreach ($arrData as $row) {
-				$subdata = [];
-				$subdata[] = $index;
-				$subdata[] = allTypeDate($row->payment_date, '-', 0);
-				$subdata[] = $row->banco;
-				$subdata[] = "$" . round($row->monto, 2);
-				$subdata[] = '<div data-url=' . $row->voucher_url . ' download
+    {
+        try {
+            $arrData = $this->PedidosCursoModel->getPagosCursoPedido($idPedidoCurso);
+            $data    = [];
+            $index   = 1;
+            foreach ($arrData as $row) {
+                $subdata = [];
+                $subdata[] = $index;
+                $subdata[] = allTypeDate($row->payment_date, '-', 0);
+                $subdata[] = $row->banco;
+                $subdata[] = "$" . round($row->monto, 2);
+                $subdata[] = '<div data-url=' . $row->voucher_url . ' download
                 onclick="showImageModal(\'' . $row->voucher_url . '\')"
                 >
                     <i class="fas fa-file"></i>
                     </div>';
-				$data[] = $subdata;
-				$index++;
-			}
-			$output = array(
-				"data" => $data
-			);
-			echo json_encode($output);
-		} catch (Exception $e) {
-			log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
-		}
-	}
+                $data[] = $subdata;
+                $index++;
+            }
+            $output = array(
+                "data" => $data
+            );
+            echo json_encode($output);
+        } catch (Exception $e) {
+            log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
+        }
+    }
 }
