@@ -443,7 +443,7 @@ class PedidosCurso extends CI_Controller
                 }
             } else {
                 $where = ['ID_Pedido_Curso' => $id_pedido_curso];
-                $data_upd = ['Nu_Estado_Usuario_Externo' => '3'];
+                $data_upd = ['Nu_Estado_Usuario_Externo' => '2'];
                 $this->PedidosCursoModel->actualizarPedido($where, $data_upd);
 
                 $error_message = 'Error al crear usuario en Moodle';
