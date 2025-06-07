@@ -595,7 +595,7 @@ function reload_table_Entidad() {
   }
 }
 
-async function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
+async function  crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
   event.preventDefault();
   url = base_url + 'Curso/PedidosCurso/crearUsuarioCursosMoodle/' + id + '/' + ID_Pedido_Curso;
   await $.ajax({
