@@ -612,7 +612,6 @@ async function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
         $('#moda-message-content').addClass('bg-' + response.status);
         $('.modal-title-message').text(response.message);
         setTimeout(function () { $('#modal-message').modal('hide'); }, 2100);
-        await enviarEmailUsuarioMoodle(id, ID_Pedido_Curso);
 
         reload_table_Entidad();
       } else {
@@ -630,6 +629,8 @@ async function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
         $('.modal-title-message').text(response.message);
         setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
       }
+      await enviarEmailUsuarioMoodle(id, ID_Pedido_Curso);
+
     }
   });
 
@@ -1564,8 +1565,7 @@ $(document).on('change', '.select-usuario-externo', async function () {
   var idPedido = $(this).data('id-pedido');
   if (estado == '2') {
     try {
-      crearUsuarioCursosMoodle(idUsuario, idPedido);
-      enviarEmailUsuarioMoodle(idUsuario, idPedido);
+      await crearUsuarioCursosMoodle(idUsuario, idPedido);
     } catch (error) {
       console.error("Error al crear usuario en Moodle:", error);
     }
