@@ -380,6 +380,94 @@
         </form>
     </div>
 </div>
+<!-- Modal para registrar pago de curso -->
+<div class="modal fade" id="modal-pago-curso" tabindex="-1" aria-labelledby="modalPagoCursoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form id="form-pago-curso" enctype="multipart/form-data">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modalPagoCursoLabel">Registrar Pago de Curso</h3>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body row">
+          <input type="hidden" id="id-pedido-curso" name="idPedido">
+          <div class="col-md-6 mb-3">
+            <label for="monto" class="form-label">Monto</label>
+            <input type="number" id="monto" name="monto" class="form-control" step="0.01" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="banco" class="form-label">Banco</label>
+            <div class="d-flex gap-3 align-items-center" id="banco-group">
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-bcp" value="BCP" required>
+                <label class="form-check-label flex" for="banco-bcp">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Logo_credito.gif" alt="BCP" style="height:32px;"><br>
+                </label>
+                </div>
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-interbank" value="INTERBANK" required>
+                <label class="form-check-label flex" for="banco-interbank">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Interbank_logo.svg" alt="INTERBANK" style="height:32px;"><br>
+                </label>
+                </div>
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-yape" value="YAPE" required>
+                <label class="form-check-label flex" for="banco-yape">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png" alt="YAPE" style="height:32px;"><br>
+                </label>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" id="fecha" name="fecha" class="form-control" required>
+          </div>
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Voucher</label>
+            <div id="file-upload-pagos-container">
+              <div class="file-upload-box" id="single-file-upload-pagos">
+                <input type="file" id="file-input-pagos" class="file-input" name="voucher"
+                  accept=".pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" required>
+                <label for="file-input-pagos" class="file-label d-flex">
+                  <i class="fas fa-upload"></i>
+                  <div class="file-group-text">
+                    <span class="file-text">Selecciona o arrastra tu archivo aquí</span><br>
+                    <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg</span>
+                  </div>
+                  <button class="upload-button upload-button-pagos" type="button">Subir archivo</button>
+                </label>
+                <div class="file-info-box hidden">
+                  <div class="file-info">
+                    <div class="file-iconic"></div>
+                    <span class="file-name"></span>
+                    <span class="file-size"></span>
+                    <button class="remove-file-button"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn bg-orange text-white">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para imágenes -->
+    <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img id="image-preview" src="" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+    </div>
 <style>
 * {
     font-family: Epilogue;
@@ -421,6 +509,9 @@ i {
     align-items: center;
 
 }
+.bg-orange{
+    color: #fff !important;
+}
 
 .btn-block {
     font-size: 14px;
@@ -448,5 +539,69 @@ i {
 
 .dataTables_filter {
     display: none;
+}
+.form-group {
+    margin-bottom: 1rem;
+}
+.file-group-text{
+    font-weight: 400;
+}
+.file-upload-box {
+    border: 2px dashed #cccccc;
+    padding: 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+.file-input {
+    display: none;
+}
+.file-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+.file-text {
+    font-size: 1rem;
+    color: #333333;
+}
+.file-format {
+    font-size: 0.9rem;
+    color: #666666;
+    margin-bottom: 1rem;
+}
+.upload-button {
+    width: 60%;
+    padding: 0.75rem .5rem;
+    background-color: #F0F4F9;
+    color: #272A30;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: .75rem;
+    transition: background-color 0.3s ease;
+}
+.file-info-box {
+    border: 1px solid #cccccc;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    margin-top: 1rem;
+    text-align: left;
+}
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+.file-name {
+    font-size: 1rem;
+    color: #333333;
+}
+.file-size {
+    font-size: 0.9rem;
+    color: #666666;
 }
 </style>

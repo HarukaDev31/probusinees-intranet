@@ -59,7 +59,7 @@ class PedidosCurso extends CI_Controller
                     $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null;
                     $estado_pago = 'pendiente';
                     if ($row->total_pagos == 0) {
-                        $estado_pago = '<span class="badge bg-secondary">Pendiente</span>';
+                        $estado_pago = 'pendiente';
                     } elseif ($row->total_pagos < $row->Ss_Total) {
                         if (
                             $tipo_curso == 1 &&
@@ -67,21 +67,21 @@ class PedidosCurso extends CI_Controller
                             (strtotime($fecha_inicio) - strtotime($fecha_hoy)) <= 2 * 86400 &&
                             (strtotime($fecha_inicio) - strtotime($fecha_hoy)) >= 0
                         ) {
-                            $estado_pago = '<span class="badge bg-primary">Cobrando</span>';
+                            $estado_pago = 'cobrando';
                         } else {
-                            $estado_pago = '<span class="badge bg-warning">Adelanto</span>';
+                            $estado_pago = 'adelanto';
                         }
                     } elseif ($row->total_pagos == $row->Ss_Total) {
-                        $estado_pago =  '<span class="badge bg-success">Pagado</span>';
+                        $estado_pago =  'pagado';
                     } elseif ($row->total_pagos > $row->Ss_Total) {
-                        $estado_pago = '<span class="badge bg-danger">Sobrepagado</span>';
+                        $estado_pago = 'sobrepagado';
                     }
                     if (
                         $tipo_curso == 1 &&
                         $fecha_fin &&
                         strtotime($fecha_hoy) > strtotime($fecha_fin)
                     ) {
-                        $estado_pago = '<span class="badge bg-info">Constancia</span>';
+                        $estado_pago = 'constancia';
                     }
                     return $estado_pago == $filtro_estado_pago;
                 });
@@ -202,7 +202,7 @@ class PedidosCurso extends CI_Controller
 
                 $divAcciones = '<div>'; //Acciones
                 $divAcciones .= '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewCliente(\'' . $row->ID_Pedido_Curso . '\')"></i>';
-                $divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="eliminarPedido(\'' . $row->ID_Pedido_Curso . '\')"></i>';
+                $divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="eliminarPedidoCurso(\'' . $row->ID_Pedido_Curso . '\')"></i>';
                 //div guardar
                 $divAcciones .= '<i class="fas fa-save text-success" style="cursor:pointer; padding:10px;" onclick="guardarCambiosPedido(\'' . $row->ID_Pedido_Curso . '\')"></i>';
                 $divAcciones .= '</div>';
@@ -218,12 +218,12 @@ class PedidosCurso extends CI_Controller
                 $subdata[] = $row->No_Entidad;
                 $subdata[] = $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad;
                 $subdata[] = $row->Nu_Celular_Entidad;
-                $subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" readonly/>';    //importe		
+                $subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" class="w-75" readonly/>';    //importe		
                 $subdata[] = "S/" . round($row->total_pagos, 2);
                 //if pagos_count is minor than 4 add button plus to add new payment
                 $divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
 
-                $divAcciones .= '<div class="d-flex"  onclick="addPagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+                $divAcciones .= '<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
 
                 if ($row->pagos_count > 0) {
                     $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->nombre)) . '\')">
@@ -692,6 +692,16 @@ class PedidosCurso extends CI_Controller
         } else {
             echo json_encode($response_usuario_bd);
             exit();
+        }
+    }
+    public function eliminarPedidoCurso()
+    {
+        $id_pedido = $this->input->post('ID_Pedido_Curso');
+        $result = $this->PedidosCursoModel->eliminarPedidoCurso($id_pedido);
+        if ($result) {
+            echo json_encode(['status' => 'success', 'message' => 'Pedido eliminado correctamente']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo eliminar el pedido']);
         }
     }
     public function actualizarDatosCliente()
