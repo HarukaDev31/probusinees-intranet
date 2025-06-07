@@ -1567,5 +1567,6 @@ $(document).on('change', '.select-usuario-externo', async function () {
   if (estado == '2') {
     // Ejecuta la función de compartir (enviar email Moodle)
     await crearUsuarioCursosMoodle(idUsuario, idPedido);
+    await enviarEmailUsuarioMoodle(idUsuario, idPedido);
   }
 });
