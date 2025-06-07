@@ -1179,7 +1179,7 @@ async function getCursosHeader() {
 ,
 $("#txt-Fe_Inicio").val() == "" || typeof $('#txt-Fe_Inicio').val() == undefined
 );
-  formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == ""  || typeof $('#txt-Fe_Inicio').val() == undefined ? ParseDateString(
+  formData.append("Filtro_Fe_Inicio", ($('#txt-Fe_Inicio').val() == ""  || typeof $('#txt-Fe_Inicio').val() == undefined) ? ParseDateString(
     //fin inicio 2 meses antes
     new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
       day: '2-digit',
@@ -1187,7 +1187,7 @@ $("#txt-Fe_Inicio").val() == "" || typeof $('#txt-Fe_Inicio').val() == undefined
       year: 'numeric'
     })) : $('#txt-Fe_Inicio').val());
 
-  formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == ""|| typeof $('#txt-Fe_Fin').val() == undefined ? ParseDateString(
+  formData.append("Filtro_Fe_Fin",( $('#txt-Fe_Fin').val() == ""|| typeof $('#txt-Fe_Fin').val() == undefined) ? ParseDateString(
     new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
