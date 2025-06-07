@@ -1565,8 +1565,11 @@ $(document).on('change', '.select-usuario-externo', async function () {
   var idUsuario = $(this).data('id-usuario');
   var idPedido = $(this).data('id-pedido');
   if (estado == '2') {
-    // Ejecuta la función de compartir (enviar email Moodle)
-    await crearUsuarioCursosMoodle(idUsuario, idPedido);
-    await enviarEmailUsuarioMoodle(idUsuario, idPedido);
+    try {
+      await crearUsuarioCursosMoodle(idUsuario, idPedido);
+      await enviarEmailUsuarioMoodle(idUsuario, idPedido);
+    } catch (error) {
+      console.error("Error al crear usuario en Moodle:", error);
+    }
   }
 });
