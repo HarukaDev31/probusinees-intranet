@@ -361,7 +361,7 @@ $(function () {
         $("#table-curso-pagos_wrapper").show();
         tableCursoPagos.ajax.reload(null, false);
       } else {
-        
+
         url = base_url + 'Curso/PedidosCurso/ajax_list';
 
         tableCursoPagos = $("#table-curso-pagos").DataTable({
@@ -1175,33 +1175,61 @@ $(document).on('change', 'select[name="ID_Campana"]', function () {
 
 async function getCursosHeader() {
   const formData = new FormData();
-  console.log( $('#txt-Fe_Inicio').val(), $('#txt-Fe_Fin').val(),typeof $('#txt-Fe_Inicio').val(), typeof $('#txt-Fe_Fin').val()
-,
-$("#txt-Fe_Inicio").val() == "" || typeof $('#txt-Fe_Inicio').val() == undefined
-);
-  formData.append("Filtro_Fe_Inicio", ($('#txt-Fe_Inicio').val() == ""  || typeof $('#txt-Fe_Inicio').val() == undefined) ? ParseDateString(
-    //fin inicio 2 meses antes
-    new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })) : $('#txt-Fe_Inicio').val());
 
-  formData.append("Filtro_Fe_Fin",( $('#txt-Fe_Fin').val() == ""|| typeof $('#txt-Fe_Fin').val() == undefined) ? ParseDateString(
-    new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })) : $('#txt-Fe_Fin').val());
+  // Obtener valores de los inputs
+  const feInicio = $('#txt-Fe_Inicio').val();
+  const feFin = $('#txt-Fe_Fin').val();
 
-  const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
-    method: "POST",
-    body: formData
-  });
-  const data = await response.json();
-  if (data.status === "success") {
-    console.log(data.data);
-    $("#span-total-importe").text("S/." + (data.data.total_importe));
+  console.log('Fe_Inicio:', feInicio, 'Fe_Fin:', feFin);
+  console.log('Fe_Inicio vacío:', !feInicio || feInicio.trim() === '');
+  console.log('Fe_Fin vacío:', !feFin || feFin.trim() === '');
+
+  // Validación corregida: verificar si está vacío o undefined
+  const feInicioVacio = !feInicio || feInicio.trim() === '';
+  const feFinVacio = !feFin || feFin.trim() === '';
+
+  // Fecha de inicio: si está vacío, usar 2 meses antes
+  const fechaInicioDefault = feInicioVacio ?
+    ParseDateString(
+      new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    ) : feInicio;
+
+  // Fecha fin: si está vacío, usar mañana
+  const fechaFinDefault = feFinVacio ?
+    ParseDateString(
+      new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    ) : feFin;
+
+  console.log('Fecha inicio a enviar:', fechaInicioDefault);
+  console.log('Fecha fin a enviar:', fechaFinDefault);
+
+  formData.append("Filtro_Fe_Inicio", fechaInicioDefault);
+  formData.append("Filtro_Fe_Fin", fechaFinDefault);
+
+  try {
+    const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      console.log(data.data);
+      $("#span-total-importe").text("S/." + (data.data.total_importe));
+    } else {
+      console.error('Error en la respuesta:', data);
+    }
+  } catch (error) {
+    console.error('Error en la petición:', error);
   }
 }
 // Delegación para inputs de importe en la tabla
