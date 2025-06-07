@@ -290,8 +290,6 @@ $(function () {
             'data': function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              console.log($('#txt-Fe_Inicio').val(), "txt-Fe_Inicio");
-              console.log(ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/'), "ParseDateString");
               data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" ? ParseDateString(
                 new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
                   day: '2-digit',
@@ -344,8 +342,8 @@ $(function () {
           autoclose: true,
           //startDate : new Date(fYear, fToday.getMonth(), '01'),
           todayHighlight: true,
-          dateFormat: 'dd/mm/yyyy',
-          format: 'dd/mm/yyyy',
+          dateFormat: 'yyyy-mm-dd',
+          format: 'yyyy-mm-dd',
         });
       })
     }
@@ -457,8 +455,8 @@ $(function () {
             autoclose: true,
             //startDate : new Date(fYear, fToday.getMonth(), '01'),
             todayHighlight: true,
-            dateFormat: 'dd/mm/yyyy',
-            format: 'dd/mm/yyyy',
+            dateFormat: 'yyyy-mm-dd',
+            format: 'yyyy-mm-dd',
           });
         })
         // FUNCION PARA CONFIGURAR EL BUSCADOR
@@ -478,8 +476,8 @@ $(function () {
     autoclose: true,
     //startDate : new Date(fYear, fToday.getMonth(), '01'),
     todayHighlight: true,
-    dateFormat: 'dd/mm/yyyy',
-    format: 'dd/mm/yyyy',
+    dateFormat: 'yyyy-mm-dd',
+    format: 'yyyy-mm-dd',
   });
 
   // table_Entidad = $("#table-curso-pedidos").DataTable({
@@ -595,7 +593,7 @@ function reload_table_Entidad() {
   }
 }
 
-async function  crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
+async function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
   event.preventDefault();
   url = base_url + 'Curso/PedidosCurso/crearUsuarioCursosMoodle/' + id + '/' + ID_Pedido_Curso;
   await $.ajax({
@@ -870,8 +868,8 @@ function ocultarSectionDatosCliente() {
     autoclose: true,
     //startDate : new Date(fYear, fToday.getMonth(), '01'),
     todayHighlight: true,
-    dateFormat: 'dd/mm/yyyy',
-    format: 'dd/mm/yyyy',
+    dateFormat: 'yyyy-mm-dd',
+    format: 'yyyy-mm-dd',
   });
   // Oculta la sección de campañas y cursos
   $('#section-campanas-cursos').hide();
@@ -1566,8 +1564,8 @@ $(document).on('change', '.select-usuario-externo', async function () {
   var idPedido = $(this).data('id-pedido');
   if (estado == '2') {
     try {
-      await crearUsuarioCursosMoodle(idUsuario, idPedido);
-      await enviarEmailUsuarioMoodle(idUsuario, idPedido);
+      crearUsuarioCursosMoodle(idUsuario, idPedido);
+      enviarEmailUsuarioMoodle(idUsuario, idPedido);
     } catch (error) {
       console.error("Error al crear usuario en Moodle:", error);
     }
