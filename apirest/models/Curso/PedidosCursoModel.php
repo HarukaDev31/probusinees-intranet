@@ -274,7 +274,7 @@ class PedidosCursoModel extends CI_Model
 
 	public function getUsuario($id)
 	{
-		$query = "SELECT No_Usuario, No_Password,usuario_moodle, No_Nombres_Apellidos FROM usuario WHERE ID_Usuario = " . $id . " LIMIT 1";
+		$query = "SELECT No_Usuario, No_Password,IFNULL(usuario_moodle,No_Usuario) as usuario_moodle, No_Nombres_Apellidos FROM usuario WHERE ID_Usuario = " . $id . " LIMIT 1";
 
 		if (!$this->db->simple_query($query)) {
 			$error = $this->db->error();
