@@ -1108,6 +1108,7 @@ Search for
                     <?php } ?>
                 </div>
                 <div class="row">
+                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                     <div data-table="prospectos"
                         class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
                         Prospectos
@@ -1116,6 +1117,7 @@ Search for
                         class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
                         Por Embarcar
                     </div>
+                    <?php } ?>
                     <?php if ($this->user->No_Grupo =="Coordinación"){  ?>
                     <div data-table="pagos"
                         class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
