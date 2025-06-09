@@ -4231,7 +4231,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $newSheet->getStyle('R' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                         $newSheet->getStyle('S' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                         foreach ($dataSystem as $data) {
-                            if ($this->isNameMatch($clientName, $data->name) ) {
+                            log_message('error', 'Comparing: ' . trim($data->nombre) . ' with ' . trim($clientName));
+                            if ($this->isNameMatch($clientName, $data->nombre)) {
                                 //$newSheet->setCellValue('C' . $newRow, $data->name);
                                 $newSheet->setCellValue('C' . $newRow, $data->documento);
                                 $newSheet->setCellValue('D' . $newRow, $data->telefono);
@@ -4296,7 +4297,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             foreach ($data as &$cliente) {
                 $nombreCliente = $cliente['cliente']['nombre'];
                 foreach ($result as $item) {
-                    if ($this->isNameMatch($nombreCliente, $item->nombre)) {
+                    if (trim($item->nombre) === trim($nombreCliente)) {
                         $cliente['cliente']['tarifa'] = $item->tarifa;
                         $cliente['cliente']['correo'] = $item->correo;
                         $cliente['id'] = $item->id;
@@ -6456,7 +6457,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
      * @param string $partialName The partial name to check for matches.
      * @return bool True if there is a match, false otherwise.
      */
-    private function isNameMatch($fullName, $partialName)
+    private function isNameMatch($fullName="", $partialName="")
     {
         $fullName = $this->normalizeString($fullName);
         $partialName = $this->normalizeString($partialName);
