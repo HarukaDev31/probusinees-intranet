@@ -2147,7 +2147,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         $tipoCliente = "No existe en contenedor";
                         //find in array
                         foreach ($dataSystem as $item) {
-                            
+
                             if ($this->isNameMatch($client, $item->nombre)) {
                                 $volumen_cotizacion = $item->volumen;
                                 $volumen_china = $item->volumen_china;
@@ -6458,8 +6458,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
      */
     private function isNameMatch($fullName, $partialName)
     {
-        $fullName = strtolower(trim($fullName));
-        $partialName = strtolower(trim($partialName));
+        $fullName = $this->normalizeString($fullName);
+        $partialName = $this->normalizeString($partialName);
 
         // Comparación exacta primero
         if ($fullName === $partialName) {
@@ -6474,8 +6474,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         // Comparar palabra por palabra
         $fullWords = explode(' ', $fullName);
         $partialWords = explode(' ', $partialName);
-
         $matchCount = 0;
+
         foreach ($partialWords as $partialWord) {
             foreach ($fullWords as $fullWord) {
                 if (strpos($fullWord, $partialWord) !== false) {
@@ -6487,5 +6487,76 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
         // Si coinciden al menos 70% de las palabras del nombre parcial
         return $matchCount >= ceil(count($partialWords) * 0.7);
+    }
+
+    private function normalizeString($string)
+    {
+        // Convertir a minúsculas y quitar espacios al inicio y final
+        $string = strtolower(trim($string));
+
+        // Mapa de caracteres con tildes a sus equivalentes sin tildes
+        $accents = [
+            'á' => 'a',
+            'à' => 'a',
+            'ä' => 'a',
+            'â' => 'a',
+            'ā' => 'a',
+            'ã' => 'a',
+            'é' => 'e',
+            'è' => 'e',
+            'ë' => 'e',
+            'ê' => 'e',
+            'ē' => 'e',
+            'í' => 'i',
+            'ì' => 'i',
+            'ï' => 'i',
+            'î' => 'i',
+            'ī' => 'i',
+            'ó' => 'o',
+            'ò' => 'o',
+            'ö' => 'o',
+            'ô' => 'o',
+            'ō' => 'o',
+            'õ' => 'o',
+            'ú' => 'u',
+            'ù' => 'u',
+            'ü' => 'u',
+            'û' => 'u',
+            'ū' => 'u',
+            'ñ' => 'n',
+            'ç' => 'c',
+            // Mayúsculas (por si acaso)
+            'Á' => 'a',
+            'À' => 'a',
+            'Ä' => 'a',
+            'Â' => 'a',
+            'Ā' => 'a',
+            'Ã' => 'a',
+            'É' => 'e',
+            'È' => 'e',
+            'Ë' => 'e',
+            'Ê' => 'e',
+            'Ē' => 'e',
+            'Í' => 'i',
+            'Ì' => 'i',
+            'Ï' => 'i',
+            'Î' => 'i',
+            'Ī' => 'i',
+            'Ó' => 'o',
+            'Ò' => 'o',
+            'Ö' => 'o',
+            'Ô' => 'o',
+            'Ō' => 'o',
+            'Õ' => 'o',
+            'Ú' => 'u',
+            'Ù' => 'u',
+            'Ü' => 'u',
+            'Û' => 'u',
+            'Ū' => 'u',
+            'Ñ' => 'n',
+            'Ç' => 'c'
+        ];
+
+        return strtr($string, $accents);
     }
 }
