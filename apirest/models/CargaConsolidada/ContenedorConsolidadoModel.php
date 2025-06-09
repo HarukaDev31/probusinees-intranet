@@ -4231,7 +4231,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $newSheet->getStyle('R' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                         $newSheet->getStyle('S' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                         foreach ($dataSystem as $data) {
-                            if (trim($data->nombre) == trim($clientName)) {
+                            if ($this->isNameMatch($clientName, $data->name) ) {
                                 //$newSheet->setCellValue('C' . $newRow, $data->name);
                                 $newSheet->setCellValue('C' . $newRow, $data->documento);
                                 $newSheet->setCellValue('D' . $newRow, $data->telefono);
@@ -4296,7 +4296,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             foreach ($data as &$cliente) {
                 $nombreCliente = $cliente['cliente']['nombre'];
                 foreach ($result as $item) {
-                    if (trim($item->nombre) === trim($nombreCliente)) {
+                    if ($this->isNameMatch($nombreCliente, $item->nombre)) {
                         $cliente['cliente']['tarifa'] = $item->tarifa;
                         $cliente['cliente']['correo'] = $item->correo;
                         $cliente['id'] = $item->id;
