@@ -4300,14 +4300,14 @@ async function viewDocumentacion() {
                                 ${file.file_url || (file.id == 1 && file.lista_embarque_url) ? `
                                         <div class="file-info">
                                           <div class="file-iconic">
-                                            ${getIconByType(file.file_url?file.type:'excel')}
+                                            ${getIconByType(file.file_url ? file.type : 'excel')}
                                           </div>
-                                            <span class="file-name">${file.folder_name??"Packing China"}</span>
+                                            <span class="file-name">${file.folder_name ?? "Packing China"}</span>
                                             
-                                            <button class="download-file-button" onclick=window.location.href='${file.file_url??file.lista_embarque_url}'>
+                                            <button class="download-file-button" onclick=window.location.href='${file.file_url ?? file.lista_embarque_url}'>
                                             <i class="fas fa-download"></i>
                                             </button>
-                                            <div  ${file.id_file?"onclick=\"deleteDocumentacionFile(${file.id_file})\"":""}>
+                                            <div ${file.id_file ? `onclick="deleteDocumentacionFile('${file.id_file}')"` : ""}>
                                             <i class="fas fa-trash"></i>
                                             </div>
                                         </div>
@@ -7561,7 +7561,7 @@ $(document).ready(async function () {
       },
     });
   });
-  $(document).on('change', '.select-status-cliente', function() {
+  $(document).on('change', '.select-status-cliente', function () {
     var status = $(this).val();
     var idCotizacion = $(this).data('id');
     $(this).removeClass('bg-warning bg-danger bg-success');
@@ -7569,20 +7569,20 @@ $(document).ready(async function () {
     if (status === 'Incompleto') $(this).addClass('bg-danger');
     if (status === 'Completado') $(this).addClass('bg-success');
     $.ajax({
-        url: base_url + "CargaConsolidada/ContenedorConsolidado/updateStatusCliente",
-        type: "POST",
-        data: { id_cotizacion: idCotizacion, status: status },
-        dataType: "json",
-        success: function(response) {
-            if(response.status === "success") {
-                tableClientesGeneral.ajax.reload();
-                Swal.fire('¡Guardado!', response.message, 'success');
-            } else {
-                Swal.fire('Error', response.message, 'error');
-            }
+      url: base_url + "CargaConsolidada/ContenedorConsolidado/updateStatusCliente",
+      type: "POST",
+      data: { id_cotizacion: idCotizacion, status: status },
+      dataType: "json",
+      success: function (response) {
+        if (response.status === "success") {
+          tableClientesGeneral.ajax.reload();
+          Swal.fire('¡Guardado!', response.message, 'success');
+        } else {
+          Swal.fire('Error', response.message, 'error');
         }
+      }
     });
-});
+  });
   $("#uploadFinal").click(() => {
     url =
       base_url +
