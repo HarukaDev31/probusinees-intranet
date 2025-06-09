@@ -2244,7 +2244,8 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         $tipoCliente = "No existe en contenedor";
                         //find in array
                         foreach ($dataSystem as $item) {
-                            if (strtolower(trim($item->nombre)) == strtolower(trim($client))) {
+
+                            if ($this->isNameMatch($client, $item->nombre)) {
                                 $volumen_cotizacion = $item->volumen;
                                 $volumen_china = $item->volumen_china;
                                 $volumen_selected = $item->vol_selected ?? '';
