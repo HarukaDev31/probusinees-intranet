@@ -2031,6 +2031,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 $itemId = $sheetPackingList->getCell('B' . $packRow)->getValue();
                 $client = $sheetPackingList->getCell('C' . $packRow)->getValue();
                 if (!empty($itemId) && !empty($client)) {
+                    log_message('error', 'Packing List Item: ' . $itemId . ' Client: ' . $client);
                     $itemToClientMap[trim($itemId)] = trim($client);
                 }
             }
