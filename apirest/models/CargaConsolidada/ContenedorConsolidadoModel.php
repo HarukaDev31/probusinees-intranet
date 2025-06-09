@@ -2034,7 +2034,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 $itemId = $sheetPackingList->getCell('B' . $packRow)->getValue();
                 $client = $sheetPackingList->getCell('C' . $packRow)->getValue();
                 if (!empty($itemId) && !empty($client)) {
-                    log_message('error', 'Packing List Item: ' . $itemId . ' Client: ' . $client);
                     $itemToClientMap[trim($itemId)] = trim($client);
                 }
             }
@@ -2063,37 +2062,40 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             $sheetListaPartidas = $objPHPExcelListaPartidas->getSheet(0);
             //SET R TO V style
             $sheet0->getStyle('R25:V25')->applyFromArray($styleArray);
+
+            // Variables para controlar el merge entre hojas
+            $currentClient = "";
+            $clientStartRow = 0;
+            $clientEndRow = 0;
+            $pendingMerge = array(); // Array para almacenar merges pendientes
+
             for ($i = 0; $i < $sheetCount; $i++) {
                 $sheet = $objPHPExcel->getSheet($i);
-                $nameActual = "";
+                $sheet0 = $objPHPExcel->getSheet(0); // Siempre referenciar la primera hoja
 
                 if ($i == 0) {
+                    // PRIMERA HOJA
+                    log_message('error', 'Processing first sheet');
                     $highestRow = $sheet->getHighestRow();
-                    $mergedEndCell = 0;
-                    $mergedStartCell = $startIndex;
+
                     for ($row = $startIndex; $row <= $highestRow; ++$row) {
                         $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
+                        log_message('error', 'ItemN: ' . $itemN);
 
-                        // Look up the client using the item ID instead of sequential row
+                        // Obtener cliente
                         $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
-
-                        // If no client found, try to use the sequential approach as fallback
                         if ($client === null) {
                             $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
-                            $startPackingListIndex++; // Still increment for compatibility
+                            $startPackingListIndex++;
                         }
 
-                        //get g merged column value where b merged column value in listapartidas =itemN using =vlookup
+                        // Buscar información aduanera
                         $mergedCells = $sheetListaPartidas->getMergeCells();
                         foreach ($mergedCells as $range) {
-                            // Extraer las celdas inicial y final del rango
                             [$startCell, $endCell] = explode(':', $range);
-                            // Verificar si el rango está en la columna B
-                            if (preg_match('/^A\d+$/', $startCell)) {
-                                // Obtener el valor de la celda fusionada
+                            if (preg_match('/^B\d+$/', $startCell)) {
                                 $value = $sheetListaPartidas->getCell($startCell)->getValue();
-                                log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
-
+                                log_message('error', 'Checking value: ' . $value . ' against itemN: ' . $itemN);
                                 if (trim($value) == $itemN) {
                                     preg_match('/\d+/', $startCell, $startMatches);
                                     preg_match('/\d+/', $endCell, $endMatches);
@@ -2104,12 +2106,12 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
                                         if (trim($adValorem) == "FTA") {
                                             $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                            log_message('error', 'Advalorem FTA: ' . $adValorem);
                                         }
                                         log_message('error', 'Advalorem: ' . $adValorem);
-
                                         $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
-                                        $sheet->setCellValue('R' . $row, $adValorem);
-                                        $sheet->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
+                                        $sheet0->setCellValue('R' . $row, $adValorem);
+                                        $sheet0->setCellValue('S' . $row, $antiDumping == 0 ? "-" : $antiDumping);
                                         break;
                                     }
                                     break;
@@ -2117,27 +2119,27 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                             }
                         }
 
-                        if ($client !== $nameActual) {
-                            if ($nameActual !== "" && $client !== "" && $client !== null) {
-                                // Si cambia el cliente, fusionar las celdas desde el inicio hasta la última fila del bloque actual
-                                $sheet->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
-                                $sheet->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                                // $sheet->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                                // $sheet->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
-                                $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
+                        // MANEJO DEL CLIENTE Y MERGE
+                        if ($client !== $currentClient) {
+                            // Si hay un cliente anterior, guardarlo para merge posterior
+                            if ($currentClient !== "" && $currentClient !== null && $clientStartRow > 0) {
+                                $pendingMerge[] = array(
+                                    'client' => $currentClient,
+                                    'start' => $clientStartRow,
+                                    'end' => $clientEndRow
+                                );
                             }
 
-                            // Actualizar el valor actual y establecer nuevas celdas iniciales
-                            $nameActual = $client;
-                            $mergedStartCell = $row;
+                            // Inicializar nuevo cliente
+                            $currentClient = $client;
+                            $clientStartRow = $row;
                         }
 
-                        $mergedEndCell = $row;
-                        $sheet->setCellValue('D' . $row, $client);
+                        // Actualizar la fila final del cliente actual
+                        $clientEndRow = $row;
+                        $sheet0->setCellValue('D' . $row, $client);
 
-                        //find if exists row in datasystem array where trim(nombre)=trim(client) if exists set volumen_cotizacion, volumen_china, volumen_doc, valor_doc, valor_cot else set -
+                        // Buscar datos del sistema
                         $volumen_cotizacion = "-";
                         $volumen_selected = '';
                         $volumen_china = "-";
@@ -2145,9 +2147,8 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         $valor_doc = "-";
                         $valor_cot = "-";
                         $tipoCliente = "No existe en contenedor";
-                        //find in array
-                        foreach ($dataSystem as $item) {
 
+                        foreach ($dataSystem as $item) {
                             if ($this->isNameMatch($client, $item->nombre)) {
                                 $volumen_cotizacion = $item->volumen;
                                 $volumen_china = $item->volumen_china;
@@ -2158,175 +2159,28 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                                 break;
                             }
                         }
-                        //volumen_doc,volumen_china,volumen
+
+                        // Seleccionar volumen apropiado
                         if ($volumen_selected == 'volumen_doc') {
                             $volumen_cotizacion = $volumen_doc;
-                        }
-                        if ($volumen_selected == 'volumen_china') {
+                        } elseif ($volumen_selected == 'volumen_china') {
                             $volumen_cotizacion = $volumen_china;
-                        }
-                        if ($volumen_selected == 'volumen') {
+                        } elseif ($volumen_selected == 'volumen') {
                             $volumen_cotizacion = $volumen_cotizacion;
                         }
-                        //set vol_cot to t column
-                        $sheet->setCellValue('T' . $row, $volumen_cotizacion);
-                        // $sheet->setCellValue('U' . $row, $volumen_china);
-                        // $sheet->setCellValue('V' . $row, $volumen_doc);
-                        $sheet->setCellValue('C' . $row, $tipoCliente);
-                        if (trim($itemN) == "TOTAL FOB PRICE") {
-                            //unmerge cell
 
+                        $sheet0->setCellValue('T' . $row, $volumen_cotizacion);
+                        $sheet0->setCellValue('C' . $row, $tipoCliente);
+
+                        if (trim($itemN) == "TOTAL FOB PRICE") {
                             $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
-                            // //MERGE FROM D TO K
                             $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
                             $highestRow = $row - 1;
                             $highestFirstSheetRow += $highestRow + 1;
-
                             break;
                         }
 
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
-                        //set horizontal alignment to center
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                        //set vertical alignment to center
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-
-                        $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
-                    }
-                } else {
-                    $startIndex = $startColumn;
-                    $highestSheetRow = $sheet->getHighestRow();
-                    for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
-                        $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
-
-                        // Look up the client using the item ID instead of sequential row
-                        $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
-
-                        // If no client found, try to use the sequential approach as fallback
-                        if ($client === null) {
-                            $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
-                            $startPackingListIndex++; // Still increment for compatibility
-                        }
-
-                        if ($client !== $nameActual && $client !== null) {
-                            if ($nameActual !== "") {
-                                $sheet0->mergeCells('C' . $mergedStartCell . ':C' . $mergedEndCell);
-                                $sheet0->mergeCells('D' . $mergedStartCell . ':D' . $mergedEndCell);
-                                // $sheet0->mergeCells('R' . $mergedStartCell . ':R' . $mergedEndCell);
-                                // $sheet0->mergeCells('S' . $mergedStartCell . ':S' . $mergedEndCell);
-                                $sheet0->mergeCells('T' . $mergedStartCell . ':T' . $mergedEndCell);
-                                // $sheet0->mergeCells('U' . $mergedStartCell . ':U' . $mergedEndCell);
-                                // $sheet0->mergeCells('V' . $mergedStartCell . ':V' . $mergedEndCell);
-                            }
-
-                            // Actualizar el valor actual y establecer nuevas celdas iniciales
-                            $nameActual = $client;
-                            $mergedStartCell = $highestFirstSheetRow;
-                        }
-                        $mergedEndCell = $highestFirstSheetRow;
-
-                        $sheet0 = $objPHPExcel->getSheet(0);
-
-                        if (trim($itemN) == "TOTAL FOB PRICE") {
-                            $highestSheetRow = $row - 1;
-                            break;
-                        }
-
-                        $sheet0->insertNewRowBefore($highestFirstSheetRow, 1);
-
-                        $volumen_cotizacion = "-";
-                        $volumen_china = "-";
-                        $volumen_doc = "-";
-                        $valor_doc = "-";
-                        $valor_cot = "-";
-                        $volumen_selected = '';
-
-                        $tipoCliente = "No existe en contenedor";
-                        //find in array
-                        foreach ($dataSystem as $item) {
-
-                            if ($this->isNameMatch($client, $item->nombre)) {
-                                $volumen_cotizacion = $item->volumen;
-                                $volumen_china = $item->volumen_china;
-                                $volumen_selected = $item->vol_selected ?? '';
-                                $volumen_doc = $item->volumen_doc;
-                                $valor_doc = $item->valor_doc;
-                                $tipoCliente = $item->name;
-                                break;
-                            }
-                        }
-
-                        //set vol_cot to t column
-                        if ($volumen_selected == 'volumen_doc') {
-                            $volumen_cotizacion = $volumen_doc;
-                        }
-                        if ($volumen_selected == 'volumen_china') {
-                            $volumen_cotizacion = $volumen_china;
-                        }
-                        if ($volumen_selected == 'volumen') {
-                            $volumen_cotizacion = $volumen_cotizacion;
-                        }
-                        $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
-                        // $sheet0->setCellValue('U' . $highestFirstSheetRow, $volumen_china);
-                        // $sheet0->setCellValue('V' . $highestFirstSheetRow, $volumen_doc);
-                        $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
-                        $mergedCells = $sheetListaPartidas->getMergeCells();
-                        foreach ($mergedCells as $range) {
-                            // Extraer las celdas inicial y final del rango
-                            [$startCell, $endCell] = explode(':', $range);
-                            // Verificar si el rango está en la columna B
-                            if (preg_match('/^A\d+$/', $startCell)) {
-                                $value = $sheetListaPartidas->getCell($startCell)->getValue();
-
-                                log_message('error', 'ItemN: ' . $itemN . ' Value: ' . $value);
-                                // Comparar el valor con el itemNumber
-
-                                if (trim($value) == $itemN) {
-                                    // Obtener el rango de filas del rango fusionado
-                                    log_message('error', 'Rango: ' . $startCell . ' - ' . $endCell);
-                                    preg_match('/\d+/', $startCell, $startMatches);
-                                    preg_match('/\d+/', $endCell, $endMatches);
-                                    $startRow = (int)$startMatches[0];
-                                    $endRow = (int)$endMatches[0];
-                                    // Obtener el valor de la columna G para el rango fusionado
-                                    for ($r = $startRow; $r <= $endRow; $r++) {
-                                        $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
-                                        if (trim($adValorem) == "FTA") {
-                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
-                                        }
-                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
-                                        $sheet0->setCellValue('R' . $highestFirstSheetRow, $adValorem);
-                                        $sheet0->setCellValue('S' . $highestFirstSheetRow, $antiDumping == 0 ? "-" : $antiDumping);
-                                        break;
-                                    }
-
-                                    // Salir del bucle si ya encontramos el rango que buscamos
-                                    break;
-                                }
-                            }
-                        }
-
-                        $sheet0->setCellValue('D' . $highestFirstSheetRow, $client);
-
-                        //get this sheet values and insert in first sheet
-
-                        // $brand = $sheet->getCell($brandColumn.$row)->getValue();
-                        $description = $sheet->getCell($descriptionColumn . $row)->getValue();
-                        $quantityCount = $sheet->getCell($quantityCountColumn . $row)->getValue();
-                        $quantityMeasure = $sheet->getCell($quantityMeasureColumn . $row)->getValue();
-                        $unitPrice = $sheet->getCell($unitPriceColumn . $row)->getValue();
-                        $unitMeasure = $sheet->getCell($unitMeasureColumn . $row)->getValue();
-                        $fobPrice = $sheet->getCell($fobPriceColumn . $row)->getValue();
-                        $sheet0->setCellValue($itemNColumn . $highestFirstSheetRow, $itemN);
-
-                        // // $sheet0->setCellValue($brandColumn.$highestFirstSheetRow,$brand);
-                        $sheet0->setCellValue($descriptionNColumn . $highestFirstSheetRow, $description);
-                        $sheet0->setCellValue($quantityCountNColumn . $highestFirstSheetRow, $quantityCount);
-                        $sheet0->setCellValue($quantityMeasureNColumn . $highestFirstSheetRow, $quantityMeasure);
-                        $sheet0->setCellValue($unitPriceNColumn . $highestFirstSheetRow, $unitPrice);
-                        $sheet0->setCellValue($unitMeasureNColumn . $highestFirstSheetRow, $unitMeasure);
-                        $sheet0->setCellValue($fobPriceNColumn . $highestFirstSheetRow, "=" . $quantityCountNColumn . $highestFirstSheetRow . "*" . $unitPriceNColumn . $highestFirstSheetRow);
-                        // // $sheet0->mergeCells('D'.$highestFirstSheetRow.':K'.$highestFirstSheetRow);
+                        // Aplicar estilos
                         $styleArray = array(
                             'borders' => array(
                                 'allborders' => array(
@@ -2334,23 +2188,190 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                                 )
                             )
                         );
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                        $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                    }
+                } else {
+                    // HOJAS ADICIONALES
+                    $startIndex = $startColumn;
+                    $highestSheetRow = $sheet->getHighestRow();
+
+                    for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
+                        $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
+
+                        // Obtener cliente
+                        $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
+                        if ($client === null) {
+                            $client = $sheetPackingList->getCell('C' . $startPackingListIndex)->getValue();
+                            $startPackingListIndex++;
+                        }
+
+                        if (trim($itemN) == "TOTAL FOB PRICE") {
+                            $highestSheetRow = $row - 1;
+                            break;
+                        }
+
+                        // MANEJO DEL CLIENTE - CONTINUIDAD ENTRE HOJAS
+                        if ($client !== $currentClient) {
+                            // Si hay un cliente anterior, guardarlo para merge
+                            if ($currentClient !== "" && $currentClient !== null && $clientStartRow > 0) {
+                                $pendingMerge[] = array(
+                                    'client' => $currentClient,
+                                    'start' => $clientStartRow,
+                                    'end' => $clientEndRow
+                                );
+                            }
+
+                            // Verificar si este cliente ya tiene filas previas
+                            $clientResumed = false;
+                            for ($j = count($pendingMerge) - 1; $j >= 0; $j--) {
+                                if ($pendingMerge[$j]['client'] === $client) {
+                                    // Reanudar el cliente anterior
+                                    $clientStartRow = $pendingMerge[$j]['start'];
+                                    $clientResumed = true;
+                                    // Remover el merge pendiente ya que lo continuaremos
+                                    unset($pendingMerge[$j]);
+                                    $pendingMerge = array_values($pendingMerge); // Reindexar
+                                    break;
+                                }
+                            }
+
+                            if (!$clientResumed) {
+                                // Nuevo cliente
+                                $clientStartRow = $highestFirstSheetRow;
+                            }
+
+                            $currentClient = $client;
+                        }
+
+                        // Insertar nueva fila
+                        $sheet0->insertNewRowBefore($highestFirstSheetRow, 1);
+                        $clientEndRow = $highestFirstSheetRow;
+
+                        // Buscar datos del sistema
+                        $volumen_cotizacion = "-";
+                        $volumen_china = "-";
+                        $volumen_doc = "-";
+                        $valor_doc = "-";
+                        $valor_cot = "-";
+                        $volumen_selected = '';
+                        $tipoCliente = "No existe en contenedor";
+
+                        foreach ($dataSystem as $item) {
+                            if ($this->isNameMatch($client, $item->nombre)) {
+                                $volumen_cotizacion = $item->volumen;
+                                $volumen_china = $item->volumen_china;
+                                $volumen_selected = $item->vol_selected ?? '';
+                                $volumen_doc = $item->volumen_doc;
+                                $valor_doc = $item->valor_doc;
+                                $tipoCliente = $item->name;
+                                break;
+                            }
+                        }
+
+                        // Seleccionar volumen apropiado
+                        if ($volumen_selected == 'volumen_doc') {
+                            $volumen_cotizacion = $volumen_doc;
+                        } elseif ($volumen_selected == 'volumen_china') {
+                            $volumen_cotizacion = $volumen_china;
+                        } elseif ($volumen_selected == 'volumen') {
+                            $volumen_cotizacion = $volumen_cotizacion;
+                        }
+
+                        $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
+                        $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
+
+                        // Buscar información aduanera
+                        $mergedCells = $sheetListaPartidas->getMergeCells();
+                        foreach ($mergedCells as $range) {
+                            [$startCell, $endCell] = explode(':', $range);
+                            if (preg_match('/^B\d+$/', $startCell)) {
+                                $value = $sheetListaPartidas->getCell($startCell)->getValue();
+                                if (trim($value) == $itemN) {
+                                    preg_match('/\d+/', $startCell, $startMatches);
+                                    preg_match('/\d+/', $endCell, $endMatches);
+                                    $startRow = (int)$startMatches[0];
+                                    $endRow = (int)$endMatches[0];
+
+                                    for ($r = $startRow; $r <= $endRow; $r++) {
+                                        $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
+                                        if (trim($adValorem) == "FTA") {
+                                            $adValorem = $sheetListaPartidas->getCell('H' . $r)->getValue();
+                                        }
+                                        log_message('error', 'Advalorem: ' . $adValorem);
+                                        $antiDumping = $sheetListaPartidas->getCell('I' . $r)->getValue();
+                                        $sheet0->setCellValue('R' . $highestFirstSheetRow, $adValorem);
+                                        $sheet0->setCellValue('S' . $highestFirstSheetRow, $antiDumping == 0 ? "-" : $antiDumping);
+                                        break;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
+                        $sheet0->setCellValue('D' . $highestFirstSheetRow, $client);
+
+                        // Copiar datos del producto
+                        $description = $sheet->getCell($descriptionColumn . $row)->getValue();
+                        $quantityCount = $sheet->getCell($quantityCountColumn . $row)->getValue();
+                        $quantityMeasure = $sheet->getCell($quantityMeasureColumn . $row)->getValue();
+                        $unitPrice = $sheet->getCell($unitPriceColumn . $row)->getValue();
+                        $unitMeasure = $sheet->getCell($unitMeasureColumn . $row)->getValue();
+                        $fobPrice = $sheet->getCell($fobPriceColumn . $row)->getValue();
+
+                        $sheet0->setCellValue($itemNColumn . $highestFirstSheetRow, $itemN);
+                        $sheet0->setCellValue($descriptionNColumn . $highestFirstSheetRow, $description);
+                        $sheet0->setCellValue($quantityCountNColumn . $highestFirstSheetRow, $quantityCount);
+                        $sheet0->setCellValue($quantityMeasureNColumn . $highestFirstSheetRow, $quantityMeasure);
+                        $sheet0->setCellValue($unitPriceNColumn . $highestFirstSheetRow, $unitPrice);
+                        $sheet0->setCellValue($unitMeasureNColumn . $highestFirstSheetRow, $unitMeasure);
+                        $sheet0->setCellValue($fobPriceNColumn . $highestFirstSheetRow, "=" . $quantityCountNColumn . $highestFirstSheetRow . "*" . $unitPriceNColumn . $highestFirstSheetRow);
+
+                        // Aplicar formato
+                        $styleArray = array(
+                            'borders' => array(
+                                'allborders' => array(
+                                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                                )
+                            )
+                        );
+
                         $objPHPExcel->getActiveSheet()->mergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
-
-
                         $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
-                        //set horizontal alignment to center
                         $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                        //set vertical alignment to center
                         $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                         $sheet0->getStyle('O' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                         $sheet0->getStyle('Q' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                        //set r column porcentage format
                         $sheet0->getStyle('R' . $highestFirstSheetRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
 
                         $highestFirstSheetRow++;
                     }
                 }
             }
+
+            // EJECUTAR TODOS LOS MERGES PENDIENTES + EL CLIENTE ACTUAL
+            if ($currentClient !== "" && $currentClient !== null && $clientStartRow > 0) {
+                $pendingMerge[] = array(
+                    'client' => $currentClient,
+                    'start' => $clientStartRow,
+                    'end' => $clientEndRow
+                );
+            }
+
+            // Aplicar todos los merges
+            $sheet0 = $objPHPExcel->getSheet(0);
+            foreach ($pendingMerge as $merge) {
+                log_message('error', 'Merging client: ' . $merge['client'] . ' from row ' . $merge['start'] . ' to ' . $merge['end']);
+                if ($merge['start'] < $merge['end']) {
+                    $sheet0->mergeCells('C' . $merge['start'] . ':C' . $merge['end']);
+                    $sheet0->mergeCells('D' . $merge['start'] . ':D' . $merge['end']);
+                    $sheet0->mergeCells('T' . $merge['start'] . ':T' . $merge['end']);
+                }
+            }
+
+
             //unmerge e to l
             $objPHPExcel->getActiveSheet()->unmergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
             $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
@@ -6458,10 +6479,20 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
      * @param string $partialName The partial name to check for matches.
      * @return bool True if there is a match, false otherwise.
      */
-    private function isNameMatch($fullName="", $partialName="")
+    private function isNameMatch($fullName, $partialName)
     {
+        // Verificación inicial
+        if (empty($fullName) || empty($partialName)) {
+            return false;
+        }
+
         $fullName = $this->normalizeString($fullName);
         $partialName = $this->normalizeString($partialName);
+
+        // Verificar que normalizeString no devolvió cadenas vacías
+        if (empty($fullName) || empty($partialName)) {
+            return false;
+        }
 
         // Comparación exacta primero
         if ($fullName === $partialName) {
@@ -6469,17 +6500,34 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
 
         // Verificar si el nombre parcial está contenido en el completo
-        if (strpos($fullName, $partialName) !== false) {
+        // Verificar que $partialName no esté vacío antes de usar strpos
+        if (!empty($partialName) && strpos($fullName, $partialName) !== false) {
             return true;
         }
 
         // Comparar palabra por palabra
-        $fullWords = explode(' ', $fullName);
-        $partialWords = explode(' ', $partialName);
+        $fullWords = array_filter(explode(' ', $fullName)); // array_filter elimina elementos vacíos
+        $partialWords = array_filter(explode(' ', $partialName)); // array_filter elimina elementos vacíos
+
+        // Verificar que tenemos palabras para comparar
+        if (empty($fullWords) || empty($partialWords)) {
+            return false;
+        }
+
         $matchCount = 0;
 
         foreach ($partialWords as $partialWord) {
+            // Verificar que la palabra parcial no esté vacía
+            if (empty($partialWord)) {
+                continue;
+            }
+
             foreach ($fullWords as $fullWord) {
+                // Verificar que la palabra completa no esté vacía
+                if (empty($fullWord)) {
+                    continue;
+                }
+
                 if (strpos($fullWord, $partialWord) !== false) {
                     $matchCount++;
                     break;
@@ -6490,6 +6538,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         // Si coinciden al menos 70% de las palabras del nombre parcial
         return $matchCount >= ceil(count($partialWords) * 0.7);
     }
+
 
     private function normalizeString($string)
     {
