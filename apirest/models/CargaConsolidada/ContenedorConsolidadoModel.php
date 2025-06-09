@@ -5557,7 +5557,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ->from($this->table_contenedor_cotizacion)
             ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
             ->where('id_contenedor', $idContenedor)
-            ->where('estado_cliente!=', null);
+            ->where('estado_cliente IS NOT NULL')
+            ->where('estado_cotizador', 'CONFIRMADO');
         //if $this-
         $query = $this->db->get();
 
