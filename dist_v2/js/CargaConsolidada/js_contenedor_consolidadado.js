@@ -1255,9 +1255,37 @@ async function addPagosCoordination(idCotizacion, nombreCliente) {
       },
     });
   }
-
-
 }
+
+function deletePagoCoordination(idPago) {
+	Swal.fire({
+		title: "¿Estás seguro?",
+		text: "Esta acción eliminará el pago.",
+		icon: "warning",
+		showCancelButton: true,
+		confirmButtonText: "Sí, eliminar",
+		cancelButtonText: "Cancelar"
+	}).then((result) => {
+		if (result.isConfirmed) {
+		$.ajax({
+			url: base_url + "CargaConsolidada/ContenedorConsolidado/deletePagoCoordination/" + idPago,
+			type: "POST",
+			success: function(response) {
+			const result = JSON.parse(response);
+			if (result.status == "success") {
+				Swal.fire("Eliminado!", result.message, "success");
+				tableCotizacionTrackingPagos.ajax.reload();
+        tableCotizacionPagos.ajax.reload();
+        tableClientesPagos.ajax.reload();
+			} else {
+				Swal.fire("Error!", result.message, "error");
+			}
+			}
+		});
+		}
+	});
+	}
+
 async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
   //show modal with table of pagos coordination
   $("#modalClientePagosCoordination").modal("show");

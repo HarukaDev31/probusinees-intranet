@@ -3731,13 +3731,15 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             WHERE id_contenedor = ' . $idContenedor . '
             AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
         ) as total_logistica_pagado', false);
-            //get carga
-            $this->db->select('carga')
-                ->from($this->table . ' as c')
-                ->where('c.id', $idContenedor);
 
             $query = $this->db->get();
             $result = $query->row();
+
+            // Haz una consulta aparte para carga:
+            $this->db->select('carga')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $cargaRow = $this->db->get()->row();
 
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error: ' . $this->db->error()['message']);
@@ -3758,7 +3760,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'total_logistica' => $result->total_logistica,
                     'total_logistica_pagado' => round($result->total_logistica_pagado, 2),
                     'bl_file_url' => $result2->bl_file_url,
-                    'carga' => $result->carga,
+                    'carga' => $cargaRow ? $cargaRow->carga : '',
                     'lista_embarque_url' => $result2->lista_embarque_url
                 ];
             } else {
@@ -6451,6 +6453,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ];
         }
     }
+    public function deletePagoCoordination($idPago)
+{
+    $this->db->where('id', $idPago);
+    return $this->db->delete('contenedor_consolidado_cotizacion_coordinacion_pagos');
+}
     public function getPagosCoordination($idCotizacion)
     {
         try {
