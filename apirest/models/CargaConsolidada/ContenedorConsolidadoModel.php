@@ -4324,13 +4324,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ->where('id_contenedor', $idContainer);
         try {
             $result = $this->db->get()->result();
-            log_message('error', 'Number of clients: ' . count($result));
-            log_message('error', 'Number of clients in data: ' . count($data));
+
             foreach ($data as &$cliente) {
                 $nombreCliente = $cliente['cliente']['nombre'];
 
                 foreach ($result as $item) {
-                    //trim($item->nombre) === trim($nombreCliente)
+                    log_message('error', 'Comparing: ' . $nombreCliente . ' with ' . $item->nombre);
                     if ($this->isNameMatch($nombreCliente, $item->nombre)) {
                         $cliente['cliente']['tarifa'] = $item->tarifa;
                         $cliente['cliente']['correo'] = $item->correo;
@@ -4539,9 +4538,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '11', "=SUM(C11:" . $InitialColumnLetter . "11)");
             $VFOBCell = $InitialColumn . '11';
             $CBMTotal = $InitialColumn . "7";
+            //log CBMTotal cell value
             $FleteCell = $InitialColumn . '14';
             $CobroCell = $InitialColumn . '40';
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
+            $cbmTotalProductos = $data['cliente']['productos'][0]['cbm'];
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                 $InitialColumn . '14',
                 "=IF($CBMTotal<1, $tarifaCellValue*0.6, $tarifaCellValue*0.6*$CBMTotal)"
@@ -4757,8 +4758,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             // $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $tarifaCellValue . "*J11");
             //if j11<1=sheet 3 tarifa cell value else j11* tarifa cell value
             $objPHPExcel->getActiveSheet()->setCellValue('K30', "=IF('3'!" . $tarifaCellValue . "<1, '3'!" . $tarifaCellValue . "*J11, '3'!" . $tarifaCellValue . "*J11)");
-            //$objPHPExcel->getActiveSheet()->setCellValue('K30', "0");
-            //get $CobroCell value of formula
+            $LogisticaValue= $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
             $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
             $ImpuestosCellValue = round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
             //convert $expirationDate dd//mm/yyyy to day de mes de año
@@ -4808,7 +4808,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 $objPHPExcel->getActiveSheet()->setCellValue('G' . $row, "='3'!" . $InitialColumn . 8);
                 $objPHPExcel->getActiveSheet()->setCellValue('J11', "='3'!" . $CBMTotal);
-
+                log_message("error","CBM Total2: " . $CBMTotal);
+                log_message("error","CBM Total Value2: " . $objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue());
                 //set currency format with dollar symbol
                 $objPHPExcel->getActiveSheet()->getStyle('G' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('I' . $row, "='3'!" . $InitialColumn . 46);
@@ -4938,7 +4939,21 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $objPHPExcel->getActiveSheet()->setCellValue('K24', "=SUM(K20:K23)");
             } else {
             }
-
+            if ($objPHPExcel->getActiveSheet()->getCell('B23')->getValue() == "ANTIDUMPING") {
+                    $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
+                }
+                if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
+                    $fob = $sheet1->getCell('K30')->getCalculatedValue();
+                    $logistica = $sheet1->getCell('K31')->getCalculatedValue();
+                    $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
+                } else {
+                    $fob = $sheet1->getCell('K29')->getCalculatedValue();
+                    $logistica = $sheet1->getCell('K30')->getCalculatedValue();
+                    $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
+                }
+                log_message('error', 'Fob: ' . $fob);
+                log_message('error', 'Logistica: ' . $logistica);
+                log_message('error', 'Impuestos: ' . $impuestos);
             //merge c8:c9
             $objPHPExcel->getActiveSheet()->mergeCells('C8:C9');
             //center vertically and horizontally
@@ -4998,21 +5013,25 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $excelFilePath = 'assets/downloads/' . $excelFileName;
             $montoFinal = $objPHPExcel->setActiveSheetIndex(0)->getCell('K30')->getCalculatedValue();
             //if b23 = antidumping then montofinal=k31;
+            $objPHPExcel->setActiveSheetIndex(0);
+
+            // Obtener valores después del recálculo
+            $sheet1 = $objPHPExcel->getActiveSheet();
             if ($objPHPExcel->getActiveSheet()->getCell('B23')->getValue() == "ANTIDUMPING") {
-                $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
-            }
-            if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
-                $fob = $sheet1->getCell('K30')->getCalculatedValue();
-                $logistica = $sheet1->getCell('K31')->getCalculatedValue();
-                $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
-            } else {
-                $fob = $sheet1->getCell('K29')->getCalculatedValue();
-                $logistica = $sheet1->getCell('K30')->getCalculatedValue();
-                $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
-            }
-            log_message('error', 'Fob: ' . $fob);
-            log_message('error', 'Logistica: ' . $logistica);
-            log_message('error', 'Impuestos: ' . $impuestos);
+                    $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
+                }
+                if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
+                    $fob = $sheet1->getCell('K30')->getCalculatedValue();
+                    $logistica = $sheet1->getCell('K31')->getCalculatedValue();
+                    $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
+                } else {
+                    $fob = $sheet1->getCell('K29')->getCalculatedValue();
+                    $logistica = $sheet1->getCell('K30')->getCalculatedValue();
+                    $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
+                }
+                $objPHPExcel->setActiveSheetIndex(1);
+                $tarifaValue=$objPHPExcel->getActiveSheet()->getCell($tarifaCellValue)->getCalculatedValue();
+                $logistica=$cbmTotalProductos*$tarifaValue;
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
