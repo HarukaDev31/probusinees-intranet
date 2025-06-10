@@ -4761,7 +4761,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             //k30 =$query[0]["Flete"]/$query[0]["Distribucion"]
             // $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $tarifaCellValue . "*J11");
             //if j11<1=sheet 3 tarifa cell value else j11* tarifa cell value
-            $objPHPExcel->getActiveSheet()->setCellValue('K30', "=IF('3'!" . $tarifaCellValue . "<1, '3'!" . $tarifaCellValue . "*J11, '3'!" . $tarifaCellValue . "*J11)");
+            $objPHPExcel->getActiveSheet()->setCellValue('K30', "=IF(J11<1, '3'!" . $tarifaCellValue . ", '3'!" . $tarifaCellValue . "*J11)");
             $LogisticaValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
             $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
             $ImpuestosCellValue = round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
@@ -4885,11 +4885,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $objPHPExcel->getActiveSheet()->unmergeCells('B' . $lastRow . ':L' . $lastRow);
                 //merge b to e
                 $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
-                //merge f to f+1
-                // $objPHPExcel->getActiveSheet()->mergeCells('F' . $lastRow . ':F' . $lastRow+1);
-                // $objPHPExcel->getActiveSheet()->mergeCells('J' . $lastRow . ':J' . $lastRow+1);
 
-                //merge k to l
             }
             if ($notUsedDefaultRows >= 0) {
                 //unmerge c to e
@@ -4923,10 +4919,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             // Verificar si se cumple la condición
             if ($antidumpingSum != 0) {
                 // Insertar una nueva fila en la posición 22
-                // $objPHPExcel->getActiveSheet()->getStyle('K23')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                // $objPHPExcel->getActiveSheet()->getStyle('K22')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                // $objPHPExcel->getActiveSheet()->getStyle('K24')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                // $objPHPExcel->getActiveSheet()->getStyle('K25')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $sheet->insertNewRowBefore($rowToCheck, 1);
 
                 // Opcional: Puedes rellenar la nueva fila con datos si es necesario
@@ -4955,9 +4947,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $logistica = $sheet1->getCell('K30')->getCalculatedValue();
                 $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
             }
-            log_message('error', 'Fob: ' . $fob);
-            log_message('error', 'Logistica: ' . $logistica);
-            log_message('error', 'Impuestos: ' . $impuestos);
+       
             //merge c8:c9
             $objPHPExcel->getActiveSheet()->mergeCells('C8:C9');
             //center vertically and horizontally
@@ -5035,7 +5025,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             }
             $objPHPExcel->setActiveSheetIndex(1);
             $tarifaValue = $objPHPExcel->getActiveSheet()->getCell($tarifaCellValue)->getCalculatedValue();
-            $logistica = $cbmTotalProductos * $tarifaValue;
+            $logistica = $cbmTotalProductos < 1.00 ? $tarifaValue : $cbmTotalProductos * $tarifaValue;
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
