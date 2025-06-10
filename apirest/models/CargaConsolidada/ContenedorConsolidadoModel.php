@@ -4321,7 +4321,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $data = $this->getMassiveExcelData($objPHPExcel);
         $result = $this->db->select('id,tarifa,nombre,correo')
             ->from($this->table_contenedor_cotizacion)
-            ->where('id_contenedor', $idContainer);
+            ->where('id_contenedor', $idContainer)
+            ->where('estado_cotizador', 'CONFIRMADO')
+            ->where('estado_cliente IS NOT NULL');
         try {
             $result = $this->db->get()->result();
 
@@ -5640,7 +5642,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $this->db->update($this->table_contenedor_cotizacion);
             if ($estado == 'COTIZADO') {
                 //get phone from cotizacion table where id=idCotizacionFinal
-                $this->db->select("CC.telefono,CC.impuestos_final,CC.volumen_final,CC.monto_final,CC.tarifa_final,
+                $this->db->select("CC.telefono,CC.id_contenedor,CC.impuestos_final,CC.volumen_final,CC.monto_final,CC.tarifa_final,nombre,logistica_final,
                 (
                 SELECT IFNULL(SUM(cccp.monto), 0) 
                 FROM " . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . " cccp
@@ -5651,19 +5653,33 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 ) AS total_pagos");
                 $this->db->from($this->table_contenedor_cotizacion . " AS CC");
                 $this->db->where('id', $idCotizacionFinal);
-                //get sum of montos from pagos where concept is 'LOGISTICA' or 'IMPUESTOS' and id_cotizacion=idCotizacionFinal
-
+                
                 $query = $this->db->get();
                 $telefono = $query->row()->telefono;
                 $telefono = preg_replace('/\s+/', '', $telefono);
                 $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
                 $totalPagos = $query->row()->total_pagos;
-                $totalAPagar = $query->row()->monto_final + $query->row()->impuestos_final - $totalPagos;
+            
                 $volumen = $query->row()->volumen_final;
-                $message = "Su cotización ha sido actualizada a COTIZADO. \n" .
-                    "Monto a pagar: S/." . number_format($totalAPagar, 2) . "\n" .
-                    "Volumen: " . number_format($volumen, 2) . " m³\n" .
-                    "Tarifa: S/." . number_format($query->row()->tarifa_final, 2) . "\n";
+                $nombre = $query->row()->nombre;
+                $logisticaFinal = $query->row()->logistica_final;
+                $impuestosFinal = $query->row()->impuestos_final;
+                $totalAPagar = $logisticaFinal + $impuestosFinal - $totalPagos;
+                $idContenedor = $query->row()->id_contenedor;
+                //get fecha de arribo from table contenedor where id=idContenedor
+                $this->db->select('fecha_arribo');
+                $this->db->from($this->table);
+                $this->db->where('id', $idContenedor);
+                $query = $this->db->get();
+                $fechaArribo = $query->row()->fecha_arribo;
+                $message = "Hola ".$nombre. " un gusto saludarte! \n" .
+                    "A continuación te envio la cotización final de tu importación.\n" .
+                    "PAGO PENDIENTE: \n" .
+                    "Costo CBM: $" . number_format($logisticaFinal, 2) . "\n" .
+                    "Impuestos: $" . number_format($impuestosFinal, 2) . "\n" .
+                    "Total: $" . number_format($totalAPagar, 2) . "\n".
+                    "Pronto le aviso nuevos avances, que tengan buen dia \n" .  
+                    "Último día de pago: " .date('d/m/Y', strtotime($fechaArribo)) . "\n" ;
 
                 $this->sendMessage($message);
                 //SEND SIMPLE MESSAGE TO CLIENT

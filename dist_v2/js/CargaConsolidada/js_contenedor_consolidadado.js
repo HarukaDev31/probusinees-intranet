@@ -441,11 +441,11 @@ async function deleteCotizacionFinalFile(id) {
 }
 async function updateEstadoCotizacionFinal(idCotizacionFinal) {
   const estado = $(`#estado-cotizacion-final${idCotizacionFinal}`).val();
-
+  spinner.show();
   url =
     base_url +
     "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionFinal";
-  $.ajax({
+  await $.ajax({
     url: url,
     type: "POST",
     data: {
@@ -461,6 +461,11 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
         Swal.fire("Error!", result.message, "error");
       }
       table_Entidad.ajax.reload();
+      spinner.hide();
+    },
+    error: function () {
+      Swal.fire("Error!", "Hubo un error al actualizar el estado", "error");
+      spinner.hide();
     },
   });
 }
@@ -2350,7 +2355,6 @@ async function viewFormularioAduana() {
   Object.keys(result[0]).forEach((key) => {
     // Buscar el elemento del formulario que coincida con la clave
     const input = form.elements[key];
-    console.log(key, input);
 
     // Si el elemento existe, asignar el valor correspondiente
     if (input) {
@@ -2376,30 +2380,30 @@ async function viewFormularioAduana() {
     const $form = $(this);
     const errors = validateForm($form);
 
-    if (errors.length > 0) {
-      // Ir al tab con el primer error
-      const firstErrorTab = errors[0].tab;
+    // if (errors.length > 0) {
+    //   // Ir al tab con el primer error
+    //   const firstErrorTab = errors[0].tab;
 
-      // Cambiar al tab con el error
-      $(".tab-btn").removeClass("active bg-gray-100");
-      $(`.tab-btn[data-tab="${firstErrorTab}"]`).addClass("active bg-gray-100");
-      $(".tab-content").removeClass("active").addClass("hidden");
-      $(`#${firstErrorTab}`).removeClass("hidden").addClass("active");
+    //   // Cambiar al tab con el error
+    //   $(".tab-btn").removeClass("active bg-gray-100");
+    //   $(`.tab-btn[data-tab="${firstErrorTab}"]`).addClass("active bg-gray-100");
+    //   $(".tab-content").removeClass("active").addClass("hidden");
+    //   $(`#${firstErrorTab}`).removeClass("hidden").addClass("active");
 
-      // Mostrar mensaje de error
-      Swal.fire(
-        "Error!",
-        `Por favor complete todos los campos obligatorios en la sección ${getTabName(
-          firstErrorTab
-        )}`,
-        "error"
-      );
+    //   // Mostrar mensaje de error
+    //   Swal.fire(
+    //     "Error!",
+    //     `Por favor complete todos los campos obligatorios en la sección ${getTabName(
+    //       firstErrorTab
+    //     )}`,
+    //     "error"
+    //   );
 
-      // Enfocar el primer campo con error
-      $form.find(`[name="${errors[0].field}"]`).focus();
+    //   // Enfocar el primer campo con error
+    //   $form.find(`[name="${errors[0].field}"]`).focus();
 
-      return false;
-    }
+    //   return false;
+    // }
 
     // Si no hay errores, continuar con el envío del formulario
     const formData = new FormData(this);
