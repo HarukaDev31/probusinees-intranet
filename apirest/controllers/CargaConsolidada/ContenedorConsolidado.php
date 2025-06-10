@@ -222,7 +222,7 @@ class ContenedorConsolidado extends CI_Controller
 				if ($this->user->No_Grupo == "Coordinación"
 				|| $this->user->No_Grupo == "Cotizador"
 				) {
-					$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
+					$subdata[] = date("d/m/Y", strtotime($row->fecha_arribo));
 					$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 				}
 
@@ -936,18 +936,18 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[]     = $row->name;
 					$subdata[]     = $row->volumen_final;
 					// $subdata[]     = $row->monto_final;
-					$subdata[]     = $row->fob_final;
-					$subdata[]     = $row->logistica_final;
-					$subdata[]     = $row->impuestos_final;
-					$subdata[]     = $row->tarifa_final;
+					$subdata[]     = "$".$row->fob_final;
+					$subdata[]     = "$".$row->logistica_final;
+					$subdata[]     = "$".$row->impuestos_final;
+					$subdata[]     = "$".$row->tarifa_final;
 					//select for options C.FINAL,AJUSTADO,COTIZADO,PAGADO,SOBREPAGO
 					$selectEstados = '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
 						<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
-						<option value="C.FINAL" ' . ($row->estado_cotizacion_final == "C.FINAL" ? "selected" : "") . '>C.FINAL</option>
-						<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
 						<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
 						<option value="PAGADO" ' . ($row->estado_cotizacion_final == "PAGADO" ? "selected" : "") . '>PAGADO</option>
 						<option value="SOBREPAGO" ' . ($row->estado_cotizacion_final == "SOBREPAGO" ? "selected" : "") . '>SOBREPAGO</option>
+						<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
+
 						</select>';
 					$subdata[] = $selectEstados;
 					//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file

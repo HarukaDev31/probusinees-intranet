@@ -5666,7 +5666,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $nombre = $query->row()->nombre;
                 $logisticaFinal = $query->row()->logistica_final;
                 $impuestosFinal = $query->row()->impuestos_final;
-                $totalAPagar = $logisticaFinal + $impuestosFinal - $totalPagos;
+                $total=$logisticaFinal + $impuestosFinal;
+                $totalAPagar = $total- $totalPagos;
                 $idContenedor = $query->row()->id_contenedor;
                 //get fecha de arribo from table contenedor where id=idContenedor
                 $this->db->select('fecha_arribo');
@@ -5679,7 +5680,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     "PAGO PENDIENTE: \n" .
                     "Costo CBM: $" . number_format($logisticaFinal, 2) . "\n" .
                     "Impuestos: $" . number_format($impuestosFinal, 2) . "\n" .
-                    "Total: $" . number_format($totalAPagar, 2) . "\n".
+                    "Total: $" . number_format($total, 2) . "\n".
                     "Pronto le aviso nuevos avances, que tengan buen dia \n" .  
                     "Último día de pago: " .date('d/m/Y', strtotime($fechaArribo)) . "\n" ;
 
