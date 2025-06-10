@@ -4762,7 +4762,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             // $objPHPExcel->getActiveSheet()->setCellValue('K30', "='3'!" . $tarifaCellValue . "*J11");
             //if j11<1=sheet 3 tarifa cell value else j11* tarifa cell value
             $objPHPExcel->getActiveSheet()->setCellValue('K30', "=IF('3'!" . $tarifaCellValue . "<1, '3'!" . $tarifaCellValue . "*J11, '3'!" . $tarifaCellValue . "*J11)");
-            $LogisticaValue= $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
+            $LogisticaValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
             $CobroCellValue = $objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue();
             $ImpuestosCellValue = round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2);
             //convert $expirationDate dd//mm/yyyy to day de mes de año
@@ -4812,8 +4812,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 $objPHPExcel->getActiveSheet()->setCellValue('G' . $row, "='3'!" . $InitialColumn . 8);
                 $objPHPExcel->getActiveSheet()->setCellValue('J11', "='3'!" . $CBMTotal);
-                log_message("error","CBM Total2: " . $CBMTotal);
-                log_message("error","CBM Total Value2: " . $objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue());
+                log_message("error", "CBM Total2: " . $CBMTotal);
+                log_message("error", "CBM Total Value2: " . $objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue());
                 //set currency format with dollar symbol
                 $objPHPExcel->getActiveSheet()->getStyle('G' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('I' . $row, "='3'!" . $InitialColumn . 46);
@@ -4944,20 +4944,20 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             } else {
             }
             if ($objPHPExcel->getActiveSheet()->getCell('B23')->getValue() == "ANTIDUMPING") {
-                    $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
-                }
-                if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
-                    $fob = $sheet1->getCell('K30')->getCalculatedValue();
-                    $logistica = $sheet1->getCell('K31')->getCalculatedValue();
-                    $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
-                } else {
-                    $fob = $sheet1->getCell('K29')->getCalculatedValue();
-                    $logistica = $sheet1->getCell('K30')->getCalculatedValue();
-                    $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
-                }
-                log_message('error', 'Fob: ' . $fob);
-                log_message('error', 'Logistica: ' . $logistica);
-                log_message('error', 'Impuestos: ' . $impuestos);
+                $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
+            }
+            if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
+                $fob = $sheet1->getCell('K30')->getCalculatedValue();
+                $logistica = $sheet1->getCell('K31')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
+            } else {
+                $fob = $sheet1->getCell('K29')->getCalculatedValue();
+                $logistica = $sheet1->getCell('K30')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
+            }
+            log_message('error', 'Fob: ' . $fob);
+            log_message('error', 'Logistica: ' . $logistica);
+            log_message('error', 'Impuestos: ' . $impuestos);
             //merge c8:c9
             $objPHPExcel->getActiveSheet()->mergeCells('C8:C9');
             //center vertically and horizontally
@@ -5022,20 +5022,20 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             // Obtener valores después del recálculo
             $sheet1 = $objPHPExcel->getActiveSheet();
             if ($objPHPExcel->getActiveSheet()->getCell('B23')->getValue() == "ANTIDUMPING") {
-                    $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
-                }
-                if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
-                    $fob = $sheet1->getCell('K30')->getCalculatedValue();
-                    $logistica = $sheet1->getCell('K31')->getCalculatedValue();
-                    $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
-                } else {
-                    $fob = $sheet1->getCell('K29')->getCalculatedValue();
-                    $logistica = $sheet1->getCell('K30')->getCalculatedValue();
-                    $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
-                }
-                $objPHPExcel->setActiveSheetIndex(1);
-                $tarifaValue=$objPHPExcel->getActiveSheet()->getCell($tarifaCellValue)->getCalculatedValue();
-                $logistica=$cbmTotalProductos*$tarifaValue;
+                $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
+            }
+            if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
+                $fob = $sheet1->getCell('K30')->getCalculatedValue();
+                $logistica = $sheet1->getCell('K31')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
+            } else {
+                $fob = $sheet1->getCell('K29')->getCalculatedValue();
+                $logistica = $sheet1->getCell('K30')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
+            }
+            $objPHPExcel->setActiveSheetIndex(1);
+            $tarifaValue = $objPHPExcel->getActiveSheet()->getCell($tarifaCellValue)->getCalculatedValue();
+            $logistica = $cbmTotalProductos * $tarifaValue;
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
@@ -5655,19 +5655,19 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 ) AS total_pagos");
                 $this->db->from($this->table_contenedor_cotizacion . " AS CC");
                 $this->db->where('id', $idCotizacionFinal);
-                
+
                 $query = $this->db->get();
                 $telefono = $query->row()->telefono;
                 $telefono = preg_replace('/\s+/', '', $telefono);
                 $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
                 $totalPagos = $query->row()->total_pagos;
-            
+
                 $volumen = $query->row()->volumen_final;
                 $nombre = $query->row()->nombre;
                 $logisticaFinal = $query->row()->logistica_final;
                 $impuestosFinal = $query->row()->impuestos_final;
-                $total=$logisticaFinal + $impuestosFinal;
-                $totalAPagar = $total- $totalPagos;
+                $total = $logisticaFinal + $impuestosFinal;
+                $totalAPagar = $total - $totalPagos;
                 $idContenedor = $query->row()->id_contenedor;
                 //get fecha de arribo from table contenedor where id=idContenedor
                 $this->db->select('fecha_arribo');
@@ -5675,17 +5675,25 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $this->db->where('id', $idContenedor);
                 $query = $this->db->get();
                 $fechaArribo = $query->row()->fecha_arribo;
-                $message = "Hola ".$nombre. " un gusto saludarte! \n" .
-                    "A continuación te envio la cotización final de tu importación.\n" .
-                    "PAGO PENDIENTE: \n" .
-                    "Costo CBM: $" . number_format($logisticaFinal, 2) . "\n" .
-                    "Impuestos: $" . number_format($impuestosFinal, 2) . "\n" .
-                    "Total: $" . number_format($total, 2) . "\n".
-                    "Pronto le aviso nuevos avances, que tengan buen dia \n" .  
-                    "Último día de pago: " .date('d/m/Y', strtotime($fechaArribo)) . "\n" ;
+                $message = "Hola " . $nombre . " 😁 un gusto saludarte! \n" .
+                    "A continuación te envio la cotización final de tu importación📋📦.\n" .
+                    "🙋‍♂️PAGO PENDIENTE: \n" .
+                    "☑️Costo CBM: $" . number_format($logisticaFinal, 2) . "\n" .
+                    "☑️Impuestos: $" . number_format($impuestosFinal, 2) . "\n" .
+                    "☑️Total: $" . number_format($total, 2) . "\n" .
+                    "Pronto le aviso nuevos avances, que tengan buen dia \n" .
+                    "Último día de pago: " . date('d/m/Y', strtotime($fechaArribo)) . "\n";
 
                 $this->sendMessage($message);
-                //SEND SIMPLE MESSAGE TO CLIENT
+                $pathCotizacionFinalPDF = $this->getBoletaForSend($idCotizacionFinal);
+                $this->sendMedia($pathCotizacionFinalPDF, null, null, null, 3);
+                $message = "Resumen de Pago\n" .
+                    "✅Cotización final: $" . number_format($total, 2) . "\n" .
+                    "✅Adelanto: $" . number_format($totalPagos, 2) . "\n" .
+                    "✅ Pendiente de pago: $" . number_format($totalAPagar, 2) . "\n";
+                $this->sendMessage($message, null, 5);
+                $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
+                $this->sendMedia($pagosUrl, 'image/jpg',null, null, 7);
             }
             //if db error is diferent to 0 return false
             if ($this->db->error()['code'] != 0) {
@@ -5786,7 +5794,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $cotizacionFinalUrl = $cotizacionFinal->cotizacion_final_url;
                 $fileUrl = str_replace(' ', '%20', $cotizacionFinal->cotizacion_final_url);
 
-                //GET FILE CONTENT FROM http://localhost/probusinees-intranet/assets/cargaconsolidada/cotizacionesFinales/1739463594_CotizacionBRYAN%20RUIZ.xlsx
                 $fileContent = file_get_contents($fileUrl);
                 if ($fileContent === false) {
                     throw new Exception("No se pudo leer el archivo Excel.");
@@ -5806,11 +5813,41 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             return false;
         }
     }
+    public function getBoletaForSend($idCotizacionFinal)
+    {
+        //get cotizacion_final_url from table where id=idCotizacion final and get objPHPExcel and generate boleta and return it
+        try {
+            $this->db->select('cotizacion_final_url');
+            $this->db->from($this->table_contenedor_cotizacion);
+            $this->db->where('id', $idCotizacionFinal);
+            $query = $this->db->get();
+            $cotizacionFinal = $query->row();
+            if ($cotizacionFinal) {
+                $cotizacionFinalUrl = $cotizacionFinal->cotizacion_final_url;
+                $fileUrl = str_replace(' ', '%20', $cotizacionFinal->cotizacion_final_url);
+
+                $fileContent = file_get_contents($fileUrl);
+                if ($fileContent === false) {
+                    throw new Exception("No se pudo leer el archivo Excel.");
+                }
+                $tempFile = tempnam(sys_get_temp_dir(), 'cotizacion_') . '.xlsx';
+                file_put_contents($tempFile, $fileContent);
+
+                // Cargar Excel
+
+                $objPHPExcel = PHPExcel_IOFactory::load($tempFile);
+                return $this->generateBoletaForSend($objPHPExcel);
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error en downloadBoleta: ' . $e->getMessage());
+            return false;
+        }
+    }
     private function generateBoleta($objPHPExcel)
     {
         try {
-
-
             $objPHPExcel->setActiveSheetIndex(0);
             $antidumping = $objPHPExcel->getActiveSheet()->getCell('B23')->getValue();
             $data = [
@@ -5923,11 +5960,152 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $options->set('isHtml5ParserEnabled', true);
             $dompdf = new Dompdf\Dompdf($options);
 
-            // $dompdf->loadHtml('<img src="data:image/png;base64,' . $imgData . '">');
             $dompdf->loadHtml($htmlContent);
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
             $dompdf->stream('Cotizacion.pdf', array("Attachment" => 0));
+        } catch (PHPExcel_Exception $e) {
+            echo "Error en la fórmula de la celda ";
+            throw $e;
+        } catch (Exception $e) {
+            echo 'Excepción descargarBoleta: ',  $e->getMessage(), "\n";
+            return $objPHPExcel;
+            throw $e;
+        }
+    }
+    private function generateBoletaForSend($objPHPExcel)
+    {
+        try {
+            $objPHPExcel->setActiveSheetIndex(0);
+            $antidumping = $objPHPExcel->getActiveSheet()->getCell('B23')->getValue();
+            $data = [
+                "name" => $objPHPExcel->getActiveSheet()->getCell('C8')->getValue(),
+                "lastname" => $objPHPExcel->getActiveSheet()->getCell('C9')->getValue(),
+                "ID" => $objPHPExcel->getActiveSheet()->getCell('C10')->getValue(),
+                "phone" => $objPHPExcel->getActiveSheet()->getCell('C11')->getValue(),
+                "date" => date('d/m/Y'),
+                "tipocliente" => $objPHPExcel->getActiveSheet()->getCell('F11')->getValue(),
+                "peso" => $objPHPExcel->getActiveSheet()->getCell('J9')->getCalculatedValue(),
+                "qtysuppliers" => $objPHPExcel->getActiveSheet()->getCell('J10')->getValue(),
+                "cbm" => $objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue(),
+                "valorcarga" => round($objPHPExcel->getActiveSheet()->getCell('K14')->getCalculatedValue(), 2),
+                "fleteseguro" => round($objPHPExcel->getActiveSheet()->getCell('K15')->getCalculatedValue(), 2),
+                "valorcif" => round($objPHPExcel->getActiveSheet()->getCell('K16')->getCalculatedValue(), 2),
+                "advalorempercent" => intval($objPHPExcel->getActiveSheet()->getCell('J20')->getCalculatedValue() * 100),
+                "advalorem" => round($objPHPExcel->getActiveSheet()->getCell('K20')->getCalculatedValue(), 2),
+                "antidumping" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K23')->getCalculatedValue(), 2) : "",
+
+                "igv" => round($objPHPExcel->getActiveSheet()->getCell('K21')->getCalculatedValue(), 2),
+                "ipm" => round($objPHPExcel->getActiveSheet()->getCell('K22')->getCalculatedValue(), 2),
+                "subtotal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K24')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K23')->getCalculatedValue(), 2),
+                "percepcion" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K26')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K25')->getCalculatedValue(), 2),
+                "total" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K27')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K26')->getCalculatedValue(), 2),
+                "valorcargaproveedor" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K29')->getCalculatedValue(), 2),
+                "servicioimportacion" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K30')->getCalculatedValue(), 2),
+                "impuestos" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2),
+                "montototal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K33')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2),
+            ];
+            $i = 37;
+            $items = [];
+            while ($objPHPExcel->getActiveSheet()->getCell('B' . $i)->getValue() != 'TOTAL') {
+                //add item to items array
+                $item = [
+                    "index" => $objPHPExcel->getActiveSheet()->getCell('B' . $i)->getCalculatedValue(),
+                    "name" => $objPHPExcel->getActiveSheet()->getCell('C' . $i)->getCalculatedValue(),
+                    "qty" => $objPHPExcel->getActiveSheet()->getCell('F' . $i)->getCalculatedValue(),
+                    "costounit" => number_format(round($objPHPExcel->getActiveSheet()->getCell('G' . $i)->getCalculatedValue(), 2), 2, '.', ','),
+                    "preciounit" => number_format(round($objPHPExcel->getActiveSheet()->getCell('I' . $i)->getCalculatedValue(), 2), 2, '.', ','),
+                    "total" => round($objPHPExcel->getActiveSheet()->getCell('J' . $i)->getCalculatedValue(), 2),
+                    "preciounitpen" => number_format(round($objPHPExcel->getActiveSheet()->getCell('K' . $i)->getCalculatedValue(), 2), 2, '.', ','),
+                ];
+                $items[] = $item;
+                $i++;
+            }
+            $itemsCount = count($items);
+            $data["br"] = $itemsCount - 18 < 0 ? str_repeat("<br>", 18 - $itemsCount) : "";
+            $data['items'] = $items;
+            $logoContent = file_get_contents(base_url() . 'assets/downloads/logo.png');
+            $logoData = base64_encode($logoContent);
+            $data["logo"] = 'data:image/png;base64,' . $logoData;
+            $htmlFilePath = 'assets/downloads/Boleta_Template.html';
+            $htmlContent = file_get_contents($htmlFilePath);
+            $pagosContent = file_get_contents(base_url() . 'assets/downloads/pagos.png');
+            $pagosData = base64_encode($pagosContent);
+            $data["pagos"] = 'data:image/png;base64,' . $pagosData;
+            //replace {{name}} with data['name']
+            foreach ($data as $key => $value) {
+                //if value is a number parse to 2 decimals with comma as unit separator and dot as decimal separator
+                if (is_numeric($value)) {
+                    if ($value == 0) {
+                        $value = '-';
+                    }
+                    if ($key != "ID" && $key != "phone" && $key != "qtysuppliers" && $key != "advalorempercent") {
+                        $value = number_format($value, 2, '.', ',');
+                    }
+                }
+                if ($key == "antidumping" && $antidumping == "ANTIDUMPING") {
+                    $antidumpingHtml = '<tr style="background:#FFFF33">
+                    <td style="border-top:none!important;border-bottom:none!important" colspan="3">ANTIDUMPING</td>
+                    <td style="border-top:none!important;border-bottom:none!important" ></td>
+                    <td style="border-top:none!important;border-bottom:none!important" >$' . number_format($data['antidumping'], 2, '.', ',') . '</td>
+                    <td style="border-top:none!important;border-bottom:none!important" >USD</td>
+                    </tr>';
+                    $htmlContent = str_replace('{{antidumping}}', $antidumpingHtml, $htmlContent);
+                    //search items with class ipm and set border none
+                }
+                if ($key == "items") {
+                    $itemsHtml = "";
+                    $total = 0;
+                    $cantidad = 0;
+                    foreach ($value as $item) {
+                        $total += $item['total'];
+                        $cantidad += $item['qty'];
+                        $itemsHtml .= '<tr>
+                        <td colspan="1">' . $item['index'] . '</td>
+                        <td colspan="5">' . $item['name'] . '</td>
+                        <td colspan="1">' . $item['qty'] . '</td>
+                        <td colspan="2">$ ' . $item['costounit'] . '</td>
+                        <td colspan="1">$ ' . $item['preciounit'] . '</td>
+                        <td colspan="1">$ ' . number_format($item['total'], 2, '.', ',') . '</td>
+                        <td colspan="1">S/. ' . $item['preciounitpen'] . '</td>
+                    </tr>';
+                    }
+                    $itemsHtml .= '<tr>
+                    <td colspan="6" >TOTAL</td>
+                    <td >' . $cantidad . '</td>
+                    <td colspan="2" style="border:none!important"></td>
+                    <td style="border:none!important"></td>
+                    <td >$ ' . number_format($total, 2, '.', ',') . '</td>
+                    <td style="border:none!important"></td>
+
+                </tr>';
+                    $htmlContent = str_replace('{{' . $key . '}}', $itemsHtml, $htmlContent);
+                } else {
+                    $htmlContent = str_replace('{{' . $key . '}}', $value, $htmlContent);
+                }
+            }
+            $options = new Dompdf\Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $dompdf = new Dompdf\Dompdf($options);
+
+            $dompdf->loadHtml($htmlContent);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+            $tempDir = sys_get_temp_dir() . '/pdfs/';
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            // Generar nombre único para el archivo
+            $fileName = 'Cotizacion_' . date('Y-m-d_H-i-s') . '_' . uniqid() . '.pdf';
+            $filePath = $tempDir . $fileName;
+
+            // Guardar el PDF en el archivo
+            $pdfContent = $dompdf->output();
+            file_put_contents($filePath, $pdfContent);
+
+            // Devolver la ruta del archivo guardado
+            return $filePath;
         } catch (PHPExcel_Exception $e) {
             echo "Error en la fórmula de la celda ";
             throw $e;
@@ -6455,10 +6633,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
     }
     public function deletePagoCoordination($idPago)
-{
-    $this->db->where('id', $idPago);
-    return $this->db->delete('contenedor_consolidado_cotizacion_coordinacion_pagos');
-}
+    {
+        $this->db->where('id', $idPago);
+        return $this->db->delete('contenedor_consolidado_cotizacion_coordinacion_pagos');
+    }
     public function getPagosCoordination($idCotizacion)
     {
         try {

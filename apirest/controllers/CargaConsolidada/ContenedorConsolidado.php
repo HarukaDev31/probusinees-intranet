@@ -222,7 +222,7 @@ class ContenedorConsolidado extends CI_Controller
 				if ($this->user->No_Grupo == "Coordinación"
 				|| $this->user->No_Grupo == "Cotizador"
 				) {
-					$subdata[] = date("d/m/Y", strtotime($row->fecha_arribo));
+					$subdata[] = date("d/m/Y", strtotime($row->fecha_arribo??$row->f_puerto));
 					$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 				}
 
