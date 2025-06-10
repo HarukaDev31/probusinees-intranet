@@ -3809,14 +3809,14 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
             // Subconsulta para cbm_total
             $this->db->select('(
-            SELECT COALESCE(SUM(cbm_total), 0) 
-            FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
-            WHERE id_contenedor = ' . $idContenedor . '
-            AND id_cotizacion IN (
-                SELECT id 
-                FROM ' . $this->table_contenedor_cotizacion . ' 
-                WHERE estado_cotizador = "CONFIRMADO"
+            SELECT COALESCE(SUM(volumen), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
             )
+            AND estado_cotizador = "CONFIRMADO"
         ) as cbm_total', false);
 
             // Subconsulta para cbm_total_pendiente
