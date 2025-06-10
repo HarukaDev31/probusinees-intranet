@@ -5867,7 +5867,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 "impuestos" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2),
                 "montototal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K33')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2),
             ];
-            $i = 37;
+            $i = $antidumping=="ANTIDUMPING"?37:36;
             $items = [];
             while ($objPHPExcel->getActiveSheet()->getCell('B' . $i)->getValue() != 'TOTAL') {
                 //add item to items array
@@ -5995,7 +5995,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 "impuestos" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2),
                 "montototal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K33')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2),
             ];
-            $i = 37;
+            $i = $antidumping=="ANTIDUMPING"?37:36;
             $items = [];
             while ($objPHPExcel->getActiveSheet()->getCell('B' . $i)->getValue() != 'TOTAL') {
                 //add item to items array
