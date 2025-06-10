@@ -906,6 +906,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $divAcciones;
 
 					$data[]    = $subdata;
+					$index++;
 				}
 			}
 			$output = [
@@ -1809,6 +1810,16 @@ class ContenedorConsolidado extends CI_Controller
 			"message" => $arrResponse['message']
 		]);
 	}
+	public function deletePagoCoordination($idPago)
+	{
+		$this->load->model('CargaConsolidada/ContenedorConsolidadoModel');
+		$result = $this->ContenedorConsolidadoModel->deletePagoCoordination($idPago);
+		if ($result) {
+			echo json_encode(['status' => 'success', 'message' => 'Pago eliminado correctamente']);
+		} else {
+			echo json_encode(['status' => 'error', 'message' => 'No se pudo eliminar el pago']);
+		}
+	}
 	public function getPagosCoordination($idCotizacion)
 	{
 		$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($idCotizacion);
@@ -1820,9 +1831,10 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
 			$subdata[] = "$".round($row->monto, 2);
-			$subdata[] = '<a href='.$row->voucher_url.' download>
+			$subdata[] = '<a href="'.$row->voucher_url.'" target="_blank" download>
 				<i class="fas fa-file-excel text-success"></i>
 				</a>';
+			$subdata[] = '<button class="btn btn-danger btn-sm" onclick="deletePagoCoordination(' . $row->id . ')"><i class="fa fa-trash"></i></button>';
 			$data[] = $subdata;
 			$index++;
 		}
@@ -1842,9 +1854,10 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
 			$subdata[] = $row->monto;
-			$subdata[] = '<a href='.$row->voucher_url.' download>
+			$subdata[] = '<a href="'.$row->voucher_url.'" target="_blank" download>
 				<i class="fas fa-file-excel text-success"></i>
 				</a>';
+			$subdata[] = '<button class="btn btn-danger btn-sm" onclick="deletePagoCoordination(' . $row->id . ')"><i class="fa fa-trash"></i></button>';
 			$data[] = $subdata;
 			$index++;
 		}
