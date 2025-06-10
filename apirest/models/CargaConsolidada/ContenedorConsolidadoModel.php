@@ -693,8 +693,14 @@ class ContenedorConsolidadoModel extends CI_Model
             }
             if (trim($sheet->getCell('B23')->getValue()) == "ANTIDUMPING") {
                 $monto = $sheet->getCell('K31')->getCalculatedValue();
+                $fob = $sheet->getCell('K30')->getCalculatedValue();
+                $impuestos = $sheet->getCell('K32')->getCalculatedValue();
+                $logistica = $sheet->getCell('K31')->getCalculatedValue();
             } else {
                 $monto = $sheet->getCell('K30')->getCalculatedValue();
+                $fob = $sheet->getCell('K29')->getCalculatedValue();
+                $logistica = $sheet->getCell('K30')->getCalculatedValue();
+                $impuestos = $sheet->getCell('K31')->getCalculatedValue();
             }
             $tarifa = $monto / ($volumen <= 0 ? 1 : $volumen);
             $peso = $sheet->getCell('K9')->getCalculatedValue();
@@ -706,6 +712,9 @@ class ContenedorConsolidadoModel extends CI_Model
                 'fecha' => $fecha,
                 'valor_cot' => $valorCot,
                 'monto' => $monto,
+                'fob_final' => $fob,
+                'impuestos_final' => $impuestos,
+                'logistica_final' => $logistica,
                 'tarifa' => $tarifa,
                 'peso' => $peso
             ];
@@ -4315,10 +4324,14 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ->where('id_contenedor', $idContainer);
         try {
             $result = $this->db->get()->result();
+            log_message('error', 'Number of clients: ' . count($result));
+            log_message('error', 'Number of clients in data: ' . count($data));
             foreach ($data as &$cliente) {
                 $nombreCliente = $cliente['cliente']['nombre'];
+
                 foreach ($result as $item) {
-                    if (trim($item->nombre) === trim($nombreCliente)) {
+                    //trim($item->nombre) === trim($nombreCliente)
+                    if ($this->isNameMatch($nombreCliente, $item->nombre)) {
                         $cliente['cliente']['tarifa'] = $item->tarifa;
                         $cliente['cliente']['correo'] = $item->correo;
                         $cliente['id'] = $item->id;
@@ -4332,6 +4345,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             return $e->getMessage();
         }
         try {
+            //log number of clients
+            log_message('error', 'Number of clients: ' . count($data));
             foreach ($data as $key => $value) {
                 $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 
@@ -4426,15 +4441,11 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $totalRows = 0;
             $cbmTotal = 0;
             $pesoTotal = 0;
+            $logistica = 0;
+            $impuestos = 0;
+            $fob = 0;
             $tarifa = $data['cliente']['tarifa'];
             $sheet1 = $objPHPExcel->getSheet(0);
-            if ($sheet1->getCell('A23')->getValue() == "ANTIDUMPING") {
-                $fob = $sheet1->getCell('J30')->getCalculatedValue();
-                $impuestos = $sheet1->getCell('J32')->getCalculatedValue();
-            } else {
-                $fob = $sheet1->getCell('J29')->getCalculatedValue();
-                $impuestos = $sheet1->getCell('J31')->getCalculatedValue();
-            }
 
             //first iterate for tributes zone, set values and apply styles to cells
             foreach ($data['cliente']['productos'] as $producto) {
@@ -4990,6 +5001,18 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             if ($objPHPExcel->getActiveSheet()->getCell('B23')->getValue() == "ANTIDUMPING") {
                 $montoFinal = $objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue();
             }
+            if ($sheet1->getCell('B23')->getValue() == "ANTIDUMPING") {
+                $fob = $sheet1->getCell('K30')->getCalculatedValue();
+                $logistica = $sheet1->getCell('K31')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('K32')->getCalculatedValue();
+            } else {
+                $fob = $sheet1->getCell('K29')->getCalculatedValue();
+                $logistica = $sheet1->getCell('K30')->getCalculatedValue();
+                $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
+            }
+            log_message('error', 'Fob: ' . $fob);
+            log_message('error', 'Logistica: ' . $logistica);
+            log_message('error', 'Impuestos: ' . $impuestos);
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
@@ -5004,6 +5027,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 'monto_final' => $montoFinal,
                 'tarifa_final' => $data['cliente']['tarifa'],
                 'impuestos_final' => $impuestos,
+                'logistica_final' => $logistica,
                 'fob_final' => $fob,
                 'estado' => 'PENDIENTE',
                 "excel_file_name" => $excelFileName,
@@ -5418,131 +5442,135 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     {
         $this->load->library('PHPExcel');
 
-        // Crear un nuevo objeto PHPExcel
         $excel = $objPHPExcel;
         $worksheet = $excel->getActiveSheet();
 
-        // Obtener los rangos de celdas combinadas
+        // Obtener el rango total de datos válidos
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+
+        // Obtener todas las celdas combinadas
         $mergedCells = $worksheet->getMergeCells();
 
-        // Columnas que están combinadas
-        $mergedColumns = ['A', 'B', 'C', 'D', 'T', 'U'];
+        // Función para obtener el valor real de una celda (considerando combinadas)
+        $getCellValue = function ($col, $row) use ($worksheet, $mergedCells) {
+            $cellAddress = $col . $row;
+            $cellValue = trim($worksheet->getCell($cellAddress)->getValue());
 
-        $columnData = [];
+            // Si la celda está vacía, buscar en celdas combinadas
+            if (empty($cellValue)) {
+                foreach ($mergedCells as $mergedRange) {
+                    // Verificar si es un rango (contiene :)
+                    if (strpos($mergedRange, ':') !== false) {
+                        // Dividir el rango manualmente
+                        list($startCell, $endCell) = explode(':', $mergedRange);
 
-        // Procesar columnas combinadas
-        foreach ($mergedColumns as $col) {
-            $columnData[$col] = array_filter($mergedCells, function ($range) use ($col) {
-                return preg_match("/^{$col}\d+:{$col}\d+$/", $range);
-            });
+                        // Extraer coordenadas de inicio y fin
+                        preg_match('/([A-Z]+)(\d+)/', $startCell, $startMatches);
+                        preg_match('/([A-Z]+)(\d+)/', $endCell, $endMatches);
 
-            usort($columnData[$col], function ($a, $b) use ($col) {
-                preg_match("/^{$col}(\d+):{$col}\d+$/", $a, $matchesA);
-                preg_match("/^{$col}(\d+):{$col}\d+$/", $b, $matchesB);
-                return $matchesA[1] - $matchesB[1];
-            });
-        }
+                        if (count($startMatches) >= 3 && count($endMatches) >= 3) {
+                            $startCol = $startMatches[1];
+                            $startRow = (int)$startMatches[2];
+                            $endCol = $endMatches[1];
+                            $endRow = (int)$endMatches[2];
+
+                            // Verificar si la celda actual está dentro del rango
+                            if ($col >= $startCol && $col <= $endCol && $row >= $startRow && $row <= $endRow) {
+                                $cellValue = trim($worksheet->getCell($startCell)->getValue());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $cellValue;
+        };
+
+        // Función para verificar si una fila pertenece a un cliente específico
+        $getClientRowRange = function ($startRow) use ($worksheet, $getCellValue, $highestRow) {
+            $endRow = $startRow;
+            $clientName = $getCellValue('A', $startRow);
+
+            // Buscar hasta dónde se extiende este cliente
+            for ($row = $startRow + 1; $row <= $highestRow; $row++) {
+                $nextClientName = $getCellValue('A', $row);
+                if (!empty($nextClientName) && $nextClientName !== $clientName) {
+                    break;
+                }
+                $endRow = $row;
+            }
+
+            return $endRow;
+        };
 
         $clients = [];
+        $processedRows = [];
 
-        foreach ($columnData['A'] as $key => $mergedRangeA) {
-            $rangeA = PHPExcel_Cell::extractAllCellReferencesInRange($mergedRangeA);
-            $firstCellA = $rangeA[0];
-            $valueA = trim($worksheet->getCell($firstCellA)->getValue());
-
-            if (empty($valueA)) {
+        // Recorrer todas las filas buscando clientes
+        for ($row = 1; $row <= $highestRow; $row++) {
+            // Saltar filas ya procesadas
+            if (in_array($row, $processedRows)) {
                 continue;
             }
 
-            // Obtener los límites del rango de la columna A
-            preg_match('/^A(\d+):A(\d+)$/', $mergedRangeA, $matchesA);
-            $startRowA = (int) $matchesA[1];
-            $endRowA = (int) $matchesA[2];
+            $clientName = $getCellValue('A', $row);
 
-            // Obtener valores de B, C, D (celdas combinadas)
-            $tipo = $dni = $telefono = '';
-            foreach ($columnData['B'] as $mergedRangeB) {
-                preg_match('/^B(\d+):B(\d+)$/', $mergedRangeB, $matchesB);
-                if ($matchesB[1] == $startRowA && $matchesB[2] == $endRowA) {
-                    $tipo = trim($worksheet->getCell("B{$matchesB[1]}")->getValue());
-                    break;
-                }
+            // Verificar si hay un nombre de cliente válido
+            if (empty($clientName)) {
+                continue;
             }
 
-            foreach ($columnData['C'] as $mergedRangeC) {
-                preg_match('/^C(\d+):C(\d+)$/', $mergedRangeC, $matchesC);
-                if ($matchesC[1] == $startRowA && $matchesC[2] == $endRowA) {
-                    $dni = trim($worksheet->getCell("C{$matchesC[1]}")->getValue());
-                    break;
-                }
+            // Determinar el rango de filas para este cliente
+            $endRow = $getClientRowRange($row);
+
+            // Marcar filas como procesadas
+            for ($r = $row; $r <= $endRow; $r++) {
+                $processedRows[] = $r;
             }
 
-            foreach ($columnData['D'] as $mergedRangeD) {
-                preg_match('/^D(\d+):D(\d+)$/', $mergedRangeD, $matchesD);
-                if ($matchesD[1] == $startRowA && $matchesD[2] == $endRowA) {
-                    $telefono = trim($worksheet->getCell("D{$matchesD[1]}")->getValue());
-                    break;
-                }
-            }
-
-            // Crear el cliente
+            // Obtener datos básicos del cliente
             $client = [
-                'nombre' => $valueA,
-                'tipo' => $tipo,
-                'dni' => $dni,
-                'telefono' => $telefono,
+                'nombre' => $clientName,
+                'tipo' => $getCellValue('B', $row),
+                'dni' => $getCellValue('C', $row),
+                'telefono' => $getCellValue('D', $row),
                 'productos' => [],
             ];
 
-            // Procesar productos (filas dentro del rango del cliente)
-            for ($row = $startRowA; $row <= $endRowA; $row++) {
-                $producto = trim($worksheet->getCell("F{$row}")->getValue());
+            // Procesar productos dentro del rango del cliente
+            for ($productRow = $row; $productRow <= $endRow; $productRow++) {
+                $producto = $getCellValue('F', $productRow);
 
                 if (empty($producto)) {
                     continue;
                 }
 
-                // Obtener peso y cbm (manejar celdas combinadas)
-                $peso = $worksheet->getCell("T{$row}")->getValue();
-                $cbm = $worksheet->getCell("U{$row}")->getValue();
+                $cantidad = $getCellValue('N', $productRow);
+                $precioUnitario = $getCellValue('O', $productRow);
 
-                // Si están vacíos, buscar en los rangos combinados
-                foreach ($columnData['T'] as $mergedRangeT) {
-                    preg_match('/^T(\d+):T(\d+)$/', $mergedRangeT, $matchesT);
-                    if ($row >= $matchesT[1] && $row <= $matchesT[2]) {
-                        $peso = trim($worksheet->getCell("T{$matchesT[1]}")->getValue());
-                        break;
-                    }
-                }
+                // Solo agregar productos con datos esenciales
+                if (!empty($cantidad) && !empty($precioUnitario)) {
+                    $productoData = [
+                        'nombre' => $producto,
+                        'cantidad' => $cantidad,
+                        'precio_unitario' => $precioUnitario,
+                        'antidumping' => $getCellValue('P', $productRow) ?: 0,
+                        'valoracion' => $getCellValue('Q', $productRow) ?: 0,
+                        'ad_valorem' => $getCellValue('R', $productRow) ?: 0,
+                        'percepcion' => $getCellValue('S', $productRow) ?: 0.035,
+                        'peso' => $getCellValue('T', $productRow) ?: 0,
+                        'cbm' => $getCellValue('U', $productRow) ?: '',
+                    ];
 
-                foreach ($columnData['U'] as $mergedRangeU) {
-                    preg_match('/^U(\d+):U(\d+)$/', $mergedRangeU, $matchesU);
-                    if ($row >= $matchesU[1] && $row <= $matchesU[2]) {
-                        $cbm = trim($worksheet->getCell("U{$matchesU[1]}")->getValue());
-                        break;
-                    }
-                }
-
-                $productoData = [
-                    'nombre' => $producto,
-                    'cantidad' => trim($worksheet->getCell("N{$row}")->getValue()),
-                    'precio_unitario' => trim($worksheet->getCell("O{$row}")->getValue()),
-                    'antidumping' => trim($worksheet->getCell("P{$row}")->getValue()) ?: 0,
-                    'valoracion' => trim($worksheet->getCell("Q{$row}")->getValue()) ?: 0,
-                    'ad_valorem' => trim($worksheet->getCell("R{$row}")->getValue()) ?: 0,
-                    'percepcion' => trim($worksheet->getCell("S{$row}")->getValue()) ?: 0.035,
-                    'peso' => $peso ?: 0,
-                    'cbm' => $cbm ?: '',
-                ];
-
-                // Validar solo campos esenciales
-                if (!empty($productoData['cantidad']) && !empty($productoData['precio_unitario'])) {
-                    array_push($client['productos'], $productoData);
+                    $client['productos'][] = $productoData;
                 }
             }
 
             $clients[] = ['cliente' => $client];
         }
+
         return $clients;
     }
     public function getCotizacionFinalDocumentacionPagos($idContenedor)

@@ -934,8 +934,9 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[]     = $row->telefono;
 					$subdata[]     = $row->name;
 					$subdata[]     = $row->volumen_final;
-					$subdata[]     = $row->monto_final;
+					// $subdata[]     = $row->monto_final;
 					$subdata[]     = $row->fob_final;
+					$subdata[]     = $row->logistica_final;
 					$subdata[]     = $row->impuestos_final;
 					$subdata[]     = $row->tarifa_final;
 					//select for options C.FINAL,AJUSTADO,COTIZADO,PAGADO,SOBREPAGO
@@ -979,7 +980,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->documento;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;	
-					$subdata[] = "$".($row->monto_final+$row->impuestos_final);
+					$subdata[] = "$".($row->logistica_final+$row->impuestos_final);
 					$subdata[] =$row->total_pagos==0 ? "$0" : "$".  number_format($row->total_pagos, 2);
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
