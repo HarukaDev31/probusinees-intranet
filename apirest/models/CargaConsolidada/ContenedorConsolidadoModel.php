@@ -4547,6 +4547,51 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $CobroCell = $InitialColumn . '40';
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
             $cbmTotalProductos = $data['cliente']['productos'][0]['cbm'];
+
+            $tarifaValue = 0;
+            $cbmTotalProductos = round($cbmTotalProductos, 2);
+            if (trim(strtoupper($tipoCliente)) == "NUEVO") {
+                switch ($cbmTotalProductos) {
+                    case $cbmTotalProductos < 0.60:
+                        $tarifaValue = 280;
+                        break;
+                    case $cbmTotalProductos < 1.00:
+                        $tarifaValue = 375;
+                        break;
+                    case $cbmTotalProductos < 2.00:
+                        $tarifaValue = 375 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos < 3.00:
+                        $tarifaValue = 350 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos < 4.00:
+                        $tarifaValue = 325 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos >= 4.10:
+                        $tarifaValue = 300 * $cbmTotalProductos;
+                }
+            } else if (trim(strtoupper($tipoCliente)) == "ANTIGUO") {
+                switch ($cbmTotalProductos) {
+                    case $cbmTotalProductos < 0.60:
+                        $tarifaValue = 260;
+                        break;
+                    case $cbmTotalProductos < 1.00:
+                        $tarifaValue = 350;
+                        break;
+                    case $cbmTotalProductos < 2.00:
+                        $tarifaValue = 350 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos < 3.00:
+                        $tarifaValue = 325 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos < 4.00:
+                        $tarifaValue = 300 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos >= 4.10:
+                        $tarifaValue = 280 * $cbmTotalProductos;
+                }
+            }
+            $objPHPExcel->setActiveSheetIndex(2)->setCellValue($tarifaCellValue, $tarifaValue);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                 $InitialColumn . '14',
                 "=IF($CBMTotal<1, $tarifaCellValue*0.6, $tarifaCellValue*0.6*$CBMTotal)"
@@ -4812,8 +4857,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $objPHPExcel->getActiveSheet()->getStyle('F' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                 $objPHPExcel->getActiveSheet()->setCellValue('G' . $row, "='3'!" . $InitialColumn . 8);
                 $objPHPExcel->getActiveSheet()->setCellValue('J11', "='3'!" . $CBMTotal);
-                log_message("error", "CBM Total2: " . $CBMTotal);
-                log_message("error", "CBM Total Value2: " . $objPHPExcel->getActiveSheet()->getCell('J11')->getCalculatedValue());
                 //set currency format with dollar symbol
                 $objPHPExcel->getActiveSheet()->getStyle('G' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 $objPHPExcel->getActiveSheet()->setCellValue('I' . $row, "='3'!" . $InitialColumn . 46);
@@ -4885,7 +4928,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $objPHPExcel->getActiveSheet()->unmergeCells('B' . $lastRow . ':L' . $lastRow);
                 //merge b to e
                 $objPHPExcel->getActiveSheet()->mergeCells('B' . $lastRow . ':E' . $lastRow);
-
             }
             if ($notUsedDefaultRows >= 0) {
                 //unmerge c to e
@@ -4947,7 +4989,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $logistica = $sheet1->getCell('K30')->getCalculatedValue();
                 $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
             }
-       
+
             //merge c8:c9
             $objPHPExcel->getActiveSheet()->mergeCells('C8:C9');
             //center vertically and horizontally
@@ -5683,7 +5725,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     "✅ Pendiente de pago: $" . number_format($totalAPagar, 2) . "\n";
                 $this->sendMessage($message, null, 5);
                 $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
-                $this->sendMedia($pagosUrl, 'image/jpg',null, null, 7);
+                $this->sendMedia($pagosUrl, 'image/jpg', null, null, 7);
             }
             //if db error is diferent to 0 return false
             if ($this->db->error()['code'] != 0) {
@@ -5867,7 +5909,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 "impuestos" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2),
                 "montototal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K33')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2),
             ];
-            $i = $antidumping=="ANTIDUMPING"?37:36;
+            $i = $antidumping == "ANTIDUMPING" ? 37 : 36;
             $items = [];
             while ($objPHPExcel->getActiveSheet()->getCell('B' . $i)->getValue() != 'TOTAL') {
                 //add item to items array
@@ -5995,7 +6037,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 "impuestos" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K31')->getCalculatedValue(), 2),
                 "montototal" => $antidumping == "ANTIDUMPING" ? round($objPHPExcel->getActiveSheet()->getCell('K33')->getCalculatedValue(), 2) : round($objPHPExcel->getActiveSheet()->getCell('K32')->getCalculatedValue(), 2),
             ];
-            $i = $antidumping=="ANTIDUMPING"?37:36;
+            $i = $antidumping == "ANTIDUMPING" ? 37 : 36;
             $items = [];
             while ($objPHPExcel->getActiveSheet()->getCell('B' . $i)->getValue() != 'TOTAL') {
                 //add item to items array
