@@ -727,7 +727,7 @@ class ContenedorConsolidadoModel extends CI_Model
         try {
             $objPHPExcel = PHPExcel_IOFactory::load($cotizacion['tmp_name']);
             //DISABLE AUTOLOAD CALCULATIONS
-    
+
             //find sheet 1 and get cell b8 as nombre,cell b9 as documento,cell b10 as correo,cell b11 as telefono,i11 as volumen,e9 as fecha
             $sheet = $objPHPExcel->getSheet(0);
             $nombre = $sheet->getCell('B8')->getValue();
@@ -773,7 +773,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $fob = $sheet->getCell('J29')->getOldCalculatedValue();
                 $impuestos = $sheet->getCell('J31')->getOldCalculatedValue();
             }
-            $tarifa = $monto / (($volumen <= 0 ? 1 : $volumen)<1.00?1:($volumen <= 0 ? 1 : $volumen));
+            $tarifa = $monto / (($volumen <= 0 ? 1 : $volumen) < 1.00 ? 1 : ($volumen <= 0 ? 1 : $volumen));
             $peso = $sheet->getCell('I9')->getOldCalculatedValue();
             return [
                 'nombre' => $nombre,
@@ -1296,8 +1296,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 'status' => "success",
                 'message' => 'Cotización actualizada exitosamente.'
             ];
-
-         
         } catch (Exception $e) {
             // Limpiar archivo temporal en caso de error
             if (isset($tempFile) && file_exists($tempFile)) {
@@ -4592,8 +4590,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $this->load->library('zip');
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
-        $result = $this->db->select('id,tarifa,nombre,correo')
-            ->from($this->table_contenedor_cotizacion)
+        $result = $this->db->select('cc.id,cc.tarifa,cc.nombre,tc.id as id_tipo_cliente, tc.name as tipoCliente,cc.correo')
+            ->from($this->table_contenedor_cotizacion.' as cc')
+            ->join($this->table_contenedor_tipo_cliente.' as tc', 'cc.id_tipo_cliente = tc.id')
             ->where('id_contenedor', $idContainer)
             ->where('estado_cotizador', 'CONFIRMADO')
             ->where('estado_cliente IS NOT NULL');
@@ -4608,6 +4607,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     if ($this->isNameMatch($nombreCliente, $item->nombre)) {
                         $cliente['cliente']['tarifa'] = $item->tarifa;
                         $cliente['cliente']['correo'] = $item->correo;
+                        $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;
+                        $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
                         $cliente['id'] = $item->id;
                         break;
                     }
@@ -4620,7 +4621,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
         try {
             //log number of clients
-            log_message('error', 'Number of clients: ' . count($data));
             foreach ($data as $key => $value) {
                 $objPHPExcel = PHPExcel_IOFactory::load($templatePath);
 
@@ -4754,7 +4754,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $pesoTotal = $data['cliente']['productos'][0]['peso'];
 
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
-            $tipoCliente = trim($data['cliente']["tipo"]);
+            //         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;  $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
+                       
+            $tipoCliente = trim($data['cliente']["tipo_cliente"]);
+            log_message('error', 'Tipo Cliente: ' . $tipoCliente);
             $tipoClienteCell = $this->incrementColumn($InitialColumn, 3) . '6';
             $tipoClienteCellValue = $this->incrementColumn($InitialColumn, 3) . '7';
 
@@ -4830,16 +4833,16 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $tarifaValue = 375;
                         break;
                     case $cbmTotalProductos < 2.00:
-                        $tarifaValue = 375 * $cbmTotalProductos;
+                        $tarifaValue = 375;
                         break;
                     case $cbmTotalProductos < 3.00:
-                        $tarifaValue = 350 * $cbmTotalProductos;
+                        $tarifaValue = 350;
                         break;
                     case $cbmTotalProductos < 4.00:
-                        $tarifaValue = 325 * $cbmTotalProductos;
+                        $tarifaValue = 325;
                         break;
                     case $cbmTotalProductos >= 4.10:
-                        $tarifaValue = 300 * $cbmTotalProductos;
+                        $tarifaValue = 300;
                 }
             } else if (trim(strtoupper($tipoCliente)) == "ANTIGUO") {
                 switch ($cbmTotalProductos) {
@@ -4850,18 +4853,18 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $tarifaValue = 350;
                         break;
                     case $cbmTotalProductos < 2.00:
-                        $tarifaValue = 350 * $cbmTotalProductos;
+                        $tarifaValue = 350 ;
                         break;
                     case $cbmTotalProductos < 3.00:
-                        $tarifaValue = 325 * $cbmTotalProductos;
+                        $tarifaValue = 325 ;
                         break;
                     case $cbmTotalProductos < 4.00:
-                        $tarifaValue = 300 * $cbmTotalProductos;
+                        $tarifaValue = 300 ;
                         break;
                     case $cbmTotalProductos >= 4.10:
-                        $tarifaValue = 280 * $cbmTotalProductos;
+                        $tarifaValue = 280 ;
                 }
-            }else if(trim(strtoupper($tipoCliente)) == "SOCIO") {
+            } else if (trim(strtoupper($tipoCliente)) == "SOCIO") {
                 switch ($cbmTotalProductos) {
                     case $cbmTotalProductos < 0.60:
                         $tarifaValue = 250;
@@ -4870,16 +4873,16 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $tarifaValue = 250;
                         break;
                     case $cbmTotalProductos < 2.00:
-                        $tarifaValue = 250 * $cbmTotalProductos;
+                        $tarifaValue = 250 ;
                         break;
                     case $cbmTotalProductos < 3.00:
-                        $tarifaValue = 250 * $cbmTotalProductos;
+                        $tarifaValue = 250 ;
                         break;
                     case $cbmTotalProductos < 4.00:
-                        $tarifaValue = 250 * $cbmTotalProductos;
+                        $tarifaValue = 250 ;
                         break;
                     case $cbmTotalProductos >= 4.10:
-                        $tarifaValue = 250 * $cbmTotalProductos;
+                        $tarifaValue = 250 ;
                 }
             } else {
                 //default value
@@ -5361,21 +5364,21 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $impuestos = $sheet1->getCell('K31')->getCalculatedValue();
             }
             $objPHPExcel->setActiveSheetIndex(1);
-            $tarifaValue = $objPHPExcel->getActiveSheet()->getCell($tarifaCellValue)->getCalculatedValue();
+            // $tarifaValue = $objPHPExcel->getActiveSheet()->getCell($tarifaCellValue)->getCalculatedValue();
             $logistica = $cbmTotalProductos < 1.00 ? $tarifaValue : $cbmTotalProductos * $tarifaValue;
             $objWriter->save($excelFilePath);
             return [
                 //id_contenedor,id_tipo_cliente,nombre,documento,correo,whatsapp,volumen_final,monto_final,tarifa_final,estado=PENDIENTE
                 'id' => $data['id'],
                 'id_contenedor' => $idContenedor,
-                'id_tipo_cliente' => 1,
+                'id_tipo_cliente' => $data['cliente']['id_tipo_cliente'],
                 'nombre' => $data['cliente']['nombre'],
                 'documento' => $data['cliente']['dni'],
                 'correo' => $data['cliente']['correo'],
                 'whatsapp' => $data['cliente']['telefono'],
                 'volumen_final' => $data['cliente']['productos'][0]['cbm'],
                 'monto_final' => $montoFinal,
-                'tarifa_final' => $data['cliente']['tarifa'],
+                'tarifa_final' => $tarifaValue,
                 'impuestos_final' => $impuestos,
                 'logistica_final' => $logistica,
                 'fob_final' => $fob,
@@ -5388,6 +5391,23 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             log_message('error', $e->getMessage());
             return $objPHPExcel;
             throw $e;
+        }
+    }
+    public function getTipoByName($tipoCliente)
+    {
+        $tipoCliente = strtoupper($tipoCliente);
+
+        switch ($tipoCliente) {
+            case 'NUEVO':
+                return 1;
+            case 'ANTIGUO':
+                return 2;
+            case 'SOCIO':
+                return 3;
+            case "MANUAL":
+                return 4; // Default to particular if not found
+            default:
+                return 1; // Default to particular if not found
         }
     }
     public function getFinalCotizacionExcel($objPHPExcel, $data)
