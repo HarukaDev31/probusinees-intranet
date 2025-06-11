@@ -4884,9 +4884,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     case $cbmTotalProductos >= 4.10:
                         $tarifaValue = 250 ;
                 }
-            } else {
-                //default value
-                $tarifaValue = 0;
             }
 
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($tarifaCellValue, $tarifaValue);
@@ -7138,10 +7135,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
     private function normalizeString($string)
     {
-        // Convertir a minúsculas y quitar espacios al inicio y final
         $string = strtolower(trim($string));
-
-        // Mapa de caracteres con tildes a sus equivalentes sin tildes
         $accents = [
             'á' => 'a',
             'à' => 'a',
@@ -7172,7 +7166,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             'ū' => 'u',
             'ñ' => 'n',
             'ç' => 'c',
-            // Mayúsculas (por si acaso)
             'Á' => 'a',
             'À' => 'a',
             'Ä' => 'a',
