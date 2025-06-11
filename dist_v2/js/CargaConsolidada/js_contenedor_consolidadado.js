@@ -1258,33 +1258,33 @@ async function addPagosCoordination(idCotizacion, nombreCliente) {
 }
 
 function deletePagoCoordination(idPago) {
-	Swal.fire({
-		title: "¿Estás seguro?",
-		text: "Esta acción eliminará el pago.",
-		icon: "warning",
-		showCancelButton: true,
-		confirmButtonText: "Sí, eliminar",
-		cancelButtonText: "Cancelar"
-	}).then((result) => {
-		if (result.isConfirmed) {
-		$.ajax({
-			url: base_url + "CargaConsolidada/ContenedorConsolidado/deletePagoCoordination/" + idPago,
-			type: "POST",
-			success: function(response) {
-			const result = JSON.parse(response);
-			if (result.status == "success") {
-				Swal.fire("Eliminado!", result.message, "success");
-				tableCotizacionTrackingPagos.ajax.reload();
-        tableCotizacionPagos.ajax.reload();
-        tableClientesPagos.ajax.reload();
-			} else {
-				Swal.fire("Error!", result.message, "error");
-			}
-			}
-		});
-		}
-	});
-	}
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Esta acción eliminará el pago.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: base_url + "CargaConsolidada/ContenedorConsolidado/deletePagoCoordination/" + idPago,
+        type: "POST",
+        success: function (response) {
+          const result = JSON.parse(response);
+          if (result.status == "success") {
+            Swal.fire("Eliminado!", result.message, "success");
+            tableCotizacionTrackingPagos.ajax.reload();
+            tableCotizacionPagos.ajax.reload();
+            tableClientesPagos.ajax.reload();
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+        }
+      });
+    }
+  });
+}
 
 async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
   //show modal with table of pagos coordination
@@ -4805,6 +4805,46 @@ async function viewCotizacion(id) {
   $("#btn-guardar-cotizacion").hide();
   $("#btn-actualizar-cotizacion").show();
   idCotizacion = result.id;
+}
+async function refreshCotizacionFile(id) {
+  //swall confirm to refresh file
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡La información actual se reemplazara!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, actualizar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const formData = new FormData();
+      formData.append("id", id);
+      return fetch(
+        base_url +
+        "CargaConsolidada/ContenedorConsolidado/refreshCotizacionFile/" + id)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error al actualizar el archivo");
+          }
+        })
+        .then((result) => {
+          Swal.fire({
+            icon: "success",
+            title: "¡Archivo actualizado!",
+            text: "El archivo de cotización se ha actualizado correctamente.",
+          });
+          reloadTableCotizacion();
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error al actualizar",
+            text: error.message || "Hubo un problema al actualizar el archivo.",
+          });
+        });
+    }
+  })
+
 }
 async function uploadCotizacionFile(id) {
   //swall with input file

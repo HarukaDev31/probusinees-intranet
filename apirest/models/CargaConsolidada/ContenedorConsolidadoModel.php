@@ -726,6 +726,8 @@ class ContenedorConsolidadoModel extends CI_Model
     {
         try {
             $objPHPExcel = PHPExcel_IOFactory::load($cotizacion['tmp_name']);
+            //DISABLE AUTOLOAD CALCULATIONS
+    
             //find sheet 1 and get cell b8 as nombre,cell b9 as documento,cell b10 as correo,cell b11 as telefono,i11 as volumen,e9 as fecha
             $sheet = $objPHPExcel->getSheet(0);
             $nombre = $sheet->getCell('B8')->getValue();
@@ -741,8 +743,6 @@ class ContenedorConsolidadoModel extends CI_Model
             } else {
                 $fecha = $this->convertDateFormat($fecha);
             }
-
-            //get tipo cliente for e11
             $tipoCliente = $sheet->getCell('E11')->getValue();
             //find if exists in table contenedor_consolidado_tipo_cliente with name = $tipoCliente else create new and get id
             $idTipoCliente = $this->db->select('id')
@@ -756,16 +756,25 @@ class ContenedorConsolidadoModel extends CI_Model
                 $idTipoCliente = $idTipoCliente->row()->id;
             }
             if (trim($sheet->getCell('A23')->getValue()) == "ANTIDUMPING") {
-                $monto = $sheet->getCell('J31')->getCalculatedValue();
-                $fob = $sheet->getCell('J30')->getCalculatedValue();
-                $impuestos = $sheet->getCell('J32')->getCalculatedValue();
+                $monto = $sheet->getCell('J31')->getOldCalculatedValue();
+                $fob = $sheet->getCell('J30')->getOldCalculatedValue();
+                $impuestos = $sheet->getCell('J32')->getOldCalculatedValue();
+                //get j24 and j26
+                log_message('error', '20: ' . $sheet->getCell('J20')->getOldCalculatedValue());
+                log_message('error', '21: ' . $sheet->getCell('J21')->getOldCalculatedValue());
+                log_message('error', '22: ' . $sheet->getCell('J22')->getOldCalculatedValue());
+                log_message('error', '23: ' . $sheet->getCell('J23')->getOldCalculatedValue());
+
+                log_message('error', '24: ' . $sheet->getCell('J24')->getOldCalculatedValue());
+                log_message('error', '26: ' . $sheet->getCell('J26')->getOldCalculatedValue());
+                log_message('error', 'impuestos: ' . $impuestos);
             } else {
-                $monto = $sheet->getCell('J30')->getCalculatedValue();
-                $fob = $sheet->getCell('J29')->getCalculatedValue();
-                $impuestos = $sheet->getCell('J31')->getCalculatedValue();
+                $monto = $sheet->getCell('J30')->getOldCalculatedValue();
+                $fob = $sheet->getCell('J29')->getOldCalculatedValue();
+                $impuestos = $sheet->getCell('J31')->getOldCalculatedValue();
             }
-            $tarifa = $monto / ($volumen <= 0 ? 1 : $volumen);
-            $peso = $sheet->getCell('I9')->getCalculatedValue();
+            $tarifa = $monto / (($volumen <= 0 ? 1 : $volumen)<1.00?1:($volumen <= 0 ? 1 : $volumen));
+            $peso = $sheet->getCell('I9')->getOldCalculatedValue();
             return [
                 'nombre' => $nombre,
                 'documento' => $documento,
@@ -1181,6 +1190,268 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             ];
         }
     }
+    public function refreshCotizacionFile($id)
+    {
+        log_message('error', 'Refresh cotizacion file with id: ' . $id);
+
+        // Obtener información de la cotización
+        $this->db->select('cotizacion_file_url,id_contenedor')
+            ->from($this->table_contenedor_cotizacion)
+            ->where('id', $id);
+        $query = $this->db->get();
+
+        if (!$query || $query->num_rows() == 0) {
+            return [
+                'status' => "error",
+                'message' => 'No se encontró la cotización con el ID proporcionado.'
+            ];
+        }
+
+        $row = $query->row();
+        $fileUrl = $row->cotizacion_file_url;
+
+        if (!$fileUrl) {
+            return [
+                'status' => "error",
+                'message' => 'No se encontró la URL del archivo de cotización.'
+            ];
+        }
+
+        log_message('info', 'Procesando archivo: ' . $fileUrl);
+
+        // Intentar leer el archivo desde diferentes ubicaciones
+        $fileContents = $this->readFileFromMultipleSources($fileUrl);
+
+        if ($fileContents === false || $fileContents === null || strlen($fileContents) == 0) {
+            log_message('error', 'No se pudo leer el archivo de cotización desde ninguna fuente: ' . $fileUrl);
+            return [
+                'status' => "error",
+                'message' => 'El archivo de cotización no existe o no se puede leer.'
+            ];
+        }
+
+        // Crear archivo temporal con extensión correcta
+        $originalExtension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+        $tempFile = sys_get_temp_dir() . '/' . uniqid('cotizacion_', true) . '.' . $originalExtension;
+
+        log_message('info', 'Creando archivo temporal: ' . $tempFile);
+
+        $bytesWritten = file_put_contents($tempFile, $fileContents);
+        if ($bytesWritten === false) {
+            log_message('error', 'No se pudo crear el archivo temporal: ' . $tempFile);
+            return [
+                'status' => "error",
+                'message' => 'Error al crear archivo temporal.'
+            ];
+        }
+
+        log_message('info', 'Archivo temporal creado exitosamente. Tamaño: ' . $bytesWritten . ' bytes');
+
+        // Verificar que el archivo temporal existe y es accesible
+        if (!file_exists($tempFile) || !is_readable($tempFile)) {
+            log_message('error', 'El archivo temporal no es accesible: ' . $tempFile);
+            return [
+                'status' => "error",
+                'message' => 'El archivo temporal no es accesible.'
+            ];
+        }
+
+        // Preparar datos para las funciones de procesamiento
+        $cotizacionFile = [
+            'tmp_name' => $tempFile,
+            'name' => basename($fileUrl),
+            'size' => $bytesWritten,
+            'type' => $this->getMimeType($originalExtension)
+        ];
+
+        // Deshabilitar verificación de claves foráneas
+        $this->db->query('SET FOREIGN_KEY_CHECKS = 0');
+
+        try {
+            // Procesar el contenido del archivo
+            $dataToInsert = $this->getCotizacionData($cotizacionFile);
+
+            if (!$dataToInsert) {
+                throw new Exception('No se pudieron extraer datos del archivo de cotización');
+            }
+
+            log_message('info', 'Datos extraídos del archivo: ' . json_encode($dataToInsert));
+
+            // Actualizar la cotización principal
+            $this->db->where('id', $id);
+            $this->db->update($this->table_contenedor_cotizacion, $dataToInsert);
+
+            if ($this->db->error()['code'] != 0) {
+                throw new Exception('Error al actualizar cotización: ' . $this->db->error()['message']);
+            }
+
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+                log_message('info', 'Archivo temporal eliminado: ' . $tempFile);
+            }
+
+            // Rehabilitar verificación de claves foráneas
+            $this->db->query('SET FOREIGN_KEY_CHECKS = 1');
+            return [
+                'status' => "success",
+                'message' => 'Cotización actualizada exitosamente.'
+            ];
+
+         
+        } catch (Exception $e) {
+            // Limpiar archivo temporal en caso de error
+            if (isset($tempFile) && file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+
+            // Rehabilitar verificación de claves foráneas en caso de error
+            $this->db->query('SET FOREIGN_KEY_CHECKS = 1');
+            log_message('error', 'Error en refreshCotizacionFile: ' . $e->getMessage());
+            return [
+                'status' => "error",
+                'message' => 'Error al procesar la cotización: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Intenta leer un archivo desde múltiples fuentes (local, servidor, URL)
+     */
+    private function readFileFromMultipleSources($fileUrl)
+    {
+        log_message('error', 'Intentando leer archivo: ' . $fileUrl);
+
+        // 1. Intentar leer como ruta absoluta (servidor)
+        if (file_exists($fileUrl)) {
+            log_message('error', 'Leyendo archivo desde ruta absoluta: ' . $fileUrl);
+            $content = file_get_contents($fileUrl);
+            if ($content !== false) {
+                log_message('error', 'Archivo leído exitosamente, tamaño: ' . strlen($content) . ' bytes');
+                return $content;
+            }
+        }
+
+        // 2. Intentar leer desde el directorio base de la aplicación (local)
+        $localPath = FCPATH . ltrim($fileUrl, '/');
+        if (file_exists($localPath)) {
+            log_message('error', 'Leyendo archivo desde ruta local: ' . $localPath);
+            $content = file_get_contents($localPath);
+            if ($content !== false) {
+                log_message('error', 'Archivo leído exitosamente, tamaño: ' . strlen($content) . ' bytes');
+                return $content;
+            }
+        }
+
+        // 3. Intentar leer desde el directorio de uploads común
+        $uploadsPath = FCPATH . 'uploads/' . basename($fileUrl);
+        if (file_exists($uploadsPath)) {
+            log_message('error', 'Leyendo archivo desde uploads: ' . $uploadsPath);
+            $content = file_get_contents($uploadsPath);
+            if ($content !== false) {
+                log_message('error', 'Archivo leído exitosamente, tamaño: ' . strlen($content) . ' bytes');
+                return $content;
+            }
+        }
+
+        // 4. Si parece ser una URL, intentar leer remotamente
+        if (filter_var($fileUrl, FILTER_VALIDATE_URL)) {
+            log_message('error', 'Intentando leer archivo remoto: ' . $fileUrl);
+
+            // Método 1: file_get_contents con contexto
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 60,
+                    'method' => 'GET',
+                    'header' => [
+                        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        'Accept: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,*/*',
+                        'Accept-Language: es-ES,es;q=0.9,en;q=0.8',
+                        'Cache-Control: no-cache'
+                    ],
+                    'follow_location' => true,
+                    'max_redirects' => 5
+                ],
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false
+                ]
+            ]);
+
+            $content = @file_get_contents($fileUrl, false, $context);
+            if ($content !== false && strlen($content) > 0) {
+                log_message('error', 'Archivo remoto leído exitosamente con file_get_contents, tamaño: ' . strlen($content) . ' bytes');
+                return $content;
+            }
+
+            // Método 2: cURL como fallback
+            if (function_exists('curl_init')) {
+                log_message('error', 'Intentando con cURL...');
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $fileUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Accept: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,*/*',
+                    'Accept-Language: es-ES,es;q=0.9,en;q=0.8',
+                    'Cache-Control: no-cache'
+                ]);
+
+                $content = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $error = curl_error($ch);
+                curl_close($ch);
+
+                if ($content !== false && $httpCode == 200 && strlen($content) > 0) {
+                    log_message('error', 'Archivo remoto leído exitosamente con cURL, tamaño: ' . strlen($content) . ' bytes');
+                    return $content;
+                } else {
+                    log_message('error', 'Error cURL: ' . $error . ', HTTP Code: ' . $httpCode);
+                }
+            }
+        }
+
+        // 5. Intentar con diferentes variaciones de ruta
+        $possiblePaths = [
+            APPPATH . '../' . $fileUrl,
+            APPPATH . $fileUrl,
+            dirname($_SERVER['SCRIPT_FILENAME']) . '/' . $fileUrl,
+            $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($fileUrl, '/')
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                log_message('error', 'Leyendo archivo desde ruta alternativa: ' . $path);
+                $content = file_get_contents($path);
+                if ($content !== false) {
+                    log_message('error', 'Archivo leído exitosamente, tamaño: ' . strlen($content) . ' bytes');
+                    return $content;
+                }
+            }
+        }
+
+        log_message('error', 'No se pudo encontrar el archivo en ninguna ubicación: ' . $fileUrl);
+        return false;
+    }
+
+    /**
+     * Obtiene el tipo MIME basado en la extensión del archivo
+     */
+    private function getMimeType($extension)
+    {
+        $mimeTypes = [
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xlsm' => 'application/vnd.ms-excel.sheet.macroEnabled.12',
+            'xls' => 'application/vnd.ms-excel',
+            'csv' => 'text/csv'
+        ];
+
+        return isset($mimeTypes[strtolower($extension)]) ? $mimeTypes[strtolower($extension)] : 'application/octet-stream';
+    }
+
     public function uploadCotizacionFile($id, $file)
     {
         try {
@@ -4548,7 +4819,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
             $cbmTotalProductos = $data['cliente']['productos'][0]['cbm'];
 
-            $tarifaValue = 0;
+            $tarifaValue = $tarifa;
             $cbmTotalProductos = round($cbmTotalProductos, 2);
             if (trim(strtoupper($tipoCliente)) == "NUEVO") {
                 switch ($cbmTotalProductos) {
@@ -4590,7 +4861,31 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     case $cbmTotalProductos >= 4.10:
                         $tarifaValue = 280 * $cbmTotalProductos;
                 }
+            }else if(trim(strtoupper($tipoCliente)) == "SOCIO") {
+                switch ($cbmTotalProductos) {
+                    case $cbmTotalProductos < 0.60:
+                        $tarifaValue = 250;
+                        break;
+                    case $cbmTotalProductos < 1.00:
+                        $tarifaValue = 250;
+                        break;
+                    case $cbmTotalProductos < 2.00:
+                        $tarifaValue = 250 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos < 3.00:
+                        $tarifaValue = 250 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos < 4.00:
+                        $tarifaValue = 250 * $cbmTotalProductos;
+                        break;
+                    case $cbmTotalProductos >= 4.10:
+                        $tarifaValue = 250 * $cbmTotalProductos;
+                }
+            } else {
+                //default value
+                $tarifaValue = 0;
             }
+
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($tarifaCellValue, $tarifaValue);
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue(
                 $InitialColumn . '14',
