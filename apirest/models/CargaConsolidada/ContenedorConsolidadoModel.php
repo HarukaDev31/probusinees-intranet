@@ -890,8 +890,8 @@ class ContenedorConsolidadoModel extends CI_Model
                     }
                     // Agrega los datos del proveedor
                     $proveedores[] = [
-                        'qty_box' => $sheet2->getCell($columnStart . $rowCajasProveedor)->getValue(),
-                        'peso' => $sheet2->getCell($columnStart . $rowPesoProveedor)->getValue(),
+                        'qty_box' => $sheet2->getCell($columnStart . $rowCajasProveedor)->getOldCalculatedValue(),
+                        'peso' => $sheet2->getCell($columnStart . $rowPesoProveedor)->getOldCalculatedValue(),
                         'cbm_total' => $sheet2->getCell($columnStart . $rowVolProveedor)->getOldCalculatedValue(),
                         'id_cotizacion' => $data->id_cotizacion,
                         'id_contenedor' => $data->id_contenedor,
