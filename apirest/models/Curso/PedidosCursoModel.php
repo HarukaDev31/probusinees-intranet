@@ -531,6 +531,8 @@ class PedidosCursoModel extends CI_Model
 	public function saveClientePagosCurso($voucher, $idPedido, $amount, $fecha, $banco)
 	{
 		try {
+			$this->maxFileSize = 1000000;
+			$this->setAllowedExtensionsImagesOfficeFiles();
 			$voucherUrl = $this->uploadSingleFile(
 				[
 					"name" => $voucher['name'],
