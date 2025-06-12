@@ -28,7 +28,14 @@ $(function () {
   });
 })
 
-function ParseDateString(fecha, tipo_fecha, caracter){
+function ParseDateString(fecha, tipo_fecha="fecha", caracter="/"){
+  if(typeof tipo_fecha === 'undefined' || tipo_fecha == null || tipo_fecha == '') {
+    tipo_fecha = 'fecha';
+  }
+  if(typeof caracter === 'undefined' || caracter == null || caracter == '') {
+    caracter = '/';
+  }
+  console.log("ParseDateString: ", fecha, tipo_fecha, caracter);
   if (tipo_fecha == 'fecha_bd') {// Caracter -> (-) y formato de fecha BD (YYY-MM-DD)
     var _FE = fecha.split(caracter);
     return _FE[2] + '/' + _FE[1] + '/' + _FE[0];

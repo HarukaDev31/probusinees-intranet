@@ -164,7 +164,7 @@ $(function () {
   tableCursoPedidos = $("#table-curso-pedidos");
   $(".tab-curso").removeClass("active");
   $(".tab-curso").off("click").click(async function () {
-    await getCursosHeader();
+ 
     $(".tab-curso").removeClass("active");
     $("#table-curso-pagos_wrapper").hide();
     $("#table-curso-variacion_wrapper").hide();
@@ -1155,23 +1155,21 @@ $(document).on('change', 'select[name="ID_Campana"]', function () {
 
 async function getCursosHeader() {
   const formData = new FormData();
-  formData.append("Filtro_Fe_Inicio", ParseDateString($('#txt-Fe_Inicio_Carga').val() == "" ?
+  formData.append("Filtro_Fe_Inicio",$('#txt-Fe_Inicio').val() == ""|| typeof $('#txt-Fe_Inicio').val() === 'undefined' ?
     //fin inicio 2 meses antes
     new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
     })
-    : $('#txt-Fe_Inicio_Carga').val(), 'fecha', '/'),
-  );
-  formData.append("Filtro_Fe_Fin", ParseDateString($('#txt-Fe_Fin').val() == "" ?
+    : $('#txt-Fe_Inicio').val());
+  formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == ""|| typeof $('#txt-Fe_Fin').val() === 'undefined' ?
     new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
     })
-    : $('#txt-Fe_Fin').val(), 'fecha', '/'),
-  );
+    : $('#txt-Fe_Fin').val());
   const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
     method: "POST",
     body: formData
