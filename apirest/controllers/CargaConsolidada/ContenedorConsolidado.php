@@ -788,7 +788,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $select_status;
 					}
 					if ($this->user->No_Grupo == "Coordinación") {
-						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes($row->nombre) . '\')">
+						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 						</div>' .
 							'<div class="d-flex" onclick="deleteCliente(' . $row->id_cotizacion . ')">
@@ -796,7 +796,7 @@ class ContenedorConsolidado extends CI_Controller
 							</div></div>';
 						$subdata[] = $divAcciones;
 					} else {
-						$btnView = '<div onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes($row->nombre) . '\')">
+						$btnView = '<div onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
 
 					<i class="fas fa-eye" style="cursor:pointer;"></i>
 					</div>';
