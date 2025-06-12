@@ -892,7 +892,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     $proveedores[] = [
                         'qty_box' => $sheet2->getCell($columnStart . $rowCajasProveedor)->getValue(),
                         'peso' => $sheet2->getCell($columnStart . $rowPesoProveedor)->getValue(),
-                        'cbm_total' => $sheet2->getCell($columnStart . $rowVolProveedor)->getValue(),
+                        'cbm_total' => $sheet2->getCell($columnStart . $rowVolProveedor)->getOldCalculatedValue(),
                         'id_cotizacion' => $data->id_cotizacion,
                         'id_contenedor' => $data->id_contenedor,
                         'code_supplier' => $codeSupplier,
@@ -6037,9 +6037,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     "✅ Pendiente de pago: $" . number_format($totalAPagar, 2) . "\n";
                 $this->sendMessage($message, null, 5);
                 $pagosUrl = base_url('assets/downloads/pagos-full.jpg');
-                $this->sendMedia($pagosUrl, 'image/jpg', null, null, 7);
+                $this->sendMedia($pagosUrl, 'image/jpg', null, null, 10);
             }
-            //if db error is diferent to 0 return false
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error en updateEstadoCotizacionFinal: ' . $this->db->error()['message']);
                 return false;
