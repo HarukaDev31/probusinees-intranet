@@ -187,17 +187,13 @@ class PedidosCurso extends CI_Controller
                 $subdata[] = $row->No_Entidad;
                 $subdata[] = $row->No_Tipo_Documento_Identidad_Breve . ": " . $row->Nu_Documento_Identidad;
                 $subdata[] = $row->Nu_Celular_Entidad;
-                $subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" readonly/>';    //importe		
+                $subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" class="w-75" readonly/>';    //importe		
                 $subdata[] = "S/" . round($row->total_pagos, 2);
                 //if pagos_count is minor than 4 add button plus to add new payment
                 $divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
 
-                $divAcciones .= '<div class="d-flex"  onclick="addPagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
-                if ($this->input->post('campana') != "0" && !empty($this->input->post('campana'))) {
-                    if ($row->ID_Campana != $this->input->post('campana')) {
-                        continue;
-                    }
-                }
+                $divAcciones .= '<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+
                 if ($row->pagos_count > 0) {
                     $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->nombre)) . '\')">
 					<i class="fas fa-eye text-primary" style="cursor:pointer;"></i>	
@@ -673,6 +669,7 @@ class PedidosCurso extends CI_Controller
             exit();
         }
     }
+
     public function actualizarDatosCliente()
     {
         $id_entidad = $this->input->post('ID_Entidad');

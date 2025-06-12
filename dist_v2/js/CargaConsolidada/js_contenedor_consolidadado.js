@@ -7973,11 +7973,14 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
     const selectFileButton = container.querySelector(selectInputId);
 
     if (selectFileButton) {
-      // Abrir el diálogo de selección de archivos al hacer clic en el botón
-      selectFileButton.addEventListener('click', (e) => {
+      // Elimina cualquier listener anterior para evitar duplicados
+      selectFileButton.removeEventListener('click', selectFileButton._uploadClickHandler);
+      // Crea y guarda el handler en la propiedad del botón
+      selectFileButton._uploadClickHandler = function(e) {
         e.preventDefault();
         fileInput.click();
-      });
+      };
+      selectFileButton.addEventListener('click', selectFileButton._uploadClickHandler);
     }
 
     // Mostrar la información del archivo seleccionado
