@@ -247,9 +247,7 @@
         }
         public function sendMediaInspection($filePath, $mimeType = null, $message = null, $phoneNumberId = null,$sleep=0,$inspection_id=null) {
             $phoneNumberId= $phoneNumberId ? $phoneNumberId : $this->phoneNumberId;
-
             $fileContent = base64_encode(file_get_contents($filePath));
-            
             return $this->_callApi('/media-inspection', [
                 'fileContent' => $fileContent,
                 'fileName' => basename($filePath),

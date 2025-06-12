@@ -7,6 +7,7 @@ class AdministracionModel extends CI_Model
     private $table_cursos_pagos_conceptos = "pedido_curso_pagos_concept";
     private $table_consolidado = "carga_consolidada_contenedor";
     private $table_consolidado_cotizacion = "contenedor_consolidado_cotizacion";
+    private $table_consolidado_cotizacion_providers = "contenedor_consolidado_cotizacion_proveedores";
     private $CONCEPT_PAGO_LOGISTICA = 1; // Assuming this is the ID for "LOGISTICA" concept
     private $CONCEPT_PAGO_IMPUESTOS = 2; // Assuming this is the ID for "IMPUESTOS" concept
     private $table_curso = 'pedido_curso';
@@ -34,31 +35,47 @@ class AdministracionModel extends CI_Model
     {
         $this->db->select(
             $this->table_consolidado_cotizacion . '.*, 
-            COUNT(CASE WHEN ' . $this->table_consolidado_pagos_concept . '.name = "LOGISTICA" OR ' . $this->table_consolidado_pagos_concept . '.name = "IMPUESTOS" THEN ' . $this->table_consolidado_pagos . '.id END) as total_pagos,
-            ' . $this->table_consolidado . '.id as id_consolidado, 
-            ' . $this->table_consolidado . '.carga as carga,
-            SUM(CASE WHEN ' . $this->table_consolidado_pagos_concept . '.name = "LOGISTICA" OR ' . $this->table_consolidado_pagos_concept . '.name = "IMPUESTOS" THEN ' . $this->table_consolidado_pagos . '.monto ELSE 0 END) as total_pagos_monto'
+        ' . $this->table_consolidado . '.id as id_consolidado, 
+        ' . $this->table_consolidado . '.carga as carga,
+        (
+            SELECT COUNT(*)
+            FROM ' . $this->table_consolidado_pagos . ' as ccp
+            JOIN ' . $this->table_consolidado_pagos_concept . ' as ccpc ON ccp.id_concept = ccpc.id
+            WHERE ccp.id_cotizacion = ' . $this->table_consolidado_cotizacion . '.id
+            AND (ccpc.name = "LOGISTICA" OR ccpc.name = "IMPUESTOS")
+        ) AS total_pagos,
+        (
+            SELECT IFNULL(SUM(ccp.monto), 0)
+            FROM ' . $this->table_consolidado_pagos . ' as ccp
+            JOIN ' . $this->table_consolidado_pagos_concept . ' as ccpc ON ccp.id_concept = ccpc.id
+            WHERE ccp.id_cotizacion = ' . $this->table_consolidado_cotizacion . '.id
+            AND (ccpc.name = "LOGISTICA" OR ccpc.name = "IMPUESTOS")
+        ) AS total_pagos_monto,
+        (SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                "id_pago", ccp2.id,
+                "monto", ccp2.monto,
+                "concepto", ccpc2.name,
+                "status", ccp2.status,
+                "payment_date", ccp2.payment_date
+            )   
+        ) FROM ' . $this->table_consolidado_pagos . ' as ccp2
+        LEFT JOIN ' . $this->table_consolidado_pagos_concept . ' as ccpc2 ON ccp2.id_concept = ccpc2.id
+        WHERE ccp2.id_cotizacion = ' . $this->table_consolidado_cotizacion . '.id 
+        AND (ccp2.id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . ' 
+        OR ccp2.id_concept = ' . intval($this->CONCEPT_PAGO_IMPUESTOS) . ')
+        ) as pagos_details'
         );
 
         $this->db->from($this->table_consolidado_cotizacion);
-
-        $this->db->join(
-            $this->table_consolidado_pagos,
-            $this->table_consolidado_pagos . '.id_cotizacion = ' . $this->table_consolidado_cotizacion . '.id',
-            'left'
-        );
-
-        $this->db->join(
-            $this->table_consolidado_pagos_concept,
-            $this->table_consolidado_pagos_concept . '.id = ' . $this->table_consolidado_pagos . '.id_concept',
-            'left'
-        );
 
         $this->db->join(
             $this->table_consolidado,
             $this->table_consolidado . '.id = ' . $this->table_consolidado_cotizacion . '.id_contenedor',
             'inner'
         );
+
+        // Filtros de fecha
         if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
             $this->db->where($this->table_consolidado_cotizacion . '.fecha >=', $this->input->post('Filtro_Fe_Inicio'));
         }
@@ -66,11 +83,38 @@ class AdministracionModel extends CI_Model
         if (!empty($this->input->post('Filtro_Fe_Fin'))) {
             $this->db->where($this->table_consolidado_cotizacion . '.fecha <=', $this->input->post('Filtro_Fe_Fin'));
         }
-        $this->db->where($this->table_consolidado_cotizacion . '.id IN (SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . ' WHERE id_concept = ' . $this->CONCEPT_PAGO_LOGISTICA . ' OR id_concept = ' . $this->CONCEPT_PAGO_IMPUESTOS . ')');
-        $this->db->group_by($this->table_consolidado_cotizacion . '.id');
+
+        //start or where group
+        $this->db->where($this->table_consolidado_cotizacion . '.id IN (
+        SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . ' 
+        WHERE id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . ' 
+        OR id_concept = ' . intval($this->CONCEPT_PAGO_IMPUESTOS) . '
+        )');
+        //or where estado_cliente != null
+        $this->db->or_where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
 
 
-        return $this->db->get()->result();
+
+
+        // Filtros opcionales adicionales si los necesitas
+        if (!empty($this->input->post('estado'))) {
+            $this->db->where($this->table_consolidado_cotizacion . '.estado', $this->input->post('estado'));
+        }
+
+        if (isset($this->order)) {
+            $order = $this->order;
+            $this->db->order_by(key($order), $order[key($order)]);
+        }
+
+        $query = $this->db->get();
+
+        // Verificar si la query fue exitosa
+        if (!$query) {
+            log_message('error', 'Error en query getConsolidadoPagos: ' . $this->db->error()['message']);
+            return [];
+        }
+
+        return $query->result();
     }
     public function getHeadersConsolidado()
     {
@@ -116,6 +160,7 @@ class AdministracionModel extends CI_Model
         }
 
         $this->db->where($this->table_consolidado_cotizacion . '.id IN (SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . ' WHERE id_concept = ' . $this->CONCEPT_PAGO_LOGISTICA . ' OR id_concept = ' . $this->CONCEPT_PAGO_IMPUESTOS . ')');
+        $this->db->or_where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
 
 
         $result = $this->db->get()->row_array();
@@ -184,7 +229,19 @@ class AdministracionModel extends CI_Model
         JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept = ccp.id
         WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso
         AND (ccp.name = 'ADELANTO')
-    ) AS total_pagos"
+    ) AS total_pagos,
+    (SELECT JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'id_pago', cccp2.id,
+            'monto', cccp2.monto,
+            'status', cccp2.status
+         
+        )   
+    ) FROM pedido_curso_pagos as cccp2
+    where cccp2.id_pedido_curso = CC.ID_Pedido_Curso 
+    and cccp2.id_concept = " . $this->CONCEPT_PAGO_ADELANTO_CURSO . "   
+    ) as pagos_details,
+    "
         );
 
         $this->db->from($this->table_curso . ' AS CC');
@@ -202,10 +259,6 @@ class AdministracionModel extends CI_Model
 
         $this->db->where('CC.ID_Pedido_Curso IN (SELECT id_pedido_curso FROM pedido_curso_pagos WHERE id_concept = ' . $this->CONCEPT_PAGO_ADELANTO_CURSO . ')');
 
-        // Filtros opcionales
-        if (!empty($this->input->post('estado_pago'))) {
-            $this->db->where("CC.Nu_Estado", $this->input->post('estado_pago'));
-        }
 
         if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
             $this->db->where('CC.Fe_Emision >=', $this->input->post('Filtro_Fe_Inicio'));
@@ -249,6 +302,7 @@ class AdministracionModel extends CI_Model
             'total_importe' => $result['total'] ?? 0,
         ];
     }
+
     public function getPagosCurso($idPedidoCurso)
     {
         try {
@@ -390,12 +444,12 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
-    public function handlePayment($idPago, $isConfirmed)
+    public function handlePayment($idPago, $status)
     {
         try {
-            log_message("error", "handlePayment: idPago: $idPago, isConfirmed: $isConfirmed");
+            log_message("error", "handlePayment: idPago: $idPago, status: $status");
             $this->db->where('id', $idPago);
-            $this->db->update($this->table_consolidado_pagos, ['is_confirmed' => $isConfirmed]);
+            $this->db->update($this->table_consolidado_pagos, ['status' => $status]);
             return [
                 'status' => "success",
                 'message' => 'Pago actualizado correctamente'
@@ -408,12 +462,12 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
-    public function handlePaymentCurso($idPagoCurso, $isConfirmed)
+    public function handlePaymentCurso($idPagoCurso, $status)
     {
         try {
-            log_message("error", "handlePaymentCurso: idPagoCurso: $idPagoCurso, isConfirmed: $isConfirmed");
+            log_message("error", "handlePaymentCurso: idPagoCurso: $idPagoCurso, status: $status");
             $this->db->where('id', $idPagoCurso);
-            $this->db->update($this->table_pedido_curso_pagos, ['is_confirmed' => $isConfirmed]);
+            $this->db->update($this->table_pedido_curso_pagos, ['status' => $status]);
             return [
                 'status' => "success",
                 'message' => 'Pago del curso actualizado correctamente'

@@ -21,7 +21,12 @@ $SectionNames = [
     "Cotizados" => "Cotizados",
     "Seleccionados" => "Seleccionados"
   ]
-]
+];
+$rolesViewFeatures = [
+  "Coordinación",
+  "Documentacion",
+  "Cotizador",
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -276,8 +281,8 @@ $SectionNames = [
                 $menu_padre = $menu_padre[0];
                 //get current url window
                 $current_url = explode('/', $this->router->class);
-             
-                
+
+
                 $No_Class_Li_Padre = "nav-item";
                 $No_Class_A_Padre_Active = "";
                 $childrens = array_filter($arrMenuPadre->Hijos, function ($child) use ($arrMenuPadre) {
@@ -302,13 +307,12 @@ $SectionNames = [
                 }
               ?>
                 <li class="<?php echo $No_Class_Li_Padre; ?>">
-                  <?php if ($arrMenuPadre->ID_Padre == 0 && $arrMenuPadre->show_father==1) { ?>
+                  <?php if ($arrMenuPadre->ID_Padre == 0 && $arrMenuPadre->show_father == 1) { ?>
                     <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
                       <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
                       <p>&nbsp;<?php
                                 if ($this->user->No_Grupo == 'ContenedorAlmacen') {
-                                  echo $arrMenuPadre->No_Menu_China ;
-
+                                  echo $arrMenuPadre->No_Menu_China;
                                 } else {
                                   echo $arrMenuPadre->No_Menu;
                                 } ?>
@@ -370,19 +374,18 @@ $SectionNames = [
                         endforeach; ?>
                       </ul>
                     <?php endif; ?>
-                  <?php } else if($arrMenuPadre->ID_Padre == 0 && $arrMenuPadre->show_father==0) { ?>
+                  <?php } else if ($arrMenuPadre->ID_Padre == 0 && $arrMenuPadre->show_father == 0) { ?>
                     <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
                       <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
                       <p>&nbsp;<?php
                                 if ($this->user->No_Grupo == 'ContenedorAlmacen') {
-                                  echo $arrMenuPadre->No_Menu_China ;
-
+                                  echo $arrMenuPadre->No_Menu_China;
                                 } else {
                                   echo $arrMenuPadre->No_Menu;
                                 } ?>
                       </p>
                     </a>
-                    <?php } ?>
+                  <?php } ?>
                 </li>
               <?php endforeach; ?>
               <?php if ($this->user->No_Grupo == 'Coordinacion') { ?>
@@ -395,7 +398,7 @@ $SectionNames = [
               <?php } ?>
             </ul>
           </nav>
-          <?php if ($this->user->No_Grupo != 'ContenedorAlmacen' && $this->user->No_Grupo != 'CatalogoChina') { ?>
+          <?php if (in_array($this->user->No_Grupo, $rolesViewFeatures)) { ?>
             <nav class="mt-2">
               <ul class="nav nav-pills nav-sidebar flex-column" data-widget="" role="settings" data-accordion="false">
                 <li class="nav-header">Preferencias</li>

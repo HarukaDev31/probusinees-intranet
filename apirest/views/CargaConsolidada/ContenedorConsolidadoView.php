@@ -1987,6 +1987,7 @@ Search for
                                 <th>Banco</th>
                                 <th>Monto</th>
                                 <th>Voucher</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                     </table>
@@ -2903,7 +2904,9 @@ div#table-clientes-general_filter,
 div#table-cotizacion-inspection_filter,
 div#table-cotizacion-inspection-coordinacion_filter,
 div#table-clientes-variacion_filter,
-div#table-cotizacion-prospectos_filter {
+div#table-cotizacion-prospectos_filter,
+div#table-cotizacion-pagos_filter,
+div#table-clientes-pagos_filter {
     display: none;
 }
 

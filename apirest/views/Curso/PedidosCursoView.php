@@ -27,72 +27,79 @@
                             aria-expanded="false">
                             <i class="fa fa-filter"></i>Filtros
                         </button>
-                        <!-- Menú Desplegable -->
+                        <!-- Menú Desplegable MAIN -->
                         <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
                             <div class="form-group">
                                 <div class="d-flex align-items-center p-2">
                                     <div class="d-flex" style="width:60%">Fecha Inicio</div>
                                     <div style="width: 200px;">
-                                        <input type="text" id="txt-Fe_Inicio_Carga"
-                                            class="form-control text-center input-date input-report required"
-                                            >
+                                        <input type="text" id="txt-Fe_Inicio"
+                                            class="form-control text-center input-date input-report required">
                                         <span class="help-block text-danger" id="error"></span>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center p-2">
                                     <div class="d-flex" style="width:60%">Fecha Fin</div>
                                     <div style="width: 200px;">
-                                        <input type="text" id="txt-Fe_Fin_Carga"
-                                            class="form-control input-date input-report required"
-                                           >
+                                        <input type="text" id="txt-Fe_Fin"
+                                            class="form-control input-date input-report required">
                                         <span class="help-block text-danger" id="error"></span>
                                     </div>
                                 </div>
                                 <?php if ($this->user->No_Grupo != "Coordinación") {  ?>
-                                <div class="d-flex align-items-center p-2" style="width:300px;">
-                                    <div class="d-flex" style="width:60%">Pago</div>
-                                    <div style="width: 200px;">
-                                        <select id="cbo-filtro-estado_pago" name="ID_Estado"
-                                            class="form-control input-estado">
-                                            <option value="0" selected>Todos</option>
-                                            <option value="pendiente">PENDIENTE</option>
-                                            <option value="adelanto">ADELANTO</option>
-                                            <option value="pagado">PAGADO</option>
-                                            <option value="sobrepagado">SOBREPAGADO</option>
-                                            <option value="constancia">CONSTANCIA</option>
-                                        </select>
+                                    <div class="d-flex align-items-center p-2" style="width:300px;">
+                                        <div class="d-flex" style="width:60%">Estado</div>
+                                        <div style="width: 200px;">
+                                            <select id="cbo-filtro-estado_pago" name="ID_Estado"
+                                                class="form-control input-estado">
+                                                <option value="0" selected>Todos</option>
+                                                <option value="pendiente">PENDIENTE</option>
+                                                <option value="adelanto">ADELANTO</option>
+                                                <option value="pagado">PAGADO</option>
+                                                <option value="sobrepagado">SOBREPAGADO</option>
+                                                <option value="constancia">CONSTANCIA</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
+                                    <div class="d-flex align-items-center p-2" style="width:300px;">
+                                        <div class="d-flex" style="width:60%">Campaña</div>
+                                        <div style="width: 200px;">
+                                            <select id="txt-ID_Campana_Curso" name="ID_Campana_Curso"
+                                                class="form-control input-estado">
+
+                                            </select>
+                                        </div>
+                                    </div>
                                 <?php } ?>
                                 <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
-                                <div class="d-flex align-items-center p-2" style="width:300px;">
-                                    <div class="d-flex" style="width:60%">Estado</div>
-                                    <div style="width: 200px;">
-                                        <select id="txt-ID_States_Cliente" name="ID_States_Cliente"
-                                            class="form-control input-estado">
-                                            <option value="0" selected>Todos</option>
-                                            <option value="ROTULADO">ROTULADO</option>
-                                            <option value="COBRANDO">COBRANDO</option>
-                                            <option value="DATOS PROVEEDOR">DATOS PROVEEDOR</option>
-                                        </select>
+                                    <div class="d-flex align-items-center p-2" style="width:300px;">
+                                        <div class="d-flex" style="width:60%">Estado</div>
+                                        <div style="width: 200px;">
+                                            <select id="txt-ID_States_Cliente" name="ID_States_Cliente"
+                                                class="form-control input-estado">
+                                                <option value="0" selected>Todos</option>
+                                                <option value="ROTULADO">ROTULADO</option>
+                                                <option value="COBRANDO">COBRANDO</option>
+                                                <option value="DATOS PROVEEDOR">DATOS PROVEEDOR</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="d-flex align-items-center p-2" style="width:300px;">
-                                    <div class="d-flex" style="width:60%">Status</div>
-                                    <div style="width: 200px;">
-                                        <select id="txt-ID_Estatus_Cotizacion" name="ID_Status"
-                                            class="form-control input-estado">
-                                            <option value="0" selected>Todos</option>
-                                            <option value="NC">NC</option>
-                                            <option value="C">C</option>
-                                            <option value="R">R</option>
-                                            <option value="NS">NS</option>
-                                            <option value="INSPECTION">INSPECTION</option>
-                                            <option value="LOADED">LOADED</option>
-                                            <option value="NO LOADED">NO LOADED</option>
-                                        </select>
+                                    <div class="d-flex align-items-center p-2" style="width:300px;">
+                                        <div class="d-flex" style="width:60%">Status</div>
+                                        <div style="width: 200px;">
+                                            <select id="txt-ID_Estatus_Cotizacion" name="ID_Status"
+                                                class="form-control input-estado">
+                                                <option value="0" selected>Todos</option>
+                                                <option value="NC">NC</option>
+                                                <option value="C">C</option>
+                                                <option value="R">R</option>
+                                                <option value="NS">NS</option>
+                                                <option value="INSPECTION">INSPECTION</option>
+                                                <option value="LOADED">LOADED</option>
+                                                <option value="NO LOADED">NO LOADED</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
                                 <?php } ?>
                             </div>
                             <div class="dropdown-divider"></div>
@@ -122,26 +129,6 @@
                 <div class="col-12">
                     <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
                         value="<?php echo $this->router->method; ?>">
-
-
-
-
-                    <div class="col-6 col-sm-3 hidden">
-                        <label>F. Inicio</label>
-                        <div class="form-group">
-                            <input type="text" id="txt-Fe_Inicio" class="form-control input-report required"
-                                value="<?php echo dateNow('month_date_ini_report'); ?>">
-                            <span class="help-block text-danger" id="error"></span>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-3 hidden">
-                        <label>F. Fin</label>
-                        <div class="form-group">
-                            <input type="text" id="txt-Fe_Fin" class="form-control input-report required"
-                                value="<?php echo dateNow('month_date_fin_report'); ?>">
-                            <span class="help-block text-danger" id="error"></span>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="flex col-xl-6">
                             <div data-table="alumnos"
@@ -166,7 +153,7 @@
                                     <th>Fecha</th>
                                     <th>Cliente</th>
                                     <th>Curso</th>
-                                    <th>Mes</th>
+                                    <th>Campaña</th>
                                     <th>Usuario</th>
                                     <th>Importe</th>
                                     <th>Estado</th>
@@ -469,77 +456,77 @@
         </div>
     </div>
 <style>
-* {
-    font-family: Epilogue;
-}
+    * {
+        font-family: Epilogue;
+    }
 
-#table-Pedidos_filter {
-    display: none;
-}
+    #table-Pedidos_filter {
+        display: none;
+    }
 
-.table.table-hover.dataTable.no-footer tbody {
-    background-color: white;
-}
+    .table.table-hover.dataTable.no-footer tbody {
+        background-color: white;
+    }
 
-tr.odd>td,
-tr.even>td {
-    border-top: 4px solid #f4f6f9;
-    border-bottom: 4px solid #f4f6f9;
-    vertical-align: middle !important;
-    height: 3vh;
-}
+    tr.odd>td,
+    tr.even>td {
+        border-top: 4px solid #f4f6f9;
+        border-bottom: 4px solid #f4f6f9;
+        vertical-align: middle !important;
+        height: 3vh;
+    }
 
-th.sorting_disabled {
-    font-weight: normal !important;
-}
+    th.sorting_disabled {
+        font-weight: normal !important;
+    }
 
-.table thead th {
-    /* vertical-align: bottom !important; */
-    border-bottom: 0px solid #dee2e6 !important;
-    border-top: 0px solid #dee2e6;
-}
+    .table thead th {
+        /* vertical-align: bottom !important; */
+        border-bottom: 0px solid #dee2e6 !important;
+        border-top: 0px solid #dee2e6;
+    }
 
-i:hover {
-    cursor: pointer;
-    color: #5dade2;
-}
+    i:hover {
+        cursor: pointer;
+        color: #5dade2;
+    }
 
-i {
-    align-self: center;
-    align-items: center;
+    i {
+        align-self: center;
+        align-items: center;
 
-}
+    }
 .bg-orange{
     color: #fff !important;
 }
 
-.btn-block {
-    font-size: 14px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-}
+    .btn-block {
+        font-size: 14px;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+    }
 
-.selected-dia {
-    background: #3b82f6 !important;
-    color: #fff !important;
-    border-radius: 50% !important;
-}
+    .selected-dia {
+        background: #3b82f6 !important;
+        color: #fff !important;
+        border-radius: 50% !important;
+    }
 
-.swal2-input {
-    width: 80%;
-    height: 40px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-shadow: none;
-    transition: border-color 0.3s ease;
-}
+    .swal2-input {
+        width: 80%;
+        height: 40px;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        transition: border-color 0.3s ease;
+    }
 
-.dataTables_filter {
-    display: none;
-}
+    .dataTables_filter {
+        display: none;
+    }
 .form-group {
     margin-bottom: 1rem;
 }

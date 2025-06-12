@@ -441,11 +441,11 @@ async function deleteCotizacionFinalFile(id) {
 }
 async function updateEstadoCotizacionFinal(idCotizacionFinal) {
   const estado = $(`#estado-cotizacion-final${idCotizacionFinal}`).val();
-
+  spinner.show();
   url =
     base_url +
     "CargaConsolidada/ContenedorConsolidado/updateEstadoCotizacionFinal";
-  $.ajax({
+  await $.ajax({
     url: url,
     type: "POST",
     data: {
@@ -461,6 +461,11 @@ async function updateEstadoCotizacionFinal(idCotizacionFinal) {
         Swal.fire("Error!", result.message, "error");
       }
       table_Entidad.ajax.reload();
+      spinner.hide();
+    },
+    error: function () {
+      Swal.fire("Error!", "Hubo un error al actualizar el estado", "error");
+      spinner.hide();
     },
   });
 }
@@ -1250,9 +1255,37 @@ async function addPagosCoordination(idCotizacion, nombreCliente) {
       },
     });
   }
-
-
 }
+
+function deletePagoCoordination(idPago) {
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Esta acción eliminará el pago.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: base_url + "CargaConsolidada/ContenedorConsolidado/deletePagoCoordination/" + idPago,
+        type: "POST",
+        success: function (response) {
+          const result = JSON.parse(response);
+          if (result.status == "success") {
+            Swal.fire("Eliminado!", result.message, "success");
+            tableCotizacionTrackingPagos.ajax.reload();
+            tableCotizacionPagos.ajax.reload();
+            tableClientesPagos.ajax.reload();
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+        }
+      });
+    }
+  });
+}
+
 async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
   //show modal with table of pagos coordination
   $("#modalClientePagosCoordination").modal("show");
@@ -2350,7 +2383,6 @@ async function viewFormularioAduana() {
   Object.keys(result[0]).forEach((key) => {
     // Buscar el elemento del formulario que coincida con la clave
     const input = form.elements[key];
-    console.log(key, input);
 
     // Si el elemento existe, asignar el valor correspondiente
     if (input) {
@@ -2376,30 +2408,30 @@ async function viewFormularioAduana() {
     const $form = $(this);
     const errors = validateForm($form);
 
-    if (errors.length > 0) {
-      // Ir al tab con el primer error
-      const firstErrorTab = errors[0].tab;
+    // if (errors.length > 0) {
+    //   // Ir al tab con el primer error
+    //   const firstErrorTab = errors[0].tab;
 
-      // Cambiar al tab con el error
-      $(".tab-btn").removeClass("active bg-gray-100");
-      $(`.tab-btn[data-tab="${firstErrorTab}"]`).addClass("active bg-gray-100");
-      $(".tab-content").removeClass("active").addClass("hidden");
-      $(`#${firstErrorTab}`).removeClass("hidden").addClass("active");
+    //   // Cambiar al tab con el error
+    //   $(".tab-btn").removeClass("active bg-gray-100");
+    //   $(`.tab-btn[data-tab="${firstErrorTab}"]`).addClass("active bg-gray-100");
+    //   $(".tab-content").removeClass("active").addClass("hidden");
+    //   $(`#${firstErrorTab}`).removeClass("hidden").addClass("active");
 
-      // Mostrar mensaje de error
-      Swal.fire(
-        "Error!",
-        `Por favor complete todos los campos obligatorios en la sección ${getTabName(
-          firstErrorTab
-        )}`,
-        "error"
-      );
+    //   // Mostrar mensaje de error
+    //   Swal.fire(
+    //     "Error!",
+    //     `Por favor complete todos los campos obligatorios en la sección ${getTabName(
+    //       firstErrorTab
+    //     )}`,
+    //     "error"
+    //   );
 
-      // Enfocar el primer campo con error
-      $form.find(`[name="${errors[0].field}"]`).focus();
+    //   // Enfocar el primer campo con error
+    //   $form.find(`[name="${errors[0].field}"]`).focus();
 
-      return false;
-    }
+    //   return false;
+    // }
 
     // Si no hay errores, continuar con el envío del formulario
     const formData = new FormData(this);
@@ -4297,17 +4329,17 @@ async function viewDocumentacion() {
                               ${file.id_contenedor ? `<div class="badge badge-danger text-white delete-folder-button" onclick="deleteDocumentacionFolder(${file.id})">X</div>` : ""}
                             </label>
                             <div class="file-upload-box">
-                                ${file.file_url ? `
+                                ${file.file_url || (file.id == 1 && file.lista_embarque_url) ? `
                                         <div class="file-info">
                                           <div class="file-iconic">
-                                            ${getIconByType(file.type)}
+                                            ${getIconByType(file.file_url ? file.type : 'excel')}
                                           </div>
-                                            <span class="file-name">${file.folder_name}</span>
+                                            <span class="file-name">${file.folder_name ?? "Packing China"}</span>
                                             
-                                            <button class="download-file-button" onclick=window.location.href='${file.file_url}'>
+                                            <button class="download-file-button" onclick=window.location.href='${file.file_url ?? file.lista_embarque_url}'>
                                             <i class="fas fa-download"></i>
                                             </button>
-                                            <div  onclick="deleteDocumentacionFile(${file.id_file})">
+                                            <div ${file.id_file ? `onclick="deleteDocumentacionFile('${file.id_file}')"` : ""}>
                                             <i class="fas fa-trash"></i>
                                             </div>
                                         </div>
@@ -4773,6 +4805,46 @@ async function viewCotizacion(id) {
   $("#btn-guardar-cotizacion").hide();
   $("#btn-actualizar-cotizacion").show();
   idCotizacion = result.id;
+}
+async function refreshCotizacionFile(id) {
+  //swall confirm to refresh file
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡La información actual se reemplazara!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, actualizar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const formData = new FormData();
+      formData.append("id", id);
+      return fetch(
+        base_url +
+        "CargaConsolidada/ContenedorConsolidado/refreshCotizacionFile/" + id)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error al actualizar el archivo");
+          }
+        })
+        .then((result) => {
+          Swal.fire({
+            icon: "success",
+            title: "¡Archivo actualizado!",
+            text: "El archivo de cotización se ha actualizado correctamente.",
+          });
+          reloadTableCotizacion();
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error al actualizar",
+            text: error.message || "Hubo un problema al actualizar el archivo.",
+          });
+        });
+    }
+  })
+
 }
 async function uploadCotizacionFile(id) {
   //swall with input file
@@ -7561,7 +7633,7 @@ $(document).ready(async function () {
       },
     });
   });
-  $(document).on('change', '.select-status-cliente', function() {
+  $(document).on('change', '.select-status-cliente', function () {
     var status = $(this).val();
     var idCotizacion = $(this).data('id');
     $(this).removeClass('bg-warning bg-danger bg-success');
@@ -7569,20 +7641,20 @@ $(document).ready(async function () {
     if (status === 'Incompleto') $(this).addClass('bg-danger');
     if (status === 'Completado') $(this).addClass('bg-success');
     $.ajax({
-        url: base_url + "CargaConsolidada/ContenedorConsolidado/updateStatusCliente",
-        type: "POST",
-        data: { id_cotizacion: idCotizacion, status: status },
-        dataType: "json",
-        success: function(response) {
-            if(response.status === "success") {
-                tableClientesGeneral.ajax.reload();
-                Swal.fire('¡Guardado!', response.message, 'success');
-            } else {
-                Swal.fire('Error', response.message, 'error');
-            }
+      url: base_url + "CargaConsolidada/ContenedorConsolidado/updateStatusCliente",
+      type: "POST",
+      data: { id_cotizacion: idCotizacion, status: status },
+      dataType: "json",
+      success: function (response) {
+        if (response.status === "success") {
+          tableClientesGeneral.ajax.reload();
+          Swal.fire('¡Guardado!', response.message, 'success');
+        } else {
+          Swal.fire('Error', response.message, 'error');
         }
+      }
     });
-});
+  });
   $("#uploadFinal").click(() => {
     url =
       base_url +

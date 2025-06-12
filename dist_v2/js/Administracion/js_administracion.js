@@ -4,6 +4,10 @@ var currentCotizacion = 0;
 var aPagar = 0;
 var pagado = 0;
 var currentCurso = 0;
+var currentCliente = "";
+var currentTableCurso = "consolidado"; // Default table type
+var tableCursoPedidos;
+var tableCursoPagos;
 async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
   // Obtener la instancia de DataTable
   var table = $("#" + tableId).DataTable();
@@ -32,6 +36,24 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
     }
   });
 }
+function limpiarFiltrosTabla() {
+  $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+  $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+  $("#txt-ID_Estado_Cotizacion").val('0');
+  $("#txt-ID_Campana").val('0');
+  if (currentTableCurso === 'consolidado') {
+    $("#cbo-filtro-estado_pago").val('0').trigger('change');
+    tableCursoPedidos.ajax.reload(null, false);
+  }
+  else if (currentTableCurso === 'curso') {
+    $("#cbo-filtro-estado_pago").val('0').trigger('change');
+    tableCursoPagos.ajax.reload(null, false);
+  }
+
+  //dropdown-menu  remove show class
+  $('.dropdown-menu').removeClass('show');
+
+}
 async function backToList() {
   sectionListaPedidos.show(); // Show the section with the list of orders
   paymentSection.hide(); // Hide the payment section
@@ -39,13 +61,21 @@ async function backToList() {
   currentCurso = 0; // Reset current course ID
   aPagar = 0; // Reset amount to be paid
   pagado = 0; // Reset amount already paid
-  $("#payment-tracking-section-cards").empty(); // Clear previous content in payment cards section
+  $("#payment-tracking-section-cards").empty();
+  if (currentTableCurso == "consolidado") {
+    tableCursoPedidos.ajax.reload(null, false); // Reload the consolidated payments table
+  }
+  else if (currentTableCurso == "curso") {
+    tableCursoPagos.ajax.reload(null, false); // Reload the course payments table
+  }
 }
-async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago) {
+async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago, nombreCliente) {
+  currentCliente = nombreCliente ?? currentCliente; // Store the current client name
   currentCurso = idPedidoCurso; // Store the current course ID
   aPagar = apagar; // Store the amount to be paid
   pagado = pago; // Store the amount already paid
   sectionListaPedidos.hide(); // Hide the section with the list of orders
+  $("#payment-tracking-title").text(`${nombreCliente}`); // Set the title of the payment section
   const paymentSectionCards = $("#payment-tracking-section-cards");
   paymentSectionCards.empty(); // Clear previous content
   const url = base_url + "Administracion/Administracion/getDetailsPagosCurso/" + idPedidoCurso;
@@ -57,14 +87,15 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago) {
     const data = await response.json();
 
     if (data.status == 'success') {
-      $("#total-amount").text(`$${Number(apagar).toFixed(2)}`);
-      $("#paid-amount").text(`$${Number(pago).toFixed(2)}`);
+      $("#total-amount").text(`S/.${Number(apagar).toFixed(2)}`);
+      $("#paid-amount").text(`S/.${Number(pago).toFixed(2)}`);
       console.log(data.data.nota);
       let index = 1; // Initialize index for payment cards
       $("#nota").val(data.data.nota || ""); // Set the note input value
       data.data.data.forEach(detail => {
 
-        paymentSectionCards.append(`<div class="payment-card bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
+        paymentSectionCards.append(`<div class="payment-card ${detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white-100"
+          } rounded-xl ">
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Pago ${index}</h3>
                     <div class="space-y-4">
@@ -85,17 +116,13 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago) {
                             <input disabled type="text" value="${detail.payment_date}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
                         </div>
                     </div>
-                    <button
-                    onclick="confirmPayment('${detail.id}', '${detail.is_confirmed}','handlePaymentCurso')"
-                    id="payment-card-${detail.id}"
-                    class="confirm-btn w-full mt-6
-          font-semibold rounded-lg py-3 transition-all duration-300 transform hover:-translate-y-1
-            text-white text-lg
-                    ${detail.is_confirmed == "1" ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"}">
-                        ${detail.is_confirmed == "1" ? "Confirmado" : "Confirmar Pago"}
-                    </button>
+                    <select class="form-select mt-4 w-100" id="cbo-estado-pago-${detail.id}" onchange="confirmPayment('${detail.id}', this.value, 'handlePaymentCurso')">
+                      <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""} class="bg-light">Pendiente</option>
+                      <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""} class="bg-success">Confirmado</option>
+                      <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""} class="bg-danger">Observado</option>
+                  </select>
                 </div>
-            </div>`); 7
+            </div>`);
         index++; // Increment index for next payment card
       });
       const cotizacionSection = $("#cotizaciones-container");
@@ -107,12 +134,15 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago) {
     console.error("Error fetching payment details:", error);
   }
 }
-async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago) {
+async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago, nombreCliente) {
   currentCotizacion = idCotizacion; // Store the current cotizacion ID
   aPagar = apagar; // Store the amount to be paid
   pagado = pago; // Store the amount already paid
+  currentCliente = nombreCliente ?? currentCliente; // Store the current client name
   sectionListaPedidos.hide(); // Hide the section with the list of orders
+  $("#payment-tracking-title").text(`${nombreCliente}`); // Set the title of the payment section
   const paymentSectionCards = $("#payment-tracking-section-cards");
+  $("#cotizaciones-container").show(); // Show the cotizaciones section
   paymentSectionCards.empty(); // Clear previous content
   const url = base_url + "Administracion/Administracion/getDetailsPagosConsolidado/" + idCotizacion;
   try {
@@ -130,7 +160,8 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago) {
       $("#nota").val(data.data.nota || ""); // Set the note input value
       data.data.data.forEach(detail => {
 
-        paymentSectionCards.append(`<div class="payment-card bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
+        paymentSectionCards.append(`<div class="payment-card ${detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white-100"
+          } rounded-xl ">
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Pago ${index}</h3>
                     <div class="space-y-4">
@@ -151,15 +182,11 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago) {
                             <input disabled type="text" value="${detail.payment_date}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
                         </div>
                     </div>
-                    <button 
-                    onclick="confirmPayment('${detail.id}', '${detail.is_confirmed}')"
-                    id="payment-card-${detail.id}"
-                    class="confirm-btn w-full mt-6 
-          font-semibold rounded-lg py-3 transition-all duration-300 transform hover:-translate-y-1
-            text-white text-lg
-                    ${detail.is_confirmed == "1" ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"}">
-                        ${detail.is_confirmed == "1" ? "Confirmado" : "Confirmar Pago"}
-                    </button>
+                     <select class="form-select mt-4 w-100" id="cbo-estado-pago-${detail.id}" onchange="confirmPayment('${detail.id}', this.value, 'handlePayment')">
+                      <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""} class="bg-light">Pendiente</option>
+                      <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""} class="bg-success">Confirmado</option>
+                      <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""} class="bg-danger">Observado</option>
+                  </select>
                 </div>
             </div>`);
         index++; // Increment index for next payment card
@@ -225,10 +252,10 @@ async function saveNote() {
       alert("Nota guardada exitosamente.");
       $("#note-input").val(""); // Clear the input field
       if (currentCurso > 0) {
-        viewDetailsPagosCurso(currentCurso, aPagar, pagado); // Refresh the payment details for course
+        viewDetailsPagosCurso(currentCurso, aPagar, pagado, currentCliente); // Refresh the payment details for course
       } else {
 
-        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado);
+        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado, currentCliente);
       }// Refresh the payment details
     } else {
       alert("Error al guardar la nota: " + data.message);
@@ -275,8 +302,8 @@ async function getTableHeaders(table) {
     }
     const data = await response.json();
     if (data.status == 'success') {
-      let symbol= table == "consolidado" ? "$" : "S/";
-      $("#span-total-importe").text(symbol+ Number(data.data.total_importe).toFixed(2));
+      let symbol = table == "consolidado" ? "$" : "S/";
+      $("#span-total-importe").text(symbol + Number(data.data.total_importe).toFixed(2));
     } else {
       console.error("Error fetching headers:", data.message);
       return [];
@@ -287,13 +314,13 @@ async function getTableHeaders(table) {
   }
 
 }
-async function confirmPayment(idPago, isConfirmed, type = "handlePayment") {
+async function confirmPayment(idPago, value, type = "handlePayment") {
   const url = base_url + "Administracion/Administracion/" + type;
   try {
     const formData = new FormData();
-    let confirmed = isConfirmed == "1" ? "0" : "1";
+
     formData.append("idPago", idPago);
-    formData.append("isConfirmed", confirmed); // Toggle confirmation status
+    formData.append("status", value); // Toggle confirmation status
 
     const response = await fetch(url, {
       method: "POST",
@@ -306,9 +333,9 @@ async function confirmPayment(idPago, isConfirmed, type = "handlePayment") {
     console.log(data);
     if (data.status == 'success') {
       if (type == "handlePayment") {
-        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado);
+        viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado, currentCliente);
       } else if (type == "handlePaymentCurso") {
-        viewDetailsPagosCurso(currentCurso, aPagar, pagado);
+        viewDetailsPagosCurso(currentCurso, aPagar, pagado, currentCliente);
       }
       // Refresh the payment details
     }
@@ -492,26 +519,35 @@ async function viewClientePagosCurso(idPedidoCurso, nombreCliente) {
 $(".tab-administracion").removeClass("active");
 $(".tab-administracion").off("click").click(function () {
   $(".tab-administracion").removeClass("active");
-  // $("#table-administracion-pagos_wrapper").hide();
-  // $("#table-administracion-variacion_wrapper").hide();
-  // $("#table-administracion-pagos_wrapper").hide();
 
   let table = this.getAttribute("data-table");
   this.classList.add("active");
 
   if (table == "consolidado") {
+    //append to txt-ID_Campana select options from #1 to #50 with value just number
+    $("#txt-ID_Campana").empty();
+    // Add an empty option
+    $("#txt-ID_Campana").append('<option value="0">Seleccione una campaña</option>');
+    for (let i = 1; i <= 50; i++) {
+      $("#txt-ID_Campana").append(`<option value="${i}">#${i}</option>`);
+    }
     getTableHeaders("consolidado");
     $("#table-pagos-consolidado").attr("style", "");
     $("#table-pagos-curso").hide();
     $("#table-pagos-curso_wrapper").hide();
     url = base_url + 'Administracion/Administracion/getConsolidadoPagos';
-
+    currentTableCurso = "consolidado";
     if ($.fn.DataTable.isDataTable("#table-pagos-consolidado")) {
+      limpiarFiltrosTabla();
 
       $("#table-pagos-consolidado").show();
       $("#table-pagos-consolidado_wrapper").show();
       tableCursoPedidos.ajax.reload(null, false);
     } else {
+      $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+      $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+      $("#txt-ID_Estado_Cotizacion").val('0');
+      $("#txt-ID_Campana").val('0');
       tableCursoPedidos = $("#table-pagos-consolidado").DataTable({
         dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
@@ -582,7 +618,7 @@ $(".tab-administracion").off("click").click(function () {
           'dataType': 'JSON',
           'data': function (data) {
             data.sMethod = $('#hidden-sMethod').val();
-            data.estado_pago = $('#cbo-filtro-estado_pago').val();
+            data.estado_pago = $('#txt-ID_Estado_Cotizacion').val() ?? 0;
             console.log($('#txt-Fe_Inicio').val());
             data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val() == "" ?
               //fin inicio 2 meses antes 
@@ -600,6 +636,7 @@ $(".tab-administracion").off("click").click(function () {
               })
               : $('#txt-Fe_Fin').val(), 'fecha', '/');
             data.tipoTabla = "consolidado";
+            data.campana = $('#txt-ID_Campana').val() || 0; // Get the selected campaign ID
           },
         },
         'columnDefs': [
@@ -627,10 +664,10 @@ $(".tab-administracion").off("click").click(function () {
 
       $("#table-pagos-consolidado").show();
     }
-    currentTableCurso = "consolidado";
   }
 
   else if (table == "cursos") {
+    currentTableCurso = "curso"; // Set current table type to curso
     getTableHeaders("curso");
     url = base_url + 'Administracion/Administracion/getCursosPagos';
     $("#table-pagos-consolidado").hide();
@@ -639,12 +676,15 @@ $(".tab-administracion").off("click").click(function () {
     $("#table-pagos-curso_wrapper").show();
 
     if ($.fn.DataTable.isDataTable("#table-pagos-curso")) {
-
+      limpiarFiltrosTabla();
       $("#table-pagos-curso").show();
       $("#table-pagos-curso_wrapper").show();
       tableCursoPagos.ajax.reload(null, false);
     } else {
-
+      $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+      $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+      $("#txt-ID_Estado_Cotizacion").val('0');
+      $("#txt-ID_Campana").val('0');
       tableCursoPagos = $("#table-pagos-curso").DataTable({
         dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
@@ -706,7 +746,7 @@ $(".tab-administracion").off("click").click(function () {
           dataType: "JSON",
           data: function (data) {
             data.sMethod = $('#hidden-sMethod').val();
-            data.estado_pago = $('#cbo-filtro-estado_pago').val();
+            data.estado_pago = $('#txt-ID_Estado_Cotizacion').val();
             data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val() == "" ?
               new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
                 day: '2-digit',
@@ -723,6 +763,7 @@ $(".tab-administracion").off("click").click(function () {
               : $('#txt-Fe_Fin').val(), 'fecha', '/');
             // Agregar tipoTabla para identificar el tipo de tabla
             data.tipoTabla = "pagos";
+            data.campana = $('#txt-ID_Campana').val() || 0; // Get the selected campaign ID 
 
           },
         },
@@ -739,6 +780,8 @@ $(".tab-administracion").off("click").click(function () {
       currentTableCurso = "curso";
 
     }
+    getCampanasActivas();
+
   }
 });
 $(".tab-administracion").first().click();
@@ -756,7 +799,30 @@ function getIconByExtension(url) {
 
   return icon;
 }
-function viewNote(nota){
+async function getCampanasActivas() {
+  const url = base_url + "Administracion/Administracion/getCampanasActivas";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    if (data.status == 'success') {
+      const campanasSelect = $("#txt-ID_Campana");
+      campanasSelect.empty(); // Clear previous options
+      //add empty option
+      campanasSelect.append('<option value="0">Seleccione una campaña</option>');
+      data.data.forEach(campana => {
+        campanasSelect.append(`<option value="${campana.ID_Campana}">${campana.nombre_campana}</option>`);
+      });
+    } else {
+      console.error("Error fetching active campaigns:", data.message);
+    }
+  } catch (error) {
+    console.error("Error fetching active campaigns:", error);
+  }
+}
+function viewNote(nota) {
   //show nota in modal
   const modal = document.createElement('div');
   modal.className = 'modal fade';
@@ -823,6 +889,7 @@ $(document).ready(function () {
       tableCursoPagos.ajax.reload(null, false);
       getTableHeaders("curso");
     }
+    $(".dropdown-menu").removeClass("show"); // Remove the show class from the dropdown menu
   });
 });
 $('.input-report').datepicker({
@@ -831,4 +898,15 @@ $('.input-report').datepicker({
   todayHighlight: true,
   dateFormat: 'dd/mm/yyyy',
   format: 'dd/mm/yyyy',
+});
+$("#cancelar-btn").on("click", function () {
+  limpiarFiltrosTabla();
+  if (currentTableCurso === 'consolidado') {
+    $("#cbo-filtro-estado_pago").val('0').trigger('change');
+    tableCursoPedidos.ajax.reload(null, false); // Reload the consolidated payments table
+  } else if (currentTableCurso === 'curso') {
+    $("#cbo-filtro-estado_pago").val('0').trigger('change');
+    tableCursoPagos.ajax.reload(null, false); // Reload the course payments table
+  }
+  $(".dropdown-menu").removeClass("show"); // Remove the show class from the dropdown menu
 });

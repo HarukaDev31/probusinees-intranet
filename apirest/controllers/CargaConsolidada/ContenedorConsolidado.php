@@ -222,7 +222,7 @@ class ContenedorConsolidado extends CI_Controller
 				if ($this->user->No_Grupo == "Coordinación"
 				|| $this->user->No_Grupo == "Cotizador"
 				) {
-					$subdata[] = date("d/m/Y", strtotime($row->f_puerto));
+					$subdata[] = date("d/m/Y", strtotime($row->fecha_arribo??$row->f_puerto));
 					$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 				}
 
@@ -385,7 +385,6 @@ class ContenedorConsolidado extends CI_Controller
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacion($idContenedor);
 			}else if($tipoTabla=="embarque"){
 				$arrResponse = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
-
 			}
 			else {
 				$arrResponse = $this->ContenedorConsolidadoModel->getClientesDocumentacionPagos($idContenedor);
@@ -407,13 +406,14 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->volumen;
 					//div with a tag to download file and button to delete file
 					$divFile = '<div style="display: flex;gap: 10px; justify-content:center;">';
-					if (! empty($row->cotizacion_file_url)) {
+					if (!empty($row->cotizacion_file_url)) {
 						$divFile .= '
 						<a href="' . $row->cotizacion_file_url . '" download>
 							<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="32" viewBox="0 0 48 48">
 						<rect width="16" height="9" x="28" y="15" fill="#21a366"></rect><path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z"></path><rect width="16" height="9" x="28" y="24" fill="#107c42"></rect><rect width="16" height="9" x="12" y="15" fill="#3fa071"></rect><path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z"></path><path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z"></path><path d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z" opacity=".05"></path><path d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z" opacity=".07"></path><path d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z" opacity=".09"></path><linearGradient id="flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1" x1="4.725" x2="23.055" y1="14.725" y2="33.055" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#18884f"></stop><stop offset="1" stop-color="#0b6731"></stop></linearGradient><path fill="url(#flEJnwg7q~uKUdkX0KCyBa_UECmBSgBOvPT_gr1)" d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z"></path><path fill="#fff" d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z"></path>
 						</svg>
 						</a>
+						<i class="fas fa-sync-alt" style="cursor:pointer;" onclick="refreshCotizacionFile(' . $row->id_cotizacion . ')"></i>
 						<i class="fas fa-trash" style="cursor:pointer;" onclick="deleteCotizacionFile(' . $row->id_cotizacion . ')"></i>';
 					} else {
 						$divFile .= '
@@ -907,6 +907,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $divAcciones;
 
 					$data[]    = $subdata;
+					$index++;
 				}
 			}
 			$output = [
@@ -935,18 +936,19 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[]     = $row->telefono;
 					$subdata[]     = $row->name;
 					$subdata[]     = $row->volumen_final;
-					$subdata[]     = $row->monto_final;
-					$subdata[]     = $row->fob_final;
-					$subdata[]     = $row->impuestos_final;
-					$subdata[]     = $row->tarifa_final;
+					// $subdata[]     = $row->monto_final;
+					$subdata[]     = "$".$row->fob_final;
+					$subdata[]     = "$".$row->logistica_final;
+					$subdata[]     = "$".$row->impuestos_final;
+					$subdata[]     = "$".$row->tarifa_final;
 					//select for options C.FINAL,AJUSTADO,COTIZADO,PAGADO,SOBREPAGO
 					$selectEstados = '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
 						<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
-						<option value="C.FINAL" ' . ($row->estado_cotizacion_final == "C.FINAL" ? "selected" : "") . '>C.FINAL</option>
-						<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
 						<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
 						<option value="PAGADO" ' . ($row->estado_cotizacion_final == "PAGADO" ? "selected" : "") . '>PAGADO</option>
 						<option value="SOBREPAGO" ' . ($row->estado_cotizacion_final == "SOBREPAGO" ? "selected" : "") . '>SOBREPAGO</option>
+						<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
+
 						</select>';
 					$subdata[] = $selectEstados;
 					//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
@@ -980,7 +982,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->documento;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;	
-					$subdata[] = "$".($row->monto_final+$row->impuestos_final);
+					$subdata[] = "$".($row->logistica_final+$row->impuestos_final);
 					$subdata[] =$row->total_pagos==0 ? "$0" : "$".  number_format($row->total_pagos, 2);
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
@@ -1107,6 +1109,12 @@ class ContenedorConsolidado extends CI_Controller
 	public function deleteCotizacion($idCotizacion)
 	{
 		$arrResponse = $this->ContenedorConsolidadoModel->deleteCotizacion($idCotizacion);
+		echo json_encode([
+			"status" => $arrResponse,
+		]);
+	}
+	public function refreshCotizacionFile($id){
+		$arrResponse  = $this->ContenedorConsolidadoModel->refreshCotizacionFile($id);
 		echo json_encode([
 			"status" => $arrResponse,
 		]);
@@ -1810,6 +1818,16 @@ class ContenedorConsolidado extends CI_Controller
 			"message" => $arrResponse['message']
 		]);
 	}
+	public function deletePagoCoordination($idPago)
+	{
+		$this->load->model('CargaConsolidada/ContenedorConsolidadoModel');
+		$result = $this->ContenedorConsolidadoModel->deletePagoCoordination($idPago);
+		if ($result) {
+			echo json_encode(['status' => 'success', 'message' => 'Pago eliminado correctamente']);
+		} else {
+			echo json_encode(['status' => 'error', 'message' => 'No se pudo eliminar el pago']);
+		}
+	}
 	public function getPagosCoordination($idCotizacion)
 	{
 		$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($idCotizacion);
@@ -1821,9 +1839,10 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
 			$subdata[] = "$".round($row->monto, 2);
-			$subdata[] = '<a href='.$row->voucher_url.' download>
+			$subdata[] = '<a href="'.$row->voucher_url.'" target="_blank" download>
 				<i class="fas fa-file-excel text-success"></i>
 				</a>';
+			$subdata[] = '<button class="btn btn-danger btn-sm" onclick="deletePagoCoordination(' . $row->id . ')"><i class="fa fa-trash"></i></button>';
 			$data[] = $subdata;
 			$index++;
 		}
@@ -1843,9 +1862,10 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
 			$subdata[] = $row->monto;
-			$subdata[] = '<a href='.$row->voucher_url.' download>
+			$subdata[] = '<a href="'.$row->voucher_url.'" target="_blank" download>
 				<i class="fas fa-file-excel text-success"></i>
 				</a>';
+			$subdata[] = '<button class="btn btn-danger btn-sm" onclick="deletePagoCoordination(' . $row->id . ')"><i class="fa fa-trash"></i></button>';
 			$data[] = $subdata;
 			$index++;
 		}

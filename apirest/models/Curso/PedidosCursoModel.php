@@ -28,7 +28,26 @@ class PedidosCursoModel extends CI_Model
 	{
 		parent::__construct();
 	}
-
+	public function eliminarPedido($idPedido)
+	{
+		//SET FOREIGN_KEY_CHECKS=0;
+		try {
+			$this->db->query("SET FOREIGN_KEY_CHECKS=0");
+			$this->db->where('ID_Pedido_Curso', $idPedido);
+			$this->db->delete($this->table);
+			//SET FOREIGN_KEY_CHECKS=1;
+			$this->db->query("SET FOREIGN_KEY_CHECKS=1");
+			if ($this->db->error()['code'] == 0) {
+				return array('status' => 'success', 'message' => 'Pedido eliminado correctamente');
+			} else {
+				log_message('error', 'Error en eliminarPedido: ' . $this->db->error()['message']);
+				return array('status' => 'error', 'message' => 'Error al eliminar el pedido');
+			}
+		} catch (Exception $e) {
+			log_message('error', 'Error en eliminarPedido: ' . $e->getMessage());
+			return array('status' => 'error', 'message' => 'Error al eliminar el pedido: ' . $e->getMessage());
+		}
+	}
 	public function _get_datatables_query()
 	{
 		try {
@@ -53,7 +72,7 @@ class PedidosCursoModel extends CI_Model
              WHERE cccp.id_pedido_curso = PC.ID_Pedido_Curso                 
              AND (ccp.name = 'ADELANTO')           
          ) AS total_pagos")
-				->from($this->table. ' AS PC')
+				->from($this->table . ' AS PC')
 				->join($this->table_pais . ' AS P', 'P.ID_Pais = PC.ID_Pais', 'join')
 				->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = PC.ID_Entidad', 'join')
 				->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join')
@@ -66,11 +85,11 @@ class PedidosCursoModel extends CI_Model
 
 			//if !empty isset Filtro_Fe_Inicio
 			if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
-				$this->db->where('PC.Fe_Registro >=', $this->input->post('Filtro_Fe_Inicio'));
+				$this->db->where('DATE(PC.Fe_Registro) >=', $this->input->post('Filtro_Fe_Inicio'));
 			}
 			//if !empty isset Filtro_Fe_Fin
 			if (!empty($this->input->post('Filtro_Fe_Fin'))) {
-				$this->db->where('PC.Fe_Registro <=', $this->input->post('Filtro_Fe_Fin'));
+				$this->db->where('DATE(PC.Fe_Registro) <=', $this->input->post('Filtro_Fe_Fin'));
 			}
 
 			if (isset($this->order)) {
@@ -81,10 +100,67 @@ class PedidosCursoModel extends CI_Model
 			log_message('error', 'Error en _get_datatables_query: ' . $e->getMessage());
 		}
 	}
+	public function getPagosCurso()
+	{
+		$this->db->select(
+			"CC.*
+		  ,CLI.Fe_Nacimiento,
+		   CLI.Nu_Como_Entero_Empresa,
+		    CLI.No_Otros_Como_Entero_Empresa,
+			 No_Distrito, No_Provincia, 
+			 No_Departamento, 
+			 TDI.No_Tipo_Documento_Identidad_Breve,
+			  P.No_Pais, CLI.Nu_Tipo_Sexo, 
+			  CLI.No_Entidad, CLI.Nu_Documento_Identidad,
+			   CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad,
+			    CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password,
+         (                 
+             SELECT COUNT(*)                  
+             FROM pedido_curso_pagos as cccp                 
+             JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept = ccp.id                 
+             WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
+             AND (ccp.name = 'ADELANTO')             
+         ) AS pagos_count,
+         (                 
+             SELECT IFNULL(SUM(cccp.monto), 0)                  
+             FROM pedido_curso_pagos as cccp                 
+             JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept= ccp.id                 
+             WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
+             AND (ccp.name = 'ADELANTO')           
+         ) AS total_pagos"
+		)
+			->from($this->table . ' AS CC')  // Add the CC alias here!
+			->join($this->table_pais . ' AS P', 'P.ID_Pais = CC.ID_Pais', 'join')  // Update references
+			->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = CC.ID_Entidad', 'join')  // Update references
+			->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join')
+			->join($this->table_moneda . ' AS M', 'M.ID_Moneda = CC.ID_Moneda', 'join')  // Update references
+			->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'join')
+			->join($this->table_distrito, $this->table_distrito . '.ID_Distrito = CLI.ID_Distrito', 'left')
+			->join($this->table_provincia, $this->table_provincia . '.ID_Provincia = CLI.ID_Provincia', 'left')
+			->join($this->table_departamento, $this->table_departamento . '.ID_Departamento = CLI.ID_Departamento', 'left')
+			->where('CC.ID_Empresa', $this->user->ID_Empresa);  // Update reference
 
+		// if (!empty($this->input->post('estado_pago'))) {
+		// 	$this->db->where("CC.Nu_Estado=", $this->input->post('estado_pago'));  // Update reference
+		// }
+		if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
+			$this->db->where('DATE(CC.Fe_Registro) >=', $this->input->post('Filtro_Fe_Inicio'));
+		}
+		//if !empty isset Filtro_Fe_Fin
+		if (!empty($this->input->post('Filtro_Fe_Fin'))) {
+			$this->db->where('DATE(CC.Fe_Registro) <=', $this->input->post('Filtro_Fe_Fin'));
+		}
+		if (isset($this->order)) {
+			$order = $this->order;
+			$this->db->order_by(key($order), $order[key($order)]);
+		}
+		$query = $this->db->get();
+		return $query->result();
+	}
 	public function getDatosClientePorPedido($id_pedido)
 	{
-		$this->db->select("
+		$this->db->select(
+			"
 			CLI.ID_Entidad as id_entidad,
 			CLI.No_Entidad as nombres,
 			CLI.Nu_Tipo_Sexo as sexo,
@@ -102,7 +178,7 @@ class PedidosCursoModel extends CI_Model
 			PR.No_Provincia as provincia,
 			DI.No_Distrito as distrito,
 			USR.ID_Usuario as id_usuario, 
-			USR.usuario_moodle as usuario_moodle,
+			IFNULL(USR.usuario_moodle,USR.No_Usuario) as usuario_moodle,
 			USR.No_Password as password_moodle,
 			PC.ID_Campana,
 			PC.tipo_curso as tipo_curso,
@@ -176,7 +252,8 @@ class PedidosCursoModel extends CI_Model
 		$this->db->from($this->table);
 		return $this->db->count_all_results();
 	}
-	public function setUsuarioModdle($user,$password,$id_usuario){
+	public function setUsuarioModdle($user, $password, $id_usuario)
+	{
 		$data = array(
 			'usuario_moodle' => $user,
 			'No_Password' => $password
@@ -187,7 +264,6 @@ class PedidosCursoModel extends CI_Model
 		} else {
 			return array('status' => 'error', 'message' => 'Error al actualizar el usuario');
 		}
-
 	}
 	public function actualizarPedido($where, $data)
 	{
@@ -198,7 +274,7 @@ class PedidosCursoModel extends CI_Model
 
 	public function getUsuario($id)
 	{
-		$query = "SELECT No_Usuario, No_Password,usuario_moodle, No_Nombres_Apellidos FROM usuario WHERE ID_Usuario = " . $id . " LIMIT 1";
+		$query = "SELECT No_Usuario, No_Password,IFNULL(usuario_moodle,No_Usuario) as usuario_moodle, No_Nombres_Apellidos FROM usuario WHERE ID_Usuario = " . $id . " LIMIT 1";
 
 		if (!$this->db->simple_query($query)) {
 			$error = $this->db->error();
@@ -433,81 +509,25 @@ class PedidosCursoModel extends CI_Model
 		}
 		return null;
 	}
-	public function getPagosCurso()
-	{
-		$this->db->select(
-			"CC.*
-		  ,CLI.Fe_Nacimiento,
-		   CLI.Nu_Como_Entero_Empresa,
-		    CLI.No_Otros_Como_Entero_Empresa,
-			 No_Distrito, No_Provincia, 
-			 No_Departamento, 
-			 TDI.No_Tipo_Documento_Identidad_Breve,
-			  P.No_Pais, CLI.Nu_Tipo_Sexo, 
-			  CLI.No_Entidad, CLI.Nu_Documento_Identidad,
-			   CLI.Nu_Celular_Entidad, CLI.Txt_Email_Entidad,
-			    CLI.Nu_Edad, M.No_Signo, USR.ID_Usuario, USR.No_Usuario, USR.No_Password,
-         (                 
-             SELECT COUNT(*)                  
-             FROM pedido_curso_pagos as cccp                 
-             JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept = ccp.id                 
-             WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
-             AND (ccp.name = 'ADELANTO')             
-         ) AS pagos_count,
-         (                 
-             SELECT IFNULL(SUM(cccp.monto), 0)                  
-             FROM pedido_curso_pagos as cccp                 
-             JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept= ccp.id                 
-             WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
-             AND (ccp.name = 'ADELANTO')           
-         ) AS total_pagos"
-		)
-			->from($this->table . ' AS CC')  // Add the CC alias here!
-			->join($this->table_pais . ' AS P', 'P.ID_Pais = CC.ID_Pais', 'join')  // Update references
-			->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = CC.ID_Entidad', 'join')  // Update references
-			->join($this->table_tipo_documento_identidad . ' AS TDI', 'TDI.ID_Tipo_Documento_Identidad = CLI.ID_Tipo_Documento_Identidad', 'join')
-			->join($this->table_moneda . ' AS M', 'M.ID_Moneda = CC.ID_Moneda', 'join')  // Update references
-			->join($this->table_usuario . ' AS USR', 'USR.ID_Entidad = CLI.ID_Entidad', 'join')
-			->join($this->table_distrito, $this->table_distrito . '.ID_Distrito = CLI.ID_Distrito', 'left')
-			->join($this->table_provincia, $this->table_provincia . '.ID_Provincia = CLI.ID_Provincia', 'left')
-			->join($this->table_departamento, $this->table_departamento . '.ID_Departamento = CLI.ID_Departamento', 'left')
-			->where('CC.ID_Empresa', $this->user->ID_Empresa);  // Update reference
 
-		if (!empty($this->input->post('estado_pago'))) {
-			$this->db->where("CC.Nu_Estado=", $this->input->post('estado_pago'));  // Update reference
+	public function getPagosCursoPedido($idPedidoCurso)
+	{
+		try {
+			$this->db->select('pedido_curso_pagos.*, pedido_curso_pagos_concept.name as concepto')
+				->from($this->table_pedido_curso_pagos)
+				->join($this->table_pedido_curso_pagos_conceptos, 'pedido_curso_pagos.id_concept = pedido_curso_pagos_concept.id')
+				->where('id_pedido_curso', $idPedidoCurso)
+				->order_by('payment_date', 'DESC');
+			$query = $this->db->get();
+			return $query->result();
+		} catch (Exception $e) {
+			log_message('error', 'Error en getPagosCurso: ' . $e->getMessage());
+			return [
+				'status' => "error",
+				'message' => 'Error al obtener los pagos del curso: ' . $e->getMessage()
+			];
 		}
-		if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
-			$this->db->where('CC.Fe_Registro >=', $this->input->post('Filtro_Fe_Inicio'));
-		}
-		//if !empty isset Filtro_Fe_Fin
-		if (!empty($this->input->post('Filtro_Fe_Fin'))) {
-			$this->db->where('CC.Fe_Registro <=', $this->input->post('Filtro_Fe_Fin'));
-		}
-		if (isset($this->order)) {
-			$order = $this->order;
-			$this->db->order_by(key($order), $order[key($order)]);
-		}
-		$query = $this->db->get();
-		return $query->result();
 	}
-	 public function getPagosCursoPedido($idPedidoCurso)
-    {
-        try {
-            $this->db->select('pedido_curso_pagos.*, pedido_curso_pagos_concept.name as concepto')
-                ->from($this->table_pedido_curso_pagos)
-                ->join($this->table_pedido_curso_pagos_conceptos, 'pedido_curso_pagos.id_concept = pedido_curso_pagos_concept.id')
-                ->where('id_pedido_curso', $idPedidoCurso)
-                ->order_by('payment_date', 'DESC');
-            $query = $this->db->get();
-            return $query->result();
-        } catch (Exception $e) {
-            log_message('error', 'Error en getPagosCurso: ' . $e->getMessage());
-            return [
-                'status' => "error",
-                'message' => 'Error al obtener los pagos del curso: ' . $e->getMessage()
-            ];
-        }
-    }
 	public function saveClientePagosCurso($voucher, $idPedido, $amount, $fecha, $banco)
 	{
 		try {
@@ -556,14 +576,14 @@ class PedidosCursoModel extends CI_Model
 		//get sum of importe from pedido_curso_pagos 
 		$this->db->select('SUM(Ss_Total) as total_importe');
 		$this->db->from($this->table);
-		
-        if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
-            $this->db->where($this->table.'.Fe_Emision >=', $this->input->post('Filtro_Fe_Inicio'));
-        }
 
-        if (!empty($this->input->post('Filtro_Fe_Fin'))) {
-            $this->db->where($this->table.'.Fe_Emision <=', $this->input->post('Filtro_Fe_Fin'));
-        }
+		if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
+			$this->db->where($this->table . '.Fe_Emision >=', $this->input->post('Filtro_Fe_Inicio'));
+		}
+
+		if (!empty($this->input->post('Filtro_Fe_Fin'))) {
+			$this->db->where($this->table . '.Fe_Emision <=', $this->input->post('Filtro_Fe_Fin'));
+		}
 		$query = $this->db->get();
 		return $query->row();
 	}
