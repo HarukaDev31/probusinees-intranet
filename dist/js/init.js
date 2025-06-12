@@ -856,38 +856,24 @@ function ParseDateHour(fecha){
   return _FEH[0] + '/' + _FE[1] + '/' + _FE[0] + ' ' + _FEH[1];
 }
 
-function ParseDateString(fecha, tipo, caracter){
-  if (tipo == 1) {// Caracter -> /
+function ParseDateString(fecha, tipo_fecha="fecha", caracter="/"){
+  if(typeof tipo_fecha === 'undefined' || tipo_fecha == null || tipo_fecha == '') {
+    tipo_fecha = 'fecha';
+  }
+  if(typeof caracter === 'undefined' || caracter == null || caracter == '') {
+    caracter = '/';
+  }
+  console.log("ParseDateString: ", fecha, tipo_fecha, caracter);
+  if (tipo_fecha == 'fecha_bd') {// Caracter -> (-) y formato de fecha BD (YYY-MM-DD)
+    var _FE = fecha.split(caracter);
+    return _FE[2] + '/' + _FE[1] + '/' + _FE[0];
+  } else if (tipo_fecha == 'fecha_hora_bd') {// Caracter -> (-) y formato de fecha BD (YYY-MM-DD)
+    var arrFechaHora = fecha.split(caracter);
+    var Fecha = arrFechaHora[0].split('-');
+    return Fecha[2] + '/' + Fecha[1] + '/' + Fecha[0] + ' ' + arrFechaHora[1];
+  } else if (tipo_fecha == 'fecha') {// Caracter -> (-) y formato de fecha BD (YYY-MM-DD)
     var _FE = fecha.split(caracter);
     return _FE[2] + '-' + _FE[1] + '-' + _FE[0];
-  } else if (tipo == 2) {// Caracter -> -
-    var _FE = fecha.split(caracter);
-    return _FE[2] + '/' + _FE[1] + '/' + _FE[0];
-  } else if (tipo == 3) {// Caracter -> - y fecha y hora BD pero solo obtiene fecha
-    var _FE = fecha.split(caracter);
-    var _FEH = _FE[2].split(' ');
-    return _FEH[0] + '/' + _FE[1] + '/' + _FE[0];
-  } else if (tipo == 4) {// Caracter -> - y fecha y hora BD pero solo obtiene hora
-    var _FE = fecha.split(caracter);
-    var _FEH = _FE[2].split(' ');
-    var _H = _FEH[1].split(':');
-    return _H[0];
-  } else if (tipo == 5) {// Caracter -> - y fecha y hora BD pero solo obtiene minuto
-    var _FE = fecha.split(caracter);
-    var _FEH = _FE[2].split(' ');
-    var _M = _FEH[1].split(':');
-    return _M[1];
-  } else if (tipo == 6) {// Caracter -> (-) y formato de fecha BD (YYY-MM-DD)
-    var _FE = fecha.split('-');
-    return _FE[2] + '/' + _FE[1] + '/' + _FE[0];
-  } else if (tipo == 7) {// Caracter -> (N tipos / - ) y fecha y hora BD pero solo obtiene hora:minuto:segundo
-    var _FE = fecha.split(caracter);
-    var _FEH = _FE[2].split(' ');
-    var _H = _FEH[1].split(':');
-    return _H[0] + ':' + _H[1] + ':' + _H[2];
-  } else if (tipo == 8) {// Caracter -> - y DD/MM/YYYY HH:MM:SS
-    var _FE = fecha.split(caracter);
-    return _FE[0];
   }
 }
 
