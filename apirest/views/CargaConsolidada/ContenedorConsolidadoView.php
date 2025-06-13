@@ -1107,20 +1107,20 @@ Search for
                     </div>
                     <?php } ?>
                 </div>
-                <div class="row">
+                <div class="row tabs">
                     <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                     <div data-table="prospectos"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-cotizacion">
                         Prospectos
                     </div>
                     <div data-table="embarque"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-cotizacion">
                         Por Embarcar
                     </div>
                     <?php } ?>
                     <?php if ($this->user->No_Grupo =="Coordinación"){  ?>
                     <div data-table="pagos"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        class="col-12 col-md-3 col-xl-1 d-flex xl:max-w-fit align-items-center justify-content-center btn tab tab-cotizacion">
                         Pagos
                     </div>
                     <?php } ?>
@@ -1331,18 +1331,18 @@ Search for
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row tabs">
                 <div data-table="general"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-clientes">
                     General
                 </div>
                 <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
                 <div data-table="variacion"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-clientes">
                     Variación
                 </div>
                 <div data-table="pagos"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    class="col-12 col-md-4 col-xl-1 d-flex max-w-fit align-items-center justify-content-center btn tab tab-clientes">
                     Pagos
                 </div>
                 <?php } ?>
@@ -1865,15 +1865,15 @@ Search for
                     <div class="fa fa-arrow-left"></div>
                 </button>
             </div>
-            <div class="row">
+            <div class="row tabs">
                 <div data-table="general"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes-final">
+                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-clientes-final">
                     General
                 </div>
                 <?php if ($this->user->No_Grupo != "Coordinacion") {  ?>
                 
                 <div data-table="pagos"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes-final">
+                    class="col-12 col-md-4 col-xl-1 d-flex max-w-fit align-items-center justify-content-center btn tab tab-clientes-final">
                     Pagos
                 </div>
                 <?php } ?>
@@ -2020,44 +2020,7 @@ Search for
             </div>
         </div>
     </div>
-    <!-- Modal para imágenes -->
-    <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <img id="image-preview" src="" style="width: 100%;">
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal para videos -->
-    <div class="modal fade" id="video-modal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <video id="video-preview" controls style="width: 100%;">
-                        <source src="" type="video/mp4">
-                        Tu navegador no soporta la reproducción de videos.
-                    </video>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para archivos (PDF, Word, Excel) -->
-    <div class="modal fade" id="file-modal" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <iframe id="file-preview" src="" style="width: 100%; height: 500px;"></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade" id="modal-crear-cotizacion" tabindex="-1" role="dialog" aria-labelledby="modal-cotizacion"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -2254,6 +2217,124 @@ Search for
         </div>
     </div>
 </div>
+<!-- Modal para registrar pago de curso -->
+<div class="modal fade" id="modal-pago-curso" tabindex="-1" aria-labelledby="modalPagoCursoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form id="form-pago-curso" enctype="multipart/form-data">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center">
+          <h2 class="modal-title" id="modalPagoCursoLabel">Registrar Pago de Curso</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body row">
+          <input type="hidden" id="id-pedido-curso" name="idPedido">
+          <div class="col-md-6 mb-3">
+            <label for="monto" class="form-label">Monto</label>
+            <div class="input-soles-wrapper">
+                <span class="soles-symbol">S/</span>
+                <input type="number" id="monto" name="monto" class="form-control" step="0.01" required>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="banco" class="form-label">Banco</label>
+            <div class="d-flex gap-3 align-items-center" id="banco-group">
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-bcp" value="BCP" required>
+                <label class="form-check-label flex" for="banco-bcp">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Logo_credito.gif" alt="BCP" style="height:32px;"><br>
+                </label>
+                </div>
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-interbank" value="INTERBANK" required>
+                <label class="form-check-label flex" for="banco-interbank">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Interbank_logo.svg" alt="INTERBANK" style="height:32px;"><br>
+                </label>
+                </div>
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-yape" value="YAPE" required>
+                <label class="form-check-label flex" for="banco-yape">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png" alt="YAPE" style="height:32px;"><br>
+                </label>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" id="fecha_pago" name="fecha" class="form-control" required>
+          </div>
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Voucher</label>
+            <div id="file-upload-pagos-container">
+              <div class="file-upload-box" id="single-file-upload-pagos">
+                <input type="file" id="file-input-pagos" class="file-input" name="voucher"
+                  accept=".pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg">
+                <label for="file-input-pagos" class="file-label d-flex">
+                  <i class="fas fa-upload"></i>
+                  <div class="file-group-text">
+                    <span class="file-text">Selecciona o arrastra tu archivo aquí</span><br>
+                    <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg</span>
+                  </div>
+                  <button class="upload-button upload-button-pagos" type="button">Subir archivo</button>
+                </label>
+                <div class="file-info-box hidden">
+                  <div class="file-info">
+                    <div class="file-iconic"></div>
+                    <span class="file-name"></span>
+                    <span class="file-size"></span>
+                    <button class="remove-file-button"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn bg-orange text-white">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <!-- Modal para imágenes -->
+    <div class="modal fade" id="image-modal" tabindex="-2" role="dialog" aria-labelledby="imageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img id="image-preview" src="" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para videos -->
+    <div class="modal fade" id="video-modal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <video id="video-preview" controls style="width: 100%;">
+                        <source src="" type="video/mp4">
+                        Tu navegador no soporta la reproducción de videos.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para archivos (PDF, Word, Excel) -->
+    <div class="modal fade" id="file-modal" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <iframe id="file-preview" src="" style="width: 100%; height: 500px;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <style scoped>
 * {
@@ -2916,24 +2997,30 @@ div#table-clientes-pagos_filter {
     display: none;
 }
 
-.tab-cliente-documentacion {
+.tabs{
+    gap:10px;
+    margin-right: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.tab {
     padding: 0.5em;
     border-radius: 0.5em;
-    margin-bottom: 1em;
     width: 100%;
     border-width: 2px;
     border-color: #CDCDCD;
     color: #7E7E7E;
     text-align: center;
     cursor: pointer;
+    background-color: transparent;
 
 }
 
-.tab-cliente-documentacion.active {
+.tab.active {
     background-color: #FFFFFF;
     color: black;
-    border-width: 0px;
-
 }
 
 .documentos-clientes-tabs {
@@ -3228,5 +3315,19 @@ label>i {
 }
 .table-responsive{
     overflow-x: hidden;
+}
+.input-soles-wrapper {
+  position: relative;
+}
+.input-soles-wrapper .soles-symbol {
+  position: absolute;
+  left: 20px;
+  top: 51%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1rem;
+}
+.input-soles-wrapper input {
+  padding-left: 2.2em;
 }
 </style>

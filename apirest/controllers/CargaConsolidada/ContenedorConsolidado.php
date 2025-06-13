@@ -398,11 +398,11 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata   = [];
 					$subdata[] = $index;
 					$subdata[] = date("d/m/Y", strtotime($row->fecha));
-					$subdata[] = $row->nombre;
+					$subdata[] = ucwords(strtolower($row->nombre));
 					$subdata[] = $row->documento;
 					$subdata[] = $row->correo;
 					$subdata[] = $row->telefono;
-					$subdata[] = $row->name;
+					$subdata[] = ucwords(strtolower($row->name));
 					$subdata[] = $row->volumen;
 					//div with a tag to download file and button to delete file
 					$divFile = '<div style="display: flex;gap: 10px; justify-content:center;">';
@@ -653,7 +653,7 @@ class ContenedorConsolidado extends CI_Controller
 					}
 					$subdata[] = $proveedoresSelect;
 					$subdata[] = $index;
-					$subdata[] = $row->nombre;
+					$subdata[] = ucwords(strtolower($row->nombre));;
 					if ($this->user->No_Grupo != "ContenedorAlmacen") {
 						$subdata[] = $row->telefono;
 						$subdata[] = $estadoSelect;
@@ -673,35 +673,49 @@ class ContenedorConsolidado extends CI_Controller
 				}else{
 					$subdata   = [];
 					$subdata[] = $index;
-					$subdata[] = $row->nombre;
+					$subdata[] = ucwords(strtolower($row->nombre));;
 					$subdata[] = $row->documento;
 					$subdata[] = $row->telefono;
-					$subdata[] = $row->name;
-					//badge for estado_pagos_coordinacion gray is PENDIENTE,yellow if ADELANTO,green if PAGADO,red if SOBREPAGO
-					$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
-					if ($row->pagos_count==0) {
-						$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
-					} else if ($row->total_pagos<$row->monto) {
-						$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
-					} else if ($row->total_pagos==$row->monto) {
-						$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
-					} else if ($row->total_pagos>$row->monto) {
-						$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
+					$subdata[] = ucwords(strtolower($row->name));	
+					$estadoPago = 'PENDIENTE';
+					if ($row->pagos_count == 0) {
+						$estadoPago = 'PENDIENTE';
+					} else if ($row->total_pagos < $row->monto) {
+						$estadoPago = 'ADELANTO';
+					} else if ($row->total_pagos == $row->monto) {
+						$estadoPago = 'PAGADO';
+					} else if ($row->total_pagos > $row->monto) {
+						$estadoPago = 'SOBREPAGO';
 					}
+
+					$colorClass = '';
+					switch ($estadoPago) {
+						case 'PENDIENTE': $colorClass = 'bg-secondary'; break;
+						case 'ADELANTO': $colorClass = 'bg-warning'; break;
+						case 'PAGADO': $colorClass = 'bg-success'; break;
+						case 'SOBREPAGO': $colorClass = 'bg-danger'; break;
+					}
+
+					$estadoPagosCoordinacion = '<select class="form-control estado-pagos-coordinacion ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
+					$estadoPagosCoordinacion .= '<option value="PENDIENTE" class="bg-secondary"' . ($estadoPago == 'PENDIENTE' ? ' selected' : '') . '>Pendiente</option>';
+					$estadoPagosCoordinacion .= '<option value="ADELANTO" class="bg-warning"' . ($estadoPago == 'ADELANTO' ? ' selected' : '') . '>Adelanto</option>';
+					$estadoPagosCoordinacion .= '<option value="PAGADO" class="bg-success"' . ($estadoPago == 'PAGADO' ? ' selected' : '') . '>Pagado</option>';
+					$estadoPagosCoordinacion .= '<option value="SOBREPAGO" class="bg-danger"' . ($estadoPago == 'SOBREPAGO' ? ' selected' : '') . '>Sobrepago</option>';
+					$estadoPagosCoordinacion .= '</select>';
 					$subdata[] = $estadoPagosCoordinacion;
 					$subdata[] = "Logistica";
-					$subdata[] = $row->monto;
-					$subdata[] = $row->total_pagos==0 ? "0" : number_format($row->total_pagos, 2);
+					$subdata[] = "$".$row->monto;
+					$subdata[] = $row->total_pagos==0 ? "0" : "$".number_format($row->total_pagos, 2);
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
 					if($row->pagos_count < 4) {
-						$divAcciones .='<div class="d-flex"  onclick="addPagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+						$divAcciones .='<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
 					} 
 					if($row->pagos_count > 0) {
 						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
 						</div>';
-					}
+					}	
 					$divAcciones .=  '</div>';
 					$subdata[] = $divAcciones;
 
@@ -732,11 +746,11 @@ class ContenedorConsolidado extends CI_Controller
 				if ($tipoTabla == "general") {
 					$subdata   = [];
 					$subdata[] = $index;
-					$subdata[] = $row->nombre;
+					$subdata[] = ucwords(strtolower($row->nombre));
 					$subdata[] = $row->documento;
 					$subdata[] = $row->correo;
 					$subdata[] = $row->telefono;
-					$subdata[] = $row->name;
+					$subdata[] = ucwords(strtolower($row->name));
 					if ($this->user->No_Grupo != "Documentacion") {
 						$subdata[] = $row->volumen;
 						$subdata[] = $row->fob;
@@ -747,7 +761,7 @@ class ContenedorConsolidado extends CI_Controller
 
 					if ($this->user->No_Grupo == "Coordinación") {
 						$selectEstadoCliente = "";
-						$selectEstadoCliente = '<select class="form-control
+						$selectEstadoCliente = '<select class="form-control xl:w-auto	
 						' . ($row->estado_cliente == "RESERVADO" ? "bg-warning" : "") .
 							($row->estado_cliente == "NO RESERVADO" ? "bg-secondary" : "") .
 							($row->estado_cliente == "DOCUMENTACION" ? "bg-primary" : "") .
@@ -776,7 +790,7 @@ class ContenedorConsolidado extends CI_Controller
 								$colorClass = 'bg-success';
 								break;
 						}
-						$select_status = '<select class="select-status-cliente form-control ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
+						$select_status = '<select class="select-status-cliente form-control xl:w-auto ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
 						$select_status .= '<option value="Pendiente" class="bg-warning"'
 							. ($status == 'Pendiente' ? ' selected' : ' disabled') . '>PENDIENTE</option>';
 						$select_status .= '<option value="Incompleto" class="bg-danger"'
@@ -878,25 +892,39 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->documento;
 					$subdata[] = $row->telefono;
 					$subdata[] = $row->name;
-					//badge for estado_pagos_coordinacion gray is PENDIENTE,yellow if ADELANTO,green if PAGADO,red if SOBREPAGO
-					$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
-					if ($row->pagos_count==0) {
-						$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
-					} else if ($row->total_pagos<$row->monto) {
-						$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
-					} else if ($row->total_pagos==$row->monto) {
-						$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
-					} else if ($row->total_pagos>$row->monto) {
-						$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
+					$estadoPago = 'PENDIENTE';
+					if ($row->pagos_count == 0) {
+						$estadoPago = 'PENDIENTE';
+					} else if ($row->total_pagos < $row->monto) {
+						$estadoPago = 'ADELANTO';
+					} else if ($row->total_pagos == $row->monto) {
+						$estadoPago = 'PAGADO';
+					} else if ($row->total_pagos > $row->monto) {
+						$estadoPago = 'SOBREPAGO';
 					}
+
+					$colorClass = '';
+					switch ($estadoPago) {
+						case 'PENDIENTE': $colorClass = 'bg-secondary'; break;
+						case 'ADELANTO': $colorClass = 'bg-warning'; break;
+						case 'PAGADO': $colorClass = 'bg-success'; break;
+						case 'SOBREPAGO': $colorClass = 'bg-danger'; break;
+					}
+
+					$estadoPagosCoordinacion = '<select class="form-control estado-pagos-coordinacion ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
+					$estadoPagosCoordinacion .= '<option value="PENDIENTE" class="bg-secondary"' . ($estadoPago == 'PENDIENTE' ? ' selected' : '') . '>Pendiente</option>';
+					$estadoPagosCoordinacion .= '<option value="ADELANTO" class="bg-warning"' . ($estadoPago == 'ADELANTO' ? ' selected' : '') . '>Adelanto</option>';
+					$estadoPagosCoordinacion .= '<option value="PAGADO" class="bg-success"' . ($estadoPago == 'PAGADO' ? ' selected' : '') . '>Pagado</option>';
+					$estadoPagosCoordinacion .= '<option value="SOBREPAGO" class="bg-danger"' . ($estadoPago == 'SOBREPAGO' ? ' selected' : '') . '>Sobrepago</option>';
+					$estadoPagosCoordinacion .= '</select>';
 					$subdata[] = $estadoPagosCoordinacion;
 					$subdata[] = "Logistica";
 					$subdata[] = "$".round($row->monto+$row->impuestos,2);
-					$subdata[] = $row->total_pagos==0 ? "0" : number_format($row->total_pagos, 2);
+					$subdata[] = $row->total_pagos==0 ? "0" : "$".number_format($row->total_pagos, 2);
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
 					if($row->pagos_count < 4) {
-						$divAcciones .='<div class="d-flex"  onclick="addPagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+						$divAcciones .='<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
 					} 
 					if($row->pagos_count > 0) {
 						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
@@ -930,11 +958,11 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata       = [];
 				if($tipoTabla == "general") {
 					$subdata[]     = $index;
-					$subdata[]     = $row->nombre;
+					$subdata[]     = ucwords(strtolower($row->nombre));
 					$subdata[]     = $row->documento;
 					$subdata[]     = $row->correo;
 					$subdata[]     = $row->telefono;
-					$subdata[]     = $row->name;
+					$subdata[]     = ucwords(strtolower($row->name));
 					$subdata[]     = $row->volumen_final;
 					// $subdata[]     = $row->monto_final;
 					$subdata[]     = "$".$row->fob_final;
@@ -1012,11 +1040,11 @@ class ContenedorConsolidado extends CI_Controller
 			foreach ($arrResponse as $row) {
 				$subdata = array();
 				$subdata[] = $index;
-				$subdata[] = $row->nombre;
+				$subdata[] = ucwords(strtolower($row->nombre));
 				$subdata[] = $row->documento;
 				$subdata[] = $row->correo;
 				$subdata[] = $row->telefono;
-				$subdata[] = $row->name;
+				$subdata[] = ucwords(strtolower($row->name));
 				$subdata[] = '<div class="badge badge-' . ($row->estado_cotizacion_final == "AJUSTADO" ? "danger" : "success") . '">' .
 					($row->estado_cotizacion_final == "AJUSTADO" ? "SI" : "NO") . '</div>';
 
@@ -1839,10 +1867,20 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata[] = $row->payment_date;
 			$subdata[] = $row->banco;
 			$subdata[] = "$".round($row->monto, 2);
-			$subdata[] = '<a href="'.$row->voucher_url.'" target="_blank" download>
-				<i class="fas fa-file-excel text-success"></i>
-				</a>';
-			$subdata[] = '<button class="btn btn-danger btn-sm" onclick="deletePagoCoordination(' . $row->id . ')"><i class="fa fa-trash"></i></button>';
+			// Obtener extensión del archivo
+            $ext = strtolower(pathinfo($row->voucher_url, PATHINFO_EXTENSION));
+			// Generar el ícono usando una función JS en el frontend
+            $iconHtml = "<span class='file-icon' data-ext='{$ext}' data-url='{$row->voucher_url}'></span>";
+			$subdata[] = '<div data-url="' . $row->voucher_url . '" download
+                onclick="showImageModal(\'' . $row->voucher_url . '\')"
+                >' . $iconHtml . '</div>';
+			$divAcciones = '<div class="btn-group">';
+			//edit button
+			$divAcciones .= '<i class="fas fa-edit text-warning p-[10px]" style="cursor: pointer;" onclick="editPagoCoordination(' . $row->id . ')"></i>';
+			//delete button
+			$divAcciones .= '<i class="fas fa-trash text-danger p-[10px]" style="cursor: pointer;" onclick="deletePagoCoordination(' . $row->id . ')"></i>';
+			$divAcciones .= '</div>';
+			$subdata[] = $divAcciones;
 			$data[] = $subdata;
 			$index++;
 		}

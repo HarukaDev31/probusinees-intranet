@@ -1195,67 +1195,59 @@ async function uploadFacturaGeneral(idCotizacion) {
     });
   }
 }
-async function addPagosCoordination(idCotizacion, nombreCliente) {
-  //showm modal with fields monto banco text , voucher file , fecha date required
-  const { value: formValues } = await Swal.fire({
-    title: `Pagos de Coordinación - ${nombreCliente}`,
-    html: `
-      <input type="number" id="monto" class="swal2-input" placeholder="Monto" step="0.01" required>
-      <select id="banco" class="swal2-input" required>
-        <option value="" disabled selected>Seleccione un banco</option>
-        <option value="BCP" class="bg-primary">BCP</option>
-        <option value="INTERBANK" class="bg-success">INTERBANK</option>
-        </select>
-      <input type="file" id="voucher" class="swal2-input" accept="image/*;application/pdf" required>
-      <input type="date" id="fecha" class="swal2-input" required>
-
-    `,
-    focusConfirm: false,
-    preConfirm: () => {
-      const monto = $("#monto").val();
-      const banco = $("#banco").val();
-      const voucher = $("#voucher")[0].files[0];
-      const fecha = $("#fecha").val();
-      if (!monto || !banco || !voucher || !fecha) {
-        Swal.showValidationMessage("Por favor, completa todos los campos.");
-      } else {
-        const formData = new FormData();
-        formData.append("monto", monto);
-        formData.append("banco", banco);
-        formData.append("voucher", voucher);
-        formData.append("fecha", fecha);
-        formData.append("idCotizacion", idCotizacion);
-        formData.append("idContenedor", idContenedor);
-        return formData;
-      }
-    },
-    showCancelButton: true,
-    confirmButtonText: "Guardar",
-    cancelButtonText: "Cancelar",
-  });
-  if (formValues) {
-    const formData = formValues;
-    url =
-      base_url + "CargaConsolidada/ContenedorConsolidado/saveClientePagosCoordination";
-    $.ajax({
-      url: url,
-      type: "POST",
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function (response) {
-        const result = JSON.parse(response);
-        if (result.status == "success") {
-          Swal.fire("Correcto!", result.message, "success");
-          // Reload the table or perform any other action needed
-          tableCotizacionPagos.ajax.reload();
-        } else {
-          Swal.fire("Error!", result.message, "error");
-        }
-      },
-    });
-  }
+function abrirModalPagoCurso(idCot, nombreCliente) {
+  $('#modalPagoCursoLabel').text(`Registrar Pago de Curso - ${nombreCliente}`);
+  $('#id-pedido-curso').val(idCot);
+  $('#form-pago-curso')[0].reset();
+  $('#modal-pago-curso').modal('show');
+  idCotizacion = idCot;
+  // Inicializa el input personalizado
+  setupSingleFileUpload(
+    "single-file-upload-pagos",
+    "file-input-pagos",
+  ['pdf', 'docx', 'xlsx', 'xls', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt', 'png', 'jpg', 'jpeg'],
+    '.upload-button-pagos'
+  );
+  // Establecer la fecha de hoy en el campo fecha
+  const hoy = new Date().toISOString().split('T')[0];
+  $('#fecha_pago').val(hoy);
 }
+
+// Enviar el formulario por AJAX
+$('#form-pago-curso').on('submit', function(e) {
+  e.preventDefault();
+  // Validar que se haya seleccionado un archivo
+  const fileInput = document.getElementById('file-input-pagos');
+  if (!fileInput.files || fileInput.files.length === 0) {
+    $('.file-upload-box').addClass('border-danger');
+    Swal.fire("Error", "Debes seleccionar un archivo de voucher.", "warning");
+    return;
+  }
+  const formData = new FormData(this);
+  formData.append("idCotizacion", idCotizacion);
+  formData.append("idContenedor", idContenedor);
+  $.ajax({
+    url: base_url + "CargaConsolidada/ContenedorConsolidado/saveClientePagosCoordination",
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function(response) {
+      const result = typeof response === "string" ? JSON.parse(response) : response;
+      if (result.status === "success") {
+        Swal.fire("Correcto!", result.message, "success");
+        $('#modal-pago-curso').modal('hide');
+        if (typeof tableCursoPagos !== "undefined" && tableCursoPagos && typeof tableCursoPagos.ajax !== "undefined") tableCursoPagos.ajax.reload();
+        if (typeof tableClientesPagos !== "undefined" && tableClientesPagos && typeof tableClientesPagos.ajax !== "undefined") tableClientesPagos.ajax.reload();
+        if (typeof tableCotizacionPagos !== "undefined" && tableCotizacionPagos && typeof tableCotizacionPagos.ajax !== "undefined") tableCotizacionPagos.ajax.reload();
+        if (typeof tableCotizacionTrackingPagos !== "undefined" && tableCotizacionTrackingPagos && typeof tableCotizacionTrackingPagos.ajax !== "undefined") tableCotizacionTrackingPagos.ajax.reload();
+      } else {
+        Swal.fire("Error!", result.message, "error");
+      }
+    }
+  });
+});
+
 
 function deletePagoCoordination(idPago) {
   Swal.fire({
@@ -1274,9 +1266,10 @@ function deletePagoCoordination(idPago) {
           const result = JSON.parse(response);
           if (result.status == "success") {
             Swal.fire("Eliminado!", result.message, "success");
-            tableCotizacionTrackingPagos.ajax.reload();
-            tableCotizacionPagos.ajax.reload();
-            tableClientesPagos.ajax.reload();
+            if (typeof tableCursoPagos !== "undefined" && tableCursoPagos && typeof tableCursoPagos.ajax !== "undefined") tableCursoPagos.ajax.reload();
+            if (typeof tableClientesPagos !== "undefined" && tableClientesPagos && typeof tableClientesPagos.ajax !== "undefined") tableClientesPagos.ajax.reload();
+            if (typeof tableCotizacionPagos !== "undefined" && tableCotizacionPagos && typeof tableCotizacionPagos.ajax !== "undefined") tableCotizacionPagos.ajax.reload();
+            if (typeof tableCotizacionTrackingPagos !== "undefined" && tableCotizacionTrackingPagos && typeof tableCotizacionTrackingPagos.ajax !== "undefined") tableCotizacionTrackingPagos.ajax.reload();
           } else {
             Swal.fire("Error!", result.message, "error");
           }
@@ -1295,7 +1288,6 @@ async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
   if (!$.fn.DataTable.isDataTable("#table-pagos-tracking-coordinacion")) {
     tableCotizacionTrackingPagos = $("#table-pagos-tracking-coordinacion").DataTable({
       dom:
-        "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
       buttons: [],
@@ -1365,7 +1357,12 @@ async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
 
       },
       drawCallback: function (settings) {
-
+        $('.file-icon').each(function() {
+        const ext = $(this).data('ext');
+        const url = $(this).data('url');
+        // Supón que tienes una función getIconByType(ext) que retorna el HTML del ícono
+        $(this).html(getIconByType(ext));
+}); 
       },
     });
   } else {
@@ -2609,7 +2606,6 @@ const openStepFunction = async (step, id) => {
         enableHorizontalAutoScrollForAllTables();
         tableCotizacionEmbarque = $("#table-cotizacion-embarque").DataTable({
           dom:
-            "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
           buttons: [],
@@ -2772,7 +2768,6 @@ const openStepFunction = async (step, id) => {
               "#table-cotizacion-embarque"
             ).DataTable({
               dom:
-                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
               buttons: [],
@@ -2922,7 +2917,6 @@ const openStepFunction = async (step, id) => {
               "#table-cotizacion-prospectos"
             ).DataTable({
               dom:
-                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
               buttons: [],
@@ -3071,7 +3065,6 @@ const openStepFunction = async (step, id) => {
               "#table-cotizacion-pagos"
             ).DataTable({
               dom:
-                "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
               buttons: [],
@@ -3225,7 +3218,7 @@ const openStepFunction = async (step, id) => {
         } else {
           url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
           tableClientesGeneral = $("#table-clientes-general").DataTable({
-            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            dom:
               "<'row'<'col-sm-12'tr>>" +
               "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
             buttons: [],
@@ -3319,7 +3312,7 @@ const openStepFunction = async (step, id) => {
         } else {
           url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
           tableClientesVariacion = $("#table-clientes-variacion").DataTable({
-            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            dom:
               "<'row'<'col-sm-12'tr>>" +
               "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
             buttons: [],
@@ -3414,7 +3407,7 @@ const openStepFunction = async (step, id) => {
         } else {
           url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
           tableClientesPagos = $("#table-clientes-pagos").DataTable({
-            dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+            dom:
               "<'row'<'col-sm-12'tr>>" +
               "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
             buttons: [],
@@ -3503,313 +3496,7 @@ const openStepFunction = async (step, id) => {
     });
     $(".tab-clientes").first().click();
 
-    // url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
-    // clientesContainer.show();
-    // if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-    //   reloadTableClientesGeneral();
-    // } else {
-    //   tableClientesGeneral.show();
-    //   limpiarFiltroDataTable("table-clientes-general");
 
-    //   tableClientesGeneral = $("#table-clientes-general").DataTable({
-    //     dom:
-    //       "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-    //       "<'row'<'col-sm-12'tr>>" +
-    //       "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-    //     buttons: [
-    //       {
-    //         extend: "excel",
-    //         text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-    //         titleAttr: "Excel",
-    //         exportOptions: {
-    //           columns: ":visible",
-    //         },
-    //         attr: {
-    //           id: "export-excel-main",
-    //           class: "hidden",
-    //         },
-    //       },
-    //       {
-    //         text: "General",
-    //         action: function () {
-    //           if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
-    //             $("#table-clientes-variacion").attr("style", "display:none");
-    //             $("#table-clientes-variacion_wrapper").hide();
-    //           }
-    //           if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-    //             $("#table-clientes-general").attr("style", "");
-    //             $("#table-clientes-general_wrapper").show();
-    //             reloadTableClientesGeneral();
-    //           } else {
-    //             $("#table-clientes-general").attr("style", "");
-    //             $("#table-clientes-general_wrapper").show();
-    //             reloadTableClientesGeneral();
-    //           }
-    //           limpiarInputBuscadorPersonalizado("search-table");
-    //           configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
-    //         },
-    //         className: "btn btn-light",
-    //       },
-    //       currentPrivilege != "Documentacion"
-    //         ? {
-    //           text: "Variación",
-    //           action: function () {
-    //             if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
-    //               $("#table-clientes-general").attr("style", "display:none");
-    //               $("#table-clientes-general_wrapper").hide();
-    //             }
-    //             if ($.fn.DataTable.isDataTable("#table-clientes-variacion")) {
-    //               $("#table-clientes-variacion").attr("style", "");
-    //               $("#table-clientes-variacion_wrapper").show();
-    //               limpiarFiltroDataTable("table-clientes-variacion");
-    //               reloadTableClientesVariacion();
-    //             } else {
-    //               url =
-    //                 base_url + "CargaConsolidada/ContenedorConsolidado/step";
-    //               tableClientesVariacion.show();
-    //               tableClientesVariacion = $(
-    //                 "#table-clientes-variacion"
-    //               ).DataTable({
-    //                 dom:
-    //                   "<'row'<'col-sm-12 col-md-7'B><'col-sm-12 col-md-4'f><'col-sm-12 col-md-1'>>" +
-    //                   "<'row'<'col-sm-12'tr>>" +
-    //                   "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-
-
-    //                 buttons: [
-    //                   {
-    //                     extend: "excel",
-    //                     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-    //                     titleAttr: "Excel",
-    //                     exportOptions: {
-    //                       columns: ":visible",
-    //                     },
-    //                     attr: {
-    //                       id: "export-excel-main",
-    //                       class: "hidden",
-    //                     },
-    //                   },
-    //                   {
-    //                     extend: "pdf",
-    //                     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-    //                     titleAttr: "PDF",
-    //                     exportOptions: {
-    //                       columns: ":visible",
-    //                     },
-    //                     attr: {
-    //                       id: "export-pdf-main",
-    //                       class: "hidden",
-    //                     },
-    //                   },
-    //                   {
-    //                     text: "General",
-    //                     action: function () {
-    //                       if (
-    //                         $.fn.DataTable.isDataTable(
-    //                           "#table-clientes-variacion"
-    //                         )
-    //                       ) {
-    //                         $("#table-clientes-variacion").attr(
-    //                           "style",
-    //                           "display:none"
-    //                         );
-    //                         $("#table-clientes-variacion_wrapper").hide();
-    //                       }
-    //                       if (
-    //                         $.fn.DataTable.isDataTable(
-    //                           "#table-clientes-general"
-    //                         )
-    //                       ) {
-    //                         $("#table-clientes-general_wrapper").show();
-
-    //                         $("#table-clientes-general").attr("style", "");
-    //                         reloadTableClientesGeneral();
-    //                       } else {
-    //                         $("#table-clientes-general").attr("style", "");
-    //                         $("#table-clientes-general_wrapper").show();
-    //                         limpiarFiltroDataTable("table-clientes-general");
-    //                         reloadTableClientesGeneral();
-    //                       }
-    //                       limpiarInputBuscadorPersonalizado("search-table");
-    //                       configurarBuscador("table-clientes-general", "search-table", "table-clientes-general_info");
-    //                     },
-    //                   },
-    //                   {
-    //                     text: "Variación",
-    //                     className: "btn btn-light",
-    //                     action: function () {
-    //                       if (
-    //                         $.fn.DataTable.isDataTable(
-    //                           "#table-clientes-general"
-    //                         )
-    //                       ) {
-    //                         $("#table-clientes-general").attr(
-    //                           "style",
-    //                           "display:none"
-    //                         );
-    //                         $("#table-clientes-general_wrapper").hide();
-    //                       }
-    //                       if (
-    //                         $.fn.DataTable.isDataTable(
-    //                           "#table-clientes-variacion"
-    //                         )
-    //                       ) {
-    //                         $("#table-clientes-variacion_wrapper").show();
-    //                         limpiarFiltroDataTable("table-clientes-variacion");
-
-    //                         $("#table-clientes-variacion").attr("style", "");
-    //                         reloadTableClientesVariacion();
-    //                       } else {
-    //                         $("#table-clientes-variacion").attr("style", "");
-    //                         reloadTableClientesVariacion();
-    //                       }
-
-    //                     },
-    //                   },
-    //                 ],
-    //                 columnDefs: [
-    //                   {
-    //                     targets: "no-hidden",
-    //                     visible: false,
-    //                   },
-    //                   {
-    //                     className: "text-center",
-    //                     targets: "no-sort",
-    //                     orderable: false,
-    //                   },
-    //                   {
-    //                     targets: "",
-    //                     orderable: false,
-    //                   },
-    //                   {
-    //                     targets: "sorting_asc",
-    //                     orderable: false,
-    //                   },
-    //                 ],
-    //                 pageLength: 100, // Mostrar 100 elementos por página
-    //                 lengthMenu: [
-    //                   [100, 1000, -1],
-    //                   [100, 1000, "Todos"],
-    //                 ],
-    //                 paging: true,
-    //                 lengthChange: true,
-    //                 searching: true,
-    //                 ordering: true,
-    //                 info: true,
-    //                 autoWidth: false,
-    //                 responsive: false,
-    //                 serverSide: false,
-    //                 pagingType: "full_numbers",
-    //                 oLanguage: {
-    //                   sInfo:
-    //                     "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-    //                   sLengthMenu: "_MENU_",
-    //                   sSearch: "Buscar por: ",
-    //                   sSearchPlaceholder: "",
-    //                   sZeroRecords: "No se encontraron registros",
-    //                   sInfoEmpty: "No hay registros",
-    //                   sLoadingRecords: "Cargando...",
-    //                   sProcessing: "Procesando...",
-    //                   oPaginate: {
-    //                     sFirst: "<<",
-    //                     sLast: ">>",
-    //                     sPrevious: "<",
-    //                     sNext: ">",
-    //                   },
-    //                 },
-    //                 ajax: {
-    //                   url: url,
-    //                   type: "POST",
-    //                   dataType: "JSON",
-    //                   data: function (data) {
-    //                     data.stepIndex = stepIndex;
-    //                     data.idContenedor = idContenedor;
-    //                     data.tipoTabla = "variacion";
-    //                     data.Filtro_Estado = $("#txt-ID_Estado").val();
-    //                     validateListEmbarque(idContenedor);
-    //                   },
-    //                 },
-    //               });
-    //               limpiarFiltroDataTable("table-clientes-variacion");
-    //               reloadTableClientesVariacion();
-    //             }
-    //             limpiarInputBuscadorPersonalizado("search-table");
-    //             configurarBuscador(
-    //               "table-clientes-variacion",
-    //               "search-table",
-    //               "table-clientes-variacion_info"
-    //             );
-    //           },
-    //         }
-    //         : null,
-    //     ]
-    //       //filter null
-    //       .filter(Boolean),
-    //     paging: true,
-    //     lengthChange: true,
-    //     searching: true,
-    //     ordering: true,
-    //     info: true,
-    //     autoWidth: false,
-    //     responsive: false,
-    //     serverSide: false,
-    //     pagingType: "full_numbers",
-    //     columnDefs: [
-    //       {
-    //         targets: "no-hidden",
-    //         visible: false,
-    //       },
-    //       {
-    //         targets: "no-sort",
-    //         orderable: false,
-    //       },
-    //       {
-    //         targets: "",
-    //         orderable: false,
-    //       },
-    //       {
-    //         targets: "sorting_asc",
-    //         orderable: false,
-    //       },
-    //     ],
-    //     pageLength: 100, // Mostrar 100 elementos por página
-    //     lengthMenu: [
-    //       [100, 1000, -1],
-    //       [100, 1000, "Todos"],
-    //     ],
-    //     oLanguage: {
-    //       sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-    //       sLengthMenu: "_MENU_",
-    //       sSearch: "Buscar por: ",
-    //       sSearchPlaceholder: "",
-    //       sZeroRecords: "No se encontraron registros",
-    //       sInfoEmpty: "No hay registros",
-    //       sLoadingRecords: "Cargando...",
-    //       sProcessing: "Procesando...",
-    //       oPaginate: {
-    //         sFirst: "<<",
-    //         sLast: ">>",
-    //         sPrevious: "<",
-    //         sNext: ">",
-    //       },
-    //     },
-    //     ajax: {
-    //       url: url,
-    //       type: "POST",
-    //       dataType: "JSON",
-    //       data: function (data) {
-    //         data.stepIndex = stepIndex;
-    //         data.idContenedor = idContenedor;
-    //         data.tipoTabla = "general";
-    //         data.Filtro_Estado = "0";
-    //       },
-    //     },
-    //   });
-    //   limpiarFiltroDataTable("table-clientes-general");
-    //   reloadTableClientesGeneral();
-    // }
     limpiarInputBuscadorPersonalizado("search-table");
     configurarBuscador(
       "table-clientes-general",
@@ -3975,7 +3662,6 @@ async function viewFacturaGuia() {
 
     tableFacturaGuia = $("#table-factura-guia").DataTable({
       dom:
-        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
 
@@ -4095,7 +3781,7 @@ async function viewCotizacionFinal() {
       } else {
         tableCotizacionFinal.show();
         tableCotizacionFinal = $("#table-cotizacion-final").DataTable({
-          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+          dom:
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
           buttons: [
@@ -4178,7 +3864,7 @@ async function viewCotizacionFinal() {
       } else {
         tableCotizacionFinalPagos.show();
         tableCotizacionFinalPagos = $("#table-cotizacion-final-pagos").DataTable({
-          dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
+          dom:
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
           buttons: [
@@ -6248,7 +5934,6 @@ $(document).ready(async function () {
       $("#table-contenedor").html("");
       table_Entidad = $("#table-contenedor-completados").DataTable({
         dom:
-          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
 
@@ -6359,7 +6044,6 @@ $(document).ready(async function () {
       $("#table-contenedor-completados").html("");
       table_Entidad = $("#table-contenedor").DataTable({
         dom:
-          "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
 
@@ -6492,7 +6176,6 @@ $(document).ready(async function () {
     limpiarInputBuscadorPersonalizado("search-table");
     table_Entidad = $("#table-contenedor").DataTable({
       dom:
-        "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
 
@@ -7972,6 +7655,14 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
     const removeFileButton = container.querySelector('.remove-file-button');
     const selectFileButton = container.querySelector(selectInputId);
 
+    function limpiarVistaPreviaArchivo() {
+      fileInput.value = "";
+      fileInfoBox.classList.add('hidden');
+      if (fileNameElement) fileNameElement.textContent = "";
+      if (fileSizeElement) fileSizeElement.textContent = "";
+      if (fileIconElement) fileIconElement.innerHTML = "";
+    }
+
     if (selectFileButton) {
       // Elimina cualquier listener anterior para evitar duplicados
       selectFileButton.removeEventListener('click', selectFileButton._uploadClickHandler);
@@ -7999,7 +7690,6 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
 
         // Obtener el ícono correspondiente
         const fileIcon = getIconByType(fileType || fileExtension);
-        console.log('Ícono obtenido:', fileIcon); // Depuración
 
         // Mostrar el cuadro de información del archivo
         fileInfoBox.classList.remove('hidden');
@@ -8044,7 +7734,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
           });
         }
       } else {
-        fileInfoBox.classList.add('hidden'); // Ocultar el cuadro de información
+        limpiarVistaPreviaArchivo();
       }
     });
 
@@ -8052,8 +7742,7 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
     if (removeFileButton) {
       removeFileButton.addEventListener('click', (e) => {
         e.preventDefault();
-        fileInput.value = ""; // Limpia el input
-        fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
+        limpiarVistaPreviaArchivo();
       });
     }
 
@@ -8089,10 +7778,14 @@ function setupSingleFileUpload(containerId, inputId, allowedFileTypes = [], sele
       }
     });
 
-    // Restablecer el estado del cuadro de información cuando el modal se oculta
-    $('#modal-crear-cotizacion').on('hidden.bs.modal', function () {
-      fileInput.value = ""; // Limpia el input
-      fileInfoBox.classList.add('hidden'); // Oculta el cuadro de información
+    // Limpiar al cerrar el modal de pago de curso
+    $('#modal-pago-curso').on('hidden.bs.modal', function () {
+      limpiarVistaPreviaArchivo();
+    });
+
+    // Limpiar al enviar el formulario de pago de curso
+    $('#form-pago-curso').on('submit', function () {
+      limpiarVistaPreviaArchivo();
     });
 
   } catch (e) {

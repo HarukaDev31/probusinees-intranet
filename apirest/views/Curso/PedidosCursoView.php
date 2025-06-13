@@ -125,24 +125,23 @@
     </section>
     <section class="content" id="section-listar-pedidos">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
                     <input type="hidden" id="hidden-sMethod" name="sMethod" class="form-control"
                         value="<?php echo $this->router->method; ?>">
-                    <div class="row">
-                        <div class="flex col-xl-6">
-                            <div data-table="alumnos"
-                                class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
-                                Alumnos
-                            </div>
-                            <div data-table="pagos"
-                                class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-curso">
-                                Pagos
-                            </div>
+                    <div class="flex">
+                        <div class="row tabs" style="width: -webkit-fill-available;">
+                                <div data-table="alumnos"
+                                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-curso">
+                                    Alumnos
+                                </div>
+                                <div data-table="pagos"
+                                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-curso">
+                                    Pagos
+                                </div>
+                            
                         </div>
                         <div class="col-12 col-md-4 col-xl-2 d-flex align-items-center">
-                            Total Importe:
-                            <span id="span-total-importe" class=" pl-2 font-weight-bold"></span>
+                                Total Importe:
+                                <span id="span-total-importe" class=" pl-2 font-weight-bold"></span>
                         </div>
                     </div>
                     <div class="table-responsive div-Listar">
@@ -176,10 +175,6 @@
                             </thead>
                         </table>
                     </div>
-
-                </div>
-
-            </div>
             <!-- /.row -->
         </div>
         <!-- /.container-fluid -->
@@ -310,8 +305,8 @@
 <!-- Modal Nueva Campaña -->
 <div class="modal fade" id="modalClientePagosCoordination" tabindex="-1" role="dialog"
     aria-labelledby="modalClientePagosCoordinationLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg adelantos-modal" role="document">
+        <div class="modal-content justify-content-center">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalClientePagosCoordinationLabel">Pagos del Cliente</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -373,15 +368,18 @@
   <div class="modal-dialog modal-lg">
     <form id="form-pago-curso" enctype="multipart/form-data">
       <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title" id="modalPagoCursoLabel">Registrar Pago de Curso</h3>
+        <div class="modal-header justify-content-center">
+          <h2 class="modal-title" id="modalPagoCursoLabel">Registrar Pago de Curso</h2>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body row">
           <input type="hidden" id="id-pedido-curso" name="idPedido">
           <div class="col-md-6 mb-3">
             <label for="monto" class="form-label">Monto</label>
-            <input type="number" id="monto" name="monto" class="form-control" step="0.01" required>
+            <div class="input-soles-wrapper">
+                <span class="soles-symbol">S/</span>
+                <input type="number" id="monto" name="monto" class="form-control" step="0.01" required>
+            </div>
           </div>
           <div class="col-md-6 mb-3">
             <label for="banco" class="form-label">Banco</label>
@@ -408,14 +406,14 @@
           </div>
           <div class="col-md-6 mb-3">
             <label for="fecha" class="form-label">Fecha</label>
-            <input type="date" id="fecha" name="fecha" class="form-control" required>
+            <input type="date" id="fecha_pago" name="fecha" class="form-control" required>
           </div>
           <div class="col-md-12 mb-3">
             <label class="form-label">Voucher</label>
             <div id="file-upload-pagos-container">
               <div class="file-upload-box" id="single-file-upload-pagos">
                 <input type="file" id="file-input-pagos" class="file-input" name="voucher"
-                  accept=".pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg" required>
+                  accept=".pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg">
                 <label for="file-input-pagos" class="file-label d-flex">
                   <i class="fas fa-upload"></i>
                   <div class="file-group-text">
@@ -591,5 +589,47 @@
 .file-size {
     font-size: 0.9rem;
     color: #666666;
+}
+.input-soles-wrapper {
+  position: relative;
+}
+.input-soles-wrapper .soles-symbol {
+  position: absolute;
+  left: 20px;
+  top: 51%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1rem;
+}
+.input-soles-wrapper input {
+  padding-left: 2.2em;
+}
+
+.tabs{
+    gap:10px;
+    margin-right: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.tab {
+    padding: 0.5em;
+    border-radius: 0.5em;
+    width: 100%;
+    border-width: 2px;
+    border-color: #CDCDCD;
+    color: #7E7E7E;
+    text-align: center;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.tab.active {
+    background-color: #FFFFFF;
+    color: black;
+}
+.adelantos-modal{
+    background-color: #F0F4F9;
 }
 </style>
