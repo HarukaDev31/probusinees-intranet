@@ -281,6 +281,29 @@ async function saveInspection() {
 
 
 }
+function showImageModal(url) {
+  ///create modal and show image
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.id = 'imageModal';
+  modal.tabIndex = -1;
+  modal.setAttribute('role', 'dialog');
+  const modalDialog = document.createElement('div');
+  modalDialog.className = 'modal-dialog modal-dialog-centered';
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+  const modalBody = document.createElement('div');
+  modalBody.className = 'modal-body';
+  modalBody.innerHTML = `<img src="${url}" alt="Image" class="img-fluid">`;
+  modalContent.appendChild(modalBody);
+  modalDialog.appendChild(modalContent);
+  modal.appendChild(modalDialog);
+  document.body.appendChild(modal);
+  $(modal).modal('show');
+  $(modal).on('hidden.bs.modal', function () {
+    $(this).remove(); // Remove modal from DOM after closing
+  });
+}
 async function descargarBoletaPDF(idCotizacionFinal) {
   spinner.show();
   $.ajax({
