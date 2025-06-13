@@ -37,6 +37,8 @@ class ContenedorConsolidadoModel extends CI_Model
     private $cambioEstadoProveedor = "cambio-estado-proveedor";
     private $table_contenedor_cotizacion_final = "contenedor_consolidado_cotizacion_final";
     private $CONCEPT_PAGO_LOGISTICA = 1;
+    private $CONCEPT_PAGO_IMPUESTO = 2;
+
     private $providerOrderStatus = [
         "NC" => 0,
         "C" => 1,
@@ -6944,11 +6946,22 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 ],
                 'assets/cargaconsolidada/pagos'
             );
+            //check if  cotizacion has cotizacion_final_url
+            $this->db->select('cotizacion_final_url');
+            $this->db->from($this->table_contenedor_cotizacion);
+            $this->db->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $cotizacion = $query->row();
+            $cotizacionFinalUrl = null;
+            if ($cotizacion) {
+                log_message('error', 'Cotizacion Final URL: ' . $cotizacion->cotizacion_final_url);
+                $cotizacionFinalUrl = $cotizacion->cotizacion_final_url;
+            }
             $data = [
                 'voucher_url' => $voucherUrl,
                 'id_cotizacion' => $idCotizacion,
                 'id_contenedor' => $idContenedor,
-                'id_concept' => $this->CONCEPT_PAGO_LOGISTICA,
+                'id_concept' => !$cotizacionFinalUrl?$this->CONCEPT_PAGO_LOGISTICA:$this->CONCEPT_PAGO_IMPUESTO,
                 'monto' => $amount,
                 'payment_date' => date('Y-m-d', strtotime($fecha)),
                 'banco' => $banco

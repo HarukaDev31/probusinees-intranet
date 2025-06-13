@@ -1260,8 +1260,11 @@ $('#form-pago-curso').on('submit', function(e) {
       if (result.status === "success") {
         Swal.fire("Correcto!", result.message, "success");
         $('#modal-pago-curso').modal('hide');
+        if ($.fn.DataTable.isDataTable('#table-cotizacion-final-pagos')) {
+          tableCotizacionFinalPagos.ajax.reload();
+        }
         if (typeof tableCursoPagos !== "undefined" && tableCursoPagos && typeof tableCursoPagos.ajax !== "undefined") tableCursoPagos.ajax.reload();
-        if (typeof tableClientesPagos !== "undefined" && tableClientesPagos && typeof tableClientesPagos.ajax !== "undefined") tableClientesPagos.ajax.reload();
+        if (typeof tableClientesPagos !== "undefine)d" && tableClientesPagos && typeof tableClientesPagos.ajax !== "undefined") tableClientesPagos.ajax.reload();
         if (typeof tableCotizacionPagos !== "undefined" && tableCotizacionPagos && typeof tableCotizacionPagos.ajax !== "undefined") tableCotizacionPagos.ajax.reload();
         if (typeof tableCotizacionTrackingPagos !== "undefined" && tableCotizacionTrackingPagos && typeof tableCotizacionTrackingPagos.ajax !== "undefined") tableCotizacionTrackingPagos.ajax.reload();
       } else {
