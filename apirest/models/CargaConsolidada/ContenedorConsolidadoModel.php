@@ -4593,8 +4593,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
         $result = $this->db->select('cc.id,cc.tarifa,cc.nombre,tc.id as id_tipo_cliente, tc.name as tipoCliente,cc.correo')
-            ->from($this->table_contenedor_cotizacion.' as cc')
-            ->join($this->table_contenedor_tipo_cliente.' as tc', 'cc.id_tipo_cliente = tc.id')
+            ->from($this->table_contenedor_cotizacion . ' as cc')
+            ->join($this->table_contenedor_tipo_cliente . ' as tc', 'cc.id_tipo_cliente = tc.id')
             ->where('id_contenedor', $idContainer)
             ->where('estado_cotizador', 'CONFIRMADO')
             ->where('estado_cliente IS NOT NULL');
@@ -4757,7 +4757,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
             $objPHPExcel->getActiveSheet()->getColumnDimension($InitialColumn)->setAutoSize(true);
             //         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;  $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
-                       
+
             $tipoCliente = trim($data['cliente']["tipo_cliente"]);
             log_message('error', 'Tipo Cliente: ' . $tipoCliente);
             $tipoClienteCell = $this->incrementColumn($InitialColumn, 3) . '6';
@@ -4855,16 +4855,16 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $tarifaValue = 350;
                         break;
                     case $cbmTotalProductos < 2.00:
-                        $tarifaValue = 350 ;
+                        $tarifaValue = 350;
                         break;
                     case $cbmTotalProductos < 3.00:
-                        $tarifaValue = 325 ;
+                        $tarifaValue = 325;
                         break;
                     case $cbmTotalProductos < 4.00:
-                        $tarifaValue = 300 ;
+                        $tarifaValue = 300;
                         break;
                     case $cbmTotalProductos >= 4.10:
-                        $tarifaValue = 280 ;
+                        $tarifaValue = 280;
                 }
             } else if (trim(strtoupper($tipoCliente)) == "SOCIO") {
                 switch ($cbmTotalProductos) {
@@ -4875,16 +4875,16 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $tarifaValue = 250;
                         break;
                     case $cbmTotalProductos < 2.00:
-                        $tarifaValue = 250 ;
+                        $tarifaValue = 250;
                         break;
                     case $cbmTotalProductos < 3.00:
-                        $tarifaValue = 250 ;
+                        $tarifaValue = 250;
                         break;
                     case $cbmTotalProductos < 4.00:
-                        $tarifaValue = 250 ;
+                        $tarifaValue = 250;
                         break;
                     case $cbmTotalProductos >= 4.10:
-                        $tarifaValue = 250 ;
+                        $tarifaValue = 250;
                 }
             }
 
@@ -6961,7 +6961,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 'voucher_url' => $voucherUrl,
                 'id_cotizacion' => $idCotizacion,
                 'id_contenedor' => $idContenedor,
-                'id_concept' => !$cotizacionFinalUrl?$this->CONCEPT_PAGO_LOGISTICA:$this->CONCEPT_PAGO_IMPUESTO,
+                'id_concept' => !$cotizacionFinalUrl ? $this->CONCEPT_PAGO_LOGISTICA : $this->CONCEPT_PAGO_IMPUESTO,
                 'monto' => $amount,
                 'payment_date' => date('Y-m-d', strtotime($fecha)),
                 'banco' => $banco
@@ -7010,12 +7010,17 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $this->db->select('contenedor_consolidado_cotizacion_coordinacion_pagos.*')
                 ->from($this->table_contenedor_consolidado_cotizacion_coordinacion_pagos)
                 ->join($this->table_pagos_concept, 'contenedor_consolidado_cotizacion_coordinacion_pagos.id_concept = cotizacion_coordinacion_pagos_concept.id')
-                ->where('id_cotizacion', $idCotizacion)
-                ->where('id_concept', $this->CONCEPT_PAGO_LOGISTICA);
-                if ($cotizacionFinalUrl) {
-                    $this->db->or_where('id_concept', $this->CONCEPT_PAGO_IMPUESTO);
-                }
-                $this->db->order_by('payment_date', 'DESC');
+                ->where('id_cotizacion', $idCotizacion);
+
+            // Agrupar las condiciones OR para id_concept
+            $this->db->group_start();
+            $this->db->where('id_concept', $this->CONCEPT_PAGO_LOGISTICA);
+            if ($cotizacionFinalUrl) {
+                $this->db->or_where('id_concept', $this->CONCEPT_PAGO_IMPUESTO);
+            }
+            $this->db->group_end();
+
+            $this->db->order_by('payment_date', 'DESC');
             $query = $this->db->get();
             return $query->result();
         } catch (Exception $e) {

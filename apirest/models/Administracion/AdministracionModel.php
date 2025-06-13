@@ -181,8 +181,7 @@ class AdministracionModel extends CI_Model
                 ->from($this->table_consolidado_pagos)
                 ->join($this->table_consolidado_pagos_concept, 'contenedor_consolidado_cotizacion_coordinacion_pagos.id_concept = cotizacion_coordinacion_pagos_concept.id')
                 ->where('id_cotizacion', $idCotizacion)
-                ->where('id_concept', $this->CONCEPT_PAGO_LOGISTICA)
-                ->or_where('id_concept', $this->CONCEPT_PAGO_IMPUESTOS)
+                ->where_in('id_concept', [$this->CONCEPT_PAGO_LOGISTICA, $this->CONCEPT_PAGO_IMPUESTOS])
                 ->order_by('payment_date', 'DESC');
             $query = $this->db->get();
             return $query->result();
