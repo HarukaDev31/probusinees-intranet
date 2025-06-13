@@ -6996,13 +6996,26 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     public function getPagosCoordination($idCotizacion)
     {
         try {
-            //get all data from table contenedor_consolidado_cotizacion_coordinacion_pagos where id_cotizacion=idCotizacion join with contenedor_consolidado_cotizacion_coordinacion_pagos_concept where id_concept=concept_pagos_logistica
+            //check if cotizacion has cotizacion_final_url
+            $this->db->select('cotizacion_final_url');
+            $this->db->from($this->table_contenedor_cotizacion);
+            $this->db->where('id', $idCotizacion);
+            $query = $this->db->get();
+            $cotizacion = $query->row();
+            $cotizacionFinalUrl = null;
+            if ($cotizacion) {
+                log_message('error', 'Cotizacion Final URL: ' . $cotizacion->cotizacion_final_url);
+                $cotizacionFinalUrl = $cotizacion->cotizacion_final_url;
+            }
             $this->db->select('contenedor_consolidado_cotizacion_coordinacion_pagos.*')
                 ->from($this->table_contenedor_consolidado_cotizacion_coordinacion_pagos)
                 ->join($this->table_pagos_concept, 'contenedor_consolidado_cotizacion_coordinacion_pagos.id_concept = cotizacion_coordinacion_pagos_concept.id')
                 ->where('id_cotizacion', $idCotizacion)
-                ->where('id_concept', $this->CONCEPT_PAGO_LOGISTICA)
-                ->order_by('payment_date', 'DESC');
+                ->where('id_concept', $this->CONCEPT_PAGO_LOGISTICA);
+                if ($cotizacionFinalUrl) {
+                    $this->db->or_where('id_concept', $this->CONCEPT_PAGO_IMPUESTO);
+                }
+                $this->db->order_by('payment_date', 'DESC');
             $query = $this->db->get();
             return $query->result();
         } catch (Exception $e) {
