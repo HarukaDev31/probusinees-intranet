@@ -1219,7 +1219,7 @@ async function uploadFacturaGeneral(idCotizacion) {
   }
 }
 function abrirModalPagoCurso(idCot, nombreCliente) {
-  $('#modalPagoCursoLabel').text(`Registrar Pago de Curso - ${nombreCliente}`);
+  $('#modalPagoCursoLabel').text(`Registrar Pago de Cliente - ${nombreCliente}`);
   $('#id-pedido-curso').val(idCot);
   $('#form-pago-curso')[0].reset();
   $('#modal-pago-curso').modal('show');

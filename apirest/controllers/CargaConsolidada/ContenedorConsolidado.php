@@ -1015,7 +1015,7 @@ class ContenedorConsolidado extends CI_Controller
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
 					
-					$divAcciones .='<div class="d-flex"  onclick="addPagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
+					$divAcciones .='<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
 					
 					if($row->pagos_count > 0) {
 						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
