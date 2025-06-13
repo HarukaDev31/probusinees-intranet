@@ -541,7 +541,7 @@ class PedidosCursoModel extends CI_Model
 					"error" => $voucher['error'],
 					"size" => $voucher['size']
 				],
-				'assets/curso/pagos'
+				'assets/images/'
 			);
 			$data = [
 				'voucher_url' => $voucherUrl,
