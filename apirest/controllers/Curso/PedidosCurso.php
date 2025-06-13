@@ -195,7 +195,7 @@ class PedidosCurso extends CI_Controller
                 $divAcciones .= '<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
 
                 if ($row->pagos_count > 0) {
-                    $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->nombre)) . '\')">
+                    $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')">
 					<i class="fas fa-eye text-primary" style="cursor:pointer;"></i>	
                     </div>';
                 }
@@ -848,6 +848,10 @@ class PedidosCurso extends CI_Controller
                 >
                     <i class="fas fa-file"></i>
                     </div>';
+                $divAcciones = '<div class="d-flex justify-content-start">';
+                $divAcciones .= '<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="eliminarPagoCurso(\'' . $row->id . '\')"></i>';
+                $divAcciones .= '</div>';
+                $subdata[] = $divAcciones;
                 $data[] = $subdata;
                 $index++;
             }
@@ -857,6 +861,20 @@ class PedidosCurso extends CI_Controller
             echo json_encode($output);
         } catch (Exception $e) {
             log_message('error', 'ContenedorConsolidado : getPagosCurso() => ' . $e->getMessage());
+        }
+    }
+    public function eliminarPagoCurso($idPagoCurso)
+    {
+        try {
+            $result = $this->PedidosCursoModel->eliminarPagoCurso($idPagoCurso);
+            if ($result) {
+                echo json_encode(['status' => 'success', 'message' => 'Pago eliminado correctamente']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'No se pudo eliminar el pago']);
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Error al eliminar pago: ' . $e->getMessage());
+            echo json_encode(['status' => 'error', 'message' => 'Error al eliminar el pago']);
         }
     }
 }

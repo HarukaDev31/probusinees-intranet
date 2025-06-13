@@ -158,6 +158,36 @@ $('#form-pago-curso').on('submit', function(e) {
   });
 });
 
+function eliminarPagoCurso(idPagoCurso) {
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Esta acción eliminará el pago.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: base_url + "Curso/PedidosCurso/eliminarPagoCurso/" + idPagoCurso,
+        type: "POST",
+        dataType: "json",
+        success: function(response) {
+          if (response.status === "success") {
+            Swal.fire("Eliminado", response.message, "success");
+            // Recarga las tablas
+            if (typeof tableCursoPagos !== "undefined" && tableCursoPagos && typeof tableCursoPagos.ajax !== "undefined") tableCursoPagos.ajax.reload();
+            if (typeof tableClientesPagos !== "undefined" && tableClientesPagos && typeof tableClientesPagos.ajax !== "undefined") tableClientesPagos.ajax.reload();
+            if (typeof tableCotizacionPagos !== "undefined" && tableCotizacionPagos && typeof tableCotizacionPagos.ajax !== "undefined") tableCotizacionPagos.ajax.reload();
+            if (typeof tableCotizacionTrackingPagos !== "undefined" && tableCotizacionTrackingPagos && typeof tableCotizacionTrackingPagos.ajax !== "undefined") tableCotizacionTrackingPagos.ajax.reload();
+          } else {
+            Swal.fire("Error", response.message, "error");
+          }
+        }
+      });
+    }
+  });
+}
 
 $(function () {
   tableCursoPagos = $("#table-curso-pagos");

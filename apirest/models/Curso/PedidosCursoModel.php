@@ -573,6 +573,11 @@ class PedidosCursoModel extends CI_Model
 			];
 		}
 	}
+	public function eliminarPagoCurso($idPagoCurso)
+	{
+		$this->db->where('id', $idPagoCurso);
+		return $this->db->delete($this->table_pedido_curso_pagos);
+	}
 	public function getCursosHeader()
 	{
 		//get sum of importe from pedido_curso_pagos 

@@ -327,6 +327,7 @@
                             <th>Banco</th>
                             <th>Monto</th>
                             <th>Voucher</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                 </table>
