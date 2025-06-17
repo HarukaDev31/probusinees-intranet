@@ -890,11 +890,11 @@ class ContenedorConsolidadoModel extends CI_Model
                     if (!$codeSupplier || $codeSupplier == '') {
                         $codeSupplier = $this->generateCodeSupplier($nameCliente, $count, $provider, $idContenedor);
                     }
-                    // Agrega los datos del proveedor
+                    // echo $sheet2->getCell($columnStart . $rowCajasProveedor)->getOldCalculatedValue();
                     $proveedores[] = [
-                        'qty_box' => $sheet2->getCell($columnStart . $rowCajasProveedor)->getOldCalculatedValue(),
-                        'peso' => $sheet2->getCell($columnStart . $rowPesoProveedor)->getOldCalculatedValue(),
-                        'cbm_total' => $sheet2->getCell($columnStart . $rowVolProveedor)->getOldCalculatedValue(),
+                        'qty_box' => $this->getDataCell($sheet2, $columnStart . $rowCajasProveedor),
+                        'peso' => $this->getDataCell($sheet2, $columnStart . $rowPesoProveedor),
+                        'cbm_total' => $this->getDataCell($sheet2, $columnStart . $rowVolProveedor),
                         'id_cotizacion' => $data->id_cotizacion,
                         'id_contenedor' => $data->id_contenedor,
                         'code_supplier' => $codeSupplier,
@@ -914,7 +914,18 @@ class ContenedorConsolidadoModel extends CI_Model
             ];
         }
     }
-
+    public function getDataCell($sheet, $cell)
+    {
+        $value = "";
+        $value = $sheet->getCell($cell)->getValue();
+        if ($value == "") {
+            $value = $sheet->getCell($cell)->getOldCalculatedValue();
+        }
+        if ($value == "") {
+            $value = $sheet->getCell($cell)->getCalculatedValue();
+        }
+        return $value;
+    }
     public function getEmbarqueData($cotizacion, $data)
     {
         try {
@@ -1505,11 +1516,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                 // Obtener los datos de embarque
                 $dataEmbarque = $this->getEmbarqueDataModified($file, $dataToInsert);
-
-                // Crear un array con los code_supplier de dataEmbarque
                 $codeSupplierEmbarque = array_column($dataEmbarque, 'code_supplier');
-                log_message('error', 'Code supplier embarque: ' . json_encode($codeSupplierEmbarque));
-                log_message('error', 'Code supplier db: ' . json_encode($codeSupplier));
                 // Recorrer los code_supplier de la base de datos
                 foreach ($codeSupplier as $code) {
                     if (in_array($code, $codeSupplierEmbarque)) {
@@ -1534,16 +1541,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         $this->db->insert($this->table_contenedor_cotizacion_proveedores, $data);
                     }
                 }
-                //foreach in codesupplier if exists in dataEmbarque update else insert and if exists in codesupplier but not in dataEmbarque delete
 
-
-                // foreach ($dataEmbarque as $key => $value) {
-                //     $dataEmbarque[$key]['id_cotizacion'] = $id;
-                //     $dataEmbarque[$key]['id_contenedor'] = $data->id_contenedor;
-                //     //find if e
-                // }
-                //insert in tabla proveedores
-                // $this->db->insert_batch($this->table_contenedor_cotizacion_proveedores, $dataEmbarque);
                 if ($this->db->error()['code'] == 0) {
                     return "success";
                 }
