@@ -67,7 +67,7 @@ class Administracion extends CI_Controller
 					}
 				}
 				$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $value->estado_pagos_coordinacion . '</span>';
-				$aPagar = ($value->monto_final + $value->impuestos_final) == 0 ? $value->monto : ($value->monto_final + $value->impuestos_final);
+				$aPagar = ($value->logistica_final + $value->impuestos_final) == 0 ? $value->monto : ($value->logistica_final + $value->impuestos_final);
 				$estadoPago = '';
 				if ($value->total_pagos == 0) {
 					$estadoPago = 'PENDIENTE';
