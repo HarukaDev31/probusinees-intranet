@@ -3929,27 +3929,27 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $sendStatus = false;
             }
         }
-        // if ($sendStatus) {
-        //     $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
-        //         '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
+        if ($sendStatus) {
+            $message = $cliente . '----' . $supplierCode . '----' . ($qtyBoxChina ?? $qtyBox) . ' boxes. ' . "\n\n" .
+                '📦 Tu carga llego a nuestro almacén de Yiwu, te comparto las fotos y videos. ' . "\n\n";
 
-        //     $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
-        // }
-        // //filter imagesUrls and videosUrls to get only the files that has send_status = 0
-        // // $imagesUrls = array_filter($imagesUrls, function ($image) {
-        // //     return $image->send_status == "PENDING";
-        // // });
-        // // $videosUrls = array_filter($videosUrls, function ($video) {
-        // //     return $video->send_status == "PENDING";
-        // // });
-        // //send media inspection
+            $this->sendMessage('Hola buen día 🙋🏻‍♀' . "\n\n" . 'Inspección: ' . "\n" . $message);
+        }
+        //filter imagesUrls and videosUrls to get only the files that has send_status = 0
+        $imagesUrls = array_filter($imagesUrls, function ($image) {
+            return $image->send_status == "PENDING";
+        });
+        $videosUrls = array_filter($videosUrls, function ($video) {
+            return $video->send_status == "PENDING";
+        });
+        //send media inspection
 
-        // foreach ($imagesUrls as $image) {
-        //     $this->sendMediaInspection($image->file_path, $image->file_type, null, null, 1, $image->id);
-        // }
-        // foreach ($videosUrls as $video) {
-        //     $this->sendMediaInspection($video->file_path, $video->file_type, null, null, 1, $video->id);
-        // }
+        foreach ($imagesUrls as $image) {
+            $this->sendMediaInspection($image->file_path, $image->file_type, null, null, 1, $image->id);
+        }
+        foreach ($videosUrls as $video) {
+            $this->sendMediaInspection($video->file_path, $video->file_type, null, null, 1, $video->id);
+        }
         return true;
     }
     public function getClientesHeader($idContenedor)

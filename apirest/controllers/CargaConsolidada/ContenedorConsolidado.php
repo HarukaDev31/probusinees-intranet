@@ -792,7 +792,7 @@ class ContenedorConsolidado extends CI_Controller
 						}
 						$select_status = '<select class="select-status-cliente form-control xl:w-auto ' . $colorClass . '" data-id="' . $row->id_cotizacion . '">';
 						$select_status .= '<option value="Pendiente" class="bg-warning"'
-							. ($status == 'Pendiente' ? ' selected' : ' disabled') . '>PENDIENTE</option>';
+							. ($status == 'Pendiente' ? ' selected' : ' ') . '>PENDIENTE</option>';
 						$select_status .= '<option value="Incompleto" class="bg-danger"'
 							. ($status == 'Incompleto' ? ' selected' : '') . '>INCOMPLETO</option>';
 						$select_status .= '<option value="Completado" class="bg-success"'
