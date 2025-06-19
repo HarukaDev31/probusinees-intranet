@@ -58,7 +58,7 @@ class Administracion extends CI_Controller
 				$subdata[] = $value->documento;
 				$subdata[] = $value->telefono;
 				$subdata[] = "Consolidado";
-				$subdata[] = "<span class='badge badge-secondary'>" . "#" . $value->carga. "</span>";
+				$subdata[] = "<span class='badge badge-secondary'>" . "#" . $value->carga . "</span>";
 				//if input post campana is not 0 
 				if (!empty($this->input->post('campana')) && $this->input->post('campana') != '0') {
 					$campanaFiltro = $this->input->post('campana');
@@ -145,7 +145,8 @@ class Administracion extends CI_Controller
 		);
 		echo json_encode($output);
 	}
-	public function getCampanasActivas(){
+	public function getCampanasActivas()
+	{
 		try {
 			$arrResponse = $this->AdministracionModel->getCampanasActivas();
 			echo json_encode([
@@ -365,6 +366,20 @@ class Administracion extends CI_Controller
 			]);
 		} catch (Exception $e) {
 			log_message('error', 'ContenedorConsolidado : getHeadersCurso() => ' . $e->getMessage());
+		}
+		//get containers avalable for consolidation
+
+	}
+	public function getContainersAvailable()
+	{
+		try {
+			$arrResponse = $this->AdministracionModel->getContainersAvailable();
+			echo json_encode([
+				'status' => 'success',
+				'data'   => $arrResponse
+			]);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getContainersAvailable() => ' . $e->getMessage());
 		}
 	}
 }

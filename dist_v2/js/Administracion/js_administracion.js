@@ -264,6 +264,25 @@ async function saveNote() {
     console.error("Error saving note:", error);
   }
 }
+async function getContainersAvailable() {
+  const url = base_url + "Administracion/Administracion/getContainersAvailable";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    if (data.status == 'success') {
+      return data.data; // Return the available containers
+    } else {
+      console.error("Error fetching containers:", data.message);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching containers:", error);
+    return [];
+  }
+}
 async function getTableHeaders(table) {
   url = base_url + "Administracion/Administracion/";
   if (table == "consolidado") {
@@ -273,21 +292,21 @@ async function getTableHeaders(table) {
   }
   try {
     const formData = new FormData();
-    formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == "" ?ParseDateString(      //fin inicio 2 meses antes
+    formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == "" ? ParseDateString(      //fin inicio 2 meses antes
       new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
-      }),'fecha','/')
+      }), 'fecha', '/')
       : $('#txt-Fe_Inicio').val());
-    formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == "" ?ParseDateString(
+    formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == "" ? ParseDateString(
       new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
       }), 'fecha', '/')
       : $('#txt-Fe_Fin').val());
-    
+
     const response = await fetch(url,
       {
         method: "POST",
@@ -515,7 +534,7 @@ async function viewClientePagosCurso(idPedidoCurso, nombreCliente) {
 
 }
 $(".tab-administracion").removeClass("active");
-$(".tab-administracion").off("click").click(function () {
+$(".tab-administracion").off("click").click(async function () {
   $(".tab-administracion").removeClass("active");
 
   let table = this.getAttribute("data-table");
@@ -525,9 +544,13 @@ $(".tab-administracion").off("click").click(function () {
     //append to txt-ID_Campana select options from #1 to #50 with value just number
     $("#txt-ID_Campana").empty();
     // Add an empty option
-    $("#txt-ID_Campana").append('<option value="0">Seleccione una campaña</option>');
-    for (let i = 1; i <= 50; i++) {
-      $("#txt-ID_Campana").append(`<option value="${i}">#${i}</option>`);
+    $("#txt-ID_Campana").append('<option value="0">Seleccione un Contenedor</option>');
+    const data = await getContainersAvailable();
+    if (data.length > 0) {
+      data.forEach(container => {
+        $("#txt-ID_Campana").append(`<option value="${container.carga}">Contenedor #${container.carga}</option>`);
+      });
+    } else {
     }
     getTableHeaders("consolidado");
     $("#table-pagos-consolidado").attr("style", "");
