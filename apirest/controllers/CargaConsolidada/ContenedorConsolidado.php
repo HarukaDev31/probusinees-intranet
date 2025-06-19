@@ -936,17 +936,32 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = "Logistica";
 					$subdata[] = "$".round($row->monto+$row->impuestos,2);
 					$subdata[] = $row->total_pagos==0 ? "0" : "$".number_format($row->total_pagos, 2);
+					$divAcciones = '<div class="nav">';
 					//if pagos_count is minor than 4 add button plus to add new payment
-					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
-					if($row->pagos_count < 4) {
-						$divAcciones .='<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
-					} 
-					if($row->pagos_count > 0) {
-						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
-						<i class="fas fa-eye" style="cursor:pointer;"></i>
-						</div>';
+					$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($row->id_cotizacion);
+					usort($arrData, function($a, $b) {
+						return $a->id - $b->id;
+					});
+					for ($i = 0; $i < 4; $i++) {
+						if (isset($arrData[$i])) {
+							$divAcciones .= '
+								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg"
+									onclick="viewClientePagoCoordination(' . $arrData[$i]->id . ', '. $row->id_cotizacion . ' )"
+									style="cursor:pointer;">
+									$' . number_format($arrData[$i]->monto, 2) . '
+								</button>
+							';
+						} else {
+							$divAcciones .= '
+								<button class="nav-link col-3 border-2 border-[#DFDFDF] rounded-lg"
+									onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')"
+									style="cursor:pointer;">
+									<i class="fas fa-plus"></i>
+								</button>
+							';
+						}
 					}
-					$divAcciones .=  '</div>';
+					$divAcciones .= '</div>';
 					$subdata[] = $divAcciones;
 
 					$data[]    = $subdata;
@@ -1065,17 +1080,32 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->name;	
 					$subdata[] = "$".($row->logistica_final+$row->impuestos_final);
 					$subdata[] =$row->total_pagos==0 ? "$0" : "$".  number_format($row->total_pagos, 2);
+					$divAcciones = '<div class="nav">';
 					//if pagos_count is minor than 4 add button plus to add new payment
-					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
-					
-					$divAcciones .='<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
-					
-					if($row->pagos_count > 0) {
-						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
-						<i class="fas fa-eye" style="cursor:pointer;"></i>
-						</div>';
+					$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($row->id_cotizacion);
+					usort($arrData, function($a, $b) {
+						return $a->id - $b->id;
+					});
+					for ($i = 0; $i < 4; $i++) {
+						if (isset($arrData[$i])) {
+							$divAcciones .= '
+								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg"
+									onclick="viewClientePagoCoordination(' . $arrData[$i]->id . ', '. $row->id_cotizacion . ' )"
+									style="cursor:pointer;">
+									$' . number_format($arrData[$i]->monto, 2) . '
+								</button>
+							';
+						} else {
+							$divAcciones .= '
+								<button class="nav-link col-3 border-2 border-[#DFDFDF] rounded-lg"
+									onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')"
+									style="cursor:pointer;">
+									<i class="fas fa-plus"></i>
+								</button>
+							';
+						}
 					}
-					$divAcciones .=  '</div>';
+					$divAcciones .= '</div>';
 					$subdata[] = $divAcciones;
 					$index++;
 					$data[]    = $subdata;
