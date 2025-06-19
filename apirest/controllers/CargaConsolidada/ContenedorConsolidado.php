@@ -1169,8 +1169,8 @@ class ContenedorConsolidado extends CI_Controller
 						</div>';
 					}
 				} else {
-					$divFile .= '<div class="tab flex justify-evenly">
-						<i class="fas fa-plus" style="cursor:pointer;" onclick="uploadFacturaGeneral(' . $row->id_cotizacion . ')"></i>Subir';
+					$divFile .= '<div class="tab flex justify-evenly onclick="uploadFacturaGeneral(' . $row->id_cotizacion . ')">
+						<i class="fas fa-plus" style="cursor:pointer;" </i>Subir';
 				}
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
