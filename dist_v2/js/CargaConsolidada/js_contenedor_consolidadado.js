@@ -104,7 +104,93 @@ var documentationContainerProfile = null;
 var documentacionSelectedProvider = 0;
 var documentacionDocumentacionContainer = null;
 var documentacionAduanaContainer = null;
+function viewClientePagoCoordination(idPago) {
+  $.get(base_url + 'CargaConsolidada/ContenedorConsolidado/getPagoCoordination/' + idPago, function(adelanto) {
+    if (adelanto) {
+      // Formatea el monto a dos decimales
+      const monto = Number(adelanto.monto).toFixed(2);
 
+      // Formatea la fecha a dd/mm/yyyy
+      let fecha = adelanto.payment_date;
+      if (fecha) {
+        const d = new Date(fecha);
+        // Si la fecha es válida
+        if (!isNaN(d.getTime())) {
+          const day = String(d.getDate()).padStart(2, '0');
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const year = d.getFullYear();
+          fecha = `${day}/${month}/${year}`;
+        }
+      }
+
+      // Mapea bancos a imágenes (agrega los que necesites)
+      const bancosImg = {
+        'BCP': 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Logo_credito.gif',
+        'YAPE': 'https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png',
+        'INTERBANK': 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Interbank_logo.svg',
+        // ...otros bancos...
+      };
+      let bancoImg = bancosImg[adelanto.banco?.toUpperCase()] || '';
+      let bancoHtml = bancoImg
+        ? `<img src="${bancoImg}" alt="${adelanto.banco}" style="height:50px;vertical-align:middle;">`
+        : adelanto.banco;
+
+      // Imagen del voucher
+      let voucherHtml = '';
+      if (adelanto.voucher_url) {
+      // Si es imagen, muestra vista previa, si es PDF, muestra enlace
+      const ext = adelanto.voucher_url.split('.').pop().toLowerCase();
+      const iconHtml = getIconByType(ext);
+      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+        voucherHtml = `
+          <div class="mt-3">
+            <label><strong>Voucher:</strong></label><br>
+            <img src="${adelanto.voucher_url}" alt="Voucher" style="max-width:100%;max-height:200px;border:1px solid #ccc;border-radius:8px;">
+          </div>
+        `;
+      } else {
+        voucherHtml = `
+          <div class="mt-3">
+            <label><strong>Archivo:</strong></label><br>
+            <div class="flex">
+              <span style="align-content:center;cursor:pointer;display:inline-block;" onclick="window.open('${adelanto.voucher_url}', '_blank')">
+                ${iconHtml}
+              </span>
+              <span style="margin-left:8px;">${decodeURIComponent(adelanto.voucher_url.split('/').pop())}</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+    // Si no hay datos, pero hay archivo, muestra solo el archivo
+    if (!monto && !fecha && !bancoHtml && voucherHtml) {
+      $('#modalClientePagoCoordination .modal-body').html(voucherHtml);
+      $('#modalClientePagoCoordination').modal('show');
+      return;
+    }
+      // Botón Quitar
+      let quitarBtn = `
+        <div class="mt-4 text-right">
+          <button class="btn btn-danger" onclick="deletePagoCoordination(${adelanto.id})">
+            <i class="fa fa-trash"></i> 
+          </button>
+        </div>
+      `;
+
+      let html = `
+      <div class="flex flex-column">
+        ${monto ? `<div><strong>Monto:</strong> S/ ${monto}</div>` : ''}
+        ${fecha ? `<div><strong>Fecha:</strong> ${fecha}</div>` : ''}
+        ${bancoHtml ? `<div><strong>Banco:</strong> ${bancoHtml}</div>` : ''}
+        ${voucherHtml}
+        ${quitarBtn}
+      </div>
+      `;
+      $('#modalClientePagoCoordination .modal-body').html(html);
+      $('#modalClientePagoCoordination').modal('show');
+    }
+  }, 'json');
+}
 function getSwalConfig(type, privilege) {
   const isEnglish = privilege === "ContenedorAlmacen";
 
@@ -1306,93 +1392,7 @@ function deletePagoCoordination(idPago) {
     }
   });
 }
-function viewClientePagoCoordination(idPago) {
-  $.get(base_url + 'CargaConsolidada/ContenedorConsolidado/getPagoCoordination/' + idPago, function(adelanto) {
-    if (adelanto) {
-      // Formatea el monto a dos decimales
-      const monto = Number(adelanto.monto).toFixed(2);
 
-      // Formatea la fecha a dd/mm/yyyy
-      let fecha = adelanto.payment_date;
-      if (fecha) {
-        const d = new Date(fecha);
-        // Si la fecha es válida
-        if (!isNaN(d.getTime())) {
-          const day = String(d.getDate()).padStart(2, '0');
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const year = d.getFullYear();
-          fecha = `${day}/${month}/${year}`;
-        }
-      }
-
-      // Mapea bancos a imágenes (agrega los que necesites)
-      const bancosImg = {
-        'BCP': 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Logo_credito.gif',
-        'YAPE': 'https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png',
-        'INTERBANK': 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Interbank_logo.svg',
-        // ...otros bancos...
-      };
-      let bancoImg = bancosImg[adelanto.banco?.toUpperCase()] || '';
-      let bancoHtml = bancoImg
-        ? `<img src="${bancoImg}" alt="${adelanto.banco}" style="height:50px;vertical-align:middle;">`
-        : adelanto.banco;
-
-      // Imagen del voucher
-      let voucherHtml = '';
-      if (adelanto.voucher_url) {
-      // Si es imagen, muestra vista previa, si es PDF, muestra enlace
-      const ext = adelanto.voucher_url.split('.').pop().toLowerCase();
-      const iconHtml = getIconByType(ext);
-      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
-        voucherHtml = `
-          <div class="mt-3">
-            <label><strong>Voucher:</strong></label><br>
-            <img src="${adelanto.voucher_url}" alt="Voucher" style="max-width:100%;max-height:200px;border:1px solid #ccc;border-radius:8px;">
-          </div>
-        `;
-      } else {
-        voucherHtml = `
-          <div class="mt-3">
-            <label><strong>Archivo:</strong></label><br>
-            <div class="flex">
-              <span style="align-content:center;cursor:pointer;display:inline-block;" onclick="window.open('${adelanto.voucher_url}', '_blank')">
-                ${iconHtml}
-              </span>
-              <span style="margin-left:8px;">${decodeURIComponent(adelanto.voucher_url.split('/').pop())}</span>
-            </div>
-          </div>
-        `;
-      }
-    }
-    // Si no hay datos, pero hay archivo, muestra solo el archivo
-    if (!monto && !fecha && !bancoHtml && voucherHtml) {
-      $('#modalClientePagoCoordination .modal-body').html(voucherHtml);
-      $('#modalClientePagoCoordination').modal('show');
-      return;
-    }
-      // Botón Quitar
-      let quitarBtn = `
-        <div class="mt-4 text-right">
-          <button class="btn btn-danger" onclick="deletePagoCoordination(${adelanto.id})">
-            <i class="fa fa-trash"></i> 
-          </button>
-        </div>
-      `;
-
-      let html = `
-      <div class="flex flex-column">
-        ${monto ? `<div><strong>Monto:</strong> S/ ${monto}</div>` : ''}
-        ${fecha ? `<div><strong>Fecha:</strong> ${fecha}</div>` : ''}
-        ${bancoHtml ? `<div><strong>Banco:</strong> ${bancoHtml}</div>` : ''}
-        ${voucherHtml}
-        ${quitarBtn}
-      </div>
-      `;
-      $('#modalClientePagoCoordination .modal-body').html(html);
-      $('#modalClientePagoCoordination').modal('show');
-    }
-  }, 'json');
-}
 
 
 async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
