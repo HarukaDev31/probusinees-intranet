@@ -1398,7 +1398,7 @@ function viewClientePagoCoordination(idPago) {
 async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
   //show modal with table of pagos coordination
   $("#modalClientePagosCoordination").modal("show");
-  $("#modalClientePagosCoordination .modal-title").text(`Pagos de Coordinación - ${nombreCliente}`);
+  $("#modalClientePagosCoordination .modal-title").text(`Adelantos - ${nombreCliente}`);
   url =
     base_url + "CargaConsolidada/ContenedorConsolidado/getPagosCoordination/" + idCotizacion;
   if (!$.fn.DataTable.isDataTable("#table-pagos-tracking-coordinacion")) {
@@ -1407,11 +1407,11 @@ async function viewClientePagosCoordination(idCotizacion, nombreCliente) {
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
       buttons: [],
-      paging: true,
-      lengthChange: true,
+      paging: false,
+      lengthChange: false,
       searching: true,
       ordering: false,
-      info: true,
+      info: false,
       autoWidth: false,
       responsive: false,
       serverSide: false,
