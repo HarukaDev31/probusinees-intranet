@@ -707,16 +707,31 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = "$".$row->monto;
 					$subdata[] = $row->total_pagos==0 ? "0" : "$".number_format($row->total_pagos, 2);
 					//if pagos_count is minor than 4 add button plus to add new payment
-					$divAcciones='<div class="d-flex px-2 w-100" style="gap:1em;">';
-					if($row->pagos_count < 4) {
-						$divAcciones .='<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
-					} 
-					if($row->pagos_count > 0) {
-						$divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCoordination(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
-						<i class="fas fa-eye" style="cursor:pointer;"></i>
-						</div>';
-					}	
-					$divAcciones .=  '</div>';
+					$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($row->id_cotizacion);
+					usort($arrData, function($a, $b) {
+						return $a->id - $b->id;
+					});
+					$divAcciones = '<div class="nav">';
+					for ($i = 0; $i < 4; $i++) {
+						if (isset($arrData[$i])) {
+							$divAcciones .= '
+								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg"
+									onclick="viewClientePagoCoordination(' . $arrData[$i]->id . ', '. $row->id_cotizacion . ' )"
+									style="cursor:pointer;">
+									$' . number_format($arrData[$i]->monto, 2) . '
+								</button>
+							';
+						} else {
+							$divAcciones .= '
+								<button class="nav-link col-3 border-2 border-[#DFDFDF] rounded-lg"
+									onclick="abrirModalPagoCurso(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')"
+									style="cursor:pointer;">
+									<i class="fas fa-plus"></i>
+								</button>
+							';
+						}
+					}
+					$divAcciones .= '</div>';
 					$subdata[] = $divAcciones;
 
 					$data[]    = $subdata;
@@ -970,14 +985,35 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[]     = "$".$row->impuestos_final;
 					$subdata[]     = "$".$row->tarifa_final;
 					//select for options C.FINAL,AJUSTADO,COTIZADO,PAGADO,SOBREPAGO
-					$selectEstados = '<select class="form-control" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
-						<option value="PENDIENTE" ' . ($row->estado_cotizacion_final == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
-						<option value="COTIZADO" ' . ($row->estado_cotizacion_final == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
-						<option value="PAGADO" ' . ($row->estado_cotizacion_final == "PAGADO" ? "selected" : "") . '>PAGADO</option>
-						<option value="SOBREPAGO" ' . ($row->estado_cotizacion_final == "SOBREPAGO" ? "selected" : "") . '>SOBREPAGO</option>
-						<option value="AJUSTADO" ' . ($row->estado_cotizacion_final == "AJUSTADO" ? "selected" : "") . '>AJUSTADO</option>
+					$estadoClass = '';
+					switch ($row->estado_cotizacion_final) {
+						case 'PENDIENTE':
+							$estadoClass = 'bg-secondary';
+							break;
+						case 'AJUSTADO':
+							$estadoClass = 'bg-[#FF742B] text-white';
+							break;
+						case 'COTIZADO':
+							$estadoClass = 'bg-[#1E6CDB] text-white';
+							break;
+						case 'PAGADO':
+							$estadoClass = 'bg-success';
+							break;
+						case 'SOBREPAGO':
+							$estadoClass = 'bg-danger text-white';
+							break;
+						default:
+							$estadoClass = '';
+							break;
+					}
 
-						</select>';
+					$selectEstados = '<select class="form-control ' . $estadoClass . '" id="estado-cotizacion-final' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizacionFinal(' . $row->id_cotizacion . ')">
+						<option value="PENDIENTE" class="bg-secondary"' . ($row->estado_cotizacion_final == "PENDIENTE" ? " selected" : "") . '>Pendiente</option>
+						<option value="AJUSTADO" class="bg-[#FF742B] text-white"' . ($row->estado_cotizacion_final == "AJUSTADO" ? " selected" : "") . '>Ajustado</option>
+						<option value="COTIZADO" class="bg-[#1E6CDB] text-white"' . ($row->estado_cotizacion_final == "COTIZADO" ? " selected" : "") . '>Cotizado</option>
+						<option value="PAGADO" class="bg-success"' . ($row->estado_cotizacion_final == "PAGADO" ? " selected" : "") . '>Pagado</option>
+						<option value="SOBREPAGO" class="bg-danger text-white"' . ($row->estado_cotizacion_final == "SOBREPAGO" ? " selected" : "") . '>Sobrepago</option>
+					</select>';
 					$subdata[] = $selectEstados;
 					//if cotizacion_final_url not null div with excel icon to download file else div with upload icon to upload file
 					$divFile = '<div>';
@@ -995,8 +1031,8 @@ class ContenedorConsolidado extends CI_Controller
 							</div>
 							';
 					} else {
-						$divFile .= '
-							<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFinal(' . $row->id_cotizacion . ')"></i>';
+						$divFile .= '<div class="tab flex justify-evenly">
+							<i class="fas fa-plus" style="cursor:pointer;" onclick="uploadCotizacionFinal(' . $row->id_cotizacion . ')"></i>Subir</div>';
 					}
 					$divFile .= '</div>';
 					$subdata[] = $divFile;
@@ -1045,54 +1081,75 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata[] = $row->correo;
 				$subdata[] = $row->telefono;
 				$subdata[] = ucwords(strtolower($row->name));
-				$subdata[] = '<div class="badge badge-' . ($row->estado_cotizacion_final == "AJUSTADO" ? "danger" : "success") . '">' .
-					($row->estado_cotizacion_final == "AJUSTADO" ? "SI" : "NO") . '</div>';
+				$subdata[] = '<span class="rounded-lg px-3 py-2 bg-' . ($row->estado_cotizacion_final == "AJUSTADO" ? "danger" : "success") . '">' .
+					($row->estado_cotizacion_final == "AJUSTADO" ? "Si" : "No") . '</span>';
 
-				//if cotizacion_final_url exists add icon download
+				// Cotización final
 				$divFile = '<div>';
 				if (!empty($row->cotizacion_final_url)) {
-					$divFile .= '<div class="d-flex flex-row gap-2">
-						<a href="' . $row->cotizacion_final_url . '" download>
-							<i class="fas fa-file-excel text-success"></i>
-						</a>
-						</div>
-						';
+					$ext = strtolower(pathinfo($row->cotizacion_final_url, PATHINFO_EXTENSION));
+					$iconHtml = "<span class='file-icon' data-ext='{$ext}' data-url='{$row->cotizacion_final_url}'></span>";
+					if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+							<span style="cursor:pointer;" onclick="showImageModal(\'' . $row->cotizacion_final_url . '\')">'
+							. $iconHtml .
+							'</span>
+						</div>';
+					} else {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+							<a href="' . $row->cotizacion_final_url . '" download>' . $iconHtml . '</a>
+						</div>';
+					}
 				}
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
-				//if factura_general_url is not null add download and delete button else add upload button
+
+				// Factura general
 				$divFile = '<div>';
 				if (!empty($row->factura_general_url)) {
-					$divFile .= '<div class="d-flex flex-row gap-2">
-						<a href="' . $row->factura_general_url . '" download>
-							<i class="fas fa-file-excel text-success"></i>
-
-						</a>
-						<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteFacturaGeneralFile(' . $row->id_cotizacion . ')"></i>
-
-						</div>
-						';
+					$ext = strtolower(pathinfo($row->factura_general_url, PATHINFO_EXTENSION));
+					$iconHtml = "<span class='file-icon' data-ext='{$ext}' data-url='{$row->factura_general_url}'></span>";
+					if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+							<span style="cursor:pointer;" onclick="showImageModal(\'' . $row->factura_general_url . '\')">'
+							. $iconHtml .
+							'</span>
+							<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteFacturaGeneralFile(' . $row->id_cotizacion . ')"></i>
+						</div>';
+					} else {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+							<a href="' . $row->factura_general_url . '" download>' . $iconHtml . '</a>
+							<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteFacturaGeneralFile(' . $row->id_cotizacion . ')"></i>
+						</div>';
+					}
 				} else {
-					$divFile .= '
-						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadFacturaGeneral(' . $row->id_cotizacion . ')"></i>';
+					$divFile .= '<div class="tab flex justify-evenly">
+						<i class="fas fa-plus" style="cursor:pointer;" onclick="uploadFacturaGeneral(' . $row->id_cotizacion . ')"></i>Subir';
 				}
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
-				//if guia_remision_url is not null add download and delete button else add upload button
+
+				// Guía de remisión
 				$divFile = '<div>';
 				if (!empty($row->guia_remision_url)) {
-					$divFile .= '<div class="d-flex flex-row gap-2">
-						<a href="' . $row->guia_remision_url . '" download>
-							<i class="fas fa-file-excel text-success"></i>
-
-						</a>
-						<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteGuiaRemisionFile(' . $row->id_cotizacion . ')"></i>
-
-						</div>
-						';
+					$ext = strtolower(pathinfo($row->guia_remision_url, PATHINFO_EXTENSION));
+					$iconHtml = "<span class='file-icon' data-ext='{$ext}' data-url='{$row->guia_remision_url}'></span>";
+					if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+							<span style="cursor:pointer;" onclick="showImageModal(\'' . $row->guia_remision_url . '\')">'
+							. $iconHtml .
+							'</span>
+							<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteGuiaRemisionFile(' . $row->id_cotizacion . ')"></i>
+						</div>';
+					} else {
+						$divFile .= '<div class="d-flex flex-row gap-2">
+							<a href="' . $row->guia_remision_url . '" download>' . $iconHtml . '</a>
+							<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteGuiaRemisionFile(' . $row->id_cotizacion . ')"></i>
+						</div>';
+					}
 				} else {
-					$divFile .= '
-						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadGuiaRemision(' . $row->id_cotizacion . ')"></i>';
+					$divFile .= '<div class="tab flex justify-evenly">
+						<i class="fas fa-plus" style="cursor:pointer;" onclick="uploadGuiaRemision(' . $row->id_cotizacion . ')"></i>Subir';
 				}
 				$divFile .= '</div>';
 				$subdata[] = $divFile;
@@ -1856,6 +1913,11 @@ class ContenedorConsolidado extends CI_Controller
 			echo json_encode(['status' => 'error', 'message' => 'No se pudo eliminar el pago']);
 		}
 	}
+	public function getPagoCoordination($idPago)
+	{
+		$pago = $this->ContenedorConsolidadoModel->getPagoCoordinationById($idPago);
+		echo json_encode($pago);
+	}
 	public function getPagosCoordination($idCotizacion)
 	{
 		$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($idCotizacion);
@@ -1871,9 +1933,13 @@ class ContenedorConsolidado extends CI_Controller
             $ext = strtolower(pathinfo($row->voucher_url, PATHINFO_EXTENSION));
 			// Generar el ícono usando una función JS en el frontend
             $iconHtml = "<span class='file-icon' data-ext='{$ext}' data-url='{$row->voucher_url}'></span>";
-			$subdata[] = '<div data-url="' . $row->voucher_url . '" download
-                onclick="showImageModal(\'' . $row->voucher_url . '\')"
-                >' . $iconHtml . '</div>';
+			if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
+				// Si es imagen, abre el modal de imagen
+				$subdata[] = '<div style="cursor: pointer;" onclick="showImageModal(\'' . $row->voucher_url . '\')">' . $iconHtml . '</div>';
+			} else {
+				// Si no es imagen, descarga el archivo
+				$subdata[] = '<a href="' . $row->voucher_url . '" download style="cursor: pointer;">' . $iconHtml . '</a>';
+			}
 			$divAcciones = '<div class="btn-group">';
 			//edit button
 			$divAcciones .= '<i class="fas fa-edit text-warning p-[10px]" style="cursor: pointer;" onclick="editPagoCoordination(' . $row->id . ')"></i>';
