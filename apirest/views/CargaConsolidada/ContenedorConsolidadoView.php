@@ -1838,36 +1838,44 @@ Search for
         </div>
 
     </section>
-    <section class="content card" id="cotizacion-final-container">
-        <div class="min-h-screen bg-gray-50 p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6" id="cotizacion-final-title"></h1>
-
-            <div class="flex gap-4 mb-8">
-
-                <button id="uploadGeneral"
-                    class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-                    <div class="fa fa-upload"></div>
-                    Subir Factura
-                </button>
-                <button id="downloadTemplate"
-                    class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors flex items-center gap-2">
-                    <div class="fa fa-download"></div>
-                    Plantilla General
-                </button>
-                <button id="uploadFinal"
-                    class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                    <div class="fa fa-upload"></div>
-                    Plantilla Final
-                </button>
-                <!--button back-->
-                <button id="btn-back-cotizacion-final"
-                    class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                    <div class="fa fa-arrow-left"></div>
-                </button>
+    <section class="content" id="cotizacion-final-container">
+        <div class="container-fluid">
+            <!-- Header de la tabla -->
+            <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
+                <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"  id="btn-back-cotizacion-final"><i class="fa fa-arrow-left"></i> Regresar</button>
+            </div>
+            <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 pt-3" style="border-bottom: #DFDFDF solid 2px">
+                <div class="d-flex align-items-center col-sm-3 xl:max-w-[200px]" style="border-right: #DFDFDF solid 2px; padding:15px 10px">
+                    <span id="cotizacion-final-title"></span>
+                </div>
+                
+                <div class="col-5 col-sm-12 col-md-4 col-xl-5 d-flex align-items-center justify-content-center justify-content-xl-start">
+                    <span>Cotitación Final</span>
+                </div>
+                <div class="flex xl:w-[40%]">
+                    <div class="col-5 col-sm-12  col-md-4  col-xl-4 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        <button id="uploadGeneral" class="tab">
+                            <div class="fa fa-upload"></div>
+                            Subir Factura
+                        </button>
+                    </div>
+                    <div class="col-5 col-sm-12  col-md-4  col-xl-4 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        <button id="downloadTemplate" class="tab">
+                            <div class="fa fa-download"></div>
+                            Plantilla General
+                        </button>
+                    </div>
+                    <div class="col-5 col-sm-12  col-md-4  col-xl-4 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        <button id="uploadFinal" class="tab">
+                            <div class="fa fa-upload"></div>
+                            Plantilla Final
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="row tabs">
                 <div data-table="general"
-                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-clientes-final">
+                    class="col-12 col-md-4 col-xl-1 d-flex max-w-fit align-items-center justify-content-center btn tab tab-clientes-final">
                     General
                 </div>
                 <?php if ($this->user->No_Grupo != "Coordinacion") {  ?>
@@ -1878,9 +1886,9 @@ Search for
                 </div>
                 <?php } ?>
             </div>
-            <div class="table-responsive" class="table table-bordered table-hover table-striped">
-                <table id="table-cotizacion-final" class="table table-bordered table-hover table-striped">
-                    <thead class="thead-light">
+            <div class="table-responsive" class="table table-hover">
+                <table id="table-cotizacion-final" class="table table-hover dataTable no-footer">
+                    <thead class="thead-default">
                         <tr>
                             <th>N°</th>
                             <th>Nombre</th>
@@ -1889,8 +1897,8 @@ Search for
                             <th>Whatsapp</th>
                             <th>T. Cliente</th>
                             <th>Volumen </th>
-                            <th>FOB</th>
-                            <th>Logistica</th>
+                            <th>Fob</th>
+                            <th>Logística</th>
                             <th>Impuesto</th>
                             <th>Tarifa </th>
                             <th>Estados</th>
@@ -1898,8 +1906,8 @@ Search for
                         </tr>
                     </thead>
                 </table>
-                <table id="table-cotizacion-final-pagos" class="table table-bordered table-hover table-striped hidden">
-                    <thead class="thead-light">
+                <table id="table-cotizacion-final-pagos" class="table table-hover hidden">
+                    <thead class="thead-default">
                         <tr>
                             <th>N.</th>
                             <th>Nombre</th>
@@ -1913,24 +1921,26 @@ Search for
                     </thead>
                 </table>
             </div>
+        </div>   
     </section>
-    <section class="content card" id="factura-guia-container">
-        <div class="min-h-screen bg-gray-50 p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6" id="factura-guia-title"></h1>
-            <div class="flex
-      w-full gap-4 mb-8
-      justify-end
-
-      ">
-
-                <button id="btn-back-factura-guia"
-                    class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                    <div class="fa fa-arrow-left"></div>
-                </button>
+    <section class="content" id="factura-guia-container">
+        <div class="container-fluid">
+            <!-- Header de la tabla -->
+            <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
+                <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" id="btn-back-factura-guia"><i class="fa fa-arrow-left"></i> Regresar</button>
             </div>
-            <div class="table-responsive" class="table table-bordered table-hover table-striped">
-                <table id="table-factura-guia" class="table table-bordered table-hover table-striped">
-                    <thead class="thead-light">
+            <div class="col-xl-12 row mb-2 gap-xs-3 gap-md-0 mx-100 pt-3" style="border-bottom: #DFDFDF solid 2px">
+                <div class="d-flex align-items-center col-sm-3 xl:max-w-[200px]" style="border-right: #DFDFDF solid 2px; padding:15px 10px">
+                    <span id="factura-guia-title"></span>
+                </div>
+                
+                <div class="col-5 col-sm-12 col-md-4 col-xl-5 d-flex align-items-center justify-content-center justify-content-xl-start">
+                    <span>Factura y Guia Remisión</span>
+                </div>
+            </div>
+            <div class="table-responsive" class="table table-hover">
+                <table id="table-factura-guia" class="table table-hover dataTable no-footer">
+                    <thead class="thead-default">
                         <tr>
                             <th>N°</th>
                             <th>Nombre</th>
@@ -1940,8 +1950,8 @@ Search for
                             <th>T. Cliente</th>
                             <th>Ajuste</th>
                             <th>C.Final</th>
-                            <th>Factura</th>
-                            <th>Guia R</th>
+                            <th>Factura C.</th>
+                            <th>Guia R.</th>
                         </tr>
                     </thead>
                 </table>
@@ -1967,6 +1977,22 @@ Search for
             </div>
         </div>
     </div>
+
+    <!-- modal with id modalClientePagoCoordination -->
+    <div class="modal fade" id="modalClientePagoCoordination" tabindex="-1" role="dialog" aria-labelledby="modalClientePagoCoordinationLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalle del Adelanto</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargan los datos dinámicamente -->
+            </div>
+            </div>
+        </div>
+    </div>
+
     <!-- modal with table and id modalClientePagosCoordination -->
     <div class="modal fade" id="modalClientePagosCoordination" tabindex="-1" role="dialog"
         aria-labelledby="modalClientePagosCoordinationLabel" aria-hidden="true">
@@ -3023,6 +3049,12 @@ div#table-clientes-pagos_filter {
     color: black;
 }
 
+.tab:hover {
+    background-color: #FFFFFF;
+    color: black;
+    transition: background-color 0.5s ease;
+}
+
 .documentos-clientes-tabs {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
@@ -3330,4 +3362,7 @@ label>i {
 .input-soles-wrapper input {
   padding-left: 2.2em;
 }
+#modalClientePagosCoordination >.modal-dialog>.modal-content {
+ background-color: #F0F4F9;
+} 
 </style>

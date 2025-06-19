@@ -6931,9 +6931,19 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             return false;
         }
     }
+    public function getPagoCoordinationById($idPago)
+    {
+        $this->db->where('id', $idPago);
+        $query = $this->db->get('contenedor_consolidado_cotizacion_coordinacion_pagos');
+        return $query->row();
+    }
     public function saveClientePagosCoordination($voucher, $idCotizacion, $idContenedor, $amount, $fecha, $banco)
     {
         try {
+
+            // Permitir imágenes y archivos de oficina
+            $this->setAllowedExtensionsImagesOfficeFiles();
+            
             $voucherUrl = $this->uploadSingleFile(
                 [
                     "name" => $voucher['name'],
