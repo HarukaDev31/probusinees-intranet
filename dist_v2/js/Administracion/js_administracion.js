@@ -78,6 +78,8 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago, nombreCliente)
   $("#payment-tracking-title").text(`${nombreCliente}`); // Set the title of the payment section
   const paymentSectionCards = $("#payment-tracking-section-cards");
   paymentSectionCards.empty(); // Clear previous content
+  const cotizacionSection = $("#cotizaciones-container");
+  cotizacionSection.hide();
   const url = base_url + "Administracion/Administracion/getDetailsPagosCurso/" + idPedidoCurso;
   try {
     const response = await fetch(url);
@@ -93,42 +95,82 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago, nombreCliente)
       let index = 1; // Initialize index for payment cards
       $("#nota").val(data.data.nota || ""); // Set the note input value
       data.data.data.forEach(detail => {
-
-        paymentSectionCards.append(`<div class="payment-card ${detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white-100"
-          } rounded-xl ">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Pago ${index}</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Monto:</span>
-                            <input disabled type="text" value="${Number((detail.monto)).toFixed(2)}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+        const cardBg = detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white";
+        paymentSectionCards.append(`<div class="payment-card ${cardBg} rounded-xl ">
+                <div class="">
+                    <h3 class="text-lg text-center text-gray-800 mb-2 p-4">Adelanto N° ${index}</h3>
+                        <div class="space-y-3 p-4 border-b border-t border-gray-200">
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Monto:</span>
+                                <input disabled type="text" value="$${Number((detail.monto)).toFixed(2)}" class="border-0 ${cardBg} px-3 w-full " readonly>
+                            </div>
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Fecha:</span>
+                                <input disabled type="text" value="${detail.payment_date}" class="border-0 ${cardBg} px-3 py-2 w-full" readonly>
+                            </div>
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Banco:</span>
+                                <input disabled type="text" value="${detail.banco}" class="border-0 ${cardBg} px-3 py-2 w-full" readonly>
+                            </div>
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Voucher:</span>
+                                <a  style="cursor:pointer" onclick="showImageModal('${detail.voucher_url}')">
+                                ${initGetIconByType(detail.voucher_url.split('.').pop())}</a>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Banco:</span>
-                            <input disabled type="text" value="${detail.banco}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                        <div class="p-4">
+                          <select class="hidden w-100 py-2 border-2 border-gray-200 rounded-lg" id="cbo-estado-pago-${detail.id}">
+                            <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""}>Pendiente</option>
+                            <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""}>Conforme</option>
+                            <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""}>Observar</option>
+                          </select>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Voucher:</span>
-                            ${getIconByExtension(detail.voucher_url)}
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Fecha:</span>
-                            <input disabled type="text" value="${detail.payment_date}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
-                        </div>
-                    </div>
-                    <select class="form-select mt-4 w-100" id="cbo-estado-pago-${detail.id}" onchange="confirmPayment('${detail.id}', this.value, 'handlePaymentCurso')">
-                      <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""} class="bg-light">Pendiente</option>
-                      <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""} class="bg-success">Confirmado</option>
-                      <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""} class="bg-danger">Observado</option>
-                  </select>
                 </div>
             </div>`);
-        index++; // Increment index for next payment card
+        setTimeout(() => {
+          $(`#cbo-estado-pago-${detail.id}`).select2({
+            dropdownParent: $(`#cbo-estado-pago-${detail.id}`).parent(),
+            templateResult: function (state) {
+              if (!state.id) return state.text;
+              if (state.id === "CONFIRMADO") {
+                return $(`<span class="flex">
+                    <svg width="20" height="20" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 6.47826L4.31034 10L13 1" stroke="#00D680" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>&nbsp;
+                    Conforme
+                </span>`);
+              }
+              if (state.id === "PENDIENTE") {
+                return $(`<span class="flex">
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 3.80078V8.00078L10.8 9.40078" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>&nbsp;
+                  Pendiente
+                </span>`);
+              }
+              if (state.id === "OBSERVADO") {
+                return $(`<span class="flex">
+                  <svg width="20" height="20" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.04177 1.66567L1.18532 11.4426C1.06457 11.6517 1.00068 11.8887 1.00001 12.1302C0.999329 12.3717 1.06189 12.6091 1.18146 12.8189C1.30104 13.0287 1.47346 13.2035 1.68157 13.3259C1.88967 13.4484 2.12622 13.5142 2.36767 13.5169H14.0806C14.322 13.5142 14.5586 13.4484 14.7667 13.3259C14.9748 13.2035 15.1472 13.0287 15.2668 12.8189C15.3864 12.6091 15.4489 12.3717 15.4482 12.1302C15.4476 11.8887 15.3837 11.6517 15.2629 11.4426L9.40647 1.66567C9.28321 1.46247 9.10966 1.29446 8.90255 1.17786C8.69545 1.06126 8.46179 1 8.22412 1C7.98645 1 7.75279 1.06126 7.54569 1.17786C7.33859 1.29446 7.16503 1.46247 7.04177 1.66567Z" stroke="#D71009" stroke-width="1.38287" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8.22437 5.21875V7.98449" stroke="#D71009" stroke-width="1.38287" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8.22437 10.75H8.23224" stroke="#D71009" stroke-width="1.38287" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>&nbsp;
+                  Observar
+                </span>`);
+              }
+              return state.text;
+            },
+            templateSelection: function (state) {
+              return state.text;
+            },
+            escapeMarkup: function (markup) { return markup; },
+            minimumResultsForSearch: Infinity
+          });
+        }, 0);
+        index++;
       });
-      const cotizacionSection = $("#cotizaciones-container");
-      cotizacionSection.empty(); // Clear previous content in cotizacion section
-      cotizacionSection.hide(); // Hide the cotizacion section initially
-      paymentSection.show(); // Show the payment section
+      paymentSection.show();
     }
   } catch (error) {
     console.error("Error fetching payment details:", error);
@@ -142,7 +184,9 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago, nombreCli
   sectionListaPedidos.hide(); // Hide the section with the list of orders
   $("#payment-tracking-title").text(`${nombreCliente}`); // Set the title of the payment section
   const paymentSectionCards = $("#payment-tracking-section-cards");
-  $("#cotizaciones-container").show(); // Show the cotizaciones section
+  const cotizacionContainer = $("#cotizaciones-container");
+  cotizacionContainer.show(); // Show the cotizacion section
+
   paymentSectionCards.empty(); // Clear previous content
   const url = base_url + "Administracion/Administracion/getDetailsPagosConsolidado/" + idCotizacion;
   try {
@@ -159,59 +203,133 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago, nombreCli
       let index = 1; // Initialize index for payment cards
       $("#nota").val(data.data.nota || ""); // Set the note input value
       data.data.data.forEach(detail => {
-
-        paymentSectionCards.append(`<div class="payment-card ${detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white-100"
-          } rounded-xl ">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Pago ${index}</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Monto:</span>
-                            <input disabled type="text" value="${Number((detail.monto)).toFixed(2)}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+        const cardBg= detail.status == "CONFIRMADO" ? "bg-green-100" : detail.status == "OBSERVADO" ? "bg-red-100" : "bg-white";
+        paymentSectionCards.append(`<div class="payment-card ${cardBg} rounded-xl ">
+                <div class="">
+                    <h3 class="text-lg text-center text-gray-800 mb-2 p-4">Adelanto N° ${index}</h3>
+                        <div class="space-y-3 p-4 border-b border-t border-gray-200">
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Monto:</span>
+                                <input disabled type="text" value="$${Number((detail.monto)).toFixed(2)}" class="border-0 ${cardBg} px-3 w-full " readonly>
+                            </div>
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Fecha:</span>
+                                <input disabled type="text" value="${detail.payment_date}" class="border-0 ${cardBg} px-3 py-2 w-full" readonly>
+                            </div>
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Banco:</span>
+                                <input disabled type="text" value="${detail.banco}" class="border-0 ${cardBg} px-3 py-2 w-full" readonly>
+                            </div>
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="text-gray-600 w-20">Voucher:</span>
+                                <a  style="cursor:pointer" onclick="showImageModal('${detail.voucher_url}')">
+                                ${initGetIconByType(detail.voucher_url.split('.').pop())}</a> 
+                                <span class="filename-truncate"title="${detail.voucher_url ? decodeURIComponent(detail.voucher_url.split('/').pop()) : ''}">
+                                  ${detail.voucher_url ? decodeURIComponent(detail.voucher_url.split('/').pop()) : ''}
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Banco:</span>
-                            <input disabled type="text" value="${detail.banco}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                        <div class="p-4">
+                          <select class="hidden w-100 py-2 border-2 border-gray-200 rounded-lg" id="cbo-estado-pago-${detail.id}">
+                            <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""}>Pendiente</option>
+                            <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""}>Conforme</option>
+                            <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""}>Observar</option>
+                          </select>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Voucher:</span>
-                            ${getIconByExtension(detail.voucher_url)}
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-600 w-20">Fecha:</span>
-                            <input disabled type="text" value="${detail.payment_date}" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
-                        </div>
-                    </div>
-                     <select class="form-select mt-4 w-100" id="cbo-estado-pago-${detail.id}" onchange="confirmPayment('${detail.id}', this.value, 'handlePayment')">
-                      <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""} class="bg-light">Pendiente</option>
-                      <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""} class="bg-success">Confirmado</option>
-                      <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""} class="bg-danger">Observado</option>
-                  </select>
                 </div>
             </div>`);
+            // Inicializa Select2 después de agregar el select
+      setTimeout(() => {
+        $(`#cbo-estado-pago-${detail.id}`).select2({
+          dropdownParent: $(`#cbo-estado-pago-${detail.id}`).parent(),
+          templateResult: function (state) {
+            if (!state.id) return state.text;
+            if (state.id === "CONFIRMADO") {
+              return $(`<span class="flex">
+                  <svg width="20" height="20" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 6.47826L4.31034 10L13 1" stroke="#00D680" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>&nbsp;
+                  Conforme
+              </span>`);
+            }
+            if (state.id === "PENDIENTE") {
+              return $(`<span class="flex">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 3.80078V8.00078L10.8 9.40078" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>&nbsp;
+
+
+                Pendiente
+              </span>`);
+            }
+            if (state.id === "OBSERVADO") {
+              return $(`<span class="flex">
+                <svg width="20" height="20" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7.04177 1.66567L1.18532 11.4426C1.06457 11.6517 1.00068 11.8887 1.00001 12.1302C0.999329 12.3717 1.06189 12.6091 1.18146 12.8189C1.30104 13.0287 1.47346 13.2035 1.68157 13.3259C1.88967 13.4484 2.12622 13.5142 2.36767 13.5169H14.0806C14.322 13.5142 14.5586 13.4484 14.7667 13.3259C14.9748 13.2035 15.1472 13.0287 15.2668 12.8189C15.3864 12.6091 15.4489 12.3717 15.4482 12.1302C15.4476 11.8887 15.3837 11.6517 15.2629 11.4426L9.40647 1.66567C9.28321 1.46247 9.10966 1.29446 8.90255 1.17786C8.69545 1.06126 8.46179 1 8.22412 1C7.98645 1 7.75279 1.06126 7.54569 1.17786C7.33859 1.29446 7.16503 1.46247 7.04177 1.66567Z" stroke="#D71009" stroke-width="1.38287" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8.22437 5.21875V7.98449" stroke="#D71009" stroke-width="1.38287" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8.22437 10.75H8.23224" stroke="#D71009" stroke-width="1.38287" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>&nbsp;
+                Observar
+              </span>`);
+            }
+            return state.text;
+          },
+          templateSelection: function (state) {
+            // Solo texto en el input cerrado (limitación de Select2)
+            return state.text;
+          },
+          escapeMarkup: function (markup) { return markup; },
+          minimumResultsForSearch: Infinity
+        });
+      }, 0);
         index++; // Increment index for next payment card
       });
-      const cotizacionContainer = $("#cotizaciones-container");
 
-      const cotizacionSection = $("#cotizacion-card");
-      cotizacionSection.empty(); // Clear previous content in cotizacion section
+      const cotizacionCard = $("#cotizacion-card");
+      cotizacionCard.empty(); // Clear previous content in cotizacion section
       const cotizacionInicial = data.data.cotizacion_inicial_url;
       if (cotizacionInicial) {
-        cotizacionSection.append(`<button 
-          onclick="window.open('${cotizacionInicial}', '_blank')"
-          class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg py-3 transition-all duration-300 flex items-center justify-center gap-2">
-                        <span>COTIZACION INICIAL</span>
-                        <i class="fas fa-file-invoice"></i>
-                    </button>`);
+        cotizacionCard.append(`
+
+                    <div class="file-item">
+                        <div class="file-preview d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0 0 48 48">
+                                <path fill="#169154" d="M29,6H15.744C14.781,6,14,6.781,14,7.744v7.259h15V6z"></path><path fill="#18482a" d="M14,33.054v7.202C14,41.219,14.781,42,15.743,42H29v-8.946H14z"></path><path fill="#0c8045" d="M14 15.003H29V24.005000000000003H14z"></path><path fill="#17472a" d="M14 24.005H29V33.055H14z"></path><g><path fill="#29c27f" d="M42.256,6H29v9.003h15V7.744C44,6.781,43.219,6,42.256,6z"></path><path fill="#27663f" d="M29,33.054V42h13.257C43.219,42,44,41.219,44,40.257v-7.202H29z"></path><path fill="#19ac65" d="M29 15.003H44V24.005000000000003H29z"></path><path fill="#129652" d="M29 24.005H44V33.055H29z"></path></g><path fill="#0c7238" d="M22.319,34H5.681C4.753,34,4,33.247,4,32.319V15.681C4,14.753,4.753,14,5.681,14h16.638 C23.247,14,24,14.753,24,15.681v16.638C24,33.247,23.247,34,22.319,34z"></path><path fill="#fff" d="M9.807 19L12.193 19 14.129 22.754 16.175 19 18.404 19 15.333 24 18.474 29 16.123 29 14.013 25.07 11.912 29 9.526 29 12.719 23.982z"></path>
+                            </svg>
+                                &nbsp;
+                            <p>Cotización Inicial.xslx</p>
+                        </div>
+                        <div class="file-actions d-flex flex-row">
+                            <button class="btn-sm download-btn" onclick="window.open('${cotizacionInicial}', '_blank')">
+                                <i class="fas fa-download"></i> 
+                            </button>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    `);
       }
       const cotizacionFinal = data.data.cotizacion_final_url;
       if (cotizacionFinal) {
-        cotizacionSection.append(`<button
-          onclick="window.open('${cotizacionFinal}', '_blank')"
-          class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg py-3 transition-all duration-300 flex items-center justify-center gap-2">
-                        <span>COTIZACION FINAL</span>
-                        <i class="fas fa-file-invoice"></i>
-                    </button>`);
+        cotizacionCard.append(`
+                    <div class="file-item">
+                        <div class="file-preview d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0 0 48 48">
+                                <path fill="#169154" d="M29,6H15.744C14.781,6,14,6.781,14,7.744v7.259h15V6z"></path><path fill="#18482a" d="M14,33.054v7.202C14,41.219,14.781,42,15.743,42H29v-8.946H14z"></path><path fill="#0c8045" d="M14 15.003H29V24.005000000000003H14z"></path><path fill="#17472a" d="M14 24.005H29V33.055H14z"></path><g><path fill="#29c27f" d="M42.256,6H29v9.003h15V7.744C44,6.781,43.219,6,42.256,6z"></path><path fill="#27663f" d="M29,33.054V42h13.257C43.219,42,44,41.219,44,40.257v-7.202H29z"></path><path fill="#19ac65" d="M29 15.003H44V24.005000000000003H29z"></path><path fill="#129652" d="M29 24.005H44V33.055H29z"></path></g><path fill="#0c7238" d="M22.319,34H5.681C4.753,34,4,33.247,4,32.319V15.681C4,14.753,4.753,14,5.681,14h16.638 C23.247,14,24,14.753,24,15.681v16.638C24,33.247,23.247,34,22.319,34z"></path><path fill="#fff" d="M9.807 19L12.193 19 14.129 22.754 16.175 19 18.404 19 15.333 24 18.474 29 16.123 29 14.013 25.07 11.912 29 9.526 29 12.719 23.982z"></path>
+                            </svg>
+                                &nbsp;
+                            <p>Cotización Final.xslx</p>
+                        </div>
+                        <div class="file-actions d-flex flex-row">
+                            <button class="btn-sm download-btn" onclick="window.open('${cotizacionFinal}', '_blank')">
+                                <i class="fas fa-download"></i> 
+                            </button>
+                        </div>
+                    </div>
+                    
+                    `);
       }
     }
     paymentSection.show(); // Show the payment section
@@ -222,10 +340,6 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago, nombreCli
 }
 async function saveNote() {
   const note = $("#nota").val().trim();
-  if (note.length === 0) {
-    alert("Por favor, ingrese una nota.");
-    return;
-  }
 
   let url = base_url + "Administracion/Administracion/";
   if (currentCurso > 0) {
@@ -249,7 +363,11 @@ async function saveNote() {
     const data = await response.json();
     console.log(data);
     if (data.status == 'success') {
-      alert("Nota guardada exitosamente.");
+      swal.fire({
+        icon: 'success',
+        title: 'Nota guardada correctamente',
+        confirmButtonText: 'OK'
+      });
       $("#note-input").val(""); // Clear the input field
       if (currentCurso > 0) {
         viewDetailsPagosCurso(currentCurso, aPagar, pagado, currentCliente); // Refresh the payment details for course
@@ -258,7 +376,12 @@ async function saveNote() {
         viewDetailsPagosConsolidado(currentCotizacion, aPagar, pagado, currentCliente);
       }// Refresh the payment details
     } else {
-      alert("Error al guardar la nota: " + data.message);
+      swal.fire({
+        icon: 'error',
+        title: 'Error al guardar la nota',
+        text: data.message,
+        confirmButtonText: 'OK'
+      });
     }
   } catch (error) {
     console.error("Error saving note:", error);
@@ -320,7 +443,7 @@ async function getTableHeaders(table) {
     const data = await response.json();
     if (data.status == 'success') {
       let symbol = table == "consolidado" ? "$" : "S/";
-      $("#span-total-importe").text(symbol + Number(data.data.total_importe).toFixed(2));
+      $("#span-total-importe").val(symbol + Number(data.data.total_importe).toFixed(2));
     } else {
       console.error("Error fetching headers:", data.message);
       return [];
