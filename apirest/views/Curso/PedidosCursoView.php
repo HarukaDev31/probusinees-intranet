@@ -207,98 +207,121 @@
 
     </section>
     <section id="section-datos-cliente" class="container my-4" style="display:none;">
-        <div class="card shadow">
-            <div class="card-header text-white bg-secondary d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fa fa-user"></i> Datos del Cliente</h5>
-            </div>
-            <div class="card-body">
+        <div class="">
+
+            <div class="">
                 <form id="form-datos-cliente" autocomplete="off">
                     <input type="hidden" name="ID_Entidad" id="cliente-id" value="">
-                    <div class="row">
-                        <!-- Columna izquierda -->
-                        <div class="col-md-6">
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Nombre y apellidos:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-nombres"
-                                    name="No_Entidad" readonly>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 p-4 grid-rows-3">
+
+                        <div class="card px-4 py-4 row-span-3">
+                            <div class="bg-white text-black  flex flex-row justify-between align-items-center border-bottom">
+                                <h5 class="mb-0 flex flex-row gap-1"><svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15.1111 15.8737V14.1098C15.1111 13.1742 14.7394 12.2769 14.0778 11.6153C13.4163 10.9537 12.519 10.582 11.5833 10.582H4.52778C3.59215 10.582 2.69485 10.9537 2.03326 11.6153C1.37168 12.2769 1 13.1742 1 14.1098V15.8737" stroke="#272A30" stroke-width="1.12889" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M8.0561 7.99306C10.0044 7.99306 11.5839 6.41362 11.5839 4.46528C11.5839 2.51694 10.0044 0.9375 8.0561 0.9375C6.10776 0.9375 4.52832 2.51694 4.52832 4.46528C4.52832 6.41362 6.10776 7.99306 8.0561 7.99306Z" stroke="#272A30" stroke-width="1.12889" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    Información del alumno</h5>
+                                <div class="flex flex-row gap-2">
+                                    <button id="btn-editar-cliente" class="btn p-1 ml-4" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button id="btn-cancel" class="hidden btn p-1 ml-4" title="Cancelar">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <div class="col-3 col-xl-10 py-sm-3 py-xl-0 py-md-0">
+                                        <button id="btn-guardar-cliente" type="button" class="text-white bg-[#fd7e14] py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion"><i class="fa fa-save"></i> Guardar</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Dni / ID:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-dni"
-                                    name="Nu_Documento_Identidad" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Correo:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-correo"
-                                    name="Txt_Email_Entidad" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">WhatsApp:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-whatsapp"
-                                    name="Nu_Celular_Entidad" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Fecha de nacimiento:</label>
-                                <input type="date" class="form-control cliente-input" id="cliente-edad"
-                                    name="Fe_Nacimiento" readonly>
+                            <div class="row pt-2">
+                                <!-- Columna izquierda -->
+                                <div class="col-md-12">
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Nombre y apellidos:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-nombres"
+                                            name="No_Entidad" readonly>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Dni / ID:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-dni"
+                                            name="Nu_Documento_Identidad" readonly>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Correo:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-correo"
+                                            name="Txt_Email_Entidad" readonly>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">WhatsApp:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-whatsapp"
+                                            name="Nu_Celular_Entidad" readonly>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Fecha de nacimiento:</label>
+                                        <input type="date" class="form-control cliente-input" id="cliente-edad"
+                                            name="Fe_Nacimiento" readonly>
+                                    </div>
+                                </div>
+                                <!-- Columna derecha -->
+                                <div class="col-md-12">
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Sexo:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-sexo"
+                                            name="Nu_Tipo_Sexo" readonly>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Red social:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-redsocial"
+                                            name="Nu_Como_Entero_Empresa" readonly>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">País:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
+                                        <select id="select-pais" class="hidden form-control cliente-input"
+                                            name="ID_Pais"></select>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Departamento:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-departamento"
+                                            readonly>
+                                        <select id="select-departamento" class="hidden form-control cliente-input"
+                                            name="ID_Departamento"></select>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Provincia:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-provincia" readonly>
+                                        <select id="select-provincia" class="hidden form-control cliente-input"
+                                            name="ID_Provincia"></select>
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Distrito:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-distrito" readonly>
+                                        <select id="select-distrito" class="hidden form-control cliente-input"
+                                            name="ID_Distrito"></select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <!-- Columna derecha -->
-                        <div class="col-md-6">
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Sexo:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-sexo"
-                                    name="Nu_Tipo_Sexo" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Red social:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-redsocial"
-                                    name="Nu_Como_Entero_Empresa" readonly>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">País:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-pais" readonly>
-                                <select id="select-pais" class="hidden form-control cliente-input"
-                                    name="ID_Pais"></select>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Departamento:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-departamento"
-                                    readonly>
-                                <select id="select-departamento" class="hidden form-control cliente-input"
-                                    name="ID_Departamento"></select>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Provincia:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-provincia" readonly>
-                                <select id="select-provincia" class="hidden form-control cliente-input"
-                                    name="ID_Provincia"></select>
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Distrito:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-distrito" readonly>
-                                <select id="select-distrito" class="hidden form-control cliente-input"
-                                    name="ID_Distrito"></select>
+                        <div class="card px-4 py-4 row-span-1
+                        " id="acceso-aula-virtual">
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Usuario:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario">
+                                    </div>
+                                    <div class="form-group flex align-items-center">
+                                        <label class="w-[40%] mb-0 form-info-label">Contraseña:</label>
+                                        <input type="text" class="form-control cliente-input" id="cliente-moodle-password"
+                                            readonly>
+                                    </div>
+                                </div>
+                                <div id="contenedor-boton-usuario"></div>
                             </div>
                         </div>
-                    </div>
-                    <hr>
-                    <div id="acceso-aula-virtual" class="row mt-4">
-                        <div class="col-md-12">
-                            <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Usuario:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-moodle-usuario">
-                            </div>
-                            <div class="form-group flex align-items-center">
-                                <label class="w-[40%] mb-0">Contraseña:</label>
-                                <input type="text" class="form-control cliente-input" id="cliente-moodle-password"
-                                    readonly>
-                            </div>
-                        </div>
-                        <div id="contenedor-boton-usuario"></div>
                     </div>
                 </form>
             </div>
@@ -370,7 +393,7 @@
                                 <label>Fecha Inicio:</label>
                                 <span id="fecha-inicio-campana-span" class="campana-indicator"></span>
                             </div>
-                             <div class="flex flex-col">
+                            <div class="flex flex-col">
                                 <label>Fecha Fin:</label>
                                 <span id="fecha-fin-campana-span" class="campana-indicator"></span>
                             </div>
@@ -397,14 +420,14 @@
                 </div>
                 <div class="modal-body row">
                     <input type="hidden" id="id-pedido-curso" name="idPedido">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-12 mb-3">
                         <label for="monto" class="form-label">Monto</label>
                         <div class="input-soles-wrapper">
                             <span class="soles-symbol">S/</span>
                             <input type="number" id="monto" name="monto" class="form-control" step="0.01" required>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-12 mb-3">
                         <label for="banco" class="form-label">Banco</label>
                         <div class="d-flex gap-3 align-items-center" id="banco-group">
                             <div class="form-check form-check-inline text-center">
@@ -433,7 +456,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-12 mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
                         <input type="date" id="fecha_pago" name="fecha" class="form-control" required>
                     </div>
@@ -694,7 +717,8 @@
         border: 1px solid #CDCDCD;
         border-radius: 0.3em;
     }
-    .campana-indicator{
+
+    .campana-indicator {
         background: white;
         padding: 0.2em 1em;
         height: 2em;
@@ -703,6 +727,7 @@
         border: 1px solid #CDCDCD;
         border-radius: 0.3em;
     }
+
     .month-span {
         padding: 0.3em 1em;
         color: black;
@@ -812,6 +837,11 @@
         transition: all 0.2s;
     }
 
+    .form-info-label {
+        font-weight: 500 !important;
+        color: rgb(109, 108, 108) !important;
+    }
+
     .day-button:hover {
         background-color: #f8f9fa;
     }
@@ -823,5 +853,10 @@
     .day-selected {
         background-color: #FF500B !important;
         color: white !important;
+    }
+
+    .cliente-input {
+        border: none !important;
+        color: black !important;
     }
 </style>

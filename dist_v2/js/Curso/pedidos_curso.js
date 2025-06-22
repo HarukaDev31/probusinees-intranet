@@ -651,15 +651,7 @@ async function viewCliente(id) {
                 <div class="col-12 col-md-2 col-xl-1">
                 </div>
                 <div class="col-12 col-md-0 col-xl-2 justify-content-center d-flex">
-                  <button id="btn-editar-cliente" class="btn p-1 ml-4" title="Editar">
-                      <i class="fas fa-edit"></i>
-                  </button>
-                  <button id="btn-cancel" class="hidden btn p-1 ml-4" title="Cancelar">
-                      <i class="fas fa-times"></i>
-                  </button>
-                  <div class="col-3 col-xl-10 py-sm-3 py-xl-0 py-md-0">
-                    <button id="btn-guardar-cliente" type="button" class="text-white bg-[#fd7e14] py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion"><i class="fa fa-save"></i> Guardar</button>
-                  </div>
+                 
                 </div>
               </div>
             </div>
@@ -669,6 +661,7 @@ async function viewCliente(id) {
         $('#section-datos-cliente').show();
 
         $('#btn-editar-cliente').on('click', function () {
+          event.preventDefault();
           $('.cliente-input').prop('readonly', false);
           $('#cliente-moodle-password').prop('readonly', true);
           $('#btn-guardar-cliente').show();
@@ -694,6 +687,7 @@ async function viewCliente(id) {
           }, 200);
         });
         $('#btn-cancel').on('click', function () {
+          event.preventDefault();
           $('.cliente-input').prop('readonly', true);
           $('#btn-editar-cliente').show();
           $(this).hide();
@@ -707,8 +701,7 @@ async function viewCliente(id) {
           $('#select-distrito').hide();
         });
         $('#btn-guardar-cliente').on('click', function (e) {
-          console.log($('#cliente-id').val());
-          console.log($('#form-datos-cliente').serialize());
+
           e.preventDefault();
           Swal.fire({
             title: 'Guardando...',
