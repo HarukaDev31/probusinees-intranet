@@ -112,14 +112,13 @@ class PedidosCurso extends CI_Controller
                 $arrEstadoRegistro = $this->HelperImportacionModel->obtenerEstadoRegistroPagosArray($row->Nu_Estado);                             //estado
 
                 $fecha_hoy = date('Y-m-d');
-                $fecha_inicio = isset($row->Fe_Inicio) ? $row->Fe_Inicio : null;
                 $fecha_fin = isset($row->Fe_Fin) ? $row->Fe_Fin : null;
                 $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null; // 1 = En vivo
 
                 $estado_pago = '<select disabled style="padding:0.8em 0.5em;border-radius:0.5em; width:100%;font-size:1.2em;text-align:center"';
                 $estado = 'pendiente';
                 if ($row->total_pagos == 0) {
-                    $estado_pago .='class="bg-[#7E7E7E] select-estado-pago text-white">';
+                    $estado_pago .= 'class="bg-[#7E7E7E] select-estado-pago text-white">';
                     $estado_pago .= '<option class=" bg-[#7E7E7E]">Pendiente</option>';
                 } elseif ($row->total_pagos < $row->Ss_Total && $row->total_pagos > 0) {
                     $estado = 'adelanto';
@@ -179,14 +178,14 @@ class PedidosCurso extends CI_Controller
 
                 $divAcciones = '<div class="flex flex-row gap-2 align-items-center justify-content-center">'; //Acciones
 
-                $divAcciones .='<svg 
+                $divAcciones .= '<svg 
                 class="cursor-pointer"
                 width="30" height="23" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="viewCliente(\'' . $row->ID_Pedido_Curso . '\')">
                 <path d="M1 6.45455C1 6.45455 3.72727 1 8.5 1C13.2727 1 16 6.45455 16 6.45455C16 6.45455 13.2727 11.9091 8.5 11.9091C3.72727 11.9091 1 6.45455 1 6.45455Z" stroke="#7E7E7E" stroke-width="1.09091" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M8.50004 8.50107C9.62972 8.50107 10.5455 7.58528 10.5455 6.45561C10.5455 5.32594 9.62972 4.41016 8.50004 4.41016C7.37037 4.41016 6.45459 5.32594 6.45459 6.45561C6.45459 7.58528 7.37037 8.50107 8.50004 8.50107Z" stroke="#7E7E7E" stroke-width="1.09091" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 ';
-                $divAcciones.='<svg 
+                $divAcciones .= '<svg 
                 class="cursor-pointer"
                 width="30" height="23" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="eliminarPedido(\'' . $row->ID_Pedido_Curso . '\')"">
                 <path d="M1 3.32031H2.16H11.44" stroke="#FF0000" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
@@ -194,7 +193,7 @@ class PedidosCurso extends CI_Controller
                 <path d="M5.06006 6.21875V9.69875" stroke="#FF0000" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M7.37988 6.21875V9.69875" stroke="#FF0000" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>';
-                $divAcciones.='<svg
+                $divAcciones .= '<svg
                 class="cursor-pointer"
                 width="30" height="23" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="guardarCambiosPedido(\'' . $row->ID_Pedido_Curso . '\')">
                 <path d="M12.7986 3.05333L9.67446 0.426667C9.35013 0.153333 8.93314 0 8.50952 0H2.3671C1.36101 0 0.546875 0.82 0.546875 1.83333V11.1667C0.546875 12.18 1.36101 13 2.3671 13H11.6337C12.6398 13 13.4539 12.18 13.4539 11.1667V4.46667C13.4539 3.92 13.2156 3.40667 12.7986 3.06V3.05333ZM7.82776 1.00667V3.17333C7.82776 3.63333 7.4571 4.00667 7.00039 4.00667H4.35279C3.89608 4.00667 3.52542 3.63333 3.52542 3.17333V1.00667H7.82776ZM3.52542 12.0067V9.17333C3.52542 8.71333 3.89608 8.34 4.35279 8.34H9.64799C10.1047 8.34 10.4754 8.71333 10.4754 9.17333V12.0067H3.52542ZM12.4611 11.1733C12.4611 11.6333 12.0904 12.0067 11.6337 12.0067H11.4682V9.17333C11.4682 8.16 10.6541 7.34 9.64799 7.34H4.35279C3.34671 7.34 2.53257 8.16 2.53257 9.17333V12.0067H2.3671C1.91039 12.0067 1.53972 11.6333 1.53972 11.1733V1.84C1.53972 1.38 1.91039 1.00667 2.3671 1.00667H2.53257V3.17333C2.53257 4.18667 3.34671 5.00667 4.35279 5.00667H7.00039C8.00648 5.00667 8.82061 4.18667 8.82061 3.17333V1.07333C8.90004 1.10667 8.97285 1.14667 9.03904 1.2L12.1632 3.82667C12.3552 3.98667 12.4611 4.22 12.4611 4.46667V11.1733Z" fill="green"/>
@@ -215,14 +214,10 @@ class PedidosCurso extends CI_Controller
                 $subdata[] = $row->No_Signo . '<input value="' . round($row->Ss_Total, 2) . '" class="w-75" readonly/>';    //importe		
                 $subdata[] = "S/" . round($row->total_pagos, 2);
                 //if pagos_count is minor than 4 add button plus to add new payment
-                $divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
-
-                $divAcciones .= '<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
-
-                if ($row->pagos_count > 0) {
-                    $divAcciones .= '<div class="d-flex"  onclick="viewClientePagosCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')">
-					<i class="fas fa-eye text-primary" style="cursor:pointer;"></i>	
-                    </div>';
+                $divAcciones = '<div class="nav gap-1">';
+                $pagos_details = json_decode($row->pagos_details, true);
+                foreach ($pagos_details as $pago) {
+                    $divAcciones .= '<button class="nav-link p-2 rounded-lg bg' . $this->getColorTabByStatus($pago['status']) . '">S/' . $pago['monto'] . '</button>';
                 }
                 $divAcciones .=  '</div>';
                 $subdata[] = $divAcciones;
@@ -237,9 +232,25 @@ class PedidosCurso extends CI_Controller
         );
         echo json_encode($output);
     }
-    public function eliminarPedido($idPedido){
+    public function getColorTabByStatus($status)
+    {
+        switch ($status) {
+            case 'PENDIENTE':
+                return '-[#585858] text-white';
+            case 'ADELANTO':
+                return '-warning';
+            case 'CONFIRMADO':
+                return '-[#00D680]';
+            case 'OBSERVADO':
+                return '-[#D71009] text-white';
+            default:
+                return '-secondary';
+        }
+    }
+    public function eliminarPedido($idPedido)
+    {
         $response = $this->PedidosCursoModel->eliminarPedido($idPedido);
-        echo json_encode($response);    
+        echo json_encode($response);
     }
     public function ViewCliente($id_pedido)
     {
@@ -473,7 +484,7 @@ class PedidosCurso extends CI_Controller
                 }
                 $arrPost = [];
                 //get no_usuario and no_password from response_usuario_bd
-                $arrPost['No_Usuario'] = $result->usuario_moodle=="" ? $result->No_Usuario : $result->usuario_moodle; 
+                $arrPost['No_Usuario'] = $result->usuario_moodle == "" ? $result->No_Usuario : $result->usuario_moodle;
                 $arrPost['No_Password'] = $this->encryption->decrypt($result->No_Password);
 
                 $response_error = [
@@ -730,13 +741,13 @@ class PedidosCurso extends CI_Controller
             $rows[]      = date('d/m/Y', strtotime($row['Fe_Fin']));
             $rows[]      = ($row['cantidad_personas'] ?? $row['Cantidad']) . ' personas';
             $divAcciones = '<div class="d-flex px-2 w-100 flex-row" style="gap:1em;">';
-            $divAcciones .='<svg 
+            $divAcciones .= '<svg 
                             class="cursor-pointer" onclick="editarCampana(\'' . $row['ID_Campana'] . '\')"
                             width="16" height="15" viewBox="0 0 16 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.83398 14H14.6676" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M11.2504 1.47176C11.5524 1.1697 11.9621 1 12.3893 1C12.6008 1 12.8103 1.04166 13.0057 1.12261C13.2011 1.20355 13.3787 1.32219 13.5282 1.47176C13.6778 1.62133 13.7964 1.79889 13.8774 1.99431C13.9583 2.18972 14 2.39917 14 2.61069C14 2.82221 13.9583 3.03166 13.8774 3.22708C13.7964 3.42249 13.6778 3.60006 13.5282 3.74962L4.03715 13.2407L1 14L1.75929 10.9629L11.2504 1.47176Z" stroke="#585858" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>';
-            $divAcciones .='<svg 
+            $divAcciones .= '<svg 
                             class="cursor-pointer" onclick="borrarCampana(\'' . $row['ID_Campana'] . '\')"
                             width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0.666992 3.32031H1.82699H11.107" stroke="#FF0000" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round"/>

@@ -103,7 +103,7 @@ class PedidosCursoModel extends CI_Model
 	public function getPagosCurso()
 	{
 		$this->db->select(
-			"CC.*
+			'CC.*
 		  ,CLI.Fe_Nacimiento,
 		   CLI.Nu_Como_Entero_Empresa,
 		    CLI.No_Otros_Como_Entero_Empresa,
@@ -119,15 +119,28 @@ class PedidosCursoModel extends CI_Model
              FROM pedido_curso_pagos as cccp                 
              JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept = ccp.id                 
              WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
-             AND (ccp.name = 'ADELANTO')             
+             AND (ccp.name = "ADELANTO")             
          ) AS pagos_count,
          (                 
              SELECT IFNULL(SUM(cccp.monto), 0)                  
              FROM pedido_curso_pagos as cccp                 
              JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept= ccp.id                 
              WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
-             AND (ccp.name = 'ADELANTO')           
-         ) AS total_pagos"
+             AND (ccp.name = "ADELANTO")           
+         ) AS total_pagos,
+		   (SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                "id_pago", ccp2.id,
+                "monto", ccp2.monto,
+                "concepto", ccpc2.name,
+                "status", ccp2.status,
+                "payment_date", ccp2.payment_date
+            )
+           ) FROM ' . $this->table_pedido_curso_pagos . ' as ccp2
+        LEFT JOIN ' . $this->table_pedido_curso_pagos_conceptos . ' as ccpc2 ON ccp2.id_concept = ccpc2.id
+        WHERE ccp2.id_cotizacion = ' . $this->table_consolidado_cotizacion . '.id
+        AND (ccp2.id_concept = ' . intval($this->CONCEPT_PAGO_ADELANTO) . ')
+        ) as pagos_details'
 		)
 			->from($this->table . ' AS CC')  // Add the CC alias here!
 			->join($this->table_pais . ' AS P', 'P.ID_Pais = CC.ID_Pais', 'join')  // Update references

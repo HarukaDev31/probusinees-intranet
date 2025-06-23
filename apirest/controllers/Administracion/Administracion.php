@@ -229,7 +229,7 @@ class Administracion extends CI_Controller
 				$divAcciones = '<div class="nav gap-1">';
 				$pagos_details = json_decode($row->pagos_details, true);
 				foreach ($pagos_details as $pago) {
-					$divAcciones .= '<button class="nav-link p-2 rounded-lg bg' . $this->getColortabByStatus($pago['status']) . '">S/' . $pago['monto'] . '</button>';
+					$divAcciones .= '<button class="nav-link p-2 rounded-lg bg' . $this->getColorTabByStatus($pago['status']) . '">S/' . $pago['monto'] . '</button>';
 				}
 				$divAcciones .= '</div>';
 				$subdata[] = $divAcciones;
