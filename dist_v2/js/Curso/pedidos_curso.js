@@ -1,3 +1,4 @@
+
 var url, table_Entidad, div_items = '', iCounter = 1;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^\|";
@@ -10,6 +11,7 @@ const daysOfWeek = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
 var currentTableCurso = 'alumnos';
 var tableCursoPagos;
 var tableCursoPedidos;
+var selectedDaysCampana = [];
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 function showImageModal(url) {
   ///create modal and show image
@@ -791,6 +793,9 @@ function ocultarSectionDatosCliente() {
   });
   // Oculta la sección de campañas y cursos
   $('#section-campanas-cursos').hide();
+  $('.dropdown-menu').on('click', function (event) {
+    event.stopPropagation(); // Evita que el evento se propague
+  });
 
 }
 // Función para aplicar los filtros y recargar la tabla
@@ -950,6 +955,11 @@ function cargarTablaCampanas() {
 
 
 function editarCampana(id) {
+  $('.month-selector').empty().off('click'); // Eliminar eventos también
+  $('.month-container').empty();
+
+  // Limpiar las fechas seleccionadas
+  $('#fecha-inicio-campana-span, #fecha-fin-campana-span').text('--/--/----');
   $.ajax({
     url: base_url + "Curso/PedidosCurso/getCampanaById",
     type: "POST",
@@ -962,8 +972,81 @@ function editarCampana(id) {
         $('#id-campana-editar').val(response.data.ID_Campana);
         $('#fecha-inicio-campana').val(response.data.Fe_Inicio);
         $('#fecha-fin-campana').val(response.data.Fe_Fin);
-        // Abre el modal
+
         $('#modal-nueva-campana').modal('show');
+        const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+
+        months.forEach((month, index) => {
+          $('.month-selector').append(`
+      <div class="form-group">
+        <span data-month="${index}" class="${index < currentMonth ? 'month-span-disabled' : 'month-span'}">
+          ${month}
+        </span>
+      </div>
+    `);
+        });
+
+        // Usar delegación de eventos para los clicks
+        $('.month-selector').on('click', '.month-span:not(.month-span-disabled)', function () {
+          const monthIndex = $(this).data('month');
+          const year = currentYear;
+
+          if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+            $(`.month-container [data-month="${monthIndex}"]`).remove();
+          } else {
+            if ($('.month-container').children().length >= 2) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Solo puedes seleccionar dos meses',
+                text: 'Por favor, deselecciona un mes antes de seleccionar otro.',
+              });
+              return;
+            }
+            $(this).addClass('selected');
+
+            // Obtener primer y último día del mes seleccionado
+            const firstDay = new Date(year, monthIndex, 1);
+            const lastDay = new Date(year, monthIndex + 1, 0);
+
+            // Generar el calendario
+            const calendarHtml = `
+        <div class="month-calendar" data-month="${monthIndex}">
+          <h4 class="text-center mb-3">${months[monthIndex]} ${year}</h4>
+          ${createHtmlCalendar(firstDay, lastDay)}
+        </div>
+      `;
+
+            $(".month-container").append(calendarHtml);
+          }
+        });
+        //from fe_inicio and fe_fin select one or two months click months
+        const feInicio = new Date(response.data.Fe_Inicio);
+        const feFin = new Date(response.data.Fe_Fin);
+        //click on months with data-month=fe_inicio.getMonth() and fe_fin.getMonth()
+        if (feInicio.getMonth() === feFin.getMonth()) {
+          $(`.month-selector .month-span[data-month="${feInicio.getMonth()}"]`).trigger('click');
+        } else {
+          $(`.month-selector .month-span[data-month="${feInicio.getMonth()}"]`).trigger('click');
+          $(`.month-selector .month-span[data-month="${feFin.getMonth()}"]`).trigger('click');
+        }
+        const days = response.data.dias;
+        if (days) {
+          const parseDays = JSON.parse(days);
+          parseDays.forEach(date => {
+            console.log(date, "date");
+            console.log(Date.parse(date.fecha), "date fecha");
+            const year = date.fecha.split('-')[0];
+            const month = date.fecha.split('-')[1] - 1; // Los meses en
+            // JavaScript son 0-indexados
+            const day = date.fecha.split('-')[2];
+            $(`.month-container .day-button[data-day="${day}"][data-month="${month}"][data-year="${year}"]`).trigger('click')
+          });
+        }
+
         table_Campanas.ajax.reload();
       } else {
         Swal.fire('Error', 'No se pudo obtener la campaña', 'error');
@@ -971,10 +1054,7 @@ function editarCampana(id) {
     }
   });
 }
-// Para crear, limpia el formulario y cambia el título
-$('#btn-crear-campana').on('click', function () {
 
-});
 
 function createHtmlCalendar(startDate, endDate) {
   const daysOfWeek = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
@@ -1044,18 +1124,17 @@ $('.month-container').on('click', '.day-button', function (event) {
   // Obtener todos los días seleccionados
   const selectedDays = $('.day-selected');
 
-  // Si hay selecciones en otro mes y ya hay 2 selecciones
   const selectedInOtherMonths = selectedDays.filter(function () {
     return $(this).data('month') !== clickedMonth;
   });
 
-  if (selectedInOtherMonths.length > 0 && selectedDays.length >= 2) {
+  if (selectedInOtherMonths.length > 0 && selectedDays.length >= 6) {
     // Deseleccionar el más antiguo
     const oldest = findOldestSelectedDay();
     if (oldest) oldest.removeClass('day-selected');
   }
-  // Si estamos en el mismo mes y ya hay 2 selecciones
-  else if (selectedDays.length >= 2) {
+  // Si estamos en el mismo mes y ya hay 6 selecciones
+  else if (selectedDays.length >= 6) {
     // Deseleccionar el más antiguo de este mes
     const oldestInMonth = findOldestSelectedDay(clickedMonth);
     if (oldestInMonth) oldestInMonth.removeClass('day-selected');
@@ -1092,7 +1171,7 @@ function findOldestSelectedDay(specificMonth = null) {
 // Función para actualizar los spans con las fechas seleccionadas
 function updateDateSpans() {
   const selectedDays = getSelectedDaysSorted();
-
+  console.log(selectedDays, "selectedDays");
   // Formatear fechas (ej: "15/06/2024")
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -1111,9 +1190,10 @@ function updateDateSpans() {
   else {
     // Ordenar las fechas cronológicamente
     const sortedDates = selectedDays.map(d => d.date).sort((a, b) => a - b);
+    selectedDaysCampana = sortedDates;
 
     $('#fecha-inicio-campana-span').text(formatDate(sortedDates[0]));
-    $('#fecha-fin-campana-span').text(formatDate(sortedDates[1]));
+    $('#fecha-fin-campana-span').text(formatDate(sortedDates[selectedDays.length - 1]));
   }
 }
 
@@ -1164,7 +1244,64 @@ function borrarCampana(id) {
     }
   });
 }
+//onclick close-modal-comprobante hide modal-image-preview
+$(document).on('click', '.close-modal-comprobante', function () {
+  event.preventDefault();
+  $('#modal-image-preview').modal('hide');
+});
+$(document).on('click', '.close-modal-pago', function () {
+  event.preventDefault();
+  $('#modal-pago').modal('hide');
+});
+function showPago(monto, banco, fecha, voucher_url) {
+  event.preventDefault();
 
+  // Set basic info
+  $('#monto-pago').text('S/ ' + parseFloat(monto).toFixed(2));
+  $('#banco-pago').text(banco);
+  $('#fecha-pago').text(fecha);
+
+  // Handle voucher URL
+  const voucherContainer = $('#voucher-container');
+  voucherContainer.empty();
+
+  if (voucher_url) {
+    const fileExt = voucher_url.split('.').pop().toLowerCase();
+    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt);
+
+    if (isImage) {
+      // For images - show thumbnail that opens preview modal
+      const imgThumb = $('<div class="cursor-pointer group">')
+        .append($('<img>')
+          .attr('src', voucher_url)
+          .addClass('w-24 h-24 object-cover rounded-lg border border-gray-200 group-hover:border-blue-500 transition')
+          .on('click', function () {
+            $('#image-preview-comprobante').attr('src', voucher_url);
+            $('#download-btn').attr('href', voucher_url);
+            $('#modal-image-preview').modal('show');
+          })
+        )
+        .append($('<div class="text-xs text-center mt-1 text-blue-600">Ver comprobante</div>'));
+
+      voucherContainer.append(imgThumb);
+    } else {
+      // For non-images - show download link with file icon
+      const fileIcon = $('<i class="fas fa-file-download text-3xl text-gray-400 mb-2"></i>');
+      const downloadLink = $('<a>')
+        .attr('href', voucher_url)
+        .attr('download', '')
+        .addClass('inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500')
+        .text('Descargar comprobante');
+
+      voucherContainer.append(fileIcon, $('<div class="mt-2"></div>').append(downloadLink));
+    }
+  } else {
+    voucherContainer.append($('<span class="text-gray-400">Sin comprobante</span>'));
+  }
+
+  // Show modal
+  $('#modal-pago').modal('show');
+}
 // Botón para mostrar campañas
 $(document).on('click', '#btn-nueva-campana', function () {
   $('#section-listar-pedidos').hide();
@@ -1206,7 +1343,6 @@ $(document).on('click', '#btn-nueva-campana', function () {
     const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
 
-    // Generar los meses
     months.forEach((month, index) => {
       $('.month-selector').append(`
       <div class="form-group">
@@ -1222,10 +1358,6 @@ $(document).on('click', '#btn-nueva-campana', function () {
       const monthIndex = $(this).data('month');
       const year = currentYear;
 
-      // Validar límite de 2 meses seleccionados
-
-
-      // Toggle de selección
       if ($(this).hasClass('selected')) {
         $(this).removeClass('selected');
         $(`.month-container [data-month="${monthIndex}"]`).remove();
@@ -1266,10 +1398,10 @@ $(document).on('click', '#btn-nueva-campana', function () {
 // Guardar la campaña al enviar el formulario
 $('#form-nueva-campana').on('submit', function (e) {
   e.preventDefault();
-  
+
   // Obtener días seleccionados ordenados por fecha
   const selectedDays = [];
-  $('.day-selected').each(function() {
+  $('.day-selected').each(function () {
     selectedDays.push({
       day: $(this).data('day'),
       month: $(this).data('month') + 1, // Meses de 1-12
@@ -1277,7 +1409,7 @@ $('#form-nueva-campana').on('submit', function (e) {
       date: new Date($(this).data('year'), $(this).data('month'), $(this).data('day'))
     });
   });
-  
+
   // Ordenar por fecha (más antigua primero)
   selectedDays.sort((a, b) => a.date - b.date);
 
@@ -1289,13 +1421,13 @@ $('#form-nueva-campana').on('submit', function (e) {
 
   const id = $('#id-campana-editar').val();
   const url = id ? base_url + "Curso/PedidosCurso/editarCampana" : base_url + "Curso/PedidosCurso/crearCampana";
-  
+
   // Crear FormData con todos los campos del formulario
   const form = new FormData(this);
-  
+
   // Agregar campos adicionales
   form.append("ID_Campana", id || '0');
-  
+
   // Formatear fechas como YYYY-MM-DD
   const formatDate = (year, month, day) => {
     return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
@@ -1304,7 +1436,7 @@ $('#form-nueva-campana').on('submit', function (e) {
   // Fecha de inicio (siempre la más antigua)
   const startDate = selectedDays[0];
   form.append("Fe_Inicio", formatDate(startDate.year, startDate.month, startDate.day));
-  
+
   // Fecha fin (la más reciente si hay más de una selección)
   const endDate = selectedDays.length > 1 ? selectedDays[selectedDays.length - 1] : startDate;
   form.append("Fe_Fin", formatDate(endDate.year, endDate.month, endDate.day));
@@ -1332,7 +1464,7 @@ $('#form-nueva-campana').on('submit', function (e) {
         Swal.fire('Error', response.message || 'Error al procesar la solicitud', 'error');
       }
     },
-    error: function(xhr) {
+    error: function (xhr) {
       let errorMsg = 'Error en la solicitud';
       if (xhr.responseJSON && xhr.responseJSON.message) {
         errorMsg = xhr.responseJSON.message;

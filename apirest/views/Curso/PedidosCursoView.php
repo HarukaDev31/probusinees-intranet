@@ -508,6 +508,63 @@
         </div>
     </div>
 </div>
+<div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto" id="modal-pago" tabindex="-1" aria-labelledby="pagoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg relative w-auto pointer-events-none">
+    <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+      <div class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
+        <h5 class="text-xl font-medium leading-normal text-gray-800" id="pagoModalLabel">Detalles del Pago</h5>
+        <button type="button" class="btn-close box-content w-4 h-4 p-1 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline" data-bs-dismiss="modal" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body relative p-4">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Monto:</p>
+            <p id="monto-pago" class="text-lg font-semibold text-gray-800"></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Banco:</p>
+            <p id="banco-pago" class="text-lg font-semibold text-gray-800"></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Fecha:</p>
+            <p id="fecha-pago" class="text-lg font-semibold text-gray-800"></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Comprobante:</p>
+            <div id="voucher-container" class="mt-2">
+              <!-- Voucher content will be inserted here -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
+        <button type="button" class="close-modal-pago px-6 py-2.5 bg-gray-200 text-gray-700 font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-gray-300 hover:shadow-lg focus:bg-gray-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-400 active:shadow-lg transition duration-150 ease-in-out" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for image preview -->
+<div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto" id="modal-image-preview" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg relative w-auto pointer-events-none">
+    <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+      <div class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
+        <h5 class="text-xl font-medium leading-normal text-gray-800">Vista previa del comprobante</h5>
+        <button type="button" class="btn-close box-content w-4 h-4 p-1 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline" data-bs-dismiss="modal" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body relative p-4 flex justify-center">
+        <img id="image-preview-comprobante" src="" alt="Comprobante" class="max-w-full h-auto rounded-lg">
+      </div>
+      <div class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
+        <a id="download-btn" href="#" 
+        target="_blank" rel="noopener noreferrer"
+        class="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out mr-2" download>Descargar</a>
+        <button type="button" class="close-modal-comprobante px-6 py-2.5 bg-gray-200 text-gray-700 font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-gray-300 hover:shadow-lg focus:bg-gray-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-400 active:shadow-lg transition duration-150 ease-in-out" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
     * {
         font-family: Epilogue;

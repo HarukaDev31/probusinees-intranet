@@ -215,10 +215,13 @@ class PedidosCurso extends CI_Controller
                 $subdata[] = "S/" . round($row->total_pagos, 2);
                 //if pagos_count is minor than 4 add button plus to add new payment
                 $divAcciones = '<div class="nav gap-1">';
-                $pagos_details = json_decode($row->pagos_details, true);
+                $pagos_details = json_decode($row->pagos_details, true)?? [];
                 foreach ($pagos_details as $pago) {
-                    $divAcciones .= '<button class="nav-link p-2 rounded-lg bg' . $this->getColorTabByStatus($pago['status']) . '">S/' . $pago['monto'] . '</button>';
+                    $divAcciones .= '<button
+                    onclick="showPago('.$pago['monto'].', \'' . $pago['concepto'] . '\', \'' . $pago['payment_date'] . '\', \'' . $pago['voucher_url'] . '\')"
+                    class="nav-link p-2 rounded-lg bg' . $this->getColorTabByStatus($pago['status']) . '">S/' . $pago['monto'] . '</button>';
                 }
+                $divAcciones .= '<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
                 $divAcciones .=  '</div>';
                 $subdata[] = $divAcciones;
                 $data[] = $subdata;
@@ -767,7 +770,9 @@ class PedidosCurso extends CI_Controller
 
     public function crearCampana()
     {
-        $result = $this->PedidosCursoModel->crearCampana($this->input->post('Fe_Inicio'), $this->input->post('Fe_Fin'));
+        $result = $this->PedidosCursoModel->crearCampana($this->input->post('Fe_Inicio'), $this->input->post('Fe_Fin'),
+        $this->input->post('Dias_Seleccionados')
+    );
         echo json_encode($result);
     }
     public function editarCampana()
@@ -775,7 +780,8 @@ class PedidosCurso extends CI_Controller
         $id        = $this->input->post('ID_Campana');
         $fe_inicio = $this->input->post('Fe_Inicio');
         $fe_fin    = $this->input->post('Fe_Fin');
-        $result    = $this->PedidosCursoModel->editarCampana($id, $fe_inicio, $fe_fin);
+        $dias      = $this->input->post('Dias_Seleccionados');
+        $result    = $this->PedidosCursoModel->editarCampana($id, $fe_inicio, $fe_fin, $dias);
         echo json_encode($result);
     }
     public function getCampanaById()
