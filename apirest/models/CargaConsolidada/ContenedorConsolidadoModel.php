@@ -5994,8 +5994,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 FROM " . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . " cccp
                 JOIN " . $this->table_pagos_concept . " ccp ON cccp.id_concept= ccp.id
                 WHERE cccp.id_cotizacion = CC.id
-                AND ccp.name = 'LOGISTICA'
-                OR ccp.name = 'IMPUESTOS'
+                AND (ccp.name = 'LOGISTICA'
+                OR ccp.name = 'IMPUESTOS')
                 ) AS total_pagos");
                 $this->db->from($this->table_contenedor_cotizacion . " AS CC");
                 $this->db->where('id', $idCotizacionFinal);
@@ -6013,7 +6013,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $total = $logisticaFinal + $impuestosFinal;
                 $totalAPagar = $total - $totalPagos;
                 $idContenedor = $query->row()->id_contenedor;
-                //get fecha de arribo from table contenedor where id=idContenedor
                 $this->db->select('fecha_arribo');
                 $this->db->from($this->table);
                 $this->db->where('id', $idContenedor);
@@ -6027,7 +6026,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     "☑️Total: $" . number_format($total, 2) . "\n" .
                     "Pronto le aviso nuevos avances, que tengan buen dia \n" .
                     "Último día de pago: " . date('d/m/Y', strtotime($fechaArribo)) . "\n";
-
                 $this->sendMessage($message);
                 $pathCotizacionFinalPDF = $this->getBoletaForSend($idCotizacionFinal);
                 $this->sendMedia($pathCotizacionFinalPDF, null, null, null, 3);

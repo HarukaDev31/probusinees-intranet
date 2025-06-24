@@ -170,7 +170,13 @@
     //     }
         private function _callApi($endpoint, $data) {
             $url = 'https://redis.probusiness.pe/api/whatsapp'. $endpoint;
-            
+            //check if on prod or on local using base_url
+            $envUrl=base_url();
+            //if $envUrl contains 'localhost' 
+            if (strpos($envUrl, 'localhost') !== false ){
+                $data['phoneNumberId'] = '51912705923@c.us';
+                
+            }
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
