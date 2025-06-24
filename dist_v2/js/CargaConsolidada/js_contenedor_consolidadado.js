@@ -104,6 +104,55 @@ var documentationContainerProfile = null;
 var documentacionSelectedProvider = 0;
 var documentacionDocumentacionContainer = null;
 var documentacionAduanaContainer = null;
+$("#uploadFinal").click(() => {
+    event.preventDefault();
+    url =
+      base_url +
+      "CargaConsolidada/ContenedorConsolidado/generateMassiveExcelPayrolls";
+    const formData = new FormData();
+    formData.append("idContenedor", idContenedor);
+    //swall input file
+    Swal.fire({
+      title: "Subir Factura General",
+      input: "file",
+      inputAttributes: {
+        //excel file
+        accept:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Subir",
+      showLoaderOnConfirm: true,
+      preConfirm: async (file) => {
+        formData.append("file", file);
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            body: formData, // Asegúrate de que formData contiene los datos correctos
+          });
+
+          const blob = await response.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+
+          // Crear un enlace <a> invisible y simular un clic para descargar
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = "Cotizaciones Finales.zip"; // Nombre del archivo
+          document.body.appendChild(a);
+          a.click();
+
+          window.URL.revokeObjectURL(blobUrl);
+          document.body.removeChild(a);
+        } catch (error) {
+          console.error("Error al descargar el archivo:", error);
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }).then((result) => {
+      Swal.fire("Correcto", result.value.message, "success");
+      tableCotizacionFinal.ajax.reload();
+    });
+  });
 function viewClientePagoCoordination(idPago) {
   $.get(base_url + 'CargaConsolidada/ContenedorConsolidado/getPagoCoordination/' + idPago, function(adelanto) {
     if (adelanto) {
@@ -3882,7 +3931,7 @@ async function viewCotizacionFinal() {
 
     let table = this.getAttribute("data-table");
     this.classList.add("active");
-
+    console.log("Table clicked:", table);
     if (table == "general") {
       // Handle final table
       $("#table-cotizacion-final").attr("style", "");
@@ -4051,7 +4100,7 @@ async function viewCotizacionFinal() {
     }
   });
 
-  // Activate first tab
+
   $(".tab-clientes-final").first().click();
 }
 async function deleteDocumentacionFolder(id) {
@@ -7452,55 +7501,7 @@ $(document).ready(async function () {
       }
     });
   });
-  $("#uploadFinal").click(() => {
-    url =
-      base_url +
-      "CargaConsolidada/ContenedorConsolidado/generateMassiveExcelPayrolls";
-    const formData = new FormData();
-    formData.append("idContenedor", idContenedor);
-    //swall input file
-    Swal.fire({
-      title: "Subir Factura General",
-      input: "file",
-      inputAttributes: {
-        //excel file
-        accept:
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      },
-      showCancelButton: true,
-      confirmButtonText: "Subir",
-      showLoaderOnConfirm: true,
-      preConfirm: async (file) => {
-        formData.append("file", file);
-        try {
-          const response = await fetch(url, {
-            method: "POST",
-            body: formData, // Asegúrate de que formData contiene los datos correctos
-          });
 
-          const blob = await response.blob();
-          const blobUrl = window.URL.createObjectURL(blob);
-
-          // Crear un enlace <a> invisible y simular un clic para descargar
-          const a = document.createElement("a");
-          a.href = blobUrl;
-          a.download = "Cotizaciones Finales.zip"; // Nombre del archivo
-          document.body.appendChild(a);
-          a.click();
-
-          // Limpiar recursos
-          window.URL.revokeObjectURL(blobUrl);
-          document.body.removeChild(a);
-        } catch (error) {
-          console.error("Error al descargar el archivo:", error);
-        }
-      },
-      allowOutsideClick: () => !Swal.isLoading(),
-    }).then((result) => {
-      Swal.fire("Correcto", result.value.message, "success");
-      tableCotizacionFinal.ajax.reload();
-    });
-  });
   $("#btn-back-cotizacion-final").click(function () {
     cotizacionFinalContainer.hide();
     returnToSteps();
