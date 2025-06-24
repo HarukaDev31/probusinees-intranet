@@ -461,9 +461,9 @@ class PedidosCursoModel extends CI_Model
 			return ['status' => 'warning', 'message' => 'No se modificó ningún dato'];
 		}
 	}
-public function getCampanaById($id)
-{
-    $this->db->select('
+	public function getCampanaById($id)
+	{
+		$this->db->select('
         c.ID_Campana,
         c.Fe_Creacion,
         c.Fe_Inicio,
@@ -477,11 +477,11 @@ public function getCampanaById($id)
             )
         ) FROM `' . $this->table_campana_curso_dias . '` WHERE id_campana = c.ID_Campana) as dias
     ');
-    $this->db->from('campana_curso c');
-    $this->db->where('c.ID_Campana', $id);
-    $query = $this->db->get();
-    return $query->row_array();
-}
+		$this->db->from('campana_curso c');
+		$this->db->where('c.ID_Campana', $id);
+		$query = $this->db->get();
+		return $query->row_array();
+	}
 
 	public function borrarCampana($id)
 	{
@@ -647,5 +647,48 @@ public function getCampanaById($id)
 		}
 		$query = $this->db->get();
 		return $query->row();
+	}
+	public function borrarPagoCurso($idPagoCurso)
+	{
+		//find the payment by id and unlink the voucher file
+		try {
+			$this->db->select('voucher_url');
+			$this->db->from($this->table_pedido_curso_pagos);
+			$this->db->where('id', $idPagoCurso);
+			$query = $this->db->get();
+			if ($query->num_rows() > 0) {
+				$row = $query->row();
+				if (!empty($row->voucher_url)) {
+					// Unlink the file
+					if (file_exists($row->voucher_url)) {
+						unlink($row->voucher_url);
+					}
+				}
+				//delete the payment record
+				$this->db->where('id', $idPagoCurso);
+				$this->db->delete($this->table_pedido_curso_pagos);
+				if ($this->db->affected_rows() > 0) {
+					return [
+						'status' => 'success',
+						'message' => 'Pago eliminado correctamente'
+					];
+				} else {
+					return [
+						'status' => 'error',
+						'message' => 'No se pudo eliminar el pago'
+					];
+				}
+			}
+			return [
+				'status' => 'error',
+				'message' => 'Pago no encontrado'
+			];
+		} catch (Exception $e) {
+			log_message('error', 'Error al obtener el pago: ' . $e->getMessage());
+			return [
+				'status' => "error",
+				'message' => 'Error al obtener el pago: ' . $e->getMessage()
+			];
+		}
 	}
 }

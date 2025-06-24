@@ -1253,7 +1253,7 @@ $(document).on('click', '.close-modal-pago', function () {
   event.preventDefault();
   $('#modal-pago').modal('hide');
 });
-function showPago(monto, banco, fecha, voucher_url) {
+function showPago(monto, banco, fecha, voucher_url, id) {
   event.preventDefault();
 
   // Set basic info
@@ -1264,7 +1264,45 @@ function showPago(monto, banco, fecha, voucher_url) {
   // Handle voucher URL
   const voucherContainer = $('#voucher-container');
   voucherContainer.empty();
-
+  $('#delete-pago-btn').off('click').on('click', function () {
+    event.preventDefault();
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción eliminará el pago.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('idPagoCurso', id);
+        $.ajax({
+          url: base_url + "Curso/PedidosCurso/borrarPagoCurso",
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json",
+          success: function (response) {
+            if (response.status === "success") {
+              Swal.fire('¡Eliminado!', response.message, 'success');
+              //close modal
+              $('#modal-pago').modal('hide');
+              // Reload the table
+              if (typeof tableCursoPagos !== 'undefined' && tableCursoPagos !== null
+              ) {
+                tableCursoPagos.ajax.reload(null, false);
+              }
+              
+            } else {
+              Swal.fire('Error', response.message, 'error');
+            }
+          }
+        });
+      }
+    })
+  });
   if (voucher_url) {
     const fileExt = voucher_url.split('.').pop().toLowerCase();
     const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt);

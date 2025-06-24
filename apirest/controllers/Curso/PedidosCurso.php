@@ -218,7 +218,7 @@ class PedidosCurso extends CI_Controller
                 $pagos_details = json_decode($row->pagos_details, true)?? [];
                 foreach ($pagos_details as $pago) {
                     $divAcciones .= '<button
-                    onclick="showPago('.$pago['monto'].', \'' . $pago['concepto'] . '\', \'' . $pago['payment_date'] . '\', \'' . $pago['voucher_url'] . '\')"
+                    onclick="showPago('.$pago['monto'].', \'' . $pago['concepto'] . '\', \'' . $pago['payment_date'] . '\', \'' . $pago['voucher_url'] . '\', \'' . $pago['id_pago'] . '\')"
                     class="nav-link p-2 rounded-lg bg' . $this->getColorTabByStatus($pago['status']) . '">S/' . $pago['monto'] . '</button>';
                 }
                 $divAcciones .= '<div class="d-flex"  onclick="abrirModalPagoCurso(' . $row->ID_Pedido_Curso . ', \'' . addslashes(trim($row->No_Entidad)) . '\')" style="cursor:not-allowed;"><i class="fas fa-plus" style="cursor:pointer;"></i></div>';
@@ -929,6 +929,16 @@ class PedidosCurso extends CI_Controller
         } catch (Exception $e) {
             log_message('error', 'Error al eliminar pago: ' . $e->getMessage());
             echo json_encode(['status' => 'error', 'message' => 'Error al eliminar el pago']);
+        }
+    }
+    public function borrarPagoCurso()
+    {
+        $idPagoCurso = $this->input->post('idPagoCurso');
+        if ($idPagoCurso) {
+            $result = $this->PedidosCursoModel->borrarPagoCurso($idPagoCurso);
+            echo json_encode($result);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'ID de pago no proporcionado']);
         }
     }
 }

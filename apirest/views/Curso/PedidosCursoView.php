@@ -532,12 +532,14 @@
           <div>
             <p class="text-sm font-medium text-gray-500">Comprobante:</p>
             <div id="voucher-container" class="mt-2">
-              <!-- Voucher content will be inserted here -->
             </div>
           </div>
+          
         </div>
       </div>
       <div class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
+        <!--borrar pago-->
+        <button type="button" class="btn btn-danger mr-2" id="delete-pago-btn">Borrar Pago</button>
         <button type="button" class="close-modal-pago px-6 py-2.5 bg-gray-200 text-gray-700 font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-gray-300 hover:shadow-lg focus:bg-gray-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-400 active:shadow-lg transition duration-150 ease-in-out" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
