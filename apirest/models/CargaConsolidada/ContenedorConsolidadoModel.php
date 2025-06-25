@@ -6052,7 +6052,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             "file_name", file_name,
             "file_url", file_path,
             "file_ext", file_type,
-            "file_size", file_size
+            "file_size", file_size,
+            "tipo", tipo
         )) as files from carga_consolidada_aduana_files where id_contenedor =' . $idContenedor . '),"[]") as files')
             ->from($this->table)
             ->where('id', $idContenedor);
@@ -6088,6 +6089,30 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'file_size' => $files['files']['size'][$key],
                 ];
                 $this->db->insert($this->table_contenedor_aduana_files, $data);
+            }
+            // Guardar archivos de Impuestos
+            if (isset($files['impuestos_pagados'])) {
+                foreach ($files['impuestos_pagados']['tmp_name'] as $key => $tmp_name) {
+                    $fileUrl = $this->uploadSingleFile(
+                        [
+                            "name" => $files['impuestos_pagados']['name'][$key],
+                            "type" => $files['impuestos_pagados']['type'][$key],
+                            "tmp_name" => $files['impuestos_pagados']['tmp_name'][$key],
+                            "error" => $files['impuestos_pagados']['error'][$key],
+                            "size" => $files['impuestos_pagados']['size'][$key]
+                        ],
+                        'assets/cargaconsolidada/impuestosPagados'
+                    );
+                    $dataImpuestos = [
+                        'id_contenedor' => $idContenedor,
+                        'file_name' => $files['impuestos_pagados']['name'][$key],
+                        'file_path' => $fileUrl,
+                        'file_type' => $files['impuestos_pagados']['type'][$key],
+                        'file_size' => $files['impuestos_pagados']['size'][$key],
+                        'tipo' => 'impuestos'
+                    ];
+                    $this->db->insert($this->table_contenedor_aduana_files, $dataImpuestos);
+                }
             }
             if ($this->db->error()['code'] != 0) {
                 log_message('error', 'Error en updateFormularioAduana: ' . $this->db->error()['message']);

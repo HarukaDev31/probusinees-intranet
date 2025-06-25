@@ -2240,10 +2240,17 @@ async function viewFormularioAduana() {
   let response = await fetch(url);
   const result = await response.json();
   $('#file-lista-aduana').empty();
+  $('#file-lista-impuestos').empty();
   $('#file-input-aduana').val('');
+  $('#file-input-impuestos').val('');
   files = JSON.parse(result[0].files);
+  console.log(files);
   files.forEach((file) => {
-    addFileToList(file, null, 'file-lista-aduana', true);
+    if (file.tipo === 'aduana') {
+      addFileToList(file, null, 'file-lista-aduana', true);
+    } else if (file.tipo === 'impuestos') {
+      addFileToList(file, null, 'file-lista-impuestos', true);
+    }
   });
   spinner.hide();
   documentacionAduanaContainer.show();
@@ -2436,6 +2443,13 @@ async function viewFormularioAduana() {
     const files = fileInput.files;
     for (let i = 0; i < files.length; i++) {
       formData.append("files[]", files[i]);
+    }
+    const fileInputImpuestos = $("#file-input-impuestos")[0];
+    if (fileInputImpuestos) {
+      const filesImpuestos = fileInputImpuestos.files;
+      for (let i = 0; i < filesImpuestos.length; i++) {
+        formData.append("impuestos_pagados[]", filesImpuestos[i]);
+      }
     }
     formData.append("idContainer", idContenedor);
     url =
@@ -8217,6 +8231,22 @@ function setupMultiFileUpload(containerId, inputId, allowedFileTypes = [], autom
         // Disparar el evento change para mostrar los archivos
         fileInput.dispatchEvent(new Event('change'));
       }
+      // --- LIMPIEZA AUTOMÁTICA AL GUARDAR O CERRAR MODAL ---
+      // Si el input está en un modal, límpialo al cerrar el modal
+      $(`#${containerId}`).closest('.modal').on('hidden.bs.modal', function () {
+        fileInput.value = "";
+        if (fileList) fileList.innerHTML = "";
+        if (fileList) fileList.classList.add('hidden');
+      });
+
+      // Si tienes un botón de guardar, límpialo después de guardar (AJAX success)
+      // Ejemplo: busca el botón de guardar dentro del contenedor y agrega el evento
+      const guardarBtn = $(`#${containerId}`).find('.btn-guardar-aduana, .btn-guardar-impuestos');
+      guardarBtn.on('click', function () {
+        fileInput.value = "";
+        if (fileList) fileList.innerHTML = "";
+        if (fileList) fileList.classList.add('hidden');
+      });
     }
   });
   if (removeFileButton) {
@@ -8858,4 +8888,5 @@ setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'doc
 
 setupMultiFileUploadv2("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'], false, '#remove-file-button-inspeccion');
 setupMultiFileUpload("multiple-file-upload-aduana", "file-input-aduana", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
+setupMultiFileUpload("multiple-file-upload-impuestos", "file-input-impuestos", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
