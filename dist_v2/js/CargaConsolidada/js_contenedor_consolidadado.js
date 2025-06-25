@@ -2244,7 +2244,6 @@ async function viewFormularioAduana() {
   $('#file-input-aduana').val('');
   $('#file-input-impuestos').val('');
   files = JSON.parse(result[0].files);
-  console.log(files);
   files.forEach((file) => {
     if (file.tipo === 'aduana') {
       addFileToList(file, null, 'file-lista-aduana', true);
