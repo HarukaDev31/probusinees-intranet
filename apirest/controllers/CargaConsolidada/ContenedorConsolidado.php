@@ -9,6 +9,7 @@ class ContenedorConsolidado extends CI_Controller
 	private $logo_cliente_path = '../assets/images/logos/';
 	private $logo_cliente_logos_empresa_almacen_path = '../assets/images/logos_empresa_almacen/';
 	private $roleGerencia = "GERENCIA";
+	private $roleCoordinacion = "Coordinación";
 	function __construct()
 	{
 		try {
@@ -638,7 +639,7 @@ class ContenedorConsolidado extends CI_Controller
 								</div>';
 						}
 						//if no grupo is $roleGerencia add button with text change rotulado to penidng 
-						if ($this->user->No_Grupo == $this->roleGerencia) {
+						if ($this->user->No_Grupo == $this->roleGerencia || $this->user->No_Grupo == $this->roleCoordinacion) {
 							$divAcciones .= '<div class="mb-1"
 							data-toggle="tooltip" data-placement="right" title="Cambiar Rotulado a Pendiente"
 							onclick="updateRotulado(' . $row->id . ',' . $proveedor->id_proveedor . ')">

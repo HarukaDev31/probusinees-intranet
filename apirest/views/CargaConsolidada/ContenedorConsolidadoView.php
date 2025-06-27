@@ -1709,7 +1709,7 @@ Search for
                         <?php } ?> &nbsp; <i class="fa fa-save"></i>
                     </div>
 
-                    <?php if ($this->user->No_Grupo == "GERENCIA") {  ?>
+                    <?php if ($this->user->No_Grupo == "GERENCIA" ) {   ?>
 
                     <div id="btn-send-inspection">
                         <i class="fas fa-save"></i>
