@@ -199,8 +199,19 @@ class Administracion extends CI_Controller
 					}
 				}
 				$subdata[] = $select; //mes
-				
-				$estadoPago = "";
+
+				// --- Lógica de estado de pago igual que consolidado ---
+				$aPagar = ($row->logistica_final + $row->impuestos_final) == 0 ? $row->Ss_Total : ($row->logistica_final + $row->impuestos_final);
+				$estadoPago = '';
+				if ($row->total_pagos == 0) {
+					$estadoPago = 'PENDIENTE';
+				} else if ($row->total_pagos < $aPagar) {
+					$estadoPago = 'ADELANTO';
+				} else if ($row->total_pagos == $aPagar) {
+					$estadoPago = 'PAGADO';
+				} else if ($row->total_pagos > $aPagar) {
+					$estadoPago = 'SOBREPAGO';
+				}
 				$estadoClass = '';
 				switch ($estadoPago) {
 					case 'PENDIENTE': $estadoClass = 'bg-secondary text-white'; break;
@@ -209,16 +220,14 @@ class Administracion extends CI_Controller
 					case 'SOBREPAGO': $estadoClass = 'bg-danger text-white'; break;
 					default: $estadoClass = 'bg-secondary text-white'; break;
 				}
-				$estadoCurso = '<select class="form-control form-control-sm '.$estadoClass.'" disabled>
-					<option value="PENDIENTE" '.($estadoPago == "PENDIENTE" ? "selected" : "").'>Pendiente</option>
-					<option value="ADELANTO" '.($estadoPago == "ADELANTO" ? "selected" : "").'>Adelanto</option>
-					<option value="PAGADO" '.($estadoPago == "PAGADO" ? "selected" : "").'>Pagado</option>
-					<option value="SOBREPAGO" '.($estadoPago == "SOBREPAGO" ? "selected" : "").'>Sobrepago</option>
-				</select>';
+				$estadoCurso = '<select class="form-control form-control-sm '.$estadoClass.'" disabled>';
+				$estadoCurso .= '<option value="PENDIENTE" '.($estadoPago == "PENDIENTE" ? "selected" : "").'>Pendiente</option>';
+				$estadoCurso .= '<option value="ADELANTO" '.($estadoPago == "ADELANTO" ? "selected" : "").'>Adelanto</option>';
+				$estadoCurso .= '<option value="PAGADO" '.($estadoPago == "PAGADO" ? "selected" : "").'>Pagado</option>';
+				$estadoCurso .= '<option value="SOBREPAGO" '.($estadoPago == "SOBREPAGO" ? "selected" : "").'>Sobrepago</option>';
+				$estadoCurso .= '</select>';
 				//get from input post estado_pago if !=0 filter by estado_curso if not in continue
 				if ($this->input->post('estado_pago') != 0) {
-					log_message('debug', 'ContenedorConsolidado : getCursosPagos() => estado_pago: ' . $this->input->post('estado_pago'));
-					//if estado_pago not includes in estadoCurso string continue
 					if (strpos($estadoCurso, $this->input->post('estado_pago')) === false) {
 						continue;
 					}
