@@ -2981,7 +2981,7 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
             $options->set('isHtml5ParserEnabled', true);
             $options->set('isFontSubsettingEnabled', true);
             $options->set('isRemoteEnabled', true);
-            $sleepSendMedia = 3;
+            $sleepSendMedia = 7;
             // Procesar cada proveedor
             foreach ($providersHasNoSended as $proveedor) {
                 log_message('error', 'Proveedor enviado: ' . json_encode($proveedor));
@@ -3056,8 +3056,9 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro�
                 throw new Exception("Error al cerrar el archivo ZIP");
             }
             $direccionUrl = base_url('assets/downloads/Direccion.jpg');
+            $sleepSendMedia += 3;
             $this->sendMedia($direccionUrl, 'image/jpg', '🏽Dile a tu proveedor que envíe la carga a nuestro almacén en China', null, $sleepSendMedia);
-            $sleepSendMedia += 1;
+            $sleepSendMedia += 3;
             $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
 ➡ *Datos del proveedor: (Usted lo llena)*
