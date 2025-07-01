@@ -3273,6 +3273,7 @@ const openStepFunction = async (step, id) => {
           }
           currentTableCotizacion = "embarque";
         } else if (table == "prospectos") {
+          currentTableCotizacion = "prospectos";
           $("#table-cotizacion-prospectos").attr("style", "");
           $("#table-cotizacion-embarque").hide();
           $("#table-cotizacion-pagos").hide();
