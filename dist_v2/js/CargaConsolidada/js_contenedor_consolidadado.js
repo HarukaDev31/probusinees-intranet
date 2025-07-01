@@ -2968,13 +2968,47 @@ const openStepFunction = async (step, id) => {
                               inputValues.push(value.trim());
                             }
                           });
-                          return inputValues.join(' \r\n');
+                          return inputValues.join('\n');
                         }
 
-                        // Handle single select
-                        if ($(node).find('select').length > 0) {
-                          const selectedText = $(node).find('select option:selected').text();
-                          return selectedText || '';
+                        if ($(node).find('select').length > 1) {
+                          const selectValues = [];
+                          $(node).find('select').each(function () {
+                            const $select = $(this);
+                            // Try different approaches to get selected value
+                            let selectedText = '';
+
+                            // Method 1: Direct selected option text
+                            const selectedOption = $select.find('option:selected');
+                            if (selectedOption.length > 0) {
+                              selectedText = selectedOption.text().trim();
+                            }
+
+                            // Method 2: If method 1 fails, try getting by value
+                            if (!selectedText) {
+                              const selectedValue = $select.val();
+                              if (selectedValue) {
+                                const optionByValue = $select.find('option[value="' + selectedValue + '"]');
+                                if (optionByValue.length > 0) {
+                                  selectedText = optionByValue.text().trim();
+                                } else {
+                                  selectedText = selectedValue; // Use value as fallback
+                                }
+                              }
+                            }
+
+                            // Method 3: If still no text, try selectedIndex
+                            if (!selectedText && $select[0].selectedIndex >= 0) {
+                              const option = $select[0].options[$select[0].selectedIndex];
+                              if (option) {
+                                selectedText = option.text.trim();
+                              }
+                            }
+
+                            if (selectedText) {
+                              selectValues.push(selectedText);
+                            }
+                          });
                         }
 
                         // Handle single input
@@ -2984,16 +3018,7 @@ const openStepFunction = async (step, id) => {
                         }
 
                         // Handle multiple selects (if needed)
-                        if ($(node).find('select').length > 1) {
-                          const selectValues = [];
-                          $(node).find('select').each(function () {
-                            const selectedText = $(this).find('option:selected').text();
-                            if (selectedText && selectedText.trim()) {
-                              selectValues.push(selectedText.trim());
-                            }
-                          });
-                          return selectValues.join(' \r\n');
-                        }
+
 
                         // Handle mixed inputs and selects
                         if ($(node).find('input, select').length > 0) {
@@ -3015,7 +3040,7 @@ const openStepFunction = async (step, id) => {
                             }
                           });
 
-                          return allValues.join(' \r\n');
+                          return allValues.join('\n');
                         }
 
                         // Handle textareas (if you have them)
@@ -3027,7 +3052,7 @@ const openStepFunction = async (step, id) => {
                               textareaValues.push(value.trim());
                             }
                           });
-                          return textareaValues.join(' \r\n');
+                          return textareaValues.join('\n');
                         }
 
                         // Handle divs with text content (as fallback)
@@ -3040,7 +3065,7 @@ const openStepFunction = async (step, id) => {
                             }
                           });
                           if (divValues.length > 0) {
-                            return divValues.join(' \r\n');
+                            return divValues.join('\n');
                           }
                         }
 
