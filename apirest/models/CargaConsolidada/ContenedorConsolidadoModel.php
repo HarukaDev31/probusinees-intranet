@@ -275,6 +275,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
             ->from($this->table_contenedor_cotizacion)
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
+            ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = ' . $this->table_contenedor_cotizacion . '.id_usuario', 'left')
             ->where('id_contenedor', $idContenedor)
             ->order_by('id_cotizacion', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual

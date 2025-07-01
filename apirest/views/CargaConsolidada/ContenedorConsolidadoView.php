@@ -1129,6 +1129,7 @@ Search for
                     <table id="table-cotizacion-prospectos" class="table table-hover dataTable no-footer hidden">
                         <thead class="thead-default">
                             <tr>
+                                <th>Asesor</th>
                                 <th>N°</th>
                                 <th>Fecha</th>
                                 <th>Nombre</th>

@@ -397,6 +397,7 @@ class ContenedorConsolidado extends CI_Controller
 				if ($tipoTabla == "prospectos") {
 
 					$subdata   = [];
+					$subdata[] = $row->No_Nombres_Apellidos;
 					$subdata[] = $index;
 					$subdata[] = date("d/m/Y", strtotime($row->fecha));
 					$subdata[] = ucwords(strtolower($row->nombre));
