@@ -2959,12 +2959,92 @@ const openStepFunction = async (step, id) => {
                     columns: ":visible, :hidden",
                     format: {
                       body: function (data, row, column, node) {
-                        console.log("data", data,"node", node);
+                        // Handle multiple inputs in a div
+                        if ($(node).find('input').length > 1) {
+                          const inputValues = [];
+                          $(node).find('input').each(function () {
+                            const value = $(this).val();
+                            if (value && value.trim()) {
+                              inputValues.push(value.trim());
+                            }
+                          });
+                          return inputValues.join(' \r\n');
+                        }
+
+                        // Handle single select
                         if ($(node).find('select').length > 0) {
-                          const selectedText = $(node).find('select option:selected').text()+'\n';
+                          const selectedText = $(node).find('select option:selected').text();
                           return selectedText || '';
                         }
-                        // Si no es un select, devuelve el dato normal
+
+                        // Handle single input
+                        if ($(node).find('input').length === 1) {
+                          const inputValue = $(node).find('input').val();
+                          return inputValue || '';
+                        }
+
+                        // Handle multiple selects (if needed)
+                        if ($(node).find('select').length > 1) {
+                          const selectValues = [];
+                          $(node).find('select').each(function () {
+                            const selectedText = $(this).find('option:selected').text();
+                            if (selectedText && selectedText.trim()) {
+                              selectValues.push(selectedText.trim());
+                            }
+                          });
+                          return selectValues.join(' \r\n');
+                        }
+
+                        // Handle mixed inputs and selects
+                        if ($(node).find('input, select').length > 0) {
+                          const allValues = [];
+
+                          // Get all input values
+                          $(node).find('input').each(function () {
+                            const value = $(this).val();
+                            if (value && value.trim()) {
+                              allValues.push(value.trim());
+                            }
+                          });
+
+                          // Get all select values
+                          $(node).find('select').each(function () {
+                            const selectedText = $(this).find('option:selected').text();
+                            if (selectedText && selectedText.trim()) {
+                              allValues.push(selectedText.trim());
+                            }
+                          });
+
+                          return allValues.join(' \r\n');
+                        }
+
+                        // Handle textareas (if you have them)
+                        if ($(node).find('textarea').length > 0) {
+                          const textareaValues = [];
+                          $(node).find('textarea').each(function () {
+                            const value = $(this).val();
+                            if (value && value.trim()) {
+                              textareaValues.push(value.trim());
+                            }
+                          });
+                          return textareaValues.join(' \r\n');
+                        }
+
+                        // Handle divs with text content (as fallback)
+                        if ($(node).find('div').length > 1) {
+                          const divValues = [];
+                          $(node).find('div').each(function () {
+                            const text = $(this).text().trim();
+                            if (text) {
+                              divValues.push(text);
+                            }
+                          });
+                          if (divValues.length > 0) {
+                            return divValues.join(' \r\n');
+                          }
+                        }
+
+                        // Default: return the cell data as is
                         return data;
                       }
                     }
@@ -2980,6 +3060,51 @@ const openStepFunction = async (step, id) => {
                   titleAttr: "PDF",
                   exportOptions: {
                     columns: ":visible",
+                    format: {
+                      body: function (data, row, column, node) {
+                        // For PDF, you might want to use different separators
+                        // PDF doesn't handle line breaks as well as Excel
+
+                        // Handle multiple inputs in a div
+                        if ($(node).find('input').length > 1) {
+                          const inputValues = [];
+                          $(node).find('input').each(function () {
+                            const value = $(this).val();
+                            if (value && value.trim()) {
+                              inputValues.push(value.trim());
+                            }
+                          });
+                          return inputValues.join('; '); // Use semicolon for PDF
+                        }
+
+                        // Handle single select
+                        if ($(node).find('select').length > 0) {
+                          const selectedText = $(node).find('select option:selected').text();
+                          return selectedText || '';
+                        }
+
+                        // Handle single input
+                        if ($(node).find('input').length === 1) {
+                          const inputValue = $(node).find('input').val();
+                          return inputValue || '';
+                        }
+
+                        // Handle multiple selects
+                        if ($(node).find('select').length > 1) {
+                          const selectValues = [];
+                          $(node).find('select').each(function () {
+                            const selectedText = $(this).find('option:selected').text();
+                            if (selectedText && selectedText.trim()) {
+                              selectValues.push(selectedText.trim());
+                            }
+                          });
+                          return selectValues.join('; '); // Use semicolon for PDF
+                        }
+
+                        // Default
+                        return data;
+                      }
+                    }
                   },
                   attr: {
                     id: actionButtonsIds["table-cotizacion-embarque"].pdf,
