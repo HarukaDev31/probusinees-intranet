@@ -102,7 +102,7 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago, nombreCliente)
                         <div class="space-y-3 p-4 border-b border-t border-gray-200">
                             <div class="flex items-center gap-3 px-3">
                                 <span class="text-gray-600 w-20">Monto:</span>
-                                <input disabled type="text" value="$${Number((detail.monto)).toFixed(2)}" class="border-0 ${cardBg} px-3 w-full " readonly>
+                                <input disabled type="text" value="S/.${Number((detail.monto)).toFixed(2)}" class="border-0 ${cardBg} px-3 w-full " readonly>
                             </div>
                             <div class="flex items-center gap-3 px-3">
                                 <span class="text-gray-600 w-20">Fecha:</span>

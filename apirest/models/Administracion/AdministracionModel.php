@@ -585,7 +585,7 @@ class AdministracionModel extends CI_Model
                 if ($clienteInfo && !empty($clienteInfo->telefono) && !empty($clienteInfo->nombre)) {
                     // Preparar el mensaje
                     $mensaje = "Hola " . $clienteInfo->nombre . ", este mensaje es automático:\n\n";
-                    $mensaje .= "Su dinero de $" . number_format($clienteInfo->monto, 2) . " ha sido confirmado\n\n";
+                    $mensaje .= "Su dinero de S/" . number_format($clienteInfo->monto, 2) . " ha sido confirmado\n\n";
                     $mensaje .= "Muchas gracias.";
                     
                     // Formatear el número de teléfono
