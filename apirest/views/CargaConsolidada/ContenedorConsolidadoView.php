@@ -639,9 +639,9 @@ Search for
                                         class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg input-aduana focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
                             </div>
-                            <div class="form-group row-span-3">
+                            <div class="form-group row-span-2">
                                 <div class="col-12 col-sm-12" id="multiple-file-upload-aduana">
-                                    <div class="form-group">
+                                    <div class="form-group"> DOC. TRIBUTOS Y AJUSTES
                                         <div
                                             class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
                                             <input type="file" id="file-input-aduana" class="file-input" multiple
@@ -710,6 +710,45 @@ Search for
                                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                                     <input name="costo_destino" type="number" step="0.01"
                                         class="w-full pl-8 pr-4 py-2 border border-gray-200 input-aduana rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="form-group row-span-2">
+                                <div class="col-12 col-sm-12" id="multiple-file-upload-impuestos">
+                                    <div class="form-group"> RESUMEN DE IMPUESTOS PAGADOS
+                                        <div
+                                            class="file-upload-box <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
+                                            <input type="file" id="file-input-impuestos" class="file-input" multiple
+                                                accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm" />
+                                            <label for="file-inpute" class="file-label d-flex">
+                                                <i class="fas fa-upload"></i>
+                                                <div class="file-group-text">
+                                                    <span class="file-text">
+                                                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                        Selecciona o arrastra tu archivo aquí
+                                                        <?php } else { ?>
+                                                        Select or drag your file here
+                                                        <?php } ?></span>
+                                                    <span class="file-format">
+                                                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                        Formatos
+                                                        <?php } else { ?>
+                                                        Formats
+                                                        <?php } ?>: .xlsx</span>
+                                                </div>
+                                                <button class="upload-button upload-button-impuestos" type="button">
+                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    Subir archivo
+                                                    <?php } else { ?>
+                                                    Upload Files
+                                                    <?php } ?></button>
+                                            </label>
+                                        </div>
+                                        <!-- Cuadro de información del archivo subido (oculto inicialmente) -->
+                                        <div class="file-lista hidden" id="file-lista-impuestos">
+                                        </div>
+                                        <span class="invalid-feedback" id="error-volumen">La cotización es
+                                            requerida</span>
+                                    </div>
                                 </div>
                             </div>
 
