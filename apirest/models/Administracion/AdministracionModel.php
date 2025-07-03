@@ -539,12 +539,70 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
+    
+    /**
+     * Obtiene información del cliente asociado a un pago de curso
+     */
+    private function getClienteInfoFromPagoCurso($idPagoCurso)
+    {
+        try {
+            $this->db->select('
+                CLI.No_Entidad as nombre,
+                CLI.Nu_Celular_Entidad as telefono,
+                pcp.monto,
+                CC.ID_Pedido_Curso
+            ');
+            $this->db->from($this->table_pedido_curso_pagos . ' AS pcp');
+            $this->db->join($this->table_curso . ' AS CC', 'CC.ID_Pedido_Curso = pcp.id_pedido_curso', 'inner');
+            $this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = CC.ID_Entidad', 'inner');
+            $this->db->where('pcp.id', $idPagoCurso);
+            $this->db->limit(1);
+            
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
+                return $query->row();
+            }
+            return null;
+        } catch (Exception $e) {
+            log_message('error', 'Error en getClienteInfoFromPagoCurso: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
     public function handlePaymentCurso($idPagoCurso, $status)
     {
         try {
             log_message("error", "handlePaymentCurso: idPagoCurso: $idPagoCurso, status: $status");
+            
+            // Actualizar el status del pago del curso
             $this->db->where('id', $idPagoCurso);
             $this->db->update($this->table_pedido_curso_pagos, ['status' => $status]);
+            
+            // Si el status es confirmado, enviar mensaje de WhatsApp
+            if (strtoupper($status) === 'CONFIRMADO') {
+                $clienteInfo = $this->getClienteInfoFromPagoCurso($idPagoCurso);
+                
+                if ($clienteInfo && !empty($clienteInfo->telefono) && !empty($clienteInfo->nombre)) {
+                    // Preparar el mensaje
+                    $mensaje = "Hola " . $clienteInfo->nombre . ", este mensaje es automático:\n\n";
+                    $mensaje .= "Su dinero de $" . number_format($clienteInfo->monto, 2) . " ha sido confirmado\n\n";
+                    $mensaje .= "Muchas gracias.";
+                    
+                    // Formatear el número de teléfono
+                    $telefono = preg_replace('/\s+/', '', $clienteInfo->telefono);
+                    $telefono = $telefono ? $telefono . '@c.us' : '';
+                    
+                    // Enviar mensaje de WhatsApp
+                    try {
+                        $whatsappResponse = $this->sendMessage($mensaje, $telefono);
+                        log_message('info', 'WhatsApp enviado para pago curso ' . $idPagoCurso . ': ' . json_encode($whatsappResponse));
+                    } catch (Exception $whatsappError) {
+                        log_message('error', 'Error al enviar WhatsApp para pago curso ' . $idPagoCurso . ': ' . $whatsappError->getMessage());
+                        // No fallar el proceso principal si WhatsApp falla
+                    }
+                }
+            }
+            
             return [
                 'status' => "success",
                 'message' => 'Pago del curso actualizado correctamente'
