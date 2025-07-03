@@ -1,6 +1,9 @@
 <?php
+require_once APPPATH . 'traits/WhatsappTrait.php';
+
 class AdministracionModel extends CI_Model
 {
+    use WhatsappTrait;
     private $table_consolidado_pagos = "contenedor_consolidado_cotizacion_coordinacion_pagos";
     private $table_consolidado_pagos_concept = "cotizacion_coordinacion_pagos_concept";
     private $table_curso_pagos = "pedido_curso_pagos";
@@ -34,8 +37,8 @@ class AdministracionModel extends CI_Model
     public function getConsolidadoPagos()
     {
         $this->db->select(
-            $this->table_consolidado_cotizacion . '.*, 
-        ' . $this->table_consolidado . '.id as id_consolidado, 
+            $this->table_consolidado_cotizacion . '.*,
+        ' . $this->table_consolidado . '.id as id_consolidado,
         ' . $this->table_consolidado . '.carga as carga,
         (
             SELECT COUNT(*)
@@ -58,11 +61,11 @@ class AdministracionModel extends CI_Model
                 "concepto", ccpc2.name,
                 "status", ccp2.status,
                 "payment_date", ccp2.payment_date
-            )   
-        ) FROM ' . $this->table_consolidado_pagos . ' as ccp2
+            )
+           ) FROM ' . $this->table_consolidado_pagos . ' as ccp2
         LEFT JOIN ' . $this->table_consolidado_pagos_concept . ' as ccpc2 ON ccp2.id_concept = ccpc2.id
-        WHERE ccp2.id_cotizacion = ' . $this->table_consolidado_cotizacion . '.id 
-        AND (ccp2.id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . ' 
+        WHERE ccp2.id_cotizacion = ' . $this->table_consolidado_cotizacion . '.id
+        AND (ccp2.id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . '
         OR ccp2.id_concept = ' . intval($this->CONCEPT_PAGO_IMPUESTOS) . ')
         ) as pagos_details'
         );
@@ -84,23 +87,28 @@ class AdministracionModel extends CI_Model
             $this->db->where($this->table_consolidado_cotizacion . '.fecha <=', $this->input->post('Filtro_Fe_Fin'));
         }
 
-        //start or where group
-        $this->db->where($this->table_consolidado_cotizacion . '.id IN (
-        SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . ' 
-        WHERE id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . ' 
-        OR id_concept = ' . intval($this->CONCEPT_PAGO_IMPUESTOS) . '
-        )');
-        //or where estado_cliente != null
-        $this->db->or_where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
-
-
-
-
-        // Filtros opcionales adicionales si los necesitas
+        // Filtros opcionales adicionales
         if (!empty($this->input->post('estado'))) {
             $this->db->where($this->table_consolidado_cotizacion . '.estado', $this->input->post('estado'));
         }
 
+        $this->db->where($this->table_consolidado_cotizacion . '.estado_cotizador', 'CONFIRMADO');
+
+        $this->db->group_start();
+        // Opción 1: Tiene pagos
+        $this->db->where($this->table_consolidado_cotizacion . '.id IN (
+            SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . '
+            WHERE id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . '
+            OR id_concept = ' . intval($this->CONCEPT_PAGO_IMPUESTOS) . '
+        )');
+
+        $this->db->or_group_start();
+        // Opción 2: estado_cliente no es null Y contenedor completado
+        $this->db->where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
+        $this->db->where($this->table_consolidado . '.estado_china', 'COMPLETADO');
+        $this->db->group_end();
+        $this->db->group_end();
+        //where estado_china='COMPLETADO'
         if (isset($this->order)) {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
@@ -159,15 +167,27 @@ class AdministracionModel extends CI_Model
             $this->db->where($this->table_consolidado_cotizacion . '.fecha <=', $this->input->post('Filtro_Fe_Fin'));
         }
 
-        $this->db->where($this->table_consolidado_cotizacion . '.id IN (SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . ' WHERE id_concept = ' . $this->CONCEPT_PAGO_LOGISTICA . ' OR id_concept = ' . $this->CONCEPT_PAGO_IMPUESTOS . ')');
-        $this->db->or_where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
+        $this->db->where($this->table_consolidado_cotizacion . '.estado_cotizador', 'CONFIRMADO');
 
+        $this->db->group_start();
+        // Opción 1: Tiene pagos
+        $this->db->where($this->table_consolidado_cotizacion . '.id IN (
+            SELECT id_cotizacion FROM ' . $this->table_consolidado_pagos . '
+            WHERE id_concept = ' . intval($this->CONCEPT_PAGO_LOGISTICA) . '
+            OR id_concept = ' . intval($this->CONCEPT_PAGO_IMPUESTOS) . '
+        )');
 
+        $this->db->or_group_start();
+        // Opción 2: estado_cliente no es null Y contenedor completado
+        $this->db->where($this->table_consolidado_cotizacion . '.estado_cliente IS NOT NULL');
+        $this->db->where($this->table_consolidado . '.estado_china', 'COMPLETADO');
+        $this->db->group_end();
+        $this->db->group_end();
         $result = $this->db->get()->row_array();
 
         if ($result) {
             return [
-                'total_importe' => $result['total_importe'] ?? 0,
+                'total_importe' => !empty($result['total_importe']) ? $result['total_importe'] : 0,
             ];
         }
 
@@ -181,8 +201,7 @@ class AdministracionModel extends CI_Model
                 ->from($this->table_consolidado_pagos)
                 ->join($this->table_consolidado_pagos_concept, 'contenedor_consolidado_cotizacion_coordinacion_pagos.id_concept = cotizacion_coordinacion_pagos_concept.id')
                 ->where('id_cotizacion', $idCotizacion)
-                ->where('id_concept', $this->CONCEPT_PAGO_LOGISTICA)
-                ->or_where('id_concept', $this->CONCEPT_PAGO_IMPUESTOS)
+                ->where_in('id_concept', [$this->CONCEPT_PAGO_LOGISTICA, $this->CONCEPT_PAGO_IMPUESTOS])
                 ->order_by('payment_date', 'DESC');
             $query = $this->db->get();
             return $query->result();
@@ -299,7 +318,7 @@ class AdministracionModel extends CI_Model
         $query = $this->db->get();
         $result = $query->row_array();
         return [
-            'total_importe' => $result['total'] ?? 0,
+            'total_importe' => !empty($result['total']) ? $result['total'] : 0,
         ];
     }
 
@@ -332,7 +351,7 @@ class AdministracionModel extends CI_Model
             return
                 [
                     "data" => $details,
-                    "nota" => $nota->result()[0]->note_administracion ?? '',
+                    "nota" => !empty($nota->result()[0]->note_administracion) ? $nota->result()[0]->note_administracion : '',
 
                 ];
         } catch (Exception $e) {
@@ -355,7 +374,7 @@ class AdministracionModel extends CI_Model
             return
                 [
                     "data" => $details,
-                    "nota" => $nota->result()[0]->note_administracion ?? '',
+                    "nota" => !empty($nota->result()[0]->note_administracion) ? $nota->result()[0]->note_administracion : '',
                     "cotizacion_inicial_url" => $nota->result()[0]->cotizacion_file_url,
                     "cotizacion_final_url" => $nota->result()[0]->cotizacion_final_url
                 ];
@@ -444,12 +463,70 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
+    
+    /**
+     * Obtiene información del cliente asociado a un pago de consolidado
+     */
+    private function getClienteInfoFromPago($idPago)
+    {
+        try {
+            $this->db->select('
+                cot.nombre, 
+                cot.telefono, 
+                ccp.monto,
+                ccc.carga
+            ');
+            $this->db->from($this->table_consolidado_pagos . ' AS ccp');
+            $this->db->join($this->table_consolidado_cotizacion . ' AS cot', 'cot.id = ccp.id_cotizacion', 'inner');
+            $this->db->join($this->table_consolidado . ' AS ccc', 'ccc.id = cot.id_contenedor', 'inner');
+            $this->db->where('ccp.id', $idPago);
+            $this->db->limit(1);
+            
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
+                return $query->row();
+            }
+            return null;
+        } catch (Exception $e) {
+            log_message('error', 'Error en getClienteInfoFromPago: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
     public function handlePayment($idPago, $status)
     {
         try {
             log_message("error", "handlePayment: idPago: $idPago, status: $status");
+            
+            // Actualizar el status del pago
             $this->db->where('id', $idPago);
             $this->db->update($this->table_consolidado_pagos, ['status' => $status]);
+            
+            // Si el status es confirmado, enviar mensaje de WhatsApp
+            if (strtoupper($status) === 'CONFIRMADO') {
+                $clienteInfo = $this->getClienteInfoFromPago($idPago);
+                
+                if ($clienteInfo && !empty($clienteInfo->telefono) && !empty($clienteInfo->nombre)) {
+                    // Preparar el mensaje
+                    $mensaje = "Hola " . $clienteInfo->nombre . ", este mensaje es automático:\n\n";
+                    $mensaje .= "Su dinero de $" . number_format($clienteInfo->monto, 2) . " ha sido confirmado\n\n";
+                    $mensaje .= "Muchas gracias.";
+                    
+                    // Formatear el número de teléfono
+                    $telefono = preg_replace('/\s+/', '', $clienteInfo->telefono);
+                    $telefono = $telefono ? $telefono . '@c.us' : '';
+                    
+                    // Enviar mensaje de WhatsApp
+                    try {
+                        $whatsappResponse = $this->sendMessage($mensaje, $telefono);
+                        log_message('info', 'WhatsApp enviado para pago ' . $idPago . ': ' . json_encode($whatsappResponse));
+                    } catch (Exception $whatsappError) {
+                        log_message('error', 'Error al enviar WhatsApp para pago ' . $idPago . ': ' . $whatsappError->getMessage());
+                        // No fallar el proceso principal si WhatsApp falla
+                    }
+                }
+            }
+            
             return [
                 'status' => "success",
                 'message' => 'Pago actualizado correctamente'
@@ -462,12 +539,70 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
+    
+    /**
+     * Obtiene información del cliente asociado a un pago de curso
+     */
+    private function getClienteInfoFromPagoCurso($idPagoCurso)
+    {
+        try {
+            $this->db->select('
+                CLI.No_Entidad as nombre,
+                CLI.Nu_Celular_Entidad as telefono,
+                pcp.monto,
+                CC.ID_Pedido_Curso
+            ');
+            $this->db->from($this->table_pedido_curso_pagos . ' AS pcp');
+            $this->db->join($this->table_curso . ' AS CC', 'CC.ID_Pedido_Curso = pcp.id_pedido_curso', 'inner');
+            $this->db->join($this->table_cliente . ' AS CLI', 'CLI.ID_Entidad = CC.ID_Entidad', 'inner');
+            $this->db->where('pcp.id', $idPagoCurso);
+            $this->db->limit(1);
+            
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
+                return $query->row();
+            }
+            return null;
+        } catch (Exception $e) {
+            log_message('error', 'Error en getClienteInfoFromPagoCurso: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
     public function handlePaymentCurso($idPagoCurso, $status)
     {
         try {
             log_message("error", "handlePaymentCurso: idPagoCurso: $idPagoCurso, status: $status");
+            
+            // Actualizar el status del pago del curso
             $this->db->where('id', $idPagoCurso);
             $this->db->update($this->table_pedido_curso_pagos, ['status' => $status]);
+            
+            // Si el status es confirmado, enviar mensaje de WhatsApp
+            if (strtoupper($status) === 'CONFIRMADO') {
+                $clienteInfo = $this->getClienteInfoFromPagoCurso($idPagoCurso);
+                
+                if ($clienteInfo && !empty($clienteInfo->telefono) && !empty($clienteInfo->nombre)) {
+                    // Preparar el mensaje
+                    $mensaje = "Hola " . $clienteInfo->nombre . ", este mensaje es automático:\n\n";
+                    $mensaje .= "Su dinero de $" . number_format($clienteInfo->monto, 2) . " ha sido confirmado\n\n";
+                    $mensaje .= "Muchas gracias.";
+                    
+                    // Formatear el número de teléfono
+                    $telefono = preg_replace('/\s+/', '', $clienteInfo->telefono);
+                    $telefono = $telefono ? $telefono . '@c.us' : '';
+                    
+                    // Enviar mensaje de WhatsApp
+                    try {
+                        $whatsappResponse = $this->sendMessageVentas($mensaje, $telefono);
+                        log_message('info', 'WhatsApp enviado para pago curso ' . $idPagoCurso . ': ' . json_encode($whatsappResponse));
+                    } catch (Exception $whatsappError) {
+                        log_message('error', 'Error al enviar WhatsApp para pago curso ' . $idPagoCurso . ': ' . $whatsappError->getMessage());
+                        // No fallar el proceso principal si WhatsApp falla
+                    }
+                }
+            }
+            
             return [
                 'status' => "success",
                 'message' => 'Pago del curso actualizado correctamente'
@@ -479,5 +614,14 @@ class AdministracionModel extends CI_Model
                 'message' => 'Error al actualizar el pago del curso: ' . $e->getMessage()
             ];
         }
+    }
+    //get carga column from table contenedor_consolidado
+    public function getContainersAvailable()
+    {
+        $this->db->select('id, carga');
+        $this->db->from($this->table_consolidado);
+        $this->db->order_by('id', 'ASC');
+        $query = $this->db->get();
+        return $query->result_array();
     }
 }

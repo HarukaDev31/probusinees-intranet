@@ -1,3 +1,4 @@
+
 var url, table_Entidad, div_items = '', iCounter = 1;
 //AUTOCOMPLETE
 var caractes_no_validos_global_autocomplete = "\"'~!@%^\|";
@@ -5,11 +6,12 @@ var caractes_no_validos_global_autocomplete = "\"'~!@%^\|";
 let search_global_autocomplete = caractes_no_validos_global_autocomplete.split('');
 // Solo tomé algunos caracteres, completa el arreglo
 let replace_global_autocomplete = ['', '', '', '', '', '', '', '', ''];
-//28 caracteres
-// FIN AUTOCOMPLETE
+const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const daysOfWeek = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
 var currentTableCurso = 'alumnos';
 var tableCursoPagos;
 var tableCursoPedidos;
+var selectedDaysCampana = [];
 var fToday = new Date(), fYear = fToday.getFullYear(), fMonth = fToday.getMonth() + 1, fDay = fToday.getDate();
 function showImageModal(url) {
   ///create modal and show image
@@ -34,10 +36,10 @@ function showImageModal(url) {
     $(this).remove(); // Remove modal from DOM after closing
   });
 }
-async function viewClientePagosCurso(idPedidoCurso, nombreCliente) {
+async function viewClientePagosCurso(idPedidoCurso, No_Entidad) {
   //show modal with table of pagos coordination
   $("#modalClientePagosCoordination").modal("show");
-  $("#modalClientePagosCoordination .modal-title").text(`Pagos de Coordinación - ${nombreCliente}`);
+  $("#modalClientePagosCoordination .modal-title").text(`Ver adelantos de - ${No_Entidad}`);
   url =
     base_url + "Curso/PedidosCurso/getPagosCurso/" + idPedidoCurso;
   if (!$.fn.DataTable.isDataTable("#table-pagos-tracking-coordinacion")) {
@@ -121,73 +123,89 @@ async function viewClientePagosCurso(idPedidoCurso, nombreCliente) {
 
 }
 
-async function addPagosCurso(idPedido, nombreCliente) {
-  const { value: formValues } = await Swal.fire({
-    title: `Pagos de Curso - ${nombreCliente}`,
-    html: `
-      <input type="number" id="monto" class="swal2-input" placeholder="Monto" step="0.01" required>
-      <select id="banco" class="swal2-input" required>
-        <option value="" disabled selected>Seleccione un banco</option>
-        <option value="BCP" class="bg-primary">BCP</option>
-        <option value="INTERBANK" class="bg-success">INTERBANK</option>
-        <option value="YAPE" class="bg-[#742384] text-white">YAPE</option>
-        </select>
-      <input type="file" id="voucher" class="swal2-input" accept="image/*;application/pdf" required>
-      <input type="date" id="fecha" class="swal2-input" required>
-
-    `,
-    focusConfirm: false,
-    preConfirm: () => {
-      const monto = $("#monto").val();
-      const banco = $("#banco").val();
-      const voucher = $("#voucher")[0].files[0];
-      const fecha = $("#fecha").val();
-      if (!monto || !banco || !voucher || !fecha) {
-        Swal.showValidationMessage("Por favor, completa todos los campos.");
-      } else {
-        const formData = new FormData();
-        formData.append("monto", monto);
-        formData.append("banco", banco);
-        formData.append("voucher", voucher);
-        formData.append("fecha", fecha);
-        formData.append("idPedido", idPedido);
-
-        return formData;
-      }
-    },
-    showCancelButton: true,
-    confirmButtonText: "Guardar",
-    cancelButtonText: "Cancelar",
-  });
-  if (formValues) {
-    const formData = formValues;
-    url =
-      base_url + "Curso/PedidosCurso/saveClientePagosCurso"
-    $.ajax({
-      url: url,
-      type: "POST",
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function (response) {
-        const result = JSON.parse(response);
-        if (result.status == "success") {
-          Swal.fire("Correcto!", result.message, "success");
-          // Reload the table or perform any other action needed
-          tableCursoPagos.ajax.reload();
-        } else {
-          Swal.fire("Error!", result.message, "error");
-        }
-      },
-    });
-  }
+function abrirModalPagoCurso(idPedido, nombreCliente) {
+  $('#modalPagoCursoLabel').text(`Registrar Pago de Curso - ${nombreCliente}`);
+  $('#id-pedido-curso').val(idPedido);
+  $('#form-pago-curso')[0].reset();
+  $('#modal-pago-curso').modal('show');
+  // Inicializa el input personalizado
+  initSetupSingleFileUpload(
+    "single-file-upload-pagos",
+    "file-input-pagos",
+    ['pdf', 'docx', 'xlsx', 'xls', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt', 'png', 'jpg', 'jpeg'],
+    '.upload-button-pagos'
+  );
+  // Establecer la fecha de hoy en el campo fecha
+  const hoy = new Date().toISOString().split('T')[0];
+  $('#fecha_pago').val(hoy);
 }
+
+// Enviar el formulario por AJAX
+$('#form-pago-curso').on('submit', function (e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('file-input-pagos');
+  if (!fileInput.files || fileInput.files.length === 0) {
+    $('.file-upload-box').addClass('border-danger');
+    Swal.fire("Error", "Debes seleccionar un archivo de voucher.", "warning");
+    return;
+  }
+  const formData = new FormData(this);
+  $.ajax({
+    url: base_url + "Curso/PedidosCurso/saveClientePagosCurso",
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      const result = typeof response === "string" ? JSON.parse(response) : response;
+      if (result.status === "success") {
+        Swal.fire("Correcto!", result.message, "success");
+        $('#modal-pago-curso').modal('hide');
+        tableCursoPagos.ajax.reload();
+      } else {
+        Swal.fire("Error!", result.message, "error");
+      }
+    }
+  });
+});
+
+function eliminarPagoCurso(idPagoCurso) {
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Esta acción eliminará el pago.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: base_url + "Curso/PedidosCurso/eliminarPagoCurso/" + idPagoCurso,
+        type: "POST",
+        dataType: "json",
+        success: function (response) {
+          if (response.status === "success") {
+            Swal.fire("Eliminado", response.message, "success");
+            // Recarga las tablas
+            if (typeof tableCursoPagos !== "undefined" && tableCursoPagos && typeof tableCursoPagos.ajax !== "undefined") tableCursoPagos.ajax.reload();
+            if (typeof tableClientesPagos !== "undefined" && tableClientesPagos && typeof tableClientesPagos.ajax !== "undefined") tableClientesPagos.ajax.reload();
+            if (typeof tableCotizacionPagos !== "undefined" && tableCotizacionPagos && typeof tableCotizacionPagos.ajax !== "undefined") tableCotizacionPagos.ajax.reload();
+            if (typeof tableCotizacionTrackingPagos !== "undefined" && tableCotizacionTrackingPagos && typeof tableCotizacionTrackingPagos.ajax !== "undefined") tableCotizacionTrackingPagos.ajax.reload();
+          } else {
+            Swal.fire("Error", response.message, "error");
+          }
+        }
+      });
+    }
+  });
+}
+
 $(function () {
   tableCursoPagos = $("#table-curso-pagos");
   tableCursoPedidos = $("#table-curso-pedidos");
   $(".tab-curso").removeClass("active");
   $(".tab-curso").off("click").click(async function () {
-    await getCursosHeader();
+
     $(".tab-curso").removeClass("active");
     $("#table-curso-pagos_wrapper").hide();
     $("#table-curso-variacion_wrapper").hide();
@@ -333,7 +351,7 @@ $(function () {
 
       }
       tableCursoPedidos.on('draw', async function () {
-        configurarBuscador(
+        initConfigurarBuscador(
           "table-curso-pedidos",
           "search-table",
           "table-curso-pedidos_info"
@@ -386,6 +404,10 @@ $(function () {
               orderable: false,
             },
           ],
+          'createdRow': function (row, data, dataIndex) {
+            // Por ejemplo, para la columna de importe (busca el índice correcto)
+            $('td', row).eq(5).addClass('w-20');
+          },
           pageLength: 100, // Mostrar 100 elementos por página
           lengthMenu: [
             [100, 1000, -1],
@@ -446,7 +468,7 @@ $(function () {
           },
         });
         tableCursoPagos.on('draw', async function () {
-          configurarBuscador(
+          initConfigurarBuscador(
             "table-curso-pagos",
             "search-table",
             "table-curso-pagos_info"
@@ -480,102 +502,6 @@ $(function () {
     format: 'yyyy-mm-dd',
   });
 
-  // table_Entidad = $("#table-curso-pedidos").DataTable({
-  //   dom: "<'row'<'col-sm-12 col-md-4'B><'col-sm-12 col-md-7'f><'col-sm-12 col-md-1'>>" +
-  //     "<'row'<'col-sm-12'tr>>" +
-  //     "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-  //   buttons: [{
-  //     extend: 'excel',
-  //     text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-  //     titleAttr: 'Excel',
-  //     exportOptions: {
-  //       columns: ':visible'
-  //     },
-  //     attr: {
-  //       class: "hidden"
-  //     }
-  //   },
-  //   {
-  //     extend: 'pdf',
-  //     text: '<i class="fa fa-file-pdf color_icon_pdf"></i> PDF',
-  //     titleAttr: 'PDF',
-  //     exportOptions: {
-  //       columns: ':visible'
-  //     },
-  //     attr: {
-  //       class: "hidden"
-  //     }
-  //   },
-  //   {
-  //     extend: 'colvis',
-  //     text: '<i class="fa fa-ellipsis-v"></i> Columnas',
-  //     titleAttr: 'Columnas',
-  //     exportOptions: {
-  //       columns: ':visible'
-  //     },
-  //     attr: {
-  //       class: "hidden"
-  //     }
-  //   },
-
-  //   ],
-  //   'searching': true,
-  //   'bStateSave': true,
-  //   "lengthChange": true,
-  //   'processing': true,
-  //   'serverSide': false,
-  //   'info': true,
-  //   'autoWidth': false,
-  //   'pagingType': 'full_numbers',
-  //   'oLanguage': {
-  //     'sInfo': 'Mostrando (_START_ - _END_) total de registros _TOTAL_',
-  //     'sLengthMenu': '_MENU_',
-  //     'sSearch': 'Buscar por: ',
-  //     'sSearchPlaceholder': '',
-  //     'sZeroRecords': 'No se encontraron registros',
-  //     'sInfoEmpty': 'No hay registros',
-  //     'sLoadingRecords': 'Cargando...',
-  //     'sProcessing': 'Procesando...',
-  //     'oPaginate': {
-  //       'sFirst': '<<',
-  //       'sLast': '>>',
-  //       'sPrevious': '<',
-  //       'sNext': '>',
-  //     },
-  //   },
-  //   'order': [],
-  //   'ajax': {
-  //     'url': url,
-  //     'type': 'POST',
-  //     'dataType': 'JSON',
-  //     'data': function (data) {
-  //       data.sMethod = $('#hidden-sMethod').val(),
-  //         data.estado_pago = $('#cbo-filtro-estado_pago').val(),
-  //         data.Filtro_Fe_Inicio = ParseDateString($('#txt-Fe_Inicio').val(), 'fecha', '/'),
-  //         data.Filtro_Fe_Fin = ParseDateString($('#txt-Fe_Fin').val(), 'fecha', '/');
-
-  //     },
-  //   },
-  //   'columnDefs': [
-  //     {
-  //       targets: 'no-hidden',
-  //       visible: false,
-  //     }, {
-  //       className: 'text-center',
-  //       targets: 'no-sort',
-  //       orderable: false,
-  //     }, {
-  //       targets: "",
-  //       orderable: false,
-  //     },],
-  //   'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
-  // });
-  // configurarBuscador('table-curso-pedidos', 'search-table', 'table-curso-pedidos_info');
-
-  // $('#table-curso-pedidos_filter input').removeClass('form-control-sm');
-  // $('#table-curso-pedidos_filter input').addClass('form-control-md');
-  // $('#table-curso-pedidos_filter input').addClass("width_full");
-  // })
 
   $('#btn-html_reporte').click(function () {
     reload_table_Entidad();
@@ -727,15 +653,7 @@ async function viewCliente(id) {
                 <div class="col-12 col-md-2 col-xl-1">
                 </div>
                 <div class="col-12 col-md-0 col-xl-2 justify-content-center d-flex">
-                  <button id="btn-editar-cliente" class="btn p-1 ml-4" title="Editar">
-                      <i class="fas fa-edit"></i>
-                  </button>
-                  <button id="btn-cancel" class="hidden btn p-1 ml-4" title="Cancelar">
-                      <i class="fas fa-times"></i>
-                  </button>
-                  <div class="col-3 col-xl-10 py-sm-3 py-xl-0 py-md-0">
-                    <button id="btn-guardar-cliente" type="button" class="text-white bg-[#fd7e14] py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-cotizacion"><i class="fa fa-save"></i> Guardar</button>
-                  </div>
+                 
                 </div>
               </div>
             </div>
@@ -745,6 +663,7 @@ async function viewCliente(id) {
         $('#section-datos-cliente').show();
 
         $('#btn-editar-cliente').on('click', function () {
+          event.preventDefault();
           $('.cliente-input').prop('readonly', false);
           $('#cliente-moodle-password').prop('readonly', true);
           $('#btn-guardar-cliente').show();
@@ -770,6 +689,7 @@ async function viewCliente(id) {
           }, 200);
         });
         $('#btn-cancel').on('click', function () {
+          event.preventDefault();
           $('.cliente-input').prop('readonly', true);
           $('#btn-editar-cliente').show();
           $(this).hide();
@@ -783,8 +703,7 @@ async function viewCliente(id) {
           $('#select-distrito').hide();
         });
         $('#btn-guardar-cliente').on('click', function (e) {
-          console.log($('#cliente-id').val());
-          console.log($('#form-datos-cliente').serialize());
+
           e.preventDefault();
           Swal.fire({
             title: 'Guardando...',
@@ -874,6 +793,9 @@ function ocultarSectionDatosCliente() {
   });
   // Oculta la sección de campañas y cursos
   $('#section-campanas-cursos').hide();
+  $('.dropdown-menu').on('click', function (event) {
+    event.stopPropagation(); // Evita que el evento se propague
+  });
 
 }
 // Función para aplicar los filtros y recargar la tabla
@@ -1028,11 +950,16 @@ function cargarTablaCampanas() {
       },],
     'lengthMenu': [[10, 100, 1000, -1], [10, 100, 1000, "Todos"]],
   });
-  configurarBuscador('table-campanas', 'search-table-campanas', 'table-campanas_info');
+  initConfigurarBuscador('table-campanas', 'search-table-campanas', 'table-campanas_info');
 }
 
 
 function editarCampana(id) {
+  $('.month-selector').empty().off('click'); // Eliminar eventos también
+  $('.month-container').empty();
+
+  // Limpiar las fechas seleccionadas
+  $('#fecha-inicio-campana-span, #fecha-fin-campana-span').text('--/--/----');
   $.ajax({
     url: base_url + "Curso/PedidosCurso/getCampanaById",
     type: "POST",
@@ -1045,8 +972,81 @@ function editarCampana(id) {
         $('#id-campana-editar').val(response.data.ID_Campana);
         $('#fecha-inicio-campana').val(response.data.Fe_Inicio);
         $('#fecha-fin-campana').val(response.data.Fe_Fin);
-        // Abre el modal
+
         $('#modal-nueva-campana').modal('show');
+        const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+
+        months.forEach((month, index) => {
+          $('.month-selector').append(`
+      <div class="form-group">
+        <span data-month="${index}" class="${index < currentMonth ? 'month-span-disabled' : 'month-span'}">
+          ${month}
+        </span>
+      </div>
+    `);
+        });
+
+        // Usar delegación de eventos para los clicks
+        $('.month-selector').on('click', '.month-span:not(.month-span-disabled)', function () {
+          const monthIndex = $(this).data('month');
+          const year = currentYear;
+
+          if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+            $(`.month-container [data-month="${monthIndex}"]`).remove();
+          } else {
+            if ($('.month-container').children().length >= 2) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Solo puedes seleccionar dos meses',
+                text: 'Por favor, deselecciona un mes antes de seleccionar otro.',
+              });
+              return;
+            }
+            $(this).addClass('selected');
+
+            // Obtener primer y último día del mes seleccionado
+            const firstDay = new Date(year, monthIndex, 1);
+            const lastDay = new Date(year, monthIndex + 1, 0);
+
+            // Generar el calendario
+            const calendarHtml = `
+        <div class="month-calendar" data-month="${monthIndex}">
+          <h4 class="text-center mb-3">${months[monthIndex]} ${year}</h4>
+          ${createHtmlCalendar(firstDay, lastDay)}
+        </div>
+      `;
+
+            $(".month-container").append(calendarHtml);
+          }
+        });
+        //from fe_inicio and fe_fin select one or two months click months
+        const feInicio = new Date(response.data.Fe_Inicio);
+        const feFin = new Date(response.data.Fe_Fin);
+        //click on months with data-month=fe_inicio.getMonth() and fe_fin.getMonth()
+        if (feInicio.getMonth() === feFin.getMonth()) {
+          $(`.month-selector .month-span[data-month="${feInicio.getMonth()}"]`).trigger('click');
+        } else {
+          $(`.month-selector .month-span[data-month="${feInicio.getMonth()}"]`).trigger('click');
+          $(`.month-selector .month-span[data-month="${feFin.getMonth()}"]`).trigger('click');
+        }
+        const days = response.data.dias;
+        if (days) {
+          const parseDays = JSON.parse(days);
+          parseDays.forEach(date => {
+            console.log(date, "date");
+            console.log(Date.parse(date.fecha), "date fecha");
+            const year = date.fecha.split('-')[0];
+            const month = date.fecha.split('-')[1] - 1; // Los meses en
+            // JavaScript son 0-indexados
+            const day = date.fecha.split('-')[2];
+            $(`.month-container .day-button[data-day="${day}"][data-month="${month}"][data-year="${year}"]`).trigger('click')
+          });
+        }
+
         table_Campanas.ajax.reload();
       } else {
         Swal.fire('Error', 'No se pudo obtener la campaña', 'error');
@@ -1054,14 +1054,169 @@ function editarCampana(id) {
     }
   });
 }
-// Para crear, limpia el formulario y cambia el título
-$('#btn-crear-campana').on('click', function () {
-  $('#modalNuevaCampanaLabel').text('Registrar Nueva Campaña');
-  $('#form-nueva-campana')[0].reset();
-  $('#id-campana-editar').val('');
+
+
+function createHtmlCalendar(startDate, endDate) {
+  const daysOfWeek = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
+  let calendarHtml = [];
+  calendarHtml.push('<div class="calendar-grid">');
+
+  // Encabezados de días
+  daysOfWeek.forEach(day => {
+    calendarHtml.push(`<div class="day-header">${day}</div>`);
+  });
+
+  // Rellenar espacios hasta el primer día del mes
+  let current = new Date(startDate);
+  for (let i = 0; i < current.getDay(); i++) {
+    calendarHtml.push('<div class="day-empty"></div>');
+  }
+
+  // Agregar los días del mes
+  while (current <= endDate) {
+    const isToday = current.getDate() === new Date().getDate() &&
+      current.getMonth() === new Date().getMonth() &&
+      current.getFullYear() === new Date().getFullYear();
+
+    calendarHtml.push(`
+      <div class="day-cell">
+        <button class="day-button ${false ? 'day-today' : ''}" 
+                data-day="${current.getDate()}" 
+                data-month="${current.getMonth()}" 
+                data-year="${current.getFullYear()}">
+          ${current.getDate()}
+        </button>
+      </div>
+    `);
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  // Rellenar espacios hasta el final de la semana
+  if (current.getDay() !== 0) {
+    while (current.getDay() > 0) {
+      calendarHtml.push('<div class="day-empty"></div>');
+      current.setDate(current.getDate() + 1);
+    }
+  }
+
+  calendarHtml.push('</div>');
+  return calendarHtml.join('');
+}
+
+$('.month-container').on('click', '.day-button', function (event) {
+  event.stopPropagation();
+  event.preventDefault();
+
+  // Obtener datos del día clickeado
+  const clickedDay = $(this).data('day');
+  const clickedMonth = $(this).data('month');
+  const clickedYear = $(this).data('year');
+  const clickedDate = new Date(clickedYear, clickedMonth, clickedDay);
+
+  // Verificar si ya está seleccionado
+  if ($(this).hasClass('day-selected')) {
+    $(this).removeClass('day-selected');
+    updateDateSpans(); // Actualizar spans al deseleccionar
+    return;
+  }
+
+  // Obtener todos los días seleccionados
+  const selectedDays = $('.day-selected');
+
+  const selectedInOtherMonths = selectedDays.filter(function () {
+    return $(this).data('month') !== clickedMonth;
+  });
+
+  if (selectedInOtherMonths.length > 0 && selectedDays.length >= 6) {
+    // Deseleccionar el más antiguo
+    const oldest = findOldestSelectedDay();
+    if (oldest) oldest.removeClass('day-selected');
+  }
+  // Si estamos en el mismo mes y ya hay 6 selecciones
+  else if (selectedDays.length >= 6) {
+    // Deseleccionar el más antiguo de este mes
+    const oldestInMonth = findOldestSelectedDay(clickedMonth);
+    if (oldestInMonth) oldestInMonth.removeClass('day-selected');
+  }
+
+  // Seleccionar el nuevo día
+  $(this).addClass('day-selected');
+
+  // Actualizar los spans con las fechas
+  updateDateSpans();
 });
 
+// Función para encontrar el día seleccionado más antiguo
+function findOldestSelectedDay(specificMonth = null) {
+  let oldestDay = null;
+  let oldestDate = new Date(9999, 11, 31); // Fecha futura inicial
 
+  $('.day-selected').each(function () {
+    const dayData = $(this).data();
+    // Si se especificó un mes, solo considerar días de ese mes
+    if (specificMonth !== null && dayData.month !== specificMonth) return;
+
+    const dayDate = new Date(dayData.year, dayData.month, dayData.day);
+
+    if (dayDate < oldestDate) {
+      oldestDate = dayDate;
+      oldestDay = $(this);
+    }
+  });
+
+  return oldestDay;
+}
+
+// Función para actualizar los spans con las fechas seleccionadas
+function updateDateSpans() {
+  const selectedDays = getSelectedDaysSorted();
+  console.log(selectedDays, "selectedDays");
+  // Formatear fechas (ej: "15/06/2024")
+  const formatDate = (date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}/${month}/${date.getFullYear()}`;
+  };
+
+  // Actualizar los spans según la cantidad de selecciones
+  if (selectedDays.length === 0) {
+    $('#fecha-inicio-campana-span, #fecha-fin-campana-span').text('--/--/----');
+  }
+  else if (selectedDays.length === 1) {
+    $('#fecha-inicio-campana-span').text(formatDate(selectedDays[0].date));
+    $('#fecha-fin-campana-span').text('--/--/----');
+  }
+  else {
+    // Ordenar las fechas cronológicamente
+    const sortedDates = selectedDays.map(d => d.date).sort((a, b) => a - b);
+    selectedDaysCampana = sortedDates;
+
+    $('#fecha-inicio-campana-span').text(formatDate(sortedDates[0]));
+    $('#fecha-fin-campana-span').text(formatDate(sortedDates[selectedDays.length - 1]));
+  }
+}
+
+// Función auxiliar para obtener días seleccionados ordenados
+function getSelectedDaysSorted() {
+  const selected = [];
+
+  $('.day-selected').each(function () {
+    selected.push({
+      element: $(this),
+      date: new Date(
+        $(this).data('year'),
+        $(this).data('month'),
+        $(this).data('day')
+      )
+    });
+  });
+
+  // Ordenar por fecha (más antiguo primero)
+  selected.sort((a, b) => a.date - b.date);
+
+  return selected;
+}
 function borrarCampana(id) {
   Swal.fire({
     title: '¿Estás seguro?',
@@ -1089,17 +1244,112 @@ function borrarCampana(id) {
     }
   });
 }
+//onclick close-modal-comprobante hide modal-image-preview
+$(document).on('click', '.close-modal-comprobante', function () {
+  event.preventDefault();
+  $('#modal-image-preview').modal('hide');
+});
+$(document).on('click', '.close-modal-pago', function () {
+  event.preventDefault();
+  $('#modal-pago').modal('hide');
+});
+function showPago(monto, banco, fecha, voucher_url, id) {
+  event.preventDefault();
 
+  // Set basic info
+  $('#monto-pago').text('S/ ' + parseFloat(monto).toFixed(2));
+  $('#banco-pago').text(banco);
+  $('#fecha-pago').text(fecha);
+
+  // Handle voucher URL
+  const voucherContainer = $('#voucher-container');
+  voucherContainer.empty();
+  $('#delete-pago-btn').off('click').on('click', function () {
+    event.preventDefault();
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción eliminará el pago.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('idPagoCurso', id);
+        $.ajax({
+          url: base_url + "Curso/PedidosCurso/borrarPagoCurso",
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json",
+          success: function (response) {
+            if (response.status === "success") {
+              Swal.fire('¡Eliminado!', response.message, 'success');
+              //close modal
+              $('#modal-pago').modal('hide');
+              // Reload the table
+              if (typeof tableCursoPagos !== 'undefined' && tableCursoPagos !== null
+              ) {
+                tableCursoPagos.ajax.reload(null, false);
+              }
+              
+            } else {
+              Swal.fire('Error', response.message, 'error');
+            }
+          }
+        });
+      }
+    })
+  });
+  if (voucher_url) {
+    const fileExt = voucher_url.split('.').pop().toLowerCase();
+    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt);
+
+    if (isImage) {
+      // For images - show thumbnail that opens preview modal
+      const imgThumb = $('<div class="cursor-pointer group">')
+        .append($('<img>')
+          .attr('src', voucher_url)
+          .addClass('w-24 h-24 object-cover rounded-lg border border-gray-200 group-hover:border-blue-500 transition')
+          .on('click', function () {
+            $('#image-preview-comprobante').attr('src', voucher_url);
+            $('#download-btn').attr('href', voucher_url);
+            $('#modal-image-preview').modal('show');
+          })
+        )
+        .append($('<div class="text-xs text-center mt-1 text-blue-600">Ver comprobante</div>'));
+
+      voucherContainer.append(imgThumb);
+    } else {
+      // For non-images - show download link with file icon
+      const fileIcon = $('<i class="fas fa-file-download text-3xl text-gray-400 mb-2"></i>');
+      const downloadLink = $('<a>')
+        .attr('href', voucher_url)
+        .attr('download', '')
+        .addClass('inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500')
+        .text('Descargar comprobante');
+
+      voucherContainer.append(fileIcon, $('<div class="mt-2"></div>').append(downloadLink));
+    }
+  } else {
+    voucherContainer.append($('<span class="text-gray-400">Sin comprobante</span>'));
+  }
+
+  // Show modal
+  $('#modal-pago').modal('show');
+}
 // Botón para mostrar campañas
-$(document).on('click', '#btn-crear-campana', function () {
+$(document).on('click', '#btn-nueva-campana', function () {
   $('#section-listar-pedidos').hide();
   $('#section-campanas-cursos').show();
   $('#contenedor-campanas').html('');
   $('.content-header').html(`
             <div class="container-fluid">
               <div class="row mb-2 px-3 d-flex justify-content-between">
-                <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
-                  <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-campanas" onclick="ocultarSectionDatosCliente()"><i class="fa fa-arrow-left"></i> Regresar</button>
+                <div class="col-3 col-xl-2 py-sm-3 py-xl-0 py-md-0">
+                  <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-3 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte btn-back-campanas" onclick="ocultarSectionDatosCliente()"><i class="fa fa-arrow-left"></i> Regresar</button>
                 </div>
                 <div class="col-xl-3 col-md-2"></div>
                 <div class="col-6 col-md-0 col-xl-1">
@@ -1108,45 +1358,178 @@ $(document).on('click', '#btn-crear-campana', function () {
                 </div>
                 <div class="col-12 col-md-0 col-xl-2 justify-content-center d-flex">
                   <div class="col-3 col-xl-10 py-sm-3 py-xl-0 py-md-0">
-                    <button id="btn-nueva-campana" type="button" class="text-white bg-[#fd7e14] py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte "><i class="fa fa-plus"></i>Nuevo</button>
+                    <button id="btn-crear-campana" type="button" class="text-white bg-[#FF500B] py-3 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte ">Crear <i class="fa fa-plus"></i></button>
                   </div>
                 </div>
               </div>
             </div>
             
         `);
+  $("#btn-crear-campana").off("click").on("click", function () {
+    $("#modal-nueva-campana").modal("show");
+    $('#modalNuevaCampanaLabel').text('Crear Campaña');
+    $('#form-nueva-campana')[0].reset();
+    $('#id-campana-editar').val('');
+    //set empty all div in modal-body-nueva-campana
+    $('.month-selector').empty().off('click'); // Eliminar eventos también
+    $('.month-container').empty();
+
+    // Limpiar las fechas seleccionadas
+    $('#fecha-inicio-campana-span, #fecha-fin-campana-span').text('--/--/----');
+    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+
+    months.forEach((month, index) => {
+      $('.month-selector').append(`
+      <div class="form-group">
+        <span data-month="${index}" class="${index < currentMonth ? 'month-span-disabled' : 'month-span'}">
+          ${month}
+        </span>
+      </div>
+    `);
+    });
+
+    // Usar delegación de eventos para los clicks
+    $('.month-selector').on('click', '.month-span:not(.month-span-disabled)', function () {
+      const monthIndex = $(this).data('month');
+      const year = currentYear;
+
+      if ($(this).hasClass('selected')) {
+        $(this).removeClass('selected');
+        $(`.month-container [data-month="${monthIndex}"]`).remove();
+      } else {
+        if ($('.month-container').children().length >= 2) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Solo puedes seleccionar dos meses',
+            text: 'Por favor, deselecciona un mes antes de seleccionar otro.',
+          });
+          return;
+        }
+        $(this).addClass('selected');
+
+        // Obtener primer y último día del mes seleccionado
+        const firstDay = new Date(year, monthIndex, 1);
+        const lastDay = new Date(year, monthIndex + 1, 0);
+
+        // Generar el calendario
+        const calendarHtml = `
+        <div class="month-calendar" data-month="${monthIndex}">
+          <h4 class="text-center mb-3">${months[monthIndex]} ${year}</h4>
+          ${createHtmlCalendar(firstDay, lastDay)}
+        </div>
+      `;
+
+        $(".month-container").append(calendarHtml);
+      }
+    });
+  });
   cargarTablaCampanas();
 });
 
 
 
 
-$(document).on('click', '#btn-nueva-campana', function () {
-  $('#form-nueva-campana')[0].reset();
-  $('#modal-nueva-campana').modal('show');
-});
 
 // Guardar la campaña al enviar el formulario
 $('#form-nueva-campana').on('submit', function (e) {
   e.preventDefault();
-  var id = $('#id-campana-editar').val();
-  var url = id ? base_url + "Curso/PedidosCurso/editarCampana" : base_url + "Curso/PedidosCurso/crearCampana";
+
+  // Obtener días seleccionados ordenados por fecha
+  const selectedDays = [];
+  $('.day-selected').each(function () {
+    selectedDays.push({
+      day: $(this).data('day'),
+      month: $(this).data('month') + 1, // Meses de 1-12
+      year: $(this).data('year'),
+      date: new Date($(this).data('year'), $(this).data('month'), $(this).data('day'))
+    });
+  });
+
+  // Ordenar por fecha (más antigua primero)
+  selectedDays.sort((a, b) => a.date - b.date);
+
+  // Validar que hay al menos un día seleccionado
+  if (selectedDays.length === 0) {
+    Swal.fire('Error', 'Debes seleccionar al menos un día en el calendario', 'error');
+    return;
+  }
+
+  const id = $('#id-campana-editar').val();
+  const url = id ? base_url + "Curso/PedidosCurso/editarCampana" : base_url + "Curso/PedidosCurso/crearCampana";
+
+  // Crear FormData con todos los campos del formulario
+  const form = new FormData(this);
+
+  // Agregar campos adicionales
+  form.append("ID_Campana", id || '0');
+
+  // Formatear fechas como YYYY-MM-DD
+  const formatDate = (year, month, day) => {
+    return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  };
+
+  // Fecha de inicio (siempre la más antigua)
+  const startDate = selectedDays[0];
+  form.append("Fe_Inicio", formatDate(startDate.year, startDate.month, startDate.day));
+
+  // Fecha fin (la más reciente si hay más de una selección)
+  const endDate = selectedDays.length > 1 ? selectedDays[selectedDays.length - 1] : startDate;
+  form.append("Fe_Fin", formatDate(endDate.year, endDate.month, endDate.day));
+
+  // Enviar todos los días seleccionados como array
+  const allDates = selectedDays.map(d => formatDate(d.year, d.month, d.day));
+  form.append("Dias_Seleccionados", JSON.stringify(allDates));
+
+  // Configuración AJAX
   $.ajax({
     url: url,
     type: "POST",
-    data: $(this).serialize(),
+    data: form,
+    processData: false,
+    contentType: false,
     dataType: "json",
     success: function (response) {
       if (response.status === "success") {
         $('#modal-nueva-campana').modal('hide');
-        Swal.fire('¡Guardado!', response.message, 'success');
-        table_Campanas.ajax.reload(null, false);
+        Swal.fire('Éxito', response.message, 'success');
+        if (typeof table_Campanas !== 'undefined') {
+          table_Campanas.ajax.reload(null, false);
+        }
       } else {
-        Swal.fire('Error', response.message || 'No se pudo guardar.', 'error');
+        Swal.fire('Error', response.message || 'Error al procesar la solicitud', 'error');
       }
+    },
+    error: function (xhr) {
+      let errorMsg = 'Error en la solicitud';
+      if (xhr.responseJSON && xhr.responseJSON.message) {
+        errorMsg = xhr.responseJSON.message;
+      }
+      Swal.fire('Error', errorMsg, 'error');
     }
   });
 });
+
+// Función auxiliar para obtener días seleccionados ordenados
+function getSelectedDaysSorted() {
+  const selected = [];
+
+  $('.day-selected').each(function () {
+    selected.push({
+      day: $(this).data('day'),
+      month: $(this).data('month'),
+      year: $(this).data('year'),
+      date: new Date($(this).data('year'), $(this).data('month'), $(this).data('day'))
+    });
+  });
+
+  // Ordenar por fecha (más antigua primero)
+  selected.sort((a, b) => a.date - b.date);
+
+  return selected;
+}
 
 // Asignar campaña al pedido
 $(document).on('change', 'select[name="ID_Campana"]', function () {
@@ -1174,61 +1557,28 @@ $(document).on('change', 'select[name="ID_Campana"]', function () {
 
 async function getCursosHeader() {
   const formData = new FormData();
-
-  // Obtener valores de los inputs
-  const feInicio = $('#txt-Fe_Inicio').val();
-  const feFin = $('#txt-Fe_Fin').val();
-
-  console.log('Fe_Inicio:', feInicio, 'Fe_Fin:', feFin);
-  console.log('Fe_Inicio vacío:', !feInicio || feInicio.trim() === '');
-  console.log('Fe_Fin vacío:', !feFin || feFin.trim() === '');
-
-  // Validación corregida: verificar si está vacío o undefined
-  const feInicioVacio = !feInicio || feInicio.trim() === '';
-  const feFinVacio = !feFin || feFin.trim() === '';
-
-  // Fecha de inicio: si está vacío, usar 2 meses antes
-  const fechaInicioDefault = feInicioVacio ?
-    ParseDateString(
-      new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
-    ) : feInicio;
-
-  // Fecha fin: si está vacío, usar mañana
-  const fechaFinDefault = feFinVacio ?
-    ParseDateString(
-      new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
-    ) : feFin;
-
-  console.log('Fecha inicio a enviar:', fechaInicioDefault);
-  console.log('Fecha fin a enviar:', fechaFinDefault);
-
-  formData.append("Filtro_Fe_Inicio", fechaInicioDefault);
-  formData.append("Filtro_Fe_Fin", fechaFinDefault);
-
-  try {
-    const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await response.json();
-
-    if (data.status === "success") {
-      console.log(data.data);
-      $("#span-total-importe").text("S/." + (data.data.total_importe));
-    } else {
-      console.error('Error en la respuesta:', data);
-    }
-  } catch (error) {
-    console.error('Error en la petición:', error);
+  formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == "" || typeof $('#txt-Fe_Inicio').val() === 'undefined' ?
+    //fin inicio 2 meses antes
+    new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+    : $('#txt-Fe_Inicio').val());
+  formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == "" || typeof $('#txt-Fe_Fin').val() === 'undefined' ?
+    new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+    : $('#txt-Fe_Fin').val());
+  const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
+    method: "POST",
+    body: formData
+  });
+  const data = await response.json();
+  if (data.status === "success") {
+    $("#span-total-importe").text("S/." + (data.data.total_importe));
   }
 }
 // Delegación para inputs de importe en la tabla
@@ -1474,50 +1824,7 @@ $(document).ready(async function () {
     cargarDistritos($(this).val());
   });
 });
-async function configurarBuscador(tableId, searchInputId, infoContainerId) {
-  // Esperar a que la tabla esté completamente inicializada
-  await new Promise(resolve => setTimeout(resolve, 100));
 
-  // Obtener la instancia de DataTable
-  var table = $('#' + tableId).DataTable();
-  console.log('tabla : ', table)
-  // Limpiar eventos previos para evitar duplicados
-  $('.' + searchInputId).off('keyup input');
-
-  // Escuchar el evento "input" y "keyup" en el buscador personalizado
-  $('.' + searchInputId).on('input keyup', function () {
-    var searchValue = this.value;
-    console.log('Buscando:', searchValue);
-    console.log('Tabla ID:', tableId);
-    if (currentTableCurso === 'alumnos') {
-      tableCursoPedidos.search(searchValue).draw();
-    } else if (currentTableCurso === 'pagos') {
-      if (!$.fn.DataTable.isDataTable('#table-curso-pagos')) {
-        return;
-      }
-      tableCursoPagos.search(searchValue).draw();
-    }
-  });
-
-  // Función para limpiar el buscador
-  window['resetBuscador_' + tableId] = function () {
-    $('#' + searchInputId).val('');
-    table.search('').draw();
-  };
-
-  // Actualizar el mensaje de información
-  table.on('draw', function () {
-    if (infoContainerId) {
-      var info = table.page.info();
-      $('#' + infoContainerId).html(
-        `Mostrando ${info.start + 1} a ${info.end} de ${info.recordsTotal} registros`
-      );
-    }
-  });
-
-  // Ocultar el buscador nativo de DataTables para evitar conflictos
-  $('#' + tableId + '_filter').hide();
-}
 async function getCampanasActivas() {
   const url = base_url + "Administracion/Administracion/getCampanasActivas";
   try {
@@ -1558,6 +1865,9 @@ async function guardarCambiosPedido(ID_Pedido_Curso) {
     }
   });
 }
+
+
+
 
 $(document).on('change', '.select-usuario-externo', async function () {
   var estado = $(this).val();

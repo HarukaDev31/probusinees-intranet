@@ -11,3 +11,9 @@ assets/uploads/
 assets/cargaconsolidada
 assets/downloads/*
 assets/images/*
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development

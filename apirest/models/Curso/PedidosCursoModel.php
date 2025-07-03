@@ -23,7 +23,8 @@ class PedidosCursoModel extends CI_Model
 	var $table_pedido_curso_pagos_conceptos = 'pedido_curso_pagos_concept';
 	var $CONCEPT_PAGO_ADELANTO = 1; // Define el concepto de pago de adelanto
 	var $order = array('Fe_Registro' => 'desc');
-
+	var $table_campana_curso = 'campana_curso';
+	var $table_campana_curso_dias = 'campana_curso_dias';
 	public function __construct()
 	{
 		parent::__construct();
@@ -70,7 +71,7 @@ class PedidosCursoModel extends CI_Model
              FROM pedido_curso_pagos as cccp                 
              JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept= ccp.id                 
              WHERE cccp.id_pedido_curso = PC.ID_Pedido_Curso                 
-             AND (ccp.name = 'ADELANTO')           
+             AND ccp.name = 'ADELANTO'         
          ) AS total_pagos")
 				->from($this->table . ' AS PC')
 				->join($this->table_pais . ' AS P', 'P.ID_Pais = PC.ID_Pais', 'join')
@@ -103,7 +104,7 @@ class PedidosCursoModel extends CI_Model
 	public function getPagosCurso()
 	{
 		$this->db->select(
-			"CC.*
+			'CC.*
 		  ,CLI.Fe_Nacimiento,
 		   CLI.Nu_Como_Entero_Empresa,
 		    CLI.No_Otros_Como_Entero_Empresa,
@@ -119,15 +120,29 @@ class PedidosCursoModel extends CI_Model
              FROM pedido_curso_pagos as cccp                 
              JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept = ccp.id                 
              WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
-             AND (ccp.name = 'ADELANTO')             
+             AND (ccp.name = "ADELANTO")             
          ) AS pagos_count,
          (                 
              SELECT IFNULL(SUM(cccp.monto), 0)                  
              FROM pedido_curso_pagos as cccp                 
              JOIN pedido_curso_pagos_concept ccp ON cccp.id_concept= ccp.id                 
              WHERE cccp.id_pedido_curso = CC.ID_Pedido_Curso                 
-             AND (ccp.name = 'ADELANTO')           
-         ) AS total_pagos"
+             AND (ccp.name = "ADELANTO")           
+         ) AS total_pagos,
+		 (SELECT JSON_ARRAYAGG(
+    JSON_OBJECT(
+        "id_pago", ccp2.id,
+        "monto", ccp2.monto,
+        "concepto", ccpc2.name,
+        "status", ccp2.status,
+        "payment_date", ccp2.payment_date,
+		"voucher_url", ccp2.voucher_url
+    )
+	) FROM `' . $this->table_pedido_curso_pagos . '` as ccp2
+	LEFT JOIN `' . $this->table_pedido_curso_pagos_conceptos . '` as ccpc2 ON ccp2.id_concept = ccpc2.id
+	WHERE ccp2.id_pedido_curso = CC.ID_Pedido_Curso
+	AND ccp2.id_concept = ' . intval($this->CONCEPT_PAGO_ADELANTO) . '
+	) as pagos_details'
 		)
 			->from($this->table . ' AS CC')  // Add the CC alias here!
 			->join($this->table_pais . ' AS P', 'P.ID_Pais = CC.ID_Pais', 'join')  // Update references
@@ -343,7 +358,7 @@ class PedidosCursoModel extends CI_Model
 		return $result;
 	}
 
-	public function crearCampana($fe_inicio, $fe_fin)
+	public function crearCampana($fe_inicio, $fe_fin, $dias)
 	{
 		// Insertar campaña
 		$data = [
@@ -352,7 +367,6 @@ class PedidosCursoModel extends CI_Model
 			'Fe_Creacion' => date('Y-m-d H:i:s')
 		];
 		$this->db->insert('campana_curso', $data);
-
 		if ($this->db->affected_rows() > 0) {
 			// Obtener la campaña recién creada
 			$id = $this->db->insert_id();
@@ -398,7 +412,19 @@ class PedidosCursoModel extends CI_Model
 					<i class="fas fa-trash text-danger" style="cursor:pointer; padding:10px;" onclick="borrarCampana(\'' . $row['ID_Campana'] . '\')"></i>
 				</div>'
 			];
-
+			//delete dias where id_campana = $id and insert new dias
+			$this->db->where('id_campana', $id);
+			$this->db->delete($this->table_campana_curso_dias);
+			$dias = json_decode($dias, true);
+			foreach ($dias as $dia) {
+				log_message('error', 'Día a insertar: ' . $dia);
+				log_message('error', 'ID de campaña: ' . $id);
+				$data_dia = [
+					'id_campana' => $id,
+					'fecha'     => $dia
+				];
+				$this->db->insert($this->table_campana_curso_dias, $data_dia);
+			}
 			return [
 				'status' => 'success',
 				'message' => 'Campaña registrada correctamente',
@@ -408,7 +434,7 @@ class PedidosCursoModel extends CI_Model
 			return ['status' => 'error', 'message' => 'No se pudo registrar la campaña'];
 		}
 	}
-	public function editarCampana($id, $fe_inicio, $fe_fin)
+	public function editarCampana($id, $fe_inicio, $fe_fin, $dias)
 	{
 		$data = [
 			'Fe_Inicio' => $fe_inicio,
@@ -416,6 +442,19 @@ class PedidosCursoModel extends CI_Model
 		];
 		$this->db->where('ID_Campana', $id);
 		$this->db->update('campana_curso', $data);
+		//delete dias where id_campana = $id and insert new dias
+		$this->db->where('id_campana', $id);
+		$this->db->delete($this->table_campana_curso_dias);
+		$dias = json_decode($dias, true);
+		foreach ($dias as $dia) {
+			log_message('error', 'Día a insertar: ' . $dia);
+			log_message('error', 'ID de campaña: ' . $id);
+			$data_dia = [
+				'id_campana' => $id,
+				'fecha'     => $dia
+			];
+			$this->db->insert($this->table_campana_curso_dias, $data_dia);
+		}
 		if ($this->db->affected_rows() > 0) {
 			return ['status' => 'success', 'message' => 'Campaña actualizada correctamente'];
 		} else {
@@ -424,8 +463,23 @@ class PedidosCursoModel extends CI_Model
 	}
 	public function getCampanaById($id)
 	{
-		$this->db->where('ID_Campana', $id);
-		$query = $this->db->get('campana_curso');
+		$this->db->select('
+        c.ID_Campana,
+        c.Fe_Creacion,
+        c.Fe_Inicio,
+        c.Fe_Fin,
+        MONTH(c.Fe_Inicio) as Mes_Numero,
+        (SELECT COUNT(*) FROM pedido_curso p WHERE p.ID_Campana = c.ID_Campana) as cantidad_personas,
+        (SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                "id", id,
+                "fecha", fecha
+            )
+        ) FROM `' . $this->table_campana_curso_dias . '` WHERE id_campana = c.ID_Campana) as dias
+    ');
+		$this->db->from('campana_curso c');
+		$this->db->where('c.ID_Campana', $id);
+		$query = $this->db->get();
 		return $query->row_array();
 	}
 
@@ -531,6 +585,8 @@ class PedidosCursoModel extends CI_Model
 	public function saveClientePagosCurso($voucher, $idPedido, $amount, $fecha, $banco)
 	{
 		try {
+			$this->maxFileSize = 1000000;
+			$this->setAllowedExtensionsImagesOfficeFiles();
 			$voucherUrl = $this->uploadSingleFile(
 				[
 					"name" => $voucher['name'],
@@ -539,7 +595,7 @@ class PedidosCursoModel extends CI_Model
 					"error" => $voucher['error'],
 					"size" => $voucher['size']
 				],
-				'assets/curso/pagos'
+				'assets/images/'
 			);
 			$data = [
 				'voucher_url' => $voucherUrl,
@@ -571,6 +627,11 @@ class PedidosCursoModel extends CI_Model
 			];
 		}
 	}
+	public function eliminarPagoCurso($idPagoCurso)
+	{
+		$this->db->where('id', $idPagoCurso);
+		return $this->db->delete($this->table_pedido_curso_pagos);
+	}
 	public function getCursosHeader()
 	{
 		//get sum of importe from pedido_curso_pagos 
@@ -586,5 +647,48 @@ class PedidosCursoModel extends CI_Model
 		}
 		$query = $this->db->get();
 		return $query->row();
+	}
+	public function borrarPagoCurso($idPagoCurso)
+	{
+		//find the payment by id and unlink the voucher file
+		try {
+			$this->db->select('voucher_url');
+			$this->db->from($this->table_pedido_curso_pagos);
+			$this->db->where('id', $idPagoCurso);
+			$query = $this->db->get();
+			if ($query->num_rows() > 0) {
+				$row = $query->row();
+				if (!empty($row->voucher_url)) {
+					// Unlink the file
+					if (file_exists($row->voucher_url)) {
+						unlink($row->voucher_url);
+					}
+				}
+				//delete the payment record
+				$this->db->where('id', $idPagoCurso);
+				$this->db->delete($this->table_pedido_curso_pagos);
+				if ($this->db->affected_rows() > 0) {
+					return [
+						'status' => 'success',
+						'message' => 'Pago eliminado correctamente'
+					];
+				} else {
+					return [
+						'status' => 'error',
+						'message' => 'No se pudo eliminar el pago'
+					];
+				}
+			}
+			return [
+				'status' => 'error',
+				'message' => 'Pago no encontrado'
+			];
+		} catch (Exception $e) {
+			log_message('error', 'Error al obtener el pago: ' . $e->getMessage());
+			return [
+				'status' => "error",
+				'message' => 'Error al obtener el pago: ' . $e->getMessage()
+			];
+		}
 	}
 }

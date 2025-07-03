@@ -58,7 +58,7 @@ class Administracion extends CI_Controller
 				$subdata[] = $value->documento;
 				$subdata[] = $value->telefono;
 				$subdata[] = "Consolidado";
-				$subdata[] = "<span class='badge badge-secondary'>" . "#" . $value->carga. "</span>";
+				$subdata[] =  "#" . $value->carga ;
 				//if input post campana is not 0 
 				if (!empty($this->input->post('campana')) && $this->input->post('campana') != '0') {
 					$campanaFiltro = $this->input->post('campana');
@@ -66,22 +66,33 @@ class Administracion extends CI_Controller
 						continue; // Usar continue en lugar de return
 					}
 				}
-				$estadoPagosCoordinacion = '<span class="badge badge-secondary">' . $value->estado_pagos_coordinacion . '</span>';
-				$aPagar = ($value->monto_final + $value->impuestos_final) == 0 ? $value->monto : ($value->monto_final + $value->impuestos_final);
+				$aPagar = ($value->logistica_final + $value->impuestos_final) == 0 ? $value->monto : ($value->logistica_final + $value->impuestos_final);
 				$estadoPago = '';
 				if ($value->total_pagos == 0) {
 					$estadoPago = 'PENDIENTE';
-					$estadoPagosCoordinacion = '<span class="badge badge-secondary">PENDIENTE</span>';
 				} else if ($value->total_pagos_monto < $aPagar) {
 					$estadoPago = 'ADELANTO';
-					$estadoPagosCoordinacion = '<span class="badge badge-warning">ADELANTO</span>';
 				} else if ($value->total_pagos_monto == $aPagar) {
 					$estadoPago = 'PAGADO';
-					$estadoPagosCoordinacion = '<span class="badge badge-success">PAGADO</span>';
 				} else if ($value->total_pagos_monto > $aPagar) {
 					$estadoPago = 'SOBREPAGO';
-					$estadoPagosCoordinacion = '<span class="badge badge-danger">SOBREPAGO</span>';
 				}
+
+				// Define la clase según el estado
+				$estadoClass = '';
+				switch ($estadoPago) {
+					case 'PENDIENTE': $estadoClass = 'bg-secondary text-white'; break;
+					case 'ADELANTO': $estadoClass = 'bg-warning text-dark'; break;
+					case 'PAGADO': $estadoClass = 'bg-success text-white'; break;
+					case 'SOBREPAGO': $estadoClass = 'bg-danger text-white'; break;
+					default: $estadoClass = 'bg-secondary text-white'; break;
+				}
+				$estadoPagosCoordinacion = '<select class="form-control form-control-sm '.$estadoClass.'" disabled>
+					<option value="PENDIENTE" '.($estadoPago == "PENDIENTE" ? "selected" : "").'>Pendiente</option>
+					<option value="ADELANTO" '.($estadoPago == "ADELANTO" ? "selected" : "").'>Adelanto</option>
+					<option value="PAGADO" '.($estadoPago == "PAGADO" ? "selected" : "").'>Pagado</option>
+					<option value="SOBREPAGO" '.($estadoPago == "SOBREPAGO" ? "selected" : "").'>Sobrepago</option>
+				</select>';
 
 				if (!empty($this->input->post('estado_pago')) && $this->input->post('estado_pago') != '0') {
 					$estadoFiltro = $this->input->post('estado_pago');
@@ -89,6 +100,17 @@ class Administracion extends CI_Controller
 						continue; // Usar continue en lugar de return
 					}
 				}
+
+				$subdata[] = $estadoPagosCoordinacion;
+				$subdata[] = "$ " . (($aPagar) == 0 ? $value->monto : number_format($aPagar, 2, '.', ''));
+				$subdata[] = "$ " . number_format($value->total_pagos_monto, 2, '.', '');
+				$divAcciones = '<div class="nav gap-1">';
+				$pagos_details = json_decode($value->pagos_details, true);
+				foreach ($pagos_details as $pago) {
+					$divAcciones .= '<button class="nav-link p-2 rounded-lg bg' . $this->getColortabByStatus($pago['status']) . '">' . '$' . number_format($pago['monto'], 2) . '</button>';
+				}
+				$divAcciones .= '</div>';
+				$subdata[] = $divAcciones;
 				$divAcciones1 = '<div class="d-flex gap-1">';
 				$divAcciones1 .= '<div class="d-flex"  onclick="viewDetailsPagosConsolidado(' . $value->id . ',' . $value->total_pagos_monto . ',' . $aPagar . ',' . '\'' . addslashes(trim($value->nombre)) . '\')">
 						<i class="fas fa-eye" style="cursor:pointer;"></i>
@@ -99,16 +121,6 @@ class Administracion extends CI_Controller
 					</div>';
 				}
 				$subdata[] = $divAcciones1;
-				$subdata[] = $estadoPagosCoordinacion;
-				$subdata[] = "$ " . (($aPagar) == 0 ? $value->monto : number_format($aPagar, 2, '.', ''));
-				$subdata[] = "$ " . number_format($value->total_pagos_monto, 2, '.', '');
-				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
-				$pagos_details = json_decode($value->pagos_details, true);
-				foreach ($pagos_details as $pago) {
-					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">' . '$' . $pago['monto'] . '</span>';
-				}
-				$divAcciones .= '</div>';
-				$subdata[] = $divAcciones;
 				$data[] = $subdata;
 
 				$index++;
@@ -145,7 +157,8 @@ class Administracion extends CI_Controller
 		);
 		echo json_encode($output);
 	}
-	public function getCampanasActivas(){
+	public function getCampanasActivas()
+	{
 		try {
 			$arrResponse = $this->AdministracionModel->getCampanasActivas();
 			echo json_encode([
@@ -175,7 +188,7 @@ class Administracion extends CI_Controller
 				if (!empty($row->ID_Campana)) {
 					foreach ($campanas as $campana) {
 						if ($row->ID_Campana == $campana['ID_Campana']) {
-							$select .= '<span class="badge badge-secondary">' . $campana['nombre_campana'] . '</span>';
+							$select .= $campana['nombre_campana'];
 						}
 					}
 				}
@@ -186,6 +199,49 @@ class Administracion extends CI_Controller
 					}
 				}
 				$subdata[] = $select; //mes
+
+				// --- Lógica de estado de pago igual que consolidado ---
+				$aPagar = ($row->logistica_final + $row->impuestos_final) == 0 ? $row->Ss_Total : ($row->logistica_final + $row->impuestos_final);
+				$estadoPago = '';
+				if ($row->total_pagos == 0) {
+					$estadoPago = 'PENDIENTE';
+				} else if ($row->total_pagos < $aPagar) {
+					$estadoPago = 'ADELANTO';
+				} else if ($row->total_pagos == $aPagar) {
+					$estadoPago = 'PAGADO';
+				} else if ($row->total_pagos > $aPagar) {
+					$estadoPago = 'SOBREPAGO';
+				}
+				$estadoClass = '';
+				switch ($estadoPago) {
+					case 'PENDIENTE': $estadoClass = 'bg-secondary text-white'; break;
+					case 'ADELANTO': $estadoClass = 'bg-warning text-dark'; break;
+					case 'PAGADO': $estadoClass = 'bg-success text-white'; break;
+					case 'SOBREPAGO': $estadoClass = 'bg-danger text-white'; break;
+					default: $estadoClass = 'bg-secondary text-white'; break;
+				}
+				$estadoCurso = '<select class="form-control form-control-sm '.$estadoClass.'" disabled>';
+				$estadoCurso .= '<option value="PENDIENTE" '.($estadoPago == "PENDIENTE" ? "selected" : "").'>Pendiente</option>';
+				$estadoCurso .= '<option value="ADELANTO" '.($estadoPago == "ADELANTO" ? "selected" : "").'>Adelanto</option>';
+				$estadoCurso .= '<option value="PAGADO" '.($estadoPago == "PAGADO" ? "selected" : "").'>Pagado</option>';
+				$estadoCurso .= '<option value="SOBREPAGO" '.($estadoPago == "SOBREPAGO" ? "selected" : "").'>Sobrepago</option>';
+				$estadoCurso .= '</select>';
+				//get from input post estado_pago if !=0 filter by estado_curso if not in continue
+				if ($this->input->post('estado_pago') != 0) {
+					if (strpos($estadoCurso, $this->input->post('estado_pago')) === false) {
+						continue;
+					}
+				}
+				$subdata[] = $estadoCurso;
+				$subdata[] = $row->No_Signo . round($row->Ss_Total, 2);
+				$subdata[] = "S/" . round($row->total_pagos, 2);
+				$divAcciones = '<div class="nav gap-1">';
+				$pagos_details = json_decode($row->pagos_details, true);
+				foreach ($pagos_details as $pago) {
+					$divAcciones .= '<button class="nav-link p-2 rounded-lg bg' . $this->getColorTabByStatus($pago['status']) . '">S/' . $pago['monto'] . '</button>';
+				}
+				$divAcciones .= '</div>';
+				$subdata[] = $divAcciones;
 				$divAcciones1 = '<div class="d-flex gap-1">';
 				$divAcciones1 .= '<div class="d-flex"  onclick="viewDetailsPagosCurso(' . $row->ID_Pedido_Curso . ',' . $row->Ss_Total . ',' . $row->total_pagos . ',\'' . addslashes(trim($row->No_Entidad)) . '\')">
 					<i class="fas fa-eye" style="cursor:pointer;"></i>
@@ -196,45 +252,6 @@ class Administracion extends CI_Controller
 					</div>';
 				}
 				$subdata[] = $divAcciones1;
-				$estadoPago = "";
-				$estadoCurso = '<span class="badge badge-secondary">' . $row->estado_pagos_coordinacion . '</span>';
-				if ($row->total_pagos == 0) {
-					$estadoCurso = '<span class="badge badge-secondary">PENDIENTE</span>';
-					$estadoPago = 'PENDIENTE';
-				} else if ($row->total_pagos < ($row->Ss_Total)) {
-					$estadoCurso = '<span class="badge badge-warning">ADELANTO</span>';
-					$estadoPago = 'ADELANTO';
-				} else if ($row->total_pagos == ($row->Ss_Total)) {
-					$estadoCurso = '<span class="badge badge-success">PAGADO</span>';
-					$estadoPago = 'PAGADO';
-				} else if ($row->total_pagos > ($row->Ss_Total)) {
-					$estadoCurso = '<span class="badge badge-danger">SOBREPAGO</span>';
-					$estadoPago = 'SOBREPAGO';
-				}
-				if (!empty($this->input->post('estado_pago')) && $this->input->post('estado_pago') != '0') {
-					$estadoFiltro = $this->input->post('estado_pago');
-					if ($estadoPago !== $estadoFiltro) {
-						continue; // Usar continue en lugar de return
-					}
-				}
-				//get from input post estado_pago if !=0 filter by estado_curso if not in continue
-				if ($this->input->post('estado_pago') != 0) {
-					log_message('debug', 'ContenedorConsolidado : getCursosPagos() => estado_pago: ' . $this->input->post('estado_pago'));
-					//if estado_pago not includes in estadoCurso string continue
-					if (strpos($estadoCurso, $this->input->post('estado_pago')) === false) {
-						continue;
-					}
-				}
-				$subdata[] = $estadoCurso;
-				$subdata[] = $row->No_Signo . round($row->Ss_Total, 2);
-				$subdata[] = "S/" . round($row->total_pagos, 2);
-				$divAcciones = '<div class="d-flex px-2 w-100" style="gap:1em;">';
-				$pagos_details = json_decode($row->pagos_details, true);
-				foreach ($pagos_details as $pago) {
-					$divAcciones .= '<span class="badge ' . $this->getColorByStatus($pago['status']) . '">S/.' . $pago['monto'] . '</span>';
-				}
-				$divAcciones .= '</div>';
-				$subdata[] = $divAcciones;
 				$data[] = $subdata;
 			}
 			$output = array(
@@ -258,6 +275,21 @@ class Administracion extends CI_Controller
 				return 'badge-danger';
 			default:
 				return 'badge-secondary';
+		}
+	}
+	public function getColorTabByStatus($status)
+	{
+		switch ($status) {
+			case 'PENDIENTE':
+				return '-[#585858] text-white';
+			case 'ADELANTO':
+				return '-warning';
+			case 'CONFIRMADO':
+				return '-[#00D680]';
+			case 'OBSERVADO':
+				return '-[#D71009] text-white';
+			default:
+				return '-secondary';
 		}
 	}
 	public function getPagosCurso($idPedidoCurso)
@@ -365,6 +397,20 @@ class Administracion extends CI_Controller
 			]);
 		} catch (Exception $e) {
 			log_message('error', 'ContenedorConsolidado : getHeadersCurso() => ' . $e->getMessage());
+		}
+		//get containers avalable for consolidation
+
+	}
+	public function getContainersAvailable()
+	{
+		try {
+			$arrResponse = $this->AdministracionModel->getContainersAvailable();
+			echo json_encode([
+				'status' => 'success',
+				'data'   => $arrResponse
+			]);
+		} catch (Exception $e) {
+			log_message('error', 'ContenedorConsolidado : getContainersAvailable() => ' . $e->getMessage());
 		}
 	}
 }

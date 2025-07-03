@@ -880,7 +880,7 @@ Search for
                                         <span class="help-block text-danger" id="error"></span>
                                     </div>
                                 </div>
-                                <?php if ($this->user->No_Grupo != "Coordinación") {  ?>
+                                <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
                                 <div class="d-flex align-items-center p-2" style="width:300px;">
                                     <div class="d-flex" style="width:60%">Estado</div>
                                     <div style="width: 200px;">
@@ -888,8 +888,9 @@ Search for
                                             class="form-control input-estado">
                                             <option value="0" selected>Todos</option>
                                             <option value="PENDIENTE">PENDIENTE</option>
-                                            <option value="RECIBIENDO">RECIBIENDO</option>
-                                            <option value="COMPLETADO">COMPLETADO</option>
+                                            <option value="CONTACTADO">CONTACTADO</option>
+                                            <option value="INTERESADO">INTERESADO</option>
+                                            <option value="CONFIRMADO">CONFIRMADO</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1146,18 +1147,20 @@ Search for
                     </div>
                     <?php } ?>
                 </div>
-                <div class="row">
+                <div class="row tabs">
+                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
                     <div data-table="prospectos"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-cotizacion">
                         Prospectos
                     </div>
                     <div data-table="embarque"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-cotizacion">
                         Por Embarcar
                     </div>
+                    <?php } ?>
                     <?php if ($this->user->No_Grupo =="Coordinación"){  ?>
                     <div data-table="pagos"
-                        class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-cotizacion">
+                        class="col-12 col-md-3 col-xl-1 d-flex xl:max-w-fit align-items-center justify-content-center btn tab tab-cotizacion">
                         Pagos
                     </div>
                     <?php } ?>
@@ -1166,6 +1169,7 @@ Search for
                     <table id="table-cotizacion-prospectos" class="table table-hover dataTable no-footer hidden">
                         <thead class="thead-default">
                             <tr>
+                                <th>Asesor</th>
                                 <th>N°</th>
                                 <th>Fecha</th>
                                 <th>Nombre</th>
@@ -1368,18 +1372,18 @@ Search for
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row tabs">
                 <div data-table="general"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-clientes">
                     General
                 </div>
                 <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
                 <div data-table="variacion"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-clientes">
                     Variación
                 </div>
                 <div data-table="pagos"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes">
+                    class="col-12 col-md-4 col-xl-1 d-flex max-w-fit align-items-center justify-content-center btn tab tab-clientes">
                     Pagos
                 </div>
                 <?php } ?>
@@ -1746,7 +1750,7 @@ Search for
                         <?php } ?> &nbsp; <i class="fa fa-save"></i>
                     </div>
 
-                    <?php if ($this->user->No_Grupo == "GERENCIA") {  ?>
+                    <?php if ($this->user->No_Grupo == "GERENCIA" ) {   ?>
 
                     <div id="btn-send-inspection">
                         <i class="fas fa-save"></i>
@@ -1875,49 +1879,57 @@ Search for
         </div>
 
     </section>
-    <section class="content card" id="cotizacion-final-container">
-        <div class="min-h-screen bg-gray-50 p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6" id="cotizacion-final-title"></h1>
-
-            <div class="flex gap-4 mb-8">
-
-                <button id="uploadGeneral"
-                    class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-                    <div class="fa fa-upload"></div>
-                    Subir Factura
-                </button>
-                <button id="downloadTemplate"
-                    class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors flex items-center gap-2">
-                    <div class="fa fa-download"></div>
-                    Plantilla General
-                </button>
-                <button id="uploadFinal"
-                    class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                    <div class="fa fa-upload"></div>
-                    Plantilla Final
-                </button>
-                <!--button back-->
-                <button id="btn-back-cotizacion-final"
-                    class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                    <div class="fa fa-arrow-left"></div>
-                </button>
+    <section class="content" id="cotizacion-final-container">
+        <div class="container-fluid">
+            <!-- Header de la tabla -->
+            <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
+                <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"  id="btn-back-cotizacion-final"><i class="fa fa-arrow-left"></i> Regresar</button>
             </div>
-            <div class="row">
+            <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 pt-3" style="border-bottom: #DFDFDF solid 2px">
+                <div class="d-flex align-items-center col-sm-3 xl:max-w-[200px]" style="border-right: #DFDFDF solid 2px; padding:15px 10px">
+                    <span id="cotizacion-final-title"></span>
+                </div>
+                
+                <div class="col-5 col-sm-12 col-md-4 col-xl-5 d-flex align-items-center justify-content-center justify-content-xl-start">
+                    <span>Cotitación Final</span>
+                </div>
+                <div class="flex xl:w-[40%]">
+                    <div class="col-5 col-sm-12  col-md-4  col-xl-4 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        <button id="uploadGeneral" class="tab">
+                            <div class="fa fa-upload"></div>
+                            Subir Factura
+                        </button>
+                    </div>
+                    <div class="col-5 col-sm-12  col-md-4  col-xl-4 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        <button id="downloadTemplate" class="tab">
+                            <div class="fa fa-download"></div>
+                            Plantilla General
+                        </button>
+                    </div>
+                    <div class="col-5 col-sm-12  col-md-4  col-xl-4 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        <button id="uploadFinal" class="tab">
+                            <div class="fa fa-upload"></div>
+                            Plantilla Final
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row tabs">
                 <div data-table="general"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes-final">
+                    class="col-12 col-md-4 col-xl-1 d-flex max-w-fit align-items-center justify-content-center btn tab tab-clientes-final">
                     General
                 </div>
                 <?php if ($this->user->No_Grupo != "Coordinacion") {  ?>
                 
                 <div data-table="pagos"
-                    class="col-12 col-md-4 col-xl-2 d-flex align-items-center btn btn-secondary btn-light tab-clientes-final">
+                    class="col-12 col-md-4 col-xl-1 d-flex max-w-fit align-items-center justify-content-center btn tab tab-clientes-final">
                     Pagos
                 </div>
                 <?php } ?>
             </div>
-            <div class="table-responsive" class="table table-bordered table-hover table-striped">
-                <table id="table-cotizacion-final" class="table table-bordered table-hover table-striped">
-                    <thead class="thead-light">
+            <div class="table-responsive" class="table table-hover">
+                <table id="table-cotizacion-final" class="table table-hover dataTable no-footer">
+                    <thead class="thead-default">
                         <tr>
                             <th>N°</th>
                             <th>Nombre</th>
@@ -1926,8 +1938,8 @@ Search for
                             <th>Whatsapp</th>
                             <th>T. Cliente</th>
                             <th>Volumen </th>
-                            <th>FOB</th>
-                            <th>Logistica</th>
+                            <th>Fob</th>
+                            <th>Logística</th>
                             <th>Impuesto</th>
                             <th>Tarifa </th>
                             <th>Estados</th>
@@ -1935,8 +1947,8 @@ Search for
                         </tr>
                     </thead>
                 </table>
-                <table id="table-cotizacion-final-pagos" class="table table-bordered table-hover table-striped hidden">
-                    <thead class="thead-light">
+                <table id="table-cotizacion-final-pagos" class="table table-hover hidden">
+                    <thead class="thead-default">
                         <tr>
                             <th>N.</th>
                             <th>Nombre</th>
@@ -1950,24 +1962,26 @@ Search for
                     </thead>
                 </table>
             </div>
+        </div>   
     </section>
-    <section class="content card" id="factura-guia-container">
-        <div class="min-h-screen bg-gray-50 p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6" id="factura-guia-title"></h1>
-            <div class="flex
-      w-full gap-4 mb-8
-      justify-end
-
-      ">
-
-                <button id="btn-back-factura-guia"
-                    class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                    <div class="fa fa-arrow-left"></div>
-                </button>
+    <section class="content" id="factura-guia-container">
+        <div class="container-fluid">
+            <!-- Header de la tabla -->
+            <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
+                <button type="button" class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte" id="btn-back-factura-guia"><i class="fa fa-arrow-left"></i> Regresar</button>
             </div>
-            <div class="table-responsive" class="table table-bordered table-hover table-striped">
-                <table id="table-factura-guia" class="table table-bordered table-hover table-striped">
-                    <thead class="thead-light">
+            <div class="col-xl-12 row mb-2 gap-xs-3 gap-md-0 mx-100 pt-3" style="border-bottom: #DFDFDF solid 2px">
+                <div class="d-flex align-items-center col-sm-3 xl:max-w-[200px]" style="border-right: #DFDFDF solid 2px; padding:15px 10px">
+                    <span id="factura-guia-title"></span>
+                </div>
+                
+                <div class="col-5 col-sm-12 col-md-4 col-xl-5 d-flex align-items-center justify-content-center justify-content-xl-start">
+                    <span>Factura y Guia Remisión</span>
+                </div>
+            </div>
+            <div class="table-responsive" class="table table-hover">
+                <table id="table-factura-guia" class="table table-hover dataTable no-footer">
+                    <thead class="thead-default">
                         <tr>
                             <th>N°</th>
                             <th>Nombre</th>
@@ -1977,8 +1991,8 @@ Search for
                             <th>T. Cliente</th>
                             <th>Ajuste</th>
                             <th>C.Final</th>
-                            <th>Factura</th>
-                            <th>Guia R</th>
+                            <th>Factura C.</th>
+                            <th>Guia R.</th>
                         </tr>
                     </thead>
                 </table>
@@ -2004,6 +2018,22 @@ Search for
             </div>
         </div>
     </div>
+
+    <!-- modal with id modalClientePagoCoordination -->
+    <div class="modal fade" id="modalClientePagoCoordination" tabindex="-1" role="dialog" aria-labelledby="modalClientePagoCoordinationLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalle del Adelanto</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargan los datos dinámicamente -->
+            </div>
+            </div>
+        </div>
+    </div>
+
     <!-- modal with table and id modalClientePagosCoordination -->
     <div class="modal fade" id="modalClientePagosCoordination" tabindex="-1" role="dialog"
         aria-labelledby="modalClientePagosCoordinationLabel" aria-hidden="true">
@@ -2057,44 +2087,7 @@ Search for
             </div>
         </div>
     </div>
-    <!-- Modal para imágenes -->
-    <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <img id="image-preview" src="" style="width: 100%;">
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal para videos -->
-    <div class="modal fade" id="video-modal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <video id="video-preview" controls style="width: 100%;">
-                        <source src="" type="video/mp4">
-                        Tu navegador no soporta la reproducción de videos.
-                    </video>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para archivos (PDF, Word, Excel) -->
-    <div class="modal fade" id="file-modal" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <iframe id="file-preview" src="" style="width: 100%; height: 500px;"></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade" id="modal-crear-cotizacion" tabindex="-1" role="dialog" aria-labelledby="modal-cotizacion"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -2291,6 +2284,124 @@ Search for
         </div>
     </div>
 </div>
+<!-- Modal para registrar pago de curso -->
+<div class="modal fade" id="modal-pago-curso" tabindex="-1" aria-labelledby="modalPagoCursoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form id="form-pago-curso" enctype="multipart/form-data">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center">
+          <h2 class="modal-title" id="modalPagoCursoLabel">Registrar Pago de Curso</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body row">
+          <input type="hidden" id="id-pedido-curso" name="idPedido">
+          <div class="col-md-6 mb-3">
+            <label for="monto" class="form-label">Monto</label>
+            <div class="input-soles-wrapper">
+                <span class="soles-symbol">S/</span>
+                <input type="number" id="monto" name="monto" class="form-control" step="0.01" required>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="banco" class="form-label">Banco</label>
+            <div class="d-flex gap-3 align-items-center" id="banco-group">
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-bcp" value="BCP" required>
+                <label class="form-check-label flex" for="banco-bcp">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Logo_credito.gif" alt="BCP" style="height:32px;"><br>
+                </label>
+                </div>
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-interbank" value="INTERBANK" required>
+                <label class="form-check-label flex" for="banco-interbank">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Interbank_logo.svg" alt="INTERBANK" style="height:32px;"><br>
+                </label>
+                </div>
+                <div class="form-check form-check-inline text-center">
+                <input class="form-check-input" type="radio" name="banco" id="banco-yape" value="YAPE" required>
+                <label class="form-check-label flex" for="banco-yape">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png" alt="YAPE" style="height:32px;"><br>
+                </label>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" id="fecha_pago" name="fecha" class="form-control" required>
+          </div>
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Voucher</label>
+            <div id="file-upload-pagos-container">
+              <div class="file-upload-box" id="single-file-upload-pagos">
+                <input type="file" id="file-input-pagos" class="file-input" name="voucher"
+                  accept=".pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg">
+                <label for="file-input-pagos" class="file-label d-flex">
+                  <i class="fas fa-upload"></i>
+                  <div class="file-group-text">
+                    <span class="file-text">Selecciona o arrastra tu archivo aquí</span><br>
+                    <span class="file-format">Formatos: .pdf, .docx, .xlsx, .xls, .xlsm, .csv, .xlsb, .xltx, .xlt, .png, .jpg, .jpeg</span>
+                  </div>
+                  <button class="upload-button upload-button-pagos" type="button">Subir archivo</button>
+                </label>
+                <div class="file-info-box hidden">
+                  <div class="file-info">
+                    <div class="file-iconic"></div>
+                    <span class="file-name"></span>
+                    <span class="file-size"></span>
+                    <button class="remove-file-button"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn bg-orange text-white">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <!-- Modal para imágenes -->
+    <div class="modal fade" id="image-modal" tabindex="-2" role="dialog" aria-labelledby="imageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img id="image-preview" src="" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para videos -->
+    <div class="modal fade" id="video-modal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <video id="video-preview" controls style="width: 100%;">
+                        <source src="" type="video/mp4">
+                        Tu navegador no soporta la reproducción de videos.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para archivos (PDF, Word, Excel) -->
+    <div class="modal fade" id="file-modal" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <iframe id="file-preview" src="" style="width: 100%; height: 500px;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <style scoped>
 * {
@@ -2953,24 +3064,36 @@ div#table-clientes-pagos_filter {
     display: none;
 }
 
-.tab-cliente-documentacion {
+.tabs{
+    gap:10px;
+    margin-right: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.tab {
     padding: 0.5em;
     border-radius: 0.5em;
-    margin-bottom: 1em;
     width: 100%;
     border-width: 2px;
     border-color: #CDCDCD;
     color: #7E7E7E;
     text-align: center;
     cursor: pointer;
+    background-color: transparent;
 
 }
 
-.tab-cliente-documentacion.active {
+.tab.active {
     background-color: #FFFFFF;
     color: black;
-    border-width: 0px;
+}
 
+.tab:hover {
+    background-color: #FFFFFF;
+    color: black;
+    transition: background-color 0.5s ease;
 }
 
 .documentos-clientes-tabs {
@@ -3266,4 +3389,21 @@ label>i {
 .table-responsive{
     overflow-x: hidden;
 }
+.input-soles-wrapper {
+  position: relative;
+}
+.input-soles-wrapper .soles-symbol {
+  position: absolute;
+  left: 20px;
+  top: 51%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1rem;
+}
+.input-soles-wrapper input {
+  padding-left: 2.2em;
+}
+#modalClientePagosCoordination >.modal-dialog>.modal-content {
+ background-color: #F0F4F9;
+} 
 </style>
