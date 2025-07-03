@@ -594,7 +594,7 @@ class AdministracionModel extends CI_Model
                     
                     // Enviar mensaje de WhatsApp
                     try {
-                        $whatsappResponse = $this->sendMessage($mensaje, $telefono);
+                        $whatsappResponse = $this->sendMessageVentas($mensaje, $telefono);
                         log_message('info', 'WhatsApp enviado para pago curso ' . $idPagoCurso . ': ' . json_encode($whatsappResponse));
                     } catch (Exception $whatsappError) {
                         log_message('error', 'Error al enviar WhatsApp para pago curso ' . $idPagoCurso . ': ' . $whatsappError->getMessage());

@@ -3445,10 +3445,9 @@ const openStepFunction = async (step, id) => {
                 },
               },
               initComplete: function () {
-                console.log("initEmbarque");
                 $("#aplicar-btn-cotizacion").off("click");
                 $("#aplicar-btn-cotizacion").click(function () {
-                  tableCotizacionEmbarque.ajax.reload();
+                  tableCotizacion.ajax.reload();
                 });
                 $(".input-date").datepicker({
                   autoclose: true,

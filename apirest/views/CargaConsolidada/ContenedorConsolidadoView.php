@@ -841,7 +841,7 @@ Search for
                                         <span class="help-block text-danger" id="error"></span>
                                     </div>
                                 </div>
-                                <?php if ($this->user->No_Grupo != "Coordinación") {  ?>
+                                <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
                                 <div class="d-flex align-items-center p-2" style="width:300px;">
                                     <div class="d-flex" style="width:60%">Estado</div>
                                     <div style="width: 200px;">
@@ -849,8 +849,9 @@ Search for
                                             class="form-control input-estado">
                                             <option value="0" selected>Todos</option>
                                             <option value="PENDIENTE">PENDIENTE</option>
-                                            <option value="RECIBIENDO">RECIBIENDO</option>
-                                            <option value="COMPLETADO">COMPLETADO</option>
+                                            <option value="CONTACTADO">CONTACTADO</option>
+                                            <option value="INTERESADO">INTERESADO</option>
+                                            <option value="CONFIRMADO">CONFIRMADO</option>
                                         </select>
                                     </div>
                                 </div>
