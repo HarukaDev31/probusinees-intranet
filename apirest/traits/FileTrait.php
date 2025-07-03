@@ -66,12 +66,7 @@ trait FileTrait
         if (function_exists('normalizer_normalize')) {
             $fileName = normalizer_normalize($fileName, Normalizer::FORM_C);
         }
-       
-        log_message("error","upload_max_filesize: " . ini_get('upload_max_filesize'));
-        log_message("error","post_max_size: " . ini_get('post_max_size'));
-        
-       
-        // Validaciones existentes
+
         $validateExtensionAndContentTypes = $this->validateExtensionAndContentTypes($fileName, $fileType, $this->allowedExtensions, $this->allowedContentTypes);
         if (!$validateExtensionAndContentTypes) {
             return null;

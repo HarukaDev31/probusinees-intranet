@@ -38,6 +38,20 @@
 
 /*
  *---------------------------------------------------------------
+ * LOAD ENVIRONMENT VARIABLES
+ *---------------------------------------------------------------
+ */
+// Load Composer autoloader
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Load environment variables
+if (file_exists(__DIR__ . '/.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+}
+
+/*
+ *---------------------------------------------------------------
  * APPLICATION ENVIRONMENT
  *---------------------------------------------------------------
  *
@@ -53,7 +67,10 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');//development
+	define('ENVIRONMENT', 
+		!empty($_ENV['CI_ENV']) ? $_ENV['CI_ENV'] : 
+		(!empty($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production')
+	);
 
 /*
  *---------------------------------------------------------------
@@ -311,8 +328,8 @@ switch (ENVIRONMENT)
  * --------------------------------------------------------------------
  *
  */
-define('NUEVA_VERSION_SISTEMA',  '1.0.0');//Estara ligado a las nuevas versiones que saque en el arhcivo change_log
-define('DESCRIPCION_NUEVA_VERSION_SISTEMA', '
+define('NUEVA_VERSION_SISTEMA', !empty($_ENV['APP_VERSION']) ? $_ENV['APP_VERSION'] : '1.0.0');//Estara ligado a las nuevas versiones que saque en el arhcivo change_log
+define('DESCRIPCION_NUEVA_VERSION_SISTEMA', !empty($_ENV['APP_DESCRIPTION']) ? $_ENV['APP_DESCRIPTION'] : '
 <b>Bienvenido</b><br>
 ');
 

@@ -1,6 +1,9 @@
 <?php
+require_once APPPATH . 'traits/WhatsappTrait.php';
+
 class AdministracionModel extends CI_Model
 {
+    use WhatsappTrait;
     private $table_consolidado_pagos = "contenedor_consolidado_cotizacion_coordinacion_pagos";
     private $table_consolidado_pagos_concept = "cotizacion_coordinacion_pagos_concept";
     private $table_curso_pagos = "pedido_curso_pagos";
@@ -184,7 +187,7 @@ class AdministracionModel extends CI_Model
 
         if ($result) {
             return [
-                'total_importe' => $result['total_importe'] ?? 0,
+                'total_importe' => !empty($result['total_importe']) ? $result['total_importe'] : 0,
             ];
         }
 
@@ -315,7 +318,7 @@ class AdministracionModel extends CI_Model
         $query = $this->db->get();
         $result = $query->row_array();
         return [
-            'total_importe' => $result['total'] ?? 0,
+            'total_importe' => !empty($result['total']) ? $result['total'] : 0,
         ];
     }
 
@@ -348,7 +351,7 @@ class AdministracionModel extends CI_Model
             return
                 [
                     "data" => $details,
-                    "nota" => $nota->result()[0]->note_administracion ?? '',
+                    "nota" => !empty($nota->result()[0]->note_administracion) ? $nota->result()[0]->note_administracion : '',
 
                 ];
         } catch (Exception $e) {
@@ -371,7 +374,7 @@ class AdministracionModel extends CI_Model
             return
                 [
                     "data" => $details,
-                    "nota" => $nota->result()[0]->note_administracion ?? '',
+                    "nota" => !empty($nota->result()[0]->note_administracion) ? $nota->result()[0]->note_administracion : '',
                     "cotizacion_inicial_url" => $nota->result()[0]->cotizacion_file_url,
                     "cotizacion_final_url" => $nota->result()[0]->cotizacion_final_url
                 ];
@@ -460,12 +463,70 @@ class AdministracionModel extends CI_Model
             ];
         }
     }
+    
+    /**
+     * Obtiene información del cliente asociado a un pago de consolidado
+     */
+    private function getClienteInfoFromPago($idPago)
+    {
+        try {
+            $this->db->select('
+                cot.nombre, 
+                cot.telefono, 
+                ccp.monto,
+                ccc.carga
+            ');
+            $this->db->from($this->table_consolidado_pagos . ' AS ccp');
+            $this->db->join($this->table_consolidado_cotizacion . ' AS cot', 'cot.id = ccp.id_cotizacion', 'inner');
+            $this->db->join($this->table_consolidado . ' AS ccc', 'ccc.id = cot.id_contenedor', 'inner');
+            $this->db->where('ccp.id', $idPago);
+            $this->db->limit(1);
+            
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
+                return $query->row();
+            }
+            return null;
+        } catch (Exception $e) {
+            log_message('error', 'Error en getClienteInfoFromPago: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
     public function handlePayment($idPago, $status)
     {
         try {
             log_message("error", "handlePayment: idPago: $idPago, status: $status");
+            
+            // Actualizar el status del pago
             $this->db->where('id', $idPago);
             $this->db->update($this->table_consolidado_pagos, ['status' => $status]);
+            
+            // Si el status es confirmado, enviar mensaje de WhatsApp
+            if (strtoupper($status) === 'CONFIRMADO') {
+                $clienteInfo = $this->getClienteInfoFromPago($idPago);
+                
+                if ($clienteInfo && !empty($clienteInfo->telefono) && !empty($clienteInfo->nombre)) {
+                    // Preparar el mensaje
+                    $mensaje = "Hola " . $clienteInfo->nombre . ", este mensaje es automático:\n\n";
+                    $mensaje .= "Su dinero de $" . number_format($clienteInfo->monto, 2) . " ha sido confirmado\n\n";
+                    $mensaje .= "Muchas gracias.";
+                    
+                    // Formatear el número de teléfono
+                    $telefono = preg_replace('/\s+/', '', $clienteInfo->telefono);
+                    $telefono = $telefono ? $telefono . '@c.us' : '';
+                    
+                    // Enviar mensaje de WhatsApp
+                    try {
+                        $whatsappResponse = $this->sendMessage($mensaje, $telefono);
+                        log_message('info', 'WhatsApp enviado para pago ' . $idPago . ': ' . json_encode($whatsappResponse));
+                    } catch (Exception $whatsappError) {
+                        log_message('error', 'Error al enviar WhatsApp para pago ' . $idPago . ': ' . $whatsappError->getMessage());
+                        // No fallar el proceso principal si WhatsApp falla
+                    }
+                }
+            }
+            
             return [
                 'status' => "success",
                 'message' => 'Pago actualizado correctamente'

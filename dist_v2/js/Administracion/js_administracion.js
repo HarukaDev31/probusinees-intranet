@@ -119,7 +119,7 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago, nombreCliente)
                             </div>
                         </div>
                         <div class="p-4">
-                          <select class="hidden w-100 py-2 border-2 border-gray-200 rounded-lg" id="cbo-estado-pago-${detail.id}">
+                          <select class="hidden w-100 py-2 border-2 border-gray-200 rounded-lg select-pago-estado" data-id="${detail.id}" id="cbo-estado-pago-${detail.id}">
                             <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""}>Pendiente</option>
                             <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""}>Conforme</option>
                             <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""}>Observar</option>
@@ -169,6 +169,11 @@ async function viewDetailsPagosCurso(idPedidoCurso, apagar, pago, nombreCliente)
           });
         }, 0);
         index++;
+      });
+      $(".select-pago-estado").off("change").on("change", function() {
+        const id = $(this).data("id");
+        const estado = $(this).val();
+        confirmPayment(id, estado,'handlePaymentCurso');
       });
       paymentSection.show();
     }
@@ -230,7 +235,7 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago, nombreCli
                             </div>
                         </div>
                         <div class="p-4">
-                          <select class="hidden w-100 py-2 border-2 border-gray-200 rounded-lg" id="cbo-estado-pago-${detail.id}">
+                          <select class="hidden w-100 py-2 border-2 border-gray-200 rounded-lg select-pago-estado" data-id="${detail.id}" id="cbo-estado-pago-${detail.id}">
                             <option value="PENDIENTE" ${detail.status == "PENDIENTE" ? "selected" : ""}>Pendiente</option>
                             <option value="CONFIRMADO" ${detail.status == "CONFIRMADO" ? "selected" : ""}>Conforme</option>
                             <option value="OBSERVADO" ${detail.status == "OBSERVADO" ? "selected" : ""}>Observar</option>
@@ -284,6 +289,11 @@ async function viewDetailsPagosConsolidado(idCotizacion, apagar, pago, nombreCli
         });
       }, 0);
         index++; // Increment index for next payment card
+      });
+      $(".select-pago-estado").off("change").on("change", function() {
+        const id = $(this).data("id");
+        const estado = $(this).val();
+        confirmPayment(id, estado);
       });
 
       const cotizacionCard = $("#cotizacion-card");
