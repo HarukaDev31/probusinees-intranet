@@ -1915,16 +1915,25 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 break;
             }
         }
+        
+        // Preparar los datos para actualizar
+        $updateData = array();
+        
         if ($listaEmbarque != null) {
-            $this->db->set('estado_china', 'COMPLETADO');
+            $updateData['estado_china'] = 'COMPLETADO';
         } else if ($estado == "DATOS PROVEEDOR") {
+            // No hacer nada
         } else {
             if ($this->user->No_Grupo == 'Coordinación') {
-                $this->db->set('estado', 'RECIBIENDO');
+                $updateData['estado'] = 'RECIBIENDO';
             }
         }
-        $this->db->where('id', $idcontenedor);
-        $this->db->update($this->table);
+        
+        // Solo actualizar si hay datos para actualizar
+        if (!empty($updateData)) {
+            $this->db->where('id', $idcontenedor);
+            $this->db->update($this->table, $updateData);
+        }
     }
     public function validateListEmbarque($id)
     {
