@@ -42,7 +42,7 @@ $(document).ready(async function () {
     // Botón Categorizar/Enviar Producto dinámico
     let $categorizeBtn = $("#btnCategorizarDynamic");
     if ($categorizeBtn.length === 0) {
-        $categorizeBtn = $('<button id="btnCategorizarDynamic" class="bg-orange-600 hover:bg-orange-700 text-white py-2 px-8 rounded-md transition-colors flex items-center justify-center shadow-sm ml-2"></button>');
+        $categorizeBtn = $('<button id="btnCategorizarDynamic" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm"></button>');
         $("#dynamicCategorizeBtnContainer").append($categorizeBtn);
     }
     function updateCategorizeButton() {
@@ -78,7 +78,7 @@ $(document).ready(async function () {
         }
     }
 
-    async function loadProducts() {
+    async function loadProducts(filters = null) {
 
         if (window.location.href.includes("listarCompletados")) {
             isInCompleted = true;
@@ -101,7 +101,19 @@ $(document).ready(async function () {
         } else if (isInTienda) {
             url = base_url + 'CatalogoController/getCatalogoTienda';
         }
-        const response = await fetch(url);
+
+        let response;
+        if (filters) {
+            response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(filters),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        } else {
+            response = await fetch(url);
+        }
         if (response.ok) {
             const data = await response.json();
             if (data.status) {
@@ -546,9 +558,25 @@ $(document).ready(async function () {
             });
         })
         // Filter button handler
-        $('#filterBtn').on('click', function () {
-            // Implement filter modal/dropdown
-            console.log('Show filters');
+        $('#filterBtn').on('click', async function (e) {
+            e.preventDefault();
+            // Obtener valores de los filtros
+            let fechaInicio = $('#txt-Fe_Inicio_Carga').val();
+            let fechaFin = $('#txt-Fe_Fin_Carga').val();
+            let categoria = $('#txt-ID_Categoria').val();
+
+            // Normalizar fechas: si están vacías, enviar null
+            if (!fechaInicio || fechaInicio.trim() === '') fechaInicio = null;
+            if (!fechaFin || fechaFin.trim() === '') fechaFin = null;
+            if (!categoria || categoria === '0') categoria = null;
+
+            // Construir objeto de filtros solo con valores definidos
+            const filtros = {};
+            if (fechaInicio) filtros.fechaInicio = fechaInicio;
+            if (fechaFin) filtros.fechaFin = fechaFin;
+            if (categoria) filtros.categoria = categoria;
+
+            await loadProducts(Object.keys(filtros).length > 0 ? filtros : null);
         });
 
         // View toggle handlers
@@ -556,6 +584,7 @@ $(document).ready(async function () {
             e.preventDefault();
             e.stopPropagation();
             $('#viewProductSection').show();
+            $('#dynamicCategorizeBtnContainerView').show();
             $('#productListSection').hide();
             await showProductDetail($(this).data('product-id'));
             
@@ -600,6 +629,111 @@ $(document).ready(async function () {
             });
         });
     }
+    // Handler para Categorizar en vista detalle
+    $(document).on('click', '#btnCategorizarDynamicView', async function (e) {
+        e.preventDefault();
+        $('#modalConfirmacion').modal('show');
+        await fillDropdownCategorias();
+
+        // Cuando se confirme la categoría, envía solo el producto actual
+        $("#btnGuardarCategoriaProductos").off('click').on('click', async function (e) {
+            e.preventDefault();
+            const categoriaId = $("#categoriaProductos").val();
+            if (categoriaId == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Seleccione una categoría válida.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return;
+            }
+            const formData = new FormData();
+            formData.append('categoriaId', categoriaId);
+            formData.append('productIds', JSON.stringify([currentProductId]));
+            const url = base_url + 'CatalogoController/guardarCategoriaProductos';
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+            if (response.ok) {
+                const data = await response.json();
+                Swal.fire({
+                    icon: data.status ? 'success' : 'error',
+                    title: data.status ? 'Éxito' : 'Error',
+                    text: data.message || (data.status ? 'Categoría guardada correctamente.' : 'Error al guardar categoría.'),
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                if (data.status) {
+                    $('#modalConfirmacion').modal('hide');
+                    await loadProducts();
+                    $('#viewProductSection').hide();
+                    $('#productListSection').show();
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error de red al guardar categoría.',
+                });
+            }
+        });
+    });
+
+    // Handler para Enviar Producto en vista detalle
+    $(document).on('click', '#btnEnviarDynamicView', async function (e) {
+        e.preventDefault();
+        // Confirmación
+        Swal.fire({
+            title: '¿Está seguro de enviar el producto?',
+            text: "Una vez enviado, no podrá deshacer esta acción.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Enviar',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('productIds', JSON.stringify([currentProductId]));
+                const url = base_url + 'CatalogoController/pasarTienda';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: 'Producto enviado a tienda correctamente.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        await loadProducts();
+                        $('#viewProductSection').hide();
+                        $('#productListSection').show();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Error al enviar producto.',
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error de red al enviar producto.',
+                    });
+                }
+            }
+        });
+    });
 
     function debounce(func, wait) {
         let timeout;
@@ -1002,7 +1136,18 @@ $(document).ready(async function () {
             alert('No se encontró el producto');
             return;
         }
+        // Botón dinámico según pestaña
+        let btnHtml = '';
+        if (isInTienda) {
+            btnHtml = `<button id="btnCategorizarDynamicView" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm">Categorizar</button>`;
+        } else {
+            btnHtml = `<button id="btnEnviarDynamicView" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm">Enviar Producto</button>`;
+        }
+        $('#dynamicCategorizeBtnContainerView').html(btnHtml);
+
+
         const producto = data.data;
+        currentProductId = producto.id;
 
         // Imágenes
         $('#detalleMiniatura1').attr('src', producto.aditional_image1_url || '');
@@ -1580,6 +1725,12 @@ $(document).ready(async function () {
     });
     $("#percepcion").on("keyup", function () {
         calculateValues();
+    });
+
+    $('.input-date').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'es',
+        autoclose: true
     });
 
 });

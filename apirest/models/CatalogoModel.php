@@ -229,29 +229,31 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
-    public function getCatalogo()
+    public function getCatalogo($filters = [])
     {
         try {
-            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,status');
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,status,created_at,category_id');
             $this->db->from($this->table);
             $this->db->where('status', 'PENDIENTE');
-            $query = $this->db->get();
-            if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'data' => $query->result());
-            } else {
-                log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
-                return array('status' => false, 'message' => 'Error al obtener el catálogo');
+
+            // Filtro por fecha inicio
+            if (!empty($filters['fechaInicio'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
+                if ($fecha) {
+                    $this->db->where('created_at >=', $fecha->format('Y-m-d 00:00:00'));
+                }
             }
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-        }
-    }
-    public function getCatalogoCompletados()
-    {
-        try {
-            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status');
-            $this->db->from($this->table);
-            $this->db->where('status', 'COTIZADO');
+            // Filtro por fecha fin
+            if (!empty($filters['fechaFin'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaFin']);
+                if ($fecha) {
+                    $this->db->where('created_at <=', $fecha->format('Y-m-d 23:59:59'));
+                }
+            }
+            // Filtro por categoría
+            if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
+                $this->db->where('category_id', $filters['categoria']);
+            }
 
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
@@ -264,7 +266,44 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
-    public function getCatalogoSeleccionados(){
+    public function getCatalogoCompletados($filters = [])
+    {
+        try {
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status,created_at,category_id');
+            $this->db->from($this->table);
+            $this->db->where('status', 'COTIZADO');
+
+            // Filtro por fecha inicio
+            if (!empty($filters['fechaInicio'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
+                if ($fecha) {
+                    $this->db->where('created_at >=', $fecha->format('Y-m-d 00:00:00'));
+                }
+            }
+            // Filtro por fecha fin
+            if (!empty($filters['fechaFin'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaFin']);
+                if ($fecha) {
+                    $this->db->where('created_at <=', $fecha->format('Y-m-d 23:59:59'));
+                }
+            }
+            // Filtro por categoría
+            if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
+                $this->db->where('category_id', $filters['categoria']);
+            }
+
+            $query = $this->db->get();
+            if ($this->db->error()['code'] == 0) {
+                return array('status' => true, 'data' => $query->result());
+            } else {
+                log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
+                return array('status' => false, 'message' => 'Error al obtener el catálogo');
+            }
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+        }
+    }
+    public function getCatalogoSeleccionados($filters = []){
         try {
             $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status,
             catalogo_producto_category.name as category_name,
@@ -272,6 +311,26 @@ class CatalogoModel extends CI_Model
             $this->db->from($this->table);
             $this->db->join('catalogo_producto_category', 'catalogo_producto_category.id = catalogo_producto.category_id', 'left');
             $this->db->where('status', 'EN TIENDA');
+
+            // Filtro por fecha inicio
+            if (!empty($filters['fechaInicio'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
+                if ($fecha) {
+                    $this->db->where('created_at >=', $fecha->format('Y-m-d 00:00:00'));
+                }
+            }
+            // Filtro por fecha fin
+            if (!empty($filters['fechaFin'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaFin']);
+                if ($fecha) {
+                    $this->db->where('created_at <=', $fecha->format('Y-m-d 23:59:59'));
+                }
+            }
+            // Filtro por categoría
+            if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
+                $this->db->where('category_id', $filters['categoria']);
+            }
+
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
                 return array('status' => true, 'data' => $query->result());

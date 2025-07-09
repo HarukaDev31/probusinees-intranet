@@ -52,7 +52,7 @@
                                 <div class="d-flex align-items-center p-2" style="width:300px;">
                                     <div class="d-flex" style="width:60%">Categoría</div>
                                     <div style="width: 200px;">
-                                        <select id="txt-ID_Estatus_Cotizacion" name="ID_Status"
+                                        <select id="txt-ID_Categoria" name="ID_Categoria"
                                             class="form-control input-estado">
                                             <option value="0" selected>Todos</option>
                                             <option value="1">Bebés</option>
@@ -72,7 +72,7 @@
                                     style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
                                 <button
                                     class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block"
-                                    id="aplicar-btn-cotizacion">Aplicar</button>
+                                    id="filterBtn">Aplicar</button>
                             </div>
                         </div>
                     </div>
@@ -175,13 +175,8 @@
                             <path d="M9.55566 7.25V11.75" stroke="#FF3636" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                         <span>Eliminar Producto</span>
-
-
                     </button>
-                    <button id="btnSave" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm">
-                        <span>Categorizar</span>
-                        <span class="i-lucide-save ml-2"></span>
-                    </button>
+                    <div id="dynamicCategorizeBtnContainerView"></div>
                 </div>
             </div>
             <div class="w-full flex justify-center items-center">

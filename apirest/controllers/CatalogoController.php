@@ -49,20 +49,22 @@ class CatalogoController extends CI_Controller
 	}
 	public function getCatalogo()
 	{
-		$data = $this->input->post();
-		$response = $this->CatalogoModel->getCatalogo($data);
+		$filters = json_decode(file_get_contents('php://input'), true);
+		if (!is_array($filters)) $filters = [];
+		$response = $this->CatalogoModel->getCatalogo($filters);
 		echo json_encode($response);
 	}
 	public function getCatalogoCompletados()
 	{
-		$data = $this->input->post();
+		$data = json_decode(file_get_contents('php://input'), true);
 		$response = $this->CatalogoModel->getCatalogoCompletados($data);
 		echo json_encode($response);
 	}
 	public function getCatalogoTienda()
 	{
-		$data = $this->input->post();
-		$response = $this->CatalogoModel->getCatalogoSeleccionados($data);
+		$filters = json_decode(file_get_contents('php://input'), true);
+		if (!is_array($filters)) $filters = [];
+		$response = $this->CatalogoModel->getCatalogoSeleccionados($filters);
 		echo json_encode($response);
 	}
 	public function getProductDetails($id)
@@ -108,6 +110,12 @@ class CatalogoController extends CI_Controller
 		$categoriaId= $this->input->post('categoriaId');
 		$productIds= $this->input->post('productIds');
 		$response = $this->CatalogoModel->guardarCategoriaProductos($categoriaId, $productIds);
+		echo json_encode($response);
+	}
+	public function guardarCategoriaProducto(){
+		$categoriaId = $this->input->post('categoriaId');
+		$productId = $this->input->post('productId');
+		$response = $this->CatalogoModel->guardarCategoriaProducto($categoriaId, $productId);
 		echo json_encode($response);
 	}
 }
