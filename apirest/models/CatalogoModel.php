@@ -232,7 +232,7 @@ class CatalogoModel extends CI_Model
     public function getCatalogo()
     {
         try {
-            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,status');
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,status');
             $this->db->from($this->table);
             $this->db->where('status', 'PENDIENTE');
             $query = $this->db->get();
@@ -369,6 +369,65 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
+    public function deleteMultipleProducts($ids)
+    {
+        try {
+            $ids = array_map('intval', $ids);
+            if (empty($ids)) {
+                return array('status' => false, 'message' => 'No se recibieron IDs para eliminar');
+            }
+
+            // Obtener productos para borrar archivos asociados
+            $productos = $this->db->where_in('id', $ids)->get($this->table)->result();
+            $pattern = '/probusinees-intranet\/(.+)/';
+            foreach ($productos as $data) {
+                // contact_card_url
+                $matches = [];
+                if (!empty($data->contact_card_url) && preg_match($pattern, $data->contact_card_url, $matches) && isset($matches[1])) {
+                    $contactCardUrl = $matches[1];
+                    if (file_exists($contactCardUrl)) @unlink($contactCardUrl);
+                }
+                // main_image_url
+                $matches = [];
+                if (!empty($data->main_image_url) && preg_match($pattern, $data->main_image_url, $matches) && isset($matches[1])) {
+                    $mainImageUrl = $matches[1];
+                    if (file_exists($mainImageUrl)) @unlink($mainImageUrl);
+                }
+                // aditional_image1_url
+                $matches = [];
+                if (!empty($data->aditional_image1_url) && preg_match($pattern, $data->aditional_image1_url, $matches) && isset($matches[1])) {
+                    $aditionalImage1Url = $matches[1];
+                    if (file_exists($aditionalImage1Url)) @unlink($aditionalImage1Url);
+                }
+                // aditional_image2_url
+                $matches = [];
+                if (!empty($data->aditional_image2_url) && preg_match($pattern, $data->aditional_image2_url, $matches) && isset($matches[1])) {
+                    $aditionalImage2Url = $matches[1];
+                    if (file_exists($aditionalImage2Url)) @unlink($aditionalImage2Url);
+                }
+                // aditional_video1_url
+                $matches = [];
+                if (!empty($data->aditional_video1_url) && preg_match($pattern, $data->aditional_video1_url, $matches) && isset($matches[1])) {
+                    $aditionalVideo1Url = $matches[1];
+                    if (file_exists($aditionalVideo1Url)) @unlink($aditionalVideo1Url);
+                }
+            }
+
+            // Eliminar los productos de la base de datos
+            $this->db->where_in('id', $ids);
+            $this->db->delete($this->table);
+
+            if ($this->db->affected_rows() > 0) {
+                $this->reordenarCodigosCatalogo();
+                return array('status' => true, 'message' => 'Productos eliminados correctamente');
+            } else {
+                return array('status' => false, 'message' => 'No se eliminaron productos');
+            }
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            return array('status' => false, 'message' => 'Error al eliminar los productos');
+        }
+    }
     public function sendCotizacion($productId)
     {
         try {
@@ -386,21 +445,19 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
-    public function pasarTienda($productId)
+    public function pasarTienda($productIds)
     {
-        try {
-            ///update status to EN TIENDA
+        $productsIds = json_decode($productIds);
+        foreach ($productsIds as $productId) {
             $this->db->set('status', 'EN TIENDA');
             $this->db->where('id', $productId);
             $this->db->update($this->table);
-            if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'message' => 'Producto enviado a tienda correctamente');
-            } else {
-                log_message('error', 'Error al enviar el producto a tienda: ' . $this->db->error()['message']);
-                return array('status' => false, 'message' => 'Error al enviar el producto a tienda');
-            }
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
+        }
+        if ($this->db->error()['code'] == 0) {
+            return array('status' => true, 'message' => 'Productos guardados correctamente');
+        } else {
+            log_message('error', 'Error al guardar los productos: ' . $this->db->error()['message']);
+            return array('status' => false, 'message' => 'Error al guardar los productos');
         }
     }
     public function getCategorias()

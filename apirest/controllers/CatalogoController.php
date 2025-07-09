@@ -77,14 +77,22 @@ class CatalogoController extends CI_Controller
 		$response = $this->CatalogoModel->deleteProduct($productId);
 		echo json_encode($response);
 	}
+	public function deleteMultipleProducts()
+	{
+		$productIds = $this->input->post('productIds');
+		$ids = json_decode($productIds, true);
+		log_message('error', 'IDs: ' . json_encode($ids));
+		$response = $this->CatalogoModel->deleteMultipleProducts($ids);
+		echo json_encode($response);
+	}
 	public function sendCotizacion(){
 		$productId = $this->input->post('productId');
 		$response = $this->CatalogoModel->sendCotizacion($productId);
 		echo json_encode($response);
 	}
 	public function pasarTienda(){
-		$productId = $this->input->post('productId');
-		$response = $this->CatalogoModel->pasarTienda($productId);
+		$productIds = $this->input->post('productIds');
+		$response = $this->CatalogoModel->pasarTienda($productIds);
 		echo json_encode($response);
 	}
 	public function getCategorias(){
