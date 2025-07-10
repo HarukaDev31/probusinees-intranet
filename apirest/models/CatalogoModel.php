@@ -229,29 +229,34 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
-    public function getCatalogo()
+    public function getCatalogo($filters = [])
     {
         try {
-            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,status');
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,aditional_image1_url,aditional_image2_url,aditional_video1_url,precio_peru,precio_usd,prices_range,status,created_at,category_id,url_tienda,url_alibaba');
             $this->db->from($this->table);
+            // Excluir productos donde prices_range es NULL
+            $this->db->where('prices_range IS NOT NULL');
+
             $this->db->where('status', 'PENDIENTE');
-            $query = $this->db->get();
-            if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'data' => $query->result());
-            } else {
-                log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
-                return array('status' => false, 'message' => 'Error al obtener el catálogo');
+
+            // Filtro por fecha inicio
+            if (!empty($filters['fechaInicio'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
+                if ($fecha) {
+                    $this->db->where('created_at >=', $fecha->format('Y-m-d 00:00:00'));
+                }
             }
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-        }
-    }
-    public function getCatalogoCompletados()
-    {
-        try {
-            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status');
-            $this->db->from($this->table);
-            $this->db->where('status', 'COTIZADO');
+            // Filtro por fecha fin
+            if (!empty($filters['fechaFin'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaFin']);
+                if ($fecha) {
+                    $this->db->where('created_at <=', $fecha->format('Y-m-d 23:59:59'));
+                }
+            }
+            // Filtro por categoría
+            if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
+                $this->db->where('category_id', $filters['categoria']);
+            }
 
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
@@ -264,14 +269,84 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
-    public function getCatalogoSeleccionados(){
+    public function getCatalogoCompletados($filters = [])
+    {
         try {
-            $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status,
-            catalogo_producto_category.name as category_name,
-            ');
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status,created_at,category_id');
+            $this->db->from($this->table);
+            $this->db->where('status', 'COTIZADO');
+
+            // Filtro por fecha inicio
+            if (!empty($filters['fechaInicio'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
+                if ($fecha) {
+                    $this->db->where('created_at >=', $fecha->format('Y-m-d 00:00:00'));
+                }
+            }
+            // Filtro por fecha fin
+            if (!empty($filters['fechaFin'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaFin']);
+                if ($fecha) {
+                    $this->db->where('created_at <=', $fecha->format('Y-m-d 23:59:59'));
+                }
+            }
+            // Filtro por categoría
+            if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
+                $this->db->where('category_id', $filters['categoria']);
+            }
+
+            $query = $this->db->get();
+            if ($this->db->error()['code'] == 0) {
+                return array('status' => true, 'data' => $query->result());
+            } else {
+                log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
+                return array('status' => false, 'message' => 'Error al obtener el catálogo');
+            }
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+        }
+    }
+    public function getCatalogoSeleccionados($filters = []){
+        try {
+            // Verifica el perfil del usuario
+            if (isset($this->user) && $this->user->No_Grupo == $this->ROLE_PERU) {
+                $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,prices_range,status,
+                    url_tienda, url_alibaba,
+                    catalogo_producto_category.name as category_name
+                ');
+            } else {
+                // Selección completa para otros perfiles
+                $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,prices_range,status,
+                    url_tienda, url_alibaba,
+                    catalogo_producto_category.name as category_name
+                ');
+            }
             $this->db->from($this->table);
             $this->db->join('catalogo_producto_category', 'catalogo_producto_category.id = catalogo_producto.category_id', 'left');
+            // Excluir productos donde prices_range es NULL
+            $this->db->where('prices_range IS NOT NULL');
+            
             $this->db->where('status', 'EN TIENDA');
+
+            // Filtro por fecha inicio
+            if (!empty($filters['fechaInicio'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
+                if ($fecha) {
+                    $this->db->where('created_at >=', $fecha->format('Y-m-d 00:00:00'));
+                }
+            }
+            // Filtro por fecha fin
+            if (!empty($filters['fechaFin'])) {
+                $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaFin']);
+                if ($fecha) {
+                    $this->db->where('created_at <=', $fecha->format('Y-m-d 23:59:59'));
+                }
+            }
+            // Filtro por categoría
+            if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
+                $this->db->where('category_id', $filters['categoria']);
+            }
+
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
                 return array('status' => true, 'data' => $query->result());
@@ -323,6 +398,11 @@ class CatalogoModel extends CI_Model
     public function deleteProduct($id)
     {
         try {
+            // Eliminar registros relacionados en catalogo_producto_media
+            $this->db->where('id_catalogo_producto', $id);
+            $this->db->delete('catalogo_producto_media');
+
+
             //get files and unlink
             $this->db->select('contact_card_url,main_image_url,aditional_image1_url,aditional_image2_url,aditional_video1_url');
             $this->db->from($this->table);
@@ -369,6 +449,69 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
+    public function deleteMultipleProducts($ids)
+    {
+        try {
+            $ids = array_map('intval', $ids);
+            if (empty($ids)) {
+                return array('status' => false, 'message' => 'No se recibieron IDs para eliminar');
+            }
+
+            // Eliminar registros relacionados en catalogo_producto_media
+            $this->db->where_in('id_catalogo_producto', $ids);
+            $this->db->delete('catalogo_producto_media');
+
+            // Obtener productos para borrar archivos asociados
+            $productos = $this->db->where_in('id', $ids)->get($this->table)->result();
+            $pattern = '/probusinees-intranet\/(.+)/';
+            foreach ($productos as $data) {
+                // contact_card_url
+                $matches = [];
+                if (!empty($data->contact_card_url) && preg_match($pattern, $data->contact_card_url, $matches) && isset($matches[1])) {
+                    $contactCardUrl = $matches[1];
+                    if (file_exists($contactCardUrl)) @unlink($contactCardUrl);
+                }
+                // main_image_url
+                $matches = [];
+                if (!empty($data->main_image_url) && preg_match($pattern, $data->main_image_url, $matches) && isset($matches[1])) {
+                    $mainImageUrl = $matches[1];
+                    if (file_exists($mainImageUrl)) @unlink($mainImageUrl);
+                }
+                // aditional_image1_url
+                $matches = [];
+                if (!empty($data->aditional_image1_url) && preg_match($pattern, $data->aditional_image1_url, $matches) && isset($matches[1])) {
+                    $aditionalImage1Url = $matches[1];
+                    if (file_exists($aditionalImage1Url)) @unlink($aditionalImage1Url);
+                }
+                // aditional_image2_url
+                $matches = [];
+                if (!empty($data->aditional_image2_url) && preg_match($pattern, $data->aditional_image2_url, $matches) && isset($matches[1])) {
+                    $aditionalImage2Url = $matches[1];
+                    if (file_exists($aditionalImage2Url)) @unlink($aditionalImage2Url);
+                }
+                // aditional_video1_url
+                $matches = [];
+                if (!empty($data->aditional_video1_url) && preg_match($pattern, $data->aditional_video1_url, $matches) && isset($matches[1])) {
+                    $aditionalVideo1Url = $matches[1];
+                    if (file_exists($aditionalVideo1Url)) @unlink($aditionalVideo1Url);
+                }
+            }
+
+            // Eliminar los productos de la base de datos
+            $this->db->where_in('id', $ids);
+            $this->db->delete($this->table);
+
+            if ($this->db->affected_rows() > 0) {
+                $this->reordenarCodigosCatalogo();
+                return array('status' => true, 'message' => 'Productos eliminados correctamente');
+            } else {
+                return array('status' => false, 'message' => 'No se eliminaron productos');
+            }
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            return array('status' => false, 'message' => 'Error al eliminar los productos');
+        }
+    }
     public function sendCotizacion($productId)
     {
         try {
@@ -386,21 +529,19 @@ class CatalogoModel extends CI_Model
             log_message('error', $e->getMessage());
         }
     }
-    public function pasarTienda($productId)
+    public function pasarTienda($productIds)
     {
-        try {
-            ///update status to EN TIENDA
+        $productsIds = json_decode($productIds);
+        foreach ($productsIds as $productId) {
             $this->db->set('status', 'EN TIENDA');
             $this->db->where('id', $productId);
             $this->db->update($this->table);
-            if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'message' => 'Producto enviado a tienda correctamente');
-            } else {
-                log_message('error', 'Error al enviar el producto a tienda: ' . $this->db->error()['message']);
-                return array('status' => false, 'message' => 'Error al enviar el producto a tienda');
-            }
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
+        }
+        if ($this->db->error()['code'] == 0) {
+            return array('status' => true, 'message' => 'Productos guardados correctamente');
+        } else {
+            log_message('error', 'Error al guardar los productos: ' . $this->db->error()['message']);
+            return array('status' => false, 'message' => 'Error al guardar los productos');
         }
     }
     public function getCategorias()

@@ -17,3 +17,6 @@ assets/images/*
 .env.local
 .env.production
 .env.development
+
+# Vendor
+vendor/

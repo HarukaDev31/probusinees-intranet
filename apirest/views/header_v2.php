@@ -463,6 +463,9 @@ $rolesViewFeatures = [
       <!-- /.sidebar -->
     </aside>
     <style>
+      body{
+        margin: 0px !important;
+      }
       .sidebar {
         font-size: 14px;
       }

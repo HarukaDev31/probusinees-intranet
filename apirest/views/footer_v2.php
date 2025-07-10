@@ -282,9 +282,11 @@
 <?php endif; ?>
 
 <?php if (isset($js_catalogo) && $js_catalogo==true) : ?>
+  <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+  <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+  <script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'; ?>"></script>
   <script src="<?php echo base_url() . 'dist_v2/js/utils/file_uploader.js?ver=' . $iControlVersionDashboard; ?>"></script>
-
-<script src="<?php echo base_url() . 'dist_v2/js/catalogo.js?ver=' . $iControlVersionDashboard; ?>"></script>
+  <script src="<?php echo base_url() . 'dist_v2/js/catalogo.js?ver=' . $iControlVersionDashboard; ?>"></script>
 
 <?php endif; ?>
 
