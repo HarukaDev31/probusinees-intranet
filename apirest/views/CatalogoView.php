@@ -1060,8 +1060,6 @@
         /* Mejor scrolling en iOS */
     }
     .product-image{
-        width: 50%;
-        height: 50%;
         object-fit: cover;
         border-radius: 0.5rem;
     }

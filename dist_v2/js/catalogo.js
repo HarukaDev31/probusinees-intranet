@@ -1312,7 +1312,7 @@ $(document).ready(async function () {
             productDetailsHtml = 'No hay detalles';
         }
         $('#contenedorProductDetails').html(productDetailsHtml);
-        $('#contenedorProductDetails img').addClass('mx-auto my-8 max-w-xs w-full rounded-xl bg-white shadow');
+        $('#contenedorProductDetails img').addClass('mx-auto my-8 max-w-xl w-full rounded-xl bg-white shadow');
         $('#contenedorProductDetails').addClass('bg-[#f4f8fc] p-8 rounded-xl');
 
 
