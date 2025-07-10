@@ -793,26 +793,24 @@
         </div>
 
 <?php } ?>
-        <div class="flex flex-col gap-2 w-full p-4">
+        <div class="flex flex-col gap-2 w-full p-4 justify-between h-full">
             <div class="relative w-full aspect-square rounded-t-lg overflow-hidden">
                 <img src="" alt="" class="w-full h-full object-cover">
                 <div class="absolute inset-0 "></div>
             </div>
 
-            <div class="px-2 pb-4 pt-2 w-full flex flex-col gap-2">
-                <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
-                    <!-- <span class="text-gray-400 text-sm codProducto"></span> -->
+            
+            <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
+                <div class="px-2 pb-4 pt-2 w-full flex flex-col gap-2 justify-between">
                     <h3 class="mb-0 font-bold text-lg nameProducto"></h3>
                     <!--badge category_name-->
-                    <span class=" badge-category text-gray-800 text-xs  font-semibold "></span>
-                    <div class="flex-col flex items-start justify-between text-sm py-1">
-                        <span class="text-gray-600 text-md precioChina"></span>
-                        
-                        <span class="text-black-500 text-md precioUSD"></span>
-                        <span class="text-gray-500 text-md MOQ"></span>
+                    <div class="flex flex-col justify-end min-h-[110px]">
+                        <span class="badge-category text-gray-800 text-xs font-semibold"></span>
+                        <span class="text-gray-500 text-sm MOQ"></span>
+                        <span class="text-black-600 text-lg precioPeru"></span>
                     </div>
-                    <span class="text-black-600 text-lg precioPeru"></span>
-                <?php } else { ?>
+            <?php } else { ?>
+                <div class="px-2 pb-4 pt-2 w-full flex flex-col gap-2">
                     <span class="text-gray-400 text-sm codProducto"></span>
                     <!--badge category_name-->
                     <span class=" badge-category text-gray-800 text-xs  font-semibold "></span>

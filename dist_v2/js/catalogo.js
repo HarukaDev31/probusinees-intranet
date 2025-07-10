@@ -276,34 +276,29 @@ $(document).ready(async function () {
             let precioPeru = parseFloat(product.precio_peru);
             if (isNaN(precioPeru)) precioPeru = 0;
             $product.find('.precioPeru').text(`Precio Peru: S/. ${parseFloat(precioPeru).toFixed(2)}`);
-            $product.find('.precioUSD').text(`Precio USD: $ ${parseFloat(product.precio_usd).toFixed(2)}`);
+            let precioUSD = parseFloat(product.precio_usd);
+            if (isNaN(precioUSD)) precioUSD = 0;
+            $product.find('.precioUSD').text(`Precio USD: $ ${parseFloat(precioUSD).toFixed(2)}`);
             //ifproducts has category_name key set text-gray-800 
+            // Obtener el precio mínimo de prices_range
+            let minPrecio = 0;
+            if (product.prices_range) {
+                try {
+                    const priceRangeObj = JSON.parse(product.prices_range);
+                    if (Array.isArray(priceRangeObj) && priceRangeObj.length > 0) {
+                        // Buscar el mínimo en el array de precios
+                        minPrecio = Math.min(...priceRangeObj.map(obj => parseFloat(obj.price) || 0));
+                    }
+                } catch (e) {
+                    minPrecio = 0;
+                }
+            }
+            $product.find('.precioPeru').text(`Precio: S/. ${parseFloat(minPrecio).toFixed(2)}`);
             if (product.category_name) {
                 $product.find('.text-gray-800').text(`${product.category_name}`);
             }
-            if (product.status == "PENDIENTE") {
-                $product.find('.precioUSD').hide();
-                $product.find('.precioChina').hide();
-            } else {
-                $product.find('.precioUSD').show();
-                $product.find('.precioPeru').show();
-            }
             if (currentPrivilege == ROLE_PERU) {
                 $product.find('.MOQ').text(`Cantidad mínima: ${product.moq} uni.`);
-                // Obtener el precio mínimo de prices_range
-                let minPrecio = 0;
-                if (product.prices_range) {
-                    try {
-                        const priceRangeObj = JSON.parse(product.prices_range);
-                        if (Array.isArray(priceRangeObj) && priceRangeObj.length > 0) {
-                            // Buscar el mínimo en el array de precios
-                            minPrecio = Math.min(...priceRangeObj.map(obj => parseFloat(obj.price) || 0));
-                        }
-                    } catch (e) {
-                        minPrecio = 0;
-                    }
-                }
-                $product.find('.precioPeru').text(`Precio: S/. ${parseFloat(minPrecio).toFixed(2)}`);
                 $product.find('.precioUSD').hide();
                 $product.find('.precioChina').hide();
             }
