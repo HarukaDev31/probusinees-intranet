@@ -512,44 +512,58 @@ $(document).ready(async function () {
                     });
                     return;
                 }
-                // Llamar endpoint para cambiar status
-                const formData = new FormData();
-                formData.append('productIds', JSON.stringify(checkedProducts));
-                const url = base_url + 'CatalogoController/pasarTienda';
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    $('#btnEnviarProductos').show();
-                    $('#btnCancelarEnvio').hide();
-                    $('#btnDeleteProducts').hide();
-                    $('#dynamicCategorizeBtnContainer').hide();
-                    if (data.status) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: 'Productos enviados a tienda correctamente.',
-                            showConfirmButton: false,
-                            timer: 1500
+                // Confirmación antes de enviar
+                Swal.fire({
+                    title: '¿Está seguro de enviar los productos seleccionados?',
+                    text: "Una vez enviados, no podrá deshacer esta acción.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Enviar',
+                    cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        // Llamar endpoint para cambiar status
+                        const formData = new FormData();
+                        formData.append('productIds', JSON.stringify(checkedProducts));
+                        const url = base_url + 'CatalogoController/pasarTienda';
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            body: formData,
                         });
-                        checkedProducts = [];
-                        await loadProducts();
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.message || 'Error al enviar productos.',
-                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            $('#btnEnviarProductos').show();
+                            $('#btnCancelarEnvio').hide();
+                            $('#btnDeleteProducts').hide();
+                            $('#dynamicCategorizeBtnContainer').hide();
+                            if (data.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    text: 'Productos enviados a tienda correctamente.',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                checkedProducts = [];
+                                await loadProducts();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.message || 'Error al enviar productos.',
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error de red al enviar productos.',
+                            });
+                        }
                     }
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error de red al enviar productos.',
-                    });
-                }
+                });
             }
         });
 
@@ -924,10 +938,9 @@ $(document).ready(async function () {
 
         // Hacer que al hacer click en la tarjeta, se active su checkbox
         $('#productGrid .card').off('click.selectProduct').on('click.selectProduct', function (e) {
-            // Evita que el click en el checkbox o en un botón dentro de la card dispare el toggle
             if ($(e.target).is('.checkbox') || $(e.target).is('button') || $(e.target).closest('button').length) return;
             const $checkbox = $(this).find('.checkbox');
-            $checkbox.prop('checked', !$checkbox.prop('checked')).trigger('change');
+            $checkbox.trigger('click');
         });
     });
     $('#btnCancelarEnvio').on('click', function (e) {
@@ -1052,7 +1065,6 @@ $(document).ready(async function () {
     })
     $("#btnDelete").on("click", function (e) {
         e.preventDefault();
-        //show swall confirmation
         Swal.fire({
             title: '¿Está seguro de eliminar el producto?',
             text: "Una vez eliminado, no podrá deshacer esta acción.",
@@ -1062,11 +1074,21 @@ $(document).ready(async function () {
             cancelButtonColor: '#d33',
             confirmButtonText: 'Eliminar',
             cancelButtonText: 'Cancelar'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                deleteProduct(currentProductId);
+                await deleteProduct(currentProductId);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Eliminado',
+                    text: 'Producto eliminado correctamente.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                $('#viewProductSection').hide();
+                $('#productListSection').show();
+                await loadProducts();
             }
-        })
+        });
     });
 
     $("#btnDeleteProducts").on("click", async function (e) {

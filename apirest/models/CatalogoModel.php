@@ -398,6 +398,11 @@ class CatalogoModel extends CI_Model
     public function deleteProduct($id)
     {
         try {
+            // Eliminar registros relacionados en catalogo_producto_media
+            $this->db->where('id_catalogo_producto', $id);
+            $this->db->delete('catalogo_producto_media');
+
+
             //get files and unlink
             $this->db->select('contact_card_url,main_image_url,aditional_image1_url,aditional_image2_url,aditional_video1_url');
             $this->db->from($this->table);
@@ -451,6 +456,10 @@ class CatalogoModel extends CI_Model
             if (empty($ids)) {
                 return array('status' => false, 'message' => 'No se recibieron IDs para eliminar');
             }
+
+            // Eliminar registros relacionados en catalogo_producto_media
+            $this->db->where_in('id_catalogo_producto', $ids);
+            $this->db->delete('catalogo_producto_media');
 
             // Obtener productos para borrar archivos asociados
             $productos = $this->db->where_in('id', $ids)->get($this->table)->result();
