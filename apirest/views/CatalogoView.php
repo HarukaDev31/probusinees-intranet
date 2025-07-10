@@ -188,13 +188,15 @@
                         <div class="flex flex-col gap-2 mr-4">
                             <img id="detalleMiniatura1" src="URL_IMAGEN_1" class="w-20 h-20 object-cover rounded border-2 border-orange-400 cursor-pointer" />
                             <img id="detalleMiniatura2" src="URL_IMAGEN_2" class="w-20 h-20 object-cover rounded cursor-pointer" />
-                            <img id="detalleMiniatura3" src="URL_IMAGEN_3" class="w-20 h-20 object-cover rounded cursor-pointer" />
-                            <img id="detalleMiniatura4" src="URL_IMAGEN_PRINCIPAL" class="w-20 h-20 object-cover rounded cursor-pointer" />
                             <!-- Puedes agregar más miniaturas si lo necesitas -->
+                             <!-- Miniatura de video -->
+                            <video id="detalleMiniaturaVideo1" src="URL_VIDEO_1" class="w-20 h-20 object-cover rounded cursor-pointer" muted></video>
+                            <img id="detalleMiniatura3" src="URL_IMAGEN_PRINCIPAL" class="w-20 h-20 object-cover rounded cursor-pointer" />
+
                         </div>
                         <!-- Imagen principal -->
-                        <div class="ml-6 flex items-center justify-center w-auto">
-                            <img id="detalleImagenPrincipal" src="URL_IMAGEN_PRINCIPAL" class="w-80 h-80 object-contain rounded shadow" />
+                        <div class="ml-6 flex items-center justify-center w-fit">
+                            <img id="detalleImagenPrincipal" src="URL_IMAGEN_PRINCIPAL" class="mw-100 mh-100 w-[30rem] h-[30rem] object-contain rounded shadow" />
                         </div>
                     </div>
                     <!-- Columna de datos -->
@@ -209,7 +211,7 @@
                         <!-- Links -->
                         <div class="flex gap-2 mt-2">
                             <a href="LINK_PRODUCTO" target="_blank" class="border px-4 py-2 rounded text-sm hover:bg-gray-50">Link del producto</a>
-                            <a href="LINK_ALIBABA" target="_blank" class="border px-4 py-2 rounded text-sm hover:bg-gray-50">https://www.alibaba.com</a>
+                            <a href="LINK_ALIBABA" target="_blank" class="border px-4 py-2 rounded text-sm hover:bg-gray-50">Link alibaba</a>
                         </div>
                         <!-- Datos importantes -->
                         <div class="mt-4 border-t pt-4">

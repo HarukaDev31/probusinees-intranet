@@ -22,17 +22,43 @@ const ROLE_CHINA = "CatalogoChina";
 
 $(document).ready(async function () {
 
-    // Cambiar imagen principal al hacer click en miniatura
-    $('#detalleMiniatura1, #detalleMiniatura2, #detalleMiniatura3, #detalleMiniatura4').on('click', function () {
+    // Cambiar imagen principal al hacer click en miniatura o video
+    $('#detalleMiniatura1, #detalleMiniatura2, #detalleMiniatura3').on('click', function () {
         const src = $(this).attr('src');
         if (src) {
-            $('#detalleImagenPrincipal').attr('src', src);
-            // Opcional: resalta la miniatura activa
-            $('#detalleMiniatura1, #detalleMiniatura2, #detalleMiniatura3, #detalleMiniatura4').removeClass('border-orange-400');
+            // Si el principal es video, lo ocultamos
+            $('#detalleVideoPrincipal').hide();
+            $('#detalleImagenPrincipal').attr('src', src).show();
+            // Resalta la miniatura activa
+            $('#detalleMiniatura1, #detalleMiniatura2, #detalleMiniatura3, #detalleMiniaturaVideo1').removeClass('border-orange-400');
             $(this).addClass('border-orange-400');
         }
     });
 
+    // Para el video
+    $('#detalleMiniaturaVideo1').on('click', function () {
+        const src = $(this).attr('src');
+        if (src) {
+            $('#detalleImagenPrincipal').hide();
+            // Si no existe el video principal, lo creamos
+            if ($('#detalleVideoPrincipal').length === 0) {
+                $('<video id="detalleVideoPrincipal" class="w-80 h-80 object-contain rounded shadow" controls autoplay></video>')
+                    .insertAfter('#detalleImagenPrincipal');
+            }
+            const $video = $('#detalleVideoPrincipal');
+            $video.attr('src', src).show()[0].play();
+
+            // Si hay error al cargar el video, ocultarlo
+            $video.off('error').on('error', function () {
+                $(this).hide();
+                $('#detalleImagenPrincipal').show();
+            });
+
+            // Resalta la miniatura activa
+            $('#detalleMiniatura1, #detalleMiniatura2, #detalleMiniatura3, #detalleMiniatura4, #detalleMiniaturaVideo1').removeClass('border-orange-400');
+            $(this).addClass('border-orange-400');
+        }
+    });
 
     // Evita que el dropdown se cierre al hacer clic en inputs, selects o botones dentro del menú
     $('.dropdown-menu').on('click', function(e) {
@@ -682,6 +708,11 @@ $(document).ready(async function () {
         });
     });
 
+    function resetDetallePrincipal() {
+        $('#detalleVideoPrincipal').hide().attr('src', '');
+        $('#detalleImagenPrincipal').show();
+    }
+
     // Handler para Enviar Producto en vista detalle
     $(document).on('click', '#btnEnviarDynamicView', async function (e) {
         e.preventDefault();
@@ -961,7 +992,9 @@ $(document).ready(async function () {
     });
     $("#btnBack").on("click", function (e) {
         e.preventDefault();
+        resetDetallePrincipal();
         productoFormSection.hide();
+        $('#productoFormSection').hide();
         $('#viewProductSection').hide();
         productListSection.show();
     });
@@ -1150,11 +1183,28 @@ $(document).ready(async function () {
         currentProductId = producto.id;
 
         // Imágenes
-        $('#detalleMiniatura1').attr('src', producto.aditional_image1_url || '');
-        $('#detalleMiniatura2').attr('src', producto.aditional_image2_url || '');
-        $('#detalleMiniatura3').attr('src', producto.aditional_video1_url || '');
-        $('#detalleMiniatura4').attr('src', producto.main_image_url || '');
-        $('#detalleImagenPrincipal').attr('src', producto.main_image_url || '');
+        if (producto.aditional_image1_url) {
+            $('#detalleMiniatura1').attr('src', producto.aditional_image1_url).show();
+        } else {
+            $('#detalleMiniatura1').hide();
+        }
+        if (producto.aditional_image2_url) {
+            $('#detalleMiniatura2').attr('src', producto.aditional_image2_url).show();
+        } else {
+            $('#detalleMiniatura2').hide();
+        }
+        if (producto.main_image_url) {
+            $('#detalleMiniatura3').attr('src', producto.main_image_url).show();
+            $('#detalleImagenPrincipal').attr('src', producto.main_image_url).show();
+        } else {
+            $('#detalleMiniatura3').hide();
+            $('#detalleImagenPrincipal').hide();
+        }
+        if (producto.aditional_video1_url) {
+            $('#detalleMiniaturaVideo1').attr('src', producto.aditional_video1_url).show();
+        } else {
+            $('#detalleMiniaturaVideo1').hide();
+        }
 
         // Nombre
         $('.font-bold.text-lg.mb-1').text(producto.nombre);
@@ -1196,9 +1246,16 @@ $(document).ready(async function () {
         $('#contenedorPriceRange').html(priceRangeHtml);
         
 
-        // Links (ajusta si tienes campos específicos)
-        $('a[href="LINK_PRODUCTO"]').attr('href', producto.notas || '#').text('Link del producto');
-        $('a[href="LINK_ALIBABA"]').attr('href', producto.notas || '#').text('https://www.alibaba.com');
+        // Botones de links
+        let linksHtml = '';
+        if (producto.url_tienda && producto.url_tienda.trim() !== '') {
+            linksHtml += `<a href="${producto.url_tienda}" target="_blank" class="border px-4 py-2 rounded text-sm hover:bg-gray-50 mr-2">Link del producto</a>`;
+        }
+        if (producto.url_alibaba && producto.url_alibaba.trim() !== '') {
+            linksHtml += `<a href="${producto.url_alibaba}" target="_blank" class="border px-4 py-2 rounded text-sm hover:bg-gray-50">Link Alibaba</a>`;
+        }
+        // Inserta los links en el contenedor correspondiente
+        $('#viewProductSection .flex.gap-2.mt-2').html(linksHtml);
 
         // Renderizar attributes (atributos clave)
         let attributesHtml = '';

@@ -232,7 +232,7 @@ class CatalogoModel extends CI_Model
     public function getCatalogo($filters = [])
     {
         try {
-            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,status,created_at,category_id');
+            $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,aditional_image1_url,aditional_image2_url,aditional_video1_url,precio_peru,precio_usd,status,created_at,category_id,url_tienda,url_alibaba');
             $this->db->from($this->table);
             $this->db->where('status', 'PENDIENTE');
 
@@ -305,9 +305,19 @@ class CatalogoModel extends CI_Model
     }
     public function getCatalogoSeleccionados($filters = []){
         try {
-            $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status,
-            catalogo_producto_category.name as category_name,
-            ');
+            // Verifica el perfil del usuario
+            if (isset($this->user) && $this->user->No_Grupo == $this->ROLE_PERU) {
+                $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,status,
+                    url_tienda, url_alibaba,
+                    catalogo_producto_category.name as category_name
+                ');
+            } else {
+                // Selección completa para otros perfiles
+                $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status,
+                    url_tienda, url_alibaba,
+                    catalogo_producto_category.name as category_name
+                ');
+            }
             $this->db->from($this->table);
             $this->db->join('catalogo_producto_category', 'catalogo_producto_category.id = catalogo_producto.category_id', 'left');
             $this->db->where('status', 'EN TIENDA');
