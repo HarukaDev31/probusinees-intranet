@@ -290,7 +290,20 @@ $(document).ready(async function () {
             }
             if (currentPrivilege == ROLE_PERU) {
                 $product.find('.MOQ').text(`Cantidad mínima: ${product.moq} uni.`);
-                $product.find('.precioPeru').text(`Precio: S/. ${parseFloat(precioPeru).toFixed(2)}`);
+                // Obtener el precio mínimo de prices_range
+                let minPrecio = 0;
+                if (product.prices_range) {
+                    try {
+                        const priceRangeObj = JSON.parse(product.prices_range);
+                        if (Array.isArray(priceRangeObj) && priceRangeObj.length > 0) {
+                            // Buscar el mínimo en el array de precios
+                            minPrecio = Math.min(...priceRangeObj.map(obj => parseFloat(obj.price) || 0));
+                        }
+                    } catch (e) {
+                        minPrecio = 0;
+                    }
+                }
+                $product.find('.precioPeru').text(`Precio: S/. ${parseFloat(minPrecio).toFixed(2)}`);
                 $product.find('.precioUSD').hide();
                 $product.find('.precioChina').hide();
             }
@@ -905,7 +918,18 @@ $(document).ready(async function () {
         $('#btnDeleteProducts').show().css('display', 'flex');
         $('#dynamicCategorizeBtnContainer').show();
         $(".checkbox").show();
-    })
+
+        // Quitar clases view-btn y edit-btn de los productos
+        $('#productGrid .view-btn, #productGrid .edit-btn').removeClass('view-btn edit-btn');
+
+        // Hacer que al hacer click en la tarjeta, se active su checkbox
+        $('#productGrid .card').off('click.selectProduct').on('click.selectProduct', function (e) {
+            // Evita que el click en el checkbox o en un botón dentro de la card dispare el toggle
+            if ($(e.target).is('.checkbox') || $(e.target).is('button') || $(e.target).closest('button').length) return;
+            const $checkbox = $(this).find('.checkbox');
+            $checkbox.prop('checked', !$checkbox.prop('checked')).trigger('change');
+        });
+    });
     $('#btnCancelarEnvio').on('click', function (e) {
         e.preventDefault();
         $('#btnEnviarProductos').show();
@@ -914,7 +938,14 @@ $(document).ready(async function () {
         $('#dynamicCategorizeBtnContainer').hide();
         $(".checkbox").hide();
         checkedProducts = [];
-    })
+
+        // Regresar las clases según el perfil
+        if (currentPrivilege === ROLE_PERU) {
+            $('#productGrid .card').addClass('view-btn').removeClass('edit-btn');
+        } else if (currentPrivilege === ROLE_CHINA) {
+            $('#productGrid .card').addClass('edit-btn').removeClass('view-btn');
+        }
+    });
     // on show modalNuevaCategoria 
     $('#modalNuevaCategoria').on('show.bs.modal', function (e) {
 
@@ -990,13 +1021,19 @@ $(document).ready(async function () {
         e.preventDefault();
         sendCotizacion();
     });
-    $("#btnBack").on("click", function (e) {
+    $('#btnBackView').on('click', function (e) {
+        e.preventDefault();
+        resetDetallePrincipal();
+        $('#viewProductSection').hide();
+        $('#productListSection').show();
+    });
+
+    $('#btnBackForm').on('click', function (e) {
         e.preventDefault();
         resetDetallePrincipal();
         productoFormSection.hide();
-        $('#productoFormSection').hide();
-        $('#viewProductSection').hide();
-        productListSection.show();
+        console.log('hide productoFormSection');
+        $('#productListSection').show();
     });
     $("#listViewBtn").on("click", function (e) {
         e.preventDefault();

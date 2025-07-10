@@ -164,7 +164,7 @@
         <div class="container-fluid">
             <div class="flex items-center justify-between flex-col md:flex-row pt-4">
                 <button
-                    id="btnBack"
+                    id="btnBackView"
                     type="button" id="btn-back-documentacion-documentacion" class="py-2 px-4 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left mr-2"></i> Regresar</button>
                 <div class="gap-2 d-flex flex-row  mt-2 md:mt-0" id="actionButtons">
                     <button id="btnDelete" class="border-2 border-red-500 gap-2 text-red py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm">
@@ -262,7 +262,7 @@
 
             <div class="flex items-center justify-between flex-col md:flex-row pt-4">
                 <button
-                    id="btnBack"
+                    id="btnBackForm"
                     type="button" id="btn-back-documentacion-documentacion" class="py-2 px-4 bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded " data-type="html"><i class="fa fa-arrow-left mr-2"></i> Regresar</button>
                 <div class="gap-2 d-flex flex-row  mt-2 md:mt-0" id="actionButtons">
                     <button id="btnDelete" class="border-2 border-red-500 gap-2 text-red py-2 px-8 rounded-sm transition-colors flex items-center justify-center shadow-sm">
