@@ -1159,7 +1159,7 @@ $(document).ready(async function () {
     });
 
     async function showProductDetail(productId) {
-        const response = await fetch(`http://localhost/probusinees-intranet/CatalogoController/getProductDetails/${productId}`);
+        const response = await fetch(base_url+`/CatalogoController/getProductDetails/${productId}`);
         if (!response.ok) {
             alert('No se pudo cargar el detalle del producto');
             return;
