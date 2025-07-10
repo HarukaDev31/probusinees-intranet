@@ -2329,7 +2329,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                     $itemToClientMap[trim($itemId)] = trim($client);
                 }
             }
-
+            log_message('error', 'itemToClientMap: ' . json_encode($itemToClientMap));
             $sheetCount = $objPHPExcel->getSheetCount();
             $sheet0 = $objPHPExcel->getSheet(0);
             $sheet0->insertNewColumnBefore('C', 2);
