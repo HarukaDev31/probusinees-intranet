@@ -2460,7 +2460,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         $sheet0->setCellValue('T' . $row, $volumen_cotizacion);
                         $sheet0->setCellValue('C' . $row, $tipoCliente);
 
-                        if (trim($itemN) == "TOTAL FOB PRICE") {
+                        if (stripos(trim($itemN), "TOTAL") !== false) {
                             $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
                             $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
                             $highestRow = $row - 1;
@@ -2496,7 +2496,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                             $startPackingListIndex++;
                         }
 
-                        if (trim($itemN) == "TOTAL FOB PRICE") {
+                        if (stripos(trim($itemN), "TOTAL") !== false) {
                             $highestSheetRow = $row - 1;
                             break;
                         }
