@@ -2321,7 +2321,8 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             for ($packRow = $startPackingListColumn; $packRow <= $highestPackingRow; $packRow++) {
                 $itemId = $sheetPackingList->getCell('B' . $packRow)->getValue();
                 $client = $sheetPackingList->getCell('C' . $packRow)->getValue();
-                if (!empty($itemId) && !empty($client)) {
+                if (!empty($itemId) && !empty($client) && 
+                    strpos($client, 'TOTAL') === false && strpos($client, 'TOTAL') === false    ) {
                     $itemToClientMap[trim($itemId)] = trim($client);
                 }
             }
