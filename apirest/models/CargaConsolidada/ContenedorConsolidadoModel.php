@@ -2349,7 +2349,12 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             $sheet0->insertNewColumnBefore('C', 2);
             $sheet0->setCellValue('D25', 'CLIENTE');
             $sheet0->setCellValue('C25', 'TIPO DE CLIENTE');
-            $sheet0->removeColumn('E');
+            // Verificar si la columna E existe antes de removerla
+            try {
+                $sheet0->removeColumn('E');
+            } catch (Exception $e) {
+                log_message('error', 'Error removing column E: ' . $e->getMessage());
+            }
             $sheet0->setCellValue('R25', 'ADVALOREM');
             $sheet0->setCellValue('S25', 'ANTIDUMPING');
             $sheet0->setCellValue('T25', 'VOL. SISTEMA');
@@ -2441,7 +2446,10 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                         // Actualizar la fila final del cliente actual
                         $clientEndRow = $row;
-                        $sheet0->setCellValue('D' . $row, $client);
+                        // Validar que la fila sea válida antes de establecer el valor
+                        if ($row > 0) {
+                            $sheet0->setCellValue('D' . $row, $client);
+                        }
 
                         // Buscar datos del sistema
                         $volumen_cotizacion = "-";
@@ -2473,29 +2481,49 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                             $volumen_cotizacion = $volumen_cotizacion;
                         }
 
-                        $sheet0->setCellValue('T' . $row, $volumen_cotizacion);
-                        $sheet0->setCellValue('C' . $row, $tipoCliente);
+                        // Validar que la fila sea válida antes de establecer los valores
+                        if ($row > 0) {
+                            $sheet0->setCellValue('T' . $row, $volumen_cotizacion);
+                            $sheet0->setCellValue('C' . $row, $tipoCliente);
+                        }
 
                         if (stripos(trim($itemN), "TOTAL") !== false) {
-                            $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
-                            $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
+                            // Validar que la fila sea válida antes de hacer merge/unmerge
+                            if ($row > 0) {
+                                try {
+                                    $objPHPExcel->getActiveSheet()->unmergeCells('B' . $row . ':P' . $row);
+                                } catch (Exception $e) {
+                                    log_message('error', 'Error unmerging cells: ' . $e->getMessage());
+                                }
+                                try {
+                                    $objPHPExcel->getActiveSheet()->mergeCells('E' . $row . ':L' . $row);
+                                } catch (Exception $e) {
+                                    log_message('error', 'Error merging cells: ' . $e->getMessage());
+                                }
+                            }
                             $highestRow = $row - 1;
                             $highestFirstSheetRow += $highestRow + 1;
                             break;
                         }
 
-                        // Aplicar estilos
-                        $styleArray = array(
-                            'borders' => array(
-                                'allborders' => array(
-                                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                        // Aplicar estilos solo si la fila es válida
+                        if ($row > 0) {
+                            $styleArray = array(
+                                'borders' => array(
+                                    'allborders' => array(
+                                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                                    )
                                 )
-                            )
-                        );
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                        $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-                        $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                            );
+                            try {
+                                $sheet0->getStyle('R' . $row . ':T' . $row)->applyFromArray($styleArray);
+                                $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                                $sheet0->getStyle('R' . $row . ':T' . $row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                                $sheet0->getStyle('R' . $row)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
+                            } catch (Exception $e) {
+                                log_message('error', 'Error applying styles: ' . $e->getMessage());
+                            }
+                        }
                     }
                 } else {
                     // HOJAS ADICIONALES
@@ -2584,8 +2612,11 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                             $volumen_cotizacion = $volumen_cotizacion;
                         }
 
-                        $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
-                        $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
+                        // Validar que la fila sea válida antes de establecer los valores
+                        if ($highestFirstSheetRow > 0) {
+                            $sheet0->setCellValue('T' . $highestFirstSheetRow, $volumen_cotizacion);
+                            $sheet0->setCellValue('C' . $highestFirstSheetRow, $tipoCliente);
+                        }
 
                         // Buscar información aduanera
                         $mergedCells = $sheetListaPartidas->getMergeCells();
@@ -2668,37 +2699,63 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             $sheet0 = $objPHPExcel->getSheet(0);
             foreach ($pendingMerge as $merge) {
                 log_message('error', 'Merging client: ' . $merge['client'] . ' from row ' . $merge['start'] . ' to ' . $merge['end']);
-                if ($merge['start'] < $merge['end']) {
-                    $sheet0->mergeCells('C' . $merge['start'] . ':C' . $merge['end']);
-                    $sheet0->mergeCells('D' . $merge['start'] . ':D' . $merge['end']);
-                    $sheet0->mergeCells('T' . $merge['start'] . ':T' . $merge['end']);
+                if ($merge['start'] < $merge['end'] && $merge['start'] > 0 && $merge['end'] > 0) {
+                    try {
+                        $sheet0->mergeCells('C' . $merge['start'] . ':C' . $merge['end']);
+                        $sheet0->mergeCells('D' . $merge['start'] . ':D' . $merge['end']);
+                        $sheet0->mergeCells('T' . $merge['start'] . ':T' . $merge['end']);
+                    } catch (Exception $e) {
+                        log_message('error', 'Error merging cells: ' . $e->getMessage());
+                    }
                 }
             }
 
 
             //unmerge e to l - verificar si está mergeado antes de unmergear
-            $mergeRange = 'E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow;
-            $mergedCells = $objPHPExcel->getActiveSheet()->getMergeCells();
-            if (in_array($mergeRange, $mergedCells)) {
-                $objPHPExcel->getActiveSheet()->unmergeCells($mergeRange);
+            if ($highestFirstSheetRow > 0) {
+                $mergeRange = 'E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow;
+                $mergedCells = $objPHPExcel->getActiveSheet()->getMergeCells();
+                if (in_array($mergeRange, $mergedCells)) {
+                    try {
+                        $objPHPExcel->getActiveSheet()->unmergeCells($mergeRange);
+                    } catch (Exception $e) {
+                        log_message('error', 'Error unmerging cells: ' . $e->getMessage());
+                    }
+                }
+                try {
+                    $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
+                } catch (Exception $e) {
+                    log_message('error', 'Error merging cells: ' . $e->getMessage());
+                }
             }
-            $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
             //set fill none in sheet 0 row=highestFirstSheetRow
-            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
-            //set all borders
-            $styleArray = array(
-                'borders' => array(
-                    'allborders' => array(
-                        'style' => PHPExcel_Style_Border::BORDER_THIN,
-                    )
-                )
-            );
-            $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
+            if ($highestFirstSheetRow > 0) {
+                try {
+                    $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
+                    //set all borders
+                    $styleArray = array(
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                            )
+                        )
+                    );
+                    $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->applyFromArray($styleArray);
+                } catch (Exception $e) {
+                    log_message('error', 'Error applying final styles: ' . $e->getMessage());
+                }
+            }
 
             //MERGE B TO 0
             //set p highestFirstSheetRow value to sum from p.startColumn to p.highestFirstSheetRow-1
-            $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
-            $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
+            if ($highestFirstSheetRow > 0 && ($highestFirstSheetRow - 1) > 0) {
+                try {
+                    $sheet0->setCellValue('Q' . $highestFirstSheetRow, '=SUM(Q' . $startColumn . ':Q' . ($highestFirstSheetRow - 1) . ')');
+                    $sheet0->setCellValue('T' . $highestFirstSheetRow, '=SUM(T' . $startColumn . ':T' . ($highestFirstSheetRow - 1) . ')');
+                } catch (Exception $e) {
+                    log_message('error', 'Error setting sum formulas: ' . $e->getMessage());
+                }
+            }
 
             //set  d column auto size
             $sheet0->getStyle('D')->getAlignment()->setWrapText(true);
@@ -2712,15 +2769,21 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             // $sheet0->getColumnDimension('U')->setWidth(15);
             // $sheet0->getColumnDimension('V')->setWidth(15);
             //from b starcolumn to b highestFirstSheetRow-1 set fill pinkColor
-            $sheet0->getStyle('C' . $startColumn . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('C' . $startColumn . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
-            //D TO GRAY, R AND S TO SKYBLUE, T TO PINK,U TO GREEN
-            $sheet0->getStyle('D' . $startColumn . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('D' . $startColumn . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
-            $sheet0->getStyle('R' . $startColumn . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('R' . $startColumn . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
-            $sheet0->getStyle('T' . $startColumn . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('T' . $startColumn . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+            if ($highestFirstSheetRow > 1) {
+                try {
+                    $sheet0->getStyle('C' . $startColumn . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $sheet0->getStyle('C' . $startColumn . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+                    //D TO GRAY, R AND S TO SKYBLUE, T TO PINK,U TO GREEN
+                    $sheet0->getStyle('D' . $startColumn . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $sheet0->getStyle('D' . $startColumn . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
+                    $sheet0->getStyle('R' . $startColumn . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $sheet0->getStyle('R' . $startColumn . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
+                    $sheet0->getStyle('T' . $startColumn . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+                    $sheet0->getStyle('T' . $startColumn . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+                } catch (Exception $e) {
+                    log_message('error', 'Error applying column styles: ' . $e->getMessage());
+                }
+            }
             return $objPHPExcel;
         } catch (Exception $e) {
             log_message('error', __METHOD__ . '' . $e->getMessage());
