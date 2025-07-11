@@ -2344,7 +2344,9 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                     }
                 }
             }
-            $sheetCount = $totalRow;
+            // Obtener el número real de hojas en el archivo
+            $actualSheetCount = $objPHPExcel->getSheetCount();
+            $sheetCount = $actualSheetCount;
             $sheet0 = $objPHPExcel->getSheet(0);
             $sheet0->insertNewColumnBefore('C', 2);
             $sheet0->setCellValue('D25', 'CLIENTE');
@@ -2381,6 +2383,12 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             $pendingMerge = array(); // Array para almacenar merges pendientes
 
             for ($i = 0; $i < $sheetCount; $i++) {
+                // Verificar que la hoja existe antes de intentar acceder a ella
+                if ($i >= $objPHPExcel->getSheetCount()) {
+                    log_message('error', 'Sheet index ' . $i . ' is out of bounds. Total sheets: ' . $objPHPExcel->getSheetCount());
+                    break;
+                }
+                
                 $sheet = $objPHPExcel->getSheet($i);
                 $sheet0 = $objPHPExcel->getSheet(0); // Siempre referenciar la primera hoja
 
@@ -2526,9 +2534,10 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         }
                     }
                 } else {
-                    // HOJAS ADICIONALES
-                    $startIndex = $startColumn;
-                    $highestSheetRow = $sheet->getHighestRow();
+                    // HOJAS ADICIONALES - Solo procesar si realmente hay más de una hoja
+                    if ($objPHPExcel->getSheetCount() > 1) {
+                        $startIndex = $startColumn;
+                        $highestSheetRow = $sheet->getHighestRow();
 
                     for ($row = $startIndex; $row <= $highestSheetRow; ++$row) {
                         $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
@@ -2683,6 +2692,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                         $highestFirstSheetRow++;
                     }
+                    } // Cerrar el if ($objPHPExcel->getSheetCount() > 1)
                 }
             }
 
