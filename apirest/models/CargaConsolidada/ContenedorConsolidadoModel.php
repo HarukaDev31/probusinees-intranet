@@ -2676,8 +2676,12 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             }
 
 
-            //unmerge e to l
-            $objPHPExcel->getActiveSheet()->unmergeCells('E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow);
+            //unmerge e to l - verificar si está mergeado antes de unmergear
+            $mergeRange = 'E' . $highestFirstSheetRow . ':L' . $highestFirstSheetRow;
+            $mergedCells = $objPHPExcel->getActiveSheet()->getMergeCells();
+            if (in_array($mergeRange, $mergedCells)) {
+                $objPHPExcel->getActiveSheet()->unmergeCells($mergeRange);
+            }
             $sheet0->mergeCells('B' . $highestFirstSheetRow . ':P' . $highestFirstSheetRow);
             //set fill none in sheet 0 row=highestFirstSheetRow
             $sheet0->getStyle('R' . $highestFirstSheetRow . ':T' . $highestFirstSheetRow)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_NONE);
