@@ -2712,19 +2712,23 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             // $sheet0->getColumnDimension('U')->setWidth(15);
             // $sheet0->getColumnDimension('V')->setWidth(15);
             //from b starcolumn to b highestFirstSheetRow-1 set fill pinkColor
-            $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('C' . ($startColumn - 1) . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+            $sheet0->getStyle('C' . $startColumn . ':C' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('C' . $startColumn . ':C' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
             //D TO GRAY, R AND S TO SKYBLUE, T TO PINK,U TO GREEN
-            $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('D' . ($startColumn - 1) . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
-            $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('R' . ($startColumn - 1) . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
-            $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $sheet0->getStyle('T' . ($startColumn - 1) . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
+            $sheet0->getStyle('D' . $startColumn . ':D' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('D' . $startColumn . ':D' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($grayColor);
+            $sheet0->getStyle('R' . $startColumn . ':S' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('R' . $startColumn . ':S' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($skyBlueColor);
+            $sheet0->getStyle('T' . $startColumn . ':T' . ($highestFirstSheetRow - 1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            $sheet0->getStyle('T' . $startColumn . ':T' . ($highestFirstSheetRow - 1))->getFill()->getStartColor()->setRGB($pinkColor);
             return $objPHPExcel;
         } catch (Exception $e) {
             log_message('error', __METHOD__ . '' . $e->getMessage());
-            return ['status' => "error", 'message' => $e->getMessage()];
+            // Crear un objeto PHPExcel vacío para evitar el error de tipo
+            $emptyExcel = new PHPExcel();
+            $emptyExcel->getActiveSheet()->setTitle('Error');
+            $emptyExcel->getActiveSheet()->setCellValue('A1', 'Error: ' . $e->getMessage());
+            return $emptyExcel;
         }
     }
 
