@@ -2331,6 +2331,20 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             }
             log_message('error', 'itemToClientMap: ' . json_encode($itemToClientMap));
             $sheetCount = $objPHPExcel->getSheetCount();
+            //SE SHEET COUNT FIND A ROW CONTAIN "TOTAL" AND GET THE ROW -1  
+            $totalRow = 0;
+            for ($i = 0; $i < $sheetCount; $i++) {
+                $sheet = $objPHPExcel->getSheet($i);
+                $highestRow = $sheet->getHighestRow();
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
+                    if (stripos(trim($itemN), "TOTAL") !== false) {
+                        $totalRow = $row - 1;
+                        break;
+                    }
+                }
+            }
+            $sheetCount = $totalRow;
             $sheet0 = $objPHPExcel->getSheet(0);
             $sheet0->insertNewColumnBefore('C', 2);
             $sheet0->setCellValue('D25', 'CLIENTE');
@@ -2367,12 +2381,10 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                 if ($i == 0) {
                     // PRIMERA HOJA
-                    log_message('error', 'Processing first sheet');
                     $highestRow = $sheet->getHighestRow();
 
                     for ($row = $startIndex; $row <= $highestRow; ++$row) {
                         $itemN = $sheet->getCell($itemNColumn . $row)->getValue();
-                        log_message('error', 'ItemN: ' . $itemN);
 
                         // Obtener cliente
                         $client = isset($itemToClientMap[trim($itemN)]) ? $itemToClientMap[trim($itemN)] : null;
